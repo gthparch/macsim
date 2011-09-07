@@ -1,0 +1,64 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+
+AC_PREREQ([2.65])
+AC_INIT([macsim], [0.9], [kacear@gmail.com])
+AM_INIT_AUTOMAKE(macsim, 0.9)
+AC_CONFIG_SRCDIR([src/macsim.cc])
+
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+
+CPPFLAGS="$CPPFLAGS -std=c++0x"
+AC_LANG([C++])
+AC_TRY_COMPILE(
+[
+#include <vector>
+#include <iostream>
+
+using namespace std;
+],
+[
+vector<int> test_vector(5);
+int sum = 0;
+for (auto itr = test_vector.begin(); itr != test_vector.end(); ++itr) {
+sum += (*itr);
+}
+cout << sum << "\n";
+],
+[],
+[AC_MSG_ERROR("-std=c++0x not supported")]
+)
+
+
+
+# Checks for libraries.
+AC_CHECK_LIB([z], [gzread], [], AC_MSG_ERROR("zlib required"))
+AC_CHECK_LIB([pthread], [pthread_create], [], AC_MSG_ERROR("pthreads required"))
+
+
+# Checks for header files.
+AC_CHECK_HEADERS([inttypes.h limits.h stdint.h stdlib.h string.h sys/time.h unistd.h])
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([floor gettimeofday memset mkdir pow sqrt strdup strerror static_assert])
+
+AC_OUTPUT(Makefile scripts/Makefile .obj/Makefile tools/Makefile tools/trace_reader/Makefile bin/Makefile src/Makefile)

@@ -1,0 +1,81 @@
+/**********************************************************************************************
+ * File         : memreq_info.cc
+ * Author       : Hyesoon Kim
+ * Date         : 3/20/2008
+ * SVN          : $Id: memreq_info.h,v 1.5 2008-09-17 21:01:41 kacear Exp $:
+ * Description  : Memory request information
+ *********************************************************************************************/
+
+
+#include "memreq_info.h"
+
+
+// memory request type string
+const char* mem_req_c::mem_req_type_name[MAX_MEM_REQ_TYPE] = {
+  "IFETCH",
+  "DFETCH",
+  "DSTORE",
+  "IPRF",
+  "DPRF",
+  "WB",
+  "SW_DPRF",
+  "SW_DPRF_NTA",
+  "SW_DPRF_T0",
+  "SW_DPRF_T1",
+  "SW_DPRF_T2",
+};
+
+
+// memory request state string
+const char* mem_req_c::mem_state[MEM_STATE_MAX] = {
+  "MEM_INV",
+  "MEM_NEW",
+  "MEM_MERGED",
+  "MEM_OUTQUEUE_NEW",
+  "MEM_IN_NOC",
+  "MEM_OUT_FILL",
+  "MEM_OUT_WB",
+  "MEM_FILL_NEW",
+  "MEM_FILL_WAIT_DONE",
+  "MEM_FILL_WAIT_FILL",
+  "MEM_DRAM_START",
+  "MEM_DRAM_CMD",
+  "MEM_DRAM_DATA",
+  "MEM_DRAM_DONE",
+  "MEM_NOC_START",
+  "MEM_NOC_DONE",
+};
+
+
+mem_req_s::mem_req_s(macsim_c* simBase)
+{
+  m_id             = 0;
+  m_appl_id        = 0;
+  m_core_id        = 0;
+  m_thread_id      = 0;
+  m_block_id       = 0;
+  m_state          = MEM_INV;
+  m_type           = MRT_IFETCH;
+  m_priority       = 0;
+  m_addr           = 0;
+  m_size           = 0;
+  m_rdy_cycle      = 0;
+  m_pc             = 0;
+  m_prefetcher_id  = 0;
+  m_pref_loadPC    = 0;
+  m_ptx            = false;
+  m_queue          = NULL;
+  for (int ii = 0; ii < MEM_LAST; ++ii)
+    m_cache_id[ii] = 0;
+  m_uop            = NULL;
+  m_in             = 0;
+  m_dirty          = false;
+  m_done           = false;
+  m_merged_req     = NULL;
+  m_msg_type       = 0;
+  m_msg_src        = 0;
+  m_msg_dst        = 0;
+  m_done_func      = NULL;
+  m_bypass         = 0;
+  m_simBase        = simBase;
+}

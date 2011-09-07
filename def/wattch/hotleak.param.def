@@ -1,0 +1,5 @@
+/* -*- Mode: c -*- */
+
+param< ENABLE_HOTLEAK,   enable_hotleak,    bool,    false>
+
+param< CACHE_CTRL_TYPE,   cache_ctrl_type,    string,  none>

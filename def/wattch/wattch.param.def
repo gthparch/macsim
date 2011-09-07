@@ -1,0 +1,55 @@
+/* -*- Mode: c -*- */
+
+param < ENABLE_WATTCH, enable_wattch, bool , false >
+
+
+param <  WATTCH_DTLB_NSETS, wattch_dtlb_nsets,  uns, 64>
+param <  WATTCH_DTLB_ASSOC, wattch_dtlb_assoc, uns, 8>
+param <  WATTCH_DTLB_BSIZE, wattch_dtlb_bsize, uns, 32>
+
+param <  WATTCH_ITLB_NSETS, wattch_itlb_nsets, uns, 64>
+param <  WATTCH_ITLB_ASSOC, wattch_itlb_assoc, uns, 8>
+param <  WATTCH_ITLB_BSIZE, wattch_itlb_bsize, uns, 32>
+
+param <   WATTCH_LSQ_ENTRIES, wattch_lsq_entries, uns, 0>
+
+
+param <   WATTCH_NUM_DCACHE, wattch_num_dcache, uns, 1>
+     // how many copies of the dcache?  
+
+param <   WATTCH_PRAM_LOGICAL_PARTITIONING, wattch_pram_logical_partitioning, bool, 0>
+
+param <   WATTCH_DUAL_REGFILE_WRITE_BITLINES, wattch_dual_regfile_write_bitlines, bool, 0>
+     // are write bitlines for prf dual-rail?  
+param <   WATTCH_DUAL_REGFILE_READ_BITLINES, wattch_dual_regfile_read_bitlines, bool, 0>
+     // are write bitlines for prf dual-rail?  
+
+param <   WATTCH_NO_BUS_ACTIVITY, wattch_no_bus_activity, bool, 0>
+     // reset resultbus counters
+
+param <   WATTCH_FP_RENAME_WIDTH, wattch_fp_rename_width, uns, 0>
+     // make assumptions about num fp ops that read the RAT per cycle.  
+
+param <   BBT_ENTRY_SIZE, bbt_entry_size, uns, 2>
+     // Busy-bit table
+
+param <   WATTCH_MONOLITHIC_PRF, wattch_monolithic_prf, bool, 0>
+     // override partitioning as determined by number of clusters
+
+param <   WATTCH_EXTRA_RENAME_BITS, wattch_extra_rename_bits, uns, 0>
+param <   WATTCH_DONT_SAVE_NETWORK, wattch_dont_save_network, uns, 1>
+
+param <   WATTCH_MAGIC_ONEPRF_WRITE, wattch_magic_oneprf_write, uns, 0>
+     // for modeling distributed caches
+
+// For MC PART model
+param <   WATTCH_RAT_COPIES, wattch_rat_copies, uns, 1>
+param <   WATTCH_PART_LOCAL_RATS, wattch_part_local_rats, bool, 0>
+param <   WATTCH_PART_BENEFIT, wattch_part_benefit, bool, 0>
+
+param <   WATTCH_MODEL_RAB, wattch_model_rab, bool, 0>
+param <   RAB_ALLOC_PORTS, rab_alloc_ports, uns, 8>
+param <   RAB_WRITE_PORTS, rab_write_ports, uns, 4>
+param <   RAB_READ_PORTS, rab_read_ports, uns, 3>
+param <   RAB_ROWS, rab_rows, uns, 35>
+

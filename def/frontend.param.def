@@ -1,0 +1,25 @@
+/* -*- Mode: c -*- */
+
+param < FETCH_WDITH, 		fetch_wdith,		 uns16, 	4>
+param < FETCH_MEDIUM_WDITH, fetch_medium_wdith,	 uns16, 	KNOB_FETCH_WDITH>
+param < FETCH_LARGE_WDITH, 	fetch_large_wdith,	 uns16, 	KNOB_FETCH_WDITH>
+
+param < FETCH_ONLY_LOAD_READY, 	 fetch_only_load_ready,		bool,	false>
+param < FETCH_ONLY_SCHED_READY,  fetch_only_sched_ready,	bool,	false>
+param <MT_NO_FETCH_BR,           mt_no_fetch_br,         	bool,	false>
+param <NO_FETCH_ON_ICACHE_MISS,  no_fetch_on_icache_miss,   bool,	false>
+
+param <FETCH_POLICY, fetch_policy, string, rr>
+param <DEC_RR_FREQ, dec_rr_freq, uns, 1>
+param <MT_STOP_FAIR_INIT,        mt_stop_fair_init,     uns,    1> 
+param <FETCH_FAIR_PERIOD,   fetch_fair_period,    uns,      200>  
+param <FETCH_FAIR_MERGE_TH,  fetch_fair_merge_th,      uns,   3> 
+param <FETCH_FAIR_TSHARE_TH,  fetch_fair_tshare_th,      uns,   3> 
+param <FETCH_FAIR_MERGE,   fetch_fair_merge,       bool,   false> 
+param <FETCH_FAIR_TSHARE,  fetch_fair_tshare,   bool,  false> 
+param <BLOCK_KEY_SIZE,   block_key_size,         uns,   103>
+param <FETCH_FAIR_TSHARE_FREQ,  fetch_fair_tshare_freq,  uns, 5>
+
+
+
+param <NUM_INST_TO_FETCH_AFTER_LOAD, num_inst_to_fetch_after_load,  int,  1>

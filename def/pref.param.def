@@ -1,0 +1,338 @@
+/* -*- Mode: c -*- */
+
+/* These ".param.def" files contain the various parameters that can be given to the
+   simulator.  NOTE: Do not screw around with the order of these macro fields without
+   fixing the etags regexps.
+
+   DEF_PARAM(  Option, Variable Name, Type, Function, Default Value, Const) 
+
+   Option -- The name of the parameter when given on the command line (eg. "--param_0").
+	   All parameters take an argument.  Thus, "--param_0=3" would be a valid
+	   specification.
+
+   Variable Name -- The name of the variable that will be created in 'parameters.c' and
+	    externed in 'parameters.h'.
+
+   Type -- The type of the variable that will be created in 'parameters.c' and externed
+	   in 'parameters.h'.
+
+   Function -- The name of the function declared in 'parameters.c' that will parse the
+	    text after the '='.
+
+   Default Value -- The default value that the variable created will have.  This must be
+	    the same type as the 'Type' field indicates (or be able to be cast to it).
+
+   Const -- Put the word "const" here if you want this parameter to be constant.  An
+	    error messsage will be printed if the user tries to set it with a command
+	    line option.
+
+*/
+
+param< PREF_FRAMEWORK_ON, pref_framework_on, bool, false >
+param< PREF_TRACE_ON, pref_trace_on, bool, false >
+param< DEBUG_PREF, debug_pref, bool, false >
+param< PREF_DL0REQ_QUEUE_SIZE, pref_dl0req_queue_size, uns, 32 >
+param< PREF_UL1REQ_QUEUE_SIZE, pref_ul1req_queue_size, uns, 128 >
+param< PREF_DL0_MISS_ON, pref_dl0_miss_on, bool, true >
+param< PREF_DL0_HIT_ON, pref_dl0_hit_on, bool, true >
+param< PREF_DL0REQ_QUEUE_FILTER_ON, pref_dl0req_queue_filter_on, bool, true >
+param< PREF_UL1REQ_QUEUE_FILTER_ON, pref_ul1req_queue_filter_on, bool, true >
+param< PREF_DL0REQ_ADD_FILTER_ON, pref_dl0req_add_filter_on, bool, true >
+param< PREF_UL1REQ_ADD_FILTER_ON, pref_ul1req_add_fillter_on, bool, true >
+param< PREF_DL0REQ_QUEUE_OVERWRITE_ON_FULL, pref_dl0req_queue_overwrite_on_full, bool, false >
+param< PREF_UL1REQ_QUEUE_OVERWRITE_ON_FULL, pref_ul1req_queue_overwrite_on_full, bool, false >
+param< PREF_DL0SCHEDULE_NUM, pref_dl0schedule_num, uns, 4 >
+param< PREF_UL1SCHEDULE_NUM, pref_ul1schedule_num, uns, 4 >
+param< PREF_L1Q_DEMAND_RESERVE, pref_l1q_demand_reserve, uns, 0 >
+
+param< PREF_UPDATE_ON_WRONGPATH, pref_update_on_wrongpath, bool, true >
+
+/*
+DEF_PARAM( pref_framework_on                   , PREF_FRAMEWORK_ON                   , bool            , bool               , false     ,    )
+DEF_PARAM( pref_trace_on                       , PREF_TRACE_ON                       , bool            , bool               , false     ,    )
+DEF_PARAM( debug_pref                          , DEBUG_PREF                          , bool            , bool               , false     ,    )
+DEF_PARAM( pref_dl0req_queue_size              , PREF_DL0REQ_QUEUE_SIZE              , uns             , uns                , 32        ,    )
+DEF_PARAM( pref_ul1req_queue_size              , PREF_UL1REQ_QUEUE_SIZE              , uns             , uns                , 128       ,    )
+DEF_PARAM( pref_dl0_miss_on                    , PREF_DL0_MISS_ON                    , bool            , bool               , true      ,    )
+DEF_PARAM( pref_dl0_hit_on                     , PREF_DL0_HIT_ON                     , bool            , bool               , true      ,    )
+DEF_PARAM( pref_dl0req_queue_filter_on         , PREF_DL0REQ_QUEUE_FILTER_ON         , bool            , bool               , true      ,    )
+DEF_PARAM( pref_ul1req_queue_filter_on         , PREF_UL1REQ_QUEUE_FILTER_ON         , bool            , bool               , true      ,    )
+DEF_PARAM( pref_dl0req_add_filter_on           , PREF_DL0REQ_ADD_FILTER_ON           , bool            , bool               , true      ,    )
+DEF_PARAM( pref_ul1req_add_fillter_on          , PREF_UL1REQ_ADD_FILTER_ON           , bool            , bool               , true      ,    )
+DEF_PARAM( pref_dl0req_queue_overwrite_on_full , PREF_DL0REQ_QUEUE_OVERWRITE_ON_FULL , bool            , bool               , false     ,    )
+DEF_PARAM( pref_ul1req_queue_overwrite_on_full , PREF_UL1REQ_QUEUE_OVERWRITE_ON_FULL , bool            , bool               , false     ,    )
+DEF_PARAM( pref_dl0schedule_num                , PREF_DL0SCHEDULE_NUM                , uns             , uns                , 4         ,    )
+DEF_PARAM( pref_ul1schedule_num                , PREF_UL1SCHEDULE_NUM                , uns             , uns                , 4         ,    )
+DEF_PARAM( pref_l1q_demand_reserve             , PREF_L1Q_DEMAND_RESERVE             , uns             , uns                , 0         ,    ) 
+
+DEF_PARAM( pref_update_on_wrongpath            , PREF_UPDATE_ON_WRONGPATH            , bool            , bool               , true      ,    )
+*/
+
+     // Region Stuff
+param< PREF_REGION_ON, pref_region_on, bool, false >
+param< PREF_USEREGION_TOCALC_ACC, pref_useregion_tocalc_acc, bool, false >
+param< PREF_NUMTRACKING_REGIONS, pref_numtracking_regions, uns, 2048 >
+param< PREF_REGION_SIZE, pref_region_size, uns, 256 >
+param< LOG2_PREF_REGION_SIZE, log2_pref_region_size, uns, 8 >
+param< PREF_REG_UPDATE_INTERVAL, pref_reg_update_interval, uns64, 0 >
+/*
+DEF_PARAM( pref_region_on                      , PREF_REGION_ON                      , bool            , bool               , false     ,    )
+DEF_PARAM( pref_useregion_tocalc_acc           , PREF_USEREGION_TOCALC_ACC           , bool            , bool               , false     ,    )
+DEF_PARAM( pref_numtracking_regions            , PREF_NUMTRACKING_REGIONS            , uns             , uns                , 2048         ,    ) 
+DEF_PARAM( pref_region_size                    , PREF_REGION_SIZE                    , uns             , uns                , 256         ,    ) 
+DEF_PARAM( log2_pref_region_size               , LOG2_PREF_REGION_SIZE               , uns             , uns                , 8         ,    )
+DEF_PARAM( pref_reg_update_interval            , PREF_REG_UPDATE_INTERVAL            , uns64           , uns64              , 0         ,    )
+*/
+
+     // Hybrid prefetcher additions
+param< PREF_HYBRID_ON, pref_hybrid_on, bool, false >
+param< PREF_HYBRID_DEFAULT, pref_hybrid_default, uns8, 1 >
+param< PREF_HYBRID_DEFAULT_TIMEPERIOD, pref_hybrid_default_timeperiod, uns64, 100000 >
+param< PREF_HYBRID_UPDATE_MULTIPLE, pref_hybrid_update_multiple, uns, 100 >
+param< PREF_HYBRID_MIN_SENT, pref_hybrid_min_sent, uns, 10 >
+param< PREF_HYBRID_MIN_MEMUSED, pref_hybrid_min_memused, uns, 10 >
+param< PREF_HYBRID_SORT_ON_ACC, pref_hybrid_sort_on_acc, bool, true >
+param< PREF_HYBRID_SORT_ON_COV, pref_hybrid_sort_on_cov, bool, false >
+/*
+DEF_PARAM( pref_hybrid_on                      , PREF_HYBRID_ON                      , bool            , bool               , false     ,    )
+DEF_PARAM( pref_hybrid_default                 , PREF_HYBRID_DEFAULT                 , uns8            , uns8               , 1         ,    )
+DEF_PARAM( pref_hybrid_default_timeperiod      , PREF_HYBRID_DEFAULT_TIMEPERIOD      , uns64           , uns64              , 100000         ,    ) 
+DEF_PARAM( pref_hybrid_update_multiple         , PREF_HYBRID_UPDATE_MULTIPLE         , uns             , uns                , 100         ,    ) 
+DEF_PARAM( pref_hybrid_min_sent                , PREF_HYBRID_MIN_SENT                , uns             , uns                , 10         ,    ) 
+DEF_PARAM( pref_hybrid_min_memused             , PREF_HYBRID_MIN_MEMUSED             , uns             , uns                , 10         ,    ) 
+DEF_PARAM( pref_hybrid_sort_on_acc             , PREF_HYBRID_SORT_ON_ACC             , bool            , bool               , true     ,    )
+DEF_PARAM( pref_hybrid_sort_on_cov             , PREF_HYBRID_SORT_ON_COV             , bool            , bool               , false     ,    )
+*/
+
+     // Throttling Stuff
+param< PREF_THROTTLE_ON, pref_throttle_on, bool, false >
+param< PREF_THROTTLEFB_ON, pref_throttlefb_on, bool, false >
+/*
+DEF_PARAM( pref_throttle_on                    , PREF_THROTTLE_ON                    , bool            , bool               , false     ,    )
+DEF_PARAM( pref_throttlefb_on                  , PREF_THROTTLEFB_ON                  , bool            , bool               , false     ,    )
+*/
+
+param< PREF_ACC_THRESH_1, pref_acc_thresh_1, float, 0.90 >
+param< PREF_ACC_THRESH_2, pref_acc_thresh_2, float, 0.70 >
+param< PREF_ACC_THRESH_3, pref_acc_thresh_3, float, 0.60 >
+param< PREF_ACC_THRESH_4, pref_acc_thresh_4, float, 0.40 >
+/*
+DEF_PARAM(pref_acc_thresh_1                 , PREF_ACC_THRESH_1              , float  , float     , 0.90    ,      ) 
+DEF_PARAM(pref_acc_thresh_2                 , PREF_ACC_THRESH_2              , float  , float     , 0.70    ,     ) 
+DEF_PARAM(pref_acc_thresh_3                 , PREF_ACC_THRESH_3              , float  , float     , 0.60    ,     ) 
+DEF_PARAM(pref_acc_thresh_4                 , PREF_ACC_THRESH_4              , float  , float     , 0.40    ,     ) 
+*/
+     /*
+       DEF_PARAM(pref_acc_thresh_6                 , PREF_ACC_THRESH_6              , float  , float     , 0.60    ,     ) 
+       DEF_PARAM(pref_acc_thresh_7                 , PREF_ACC_THRESH_7              , float  , float     , 0.70    ,     ) 
+       DEF_PARAM(pref_acc_thresh_8                 , PREF_ACC_THRESH_8              , float  , float     , 0.80    ,     ) 
+       DEF_PARAM(pref_acc_thresh_9                 , PREF_ACC_THRESH_9              , float  , float     , 0.90    ,     ) 
+     */
+param< PREF_UPDATE_INTERVAL, pref_update_interval, uns64, 0 >
+/*
+DEF_PARAM(pref_update_interval              , PREF_UPDATE_INTERVAL           , uns64  , uns64                , 0         ,    )
+*/
+
+param< PREF_WEIGHTED_UPDATE, pref_weighted_update, bool, true >
+/*
+DEF_PARAM(pref_weighted_update              , PREF_WEIGHTED_UPDATE           , bool    , bool               , true     ,    )
+*/
+
+param< PREF_UPDATE_WEIGHTNEW, pref_update_weightnew, float, 0.30 >
+/*
+DEF_PARAM(pref_update_weightnew             , PREF_UPDATE_WEIGHTNEW          , float  , float     , 0.30    ,     ) 
+*/
+
+param< PREF_ACC_STUDY, pref_acc_study, bool, false >
+param< PREF_ACC_UPDATE_INTERVAL, pref_acc_update_interval, uns64, 1000000 >
+/*
+DEF_PARAM(pref_acc_study                    , PREF_ACC_STUDY                 , bool            , bool               , false     ,    )
+DEF_PARAM(pref_acc_update_interval          , PREF_ACC_UPDATE_INTERVAL       , uns64  , uns64                , 1000000         ,    )
+*/
+
+param< PREF_ANALYZE_LOAD, pref_analyze_load, bool, false >
+/*
+DEF_PARAM(pref_analyze_load                 , PREF_ANALYZE_LOAD              , bool            , bool               , false     ,    )
+*/
+
+param< PREF_ACCPOL_ON, pref_accpol_on, bool, false >
+/*
+DEF_PARAM(pref_accpol_on                    , PREF_ACCPOL_ON                 , bool            , bool               , false     ,    )
+*/
+
+param< PREF_ACCRATIOTHROTTLE, pref_accratiothrottle, bool, false >
+param< PREF_ACCRATIO_1, pref_accratio_1, float, 0.70 >
+/*
+DEF_PARAM(pref_accratiothrottle            , PREF_ACCRATIOTHROTTLE           , bool            , bool               , false     ,    )
+DEF_PARAM(pref_accratio_1                  , PREF_ACCRATIO_1                 , float  , float     , 0.70    ,      ) 
+*/
+
+param< PREF_POL_THRESH_1, pref_pol_thresh_1, float, 0.25 >
+param< PREF_POL_THRESH_2, pref_pol_thresh_2, float, 0.10 >
+param< PREF_POL_THRESH_3, pref_pol_thresh_3, float, 0.05 >
+/*
+DEF_PARAM(pref_pol_thresh_1                , PREF_POL_THRESH_1              , float  , float     , 0.25     ,      ) 
+DEF_PARAM(pref_pol_thresh_2                , PREF_POL_THRESH_2              , float  , float     , 0.10     ,      ) 
+DEF_PARAM(pref_pol_thresh_3                , PREF_POL_THRESH_3              , float  , float     , 0.05     ,      ) 
+*/
+
+     // Pollution Bitvector
+param< PREF_POLBV_ON, pref_polbv_on, bool, false >
+param< PREF_POLBV_SIZE, pref_polbv_size, uns, 1024 >
+param< LOG2_PREF_POLBV_SIZE, log2_pref_polbv_size, uns, 10 >
+/*
+DEF_PARAM( pref_polbv_on                   , PREF_POLBV_ON                      , bool            , bool               , false     ,    )
+DEF_PARAM( pref_polbv_size                 , PREF_POLBV_SIZE                    , uns             , uns                , 1024      ,    ) 
+DEF_PARAM( log2_pref_polbv_size            , LOG2_PREF_POLBV_SIZE               , uns             , uns                , 10        ,    )
+*/
+
+param< PREF_TIMELY_THRESH, pref_timely_thresh, float, 0.05 >
+param< PREF_POLPF_THRESH, pref_polpf_thresh, float, 0.01 >
+/*
+DEF_PARAM(pref_timely_thresh               , PREF_TIMELY_THRESH             , float  , float     , 0.05     ,      ) 
+DEF_PARAM(pref_polpf_thresh                , PREF_POLPF_THRESH              , float  , float     , 0.01     ,      ) 
+*/
+
+param< PREF_DEGFB_USEONLYACC, pref_degfb_useonlyacc, bool, false >
+/*
+DEF_PARAM( pref_degfb_useonlyacc           , PREF_DEGFB_USEONLYACC          , bool            , bool        , false     ,    )
+*/
+
+param< PREF_DEGFB_USEONLYPOL, pref_degfb_useonlypol, bool, false >
+param< PREF_DEGFB_USEONLYLATE, pref_degfb_useonlylate, bool, false >
+/*
+DEF_PARAM( pref_degfb_useonlypol           , PREF_DEGFB_USEONLYPOL          , bool            , bool        , false     ,    )
+DEF_PARAM( pref_degfb_useonlylate          , PREF_DEGFB_USEONLYLATE         , bool            , bool        , false     ,    )
+*/
+
+param< PREF_TIMELY_THRESH_2, pref_timely_thresh_2, float, 0.005 >
+/*
+DEF_PARAM(pref_timely_thresh_2             , PREF_TIMELY_THRESH_2             , float  , float     , 0.005     ,      ) 
+*/
+
+param< PREF_DEGFB_STATPHASEFILE, pref_degfb_statphasefile, bool, false >
+/*
+DEF_PARAM( pref_degfb_statphasefile        , PREF_DEGFB_STATPHASEFILE       , bool            , bool        , false     ,    )
+*/
+
+param< PREF_DHAL, pref_dhal, bool, false >
+param< PREF_DHAL_SENTTHRESH, pref_dhal_sentthresh, uns, 16 >
+param< PREF_DHAL_USETHRESH_MAX, pref_dhal_usethresh_max, uns, 12 >
+param< PREF_DHAL_USETHRESH_MIN2, pref_dhal_usethresh_min2, uns, 8 >
+param< PREF_DHAL_USETHRESH_MIN1, pref_dhal_usethresh_min1, uns, 4 >
+param< PREF_DHAL_MAXDEG, pref_dhal_maxdeg, uns, 64 >
+/*
+DEF_PARAM( pref_dhal                   , PREF_DHAL                          , bool            , bool               , false     ,    )
+DEF_PARAM( pref_dhal_sentthresh            , PREF_DHAL_SENTTHRESH           , uns             , uns                , 16      ,    ) 
+DEF_PARAM( pref_dhal_usethresh_max         , PREF_DHAL_USETHRESH_MAX        , uns             , uns                , 12      ,    ) 
+DEF_PARAM( pref_dhal_usethresh_min2         , PREF_DHAL_USETHRESH_MIN2        , uns             , uns                , 8       ,    ) 
+DEF_PARAM( pref_dhal_usethresh_min1         , PREF_DHAL_USETHRESH_MIN1        , uns             , uns                , 4       ,    ) 
+DEF_PARAM( pref_dhal_maxdeg                , PREF_DHAL_MAXDEG        , uns             , uns                , 64       ,    ) 
+*/
+
+/*param< DUMP_STATS, dump_stats, bool, true >*/
+
+param< PREF_POL_THRESH1, pref_pol_thresh1, float, 0.25 >
+param< PREF_POL_THRESH2, pref_pol_thresh2, float, 0.10 >
+param< PREF_POL_THRESH3, pref_pol_thresh3, float, 0.05 >
+
+
+param<PREF_PRINT_OUTPUT, pref_print_output, bool, false>
+
+param<HWPREF_NO_BAND, hwpref_no_band, bool, false>
+
+param<INVALIDATE_PREFETCH_AFTER_USE, invalidate_prefetch_after_use, bool, false>
+param<HWPREF_NO_MERGE, hwpref_no_merge, bool, false>
+param<HWPREF_NO_LATENCY, hwpref_no_latency, bool, false>
+
+param<PREF_SW_INSERTION, pref_sw_insertion, bool, false>
+param<PREF_SW_INSERTION_AFTER, pref_sw_insertion_after, bool, false>
+param<PREF_SW_INSERTION_NO_INST, pref_sw_insertion_no_inst, bool, false>
+param<PREF_SW_DEGREE, pref_sw_degree, int, 2>
+param<PREF_SW_DISTANCE, pref_sw_distance, int, 1>
+
+param<PREF_SW_STRIDE2D, pref_sw_stride2d, bool, false>
+param<PREF_SW_BLOCK, pref_sw_block, bool, false>
+param<PREF_SW_STRIDE, pref_sw_stride, bool, false>
+param<PREF_SW_BLOCK_ALWAYS, pref_sw_block_always, bool, false>
+param<PREF_SW_UNCOALESCED_FILE, pref_sw_uncoalesced_file, bool, false>
+param<PREF_SW_UNCOALESCED_FILE_POLICY, pref_sw_uncoalesced_file_policy, int, 0>
+param<PREF_SW_UNCOALESCED, pref_sw_uncoalesced, bool, false>
+param<PREF_SW_UNCOALESCED_CACHE, pref_sw_uncoalesced_cache, bool, false>
+param<PREF_SW_DROP_RANDOM, pref_sw_drop_random, int, 0>
+param<PREF_SW_ENABLE_PC, pref_sw_enable_pc, int, 0>
+param<PREF_SW_DISABLE_PC, pref_sw_disable_pc, int, 0>
+
+param<PREF_SW_THROTTLE_ON, pref_sw_throttle_on, bool, false>
+param<PREF_SW_THROTTLE_THRESHOLD, pref_sw_throttle_threshold, int, 1000>
+param<PREF_SW_THROTTLE_DEGREE, pref_sw_throttle_degree, int, 2>
+param<PREF_SW_THROTTLE_SLACK, pref_sw_throttle_slack, int, 100>
+param<PREF_SW_THROTTLE_EPOCH, pref_sw_throttle_epoch, int, 10000>
+
+param<PREF_SW_PREPARATION_PERIOD, pref_sw_preparation_period, int, 10000>
+param<PREF_SW_MONITOR_PERIOD, pref_sw_monitor_period, int, 10000>
+param<PREF_SW_THROTTLE_PERIOD, pref_sw_throttle_period, int, 500000>
+
+param<PREF_SW_THROTTLE_GRADUAL, pref_sw_throttle_gradual, int, 0>
+
+param<PREF_THREAD_INDEX, pref_thread_index, bool, false>
+
+param<PREF_STRIDE_TH_IP_BLOCK_FIRST, pref_stride_th_ip_block_first, bool, false>
+param<PREF_TRAIN_INST_ONCE, pref_train_inst_once, bool, false>
+
+param<PREF_SW_UNCOALESCED_SIZE, pref_sw_uncoalesced_size, int, 64>
+
+param<PREF_SW_UNCOALESCED_BLOCK_SIZE, pref_sw_uncoalesced_block_size, int, 32>
+param<PREF_SW_UNCOALESCED_BLOCK_THRESHOLD, pref_sw_uncoalesced_block_threshold, int, 32>
+
+param<PREF_DISTANCE_FEEDBACK, pref_distance_feedback, int, 0>
+
+
+/* -*- Mode: c -*- */
+
+/* These ".param.def" files contain the various parameters that can be given to the
+   simulator.  NOTE: Don't screw around with the order of these macro fields without
+   fixing the etags regexps.
+
+   DEF_PARAM(  Option, Variable Name, Type, Function, Default Value, Const) 
+
+   Option -- The name of the parameter when given on the command line (eg. "--param_0").
+	   All parameters take an argument.  Thus, "--param_0=3" would be a valid
+	   specification.
+
+   Variable Name -- The name of the variable that will be created in 'parameters.c' and
+	    externed in 'parameters.h'.
+
+   Type -- The type of the variable that will be created in 'parameters.c' and externed
+	   in 'parameters.h'.
+
+   Function -- The name of the function declared in 'parameters.c' that will parse the
+	    text after the '='.
+
+   Default Value -- The default value that the variable created will have.  This must be
+	    the same type as the 'Type' field indicates (or be able to be cast to it).
+
+   Const -- Put the word "const" here if you want this parameter to be constant.  An
+	    error messsage will be printed if the user tries to set it with a command
+	    line option.
+
+*/
+
+param< DEBUG_PREF_STRIDE, debug_pref_stride, bool, false >
+// the size of the stride table
+param< PREF_STRIDE_TABLE_N, pref_stride_table_n, uns, 256 >
+     // number of high order bits to use to determine the region
+param< PREF_STRIDE_REGION_BITS, pref_stride_region_bits, uns, 16 >
+     // Number of prefetches sent out on a miss/prefetch
+param< PREF_STRIDE_DEGREE, pref_stride_degree, uns, 4 >
+param< PREF_STRIDE_DISTANCE, pref_stride_distance, uns, 16 >
+param< PREF_STRIDE_STARTDISTANCE, pref_stride_startdistance, uns, 1 >
+param< PREF_STRIDE_SINGLE_THRESH, pref_stride_single_thresh, uns, 6 >
+param< PREF_STRIDE_MULTI_THRESH, pref_stride_multi_thresh, uns, 6 >
+param< PREF_STRIDE_MISS_THRESH, pref_stride_miss_thresh, uns, 5 >
+
+param< PREF_STRIDE_SINGLE_STRIDE_MODE, pref_stride_single_stride_mode, bool, false >
+
+param< PREF_STRIDE_ON, pref_stride_on, bool, false >
+param< PREF_STRIDE_ON_MEDIUM_CORE, pref_stride_on_medium_core, bool, false >
+param< PREF_STRIDE_ON_LARGE_CORE, pref_stride_on_large_core, bool, false >

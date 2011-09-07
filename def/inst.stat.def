@@ -1,0 +1,99 @@
+/* -*- Mode: c -*- */
+
+/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
+   It's not a good idea to reorder these, since many calls are made like
+   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
+   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
+   interval, 'Cumulative' is over the entire run so far.
+
+   DEF_STAT( Name, Type, Ratio )
+
+   The 'Type' column is used to group statistics together and format the printouts
+   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
+   Possible 'Type' values are:
+
+	COUNT -- The count is what's important.  Just print the number of times it
+	occurred.  
+	
+	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
+	the number of cycles.  (Ex. IPC)  The count is also printed.
+
+	PER_INST -- Same thing, but per instruction.
+
+	DIST -- This is a little bit complicated.  The first DIST type encountered
+	signals the beginning of a distribution.  The next DIST encountered marks the
+	end of the distribution (inclusive).  All of the stats in-between should be of
+	type COUNT.  All of the stats in a distribution are printed as a percentage of
+	the total.
+
+	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
+	determines which other stat should be used.  The current stat is divided by that
+	specified in the 'Ratio Stat' column.  This column is ignored for all types but
+	RATIO.
+
+*/
+/* please check trace_read.cc */ 
+DEF_STAT (OP_CAT_INVALID             ,     DIST,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_3DNOW               ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_AES                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_BASE                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_BINARY              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_BITBYTE             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_CALL                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_CMOV                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_COND_BR             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_DATAXFER            ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_DECIMAL             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_FCMOV               ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_FLAGOP              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_INTERRUPT           ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_IO                  ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_IOSTRINGOP          ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_LOGICAL             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_MISC                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_MMX                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_NOP                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_PCLMULQDQ           ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_POP                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_PREFETCH            ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_PUSH                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_RET                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_ROTATE              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SEGOP               ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SEMAPHORE           ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SHIFT               ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SSE                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SSE5                ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_STRINGOP            ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SYSCALL             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SYSRET              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_SYSTEM              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_UNCOND_BR           ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_VTX                 ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_WIDENOP             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_X87_ALU             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_XSAVE               ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_TR_MUL              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_TR_DIV              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_TR_FMUL             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_TR_FDIV             ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_TR_NOP              ,     COUNT,     NO_RATIO, PER_CORE) 
+DEF_STAT (OP_CAT_PREFETCH_NTA		 ,	   COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_PREFETCH_T0		 ,	   COUNT,     NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_PREFETCH_T1		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_PREFETCH_T2		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_LD_LM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_LD_SM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_LD_GM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_ST_LM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_ST_SM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_MEM_ST_GM		 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_DATA_XFER_LM	 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_DATA_XFER_SM	 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_DATA_XFER_GM	 ,     COUNT, 	  NO_RATIO, PER_CORE)
+DEF_STAT (OP_CAT_TR_LAST             ,     DIST,     NO_RATIO, PER_CORE) 
+DEF_STAT (FP_OPS_TOT , COUNT, NO_RATIO )
+DEF_STAT (FP_OPS , COUNT, NO_RATIO, PER_CORE )
+
+
+

@@ -1,0 +1,383 @@
+/* -*- Mode: c -*- */
+
+param<BP_HIST_LENGTH,         bp_hist_length,          uns,          5> 
+param<PHT_CTR_BITS,           pht_ctr_bits,            uns,           2>
+param<BP_DIR_MECH,            bp_dir_mech,            string,        gshare> 
+
+param< EXTRA_RECOVERY_CYCLES, extra_recovery_cycles, uns,        0 > 
+
+// Branch Prediction On
+param<USE_BRANCH_PREDICTION, use_branch_prediction, bool, true>
+
+// Branch History Details
+param<ADD_PRED_TO_BP_HIST, add_pred_to_bp_hist, bool, true>
+param<BP_HIST_HIGH_BIT_MOST_RECENT, bp_hist_high_bit_most_recent, bool, false>
+
+// Multi-Threaded Branch Predictors
+param<PERFECT_GHR_SWITCHING, perfect_ghr_switching, bool, false>
+param<MT_GHR_INDEX_LENGTH, mt_ghr_index_length, uns, 8>
+param<UPDATE_CURRENT_HIST_ONLY, update_current_hist_only, bool, true> 
+
+// perceptron - ideally use prime numbers for PERCEPTRON_ROWS { 127, 257, 509, 1021, 2039, 4093, 8191}
+param<PERCEPTRON_CTR_BITS  ,  perceptron_ctr_bits       ,  uns        , 8   >
+param<PERCEPTRON_ENTRIES ,    perceptron_entries           ,  uns        , 509> 
+param<PERCEPTRON_THRESH_OVRD, perceptron_thresh_ovrd    ,  uns        , 0   >
+
+
+
+param< PERFECT_BP,        perfect_bp,                bool,        false> 
+
+
+//Ali: added these, needed by WATTCH
+param<CFS_PER_CYCLE, cfs_per_cycle, uns, 3>
+param< CONF_PERCEPTRON_ENTRIES, conf_perceptron_rows, uns, 127>
+    // param< PERCEPTRON_ENTRIES,  perceptron_rows, uns, 509>
+param< CONF_HIST_LENGTH, conf_hist_length, uns, 12>
+// Confidence Mechanism
+param< CONF_MECH, conf_mech, uns, 0>
+
+
+param< HIST_LENGTH, hist_length, uns, 16>
+param< BP_MECH, bp_mech, uns, 0>
+param< CRS_ENTRIES               , crs_entries               , uns        , 32>
+param< BTB_MECH                  , btb_mech                  , uns        , 0>
+param< BTB_ENTRIES               , btb_entries               , uns        , (4 * 1024) >
+param< BTB_ASSOC                 , btb_assoc                 , uns        , 4>
+param< BTB_OFF_PATH_WRITES       , btb_off_path_writes       , bool       , true>
+
+// branch confidence
+param< ENABLE_BP_CONF            , enable_bp_conf            , bool       , false >
+param< PERF_BP_CONF_PRED         , perf_bp_conf_pred         , bool       , false >
+param< BPC_BITS                  , bpc_bits                  , uns        , 16  >
+param< BPC_MECH                  , bpc_mech                  , uns        , 1 >
+param< BPC_INDEX                 , bpc_index                 , uns       , 1 >
+param< BPC_CTR_RESET             , bpc_ctr_reset             , bool      , true >
+param< BPC_CIT_BITS              , bpc_cit_bits              , uns          , 8 >
+param< BPC_CIT_TH                , bpc_cit_th                , uns        , 50  >
+param< BPC_CTR_BITS              , bpc_ctr_bits              , uns      , 3  >
+
+
+// confidence estimator JRS 
+param< JRS_CONF_TH               , jrs_conf_th               , uns,  12  >
+param< JRS_MDC_BITS              , jrs_mdc_bits              , uns  ,  4  >
+param< JRS_ENHANCED              , jrs_enhanced              , bool , true  >
+param< JRS_RESET                 , jrs_reset                         , bool  , true >
+
+
+// conditional branch predictor
+
+
+param< BHT_ENTRIES               , bht_entries               , uns , (4 * 1024) >
+param< BHT_ASSOC                 , bht_assoc                 , uns , 4    >
+param< HYBRIDS_INDEX_LENGTH      , hybrids_index_length      , uns , 16   >
+param< HYBRIDG_HIST_LENGTH       , hybridg_hist_length       , uns , 16   >
+param< HYBRIDP_HIST_LENGTH       , hybridp_hist_length       , uns , 16    >
+param< FILTER_INDEX_LENGTH       , filter_index_length       , uns  , 16    >
+param< USE_FILTER                , use_filter                , bool , false   >
+param< INF_HYBRIDGP              , inf_hybridgp              , bool      , false    >
+param< BP_HASH_TOS               , bp_hash_tos               , bool      , false   >
+param< IBTB_HASH_TOS             , ibtb_hash_tos             , bool      , false   >
+
+
+
+
+DEF_PARAM(  bp_uses_br_addr           , BP_USES_BR_ADDR           , bool    , bool       , false      ,        )
+
+DEF_PARAM(  bp_addrbits_discard       , BP_ADDRBITS_DISCARD       , uns     , uns        , 2          ,        )  /* low address bits that are always 0 (default=2 for Alpha ISA)*/
+
+DEF_PARAM(  perfect_bp                , PERFECT_BP                , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_btb               , PERFECT_BTB               , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_cb_btb            , PERFECT_CB_BTB            , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_ibp               , PERFECT_IBP               , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_crs               , PERFECT_CRS               , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_cbr_btb           , PERFECT_CBR_BTB           , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_nt_btb            , PERFECT_NT_BTB            , bool    , bool       , false      ,        )
+DEF_PARAM(  perfect_icall             , PERFECT_ICALL             , bool    , bool       , false      ,        )
+
+DEF_PARAM(  update_bp_off_path        , UPDATE_BP_OFF_PATH        , bool    , bool       , false      ,        )
+
+
+DEF_PARAM(  enable_crs                , ENABLE_CRS                , bool    , bool       , true       , const  )
+     
+     // CRS_REALISTIC --- 0:off_path does not disturb on_path 1: next & tos scheme (use this if you want a realistic CRS) 
+     //                                                       2: pure stack scheme (doesn't work well, b/c of wrong path effects)
+DEF_PARAM(  crs_realistic             , CRS_REALISTIC             , uns     , uns        , 0          ,        )
+     
+// indirect branch predictor
+DEF_PARAM(  enable_ibp                , ENABLE_IBP                , bool    , bool       , true       ,        )
+DEF_PARAM(  use_pat_hist              , USE_PAT_HIST              , bool    , bool       , true       ,        ) /* pattern history */
+DEF_PARAM(  ibtb_mech                 , IBTB_MECH                 , uns     , ibtb_mech  , 1          ,        )
+DEF_PARAM(  ibtb_hist_length          , IBTB_HIST_LENGTH          , uns     , uns        , 16         ,        )
+DEF_PARAM(  ibtb_off_path_writes      , IBTB_OFF_PATH_WRITES      , bool    , bool       , true       ,        ) /* const */
+DEF_PARAM(  targets_in_hist           , TARGETS_IN_HIST           , uns     , uns        , 4          ,        )
+DEF_PARAM(  tc_entries                , TC_ENTRIES                , uns     , uns        , (4 * 1024) ,        )
+DEF_PARAM(  tc_assoc                  , TC_ASSOC                  , uns     , uns        , 4          ,        )
+DEF_PARAM(  tagless_2level            , TAGLESS_2LEVEL            , bool    , bool       , false      ,        )
+  // cascaded IBP
+DEF_PARAM(  cibp_stages               , CIBP_STAGES               , uns     , uns        , 4          ,        ) /* max=5 */
+DEF_PARAM(  cibp_update_hist_at_pred  , CIBP_UPDATE_HIST_AT_PRED  , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_use_ogehl_index      , CIBP_USE_OGEHL_INDEX      , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_hist_length0         , CIBP_HIST_LENGTH0         , uns     , uns        , 0          ,        ) /* max=64 */
+DEF_PARAM(  cibp_targets_in_hist0     , CIBP_TARGETS_IN_HIST0     , uns     , uns        , 1          ,        )
+DEF_PARAM(  cibp_use_pat_hist0        , CIBP_USE_PAT_HIST0        , bool    , bool       , false      ,        ) /* pattern history (CBR) instead of targets */
+DEF_PARAM(  cibp_tc_entries0          , CIBP_TC_ENTRIES0          , uns     , uns        , (4 * 1024) ,        )
+DEF_PARAM(  cibp_tc_assoc0            , CIBP_TC_ASSOC0            , uns     , uns        , 1          ,        )
+DEF_PARAM(  cibp_tagless0             , CIBP_TAGLESS0             , bool    , bool       , true       ,        )
+DEF_PARAM(  cibp_hist_length1         , CIBP_HIST_LENGTH1         , uns     , uns        , 16         ,        )
+DEF_PARAM(  cibp_targets_in_hist1     , CIBP_TARGETS_IN_HIST1     , uns     , uns        , 1          ,        )
+DEF_PARAM(  cibp_use_pat_hist1        , CIBP_USE_PAT_HIST1        , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_tc_entries1          , CIBP_TC_ENTRIES1          , uns     , uns        , (1 * 1024) ,        )
+DEF_PARAM(  cibp_tc_assoc1            , CIBP_TC_ASSOC1            , uns     , uns        , 4          ,        )
+DEF_PARAM(  cibp_tagless1             , CIBP_TAGLESS1             , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_hist_length2         , CIBP_HIST_LENGTH2         , uns     , uns        , 24         ,        )
+DEF_PARAM(  cibp_targets_in_hist2     , CIBP_TARGETS_IN_HIST2     , uns     , uns        , 3          ,        )
+DEF_PARAM(  cibp_use_pat_hist2        , CIBP_USE_PAT_HIST2        , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_tc_entries2          , CIBP_TC_ENTRIES2          , uns     , uns        , (1 * 1024) ,        )
+DEF_PARAM(  cibp_tc_assoc2            , CIBP_TC_ASSOC2            , uns     , uns        , 4          ,        )
+DEF_PARAM(  cibp_tagless2             , CIBP_TAGLESS2             , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_hist_length3         , CIBP_HIST_LENGTH3         , uns     , uns        , 32         ,        )
+DEF_PARAM(  cibp_use_pat_hist3        , CIBP_USE_PAT_HIST3        , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_targets_in_hist3     , CIBP_TARGETS_IN_HIST3     , uns     , uns        , 8          ,        )
+DEF_PARAM(  cibp_tc_entries3          , CIBP_TC_ENTRIES3          , uns     , uns        , (1 * 1024) ,        )
+DEF_PARAM(  cibp_tc_assoc3            , CIBP_TC_ASSOC3            , uns     , uns        , 4          ,        )
+DEF_PARAM(  cibp_tagless3             , CIBP_TAGLESS3             , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_hist_length4         , CIBP_HIST_LENGTH4         , uns     , uns        , 32         ,        )
+DEF_PARAM(  cibp_use_pat_hist4        , CIBP_USE_PAT_HIST4        , bool    , bool       , false      ,        )
+DEF_PARAM(  cibp_targets_in_hist4     , CIBP_TARGETS_IN_HIST4     , uns     , uns        , 16         ,        )
+DEF_PARAM(  cibp_tc_entries4          , CIBP_TC_ENTRIES4          , uns     , uns        , (2 * 1024) ,        )
+DEF_PARAM(  cibp_tc_assoc4            , CIBP_TC_ASSOC4            , uns     , uns        , 4          ,        )
+DEF_PARAM(  cibp_tagless4             , CIBP_TAGLESS4             , bool    , bool       , false      ,        )
+
+DEF_PARAM ( cibp_update_tocorrect_stage , CIB_UPDATE_TOCORRECT_STAGE, bool    , bool       , true      ,        )
+
+DEF_PARAM(  num_corr_branches         , NUM_CORR_BRANCHES         , uns     , uns        , 3          ,        )
+DEF_PARAM(  sel_hist_bp_entries       , SEL_HIST_BP_ENTRIES       , uns     , uns        , 8192       ,        )
+DEF_PARAM(  sel_hist_length           , SEL_HIST_LENGTH           , uns     , uns        , 16         ,        )
+DEF_PARAM(  sel_hist_dyn_cnt_th       , SEL_HIST_DYN_CNT_TH       , uns     , uns        , 16         ,        )
+DEF_PARAM(  sel_hist_mispred_th       , SEL_HIST_MISPRED_TH       , uns     , uns        , 4          ,        )
+
+DEF_PARAM(  knob_use_mbp              , KNOB_USE_MBP              , bool    , bool       , false      ,        )
+DEF_PARAM(  knob_use_ideal_mbp        , KNOB_USE_IDEAL_MBP        , bool    , bool       , false      ,        )
+
+//DEF_PARAM(  ssmt_magic_bp             , SSMT_MAGIC_BP             , bool    , bool       , false      ,        )
+//DEF_PARAM(  ssmt_hpc_bp               , SSMT_HPC_BP               , bool    , bool       , false      ,        )
+//DEF_PARAM(  ssmt_magic_btb            , SSMT_MAGIC_BTB            , bool    , bool       , false      ,        )
+//DEF_PARAM(  ssmt_magic_after_bp       , SSMT_MAGIC_AFTER_BP       , bool    , bool       , false      ,        )
+//DEF_PARAM(  ssmt_hpc_after_bp         , SSMT_HPC_AFTER_BP         , bool    , bool       , false      ,        )
+
+// variable length predictor
+DEF_PARAM(  vlp_election              , VLP_ELECTION              , uns     , uns        , 0          ,        )
+DEF_PARAM(  vlp_flp                   , VLP_FLP                   , bool    , bool       , false      ,        )
+DEF_PARAM(  vlp_hf                    , VLP_HF                    , int     , int        , -1         ,        )
+DEF_PARAM(  vlp_rotate                , VLP_ROTATE                , bool    , bool       , false      ,        )
+DEF_PARAM(  vlp_num_hf                , VLP_NUM_HF                , uns     , uns        , 32         ,        )
+DEF_PARAM(  vlp_num_candidate_hf      , VLP_NUM_CANDIDATE_HF      , uns     , uns        , 3          ,        )
+DEF_PARAM(  vlp_thb_total             , VLP_THB_TOTAL             , uns     , uns        , 1024       ,        )
+DEF_PARAM(  vlp_thb_width             , VLP_THB_WIDTH             , uns     , uns        , 16         ,        )
+DEF_PARAM(  inf_vlp                   , INF_VLP                   , bool    , bool       , false      ,        )
+
+DEF_PARAM(  track_vlp_file_out        , TRACK_VLP_FILE_OUT        , char *  , string     , NULL       ,        )
+DEF_PARAM(  track_vlp_file_in         , TRACK_VLP_FILE_IN         , char *  , string     , NULL       ,        )
+
+
+
+// on-path confidence mechanism
+DEF_PARAM(  opc_count_zeros           , OPC_COUNT_ZEROS           , bool    , bool       , false      ,        )
+DEF_PARAM(  opc_count_thresh          , OPC_COUNT_THRESH          , uns     , uns        , 10         ,        )
+
+// loop predictor parameters
+DEF_PARAM(  enable_loop_bp            , ENABLE_LOOP_BP             , bool    , bool       , false      ,        )
+DEF_PARAM(  inf_loop                  , INF_LOOP                   , bool    , bool       , false      ,        ) 
+DEF_PARAM(  inf_loop_buckets          , INF_LOOP_BUCKETS           , uns     , uns        , 811        ,        ) 
+DEF_PARAM(  loop_entries              , LOOP_ENTRIES               , uns     , uns        , (4 * 1024) ,        ) 
+DEF_PARAM(  loop_assoc                , LOOP_ASSOC                 , uns     , uns        , 4          ,        )
+DEF_PARAM(  loop_count_max            , LOOP_COUNT_MAX             , uns     , uns        , 127        ,        )
+DEF_PARAM(  loop_repeat_max           , LOOP_REPEAT_MAX            , uns     , uns        , 15         ,        )
+
+DEF_PARAM(  loop_bp_mech              , LOOP_BP_MECH               , uns     , loop_bp_mech   , 1          ,        )
+DEF_PARAM(  bp_loop_ter_noentry       , BP_LOOP_TER_NOENTRY             , bool    , bool       , true       ,         )   /* when trip is chainging then no prediction for that entry */ 
+DEF_PARAM( loop_pred_conf_th          , LOOP_PRED_CONF_TH          , uns    , uns         , 2         ,        )
+
+
+// PAS predictor
+DEF_PARAM(  pas_ibits                 , PAS_IBITS                  , uns     , uns        , 16         ,        )
+DEF_PARAM(  pas_abits                 , PAS_ABITS                  , uns     , uns        , 8          ,        )
+DEF_PARAM(  pas_bht_entries           , PAS_BHT_ENTRIES            , uns     , uns        , (4 * 1024) ,        )
+DEF_PARAM(  pas_bht_assoc             , PAS_BHT_ASSOC              , uns     , uns        , 4          ,        )
+DEF_PARAM(  pas_stale                 , PAS_STALE                  , uns     , uns        , 0          ,        )
+
+// gshare 2bc hybrid
+DEF_PARAM(  gs2bc_sbits               , GS2BC_SBITS                , uns     , uns        , 16         ,        )
+DEF_PARAM(  gs2bc_gbits               , GS2BC_GBITS                , uns     , uns        , 16         ,        )
+DEF_PARAM(  gs2bc_2bits               , GS2BC_2BITS                , uns     , uns        , 16         ,        )
+
+// gskew2bc hybrid
+DEF_PARAM(  gskew2bc_sel_ibits        , GSKEW2BC_SEL_IBITS         , uns     , uns        , 16         ,        )
+DEF_PARAM(  gskew2bc_sel_hbits        , GSKEW2BC_SEL_HBITS         , uns     , uns        , 16         ,        )
+DEF_PARAM(  gskew2bc_2bc_ibits        , GSKEW2BC_2BC_IBITS         , uns     , uns        , 12         ,        )
+DEF_PARAM(  gskew2bc_2bc_hbits        , GSKEW2BC_2BC_HBITS         , uns     , uns        , 4          ,        )
+DEF_PARAM(  gskew2bc_g0_ibits         , GSKEW2BC_G0_IBITS          , uns     , uns        , 16         ,        )
+DEF_PARAM(  gskew2bc_g0_hbits         , GSKEW2BC_G0_HBITS          , uns     , uns        , 12         ,        )
+DEF_PARAM(  gskew2bc_g1_ibits         , GSKEW2BC_G1_IBITS          , uns     , uns        , 20         ,        )
+DEF_PARAM(  gskew2bc_g1_hbits         , GSKEW2BC_G1_HBITS          , uns     , uns        , 20         ,        )
+
+// perceptron - ideally use prime numbers for PERCEPTRON_ROWS { 127, 257, 509, 1021, 2039, 4093, 8191}
+// DEF_PARAM(  perceptron_ctr_bits       , PERCEPTRON_CTR_BITS        , uns     , uns        , 8          ,        )
+
+// DEF_PARAM(  perceptron_thresh_ovrd    , PERCEPTRON_THRESH_OVRD     , uns     , uns        , 0          ,        )
+
+// O-GEHL - size in bits = NTABLE * COUNTER_BITS * (2 ^ INDEX_BITS) + 2 ^ (INDEX_BITS-1), if CBP_TWEAKS==0
+//       or size in bits = ((NTABLE-1)*COUNTER_BITS + 1) * (2 ^ INDEX_BITS) + (COUNTER_BITS+2) * (2 ^ (INDEX_BITS-1)), if CBP_TWEAKS==1
+//   these default values configure a 476Kbit predictor, which gives the best performance under 512Kbit
+DEF_PARAM(  ogehl_ntable              , OGEHL_NTABLE               , uns     , uns        , 12         ,        )
+DEF_PARAM(  ogehl_extra_hist          , OGEHL_EXTRA_HIST           , uns     , uns        , 3          ,        )  /* max=0 for 1-3 tables, 1 for 4, 2 for 5-7, 3 for 8+ tables */
+DEF_PARAM(  ogehl_index_bits          , OGEHL_INDEX_BITS           , uns     , uns        , 13         ,        )
+DEF_PARAM(  ogehl_counter_bits        , OGEHL_COUNTER_BITS         , uns     , uns        , 5          ,        )
+DEF_PARAM(  ogehl_min_hist_len        , OGEHL_MIN_HIST_LEN         , uns     , uns        , 3          ,        )
+DEF_PARAM(  ogehl_max_hist_len        , OGEHL_MAX_HIST_LEN         , uns     , uns        , 200        ,        )  /* max=255? */
+DEF_PARAM(  ogehl_max_path_hist       , OGEHL_MAX_PATH_HIST        , uns     , uns        , 16         ,        )  /* max=32 */
+DEF_PARAM(  ogehl_ac_bits             , OGEHL_AC_BITS              , uns     , uns        , 9          ,        )  /* max=16 */
+DEF_PARAM(  ogehl_tc_bits             , OGEHL_TC_BITS              , uns     , uns        , 7          ,        )  /* max=16 */
+DEF_PARAM(  ogehl_max_thres_update    , OGEHL_MAX_THRES_UPDATE     , uns     , uns        , 31         ,        )
+DEF_PARAM(  ogehl_full_path           , OGEHL_FULL_PATH            , bool    , bool       , true       ,        )
+DEF_PARAM(  ogehl_dyn_hist_fit        , OGEHL_DYN_HIST_FIT         , bool    , bool       , true       ,        )
+DEF_PARAM(  ogehl_dyn_thres_fit       , OGEHL_DYN_THRES_FIT        , bool    , bool       , true       ,        )
+DEF_PARAM(  ogehl_cbp_tweaks          , OGEHL_CBP_TWEAKS           , bool    , bool       , true       ,        )
+DEF_PARAM(  ogehl_global_hist_size    , OGEHL_GLOBAL_HIST_SIZE     , uns     , uns        , 8          , const  )  /* must be a power of 2, in 64-bit multiples */
+DEF_PARAM(  ogehl_ckp_full_hist       , OGEHL_CHK_FULL_HIST        , bool    , bool       , false      ,        )  /* instead of a circular list, save all global history, to avoid overwriting */
+DEF_PARAM(  ogehl_xor_inputs          , OGEHL_XOR_INPUTS           , uns     , uns        , 3          , const  )
+DEF_PARAM(  ogehl_addr_ibits          , OGEHL_ADDR_IBITS           , uns     , uns        , 8          , const  )  /* the number of bits of the PC address considered for indexing */
+
+// futgshare
+DEF_PARAM(  futgshare_num_phts        , FUTGSHARE_NUM_PHTS              , uns     , uns        , 8          ,        )
+DEF_PARAM(  futgshare_corrector_pht   , FUTGSHARE_CORRECTOR_PHT         , uns     , uns        , 7          ,        )
+DEF_PARAM(  futgshare_variable_length , FUTGSHARE_VARIABLE_LENGTH       , bool    , bool       , false      ,        )
+
+// branch misprediction information
+DEF_PARAM( knob_print_brinfo          , KNOB_PRINT_BRINFO          , bool    , bool       , false      ,        )
+DEF_PARAM( br_mispred_file            , BR_MISPRED_FILE            , char *  , string     , NULL       ,	)
+
+///////////////////////////////////////////////////////////////////////////
+// confidence estimator based on perceptron 
+
+DEF_PARAM(  conf_perceptron_th        , CONF_PERCEPTRON_TH                , int     , int         , 0         ,         ) /* threshold to distinguish high confidence and low confidence */ 
+DEF_PARAM(  conf_perceptron_ctr_bits  , CONF_PERCEPTRON_CTR_BITS          , uns     , uns        , 8          ,        )
+
+DEF_PARAM(  conf_perceptron_thresh_ovrd    , CONF_PERCEPTRON_THRESH_OVRD  , uns     , uns        , 0          ,        )
+DEF_PARAM(  conf_perceptron_train_thresh_ovrd   , CONF_PERCEPTRON_TRAIN_THRESH_OVRD     , int     , int         , 0          ,        )
+
+
+DEF_PARAM(  perceptron_conf_use_conf       , PERCEPTRON_CONF_USE_CONF     , bool    , bool        , false     ,           )
+DEF_PARAM(  perceptron_conf_train_his      , PERCEPTRON_CONF_TRAIN_HIS    , bool    , bool        , false     ,           )
+DEF_PARAM(  perceptron_conf_train_conf     , PERCEPTRON_CONF_TRAIN_CONF   , bool    , bool        , false     ,           )
+DEF_PARAM(  perceptron_conf_train_offset_conf     , PERCEPTRON_CONF_TRAIN_OFFSET_CONF   , bool    , bool        , false     ,           )
+
+DEF_PARAM(  perceptron_train_misp_factor  , PERCEPTRON_TRAIN_MISP_FACTOR          , uns     , uns        , 1          ,        )
+
+DEF_PARAM(  perceptron_train_corr_factor  , PERCEPTRON_TRAIN_CORR_FACTOR          , uns     , uns        , 1          ,        )
+DEF_PARAM(  perceptron_conf_his_both     , PERCEPTRON_CONF_HIS_BOTH   , bool    , bool        , false     ,           )
+DEF_PARAM(  perceptron_conf_his_both_length  , PERCEPTRON_CONF_HIS_BOTH_LENGTH   , uns    , uns        , 0     ,           )
+
+
+     /* other confidence estimatior's study */
+     // confidence estimator based on pc or path 
+DEF_PARAM( conf_counter_th                   , CONF_COUNTER_TH                   , uns      , uns        ,  30        ,           )
+DEF_PARAM( mis_conf_overwrite                , MIS_CONF_OVERWRITE                , bool     , bool       , false      ,           )
+DEF_PARAM( only_hist_percep                  , ONLY_HIST_PERCEP                  , bool     , bool       , false      ,           )
+DEF_PARAM( only_misp_percep                  , ONLY_MISP_PERCEP                  , bool     , bool       , true       ,           )
+
+
+
+     // global mdc jrs 
+
+DEF_PARAM( global_mdc_offset                 , GLOBAL_MDC_OFFSET                 , int      , int      ,  1         ,           )
+DEF_PARAM( use_global_mdc                    , USE_GLOBAL_MDC                    , bool     , bool       , false      ,           )
+
+DEF_PARAM( composite_self                    , COMPOSITE_SELF                    , bool     , bool       , false      ,           )
+
+     /* pht study */ 
+
+DEF_PARAM( pathbased_conf_dump               , PATHBASED_CONF_DUMP               , bool     , bool       , false      ,           )
+DEF_PARAM( pht_hit_table_name                , PHT_HIT_TABLE_NAME                , char *  , string      , "pht_hit_table.txt.out"  ,           )
+DEF_PARAM( pht_miss_table_name               , PHT_MISS_TABLE_NAME               , char *  , string      , "pht_miss_table.txt.out"  ,           )
+
+DEF_PARAM( miss_pht                          , MISS_PHT                          , bool     , bool       , false      ,           )
+
+DEF_PARAM( pht_hit_acc                       , PHT_HIT_ACC                       , uns      , uns        , 85         ,           )
+DEF_PARAM( pht_miss_acc                      , PHT_MISS_ACC                      , uns      , uns        , 75         ,           )
+
+     /* misperceptron */
+DEF_PARAM(  mis_conf_perceptron_thresh_ovrd  , MIS_CONF_PERCEPTRON_THRESH_OVRD   , int     , int         , 0          ,        )
+DEF_PARAM(  mis_conf_perceptron_train_thresh_ovrd  , MIS_CONF_PERCEPTRON_TRAIN_THRESH_OVRD   , int     , int         , 0          ,        )
+
+
+     /* diverge loop predictor */
+DEF_PARAM(diverge_loop_pred_cache_size         , DIVERGE_LOOP_PRED_CACHE_SIZE  , uns    , uns      ,1024 *64 ,          )
+DEF_PARAM(diverge_loop_pred_cache_assoc        , DIVERGE_LOOP_PRED_CACHE_ASSOC , uns    , uns      , 16      ,          )
+DEF_PARAM(diverge_loop_conf_count_th           , DIVERGE_LOOP_CONF_COUNT_TH    , uns    , uns      , 5   ,              )
+
+DEF_PARAM(diverge_loop_pred_lne_reset          , DIVERGE_LOOP_PRED_LNE_RESET   , bool   , bool     , false ,            )
+
+DEF_PARAM(enable_diverge_loop_pred             , ENABLE_DIVERGE_LOOP_PRED      , bool   , bool     , false ,            )
+
+     /* vl perceptron */
+
+DEF_PARAM(vl_per_th1                            , VL_PER_TH1                   , uns    , uns      , 99     ,            )
+DEF_PARAM(vl_per_th1_adjust                     , VL_PER_TH1_ADJUST            , uns    , uns      , 20     ,            )
+DEF_PARAM(vl_per_th2                            , VL_PER_TH2                   , uns    , uns      , 98     ,            )
+DEF_PARAM(vl_per_th2_adjust                     , VL_PER_TH2_ADJUST            , uns    , uns      , 15     ,            )
+DEF_PARAM(vl_per_th3                            , VL_PER_TH3                   , uns    , uns      , 97     ,            )
+DEF_PARAM(vl_per_th3_adjust                     , VL_PER_TH3_ADJUST            , uns    , uns      , 10     ,            )
+DEF_PARAM(vl_per_th4                            , VL_PER_TH4                   , uns    , uns      , 96     ,            )
+DEF_PARAM(vl_per_th4_adjust                     , VL_PER_TH4_ADJUST            , uns    , uns      , 8      ,            )
+DEF_PARAM(vl_per_th5                            , VL_PER_TH5                   , uns    , uns      , 95     ,            )
+DEF_PARAM(vl_per_th5_adjust                     , VL_PER_TH5_ADJUST            , uns    , uns      , 5      ,            )
+DEF_PARAM(vl_adjust_period                      , VL_ADJUST_PERIOD             , uns64  , uns64    , 10000  ,            )
+
+DEF_PARAM(bloom_filter_size                    , BLOOM_FILTER_SIZE             , uns     , uns      , 1024   ,             )
+DEF_PARAM(bloom_filter_sample_period           , BLOOM_FILTER_SAMPLE_PERIOD    , uns64   , uns64    , 1000  ,             )
+DEF_PARAM(bloom_filter_sample_interval         , BLOOM_FILTER_SAMPLE_INTERVAL  , uns64   , uns64    , 10000000  ,             )
+DEF_PARAM(entry_adjust_t                       , ENTRY_ADJUST_TH               , uns     , uns      , 30     ,              )
+DEF_PARAM(enable_entry_adjust                  , ENABLE_ENTRY_ADJUST           , bool    , bool     , false  ,           )
+
+DEF_PARAM( ibp_btb_last                        , IBP_BTB_LAST                  , bool    , bool     , false  ,           )
+
+
+DEF_PARAM( vpc_max_iter                        , VPC_MAX_ITER                  , int     , int      , 3      ,           )
+DEF_PARAM( vpc_use_btb                         , VPC_USE_BTB                   , bool    , bool     , true   ,           )
+DEF_PARAM( vpc_pred_per_cycle                  , VPC_PRED_PER_CYCLE            , uns     , uns      , 0      ,           )
+DEF_PARAM( vpc_sloppy_update                   , VPC_SLOPPY_UPDATE             , bool    , bool     , false  ,           ) 
+DEF_PARAM( vpc_btb_update_greedy               , VPC_BTB_UPDATE_GREEDY         , bool    , bool     , false  ,           ) 
+DEF_PARAM( vpc_btb_update_only_miss            , VPC_BTB_UPDATE_ONLY_MISS      , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_return                          , VPC_RETURN                    , bool    , bool     , true   ,           )
+DEF_PARAM( vpc_random_hash                     , VPC_RANDOM_HASH               , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_full_miss_insert_pos            , VPC_FULL_MISS_INSERT_POS      , int     , int      , -1     ,           )
+DEF_PARAM( vpc_check_mispred                   , VPC_CHECK_MISPRED             , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_btb_repl1                       , VPC_BTB_REPL1                 , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_btb_check_before_insert         , VPC_BTB_CHECK_BEFORE_INSERT   , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_2level_indi                     , VPC_2LEVEL_INDI               , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_2level_pred_type                , VPC_2LEVEL_PRED_TYPE          , int     , int      , 2      ,           )
+DEF_PARAM( vpc_2level_indi_repl1               , VPC_2LEVEL_INDI_REPL1         , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_2level_indi_repl2               , VPC_2LEVEL_INDI_REPL2         , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_2level_indi_first               , VPC_2LEVEL_INDI_FIRST         , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_align_ghr                       , VPC_ALIGN_GHR                 , bool    , bool     , false  ,           )
+DEF_PARAM( vpc_full_miss_use_last              , VPC_FULL_MISS_USE_LAST        , bool    , bool     , false  ,           )
+DEF_PARAM(vpc_2nd_parallel                     , VPC_2ND_PARALLEL              , bool    , bool     , false  ,           )
+DEF_PARAM(perfect_ibp_overwrite                , PERFECT_IBP_OVERWRITE         , bool    , bool     , false  ,           )
+DEF_PARAM(use_vpc_addrs                        , USE_VPC_ADDRS                 , bool    , bool     , false  ,           )
+DEF_PARAM(vpc_addrs_entries                    , VPC_ADDRS_ENTRIES             , int     , int      , 16     ,           )   
+DEF_PARAM(vpc_addrs_assoc                      , VPC_ADDRS_ASSOC               , int     , int      , 16     ,           ) 
+DEF_PARAM(vpc_2nd_update_all                   , VPC_2ND_UPDATE_ALL            , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_2nd_update_only_use              , VPC_2ND_UPDATE_ONLY_USE       , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_2nd_update_only_misfetch         , VPC_2ND_UPDATE_ONLY_MISFETCH  , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_restore_ghr                      , VPC_RESTORE_GHR               , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_btb_replace_lru                  , VPC_BTB_REPLACE_LRU           , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_btb_replace_lfu                  , VPC_BTB_REPLACE_LFU           , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_pred_continue_under_miss         , VPC_PRED_CONTINUE_UNDER_MISS  , bool    , bool     , false  ,           )  
+DEF_PARAM(vpc_decay_insertion_policy           , VPC_DECAY_INSERTION_POLICY    , bool    , bool     , false  ,           )  
+DEF_PARAM(lfu_max_value                        , LFU_MAX_VALUE                 , uns64   , uns64    ,  0     ,           )
+
+DEF_PARAM( vpc_update_only_pred                , VPC_UPDATE_ONLY_PRED          , bool    , bool     , false  ,           )  
+
+DEF_PARAM( vpc_extra_recovery_cycles          , VPC_EXTRA_RECOVERY_CYCLES     , uns64    , uns64    ,   0    ,          )
+

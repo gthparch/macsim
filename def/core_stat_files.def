@@ -1,0 +1,14 @@
+/* -*- Mode: c -*- */
+/***************************************************************************************
+* File         : stat_files.def
+* Author       : Robert S. Chappell
+* Date         : 2/15/1998
+* CVS          : $Id: core_stat_files.def,v 1.2 2008-04-07 22:27:26 hyesoon Exp $:
+* Description  : This file should contains only the includes for the various
+  ".stat.def" files.
+***************************************************************************************/
+#include "core_trace.stat.def"
+
+
+// #include "mlp.stat.def"
+

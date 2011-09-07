@@ -1,0 +1,118 @@
+/* -*- Mode: c -*- */
+
+/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
+   It's not a good idea to reorder these, since many calls are made like
+   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
+   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
+   interval, 'Cumulative' is over the entire run so far.
+
+   DEF_STAT( Name, Type, Ratio )
+
+   The 'Type' column is used to group statistics together and format the printouts
+   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
+   Possible 'Type' values are:
+
+	COUNT -- The count is what's important.  Just print the number of times it
+	occurred.  
+	
+	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
+	the number of cycles.  (Ex. IPC)  The count is also printed.
+
+	PER_INST -- Same thing, but per instruction.
+
+	DIST -- This is a little bit complicated.  The first DIST type encountered
+	signals the beginning of a distribution.  The next DIST encountered marks the
+	end of the distribution (inclusive).  All of the stats in-between should be of
+	type COUNT.  All of the stats in a distribution are printed as a percentage of
+	the total.
+
+	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
+	determines which other stat should be used.  The current stat is divided by that
+	specified in the 'Ratio Stat' column.  This column is ignored for all types but
+	RATIO.
+
+*/
+
+
+DEF_STAT( PREF_ACC_1                       , DIST    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_2                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_3                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_4                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_5                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_6                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_7                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_8                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_9                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC_10                      , DIST    ,     NO_RATIO)
+
+DEF_STAT( PREF_TIMELY_1                       , DIST    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_2                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_3                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_4                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_5                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_6                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_7                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_8                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_9                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_TIMELY_10                      , DIST    ,     NO_RATIO)
+
+DEF_STAT( PREF_POL_1                       , DIST    ,     NO_RATIO)
+DEF_STAT( PREF_POL_2                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_3                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_4                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_5                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_6                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_7                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_8                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_9                       , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_POL_10                      , DIST    ,     NO_RATIO)
+
+DEF_STAT( PREF_ACC1_HT_HP                  , DIST     ,     NO_RATIO)
+DEF_STAT( PREF_ACC1_HT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC1_LT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC1_LT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC2_HT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC2_HT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC2_LT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC2_LT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC3_HT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC3_HT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC3_LT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC3_LT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC4_HT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC4_HT_LP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC4_LT_HP                  , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_ACC4_LT_LP                  , DIST     ,     NO_RATIO)
+
+DEF_STAT( PREF_DISTANCE_1                  , DIST    ,     NO_RATIO)
+DEF_STAT( PREF_DISTANCE_2                  , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_DISTANCE_3                  , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_DISTANCE_4                  , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_DISTANCE_5                  , DIST   ,     NO_RATIO)
+
+DEF_STAT( PREF_PFPOL                       , COUNT    ,     NO_RATIO)
+
+DEF_STAT(PREF_DL0REQ_QUEUE_HIT_BY_DEMAND   , COUNT   ,     NO_RATIO) 
+DEF_STAT(PREF_UL2REQ_QUEUE_HIT_BY_DEMAND   , COUNT   ,     NO_RATIO)
+DEF_STAT(PREF_DL0REQ_QUEUE_FULL            , COUNT   ,     NO_RATIO)
+DEF_STAT(PREF_UL2REQ_QUEUE_FULL            , COUNT   ,     NO_RATIO)
+DEF_STAT(PREF_UL2REQ_SEND_QUEUE_STALL      , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_UL2REQ_QUEUE_MATCHED_REQ    , COUNT   , NO_RATIO)
+DEF_STAT( PREF_DL0REQ_QUEUE_MATCHED_REQ    , COUNT   , NO_RATIO)
+DEF_STAT( PREF_UL2REQ_QUEUE_SENTREQ        , COUNT   ,     NO_RATIO)
+
+DEF_STAT( PREF_UNUSED_EVICT                , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_REGION_SENT                 , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_REGION_USEFUL               , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_REGION_EVICT                , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_PHASE_OVERWRITE_PAGE        , COUNT    ,     NO_RATIO)
+DEF_STAT( PREF_UPDATE_COUNT                , COUNT    ,     NO_RATIO)
+
+DEF_STAT( PREF_HYBRID_SEL_0                , DIST   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_1                , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_2                , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_3                , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_4                , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_5                , COUNT   ,     NO_RATIO)
+DEF_STAT( PREF_HYBRID_SEL_6                , DIST   ,     NO_RATIO)
+

@@ -1,0 +1,193 @@
+/* -*- Mode: c -*- */
+
+/***********************************************************************************************/
+/* COMPONENTS: statically compute each of these based on parameters.  Sum is maximum per-cycle power.
+   UNITS: sets of components; along with total_cycle_power, used for per-cycle power calculations and stats. 
+   Dynamic power consumption is not computed from these units alone, though.  
+
+   NOTE: the ordering of definitions is important: 
+         the "unit" should appear right after the components that are added to form the unit.
+   If this is changed, it will mess up the static power computation in power.c.  
+ 
+*/
+
+
+
+WATTCH_COMPONENT ( btb		, BTB_POWER	)
+WATTCH_COMPONENT( local_predict	, LOCAL_PREDICT_POWER	)
+WATTCH_COMPONENT( global_predict	, GLOBAL_PREDICT_POWER	)
+WATTCH_COMPONENT( chooser		, CHOOSER_POWER	)
+WATTCH_COMPONENT( ras		, RAS_POWER	)
+WATTCH_COMPONENT( multi_ras		, MULTI_RAS_POWER	)
+WATTCH_COMPONENT( conf_estimator    , CONF_ESTIMATOR_POWER	)
+WATTCH_UNIT( bpred_power		, BPRED_POWER               ) 
+
+
+WATTCH_COMPONENT( rat_driver	, RAT_DRIVER_POWER	)
+WATTCH_COMPONENT( rat_decoder	, RAT_DECODER_POWER	)
+WATTCH_COMPONENT( rat_wordline	, RAT_W0RDLINE_POWER	)
+WATTCH_COMPONENT( rat_bitline	, RAT_BITLINE_POWER	)
+WATTCH_COMPONENT( rat_senseamp	, RAT_SENSEAMP_POWER	)
+WATTCH_COMPONENT( dcl_compare	, DCL_COMPARE_POWER	)
+WATTCH_COMPONENT( dcl_pencode	, DCL_PENCODE_POWER	)
+WATTCH_UNIT( rename_power		, RENAME_POWER              )
+
+
+
+WATTCH_COMPONENT( multi_rat_driver	, MULTI_RAT_DRIVER_POWER	)
+WATTCH_COMPONENT( multi_rat_decoder	, MULTI_RAT_DECODER_POWER	)
+WATTCH_COMPONENT( multi_rat_wordline, MULTI_RAT_W0RDLINE_POWER	)
+WATTCH_COMPONENT( multi_rat_bitline	, MULTI_RAT_BITLINE_POWER	)
+WATTCH_COMPONENT( multi_rat_senseamp, MULTI_RAT_SENSEAMP_POWER	)
+WATTCH_UNIT( multi_rename_power	, MULTI_RENAME_POWER              )
+
+
+WATTCH_COMPONENT( front_decode_buffer  , FRONT_DECODE_BUFFER_POWER	)
+WATTCH_UNIT( front_decode_buffer_power , FRONT_DECODE_BUFFER_POWER              )
+
+WATTCH_COMPONENT( front_map_buffer     , FRONT_MAP_BUFFER_POWER	)
+WATTCH_UNIT( front_map_buffer_power    , FRONT_MAP_BUFFER_POWER              )
+
+WATTCH_COMPONENT( inst_decoder      , INST_DECODER_POWER	)
+WATTCH_UNIT( decode_power		, DECODE_POWER              )
+
+
+WATTCH_COMPONENT( bbt_driver	, BBT_DRIVER_POWER	)
+WATTCH_COMPONENT( bbt_decoder	, BBT_DECODER_POWER	)
+WATTCH_COMPONENT( bbt_wordline	, BBT_WORDLINE_POWER	)
+WATTCH_COMPONENT( bbt_bitline	, BBT_BITLINE_POWER	)
+WATTCH_COMPONENT( bbt_senseamp	, BBT_SENSEAMP_POWER	)
+WATTCH_UNIT( bbt_power		, BBT_POWER                 ) // busy-bit table.  
+
+
+WATTCH_COMPONENT( pram_driver	, PRAM_DRIVER_POWER	)
+WATTCH_COMPONENT( pram_decoder	, PRAM_DECODER_POWER	)
+WATTCH_COMPONENT( pram_wordline	, PRAM_WORDLINE_POWER	)
+WATTCH_COMPONENT( pram_bitline	, PRAM_BITLINE_POWER	)
+WATTCH_COMPONENT( pram_senseamp	, PRAM_SENSEAMP_POWER	)
+WATTCH_UNIT( pram_power		, PRAM_POWER            ) 
+
+
+WATTCH_COMPONENT( wakeup_tagdrive	, WAKEUP_TAGDRIVE_POWER	)
+WATTCH_COMPONENT( wakeup_tagmatch	, WAKEUP_TAGMATCH_POWER	)
+WATTCH_COMPONENT( wakeup_ormatch	, WAKEUP_ORMATCH_POWER	)
+WATTCH_UNIT( wakeup_power	        , WAKEUP_POWER       ) 
+
+
+WATTCH_COMPONENT( selection		, SELECTION_POWER	)
+WATTCH_UNIT( selection_power	, SELECTION_POWER       ) 
+
+
+WATTCH_COMPONENT( lsq_wakeup_tagdrive, LSQ_WAKEUP_TAGDRIVE_POWER	)
+WATTCH_COMPONENT( lsq_wakeup_tagmatch, LSQ_WAKEUP_TAGMATCH_POWER	)
+WATTCH_COMPONENT( lsq_wakeup_ormatch,  LSQ_WAKEUP_ORMATCH_POWER	)
+WATTCH_UNIT( lsq_wakeup_power	, LSQ_WAKEUP_POWER          )
+
+
+WATTCH_COMPONENT( lsq_rs_driver	, LSQ_RS_DRIVER_POWER	)
+WATTCH_COMPONENT( lsq_rs_decoder	, LSQ_RS_DECODER_POWER	)
+WATTCH_COMPONENT( lsq_rs_wordline	, LSQ_RS_WORDLINE_POWER	)
+WATTCH_COMPONENT( lsq_rs_bitline	, LSQ_RS_BITLINE_POWER	)
+WATTCH_COMPONENT( lsq_rs_senseamp	, LSQ_RS_SENSEAMP_POWER	)
+WATTCH_UNIT( lsq_rs_power		, LSQ_RS_POWER              ) 
+
+
+WATTCH_COMPONENT( regfile_driver	, REGFILE_DRIVER_POWER	)
+WATTCH_COMPONENT( regfile_decoder	, REGFILE_DECODER_POWER	)
+WATTCH_COMPONENT( regfile_wordline	, REGFILE_WORDLINE_POWER	)
+WATTCH_COMPONENT( regfile_bitline	, REGFILE_BITLINE_POWER	)
+WATTCH_UNIT( regfile_power		, REGFILE_POWER             ) 
+
+WATTCH_COMPONENT( regfile_write_decoder	, REGFILE_WRITE_DECODER_POWER	)
+WATTCH_COMPONENT( regfile_write_wordline	, REGFILE_WRITE_WORDLINE_POWER	)
+WATTCH_COMPONENT( regfile_write_bitline	, REGFILE_WRITE_BITLINE_POWER	)
+WATTCH_UNIT( regfile_write_power		, REGFILE_WRITE_POWER             ) 
+
+
+
+
+WATTCH_COMPONENT( reorder_driver	, REORDER_DRIVER_POWER	)
+WATTCH_COMPONENT( reorder_decoder	, REORDER_DECODER_POWER	)
+WATTCH_COMPONENT( reorder_wordline	, REORDER_WORDLINE_POWER	)
+WATTCH_COMPONENT( reorder_bitline	, REORDER_BITLINE_POWER	)
+WATTCH_COMPONENT( reorder_senseamp	, REORDER_SENSEAMP_POWER	)
+WATTCH_UNIT( reorder_power		, REORDER_POWER             )
+
+
+WATTCH_COMPONENT( ialu		, IALU_POWER	)
+WATTCH_COMPONENT( falu		, FALU_POWER	)
+WATTCH_UNIT( fu_power		, FU_POWER                  )
+
+
+WATTCH_COMPONENT( local_bypass	, COMP_LOCAL_BYPASS_POWER   )
+WATTCH_UNIT( local_bypass_power	, LOCAL_BYPASS_POWER        ) 
+
+WATTCH_COMPONENT( global_bypass	, COMP_GLOBAL_BYPASS_POWER	)
+WATTCH_UNIT( global_bypass_power	, GLOBAL_BYPASS_POWER      )
+
+
+WATTCH_COMPONENT( icache_decoder	, ICACHE_DECODER_POWER	)
+WATTCH_COMPONENT( icache_wordline	, ICACHE_WORDLINE_POWER	)
+WATTCH_COMPONENT( icache_bitline	, ICACHE_BITLINE_POWER	)
+WATTCH_COMPONENT( icache_senseamp	, ICACHE_SENSEAMP_POWER	)
+WATTCH_COMPONENT( icache_tagarray	, ICACHE_TAGARRAY_POWER	)
+WATTCH_COMPONENT( itlb	        , ITLB_POWER	)
+WATTCH_UNIT( icache_power		, ICACHE_POWER              ) 
+
+
+WATTCH_COMPONENT( dcache_decoder	, DCACHE_DECODER_POWER	)
+WATTCH_COMPONENT( dcache_wordline	, DCACHE_WORDLINE_POWER	)
+WATTCH_COMPONENT( dcache_bitline	, DCACHE_BITLINE_POWER	)
+WATTCH_COMPONENT( dcache_senseamp	, DCACHE_SENSEAMP_POWER	)
+WATTCH_COMPONENT( dcache_tagarray	, DCACHE_TAGARRAY_POWER	)
+WATTCH_COMPONENT( dtlb	        , DTLB_POWER	)
+WATTCH_UNIT( dcache_power		, DCACHE_POWER              ) 
+
+//begin global
+WATTCH_COMPONENT( mrb_cam	        , MRB_CAM_POWER	        )
+WATTCH_COMPONENT( mrb_data_wordline	, MRB_DATA_WORDLINE_POWER	)
+WATTCH_COMPONENT( mrb_data_bitline	, MRB_DATA_BITLINE_POWER	)
+WATTCH_COMPONENT( mrb_data_senseamp	, MRB_DATA_SENSEAMP_POWER	)
+WATTCH_COMPONENT( mrb_data_driver	, MRB_DATA_DRIVER_POWER	)
+WATTCH_UNIT( mrb_power		, MRB_POWER             ) 
+
+
+WATTCH_COMPONENT( l2cache_decoder	, L2CACHE_DECODER_POWER	)
+WATTCH_COMPONENT( l2cache_wordline	, L2CACHE_WORDLINE_POWER	)
+WATTCH_COMPONENT( l2cache_bitline	, L2CACHE_BITLINE_POWER	)
+WATTCH_COMPONENT( l2cache_senseamp	, L2CACHE_SENSEAMP_POWER	)
+WATTCH_COMPONENT( l2cache_tagarray	, L2CACHE_TAGARRAY_POWER	)
+WATTCH_UNIT( l2cache_power		, L2CACHE_POWER             ) 
+
+// end global
+
+    //  model-specific modules
+WATTCH_COMPONENT( misc0_driver	, MISC0_DRIVER_POWER	)
+WATTCH_COMPONENT( misc0_decoder	, MISC0_DECODER_POWER	)
+WATTCH_COMPONENT( misc0_wordline	, MISC0_WORDLINE_POWER	)
+WATTCH_COMPONENT( misc0_bitline	, MISC0_BITLINE_POWER	)
+WATTCH_COMPONENT( misc0_senseamp	, MISC0_SENSEAMP_POWER	)
+WATTCH_UNIT( misc0_power		, MISC0_POWER               )
+
+
+WATTCH_COMPONENT( misc1_driver	, MISC1_DRIVER_POWER	)
+WATTCH_COMPONENT( misc1_decoder	, MISC1_DECODER_POWER	)
+WATTCH_COMPONENT( misc1_wordline	, MISC1_WORDLINE_POWER	)
+WATTCH_COMPONENT( misc1_bitline	, MISC1_BITLINE_POWER	)
+WATTCH_COMPONENT( misc1_senseamp	, MISC1_SENSEAMP_POWER	)
+WATTCH_UNIT( misc1_power		, MISC1_POWER               )
+
+
+WATTCH_COMPONENT( misc2_driver	, MISC2_DRIVER_POWER	)
+WATTCH_COMPONENT( misc2_decoder	, MISC2_DECODER_POWER	)
+WATTCH_COMPONENT( misc2_wordline	, MISC2_WORDLINE_POWER	)
+WATTCH_COMPONENT( misc2_bitline	, MISC2_BITLINE_POWER	)
+WATTCH_COMPONENT( misc2_senseamp	, MISC2_SENSEAMP_POWER	)
+WATTCH_UNIT( misc2_power		, MISC2_POWER               )
+ 
+
+WATTCH_COMPONENT( clock	        , COMP_CLOCK_POWER	)  
+WATTCH_UNIT(  clock_power		, CLOCK_POWER               )
+
+
+

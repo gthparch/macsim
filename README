@@ -1,0 +1,25 @@
+
+To install MacSim
+  aclocal
+  automake --add-missing
+  autoconf
+  ./configure
+  make
+  
+  Or simply,
+  aclocal && automake --add-missing && autoconf && ./configure
+  make
+
+
+To run MacSim
+  ./macsim
+
+  However, you need to have params.in and trace_file_list files in the same directory
+
+
+Different version of macsim
+  By default or make opt : optimized version (-O option)
+  make dbg : debug-enable version (-g option)
+  make gpf : gprof-enable version (-pg option)
+
+

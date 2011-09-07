@@ -1,0 +1,154 @@
+/* -*- Mode: c -*- */
+
+
+param<FE_SIZE, 						fe_size, 						uns32, 	256>
+
+param<SCHED_CLOCK, 					sched_clock, 					uns32, 	1>
+param<ALLOC_TO_EXEC_LATENCY, 		alloc_to_exec_latency, 			uns32, 	1>
+
+param<GIAQ_SIZE, 					giaq_size, 						uns32, 	32>
+param<MIAQ_SIZE, 					miaq_size, 						uns32, 	16>
+param<FQ_SIZE, 						fq_size, 						uns32, 	32>
+
+param<GIAQ_MEDIUM_SIZE, 			giaq_medium_size, 				uns32, 	KNOB_GIAQ_SIZE>
+param<MIAQ_MEDIUM_SIZE, 			miaq_medium_size, 				uns32, 	KNOB_MIAQ_SIZE>
+param<FQ_MEDIUM_SIZE, 				fq_medium_size, 				uns32, 	KNOB_FQ_SIZE>
+
+param<GIAQ_LARGE_SIZE, 				giaq_large_size, 				uns32, 	KNOB_GIAQ_SIZE>
+param<MIAQ_LARGE_SIZE, 				miaq_large_size, 				uns32, 	KNOB_MIAQ_SIZE>
+param<FQ_LARGE_SIZE, 				fq_large_size, 					uns32, 	KNOB_FQ_SIZE>
+
+
+param<GEN_ALLOCQ_INDEX,               	giaq_index,             		int,    0> 
+param<MEM_ALLOCQ_INDEX,               	miaq_index,             		int,    1>
+param<FLOAT_ALLOCQ_INDEX,               	fiaq_index,             		int,    2>
+
+param<ONE_CYCLE_EXEC,           	one_cycle_exec,         		bool,   0>
+
+param<UOP_POOL_ENTRIES_INC,			uop_pool_entries_inc, 			int, 	512>
+param<MAX_INSTS, 					max_insts, 						uns32, 	1000>
+param<SIM_CYCLE_COUNT, 				sim_cycle_count, 				uns32, 	1000000>
+
+param<FORWARD_PROGRESS_LIMIT, 		forward_progress_limit, 		uns64,  100000>
+
+param<PTX_SIM,                  	ptx_sim,                		bool,   false>
+
+param<MAX_BLOCK_NUM_APPL,         max_block_num_appl,         int,  1>
+param<MAX_BLOCK_PER_CORE,       	max_block_per_core,     		int,	8>
+param<MAX_BLOCK_PER_CORE1,       	max_block_per_core1,     		int,	8>
+param<MAX_BLOCK_PER_CORE2,       	max_block_per_core2,     		int,	8>
+param<MAX_BLOCK_PER_CORE3,       	max_block_per_core3,     		int,	8>
+param<MAX_BLOCK_PER_CORE_SUPER, max_block_per_core_super, int, 0>
+
+    // MT fetch throttling 
+
+param<ROB_SIZE, 					rob_size, 						uns16, 	128>
+param<ROB_MEDIUM_SIZE, 				rob_medium_size, 				uns16, 	KNOB_ROB_SIZE>
+param<ROB_LARGE_SIZE, 				rob_large_size, 				uns16, 	KNOB_ROB_SIZE>
+param<INT_REGFILE_SIZE, 			int_regfile_size, 				uns16, 	128>
+param<FP_REGFILE_SIZE, 				fp_regfile_size, 				uns16, 	128>
+param<MEU_NSB, 						meu_nsb, 						uns16, 	64>
+param<MEU_NLB, 						meu_nlb, 						uns16, 	64>
+param<MEU_MEDIUM_NSB, 				meu_medium_nsb, 				uns16, 	KNOB_MEU_NSB>
+param<MEU_MEDIUM_NLB, 				meu_medium_nlb, 				uns16, 	KNOB_MEU_NLB>
+param<MEU_LARGE_NSB, 				meu_large_nsb, 					uns16, 	KNOB_MEU_NSB>
+param<MEU_LARGE_NLB, 				meu_large_nlb, 					uns16, 	KNOB_MEU_NLB>
+
+param<WIDTH, 						width, 							uns16, 	2>
+param<MEDIUM_WIDTH, 				medium_width, 					uns16, 	KNOB_WIDTH>
+param<LARGE_WIDTH, 					large_width, 					uns16, 	KNOB_WIDTH>
+
+param<EXEC_RETIRE_LATENCY,      	exec_retire_latency,    		int,    1> 
+
+
+param<MEM_OBEY_STORE_DEP,       	mem_obey_store_dep,    			bool,   true>
+param<MEM_OOO_STORES,           	mem_ooo_stores,        			bool,	true> 
+
+
+param<ENABLE_RUNAHEAD,          	enable_runahead,        		bool,   false> 
+
+param<USE_NEW_ORACLE,           	use_new_oracle,         		bool,   false> 
+param<IGNORE_DEP,               	ignore_dep,             		bool,   false>
+
+/* Jaekyu / added for heartbeat / 07/17/2008 */
+
+param<HEARTBEAT_INTERVAL,       	heartbeat_interval,     		uns,    false>
+
+param<FETCH_RATIO,                      fetch_ratio,                            int,    1> 
+param<SCHEDULE_RATIO,                   schedule_ratio,                         int,    1> 
+param<FETCH_RATIO_MEDIUM_CORE,               fetch_ratio_medium_core,                            int,    1> 
+param<SCHEDULE_RATIO_MEDIUM_CORE,            schedule_ratio_medium_core,                         int,    1> 
+param<FETCH_RATIO_LARGE_CORE,                fetch_ratio_large_core,                            int,    1> 
+param<SCHEDULE_RATIO_LARGE_CORE,             schedule_ratio_large_core,                         int,    1> 
+
+param<PTX_EXEC_RATIO,                   ptx_exec_ratio,                     int,         4>
+
+/* Ali  needed by WATTCH*/
+param<ENABLE_MULTI_PATH,			enable_multi_path,       		bool,	false>
+param<ENABLE_IDEAL_MULTI_PATH,		enable_ideal_multi_path, 		bool, 	false>
+param<MULTI_ACTIVE_MAX_MULTI_PATH,	multi_active_max_multi_path, 	uns, 	4>
+param<DECODE_CYCLES,				decode_cycle, 					uns,	1>
+param<MAP_CYCLES, 					map_cycles, 					uns,	1>
+param<ISSUE_WIDTH, 					issue_width, 					uns, 	16>
+param< NODE_WIDTH, 					node_width, 					uns, 	16>
+param< NODE_DEPTH, 					node_depth, 					uns, 	32>
+param<NUM_FUS, 						num_fus, 						uns, 	16>
+
+/* added by nagesh on 09-mar-2009, to support heterogeneous architectures */
+
+
+/* Heterogeneous Feature */
+param<NUM_SIM_CORES, 				num_sim_cores, 					uns32, 	80>
+
+param<CORE_TYPE, core_type, string, x86>
+param<MEDIUM_CORE_TYPE, medium_core_type, string, x86>
+param<LARGE_CORE_TYPE, large_core_type, string, x86>
+
+param<NUM_SIM_SMALL_CORES,  num_sim_small_cores, 	  uns32, 	KNOB_NUM_SIM_CORES>
+param<NUM_SIM_LARGE_CORES, 	num_sim_large_cores, 		uns32, 	0>
+param<NUM_SIM_MEDIUM_CORES, num_sim_medium_cores, 	uns32, 	0>
+
+param<MAX_THREADS_PER_CORE,     	  max_threads_per_core,   		int,    3>
+param<MAX_THREADS_PER_MEDIUM_CORE,  max_threads_per_medium_core,   	int,    KNOB_MAX_THREADS_PER_CORE>
+param<MAX_THREADS_PER_LARGE_CORE,   max_threads_per_large_core,   	int,    KNOB_MAX_THREADS_PER_CORE>
+
+param<LATENCY_FACTOR, latency_factor, uns8, 1>
+param<LATENCY_MEDIUM_FACTOR, latency_medium_factor, uns8, 1>
+param<LATENCY_LARGE_FACTOR, latency_large_factor, uns8, 1>
+
+param<SCHEDULE,                 	schedule,          				string, io> 
+param<MEDIUM_CORE_SCHEDULE, medium_core_schedule, string, io>
+param<LARGE_CORE_SCHEDULE, large_core_schedule, string, io>
+
+param<FETCH_LATENCY, 				fetch_latency, 					uns32, 	1>
+param<ALLOC_LATENCY, 				alloc_latency, 					uns32, 	1>
+
+param<MEDIUM_CORE_ALLOC_LATENCY, 				medium_core_alloc_latency, 					uns32, 	1>
+param<MEDIUM_CORE_FETCH_LATENCY, 				medium_core_fetch_latency, 					uns32, 	1>
+
+param<LARGE_CORE_ALLOC_LATENCY, 				large_core_alloc_latency, 					uns32, 	1>
+param<LARGE_CORE_FETCH_LATENCY, 				large_core_fetch_latency, 					uns32, 	1>
+
+param<PRINT_HEARTBEAT, print_heartbeat, bool, true>
+
+param<GPU_SCHED, gpu_sched, bool, false>
+param<GPU_USE_SINGLE_ALLOCQ_TYPE, gpu_use_single_iaq_type, bool, true>
+param<GPU_SHARE_ALLOCQS_BETWEEN_THREADS, gpu_share_iaqs_between_threads, bool, true>
+
+
+/* Not used knobs */
+param<NUM_SIM_TRACES,       num_sim_traces,         uns32,  80>           
+
+
+
+
+
+
+
+
+
+
+
+
+
+

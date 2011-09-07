@@ -1,0 +1,4 @@
+#interface RETIRE
+#param( int                core_id        )
+#param( uop_pool_c&        uop_pool       )
+#param( rob_c&             rob            )

@@ -1,0 +1,49 @@
+/* -*- Mode: c -*- */
+
+/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
+   It's not a good idea to reorder these, since many calls are made like
+   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
+   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
+   interval, 'Cumulative' is over the entire run so far.
+
+   DEF_STAT( Name, Type, Ratio )
+
+   The 'Type' column is used to group statistics together and format the printouts
+   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
+   Possible 'Type' values are:
+
+	COUNT -- The count is what's important.  Just print the number of times it
+	occurred.  
+	
+	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
+	the number of cycles.  (Ex. IPC)  The count is also printed.
+
+	PER_INST -- Same thing, but per instruction.
+
+	DIST -- This is a little bit complicated.  The first DIST type encountered
+	signals the beginning of a distribution.  The next DIST encountered marks the
+	end of the distribution (inclusive).  All of the stats in-between should be of
+	type COUNT.  All of the stats in a distribution are printed as a percentage of
+	the total.
+
+	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
+	determines which other stat should be used.  The current stat is divided by that
+	specified in the 'Ratio Stat' column.  This column is ignored for all types but
+	RATIO.
+
+*/
+
+DEF_STAT(  BP_ON_PATH_CORRECT       , DIST    , NO_RATIO, PER_CORE       )
+DEF_STAT(  BP_ON_PATH_MISPREDICT    , COUNT   , NO_RATIO, PER_CORE       )
+DEF_STAT(  BP_ON_PATH_MISFETCH      , DIST    , NO_RATIO, PER_CORE       )
+
+
+
+DEF_STAT(  BP_OFF_PATH_CORRECT      , DIST    , NO_RATIO, PER_CORE       )
+DEF_STAT(  BP_OFF_PATH_MISPREDICT   , COUNT   , NO_RATIO, PER_CORE       )
+DEF_STAT(  BP_OFF_PATH_MISFETCH     , DIST    , NO_RATIO, PER_CORE       )
+
+
+DEF_STAT(  BP_MISPRED_STALL         , COUNT   , NO_RATIO, PER_CORE       )
+
+DEF_STAT(  BP_RESOLVED              , COUNT   , NO_RATIO, PER_CORE       )

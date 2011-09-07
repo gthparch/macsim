@@ -1,0 +1,157 @@
+/* -*- Mode: c -*- */
+
+/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
+   It's not a good idea to reorder these, since many calls are made like
+   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
+   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
+   interval, 'Cumulative' is over the entire run so far.
+
+   DEF_STAT( Name, Type, Ratio )
+
+   The 'Type' column is used to group statistics together and format the printouts
+   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
+   Possible 'Type' values are:
+
+	COUNT -- The count is what's important.  Just print the number of times it
+	occurred.  
+	
+	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
+	the number of cycles.  (Ex. IPC)  The count is also printed.
+
+	PER_INST -- Same thing, but per instruction.
+
+	DIST -- This is a little bit complicated.  The first DIST type encountered
+	signals the beginning of a distribution.  The next DIST encountered marks the
+	end of the distribution (inclusive).  All of the stats in-between should be of
+	type COUNT.  All of the stats in a distribution are printed as a percentage of
+	the total.
+
+	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
+	determines which other stat should be used.  The current stat is divided by that
+	specified in the 'Ratio Stat' column.  This column is ignored for all types but
+	RATIO.
+
+*/
+
+
+     /* stream prefetch */
+DEF_STAT(DCACHE_PREF_HIT                  ,COUNT,     NO_RATIO) 
+
+     /* miss queue schedule policy */
+DEF_STAT(IFETCH_WB_FIRST_SCHEDULE         ,DIST,     NO_RATIO)
+DEF_STAT(PREFETCH_LAST_SCHEDULE           ,COUNT,    NO_RATIO)
+DEF_STAT(DEMAND_PASS_PREF_SCHEDULE        ,COUNT,    NO_RATIO)
+DEF_STAT(DEMAND_PASS_LOW_OP_SCHEDULE      ,COUNT,    NO_RATIO)
+DEF_STAT(DEMAND_LAST_SCHEDULE             ,DIST,     NO_RATIO)
+
+
+/*
+DEF_STAT(SEND_MISS_REQ_QUEUE              ,COUNT,     NO_RATIO)
+*/
+
+/*DEF_STAT(L2_DATA_EVICT                    ,COUNT,     NO_RATIO)*/
+
+DEF_STAT(STREAM_BUFFER_REQ	          ,COUNT,     NO_RATIO)
+
+DEF_STAT(PREF_SEND_TO_MEM_REQ             ,DIST ,     NO_RATIO)
+DEF_STAT(PREF_SEND_TO_MEM_REQ_FAIL        ,DIST ,     NO_RATIO)
+
+DEF_STAT(HIT_TRAIN_STREAM                 ,DIST,     NO_RATIO)
+DEF_STAT(MISS_TRAIN_STREAM                ,DIST,     NO_RATIO)
+
+DEF_STAT(STREAM_TRAIN_CREATE              ,COUNT,    NO_RATIO)
+
+DEF_STAT(MEM_REQ_MISS_HWP_PREF_Q          ,DIST  , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_SW_PREF_Q           ,COUNT , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_IFETCH_Q            ,COUNT , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_DFETCH_Q            ,COUNT , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_DSTORE_Q            ,COUNT , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_DPRF_Q              ,COUNT , NO_RATIO  )
+DEF_STAT(MEM_REQ_MISS_WB_Q                ,DIST  , NO_RATIO  )
+
+
+DEF_STAT(PREF_HIT_BY_DEMAND_IFETCH        ,DIST,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_DEMAND_DFETCH        ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_DEMAND_DSTORE        ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_DEMAND_IPREF         ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_DEMAND_DPRF          ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_DEMAND_WB            ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_BY_PREF                 ,DIST,      NO_RATIO)
+     
+DEF_STAT(PREF_HIT_DEMAND_IFETCH           ,DIST,     NO_RATIO) 
+DEF_STAT(PREF_HIT_DEMAND_DFETCH           ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_DEMAND_DSTORE           ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_DEMAND_IPREF            ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_DEMAND_DPRF             ,COUNT,     NO_RATIO) 
+DEF_STAT(PREF_HIT_DEMAND_WB               ,DIST,     NO_RATIO) 
+
+
+DEF_STAT(PREF_L2_FILL                     ,DIST,      NO_RATIO)
+DEF_STAT(DEMAND_L2_FILL                   ,DIST,      NO_RATIO)
+
+/*
+DEF_STAT(TOUCH_L2_REPLACE                 ,DIST,     NO_RATIO)
+DEF_STAT(NO_TOUCH_L2_REPLACE              ,DIST,     NO_RATIO)
+
+DEF_STAT(PREF_REQ_L2_MISS                 ,COUNT,    NO_RATIO)
+DEF_STAT(DEMAND_L2_MISS                   ,COUNT,    NO_RATIO)
+DEF_STAT(PREF_REQ_L2_HIT                  ,COUNT,    NO_RATIO)
+DEF_STAT(DEMAND_L2_HIT                    ,COUNT,    NO_RATIO)
+*/
+
+DEF_STAT(PREF_REQ_QUE_FULL                ,COUNT,    NO_RATIO) 
+
+
+DEF_STAT( STREAM_REQ_QUEUE_HIT_BY_DEMAND  ,COUNT,  NO_RATIO)
+
+DEF_STAT(L2HIT_STREAM_PREF_REQ_QUE_FULL   ,COUNT,  NO_RATIO)
+
+DEF_STAT(L2HIT_HIT_TRAIN_STREAM           ,DIST,     NO_RATIO)
+DEF_STAT(L2HIT_MISS_TRAIN_STREAM          ,DIST,     NO_RATIO)
+
+DEF_STAT(L2HIT_STREAM_TRAIN_CREATE       , COUNT,    NO_RATIO)
+
+DEF_STAT(L2HIT_STREAM_BUFFER_REQ          ,COUNT,    NO_RATIO)
+
+DEF_STAT(L2HIT_STREAM_PREF_DCACHE_HIT     ,DIST,     NO_RATIO)
+DEF_STAT(L2HIT_STREAM_PREF_DCACHE_INSERT  ,COUNT,    NO_RATIO)
+DEF_STAT(L2HIT_STREAM_L2_MISS             ,DIST,     NO_RATIO)
+
+DEF_STAT(L2HIT_STREAM_DCACHE_PORT_FULL    ,COUNT,   NO_RATIO)
+DEF_STAT(L2HIT_STREAM_PREF_L2_PORT_FULL   ,COUNT,   NO_RATIO)
+
+DEF_STAT(L2HIT_TRAIN_HIT_DEMAND           ,DIST,    NO_RATIO)
+DEF_STAT(L2HIT_TRAIN_MISS_REQ             ,DIST,    NO_RATIO)
+
+DEF_STAT(L2HIT_TRAIN_FILTER_MISS          ,DIST,    NO_RATIO)
+DEF_STAT(L2HIT_TRAIN_FILTER_HIT           ,DIST,    NO_RATIO)
+
+DEF_STAT(L2HIT_PREF_REQ_DCACHE_HIT       ,DIST,    NO_RATIO)
+DEF_STAT(L2HIT_PREF_REQ_DCACHE_MISS      ,DIST,    NO_RATIO)
+
+DEF_STAT(L2HIT_L2SEND_Q_FULL             ,DIST,    NO_RATIO) /* overwrite the queue */ 
+DEF_STAT(L2HIT_L2SEND_Q_ENTER            ,DIST,    NO_RATIO) /* normal entering */
+
+DEF_STAT(L2HIT_MEM_REQ           ,COUNT,   NO_RATIO)
+
+DEF_STAT(REMOVE_REDUNDANT_STREAM_STAT    ,COUNT,   NO_RATIO)
+DEF_STAT(REPLACE_OLD_STREAM              , COUNT,  NO_RATIO)
+
+DEF_STAT(REQ_SEND_QUEUE_STALL            , COUNT,  NO_RATIO)
+
+/* DEF_STAT(PREF_L2Q_STALL                  , COUNT,  NO_RATIO) */
+/* -stat STREAM_LENGTH_0 STREAM_LENGTH_10 STREAM_LENGTH_20 STREAM_LENGTH_30 STREAM_LENGTH_40 STREAM_LENGTH_50 STREAM_LENGTH_60 STREAM_LENGTH_70 STREAM_LENGTH_80 STREAM_LENGTH_90 STREAM_LENGTH_100_P */
+
+DEF_STAT(STREAM_LENGTH_0                 , DIST,   NO_RATIO)
+DEF_STAT(STREAM_LENGTH_10                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_20                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_30                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_40                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_50                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_60                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_70                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_80                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_90                , COUNT,  NO_RATIO)
+DEF_STAT(STREAM_LENGTH_100_P             , DIST,   NO_RATIO)
+
+DEF_STAT(STREAM_ENTER_RA                 , COUNT,  NO_RATIO)

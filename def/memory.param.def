@@ -1,0 +1,209 @@
+
+param<PERFECT_ICACHE, perfect_icache, bool, false> 
+param<ICACHE_NUM_SET, icache_num_set, uns, 64> 
+param<ICACHE_ASSOC, icache_assoc, uns, 8 > 
+param<ICACHE_LINE_SIZE, icache_line_size, uns, 64 > 
+param<ICACHE_BANKS, icache_banks, uns, 32 > 
+param<ICACHE_BY_PASS, icache_by_pass, bool, false> /* Bypass */
+param<ICACHE_CYCLES, icache_cycles, uns, 1 > 
+
+param<ICACHE_MEDIUM_NUM_SET, icache_medium_num_set, uns, KNOB_ICACHE_NUM_SET> 
+param<ICACHE_MEDIUM_ASSOC, icache_medium_assoc, uns, KNOB_ICACHE_ASSOC> 
+param<ICACHE_MEDIUM_LINE_SIZE, icache_medium_line_size, uns, KNOB_ICACHE_LINE_SIZE> 
+param<ICACHE_MEDIUM_BANKS, icache_medium_banks, uns, KNOB_ICACHE_BANKS> 
+param<ICACHE_MEDIUM_BY_PASS, icache_medium_by_pass, bool, false>
+param<ICACHE_MEDIUM_CYCLES, icache_medium_cycles, uns, 1 > 
+
+param<ICACHE_LARGE_NUM_SET, icache_large_num_set, uns, KNOB_ICACHE_NUM_SET> 
+param<ICACHE_LARGE_ASSOC, icache_large_assoc, uns, KNOB_ICACHE_ASSOC> 
+param<ICACHE_LARGE_LINE_SIZE, icache_large_line_size, uns, KNOB_ICACHE_LINE_SIZE> 
+param<ICACHE_LARGE_BANKS, icache_large_banks, uns, KNOB_ICACHE_BANKS> 
+param<ICACHE_LARGE_BY_PASS, icache_large_by_pass, bool, false>
+param<ICACHE_LARGE_CYCLES, icache_large_cycles, uns, 1 > 
+
+param<ICACHE_READ_PORTS, icache_read_ports, uns, 1 >
+param<ICACHE_WRITE_PORTS, icache_write_ports, uns, 1 > 
+
+
+
+
+
+
+/* DCACHE */
+param<PERFECT_DCACHE, perfect_dcache, bool, false>
+param<DCACHE_READ_PORTS, dcache_read_ports, int, 4>
+param<DCACHE_WRITE_PORTS, dcache_write_ports, int, 4>
+
+param<L1_SMALL_NUM_SET,   l1_small_num_set,   int, 64>
+param<L1_SMALL_ASSOC,     l1_small_assoc,     int, 8>
+param<L1_SMALL_LINE_SIZE, l1_small_line_size, int, 64>
+param<L1_SMALL_NUM_BANK,  l1_small_num_bank,  int, 4>
+param<L1_SMALL_LATENCY,   l1_small_latency,   int, 3>
+param<L1_SMALL_BYPASS,    l1_small_bypass,    bool, false>
+param<L2_SMALL_NUM_SET,   l2_small_num_set,   int, 512>
+param<L2_SMALL_ASSOC,     l2_small_assoc,     int, 8>
+param<L2_SMALL_LINE_SIZE, l2_small_line_size, int, 64>
+param<L2_SMALL_NUM_BANK,  l2_small_num_bank,  int, 8>
+param<L2_SMALL_LATENCY,   l2_small_latency,   int, 8>
+param<L2_SMALL_BYPASS,    l2_small_bypass,    bool, false>
+
+param<L1_MEDIUM_NUM_SET,   l1_medium_num_set,   int, 64>
+param<L1_MEDIUM_ASSOC,     l1_medium_assoc,     int, 8>
+param<L1_MEDIUM_LINE_SIZE, l1_medium_line_size, int, 64>
+param<L1_MEDIUM_NUM_BANK,  l1_medium_num_bank,  int, 4>
+param<L1_MEDIUM_LATENCY,   l1_medium_latency,   int, 3>
+param<L1_MEDIUM_BYPASS,    l1_medium_bypass,    bool, false>
+param<L2_MEDIUM_NUM_SET,   l2_medium_num_set,   int, 512>
+param<L2_MEDIUM_ASSOC,     l2_medium_assoc,     int, 8>
+param<L2_MEDIUM_LINE_SIZE, l2_medium_line_size, int, 64>
+param<L2_MEDIUM_NUM_BANK,  l2_medium_num_bank,  int, 8>
+param<L2_MEDIUM_LATENCY,   l2_medium_latency,   int, 8>
+param<L2_MEDIUM_BYPASS,    l2_medium_bypass,    bool, false>
+
+param<L1_LARGE_NUM_SET,   l1_large_num_set,   int, 64>
+param<L1_LARGE_ASSOC,     l1_large_assoc,     int, 8>
+param<L1_LARGE_LINE_SIZE, l1_large_line_size, int, 64>
+param<L1_LARGE_NUM_BANK,  l1_large_num_bank,  int, 4>
+param<L1_LARGE_LATENCY,   l1_large_latency,   int, 3>
+param<L1_LARGE_BYPASS,    l1_large_bypass,    bool, false>
+param<L2_LARGE_NUM_SET,   l2_large_num_set,   int, 512>
+param<L2_LARGE_ASSOC,     l2_large_assoc,     int, 8>
+param<L2_LARGE_LINE_SIZE, l2_large_line_size, int, 64>
+param<L2_LARGE_NUM_BANK,  l2_large_num_bank,  int, 8>
+param<L2_LARGE_LATENCY,   l2_large_latency,   int, 8>
+param<L2_LARGE_BYPASS,    l2_large_bypass,    bool, false>
+
+param<NUM_L3,       num_l3,       int, 1>
+param<L3_INTERLEAVE_FACTOR, l3_interleave_factor, int, 64>
+param<L3_NUM_SET,   l3_num_set,      int, 8192>
+param<L3_ASSOC,     l3_assoc,     int, 16>
+param<L3_LINE_SIZE, l3_line_size, int, 64>
+param<L3_NUM_BANK,  l3_num_bank,  int, 16>
+param<L3_LATENCY,   l3_latency,   int, 25>
+
+param<DCACHE_INFINITE_PORT, dcache_infinite_port, bool, false>
+
+
+
+/* DRAM */
+param<DRAM_BUFFER_SIZE, dram_buffer_size, int, 128>
+param<DRAM_BANK_XOR_INDEX, dram_bank_xor_index, bool, true>
+param<DRAM_MERGE_REQUESTS, dram_merge_requests, bool, true>
+param<DRAM_ROWBUFFER_SIZE, dram_rowbuffer_size, int, 2048>
+param<DRAM_SCHEDULING_POLICY, dram_scheduling_policy, string, FRFCFS>
+param<DRAM_NUM_CHANNEL, dram_num_channel, int, 1>
+param<DRAM_NUM_BANKS, dram_num_banks, int, 8>
+param<DRAM_ONE_CYCLE, dram_one_cycle, uns, 10>
+param<DRAM_DDR_FACTOR, dram_ddr_factor, uns, 2>
+param<DRAM_BUS_WIDTH, dram_bus_width, uns, 8>
+param<DRAM_COLUMN, dram_column, uns, 6>
+param<DRAM_PRECHARGE, dram_precharge, uns, 6>
+param<DRAM_ACTIVATE, dram_activate, uns, 6>
+param<DRAM_FREQUENCY, dram_frequency, float, 0.4>
+param<CPU_FREQUENCY, cpu_frequency, float, 2.0>
+param<GPU_FREQUENCY, gpu_frequency, float, 1.0>
+param<DRAM_NUM_MC, dram_num_mc, int, 1>
+param<DRAM_INTERLEAVE_FACTOR, dram_interleave_factor, int, 128>
+
+
+/* Memory */
+param<MEMORY_TYPE, memory_type, string, l3_cn>
+param<MEM_MSHR_SIZE, mem_mshr_size, int, 128>
+param<MEM_QUEUE_SIZE, mem_queue_size, int, 128>
+
+
+/* Prefetcher */
+param<ENABLE_PREF_SMALL_CORE,  enable_pref_small_core,  bool, false>
+param<ENABLE_PREF_MEDIUM_CORE, enable_pref_medium_core, bool, false>
+param<ENABLE_PREF_LARGE_CORE,  enable_pref_large_core,  bool, false>
+
+
+
+/* MISC */
+param<MEM_SIZE_AMP, mem_size_amp, int, 1 >
+param<PTX_COMMON_CACHE, ptx_common_cache, bool, false>
+param<MAX_TRANSACTION_SIZE, max_transaction_size, int, 64>
+param<BYTE_LEVEL_ACCESS, byte_level_access, bool, false>
+param<INFINITE_PORT, infinite_port, bool, false>
+param<EXTRA_LD_LATENCY, extra_ld_latency, int, 0> 
+
+
+
+param<USE_CONST_AND_TEX_CACHES, use_const_and_tex_caches, bool, true>
+param<CONST_CACHE_SIZE, const_cache_size, uns32, 1024>
+param<CONST_CACHE_ASSOC, const_cache_assoc, uns8, 8>
+param<CONST_CACHE_LINE_SIZE, const_cache_line_size, uns8, 64> 
+param<CONST_CACHE_BANKS, const_cache_banks, uns8, 8> 
+param<CONST_CACHE_CYCLES, const_cache_cycles, uns8, 4> 
+param<TEXTURE_CACHE_SIZE, texture_cache_size, uns32, 256>
+param<TEXTURE_CACHE_ASSOC, texture_cache_assoc, uns8, 8>
+param<TEXTURE_CACHE_LINE_SIZE, texture_cache_line_size, uns8, 64> 
+param<TEXTURE_CACHE_BANKS, texture_cache_banks, uns8, 8> 
+param<TEXTURE_CACHE_CYCLES, texture_cache_cycles, uns8, 4> 
+param<SHARED_MEM_SIZE, shared_mem_size, uns32, 4096>
+param<SHARED_MEM_ASSOC, shared_mem_assoc, uns8, 8>
+param<SHARED_MEM_LINE_SIZE, shared_mem_line_size, uns8, 4> 
+param<SHARED_MEM_BANKS, shared_mem_banks, uns8, 16> 
+param<SHARED_MEM_CYCLES, shared_mem_cycles, uns8, 4>
+param<SHARED_MEM_PORTS, shared_mem_ports, uns, 2>
+
+
+/* Cache coherence */
+param<ENABLE_CACHE_COHERENCE, enable_cache_coherence, bool, false>
+
+
+param<COLLECT_CACHE_INFO, collect_cache_info, int, 0>
+param<HETERO_STATIC_CACHE_PARTITION, hetero_static_cache_partition, bool, false>
+param<HETERO_STATIC_CPU_PARTITION,   hetero_static_cpu_partition, int, 1>
+param<HETERO_STATIC_GPU_PARTITION,   hetero_static_gpu_partition, int, 1>
+param<HETERO_GPU_CORE_DISABLE,       hetero_gpu_core_disable, int, -2>
+param<HETERO_GPU_CORE_DISABLE1,       hetero_gpu_core_disable1, int, -2>
+
+
+
+param<HETERO_NOC_USE_SAME_QUEUE, hetero_noc_use_same_queue, bool, true>
+
+param<HETERO_MEM_PRIORITY_CPU, hetero_mem_priority_cpu, bool, false>
+param<HETERO_MEM_PRIORITY_GPU, hetero_mem_priority_gpu, bool, false>
+
+param<HETERO_USE_RRIP_CACHE, hetero_use_rrip_cache, bool, false>
+param<HETERO_USE_UCP_CACHE, hetero_use_ucp_cache, bool, false>
+param<HETERO_USE_TC_CACHE, hetero_use_tc_cache, bool, false>
+param<HETERO_USE_PIPP_CACHE, hetero_use_pipp_cache, bool, false>
+
+/* RRIP Cache */
+param<RRIP_CACHE_NUM_BIT, rrip_cache_num_bit, int, 3>
+param<RRIP_CACHE_INSERT_AT, rrip_cache_insert_at, int, 6>
+param<RRIP_CACHE_NUM_COUNTER_BIT, rrip_cache_num_counter_bit, int, 10>
+param<RRIP_CACHE_DYNAMIC_ON, rrip_cache_dynamic_on, bool, false>
+param<RRIP_CACHE_BIP_EPSILON, rrip_cache_bip_epsilon, int, 5>
+param<RRIP_CACHE_FOR_GPU, rrip_cache_for_gpu, bool, false> 
+param<RRIP_CACHE_FOR_MULTI_GPU, rrip_cache_for_multi_gpu, bool, false> 
+param<RRIP_CACHE_PROBABILITY, rrip_cache_probability, int, 20>
+param<RRIP_BIP_ALWAYS, rrip_bip_always, bool, false>
+
+param<HETERO_USE_TADIP_CACHE, hetero_use_tadip_cache, bool, false>
+param<TADIP_CACHE_NUM_COUNTER_BIT, tadip_cache_num_counter_bit, int, 10>
+param<TADIP_CACHE_BIP_EPSILON, tadip_cache_bip_epsilon, int, 5>
+
+param<UCP_CACHE_NUM_APPLICATION, ucp_cache_num_application, int, 2>
+param<UCP_CACHE_PARTITION_PERIOD, ucp_cache_partition_period, int, 5000000>
+param<UCP_CACHE_FOR_GPU, ucp_cache_for_gpu, bool, false>
+param<UCP_CACHE_FOR_MULTI_GPU, ucp_cache_for_multi_gpu, bool, false>
+param<UCP_CACHE_CPU_INTERFERENCE, ucp_cache_cpu_interference, int, 50>
+param<UCP_CACHE_GPU_MAX_PARTITION_LOOKUP, ucp_cache_gpu_max_partition_lookup, int, 2>
+param<UCP_CACHE_GPU_DROP_PROBABILITY, ucp_cache_gpu_drop_probability, int, 50>
+param<UCP_CACHE_ACCESS_CONTROL, ucp_cache_access_control, int, 1>
+
+param<TC_CACHE_CAGING_PERIOD, tc_cache_caging_period, int, 5000000>
+param<TC_CACHE_CAGING_SPACE, tc_cache_caging_space, int, 1>
+param<TC_CACHE_NUM_APPLICATION, tc_cache_num_application, int, 2>
+
+param<CACHE_FOR_STREAM_CPU, cache_for_stream_cpu, bool, false>
+
+
+param<BDP_THRESHOLD, bdp_threshold, int, 5>
+param<BDP_DEGREE, bdp_degree, int, 3>
+
+
+param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>

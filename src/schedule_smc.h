@@ -1,0 +1,132 @@
+/**********************************************************************************************
+ * File         : schedule_smc.cc
+ * Author       : Hyesoon Kim
+ * Date         : 1/1/2008 
+ * SVN          : $Id: main.cc,v 1.26 2008-09-21 00:02:54 kacear Exp $:
+ * Description  : scheduler for gpu (small many cores)
+ *********************************************************************************************/
+
+#ifndef SCHEDULE_ORIG_GPU_H_INCLUDED
+#define SCHEDULE_ORIG_GPU_H_INCLUDED
+
+
+#include "rob.h"
+#include "schedule.h"
+#include "uop.h"
+#include "frontend.h"
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief Scheduler class for GPU simulation
+///////////////////////////////////////////////////////////////////////////////////////////////
+class schedule_smc_c : public schedule_c 
+{
+  public:
+    /**
+     *  \brief Constructor for the gpu scheluder class.
+     *  \param m_core_id - Core identifier number
+     *  \param gpu_allocq - Pointer to be updated with the alloc stage queues
+     *  \param gpu_m_rob - Pointer to the Reorder buffer  
+     *  \param m_exec - Pointer to m_execution unit
+     *  \param m_unit_type - Parameter used to identify knob width
+     *  \param m_frontend - Pointer to front end queue
+     *  \return void 
+     */
+    schedule_smc_c(int m_core_id, pqueue_c<gpu_allocq_entry_s>** gpu_allocq, 
+        smc_rob_c* gpu_m_rob, exec_c* m_exec, Unit_Type m_unit_type,
+        frontend_c* m_frontend, macsim_c* simBase); 
+
+    /*! \fn void ~schedule_smc_c()
+     *  \brief Destructor for the gpu scheduler
+     *  \return void 
+     */
+    ~schedule_smc_c(void);
+
+    /*! \fn int reserve_sched_queue(int thread_id)
+     *  \brief Function to reserve scheduler queue
+     *  \param thread_id - Thread id
+     *  \return int - index of the reserved schedule queue
+     */
+//    int reserve_sched_queue(int thread_id);
+
+    /*! \fn int free_sched_queue(int thread_id)
+     *  \brief Function to free reserve scheduler queue
+     *  \param thread_id - Thread id
+     *  \return void
+     */
+//    void free_sched_queue(int thread_id);
+
+    /*! \fn void run_a_cycle()
+     *  \brief Function to perform the activities of a cycle for the scheduler.
+     *  \return void 
+     */
+    void run_a_cycle();
+
+  private:
+    /*! \fn void advance(int ALLOCQ_index)
+     *  \brief Function to move the allocation queue ahead.
+     *  \param ALLOCQ_index - Aloocation queue number to be moved ahead
+     *  \return void 
+     */
+    void advance(int ALLOCQ_index);
+
+    /*! \fn bool check_srcs(int thread_id, int entry)
+     *  \brief Function to check if the sources of an uop are ready
+     *  \param thread_id - Thread id
+     *  \param entry - ROB entry of the uop
+     *  \return bool - True if no dependency found
+     */
+    bool check_srcs(int thread_id, int entry);
+
+    /*! \fn bool uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
+     *  \brief Function to schedule uops 
+     *  \param thread_id - Thread id
+     *  \param entry - ROB entry of the uop
+     *  \param sched_fail_reason - Reason of uop schedule failure
+     *  \return bool - True on success in scheduling
+     */
+    bool uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason);
+
+    /*! \fn int get_reserved_sched_queue(int thread_id)
+     *  \brief Function to retrieve the reserved schedule queue for a thread
+     *  \param thread_id - Thread id
+     *  \return int - index of the reserved schedule queue
+     */
+  //  int get_reserved_sched_queue(int thread_id);
+
+    /*! \fn void reinit_sched_queue(int entry)
+     *  \brief Function to renitialize the schedule queue
+     *  \param entry - index of the reserved schedule queue
+     *  \return void 
+     */
+//    void reinit_sched_queue(int entry); 
+
+  private:
+    static const int MAX_GPU_SCHED_SIZE = 128; /**< max sched table size */
+
+    pqueue_c<gpu_allocq_entry_s>**   m_gpu_allocq; /**< gpu allocation queue */ 
+
+    smc_rob_c*      m_gpu_rob;  /**< gpu rob */
+    int             knob_num_threads; /**< number of maximum thread per core */
+
+#if 0
+    int           **m_schedule_lists; /**< schedule list per thread */
+    int            *m_first_schlist_ptrs; /**< first index to sched list per thread */
+    int            *m_last_schlist_ptrs; /**< last index to sched list per thread */
+    map<int, int>   m_thread_to_list_id_map; /**< tid to thread sched list map */
+    list<int>       m_free_list; /**< free sched list */
+    int            *m_schedule_arbiter; /**< schedule arbiter */
+#endif
+    int             m_schedule_modulo; /**< modulo to schedule next thread */
+
+    int* m_schlist_entry;
+    int* m_schlist_tid;
+    int m_first_schlist;
+    int m_last_schlist;
+    int m_schlist_size;
+
+    macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+   
+};
+#endif // SCHEDULE_ORIG_H_INCLUDED
+

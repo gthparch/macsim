@@ -1,0 +1,68 @@
+/* -*- Mode: c -*- */
+
+/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
+   It's not a good idea to reorder these, since many calls are made like
+   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
+   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
+   interval, 'Cumulative' is over the entire run so far.
+
+   DEF_STAT( Name, Type, Ratio )
+
+   The 'Type' column is used to group statistics together and format the printouts
+   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
+   Possible 'Type' values are:
+
+	COUNT -- The count is what's important.  Just print the number of times it
+	occurred.  
+	
+	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
+	the number of cycles.  (Ex. IPC)  The count is also printed.
+
+	PER_INST -- Same thing, but per instruction.
+
+	DIST -- This is a little bit complicated.  The first DIST type encountered
+	signals the beginning of a distribution.  The next DIST encountered marks the
+	end of the distribution (inclusive).  All of the stats in-between should be of
+	type COUNT.  All of the stats in a distribution are printed as a percentage of
+	the total.
+
+	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
+	determines which other stat should be used.  The current stat is divided by that
+	specified in the 'Ratio Stat' column.  This column is ignored for all types but
+	RATIO.
+
+*/
+
+DEF_STAT (SCHED_FAILED_REASON_SUCCESS,            		  DIST,            NO_RATIO, PER_CORE)
+DEF_STAT (SCHED_FAILED_OPERANDS_NOT_READY,        		  COUNT,            NO_RATIO, PER_CORE)
+DEF_STAT (SCHED_FAILED_NO_PORTS,                   		  DIST,            NO_RATIO, PER_CORE)
+
+DEF_STAT (NUM_SAMPLES,							  		  COUNT, 			NO_RATIO, PER_CORE)
+DEF_STAT (NUM_ACTIVE_BLOCKS,  					  		  RATIO, 			NUM_SAMPLES, PER_CORE)
+DEF_STAT (NUM_ACTIVE_THREADS, 					  		  RATIO, 			NUM_SAMPLES, PER_CORE)
+
+DEF_STAT (NUM_SCHED_IDLE_CYCLE, 				  		  COUNT, 			NO_RATIO, PER_CORE) 
+DEF_STAT (NUM_NO_SCHED_CYCLE, 					  		  COUNT, 			NO_RATIO, PER_CORE) 
+
+DEF_STAT(DISPATCHED_INST,						  		  COUNT,			NO_RATIO)
+DEF_STAT(DISPATCH_WAIT,							  		  RATIO,			DISPATCHED_INST)
+
+
+DEF_STAT(CORE_DISPATCHED_INST,					  		  COUNT,			NO_RATIO, PER_CORE)
+DEF_STAT(CORE_DISPATCH_WAIT,					  		  RATIO,			CORE_DISPATCHED_INST, PER_CORE)
+
+DEF_STAT(CORE_CYCLES,						  	  		  COUNT,			NO_RATIO, PER_CORE)
+DEF_STAT(CORE_SCHED_THREADS,					  		  RATIO,			CORE_CYCLES, PER_CORE)
+
+DEF_STAT(NUM_NO_FETCH_CYCLES,					  		  COUNT,			NO_RATIO)
+DEF_STAT(CORE_NUM_NO_FETCH_CYCLES,				  		  COUNT,			NO_RATIO, PER_CORE)
+DEF_STAT(CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS,	  COUNT,			NO_RATIO, PER_CORE)
+
+DEF_STAT(CORE_NUM_FETCH_CYCLES,							  COUNT,			NO_RATIO, PER_CORE)
+DEF_STAT(CORE_FETCH_DELTA,								  RATIO, 			CORE_NUM_FETCH_CYCLES, PER_CORE)
+
+DEF_STAT(CORE_NUM_RETIRE_CYCLES,						  COUNT,			NO_RATIO, PER_CORE)
+DEF_STAT(CORE_RETIRE_DELTA,								  RATIO, 			CORE_NUM_RETIRE_CYCLES, PER_CORE)
+
+DEF_STAT(AVG_CORE_IDLE_CYCLE, COUNT, NO_RATIO)
+

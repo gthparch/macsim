@@ -1,0 +1,117 @@
+num_sim_cores 32
+num_sim_small_cores 32
+core_type ptx
+max_threads_per_core 4
+cpu_frequency 1.2
+dram_frequency 0.8
+dram_bus_width 4
+dram_ddr_factor 2
+dram_column 11
+dram_activate 25
+dram_precharge 10
+dram_num_banks 16
+dram_num_channel 8
+dram_size_rowbuffer_bw 2048
+bus_width_in_bytes 32
+
+
+num_sim_medium_cores 0
+num_sim_large_cores 0
+
+
+width 2
+fetch_latency 5
+alloc_latency 5
+rob_size 1024
+schedule ooo
+isched_rate 4 
+msched_rate 2 
+fsched_rate 2 
+in_order_processing 0
+bp_hist_length 14
+max_block_per_core 4
+fetch_policy rr
+mt_no_fetch_br 1
+fetch_only_load_ready 0
+schedule_ratio 1
+fetch_ratio 1
+
+
+dcache_assoc 8
+dcache_line_size 64
+core_to_l2_ratio 1
+cache_coherence 1
+dcache_size 32768
+dcache_miss_always 0
+l2_by_pass 0
+icache_size 8192
+l2_merge_requests 1
+dram_merge_requests 1
+dram_fixed_latency 0
+l2_req_buffer_entries 32
+mem_req_buffer_entries 32
+l2_size 262144
+enable_pref 0
+mem_ooo_stores 0
+ptx_common_cache 0
+
+
+perfect_l2 0
+perfect_dcache 0
+perfect_inst_cache 0
+
+
+sim_cycle_count 0
+sim_single_thread 1
+num_sim_traces  80
+max_insts 200000000
+heartbeat_interval 1000000
+collect_num_active_threads 0
+collect_num_busy_banks 0
+collect_thread_start_end_cycles 1
+forward_progress_limit 10000000
+trace_mode text
+collect_num_active_dram_req 0
+gen_l2_trace 0
+collect_bar_wait_cycles 0
+collect_mlp_stats 0
+blocks_to_simulate 0
+
+
+debug_core_id 0
+debug_cycle_start 1
+debug_cycle_stop 0
+debug_front_stage 0
+debug_alloc_stage 0
+debug_schedule_stage 0
+debug_exec_stage 0
+debug_dcu_stage 0
+debug_retire_stage 0
+debug_map_stage 0
+debug_mem  0
+debug_trace_read 0
+debug_sim_thread_schedule 0
+debug_list_lib 0
+debug_cache_lib 0
+debug_uop_pool 0
+debug_bp_dir 0
+memory_debug 0
+
+
+gpu_sched 1
+const_cache_size 2048
+texture_cache_size 16384
+shared_mem_size 16384
+memory_req_priority 0
+dcache_cycles 1
+l2_cycles 14
+byte_level_access 0
+invalidate_prefetch_after_use 1
+schedule_until_block 1
+print_info_with_heartbeat 0
+proc_bus_freq_ratio 1
+bus_transfer_latency 20
+dram_additional_latency 40
+infinite_port 1
+dram_scheduling_policy FRFCFS_PRIORITY
+

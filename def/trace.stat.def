@@ -1,0 +1,5 @@
+
+DEF_STAT( TRACE_READ_COUNT,          COUNT,       NO_RATIO)
+
+
+

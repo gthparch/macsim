@@ -1,0 +1,53 @@
+/* -*- Mode: c -*- */
+
+ DEF_POWER_EVENT(   rename_access	)
+ DEF_POWER_EVENT(   multi_rename_access	)
+ DEF_POWER_EVENT(   bpred_access	)
+ DEF_POWER_EVENT(   window_access	)
+ DEF_POWER_EVENT(   lsq_access	)
+ DEF_POWER_EVENT(   regfile_read	)
+ DEF_POWER_EVENT(   regfile_write	)
+ DEF_POWER_EVENT(   iaccess_cache	)
+ DEF_POWER_EVENT(   dcache_read	)
+ DEF_POWER_EVENT(   dcache_write	)
+ DEF_POWER_EVENT(   mrb_cam_access	)
+ DEF_POWER_EVENT(   mrb_data_access	)
+ DEF_POWER_EVENT(   l2access_cache	)
+ DEF_POWER_EVENT(   alu_access	)
+ DEF_POWER_EVENT(   ialu_access	)   //
+ DEF_POWER_EVENT(   falu_access	)   //
+ DEF_POWER_EVENT(   resultbus_access	)
+ DEF_POWER_EVENT(   front_decode_buffer_access )
+ DEF_POWER_EVENT(   front_map_buffer_access )
+
+ DEF_POWER_EVENT(   local_bypass_access	)
+ DEF_POWER_EVENT(   global_bypass_access	)
+         
+ DEF_POWER_EVENT(   window_selection_access	)
+ DEF_POWER_EVENT(   window_wakeup_access	)
+ DEF_POWER_EVENT(   window_preg_access	)
+ DEF_POWER_EVENT(   lsq_preg_access	)
+ DEF_POWER_EVENT(   lsq_wakeup_access	)
+ DEF_POWER_EVENT(   lsq_store_data_access	)
+ DEF_POWER_EVENT(   lsq_load_data_access	)
+
+ DEF_POWER_EVENT(   broadcastbuffer_access	)
+ DEF_POWER_EVENT(   broadcast_stage	)
+
+ DEF_POWER_EVENT(   misc0_write	)
+ DEF_POWER_EVENT(   misc0_read	)
+ DEF_POWER_EVENT(   misc1_access	)
+ DEF_POWER_EVENT(   misc2_access	)
+         
+ DEF_POWER_EVENT(   bbt_write	)
+ DEF_POWER_EVENT(   bbt_read	)
+         
+ DEF_POWER_EVENT(   window_total_pop_count_cycle	)     // population counts for all window write data.    
+ DEF_POWER_EVENT(   window_num_pop_count_cycle	)       // num window writes in cycle
+ DEF_POWER_EVENT(   lsq_total_pop_count_cycle	)
+ DEF_POWER_EVENT(   lsq_num_pop_count_cycle	)
+ DEF_POWER_EVENT(   regfile_total_pop_count_cycle	)
+ DEF_POWER_EVENT(   regfile_num_pop_count_cycle	)
+ DEF_POWER_EVENT(   resultbus_total_pop_count_cycle	)
+ DEF_POWER_EVENT(    resultbus_num_pop_count_cycle	)       
+

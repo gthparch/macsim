@@ -1,0 +1,28 @@
+/* -*- Mode: c -*- */
+
+param <  ENABLE_GATING, enable_gating, bool, false >
+param <  NUM_CONSEC_IDLE_PERIOD_PREDICTORS, num_consec_idle_period_predictors, uns, 9  >
+param <  CONSEC_IDLE_TRIGGER, consec_idle_trigger, uns, 5>
+param <  CONSEC_IDLE_CNT_ONLY_PRED, consec_idle_cnt_only_pred, bool, false  >
+param <  CONSEC_IDLE_CNT_INTERVAL, consec_idle_cnt_interval, uns, 10>
+param <  CONSEC_IDLE_START_PRED, consec_idle_start_pred, uns, 10>
+param <  CONSEC_IDLE_CNT_CLKGATE_ON_FOREVER, consec_idle_cnt_clkgate_on_forever, uns, 50 >
+param <  CLKGATE_ON_STATE, clkgate_on_state, uns, 3 >
+param <  ENABLE_PWRGATE, enable_pwrgate, bool, false >
+param <  CLKGATEUNTILMISS, clkgateuntilmiss, bool, true >
+
+
+
+     /* multipath power model */
+
+
+param < MODEL_ADDED_MICRO_LENGTH, model_added_micro_length, uns, 10>
+param < POWER_DHP, power_dhp, bool, false>
+param < POWER_DUAL, power_dual, bool, false >
+param < POWER_DMP, power_dmp, bool, false >
+param < POWER_MULTI, power_multi, bool, false>
+param < POWER_SWPRED, power_swpred, bool, false>
+param < POWER_WISH, power_wish, bool, false >
+
+param < PRED_ID_LENGTH, pred_id_length, uns, 5 >
+param < FRONT_MAP_BUFFER_WIDTH, front_map_buffer_width, uns, 160 >

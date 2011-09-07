@@ -1,0 +1,90 @@
+
+
+
+
+
+
+trace_mode text
+heartbeat_interval 1000000
+max_insts 4000000000
+forward_progress_limit 10000
+
+
+
+
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+large_core_type x86
+cpu_frequency 2.0
+isched_rate 4 
+msched_rate 2 
+fsched_rate 2 
+sim_cycle_count 0 
+bp_hist_length 16
+one_cycle_exec 0
+in_order_processing 0 
+mem_ooo_stores 0
+fetch_policy rr
+mt_no_fetch_br 1
+large_width 4
+large_core_fetch_latency 5
+large_core_alloc_latency 10
+max_threads_per_large_core 1
+large_core_schedule ooo
+rob_large_size 256                     
+
+
+
+
+dram_frequency 0.4
+dram_bus_width 8
+dram_ddr_factor 2
+dram_column 6
+dram_activate 6
+dram_precharge 6
+dram_num_banks 8
+dram_rowbuffer_size 2048
+dram_buffer_size 128
+dram_scheduling_policy FRFCFS 
+pref_framework_on 1
+enable_cache_coherence 0
+stream_buffer_n 32
+stream_prefetch_n 4
+stream_length 64
+pref_stream_on_large_core 0
+pref_ghb_on_large_core 0
+enable_pref_large_core 0
+memory_type l3_coupled_network
+
+
+
+perfect_icache 0
+perfect_bp 0
+perfect_dcache 0
+
+
+debug_core_id 0 
+debug_cycle_start 1 
+debug_cycle_stop 0 
+debug_front_stage 0 
+debug_alloc_stage 0
+debug_schedule_stage 0
+debug_exec_stage 0
+debug_dcu_stage 0
+debug_retire_stage 0 
+debug_map_stage 0
+debug_mem  0
+debug_sim_thread_schedule 0
+debug_list_lib 0
+debug_cache_lib 0 
+debug_uop_pool 0 
+debug_bp_dir 0
+debug_trace_read 0 
+debug_print_trace 0
+debug_stream 0
+debug_pref 0
+debug_swpref 0
+debug_dram 0
+bug_detector_enable 1
