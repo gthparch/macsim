@@ -207,7 +207,6 @@ check-am: all-am
 check: check-am
 all-am: Makefile
 installdirs:
-install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -313,6 +312,9 @@ uninstall-am:
 
 
 all:
+	./run_interface
+
+install:
 	./run_interface
 
 dbg:

@@ -26,12 +26,6 @@ using namespace std;
 
 
 #define QUOTE(x) #x
-//No longer compatible with componentMACSIM
-//#define DECLARE_KNOB(OBJECTNAME, NAME, TYPE, INITIALVALUE)      \
-//  KnobTemplate< TYPE > *m_simBase->m_knobs->KNOB_##OBJECTNAME;
-//#define REGISTER_KNOB(OBJECTNAME)                                       \
-//  KnobsContainer::getInstance()->insertKnob(&*m_simBase->m_knobs->KNOB_##OBJECTNAME);
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief name and value of the knob from the file
@@ -375,6 +369,11 @@ class KnobsContainer
      * Apply new values from the command line.
      */
     bool applyComandLineArguments(int argc, char** argv, char** invalidParam);
+
+    /**
+     * Change the value of a single knob.
+     */
+    void updateKnob(string key, string value);
 
     /**
      * Adjust the value of a knob.

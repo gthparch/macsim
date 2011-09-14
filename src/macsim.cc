@@ -103,6 +103,24 @@ void macsim_c::init_knobs(int argc, char** argv)
 	// Get a reference to the actual knobs for this component instance
 	m_knobs = m_knobsContainer->getAllKnobs();
 
+#ifdef USING_SST
+	string  paramPath(argv[0]);
+	string  tracePath(argv[1]);
+	string outputPath(argv[2]);
+	
+	//Apply specified params.in file
+	m_knobsContainer->applyParamFile(paramPath);
+	
+	//Specify trace_file_list and update the knob
+	m_knobsContainer->updateKnob("trace_name_file", tracePath);
+
+	//Specify output path for statistics
+	m_knobsContainer->updateKnob("out", outputPath);
+
+	//save the states of all knobs to a file
+	m_knobsContainer->saveToFile(outputPath + "/params.out");
+
+#else
 	// apply values from parameters file
 	m_knobsContainer->applyParamFile("params.in");
 
@@ -113,6 +131,7 @@ void macsim_c::init_knobs(int argc, char** argv)
 
 	// save the states of all knobs to a file
 	m_knobsContainer->saveToFile("params.out");
+#endif
 }
 
 

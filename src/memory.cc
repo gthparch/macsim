@@ -21,6 +21,7 @@
 #include "uop.h"
 #include "factory_class.h"
 #include "rrip.h"
+#include "tadip.h"
 
 #include "config.h"
 
@@ -288,15 +289,15 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
     m_cache = new cache_ucp_c(name, m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
         m_banks, false, id, CACHE_DL1, false);
   }
+  */
   else if (level == MEM_L3 && *m_simBase->m_knobs->KNOB_HETERO_USE_TADIP_CACHE) {
     stringstream sstr;
     sstr << "L3_" << id;
     string name;
     sstr >> name;
     m_cache = new cache_tadip_c(name, m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
-        m_banks, false, id, CACHE_DL1, false);
+        m_banks, false, id, CACHE_DL1, false, simBase);
   }
-  */
   else {
     m_cache = new cache_c("dcache", m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
         m_banks, false, id, CACHE_DL1, level == MEM_L3 ? true : false, simBase);

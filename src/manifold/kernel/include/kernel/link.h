@@ -73,7 +73,7 @@ int Serialize(T data, unsigned char** d)
 template <typename T>
 int Serialize(T* data, unsigned char** d)
 {
-    return T :: Serialize(data, d);
+    return T :: Serialize(*data, *d);
 }
 
 template <typename T>

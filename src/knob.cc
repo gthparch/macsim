@@ -112,6 +112,11 @@ void KnobsContainer::adjustKnobValues()
   applyValuesToKnobs(m_valuesFromFile);
 }
 
+// update a single knob
+void KnobsContainer::updateKnob(string key, string value) {
+	createEntryFromtext(key + " " + value);
+	adjustKnobValues();
+}
 
 // apply new value to the knob
 void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)

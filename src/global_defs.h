@@ -151,8 +151,8 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 #define CACHE_HIT 0
 #define MAX_STR_LENGTH        256         /* default 256 */
 #define MAX_SIMULTANEOUS_STRINGS    32      /* default 32 */ /* power of 2 */
-#define SUCCESS 1
-#define FAILURE 0
+//#define SUCCESS 1
+//#define FAILURE 0
 #define MAX_CTR  0xffffffffffffffffULL
 #define MAX_SCTR 0x7fffffffffffffffLL
 #define MAX_INT64  0x7fffffffffffffffLL
