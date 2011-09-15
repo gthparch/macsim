@@ -275,6 +275,7 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   m_out_queue = new queue_c(simBase);
 
   // allocate cache
+  // RRIP
   if (level == MEM_L3 && *m_simBase->m_knobs->KNOB_HETERO_USE_RRIP_CACHE) {
     m_cache = new cache_rrip_c(*m_simBase->m_knobs->KNOB_RRIP_CACHE_NUM_BIT, "dcache", m_num_set, m_assoc, 
         m_line_size, sizeof(dcache_data_s), m_banks, false, id, CACHE_DL1, 
@@ -290,6 +291,7 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
         m_banks, false, id, CACHE_DL1, false);
   }
   */
+  // TADIP
   else if (level == MEM_L3 && *m_simBase->m_knobs->KNOB_HETERO_USE_TADIP_CACHE) {
     stringstream sstr;
     sstr << "L3_" << id;
