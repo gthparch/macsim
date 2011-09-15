@@ -19,39 +19,33 @@
 
 using namespace std;
 
-
-map<string, ofstream*> AllStatsOutputStreams;
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // get the output stream
 ofstream* getOutputStream(const string& filename, macsim_c* m_simBase)
 {
+  string fullpath = *m_simBase->m_knobs->KNOB_STATISTICS_OUT_DIRECTORY;
+  fullpath = fullpath + "/" + filename;
+
   // stat name already encountered
   // check if the output stream is opened then do nothing
   // otherwise open the stream
-  map<string, ofstream*>::iterator iter = AllStatsOutputStreams.find(filename);
+  map<string, ofstream*>::iterator iter = m_simBase->m_AllStatsOutputStreams.find(filename);
 
   ofstream* stream = NULL;
 
   // first time this filename is encounterd
   // create the ofstream object
-  if (iter == AllStatsOutputStreams.end()) {
+  if (iter == m_simBase->m_AllStatsOutputStreams.end()) {
     stream = new ofstream();
     stream->exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
 
-    // string fullPath = "./statistics/";
-    string fullPath = *m_simBase->m_knobs->KNOB_STATISTICS_OUT_DIRECTORY; 
-
-    fullPath = fullPath + filename;
-
     try {
-      stream->open(filename.c_str(), ios_base::out);
+      stream->open(fullpath.c_str(), ios_base::out);
     
       if (stream->is_open())
-        AllStatsOutputStreams[filename] = stream;
+        m_simBase->m_AllStatsOutputStreams[filename] = stream;
       else
       {
         delete stream;
@@ -66,7 +60,7 @@ ofstream* getOutputStream(const string& filename, macsim_c* m_simBase)
     }
   }
   else {
-    stream = AllStatsOutputStreams[filename];
+    stream = m_simBase->m_AllStatsOutputStreams[filename];
   }
 
   return stream;
@@ -444,8 +438,8 @@ void ProcessorStatistics::saveStats(string ext)
 
   int check = mkdir(Path, S_IRWXU);
   check = check; // avoid "unused variable" warning
-  if (chdir(Path) != 0)
-    exit(0);
+  //if (chdir(Path) != 0)
+  //  exit(0);
 
   // svae global statistics
   m_globalStatistics->saveStats(ext);

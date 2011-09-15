@@ -25,7 +25,7 @@ my @deconstructs = ();
 ##### START #####
 
 ### Search for parameter definitions
-@files = <$working_dir/*.def>;
+@files = <$working_dir/../../def/*.param.def>;
 if (0 == scalar(@files)) {
   print "no such files:  *.param.def\n";
   exit();

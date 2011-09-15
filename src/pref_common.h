@@ -418,6 +418,10 @@ class hwp_common_c
 
     unordered_map<int, Counter> m_last_inst_num; /**< train hardware pref once per inst. */
 
+    FILE * PREF_TRACE_OUT;
+    FILE * PREF_ACC_OUT;
+    FILE * PREF_DEGFB_FILE;
+
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
 };

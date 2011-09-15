@@ -89,6 +89,14 @@ trace_uop_s::trace_uop_s()
 trace_read_c::trace_read_c(macsim_c* simBase)
 {
   m_simBase = simBase;
+
+  // map opcode type to uop type 
+  init_pin_convert();
+
+  // initialization
+  dprint_count = 0;
+  dprint_output = new ofstream(*m_simBase->m_knobs->KNOB_STATISTICS_OUT_DIRECTORY + 
+                               "/trace_debug.out");
 }
 
 
@@ -109,13 +117,6 @@ trace_read_c::~trace_read_c()
  */
 void trace_read_c::setup_trace(int core_id, int sim_thread_id)
 {
-  static bool init = true;
-  if (init) {
-    // map opcode type to uop type 
-    init_pin_convert();
-    init = false;
-  }
-
   core_c* core = m_simBase->m_core_pointers[core_id];
   thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -350,41 +351,38 @@ bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thr
  */
 void trace_read_c::dprint_inst(trace_info_s *t_info, int core_id, int thread_id) 
 {
-  static uint32_t count = 0;
-  static ofstream* trace_output = new ofstream("trace_debug.out");
-
-  if (count++ >= 50000 || !*m_simBase->m_knobs->KNOB_DEBUG_PRINT_TRACE)
+  if (dprint_count++ >= 50000 || !*m_simBase->m_knobs->KNOB_DEBUG_PRINT_TRACE)
     return ;
  
-  *trace_output << "*** begin of the data strcture *** " << endl;
-  *trace_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
-  *trace_output << "uop_opcode " <<g_tr_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
-  *trace_output << "num_read_regs: " << hex <<  (uint32_t) t_info->m_num_read_regs << endl;
-  *trace_output << "num_dest_regs: " << hex << (uint32_t) t_info->m_num_dest_regs << endl;
+  *dprint_output << "*** begin of the data strcture *** " << endl;
+  *dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
+  *dprint_output << "uop_opcode " <<g_tr_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
+  *dprint_output << "num_read_regs: " << hex <<  (uint32_t) t_info->m_num_read_regs << endl;
+  *dprint_output << "num_dest_regs: " << hex << (uint32_t) t_info->m_num_dest_regs << endl;
   for (uint32_t ii = 0; ii < (uint32_t) t_info->m_num_read_regs; ++ii)
-    *trace_output << "src" << ii << ": " 
+    *dprint_output << "src" << ii << ": " 
       << hex << g_tr_reg_names[static_cast<uint32_t>(t_info->m_src[ii])] << endl;
 
   for (uint32_t ii = 0; ii < (uint32_t) t_info->m_num_dest_regs; ++ii)
-    *trace_output << "dst" << ii << ": " 
+    *dprint_output << "dst" << ii << ": " 
       << hex << g_tr_reg_names[static_cast<uint32_t>(t_info->m_dst[ii])] << endl;
-  *trace_output << "cf_type: " << hex << g_tr_cf_names[(uint32_t) t_info->m_cf_type] << endl;
-  *trace_output << "has_immediate: " << hex << (uint32_t) t_info->m_has_immediate << endl;
-  *trace_output << "r_dir:" << (uint32_t) t_info->m_rep_dir << endl;
-  *trace_output << "has_st: " << hex << (uint32_t) t_info->m_has_st << endl;
-  *trace_output << "num_ld: " << hex << (uint32_t) t_info->m_num_ld << endl;
-  *trace_output << "mem_read_size: " << hex << (uint32_t) t_info->m_mem_read_size << endl;
-  *trace_output << "mem_write_size: " << hex << (uint32_t) t_info->m_mem_write_size << endl;
-  *trace_output << "is_fp: " << (uint32_t) t_info->m_is_fp << endl;
-  *trace_output << "ld_vaddr1: " << hex << (uint32_t) t_info->m_ld_vaddr1 << endl;
-  *trace_output << "ld_vaddr2: " << hex << (uint32_t) t_info->m_ld_vaddr2 << endl;
-  *trace_output << "st_vaddr: " << hex << (uint32_t) t_info->m_st_vaddr << endl;
-  *trace_output << "instruction_addr: " << hex << (uint32_t)t_info->m_instruction_addr << endl;
-  *trace_output << "branch_target: " << hex << (uint32_t)t_info->m_branch_target << endl;
-  *trace_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
-  *trace_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
-  *trace_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
-  *trace_output << "*** end of the data strcture *** " << endl << endl;
+  *dprint_output << "cf_type: " << hex << g_tr_cf_names[(uint32_t) t_info->m_cf_type] << endl;
+  *dprint_output << "has_immediate: " << hex << (uint32_t) t_info->m_has_immediate << endl;
+  *dprint_output << "r_dir:" << (uint32_t) t_info->m_rep_dir << endl;
+  *dprint_output << "has_st: " << hex << (uint32_t) t_info->m_has_st << endl;
+  *dprint_output << "num_ld: " << hex << (uint32_t) t_info->m_num_ld << endl;
+  *dprint_output << "mem_read_size: " << hex << (uint32_t) t_info->m_mem_read_size << endl;
+  *dprint_output << "mem_write_size: " << hex << (uint32_t) t_info->m_mem_write_size << endl;
+  *dprint_output << "is_fp: " << (uint32_t) t_info->m_is_fp << endl;
+  *dprint_output << "ld_vaddr1: " << hex << (uint32_t) t_info->m_ld_vaddr1 << endl;
+  *dprint_output << "ld_vaddr2: " << hex << (uint32_t) t_info->m_ld_vaddr2 << endl;
+  *dprint_output << "st_vaddr: " << hex << (uint32_t) t_info->m_st_vaddr << endl;
+  *dprint_output << "instruction_addr: " << hex << (uint32_t)t_info->m_instruction_addr << endl;
+  *dprint_output << "branch_target: " << hex << (uint32_t)t_info->m_branch_target << endl;
+  *dprint_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
+  *dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
+  *dprint_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
+  *dprint_output << "*** end of the data strcture *** " << endl << endl;
 }
 
 
@@ -1696,7 +1694,7 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
 
       uop_c *child_mem_uop = NULL;
       int mem_req_count    = 0;
-      static uop_c *child_mem_reqs[128];
+      uop_c *child_mem_reqs[128];
 
       bool inst_read         = false;
       bool last_inst         = false;

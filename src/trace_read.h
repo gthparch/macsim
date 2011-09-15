@@ -335,6 +335,9 @@ class trace_read_c
     int m_int_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping table (int) */
     int m_fp_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping tabpe (fp) */
 
+    uint32_t  dprint_count;
+    ofstream* dprint_output;
+
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
 };

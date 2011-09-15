@@ -65,6 +65,7 @@ class macsim_c
 		all_stats_c*         m_allStats;
 		ProcessorStatistics* m_ProcessorStats;
 		CoreStatistics*      m_coreStatsTemplate;
+		map<string, ofstream*> m_AllStatsOutputStreams;
 		ofstream *m_core_stat_files[MAX_NUM_CORES]; // core statistics files
 
 		KnobsContainer *m_knobsContainer;
