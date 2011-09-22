@@ -151,6 +151,8 @@ void macsim_c::register_functions(void)
 	fetch_factory_c::get()->register_class("rr", fetch_factory);
 	pref_factory_c::get()->register_class(pref_factory);
 	bp_factory_c::get()->register_class("gshare", default_bp); 
+
+  llc_factory_c::get()->register_class("default", default_llc);
 }
 
 
@@ -557,5 +559,7 @@ void macsim_c::finalize()
 
 	// dump out stat files at the end of simulation
 	m_ProcessorStats->saveStats();
+
+  cout << "Done\n";
 }
 

@@ -55,4 +55,4 @@
 FACTORY_IMPLEMENTATION(dram_factory_c, dram_controller_c*);
 FACTORY_IMPLEMENTATION(bp_factory_c, bp_dir_base_c*);
 FACTORY_IMPLEMENTATION(mem_factory_c, memory_c*);
-FACTORY_IMPLEMENTATION(l3cache_factory_c, cache_c*);
+FACTORY_IMPLEMENTATION(llc_factory_c, cache_c*);

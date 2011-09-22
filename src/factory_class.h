@@ -50,12 +50,13 @@
 FACTORY_DECLARE(dram_factory_c, dram_controller_c*);
 FACTORY_DECLARE(bp_factory_c, bp_dir_base_c*);
 FACTORY_DECLARE(mem_factory_c, memory_c*);
-FACTORY_DECLARE(l3cache_factory_c, cache_c*);
+FACTORY_DECLARE(llc_factory_c, cache_c*);
 
 
 // declare wrapper functions
 bp_dir_base_c *default_bp(macsim_c*);
 memory_c *default_mem(macsim_c*);
-cache_c *default_l3cache(void);
+cache_c *default_llc(macsim_c*);
+
 
 #endif

@@ -200,7 +200,8 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
   m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
   m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-  m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET);
+  m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
+  //m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET);
 //  SIZE/*m_simBase->m_knobs->KNOB_L3_LINE_SIZE/*m_simBase->m_knobs->KNOB_L3_ASSOC); 
 
 
