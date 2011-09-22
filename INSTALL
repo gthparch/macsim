@@ -1,5 +1,14 @@
-aclocal
-automake --add-missing
-autoconf
-./configure
-make
+* How to patch
+  All patches are based on 'svn diff'
+  Please patch Macsim using this command
+  -> patch -p0 -i xxx.patch
+
+
+* How to build Macsim
+  aclocal
+  automake --add-missing
+  autoconf
+  ./configure
+  make
+
+  or aclocal && automake --add-missing && autoconf && ./configure && make

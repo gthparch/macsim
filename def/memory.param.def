@@ -151,6 +151,8 @@ param<SHARED_MEM_PORTS, shared_mem_ports, uns, 2>
 /* Cache coherence */
 param<ENABLE_CACHE_COHERENCE, enable_cache_coherence, bool, false>
 
+param<LLC_TYPE, llc_type, string, default>
+
 
 param<COLLECT_CACHE_INFO, collect_cache_info, int, 0>
 param<HETERO_STATIC_CACHE_PARTITION, hetero_static_cache_partition, bool, false>

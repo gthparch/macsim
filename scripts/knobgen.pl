@@ -226,6 +226,8 @@ sub writeHeader
   
   print ALLKNOBS_H "#include \"global_types.h\"\n";
   print ALLKNOBS_H "#include \"knob.h\"\n\n";
+
+  print ALLKNOBS_H "#define KNOB(var) *m_simBase->m_knobs->(var)\n\n"; 
   
   print ALLKNOBS_H "class all_knobs_c {\n";
   
