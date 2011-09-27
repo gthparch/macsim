@@ -1,0 +1,4 @@
+
+param<ENABLE_INST_COUNT, enable_inst_count, bool, false>
+param<ENABLE_REUSE_DIST, enable_reuse_dist, bool, false>
+param<ENABLE_COUNT_STATIC_PC, enable_count_static_pc, bool, false>
