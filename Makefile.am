@@ -2,10 +2,15 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = scripts .obj tools 
 
 all:
+	@echo Build optimized executable
+	make -C scripts
+	make opt -C .obj
 	-test -z .obj/macsim_opt || (test -z ./bin/macsim || rm -f ./bin/macsim) && cd bin && ln -s ../.obj/macsim_opt macsim
+#	-test -z .obj/macsim_opt || (test -z ./bin/macsim || rm -f ./bin/macsim) && cd bin && ln -s ../.obj/macsim_opt macsim
 
 opt:
 	@echo Build optimized executable
+	make -C scripts
 	make opt -C .obj
 	-test -z .obj/macsim_opt || (test -z ./bin/macsim || rm -f ./bin/macsim) && cd bin && ln -s ../.obj/macsim_opt macsim
 

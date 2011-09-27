@@ -209,3 +209,7 @@ param<BDP_DEGREE, bdp_degree, int, 3>
 
 
 param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>
+
+param<ABIP_CACHE_BIP, abip_cache_bip, bool, false>
+param<ABIP_CACHE_PERIOD, abip_cache_period, int, 100000>
+
