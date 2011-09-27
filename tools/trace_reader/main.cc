@@ -1,10 +1,15 @@
 #include <cassert>
 #include <fstream>
 #include <zlib.h>
+#include <cstring>
 
 #include "all_knobs.h"
 #include "knob.h"
 #include "trace_read.h"
+#include "trace_reader.h"
+  
+
+all_knobs_c* g_knobs;
 
 int read_trace(string trace_path)
 {
@@ -46,27 +51,45 @@ int read_trace(string trace_path)
     const int trace_buffer_size = 100000;
     char trace_buffer[trace_buffer_size * TRACE_SIZE];
 
+    trace_reader_c::Singleton.reset();
     while (1) {
       int byte_read = gzread(gztrace, trace_buffer, trace_buffer_size * TRACE_SIZE);
       byte_read /= TRACE_SIZE;
       inst_count += byte_read;
 
+      for (int jj = 0; jj < byte_read; ++jj) {
+        trace_info_s trace_info;
+        memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
+        trace_reader_c::Singleton.inst_event(&trace_info);
+      } 
+      
       if (byte_read != trace_buffer_size) {
         break;
       }
     } 
     gzclose(gztrace);
   }
-  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << "\n";
+//  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << "\n";
 
   return inst_count;
+}
+
+
+void register_trace_reader(void)
+{
+  trace_reader_c::Singleton.init();
 }
 
 
 int main(int argc, char* argv[])
 {
   KnobsContainer* knob_container = new KnobsContainer();
-  all_knobs_c* knobs = knob_container->getAllKnobs();
+  g_knobs = knob_container->getAllKnobs();
+  knob_container->applyParamFile("params.in");
+  char* pInvalidArgument = NULL;
+  knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
+
+  register_trace_reader();
 
   if (argc < 2) {
     cout << "> error: specify trace path\n";
