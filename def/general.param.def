@@ -80,3 +80,5 @@ param<EXCLUDE_WB_FROM_BANK_STATS, exclude_wb_from_bank_stats, bool, false>
 param<TRACK_REQ_PER_ROW_ETC, track_req_per_row_etc, bool, false>
 
 param<MAX_BLOCKS_TO_SIMULATE, max_blocks_to_simulate, int, 0>
+
+param<32_64_ISA, 32_64_isa, int, 32>

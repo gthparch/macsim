@@ -213,3 +213,8 @@ param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>
 param<ABIP_CACHE_BIP, abip_cache_bip, bool, false>
 param<ABIP_CACHE_PERIOD, abip_cache_period, int, 100000>
 
+
+/* load_queue, store_queue */
+ 
+param<LOAD_BUF_SIZE, load_buf_size, int, 16>
+param<STORE_BUF_SIZE, store_buf_size, int, 12>
