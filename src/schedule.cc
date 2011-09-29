@@ -156,6 +156,8 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   bool   bogus       = cur_uop->m_bogus;
   *sched_fail_reason = SCHED_SUCCESS;
 
+  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
+
   DEBUG("cycle_m_count:%llu m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop.va:%s "
       "allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
       m_cur_core_cycle, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num,
@@ -195,6 +197,8 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
     }
   }
 
+  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
   // execute current uop
   if (!m_exec->exec(-1, entry, cur_uop)) {
@@ -219,6 +223,8 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   // Uop exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
   --m_num_in_sched;
+  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
+  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
 
   switch (q_num) {
     case gen_ALLOCQ : 
@@ -258,6 +264,12 @@ void schedule_c::advance(int q_index)
     int entry      = (int) m_alloc_q[q_index]->peek(0);  
     uop_c *cur_uop = (uop_c *)(*m_rob)[entry]; 
 
+	STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
+	STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
+	STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
+	STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
+	STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
+
     DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%lld "
           "inst_num:%lld uop.va:%s allocq:%d mem_type:%d \n", m_cur_core_cycle,
           entry, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, 
@@ -289,7 +301,8 @@ void schedule_c::advance(int q_index)
     cur_uop->m_in_scheduler = true;
 
     ++m_num_in_sched;
-    
+   	STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
+   	
     // Add the uop's entry identifier in the ROB to the schedule list 
     m_schedule_list[m_last_schlist_ptr] = entry;
     m_last_schlist_ptr = (m_last_schlist_ptr + 1) % MAX_SCHED_SIZE;
