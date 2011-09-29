@@ -85,6 +85,7 @@ class KnobsContainer;
 class ProcessorStatistics;
 class CoreStatistics;
 class cache_partition_framework_c;
+class ei_power_c;
 
 template <class T> class pqueue_c;
 template <typename T> class hash_c;
