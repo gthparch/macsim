@@ -378,7 +378,30 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   // non-memory (compute) instructions
   else {
     uop_latency = get_latency(uop_type);
-    use_port(thread_id, entry);
+	use_port(thread_id, entry);
+
+	switch (uop_type) {
+		case UOP_FCF:
+		case UOP_FCVT:
+		case UOP_FADD:
+		case UOP_FMUL:
+		case UOP_FDIV:
+		case UOP_FCMP:
+		case UOP_FBIT:
+		case UOP_FCMOV:
+			STAT_CORE_EVENT(m_core_id, POWER_EX_P0_FU_R);
+			break;
+
+		case UOP_IMUL:
+			STAT_CORE_EVENT(m_core_id, POWER_EX_P2_FU_R);
+			break;
+
+		default:
+			STAT_CORE_EVENT(m_core_id, POWER_EX_P1_FU_R);
+			break;
+
+
+	}
   }
 
   // set scheduling cycle

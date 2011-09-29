@@ -67,7 +67,9 @@ bool icache_fill_line_wrapper(mem_req_s *req)
 
   // serve me
   if (!m_simBase->m_core_pointers[req->m_core_id]->get_frontend()->icache_fill_line(req)) {
-    result = false;
+	  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
+	  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_R);
+	  result = false;
   }
 
   return result;
@@ -326,6 +328,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
 
     // instruction cache access
     miss = iaccess_cache(tid, fetch_addr);
+	STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
 
     // instruction cache miss
     if (miss) {
@@ -537,6 +540,7 @@ bool frontend_c::icache_fill_line(mem_req_s *req)
 inline void frontend_c::send_uop_to_qfe(uop_c *uop)
 {
   bool success = m_q_frontend->enqueue(0, (int*)uop);
+  STAT_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);
   DEBUG("m_core_id:%d tid:%d inst_num:%s uop_num:%s opcode:%d isitEOM:%d sent to qfe \n", 
       m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num), unsstr64(uop->m_uop_num), 
       (int)uop->m_opcode, uop->m_isitEOM);
@@ -558,6 +562,7 @@ int frontend_c::predict_bpu(uop_c *uop)
     case CF_CBR:
       pred_dir = (m_bp_data->m_bp)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
+	  STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
     case CF_CALL:
       // 100% accurate

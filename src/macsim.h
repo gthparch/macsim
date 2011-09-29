@@ -37,6 +37,7 @@ class macsim_c
 		void init_network(string topology);
 		void open_traces(string trace_file);
 		void deallocate_memory(void);
+		void compute_power(void);
 		void fini_sim(void);
 
 	public:
@@ -85,6 +86,8 @@ class macsim_c
 		process_manager_c* m_process_manager; // process manager
 
 		uop_c *m_invalid_uop; // invalide uop pointer (for uop pool maintenance)
+	
+		ei_power_c* m_ei_power; // energy introspector
 
 		pool_c<thread_s>* m_thread_pool; // thread data pool
 		pool_c<section_info_s>* m_section_pool; // section data pool

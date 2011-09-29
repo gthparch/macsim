@@ -1285,6 +1285,29 @@ inst_info_s* trace_read_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s
 
   STAT_CORE_EVENT(core_id, OP_CAT_INVALID + (pi->m_opcode)); 
 
+  switch (pi->m_opcode) {
+	  case XED_CATEGORY_INTERRUPT:
+	  case XED_CATEGORY_IO:
+	  case XED_CATEGORY_IOSTRINGOP:
+	  case XED_CATEGORY_MISC:
+	  case XED_CATEGORY_RET:
+	  case XED_CATEGORY_ROTATE:
+	  case XED_CATEGORY_SEMAPHORE:
+	  case XED_CATEGORY_SYSCALL:
+	  case XED_CATEGORY_SYSRET:
+	  case XED_CATEGORY_SYSTEM:
+	  case XED_CATEGORY_VTX:
+	  case XED_CATEGORY_XSAVE:
+
+	  STAT_CORE_EVENT(core_id, POWER_CONTROL_REGISTER_W);
+	  break;
+
+  }
+
+  if (pi->m_num_ld || pi->m_has_st) {
+	  STAT_CORE_EVENT(core_id, POWER_SEGMENT_REGISTER_W);
+  }
+
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
@@ -1410,7 +1433,9 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     thread_trace_info->m_eom             = thread_trace_info->m_trace_uop_array[0]->m_eom;
     thread_trace_info->m_bom             = false;
     
-    uop->m_isitBOM = true;
+	uop->m_isitBOM = true;
+	STAT_CORE_EVENT(core_id, POWER_INST_DECODER_R);
+	STAT_CORE_EVENT(core_id, POWER_MICRO_OP_SEQ_R);
   } // END EOM
   // read remaining uops from the same instruction
   else { 
