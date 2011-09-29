@@ -30,6 +30,7 @@
 #include "noc.h"
 #include "factory_class.h"
 #include "dram.h"
+#include "ei_power.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
@@ -333,6 +334,12 @@ void macsim_c::init_sim(void)
 	ASSERTU(sizeof(int64) == 8);
 }
 
+void macsim_c::compute_power(void)
+{
+	m_ei_power = new ei_power_c(m_simBase);
+	m_ei_power->ei_config_gen_top();
+	m_ei_power->ei_main();
+}
 
 // open traces from trace_file_list file
 void macsim_c::open_traces(string trace_list)
@@ -402,6 +409,12 @@ void macsim_c::fini_sim(void)
 			((m_end_sim.tv_sec - m_begin_sim.tv_sec)*1000000 + 
 			m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
 	STAT_EVENT_N(EXE_TIME, second);
+
+	// compute power if enable_energy_introspector is enabled
+	if(*m_simBase->m_knobs->KNOB_ENABLE_ENERGY_INTROSPECTOR)
+	{
+		compute_power();
+	}
 }
 
 //Initialization before simulation run
