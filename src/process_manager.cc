@@ -353,12 +353,19 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
   if (!(trace_config_file >> thread_count >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", appl.c_str());
 
+
   // To support new trace version : each kernel has own configuration and some applications
   // may have multiple kernels
   if (thread_count == -1) {
     string kernel_directory;
     while (trace_config_file >> kernel_directory) {
-      process->m_applications.push_back(kernel_directory);
+      string kernel_path = appl.substr(0, appl.find_last_of('/'));
+      kernel_path += kernel_directory.substr(kernel_directory.rfind('/', kernel_directory.find_last_of('/')-1), kernel_directory.length());
+      // When a trace directory is moved to the different path,
+      // since everything is coded in absolute path, this will cause problem.
+      // By taking relative path here, the problem can be solved
+      process->m_applications.push_back(kernel_path);
+      //process->m_applications.push_back(kernel_directory);
       process->m_kernel_block_start_count.push_back(0);
     }
   }
@@ -418,7 +425,7 @@ void process_manager_c::setup_process(process_s* process)
   trace_config_file.open(trace_info_file_name.c_str(), ifstream::in);
   if (trace_config_file.fail()) {
     STAT_EVENT(FILE_OPEN_ERROR);
-    ASSERTM(0, "trace_config_file:%s", trace_info_file_name.c_str());
+    ASSERTM(0, "trace_config_file:%s\n", trace_info_file_name.c_str());
   }
   
   // -------------------------------------------
