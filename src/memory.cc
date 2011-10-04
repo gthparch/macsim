@@ -306,6 +306,8 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   }
 
   // allocate port
+  // FIXME (jaekyu, 10-4-2011) 
+  // change # ports per cache level
   m_port = new port_c* [m_banks]; 
   for (int ii = 0; ii < m_banks; ++ii) {
     m_port[ii] = new port_c("dcache_port", (uns)*m_simBase->m_knobs->KNOB_DCACHE_READ_PORTS, 
@@ -694,6 +696,7 @@ void dcu_c::process_in_queue()
       line = (dcache_data_s*)m_cache->access_cache(req->m_addr, &line_addr, 
           req->m_type == MRT_WB ? false : true, req->m_appl_id);
       cache_hit = (line) ? true : false;
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
     }
 
 
@@ -701,6 +704,8 @@ void dcu_c::process_in_queue()
     // Cache hit
     // -------------------------------------
     if (cache_hit) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R + (m_level -1));
+
       // -------------------------------------
       // hardware prefetcher training
       // -------------------------------------
@@ -975,6 +980,8 @@ void dcu_c::process_fill_queue()
           // Insert a cache line
           dcache_data_s* data;
           data = (dcache_data_s*)m_cache->insert_cache(req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id, req->m_ptx);
+      
+          STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
 
           // If there is a victim line, we do the write-back.
           if (victim_line_addr) {

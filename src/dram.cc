@@ -336,7 +336,10 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 
   // insert new drb entry to drb 
   m_buffer[bid].push_back(new_entry);
+
+  STAT_EVENT(POWER_MC_W);
 }
+
 
 // Jaekyu's bandwidth study
 static Counter acc_bandwidth = 0;
