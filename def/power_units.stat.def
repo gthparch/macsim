@@ -120,5 +120,5 @@ DEF_STAT (POWER_DCACHE_R_TAG,            		  COUNT,            NO_RATIO, PER_COR
 DEF_STAT (POWER_L2CACHE_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_L3CACHE_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 
-DEF_STAT (POWER_MC_R,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_MC_W,            		  COUNT,            NO_RATIO, PER_CORE)
+DEF_STAT (POWER_MC_R,            		  COUNT,            NO_RATIO)
+DEF_STAT (POWER_MC_W,            		  COUNT,            NO_RATIO)
