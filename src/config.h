@@ -223,11 +223,18 @@
 
 
 #define FRONTEND_CONFIG() \
+  if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx") { \
+    m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO; \
+  } \
+  else { \
+    m_fetch_ratio = 1; \
+  } \
   switch (m_unit_type) { \
     case UNIT_SMALL: \
       m_knob_width            = *m_simBase->m_knobs->KNOB_WIDTH; \
       m_knob_fetch_width      = *m_simBase->m_knobs->KNOB_FETCH_WDITH; \
       m_knob_icache_line_size = *m_simBase->m_knobs->KNOB_ICACHE_LINE_SIZE; \
+      m_fetch_modulo          = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1; \
       m_knob_ptx_sim          = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx" ? true : false; \
       break; \
@@ -236,6 +243,7 @@
       m_knob_width            = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH; \
       m_knob_fetch_width      = *m_simBase->m_knobs->KNOB_FETCH_MEDIUM_WDITH; \
       m_knob_icache_line_size = *m_simBase->m_knobs->KNOB_ICACHE_MEDIUM_LINE_SIZE; \
+      m_fetch_modulo          = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1; \
       m_knob_ptx_sim          = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx" ? true : false; \
       break; \
@@ -244,6 +252,7 @@
       m_knob_width            = *m_simBase->m_knobs->KNOB_LARGE_WIDTH; \
       m_knob_fetch_width      = *m_simBase->m_knobs->KNOB_FETCH_LARGE_WDITH; \
       m_knob_icache_line_size = *m_simBase->m_knobs->KNOB_ICACHE_LARGE_LINE_SIZE; \
+      m_fetch_modulo          = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1; \
       m_knob_ptx_sim          = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx" ? true : false; \
       break; \
@@ -255,6 +264,7 @@
   uns icache_assoc; \
   uns icache_line_size; \
   uns icache_banks; \
+  int icache_bypass; \
   uns giaq_size; \
   uns miaq_size; \
   uns fq_size; \
@@ -268,6 +278,7 @@
       icache_assoc           = *m_simBase->m_knobs->KNOB_ICACHE_ASSOC; \
       icache_line_size       = *m_simBase->m_knobs->KNOB_ICACHE_LINE_SIZE; \
       icache_banks           = *m_simBase->m_knobs->KNOB_ICACHE_BANKS; \
+      icache_bypass          = *m_simBase->m_knobs->KNOB_ICACHE_BY_PASS; \
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_SIZE; \
@@ -284,6 +295,7 @@
       icache_assoc           = *m_simBase->m_knobs->KNOB_ICACHE_MEDIUM_ASSOC; \
       icache_line_size       = *m_simBase->m_knobs->KNOB_ICACHE_MEDIUM_LINE_SIZE; \
       icache_banks           = *m_simBase->m_knobs->KNOB_ICACHE_MEDIUM_BANKS; \
+      icache_bypass          = *m_simBase->m_knobs->KNOB_ICACHE_MEDIUM_BY_PASS; \
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_MEDIUM_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_MEDIUM_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_MEDIUM_SIZE; \
@@ -300,6 +312,7 @@
       icache_assoc           = *m_simBase->m_knobs->KNOB_ICACHE_LARGE_ASSOC; \
       icache_line_size       = *m_simBase->m_knobs->KNOB_ICACHE_LARGE_LINE_SIZE; \
       icache_banks           = *m_simBase->m_knobs->KNOB_ICACHE_LARGE_BANKS; \
+      icache_bypass          = *m_simBase->m_knobs->KNOB_ICACHE_LARGE_BY_PASS; \
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_LARGE_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_LARGE_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_LARGE_SIZE; \

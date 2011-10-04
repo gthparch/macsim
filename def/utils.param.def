@@ -1,8 +1,3 @@
-param<UTIL_REUSE_DISTANCE_ENABLE, util_reuse_distance_enable, bool, false>
-param<UTIL_PCINFO_FILE, util_pcinfo_file, string, na> 
-param<UTIL_PCINFO_ENABLE, util_pcinfo_enable, bool, false>
-
 param<BUG_DETECTOR_ENABLE, bug_detector_enable, bool, false>
-
 param<COLLECT_CPI_INFO, collect_cpi_info, int, 0>
 param<COLLECT_CPI_INFO_FOR_MULTI_GPU, collect_cpi_info_for_multi_gpu, int, 0>

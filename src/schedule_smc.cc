@@ -66,7 +66,7 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_a
   m_schedule_arbiter   = new int[*m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER];
   fill_n(m_schedule_arbiter, static_cast<int>(*m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER), -1);
 #endif
-  m_schedule_modulo = (*m_simBase->m_knobs->KNOB_SCHEDULE_RATIO - 1); 
+  m_schedule_modulo = (*m_simBase->m_knobs->KNOB_GPU_SCHEDULE_RATIO - 1); 
   m_schlist_size = MAX_GPU_SCHED_SIZE, knob_num_threads;
   m_schlist_entry   = new int[m_schlist_size];
   m_schlist_tid     = new int[m_schlist_size];
@@ -360,7 +360,7 @@ void schedule_smc_c::run_a_cycle(void)
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
 
   // GPU : schedule every N cycles (G80:4, Fermi:2)
-  m_schedule_modulo = (m_schedule_modulo + 1) % *m_simBase->m_knobs->KNOB_SCHEDULE_RATIO;
+  m_schedule_modulo = (m_schedule_modulo + 1) % *m_simBase->m_knobs->KNOB_GPU_SCHEDULE_RATIO;
   if (m_schedule_modulo) 
     return;
 

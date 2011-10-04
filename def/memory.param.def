@@ -159,7 +159,6 @@ param<HETERO_STATIC_CACHE_PARTITION, hetero_static_cache_partition, bool, false>
 param<HETERO_STATIC_CPU_PARTITION,   hetero_static_cpu_partition, int, 1>
 param<HETERO_STATIC_GPU_PARTITION,   hetero_static_gpu_partition, int, 1>
 param<HETERO_GPU_CORE_DISABLE,       hetero_gpu_core_disable, int, -2>
-param<HETERO_GPU_CORE_DISABLE1,       hetero_gpu_core_disable1, int, -2>
 
 
 
@@ -168,50 +167,15 @@ param<HETERO_NOC_USE_SAME_QUEUE, hetero_noc_use_same_queue, bool, true>
 param<HETERO_MEM_PRIORITY_CPU, hetero_mem_priority_cpu, bool, false>
 param<HETERO_MEM_PRIORITY_GPU, hetero_mem_priority_gpu, bool, false>
 
-param<HETERO_USE_RRIP_CACHE, hetero_use_rrip_cache, bool, false>
-param<HETERO_USE_UCP_CACHE, hetero_use_ucp_cache, bool, false>
-param<HETERO_USE_TC_CACHE, hetero_use_tc_cache, bool, false>
-param<HETERO_USE_PIPP_CACHE, hetero_use_pipp_cache, bool, false>
-
-/* RRIP Cache */
-param<RRIP_CACHE_NUM_BIT, rrip_cache_num_bit, int, 3>
-param<RRIP_CACHE_INSERT_AT, rrip_cache_insert_at, int, 6>
-param<RRIP_CACHE_NUM_COUNTER_BIT, rrip_cache_num_counter_bit, int, 10>
-param<RRIP_CACHE_DYNAMIC_ON, rrip_cache_dynamic_on, bool, false>
-param<RRIP_CACHE_BIP_EPSILON, rrip_cache_bip_epsilon, int, 5>
-param<RRIP_CACHE_FOR_GPU, rrip_cache_for_gpu, bool, false> 
-param<RRIP_CACHE_FOR_MULTI_GPU, rrip_cache_for_multi_gpu, bool, false> 
-param<RRIP_CACHE_PROBABILITY, rrip_cache_probability, int, 20>
-param<RRIP_BIP_ALWAYS, rrip_bip_always, bool, false>
-
-param<HETERO_USE_TADIP_CACHE, hetero_use_tadip_cache, bool, false>
-param<TADIP_CACHE_NUM_COUNTER_BIT, tadip_cache_num_counter_bit, int, 10>
-param<TADIP_CACHE_BIP_EPSILON, tadip_cache_bip_epsilon, int, 5>
-
-param<UCP_CACHE_NUM_APPLICATION, ucp_cache_num_application, int, 2>
-param<UCP_CACHE_PARTITION_PERIOD, ucp_cache_partition_period, int, 5000000>
-param<UCP_CACHE_FOR_GPU, ucp_cache_for_gpu, bool, false>
-param<UCP_CACHE_FOR_MULTI_GPU, ucp_cache_for_multi_gpu, bool, false>
-param<UCP_CACHE_CPU_INTERFERENCE, ucp_cache_cpu_interference, int, 50>
-param<UCP_CACHE_GPU_MAX_PARTITION_LOOKUP, ucp_cache_gpu_max_partition_lookup, int, 2>
-param<UCP_CACHE_GPU_DROP_PROBABILITY, ucp_cache_gpu_drop_probability, int, 50>
-param<UCP_CACHE_ACCESS_CONTROL, ucp_cache_access_control, int, 1>
-
-param<TC_CACHE_CAGING_PERIOD, tc_cache_caging_period, int, 5000000>
-param<TC_CACHE_CAGING_SPACE, tc_cache_caging_space, int, 1>
-param<TC_CACHE_NUM_APPLICATION, tc_cache_num_application, int, 2>
-
-param<CACHE_FOR_STREAM_CPU, cache_for_stream_cpu, bool, false>
 
 
-param<BDP_THRESHOLD, bdp_threshold, int, 5>
-param<BDP_DEGREE, bdp_degree, int, 3>
+
+
+
 
 
 param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>
 
-param<ABIP_CACHE_BIP, abip_cache_bip, bool, false>
-param<ABIP_CACHE_PERIOD, abip_cache_period, int, 100000>
 
 
 /* load_queue, store_queue */

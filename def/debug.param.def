@@ -2,12 +2,6 @@ param<DEBUG_CYCLE_START,        debug_cycle_start,       uns,             0>
 param<DEBUG_CYCLE_STOP,         debug_cycle_stop,        uns,             0> 
 param<DEBUG_INST_START,         debug_inst_start,        uns,             0>
 param<DEBUG_INST_STOP,          debug_inst_stop,         uns,             0>
-param<DEBUG_UOP_START,          debug_uop_start,         uns,             0>
-param<DEBUG_UOP_STOP,           debug_uop_stop,          uns,             0>
-param<DEBUG_OP_START,           debug_op_start,          uns,             0>
-param<DEBUG_OP_STOP,            debug_op_stop,           uns,             0>
-
-
 param<DEBUG_FRONT_STAGE,       debug_front_stage,        uns,             0> 
 param<DEBUG_ALLOC_STAGE,       debug_alloc_stage,        uns,             0>
 param<DEBUG_SCHEDULE_STAGE,    debug_schedule_stage,     uns,             0>
@@ -17,32 +11,12 @@ param<DEBUG_RETIRE_STAGE,      debug_retire_stage,       uns,             0>
 param<DEBUG_MEM,               debug_mem,                uns,             0> 
 param<DEBUG_TRACE_READ,        debug_trace_read,         uns,             0>
 param<DEBUG_SIM,               debug_sim,                uns,             1>
-param<DEBUG_LIST_LIB,          debug_list_lib,           uns,             0>
 param<DEBUG_CACHE_LIB,         debug_cache_lib,          uns,             0>
 param<DEBUG_BP_DIR,            debug_bp_dir,             uns,             0>
-
-param<DEBUG_STREAM,            debug_stream,             uns,             0> 
-param<DEBUG_STREAM_THREAD,     debug_stream_thread,      bool,            false>
-
-param<DEBUG_CACHE_COHERENCE,   debug_cache_coherence,    uns,             0>
-param<DEBUG_DATA_FROM_L2,      debug_data_from_l2,       uns,             0>
-
 param<DEBUG_MAP_STAGE,         debug_map_stage,          uns,             0> 
-param<DEBUG_UOP_POOL,          debug_uop_pool,           uns,             0> 
 param<DEBUG_PORT,              debug_port,               uns,             0> 
-
 param<DEBUG_CORE_ID,           debug_core_id,            uns,             0> 
-
 param<DEBUG_SIM_THREAD_SCHEDULE,        debug_sim_thread_schedule,         uns,             0>
-
-param<DEBUG_SWPREF, debug_swpref, uns, 0>
 param<DEBUG_DRAM, debug_dram, uns, 0>
 param<DEBUG_PRINT_TRACE, debug_print_trace, uns, 0>
-
-param<DEBUG_HOTLEAK,            debug_hotleak,           uns,             0> 
-
-param<DEBUG_PREF_ASD, debug_pref_asd, uns, 0>
-param<DEBUG_PREF_CDP, debug_pref_cdp, uns, 0>
-param<DEBUG_PREF_ORACLE, debug_pref_oracle, uns, 0>
 param<DEBUG_MEM_TRACE, debug_mem_trace, bool, false>
-param<DEBUG_STRIDE_THREAD, debug_stride_thread, bool, false>

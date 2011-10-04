@@ -1,84 +1,15 @@
 /* -*- Mode: c -*- */
 
-//Ali: added these, needed by WATTCH
-
-param < SIM_MODEL, sim_model, uns , 0 >
-param < TRACE_MODE, trace_mode, string, text>
-param < ORACLE_TRACE_READ, oracle_trace_read, bool, false >
-
-param <ENABLE_ENERGY_INTROSPECTOR, enable_energy_introspector, bool, false>
-
-//nagesh - knobs to collect number of active threads (and blocks) over time, busy banks over time and thread start and end cycles
-param<COLLECT_NUM_ACTIVE_THREADS,			collect_num_active_threads, 			bool,            false> 
-param<COLLECT_NUM_BUSY_BANKS,				collect_num_busy_banks, 				bool,            false> 
-//below knob works only if knob_ptx_sim=1
-param<COLLECT_THREAD_START_END_CYCLES,		collect_thread_start_end_cycles, 		bool,            false> 
-param<COLLECT_BAR_WAIT_CYCLES,				collect_bar_wait_cycles, 				bool,            false> 
-param<COLLECT_MLP_STATS,					collect_mlp_stats, 						bool,            false> 
+param<ENABLE_ENERGY_INTROSPECTOR, enable_energy_introspector, bool, false>
 param<BLOCKS_TO_SIMULATE,					blocks_to_simulate,						uns,             0> 
 param<SIMULATE_LAST_BLOCKS,       simulate_last_blocks,					bool,            false> 
-
 param<REPEAT_TRACE, repeat_trace, bool, false>
 param<REPEAT_TRACE_N, repeat_trace_n, int, 0>
-param<SINGLE_TRACE, single_trace, bool, false>
-
-// jaekyu - multiple ptx simulation
 param<MAX_NUM_CORE_PER_APPL, max_num_core_per_appl, int, 0>
-param<PRINT_INFO_WITH_HEARTBEAT, print_info_with_heartbeat, bool, false>
-
-param<THROTTLE_ON,          throttle_on,          bool, false>
-param<THROTTLE_THRESHOLD,   throttle_threshold,   int,  1000>
-param<THROTTLE_DEGREE,      throttle_degree,      int,  3>
-param<THROTTLE_SLACK,       throttle_slack,       int,  240>
-param<THROTTLE_EPOCH,       throttle_epoch,       int,  45000>
-
-param<THROTTLE_PREPARATION_PERIOD, throttle_preparation_period, int, 45000>
-param<THROTTLE_MONITOR_PERIOD,     throttle_monitor_period,     int, 45000>
-param<THROTTLE_THROTTLE_PERIOD,    throttle_throttle_period,    int, 2250000>
-
-param<THROTTLE_FIXED,        throttle_fixed,        bool, false>
-param<THROTTLE_FIXED_DEGREE, throttle_fixed_degree, int,  0>
-
-param<THROTTLE_GRADUAL, throttle_gradual, int, 0>
-
-param<THROTTLE_MULT_PERIOD, throttle_mult_period, bool, true>
-param<THROTTLE_EARLY, throttle_early, bool, false>
-
-param<THROTTLE_FB_ON, throttle_fb_on, bool, false>
-param<THROTTLE_FB_COUNTER, throttle_fb_counter, int, 1000>
-param<THROTTLE_FB_LATE_THRESHOLD, throttle_fb_late_threshold, float, 0.02>
-param<THROTTLE_FB_EARLY_THRESHOLD, throttle_fb_early_threshold, float, 0.02>
-
-param<THROTTLE_MERGE_THRESHOLD, throttle_merge_threshold, float, 0.3>
-
-param<COLLECT_MEM_ADDR_STREAM, collect_mem_addr_stream, int, 0>
-param<COLLECT_BANK_CONTENTS, collect_bank_contents, bool, false>
-param<COLLECT_MTAML_INFO, collect_mtaml_info, bool, false>
-param<COLLECT_MEM_ADDR_GEN, collect_mem_addr_gen, bool, false>
-
-param<USE_MTAML, use_mtaml, bool, false>
-param<COLLECT_GLOBAL_MTAML_INFO, collect_global_mtaml_info, bool, false>
-param<USE_PTX_EXEC_RATIO_FOR_MTAML, use_ptx_exec_ratio_for_mtaml, bool, false>
-
-param<USE_CW_MW, use_cw_mw, bool, false>
-param<USE_ONLY_DIST_TO_DEP_INST, use_only_dist_to_dep_inst, bool, false>
-param<USE_AVG_C_EXC_WB, use_avg_c_exc_wb, bool, false>
-param<COLLECT_PER_CTRLER_INFO, collect_per_ctrler_info, bool, false>
-param<OLD_C_WEIGHT, old_c_weight, float, 0.9>
-
-param<USE_CONST_C, use_const_c, bool, false>
-param<CONST_C, const_c, int, 10>
-param<CONST_C_MUL_APPL, const_c_mul_appl, bool, false>
-param<CONST_C_APPL0, const_c_appl0, int, 10>
-param<CONST_C_APPL1, const_c_appl1, int, 10>
-
-param<CALC_C_OVER_TIME, calc_c_over_time, bool, false>
-param<NUM_C_CALC_STEPS, num_c_calc_steps, int, 1000>
-
-param<EXCLUDE_WB_FROM_BANK_STATS, exclude_wb_from_bank_stats, bool, false>
-
-param<TRACK_REQ_PER_ROW_ETC, track_req_per_row_etc, bool, false>
-
 param<MAX_BLOCKS_TO_SIMULATE, max_blocks_to_simulate, int, 0>
-
 param<32_64_ISA, 32_64_isa, int, 32>
+param<STDERR_FILE,                   stderr,                string,               NULL>
+param<STDOUT_FILE,                   stdout,                string,               NULL>
+param<FILE_TAG,                      file_tag,              string,               NULL>
+param<STATISTICS_OUT_DIRECTORY,      out,                   string,               .>
+param<MAX_BLOCK_PER_CORE, max_block_per_core, int, 4>

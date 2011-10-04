@@ -317,6 +317,7 @@ class frontend_c
     core_c*       m_core; /**< core pointer */
     bool          m_ready_thread_available; /**< ready thread available */
     int           m_mem_access_thread_num; /**< number of threads that access memory */
+    int           m_fetch_ratio; /**< how often fetch an instruction (GPU only) */
 
     bool          m_dcache_bank_busy[129]; /**< dcache bank busy status */
 

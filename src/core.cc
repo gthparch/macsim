@@ -145,8 +145,8 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
 
   // instruction cache
   m_icache = new cache_c("icache", icache_size, icache_assoc, icache_line_size, 
-                         sizeof(icache_data_c), icache_banks, *m_simBase->m_knobs->KNOB_ICACHE_BY_PASS,
-                         c_id, CACHE_IL1, false, m_simBase);
+                         sizeof(icache_data_c), icache_banks, icache_bypass, c_id, CACHE_IL1, 
+                         false, m_simBase);
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer

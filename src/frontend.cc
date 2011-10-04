@@ -135,7 +135,6 @@ frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) : FRONTEN
   m_fe_running             = true;
   m_fe_stall               = false;
   m_ready_thread_available = false;
-  m_fetch_modulo           = (*m_simBase->m_knobs->KNOB_FETCH_RATIO - 1);
   m_fetch_arbiter          = 0;
   m_mem_access_thread_num  = 0;
 
@@ -167,7 +166,7 @@ void frontend_c::run_a_cycle(void)
 
   // fetch every *m_simBase->m_knobs->KNOB_FETCH_RATIO cycle
   // NVIDIA G80 : 1/4 cycles, NVIDIA Fermi: 1/2 cycles
-  m_fetch_modulo = (m_fetch_modulo + 1) % *m_simBase->m_knobs->KNOB_FETCH_RATIO;
+  m_fetch_modulo = (m_fetch_modulo + 1) % m_fetch_ratio;
   if (m_fetch_modulo) 
     return;
 
@@ -328,7 +327,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
 
     // instruction cache access
     miss = iaccess_cache(tid, fetch_addr);
-	STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
 
     // instruction cache miss
     if (miss) {

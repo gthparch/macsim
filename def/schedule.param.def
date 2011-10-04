@@ -25,10 +25,4 @@ param<SCHED_TO_MEDIUM_WIDTH,  sched_to_medium_width,  uns16,         KNOB_SCHED_
 param<SCHED_TO_LARGE_WIDTH,   sched_to_large_width,   uns16,         KNOB_SCHED_TO_WIDTH> 
 
 param<TRACE_NAME_FILE,	      trace_name_file,	      string,        trace_file_list> 		
-param<IN_ORDER_PROCESSING,    in_order_processing,    bool,          true> 
-
-param<OOO_SCHED_FAIR, 		  ooo_sched_fair, 		  bool, 		 false>
-
-param<SCHEDULE_UNTIL_BLOCK, schedule_until_block, bool, false>
-
 param<NUM_WARP_SCHEDULER, num_warp_scheduler, int, 1>
