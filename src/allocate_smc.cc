@@ -83,6 +83,8 @@ void smc_allocate_c::run_a_cycle(void)
         m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num),
         unsstr64(uop->m_uop_num));
     ASSERT(uop);
+    
+    STAT_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);
 
     // check resource requirement
     int req_rob     = 1;        // required rob entries
@@ -167,11 +169,15 @@ void smc_allocate_c::run_a_cycle(void)
     allocq_entry.m_rob_entry = thread_rob->last_rob(); 
     bool success = gpu_alloc_q->enqueue(0, allocq_entry);
     ASSERT(success);
+    
+    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
 
     // insert an uop into reorder buffer
     uop->m_allocq_num = gpu_alloc_q_type;
     uop->m_state      = OS_ALLOCATE;
     thread_rob->push(uop);
+
+    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
     
     // dequeue from frontend queue
     m_frontend_q->dequeue();

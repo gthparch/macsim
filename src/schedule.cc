@@ -97,6 +97,8 @@ bool schedule_c::check_srcs(int entry)
     return true;
   }
 
+  STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
+
   // search all source (dependent) uops
   for (int i = 0; i < cur_uop->m_num_srcs; ++i) {
     if (cur_uop->m_map_src_info[i].m_uop == NULL) {
@@ -264,15 +266,18 @@ void schedule_c::advance(int q_index)
     int entry      = (int) m_alloc_q[q_index]->peek(0);  
     uop_c *cur_uop = (uop_c *)(*m_rob)[entry]; 
 
-	STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
-	STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
-	STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
-	STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
-	STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
+    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
+
+    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
+
+    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
+    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
     DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%lld "
-          "inst_num:%lld uop.va:%s allocq:%d mem_type:%d \n", m_cur_core_cycle,
-          entry, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, 
+        "inst_num:%lld uop.va:%s allocq:%d mem_type:%d \n", m_cur_core_cycle,
+        entry, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, 
           hexstr64s(cur_uop->m_vaddr), cur_uop->m_allocq_num, cur_uop->m_mem_type);
 
     // Take out the corresponding entries queue type 

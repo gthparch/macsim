@@ -162,9 +162,10 @@ class frontend_c
      *  \brief Function to provide instruction cache access
      *  \param sim_thread_id - thread id
      *  \param fetch_addr - Addr
+     *  \param fetch_data - fetch data for the thread
      *  \return bool - True if successful
      */
-    bool iaccess_cache(int sim_thread_id, Addr fetch_addr);
+    bool access_icache(int sim_thread_id, Addr fetch_addr, frontend_s* fetch_data);
 
     /*! \fn bool icache_fill_line (mem_req_s *req)
      *  \brief Function to insert in Instruction cache
@@ -289,10 +290,11 @@ class frontend_c
     /*! \fn FRONTEND_MODE process_ifetch(unsigned int sim_thread_id)
      *  \brief Functio to fetch an instruction from a thread
      *  \param sim_thread_id - Thread id
+     *  \param fetch_data - fetch information for the thread
      *  \return FRONTEND_MODE - Frontend fetch mode
      *  @see run_a_cycle
      */
-    FRONTEND_MODE process_ifetch(unsigned int sim_thread_id);
+    FRONTEND_MODE process_ifetch(unsigned int sim_thread_id, frontend_s* fetch_data);
 
     /**
      *  \brief Function to enqueue uop to fetch queue

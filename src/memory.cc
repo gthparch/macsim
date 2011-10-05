@@ -120,9 +120,6 @@ bool dcache_fill_line_wrapper(mem_req_s* req)
   // process the request
   if (result && req->m_done_func && !req->m_simBase->m_memory->done(req)) {
     result = false;
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R);
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W);
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W);
   }
 
   return result;
@@ -473,7 +470,6 @@ int dcu_c::access(uop_c* uop)
     // prefetch cache should be here
   }
 
-  STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_R);
   if (IsLoad(type)) {
 	  STAT_CORE_EVENT(uop->m_core_id, POWER_LOAD_QUEUE_R);
 	  STAT_CORE_EVENT(uop->m_core_id, POWER_LOAD_QUEUE_W);
@@ -564,9 +560,6 @@ int dcu_c::access(uop_c* uop)
         req_type, req_addr, req_size, m_latency, uop, done_func, uop->m_unique_num, NULL, m_id, 
         uop->m_thread_id, m_ptx_sim);
 
-	STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_MISS_BUF_R);
-    STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_MISS_BUF_W);
-
     // MSHR full
     if (!result) {
       uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
@@ -584,6 +577,7 @@ int dcu_c::access(uop_c* uop)
 
 
 // search matching entry.
+#if 0
 mem_req_s* dcu_c::search(Addr addr, int size)
 {
   mem_req_s* matching_entry = NULL;
@@ -610,6 +604,7 @@ mem_req_s* dcu_c::search(Addr addr, int size)
 
   return NULL;
 }
+#endif
 
 
 // fill a cache line (fill_queue)
@@ -621,6 +616,8 @@ bool dcu_c::fill(mem_req_s* req)
     req->m_state = MEM_FILL_NEW;
     DEBUG("L%d[%d] (->fill_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
     return true;
   }
 
@@ -950,6 +947,7 @@ void dcu_c::process_fill_queue()
     if (count == 4) break;
 
     mem_req_s* req = (*I);
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle) 
       continue;
@@ -989,6 +987,8 @@ void dcu_c::process_fill_queue()
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, m_ptx_sim, data);
               if (!m_wb_queue->push(wb))
                 ASSERT(0);
+
+              STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
 
               DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:%s type:%s by req:%d\n", 
                   m_level, m_id, wb->m_id, hexstr64s(victim_line_addr), \
@@ -1130,6 +1130,8 @@ void dcu_c::process_wb_queue()
 
     mem_req_s* req = (*I);
 
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
+
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
       continue;
 
@@ -1173,7 +1175,7 @@ bool dcu_c::done(mem_req_s* req)
   Addr addr;
   Addr line_addr;
   Addr repl_line_addr;
-  
+
   addr = req->m_addr;
   bank = m_cache->get_bank_num(req->m_addr);
 
@@ -1193,6 +1195,7 @@ bool dcu_c::done(mem_req_s* req)
     if (!line) {
       data = (dcache_data_s*)m_cache->insert_cache(addr, &line_addr, &repl_line_addr,
           req->m_appl_id, req->m_ptx);
+
       if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
       }
 
@@ -1201,13 +1204,13 @@ bool dcu_c::done(mem_req_s* req)
           // FIXME
           // queue rejection
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, m_ptx_sim, data);
-		  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R);
-		  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W);
-		  if (!m_wb_queue->push(wb))
+          if (!m_wb_queue->push(wb))
             ASSERT(0);
           DEBUG("L%d[%d] (done) new_wb_req:%d addr:%s by req:%d type:%s\n", 
               m_level, m_id, wb->m_id, hexstr64s(repl_line_addr), req->m_id, \
               mem_req_c::mem_req_type_name[MRT_WB]);
+
+          STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
         }
       }
 
@@ -1442,7 +1445,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   
   // find a matching request
   mem_req_s* matching_req = search_req(core_id, addr, size);
-
+  STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG);
 
   if (matching_req) {
     ASSERT(type != MRT_WB);
@@ -1496,6 +1499,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
     }
   }
   
+  STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_W);
   STAT_EVENT(TOTAL_MEMORY);
 
   Counter priority = g_mem_priority[type];

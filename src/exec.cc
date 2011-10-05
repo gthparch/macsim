@@ -439,6 +439,7 @@ void exec_c::br_exec(uop_c *uop)
       break;
     case CF_CBR:
       (m_bp_data->m_bp)->update(uop);
+      STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_W);
       break;
     case CF_CALL:
       break;

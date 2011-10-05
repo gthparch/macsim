@@ -25,13 +25,10 @@
 #include "bp.h"
 #include "map.h"
 #include "bug_detector.h"
-
 #include "config.h"
-
-
 #include "process_manager.h"
-
 #include "all_knobs.h"
+
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_FRONT_STAGE, ## args)
 #define DEBUG_CORE(m_core_id, args...)       \
@@ -67,10 +64,10 @@ bool icache_fill_line_wrapper(mem_req_s *req)
 
   // serve me
   if (!m_simBase->m_core_pointers[req->m_core_id]->get_frontend()->icache_fill_line(req)) {
-	  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
-	  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_R);
 	  result = false;
   }
+	  
+  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_W);
 
   return result;
 }
@@ -164,7 +161,9 @@ void frontend_c::run_a_cycle(void)
   if (!m_fe_running || !m_fetching_thread_num) 
     return; 
 
-  // fetch every *m_simBase->m_knobs->KNOB_FETCH_RATIO cycle
+
+  // fetch every KNOB_FETCH_RATIO cycle
+  // CPU : every cycle
   // NVIDIA G80 : 1/4 cycles, NVIDIA Fermi: 1/2 cycles
   m_fetch_modulo = (m_fetch_modulo + 1) % m_fetch_ratio;
   if (m_fetch_modulo) 
@@ -215,7 +214,7 @@ void frontend_c::run_a_cycle(void)
         // normal fetch mode
         case FRONTEND_MODE_IFETCH:
           fetch_data->m_fe_prev_mode = FRONTEND_MODE_IFETCH;
-          fetch_data->m_fe_mode      = process_ifetch(fetch_thread);
+          fetch_data->m_fe_mode      = process_ifetch(fetch_thread, fetch_data);
           break;
         // fetch stalled
         case FRONTEND_MODE_WAIT_FOR_MISS:
@@ -280,13 +279,12 @@ void frontend_c::run_a_cycle(void)
 
 
 // fetch instructions from a thread
-FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
+FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_data)
 {
   int fetched_uops = 0;
   Break_Reason break_fetch = BREAK_DONT;
 
   // First time : set up traces for current thread 
-  frontend_s *fetch_data = m_core->get_trace_info(tid)->m_fetch_data;
   if (fetch_data->m_first_time) {
     m_simBase->m_trace_reader->setup_trace(m_core_id, tid);
     fetch_data->m_first_time = false;
@@ -296,14 +294,15 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
       m_core->m_max_inst_fetched = m_core->m_inst_fetched[tid];
     }
 
-
     // set up initial fetch address
     fetch_data->m_MT_scheduler.m_next_fetch_addr = 
       m_core->get_trace_info(tid)->m_prev_trace_info->m_instruction_addr;
   }
 
 
+  // -------------------------------------
   // check whether previous branch misprediction has been resolved
+  // -------------------------------------
   if (m_bp_data->m_bp_recovery_cycle[tid] > m_cur_core_cycle) {
     DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d frontend is returned because "
         "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld\n",
@@ -316,30 +315,36 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
   }
 
 
+  // -------------------------------------
+  // Fetch main loop
+  // -------------------------------------
   while (!break_fetch) {
     Addr fetch_addr;
-    bool miss = CACHE_MISS;
 
     // get new fetch address (+ each application has own memory space)
     fetch_addr = fetch_data->m_MT_scheduler.m_next_fetch_addr;
     fetch_addr = fetch_addr + m_icache->base_cache_line((unsigned long)UINT_MAX *
         (m_core->get_trace_info(tid)->m_process->m_process_id) * 10ul);
 
+
+    // -------------------------------------
     // instruction cache access
-    miss = iaccess_cache(tid, fetch_addr);
-    STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
+    // -------------------------------------
+    bool icache_miss = access_icache(tid, fetch_addr, fetch_data);
 
     // instruction cache miss
-    if (miss) {
+    if (icache_miss) {
       DEBUG_CORE(m_core_id, "set frontend[%d] is FRONTEND_MODE_WAIT_FOR_MISS\n", tid);
       return FRONTEND_MODE_WAIT_FOR_MISS;
     } 
     // instruction cache hit
     else {
-      bool success = true;
+      STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
 
+      // -------------------------------------
       // fetch instructions
-      while ((m_q_frontend->space() > 0) && success && !break_fetch) {
+      // -------------------------------------
+      while ((m_q_frontend->space() > 0) && !break_fetch) {
         // allocate a new uop 
         uop_c *new_uop = m_uop_pool->acquire_entry(m_simBase);
         new_uop->allocate();
@@ -348,7 +353,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
 
         // read an uop from the traces 
         if (!m_simBase->m_trace_reader->get_uops_from_traces(m_core_id, new_uop, tid)) {
-          // couldn't get an up
+          // couldn't get an uop
           DEBUG("not success\n");
           m_uop_pool->release_entry(new_uop->free());
 
@@ -358,6 +363,9 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
         new_uop->m_state = OS_FETCHED; 
         new_uop->m_fetched_cycle = m_core->get_cycle_count();
 
+
+        // FIXME (jaekyu, 10-4-2011)
+        // make it member variable somehow
         // debugging purpose
 				if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE) {
 	        m_simBase->m_bug_detector->allocate(new_uop);
@@ -377,14 +385,20 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
             new_uop->m_num_dests);
 
 
+        // -------------------------------------
         // register mapping - dependence checking
+        // -------------------------------------
         if (!*m_simBase->m_knobs->KNOB_IGNORE_DEP) {
           m_map->map_uop(new_uop);
           m_map->map_mem_dep(new_uop);
+
+          STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_W);
         }
 
 
+        // -------------------------------------
         // access branch predictors
+        // -------------------------------------
         int br_mispred = false;
         if (new_uop->m_cf_type) {
           br_mispred = predict_bpu(new_uop);
@@ -410,15 +424,20 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
         }
 
 
+        // -------------------------------------
         // push the uop into the front_end_queue */
+        // -------------------------------------
         send_uop_to_qfe(new_uop);
         ++fetched_uops;
 
+
+        // -------------------------------------
         // we fetch enough uops, stop fetching
+        // -------------------------------------
         if (fetched_uops >= m_knob_width) {
           break_fetch = BREAK_ISSUE_WIDTH;
         }
-      } // while ((m_q_frontend->space() > 0) && success && !break_fetch) 
+      } // while ((m_q_frontend->space() > 0) && !break_fetch) 
 
       break_fetch = BREAK_LINE_END;
     } // cache hit
@@ -429,24 +448,26 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid)
 
 
 // instruction cache access 
-bool frontend_c::iaccess_cache(int tid, Addr fetch_addr)
+bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
 {
   Addr line_addr;
   Addr new_fetch_addr;
   icache_data_c *icache_line;
   bool cache_miss = CACHE_MISS;
   
-  frontend_s* fetch_data = m_core->get_trace_info(tid)->m_fetch_data;
-
   if (fetch_addr == 0) 
     return CACHE_HIT;
 
   new_fetch_addr = fetch_addr;
 
-
+  // -------------------------------------
   // access instruction cache
-
+  // -------------------------------------
+  STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R_TAG);
+  
+  // -------------------------------------
   // perfect icache
+  // -------------------------------------
   if (*m_simBase->m_knobs->KNOB_PERFECT_ICACHE) {
     cache_miss = CACHE_HIT;
     DEBUG("PERFECT_ICACHE!!!\n");
@@ -458,14 +479,18 @@ bool frontend_c::iaccess_cache(int tid, Addr fetch_addr)
     cache_miss = (icache_line) ? false: true;
   }
 
+  // -------------------------------------
   // cache hit
+  // -------------------------------------
   if (!cache_miss) {
     STAT_CORE_EVENT(m_core_id, ICACHE_HIT);
     DEBUG_CORE(m_core_id, "m_core_id:%d fetch_addr:%s new fetch_addr:%s m_icache hit\n", 
         m_core_id, hexstr64s(fetch_addr), hexstr64s(new_fetch_addr));
 
   } 
+  // -------------------------------------
   // cache miss 
+  // -------------------------------------
   else {
     DEBUG_CORE(m_core_id, "m_core_id:%d fetch_addr:0x%s m_icache miss line_addr:0x%s "
         "new_fetch_addr:0x%s\n", m_core_id, hexstr64s(fetch_addr), hexstr64s(line_addr), 
@@ -496,23 +521,27 @@ bool frontend_c::icache_fill_line(mem_req_s *req)
   Addr line_addr;
   Addr repl_line_addr;
 
-
   // FIXME
   // write port check?
 
+  // -------------------------------------
   // insert a cache line
-
+  // -------------------------------------
   if (m_icache->access_cache(req->m_addr, &line_addr, false, req->m_appl_id) == NULL) {
     m_icache->insert_cache(req->m_addr, &line_addr, &repl_line_addr, req->m_appl_id, 
         req->m_ptx);
+    STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
   }
-
 
   STAT_CORE_EVENT(m_core_id, ICACHE_FILL); 
 
   DEBUG_CORE(m_core_id, "m_icache_fill m_core_id:%d req_addr:0x%s\n", 
       m_core_id, hexstr64s(req->m_addr)); 
 
+
+  // FIXME (jaekyu, 10-4-2011)
+  // Too expensive to check all threads on every icache miss
+  // but probably not that frequent
 
   // find threads that are waiting for line_addr to be filled
   for (int ii = m_last_terminated_tid; ii < m_unique_scheduled_thread_num; ++ii) {
@@ -561,7 +590,7 @@ int frontend_c::predict_bpu(uop_c *uop)
     case CF_CBR:
       pred_dir = (m_bp_data->m_bp)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
-	  STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
+      STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
     case CF_CALL:
       // 100% accurate

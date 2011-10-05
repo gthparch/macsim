@@ -198,7 +198,7 @@ class dcu_c
     /**
      * Search a request from queues
      */
-    mem_req_s* search(Addr addr, int size);
+//    mem_req_s* search(Addr addr, int size);
 
     /**
      * Access the data cache

@@ -81,9 +81,10 @@ void allocate_c::run_a_cycle(void)
 
     // fetch an uop from frontend queue
     uop_c *uop = (uop_c *)m_frontend_q->peek(0);
-	STAT_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);
+
+    STAT_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);
     DEBUG("core_id:%d thread_id:%d uop_num:%s is peeked\n", 
-          m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num));
+        m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num));
 
     // check resource requirement
     int req_rob     = 1;        // require rob entries
@@ -98,8 +99,8 @@ void allocate_c::run_a_cycle(void)
     else if (uop->m_uop_type == UOP_ST) // store queue
       req_sb = 1;
     else if (uop->m_uop_type == UOP_IADD || // integer register
-             uop->m_uop_type == UOP_IMUL || 
-             uop->m_uop_type == UOP_ICMP) 
+        uop->m_uop_type == UOP_IMUL || 
+        uop->m_uop_type == UOP_ICMP) 
       req_int_reg = 1;
     else if (uop->m_uop_type == UOP_FCVT || uop->m_uop_type == UOP_FADD) // fp register
       req_fp_reg = 1;
@@ -151,34 +152,40 @@ void allocate_c::run_a_cycle(void)
     else if (req_fp_reg) {
       m_rob->alloc_fp_reg();
       uop->m_req_fp_reg = true;
-	}
+    }
 
-	// enqueue an entry in allocate queue
-	alloc_q->enqueue(0, m_rob->last_rob());
+    // enqueue an entry in allocate queue
+    alloc_q->enqueue(0, m_rob->last_rob());
 
-	STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
-	STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_W);
-	STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_W);
-	STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_W);
-	STAT_CORE_EVENT(m_core_id, POWER_FREELIST_W);
+    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
 
-	// insert an uop into reorder buffer
-	uop->m_allocq_num = (req_fp_reg ? fp_ALLOCQ : gen_ALLOCQ);
-	m_rob->push(uop);
 
-	STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
-	STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
-    
+
+    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_W);
+    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_W);
+    STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_W);
+    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_W);
+
+    // insert an uop into reorder buffer
+    uop->m_allocq_num = (req_fp_reg ? fp_ALLOCQ : gen_ALLOCQ);
+    m_rob->push(uop);
+
+    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
+
+
+
+    STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
+
     // dequeue from frontend queue
     m_frontend_q->dequeue(); 
 
     DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%s "
-          "alloc_q:%d mem_type:%d\n", 
-          m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, 
-          hexstr64s(uop->m_vaddr), uop->m_allocq_num, uop->m_mem_type); 
+        "alloc_q:%d mem_type:%d\n", 
+        m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, 
+        hexstr64s(uop->m_vaddr), uop->m_allocq_num, uop->m_mem_type); 
 
     DEBUG("core_id:%d thread_id:%d id:%lld uop is pushed. inst_count:%lld\n", 
-          m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
+        m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
   }
 }
 

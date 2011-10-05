@@ -1,37 +1,3 @@
-/* -*- Mode: c -*- */
-
-/* These ".stat" files contain the various statistics that can be taken via STAT_EVENTs.
-   It's not a good idea to reorder these, since many calls are made like
-   STAT_EVENT(ICACHE_MISS + hit) which could update either.  All stats are printed both
-   as 'Interval' and 'Cumulative'.  'Interval' is measured during the current stat
-   interval, 'Cumulative' is over the entire run so far.
-
-   DEF_STAT( Name, Type, Ratio )
-
-   The 'Type' column is used to group statistics together and format the printouts
-   somewhat.  See the 'RATIO' type for a description of the 'Ratio Stat' column.
-   Possible 'Type' values are:
-
-	COUNT -- The count is what's important.  Just print the number of times it
-	occurred.  
-	
-	PER_CYCLE -- We care about how many times this occured per cycle, so divide by
-	the number of cycles.  (Ex. IPC)  The count is also printed.
-
-	PER_INST -- Same thing, but per instruction.
-
-	DIST -- This is a little bit complicated.  The first DIST type encountered
-	signals the beginning of a distribution.  The next DIST encountered marks the
-	end of the distribution (inclusive).  All of the stats in-between should be of
-	type COUNT.  All of the stats in a distribution are printed as a percentage of
-	the total.
-
-	RATIO -- This stat should be printed as a ratio.  The 'Ratio' argument
-	determines which other stat should be used.  The current stat is divided by that
-	specified in the 'Ratio Stat' column.  This column is ignored for all types but
-	RATIO.
-
-*/
 
 DEF_STAT (POWER_FETCH_QUEUE_R,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_FETCH_QUEUE_W,            		  COUNT,            NO_RATIO, PER_CORE)
@@ -39,10 +5,9 @@ DEF_STAT (POWER_INST_QUEUE_R,            		  COUNT,            NO_RATIO, PER_COR
 DEF_STAT (POWER_INST_QUEUE_W,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_BR_PRED_R,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_BR_PRED_W,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_ICACHE_R,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_ICACHE_W,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_ICACHE_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_ICACHE_W_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
+DEF_STAT (POWER_ICACHE_R,            		  COUNT,            NO_RATIO, PER_CORE) 
+DEF_STAT (POWER_ICACHE_W,            		  COUNT,            NO_RATIO, PER_CORE) 
+DEF_STAT (POWER_ICACHE_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE) 
 DEF_STAT (POWER_ICACHE_MISS_BUF_R,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_ICACHE_MISS_BUF_W,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_ICACHE_MISS_BUF_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
@@ -91,22 +56,35 @@ DEF_STAT (POWER_DATA_TLB_R,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DATA_TLB_W,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DATA_TLB_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DATA_TLB_W_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_MISS_BUF_R,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_MISS_BUF_W,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_MISS_BUF_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DCACHE_MISS_BUF_W_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_LINEFILL_BUF_R,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_LINEFILL_BUF_W,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DCACHE_LINEFILL_BUF_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DCACHE_LINEFILL_BUF_W_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_WB_BUF_R,            		  COUNT,            NO_RATIO, PER_CORE)
-DEF_STAT (POWER_DCACHE_WB_BUF_W,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DCACHE_WB_BUF_R_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_DCACHE_WB_BUF_W_TAG,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_SEGMENT_REGISTER_R,          		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_SEGMENT_REGISTER_W,          		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_CONTROL_REGISTER_R,          		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_CONTROL_REGISTER_W,          		  COUNT,            NO_RATIO, PER_CORE)
+
+DEF_STAT (POWER_DCACHE_MISS_BUF_R,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_DCACHE_MISS_BUF_R_TAG,   COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_DCACHE_MISS_BUF_W,  COUNT,  NO_RATIO, PER_CORE)
+
+DEF_STAT (POWER_DCACHE_LINEFILL_BUF_R,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L2CACHE_LINEFILL_BUF_R, COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L3CACHE_LINEFILL_BUF_R, COUNT,  NO_RATIO, PER_CORE)
+
+DEF_STAT (POWER_DCACHE_LINEFILL_BUF_W,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L2CACHE_LINEFILL_BUF_W, COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L3CACHE_LINEFILL_BUF_W, COUNT,  NO_RATIO, PER_CORE)
+
+DEF_STAT (POWER_DCACHE_WB_BUF_R,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L2CACHE_WB_BUF_R,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L3CACHE_WB_BUF_R,  COUNT,  NO_RATIO, PER_CORE)
+
+DEF_STAT (POWER_DCACHE_WB_BUF_W,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L2CACHE_WB_BUF_W,  COUNT,  NO_RATIO, PER_CORE)
+DEF_STAT (POWER_L3CACHE_WB_BUF_W,  COUNT,  NO_RATIO, PER_CORE)
 
 DEF_STAT (POWER_DCACHE_R,            		  COUNT,            NO_RATIO, PER_CORE)
 DEF_STAT (POWER_L2CACHE_R,            		  COUNT,            NO_RATIO, PER_CORE)
