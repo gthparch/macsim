@@ -673,6 +673,7 @@ void dcu_c::process_in_queue()
     if (req->m_type == MRT_IFETCH) {
       STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_R);
       STAT_CORE_EVENT(req->m_core_id, POWER_LOAD_QUEUE_R);
+      STAT_CORE_EVENT(req->m_core_id, POWER_DATA_TLB_R);
     }
     else if (req->m_type == MRT_DSTORE) {
       STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_MISS_BUF_R);
@@ -681,6 +682,7 @@ void dcu_c::process_in_queue()
     else {
       STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_MISS_BUF_R);
       STAT_CORE_EVENT(req->m_core_id, POWER_LOAD_QUEUE_R);
+      STAT_CORE_EVENT(req->m_core_id, POWER_DATA_TLB_R);
     }
 
 
