@@ -112,6 +112,12 @@ void schedule_smc_c::advance(int q_index) {
     int tid        = allocq_entry.m_thread_id; 
     rob_c *m_rob   = m_gpu_rob->get_thread_rob(tid);
     uop_c *cur_uop = (uop_c *) (*m_rob)[allocq_entry.m_rob_entry];
+    
+    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
+    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
+    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
     ALLOCQ_Type allocq = (*m_rob)[allocq_entry.m_rob_entry]->m_allocq_num;
     if ((m_count[allocq] >= m_sched_rate[allocq]) ||
@@ -144,6 +150,8 @@ void schedule_smc_c::advance(int q_index) {
     m_last_schlist %= m_schlist_size;
     ++m_num_in_sched;
     ++m_num_per_sched[allocq];
+   	
+    STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
 
 #if 0
     // update counters 
@@ -240,6 +248,10 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
   bool bogus = cur_uop->m_bogus;
 
   *sched_fail_reason = SCHED_SUCCESS;
+  
+  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
+  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
     
   DEBUG("uop_schedule core_id:%d thread_id:%d uop_num:%lld inst_num:%lld "
       "uop.va:%s allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
@@ -292,9 +304,12 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
   }
 
   cur_uop->m_state = OS_SCHEDULE;
+  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
 
 
+  // -------------------------------------
   // execute current uop
+  // -------------------------------------
   if (!m_exec->exec(thread_id, entry, cur_uop)) {
     // uop could not execute
     DEBUG("core_id:%d thread_id:%d uop_num:%lld just cannot be executed\n", 
@@ -319,6 +334,8 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
   // Uop m_exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
   --m_num_in_sched;
+  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
+  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
 
 
   switch (q_num) {

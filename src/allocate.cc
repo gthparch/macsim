@@ -86,7 +86,9 @@ void allocate_c::run_a_cycle(void)
     DEBUG("core_id:%d thread_id:%d uop_num:%s is peeked\n", 
         m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num));
 
+    // -------------------------------------
     // check resource requirement
+    // -------------------------------------
     int req_rob     = 1;        // require rob entries
     int req_sb      = 0;        // require store buffer entries
     int req_lb      = 0;        // require load buffer entries
@@ -154,29 +156,28 @@ void allocate_c::run_a_cycle(void)
       uop->m_req_fp_reg = true;
     }
 
+    // -------------------------------------
     // enqueue an entry in allocate queue
+    // -------------------------------------
     alloc_q->enqueue(0, m_rob->last_rob());
 
     STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
-
-
-
+    STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
     STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_W);
     STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_W);
-    STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_W);
     STAT_CORE_EVENT(m_core_id, POWER_FREELIST_W);
 
+    // -------------------------------------
     // insert an uop into reorder buffer
+    // -------------------------------------
     uop->m_allocq_num = (req_fp_reg ? fp_ALLOCQ : gen_ALLOCQ);
     m_rob->push(uop);
 
     STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
 
-
-
-    STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
-
+    // -------------------------------------
     // dequeue from frontend queue
+    // -------------------------------------
     m_frontend_q->dequeue(); 
 
     DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%s "

@@ -158,7 +158,9 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   bool   bogus       = cur_uop->m_bogus;
   *sched_fail_reason = SCHED_SUCCESS;
 
-  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
+  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
+  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
   DEBUG("cycle_m_count:%llu m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop.va:%s "
       "allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
@@ -198,11 +200,14 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
       return false;
     }
   }
+  
+  cur_uop->m_state = OS_SCHEDULE;
+  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
 
-  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
-  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
+  // -------------------------------------
   // execute current uop
+  // -------------------------------------
   if (!m_exec->exec(-1, entry, cur_uop)) {
     // uop could not m_execute
     DEBUG("m_core_id:%d thread_id:%d uop_num:%lld just cannot be m_executed\n", 
@@ -266,13 +271,10 @@ void schedule_c::advance(int q_index)
     int entry      = (int) m_alloc_q[q_index]->peek(0);  
     uop_c *cur_uop = (uop_c *)(*m_rob)[entry]; 
 
-    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
-
     STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
-
+    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
     STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
     STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
     STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
     DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%lld "
@@ -289,7 +291,9 @@ void schedule_c::advance(int q_index)
       break;
     }
 
+    // -------------------------------------
     // Dequeue the element from the alloc queue
+    // -------------------------------------
     m_alloc_q[q_index]->dequeue();
 
     // Check if the entry has been flushed. If so just move ahead.
@@ -306,9 +310,12 @@ void schedule_c::advance(int q_index)
     cur_uop->m_in_scheduler = true;
 
     ++m_num_in_sched;
+
    	STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
    	
-    // Add the uop's entry identifier in the ROB to the schedule list 
+    // -------------------------------------
+    // Add the uop's entry identifier in the ROB to the schedule list (scheduler insertion) 
+    // -------------------------------------
     m_schedule_list[m_last_schlist_ptr] = entry;
     m_last_schlist_ptr = (m_last_schlist_ptr + 1) % MAX_SCHED_SIZE;
 

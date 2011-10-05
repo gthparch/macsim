@@ -171,6 +171,10 @@ void smc_allocate_c::run_a_cycle(void)
     ASSERT(success);
     
     STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
+    STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
+    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_W);
+    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_W);
+    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_W);
 
     // insert an uop into reorder buffer
     uop->m_allocq_num = gpu_alloc_q_type;

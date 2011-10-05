@@ -357,7 +357,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
       if (uop->m_mem_type) {
         update_memory_stats(uop);
       }
-			
+
       // use execution port
       use_port(thread_id, entry);
 
@@ -378,30 +378,28 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   // non-memory (compute) instructions
   else {
     uop_latency = get_latency(uop_type);
-	use_port(thread_id, entry);
+    use_port(thread_id, entry);
 
-	switch (uop_type) {
-		case UOP_FCF:
-		case UOP_FCVT:
-		case UOP_FADD:
-		case UOP_FMUL:
-		case UOP_FDIV:
-		case UOP_FCMP:
-		case UOP_FBIT:
-		case UOP_FCMOV:
-			STAT_CORE_EVENT(m_core_id, POWER_EX_P0_FU_R);
-			break;
+    switch (uop_type) {
+      case UOP_FCF:
+      case UOP_FCVT:
+      case UOP_FADD:
+      case UOP_FMUL:
+      case UOP_FDIV:
+      case UOP_FCMP:
+      case UOP_FBIT:
+      case UOP_FCMOV:
+        STAT_CORE_EVENT(m_core_id, POWER_EX_P0_FU_R);
+        break;
 
-		case UOP_IMUL:
-			STAT_CORE_EVENT(m_core_id, POWER_EX_P2_FU_R);
-			break;
+      case UOP_IMUL:
+        STAT_CORE_EVENT(m_core_id, POWER_EX_P2_FU_R);
+        break;
 
-		default:
-			STAT_CORE_EVENT(m_core_id, POWER_EX_P1_FU_R);
-			break;
-
-
-	}
+      default:
+        STAT_CORE_EVENT(m_core_id, POWER_EX_P1_FU_R);
+        break;
+    }
   }
 
   // set scheduling cycle
@@ -443,8 +441,8 @@ void exec_c::br_exec(uop_c *uop)
       break;
     case CF_CALL:
       break;
-    
-    // indirect branches
+
+      // indirect branches
     case CF_IBR:
     case CF_ICALL:
     case CF_ICO:

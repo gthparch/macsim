@@ -706,6 +706,8 @@ void dram_controller_c::bank_schedule_new(void)
       m_bank_ready[ii]     = ULLONG_MAX;
       m_bank_timestamp[ii] = m_simBase->m_simulation_cycle;
 
+      STAT_EVENT(POWER_MC_R);
+
       DEBUG("bank[%d] req:%d has been selected\n", ii, m_current_list[ii]->m_req->m_id);
     }
     // previous command is done. ready for next sequence of command.

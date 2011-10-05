@@ -470,14 +470,6 @@ int dcu_c::access(uop_c* uop)
     // prefetch cache should be here
   }
 
-  if (IsLoad(type)) {
-	  STAT_CORE_EVENT(uop->m_core_id, POWER_LOAD_QUEUE_R);
-	  STAT_CORE_EVENT(uop->m_core_id, POWER_LOAD_QUEUE_W);
-	  STAT_CORE_EVENT(uop->m_core_id, POWER_DATA_TLB_R);
-  } else if (IsStore(type)) {
-	  STAT_CORE_EVENT(uop->m_core_id, POWER_STORE_QUEUE_R);
-	  STAT_CORE_EVENT(uop->m_core_id, POWER_STORE_QUEUE_W);
-  }
 
   // cache hit
   if (cache_hit) {
@@ -488,10 +480,10 @@ int dcu_c::access(uop_c* uop)
 
     if (line && IsStore(type))
       line->m_dirty = true;
-    
+
     // hardware prefetcher training
     m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(MEM_L1, uop->m_thread_id, \
-               line_addr, uop->m_pc, uop, true);
+        line_addr, uop->m_pc, uop, true);
 
 
     if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
@@ -676,6 +668,20 @@ void dcu_c::process_in_queue()
     
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
       continue;
+
+
+    if (req->m_type == MRT_IFETCH) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_R);
+      STAT_CORE_EVENT(req->m_core_id, POWER_LOAD_QUEUE_R);
+    }
+    else if (req->m_type == MRT_DSTORE) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_MISS_BUF_R);
+      STAT_CORE_EVENT(req->m_core_id, POWER_STORE_QUEUE_R);
+    }
+    else {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_MISS_BUF_R);
+      STAT_CORE_EVENT(req->m_core_id, POWER_LOAD_QUEUE_R);
+    }
 
 
     // -------------------------------------
@@ -947,10 +953,12 @@ void dcu_c::process_fill_queue()
     if (count == 4) break;
 
     mem_req_s* req = (*I);
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle) 
       continue;
+    
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
 
     switch (req->m_state) {
       // -------------------------------------
@@ -1130,10 +1138,12 @@ void dcu_c::process_wb_queue()
 
     mem_req_s* req = (*I);
 
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R_TAG + m_level - MEM_L1);
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
       continue;
+    
+    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
 
     // L1 and L2 : insert next level's in_queue
     if (m_level != MEM_L3 && 
@@ -1445,8 +1455,12 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   
   // find a matching request
   mem_req_s* matching_req = search_req(core_id, addr, size);
-  STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG);
 
+  if (type == MRT_IFETCH) { STAT_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_R_TAG); }
+  else { STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG); }
+  STAT_CORE_EVENT(core_id, POWER_LOAD_QUEUE_R_TAG);
+  STAT_CORE_EVENT(core_id, POWER_STORE_QUEUE_R_TAG);
+  
   if (matching_req) {
     ASSERT(type != MRT_WB);
     // redundant hardware prefetch request
@@ -1499,7 +1513,19 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
     }
   }
   
-  STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_W);
+
+  if (type == MRT_IFETCH) { 
+    STAT_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_W); 
+    STAT_CORE_EVENT(core_id, POWER_LOAD_QUEUE_W);
+  }
+  else if (type == MRT_DSTORE) {
+    STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_W); 
+    STAT_CORE_EVENT(core_id, POWER_STORE_QUEUE_W);
+  }
+  else { 
+    STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_W); 
+    STAT_CORE_EVENT(core_id, POWER_LOAD_QUEUE_W);
+  }
   STAT_EVENT(TOTAL_MEMORY);
 
   Counter priority = g_mem_priority[type];
