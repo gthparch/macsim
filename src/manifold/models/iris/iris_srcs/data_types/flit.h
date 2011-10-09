@@ -17,7 +17,7 @@
  */
 #ifndef  FLIT_H_INC
 #define  FLIT_H_INC
-#include	"../../../../src/memreq_info.h"
+#include	"memreq_info.h"
 #include	"../../interfaces/genericHeader.h"
 #include	<deque>
 

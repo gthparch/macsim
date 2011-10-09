@@ -25,7 +25,7 @@ class FlitLevelPacket;
 #include	<math.h>
 #ifdef _DEBUG
 #include	"../../interfaces/MersenneTwister.h"
-#include	"../../../../src/memreq_info.h"
+#include	"memreq_info.h"
 #endif
 
 using namespace std;
