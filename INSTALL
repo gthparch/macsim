@@ -5,6 +5,8 @@
 
 
 * How to build Macsim
+  To build Macsim, autotool (xxx or higher) is required.
+
   aclocal
   automake --add-missing
   autoconf
@@ -12,3 +14,6 @@
   make
 
   or aclocal && automake --add-missing && autoconf && ./configure && make
+
+  or ./autogen.sh
+

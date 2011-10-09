@@ -19,6 +19,3 @@ clean:
 
 clean-local:
 	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.cc ../src/all_stats.cc ../src/*_interface.h ../src/statsEnums.h
-
-clean:
-	rm -f ../src/all_knobs.* ../src/*_interface.h ../src/statsEnums.h
