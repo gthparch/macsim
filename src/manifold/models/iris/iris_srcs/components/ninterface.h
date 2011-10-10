@@ -33,6 +33,7 @@
 #include	"genericBuffer.h"
 
 //extern class Clock* master_clock;
+class FlitLevelPacket;
 
 class SimpleArbiter
 {

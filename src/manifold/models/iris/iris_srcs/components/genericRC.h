@@ -20,8 +20,8 @@
 #define  _genericrc_h_INC
 
 #include	"../../interfaces/genericHeader.h"
-#include        "../data_types/flit.h"
-
+#include        "manifold/models/iris/iris_srcs/data_types/flit.h"
+class HeadFlit;
 
 class GenericRC
 {

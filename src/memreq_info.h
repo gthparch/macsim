@@ -16,10 +16,10 @@
 #include <deque>
 #include <functional>
 
+#define DONT_INCLUDE_MANIFOLD
 #include "macsim.h"
 #include "global_defs.h"
 #include "global_types.h"
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Memory component type
@@ -32,6 +32,16 @@ enum MEMORY_TYPE {
   MEM_LAST,
 };
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief NOC request type
+///////////////////////////////////////////////////////////////////////////////////////////////
+enum NOC_TYPE {
+  NOC_FILL,
+  NOC_NEW,
+  NOC_LAST,
+  MAX_NOC_STATE,
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Memory request state
@@ -140,6 +150,7 @@ class mem_req_c {
   public:
     static const char* mem_req_type_name[MAX_MEM_REQ_TYPE]; // memory request type string
     static const char* mem_state[MEM_STATE_MAX];            // memory request state string
+    
 };
 
 #endif  /* #ifndef MEMORY_H_INCLUDED  */

@@ -47,6 +47,7 @@ const char* mem_req_c::mem_state[MEM_STATE_MAX] = {
 };
 
 
+
 mem_req_s::mem_req_s(macsim_c* simBase)
 {
   m_id             = 0;

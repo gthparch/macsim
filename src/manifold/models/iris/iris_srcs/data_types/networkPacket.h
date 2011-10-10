@@ -21,15 +21,18 @@
 
 #include	"../../interfaces/genericHeader.h"
 #include	"flit.h"
-class FlitLevelPacket;
 #include	<math.h>
 #ifdef _DEBUG
 #include	"../../interfaces/MersenneTwister.h"
 #include	"memreq_info.h"
 #endif
 
-using namespace std;
+//class FlitLevelPacket;
 
+using namespace std;
+#ifdef irisinterfacenetworkpacket
+#error
+#endif
 class NetworkPacket{
     public:
         NetworkPacket();

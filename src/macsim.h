@@ -15,7 +15,21 @@
 #include "global_defs.h"
 #include "global_types.h"
 
-//#include "manifold/models/iris/interfaces/topology.h"
+#include "manifold/kernel/include/kernel/clock.h"
+
+#ifndef DONT_INCLUDE_MANIFOLD       //to prevent circular link dependencies
+#include "manifold/models/iris/interfaces/topology.h"
+#include "manifold/models/iris/interfaces/irisInterface.h"
+#include "manifold/models/iris/interfaces/irisTerminal.h"
+#include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
+#include "manifold/models/iris/iris_srcs/topology/ring.h"
+#include "manifold/models/iris/iris_srcs/topology/torus.h"
+#include "manifold/kernel/include/kernel/manifold.h"
+#include "manifold/kernel/include/kernel/component.h"
+#include "manifold/models/iris/iris_srcs/components/ninterface.h"
+#include "manifold/models/iris/iris_srcs/components/simpleRouter.h"
+#endif
+
 class Topology;
 
 class macsim_c
@@ -108,6 +122,10 @@ class macsim_c
 		trace_read_c* m_trace_reader;
                 
 		// interconnect
+	public:
+		void init_iris_config(map<string, string> &params);
+	public:
+		map<string, string> m_iris_params;
 		Topology* m_iris_network; //IRIS
 		Topology* tp;
 		uint no_nodes;
@@ -117,6 +135,7 @@ class macsim_c
 		vector<ManifoldProcessor*> m_macsim_terminals;
     cache_partition_framework_c* m_PCL;
 
+		manifold::kernel::Clock* master_clock;// = new manifold::kernel::Clock(1); //clock has to be global or static
 	private:
 		macsim_c* m_simBase; // self-reference for macro usage
 };

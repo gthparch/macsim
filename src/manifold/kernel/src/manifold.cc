@@ -189,22 +189,19 @@ void Manifold::Run(double macsim_simcycle)
 	// depending on which one is earliest           
 	if(clockIsNext)
 	{ // Process clock event
-	nextClock->ProcessThisTick();
+	    nextClock->ProcessThisTick();
 	}
 	else
-	
-	
-	
 	{ // Process timed event
-	// Set the simulation time
-	//simTime = nextEvent->time;
-	simTime = macsim_simcycle;
-	// Call the event handler
-	nextEvent->CallHandler();
-	// Remove the event from the pending list
-	events.erase(events.begin());
-	// And delete the event
-	delete nextEvent;
+	    // Set the simulation time
+	    //simTime = nextEvent->time;
+	    simTime = macsim_simcycle;
+	    // Call the event handler
+	    nextEvent->CallHandler();
+	    // Remove the event from the pending list
+	    events.erase(events.begin());
+	    // And delete the event
+	    delete nextEvent;
 	}
 
 

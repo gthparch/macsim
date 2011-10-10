@@ -3,6 +3,15 @@
 
 #include	"simpleRouter.h"
 
+
+// memory request state noc string
+const char* mem_req_noc_type_name[MAX_NOC_STATE] = {
+  "NOC_FILL",
+  "NOC_NEW",
+  "NOC_LAST",
+};
+
+
 SimpleRouter::SimpleRouter ( macsim_c* simBase )
 {
     m_simBase = simBase;
@@ -155,14 +164,18 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 in_buffers[inport].push(data->f);
                 if ( data->f->type == HEAD )
                 {
-                #if 0
-                	cout <<manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
+                #if 1
+                    if ( manifold::kernel::Manifold::NowTicks() == 404 )
+                        cout << "404!! pkt 33 is getting stuck somewhere" << endl;
+                    
+                	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
                 		<< ((HeadFlit*)data->f)->req->m_id 
                 		<< " arrived @ node " << node_id 
                 		<< " bound for " << ((HeadFlit*)data->f)->dst_node 
-                		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << "\n";
+                		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state]
+                		<< " msg type " << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << "\n";
                 		//<< " vc: " << data->vc << "\n";
-                //#else
+                #else
                   //for debugging only!
                   int stage = -1;
                   static const int stage_state[3][3] = {    //transposed array for column major order
@@ -172,8 +185,9 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                   };
                   
                   //si debug
-                  if(manifold::kernel::Manifold::NowTicks() == 7182 )
-                    cout << "req 105 gets stuck here\n";
+                  if(manifold::kernel::Manifold::NowTicks() == 6000 )
+                    cout << "what is stuck?" << endl;
+                  
                   stage = stage_state[node_id][((HeadFlit*)data->f)->dst_node];
                   stage += (stage == 1 && ((HeadFlit*)data->f)->req->m_state == 12) ? 4 : 0;
                   
@@ -459,16 +473,16 @@ SimpleRouter::tock ( void )
     /* 
      * This can be used to check if a message does not move for a large
      * interval. ( eg. interval of arrival_time + 100 )
+     *
      for ( uint i=0; i<input_buffer_state.size(); i++)
      if (input_buffer_state[i].pipe_stage != EMPTY
      && input_buffer_state[i].pipe_stage != INVALID
      && input_buffer_state[i].pkt_arrival_time+100 < manifold::kernel::Manifold::NowTicks())
      {
-     fprintf(stderr,"\n\nDeadlock at Router %d node %d Msg id %d Fid%d", GetComponentId(), node_id,
-     i,input_buffer_state[i].fid);
-     dump_state_at_deadlock();
+     fprintf(stderr,"\n\nDeadlock at Router %d node %d Msg id %d Fid%d", GetComponentId(), node_id, i, input_buffer_state[i].fid);
+     dump_state_at_deadlock(m_simBase);
      }
-     * */
+     /* */
 
     do_switch_traversal();
     do_switch_allocation();

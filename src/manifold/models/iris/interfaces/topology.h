@@ -20,10 +20,9 @@
 #define TOPOLOGY_H_
 
 #include	"genericHeader.h"
-#include	"irisTerminal.h"
-#include	"irisInterface.h"
-#include	"irisRouter.h"
-
+#include	"manifold/models/iris/interfaces/irisTerminal.h"
+#include	"manifold/models/iris/interfaces/irisInterface.h"
+#include	"manifold/models/iris/interfaces/irisRouter.h"
 
 class Topology
 {

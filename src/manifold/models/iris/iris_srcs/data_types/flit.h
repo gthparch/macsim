@@ -86,6 +86,7 @@ class Flit
  *  more than one flit. 
  * =====================================================================================
  */
+
 class HeadFlit: public Flit
 {
     public:

@@ -36,9 +36,6 @@
 #include "all_stats.h"
 #include "statistics.h"
 
-#include "manifold/models/iris/interfaces/topology.h"
-//#include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
-#include "manifold/models/iris/iris_srcs/topology/ring.h"
 
 
 using namespace std;
@@ -183,7 +180,9 @@ void macsim_c::init_memory(void)
 
 	// main memory
 	m_memory = mem_factory_c::get()->allocate(m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue(), m_simBase);
-
+#ifdef IRIS
+  m_memory->init();
+#endif
 	// interconnection network
 	m_noc = new noc_c(m_simBase);
 
@@ -274,7 +273,7 @@ void macsim_c::init_cores(int num_max_core)
 	}
 
 	// medium cores
-  int total_core = num_large_cores;
+	int total_core = num_large_cores;
 	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES; ++ii) { 
 		m_core_pointers[ii + num_large_cores] = new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
 		m_core_pointers[ii + num_large_cores]->pref_init();
@@ -287,7 +286,7 @@ void macsim_c::init_cores(int num_max_core)
 	}
 
 	// small cores
-  total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
+	total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
 	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES; ++ii) { 
 		m_core_pointers[ii + num_large_medium_cores] = 
 			new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
@@ -300,19 +299,141 @@ void macsim_c::init_cores(int num_max_core)
 			m_x86_core_pool.push(ii + total_core);
 	}
 }
+#ifdef IRIS
+//initialize IRIS parameters (with config file, preferrably)
+void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_params here
+{
+  ifstream fd("network_params.in");
+  string data;
+  if(!fd.is_open())
+  {
+    cout<<"Invalid iris file\n";
+    exit(1);
+  }
+  
+  while(!fd.eof())
+  {
+    getline(fd,data);
+    string simknob = data.substr(0,data.find("#"));
+
+    if ( simknob.find('-') == 0 )
+    {
+        string key,value;
+        istringstream iss( simknob, istringstream::in);
+        iss >> key;
+        string sim_string = key.substr(0,key.find(":"));
+        if ( sim_string.compare("-iris") == 0 )
+        {
+          iss >> value;
+          if (! key.compare("-iris:noc_topology"))
+              params.insert(pair<string,string>("topology",value));
+          if (! key.compare("-iris:no_mcs"))
+              params.insert(pair<string,string>("no_mcs",value));
+          if (! key.compare("-iris:no_ports"))
+              params.insert(pair<string,string>("no_ports",value));
+          if (! key.compare("-iris:no_vcs"))
+              params.insert(pair<string,string>("no_vcs",value));
+          if (! key.compare("-iris:credits"))
+              params.insert(pair<string,string>("credits",value));
+          if (! key.compare("-iris:int_buff_width"))
+              params.insert(pair<string,string>("int_buff_width",value));
+          if (! key.compare("-iris:mean_irt"))
+              params.insert(pair<string,string>("link_width",value));
+          if (! key.compare("-iris:self_assign_dest_id"))
+              params.insert(pair<string,string>("self_assign_dest_id",value));
+          if (! key.compare("-iris:mapping"))
+              params.insert(pair<string,string>("mapping",value));
+        }
+        else if ( sim_string.compare("-mc") == 0 )
+        {
+          iss >> value;
+          if (! key.compare("-mc:resp_payload_len"))
+              params.insert(pair<string,string>("resp_payload_len",value));
+          if (! key.compare("-mc:memory_latency"))
+              params.insert(pair<string,string>("memory_latency",value));
+        }
+        else
+          cerr << " config line unknown" << endl;
+    }
+  }
+  
+  //number of nodes depends on MacSim configuration (# of L1+L3(acts as L2))+MC nodes)
+  stringstream out;
+  out << m_macsim_terminals.size();
+  string s = out.str();
+  params.insert(pair<string,string>("no_nodes",s));
+}
 
 //IRIS
 // initialize Iris/manifold network
+
 void macsim_c::init_network(string topology_type)
 {
-	if (topology_type.compare("ring") == 0)
+
+	init_iris_config(m_iris_params);
+
+	map<std::string, std::string>:: iterator it;
+	it = m_iris_params.find("topology");
+	if ( it != m_iris_params.end())
+		  topology_type = it->second;
+		  
+	if ((it->second).compare("ring") == 0)
 	{
 		m_iris_network = new Ring(m_simBase);
+	} 
+	else if ((it->second).compare("torus") == 0)
+	{
+		m_iris_network = new Torus(m_simBase);
+	} 
+
+	//initialize iris network
+	m_iris_network->parse_config(m_iris_params);
+
+	for (int i=0; i<m_macsim_terminals.size(); i++)
+	{
+		//create component id
+		manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
+		manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
+
+		//create component
+		NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
+		SimpleRouter* rr =manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
+
+		//set node id
+		interface->node_id = i;
+		rr->node_id = i;
+
+		//register clock
+		manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
+		manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
+
+		//push back
+		m_iris_network->terminals.push_back(m_macsim_terminals[i]);
+		m_iris_network->terminal_ids.push_back(m_macsim_terminals[i]->GetComponentId());
+		m_iris_network->interfaces.push_back(interface);
+		m_iris_network->interface_ids.push_back(interface_id);
+		m_iris_network->routers.push_back(rr);
+		m_iris_network->router_ids.push_back(router_id);
+
+		//init
+		m_macsim_terminals[i]->parse_config(m_iris_params);
+		m_macsim_terminals[i]->init();
+		interface->parse_config(m_iris_params);
+		interface->init();
+		rr->parse_config(m_iris_params);
+		rr->init();
 	}
 
+	//initialize router outports
+	for (int i=0; i<m_macsim_terminals.size(); i++)
+		m_iris_network->set_router_outports(i);
+
 	m_iris_network->connect_interface_terminal();
+	m_iris_network->connect_interface_routers();
+	m_iris_network->connect_routers();
+
 }
-//*/
+#endif
 
 
 // initialize simulation
@@ -431,8 +552,8 @@ void macsim_c::initialize(int argc, char** argv)
 	m_coreStatsTemplate = new CoreStatistics(m_simBase);
 	m_ProcessorStats = new ProcessorStatistics(m_simBase);
 
-  m_allStats = new all_stats_c(m_ProcessorStats);
-  m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
+	m_allStats = new all_stats_c(m_ProcessorStats);
+	m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
 
 	init_per_core_stats(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES, m_simBase);
 
@@ -442,7 +563,9 @@ void macsim_c::initialize(int argc, char** argv)
 
 	// initialize simulation
 	init_sim();
-	
+#ifdef IRIS
+    master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
+#endif
 	// init memory
 	init_memory();
 
@@ -452,8 +575,14 @@ void macsim_c::initialize(int argc, char** argv)
 	// initialize cores
 	init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
 
+
+#ifdef IRIS
+	REPORT("Initializing sim IRIS\n");
+	manifold::kernel::Manifold::Init(0, NULL);
 	// initialize interconnect network
 	init_network("ring");
+#endif
+
 
 	// open traces
 	string trace_name_list = static_cast<string>(*m_simBase->m_knobs->KNOB_TRACE_NAME_FILE);
@@ -486,8 +615,10 @@ int macsim_c::run_a_cycle()
 
 	// run interconnection network
 	m_noc->run_a_cycle();
-	//manifold::kernel::Run();		//IRIS
-
+#ifdef IRIS
+	manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
+	manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
+#endif
 	// core execution loop
 	for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
 		// use pivot to randomize core run_cycle pattern 

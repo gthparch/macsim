@@ -891,6 +891,53 @@ void dcu_c::process_out_queue()
 
     ASSERT(m_has_router == true);
 
+#if 0
+    //req->m_uop-> (in uop.h) Mem_Type to see if it's going to global mem
+    //m_type: in memory.h NOC_NEW is requesting, NOC_FILL is servicing
+    
+    //if(m_level == MEM_MC )
+    {
+    	cout << "Sim_Cycle: " << m_simBase->m_simulation_cycle << " NOC: " << m_noc_id << 
+	" req_id: " << req->m_id << " core: " << req->m_core_id  << 
+	" block: " << req->m_block_id << " Address: " << req->m_addr << 
+	" size: " << req->m_size;
+	
+//	    if( req->m_uop != NULL)  
+	    {
+	      cout << " mem_state: " << mem_req_c::mem_state[req->m_state];
+	       
+	    }
+	    //si debug
+//	    if(req->m_id == 150)
+//	    {
+//	      cout << "150!\n";
+//	    }
+	    
+	    cout << "\n";
+	    
+    }
+//#else 
+    static long int core_reqs[] = {0,0,0,0,0,0,0,0,0,0};
+    static long long int prev_gsc = -1;
+    //if( req->m_msg_type == NOC_FILL  
+	//&& req->m_uop != NULL )
+	//&& ( req->m_uop->m_mem_type == MEM_ST_GM 
+	//|| req->m_uop->m_mem_type == MEM_LD_GM ) )    		
+    {
+	core_reqs[req->m_core_id]++;
+	  if( prev_gsc != m_simBase->m_simulation_cycle )
+      {
+    	prev_gsc = m_simBase->m_simulation_cycle;
+    	cout << "MACSIM, " << m_simBase->m_simulation_cycle << " cycle: ";
+    	for(int i=0; i<10; i++)
+    	{
+   	 	cout << core_reqs[i] << ", ";
+    	}
+    	cout << "\n";
+	  }
+    }
+#endif
+
 
     // -------------------------------------
     // NEW request : send to lower level
@@ -1121,6 +1168,11 @@ void dcu_c::process_fill_queue()
       DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
           m_simBase->m_simulation_cycle - (*I)->m_in);
+      //DEBUG_SI
+   /*   printf("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
+          m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
+          m_simBase->m_simulation_cycle - (*I)->m_in);
+     */     
       m_memory->free_req((*I)->m_core_id, (*I));
     }
   }
@@ -1277,12 +1329,13 @@ bool dcu_c::create_network_interface(void)
   if (m_has_router) {
 #ifdef IRIS
     manifold::kernel::CompId_t processor_id = 
-      manifold::kernel::Component::Create<ManifoldProcessor>(0);
+      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
     m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
     manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
         &ManifoldProcessor::tock);
 
-    g_macsim_terminals.push_back(m_terminal);
+	m_terminal->init();
+    m_simBase->m_macsim_terminals.push_back(m_terminal);
 
     m_terminal->mclass = PROC_REQ;
 

@@ -23,6 +23,9 @@
 #include "irisInterface.h"
 #include "kernel/component.h"
 #include "../iris_srcs/data_types/networkPacket.h"
+
+class NetworkPacket;
+
 using namespace std;
 /*
  * =====================================================================================

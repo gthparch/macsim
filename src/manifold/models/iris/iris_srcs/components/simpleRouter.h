@@ -42,6 +42,8 @@
 #ifndef  SIMPLEROUTER_H_INC
 #define  SIMPLEROUTER_H_INC
 
+
+#include    "manifold/models/iris/iris_srcs/data_types/flit.h"
 #include	"../../interfaces/genericHeader.h"
 #include	"../../interfaces/irisRouter.h"
 #include	"../../interfaces/irisInterface.h"
@@ -52,6 +54,7 @@
 #include	"genericVcAllocator.h"
 
 //extern class Clock* master_clock;
+class HeadFlit;
 
 class InputBufferState
 {
@@ -75,6 +78,7 @@ class InputBufferState
         std::vector<uint> possible_ovcs;
 
         std::string toString() const;
+	
 #ifdef _DEBUG
         uint fid;
 #endif

@@ -521,7 +521,7 @@ bool dram_controller_c::send_packet(drb_entry_s* dram_req)
   dram_req->m_req->m_msg_src = m_noc_id;
 #ifdef IRIS
   dram_req->m_req->m_msg_dst = 
-    g_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
+    m_simBase->m_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
 #endif
   int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
   assert(dram_req->m_req->m_msg_src != -1 && dram_req->m_req->m_msg_dst != -1);
@@ -786,12 +786,12 @@ void dram_controller_c::create_network_interface(void)
 {
 #ifdef IRIS
   manifold::kernel::CompId_t processor_id = 
-    manifold::kernel::Component::Create<ManifoldProcessor>(0);
+    manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
   m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
   manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
       &ManifoldProcessor::tock);
 
-  g_macsim_terminals.push_back(m_terminal);
+  m_simBase->m_macsim_terminals.push_back(m_terminal);
 
   m_terminal->mclass = PROC_REQ;//MC_RESP;
 

@@ -19,12 +19,14 @@
 #ifndef  IRISINTERFACE_H_INC
 #define  IRISINTERFACE_H_INC
 
+//#define irisinterfacenetworkpacket
 #include        "genericHeader.h"
 #include        "kernel/component.h"
 #include        "../iris_srcs/data_types/networkPacket.h"
-class NetworkPacket;
 #include        "../iris_srcs/data_types/linkData.h"
 //#include	"manifoldTile.h"
+class NetworkPacket;
+
 
 /*
  * =====================================================================================

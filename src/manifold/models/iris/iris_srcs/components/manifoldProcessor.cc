@@ -89,8 +89,6 @@ ManifoldProcessor::handle_new_packet_event (int port, NetworkPacket* data)
 {
 
     proc_recv = false;
-    /* Can this function be called twice in a cycle??.. make sure that does not
-     * happen*/
 
     stat_packets_in++;
     stat_last_packet_in_cycle = manifold::kernel::Manifold::NowTicks();
@@ -98,7 +96,9 @@ ManifoldProcessor::handle_new_packet_event (int port, NetworkPacket* data)
     uint lat = (manifold::kernel::Manifold::NowTicks() - data->enter_network_time); //(sent_time part of pkt)
     stat_total_latency += lat;
     _DBG(" ********* MANIFOLDPROCESSOR got new pkt ********* vc %d %d",data->proc_buffer_id, lat);
-
+if(manifold::kernel::Manifold::NowTicks() == 135)
+    cout << "manifold proc got its first packet back!" << endl;
+    
     //manifold::kernel::Manifold::Schedule( 0, &ManifoldProcessor::handle_send_credit_event, this,(int)SEND_SIG, data->proc_buffer_id);
     handle_send_credit_event((int) SEND_SIG, data->proc_buffer_id);
 
@@ -121,6 +121,7 @@ ManifoldProcessor::print_stats( void ) const
     return str.str();
 }
 
+//only works for 8 bits
 uint 
 ManifoldProcessor::get_bit_rev_dest(uint b)
 {

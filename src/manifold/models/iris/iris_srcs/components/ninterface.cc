@@ -105,9 +105,9 @@ void
 NInterface::init()
 {
 
-    char tmp[30];
-    sprintf(tmp,"log_%d.txt",m_simBase->Mytid);
-    m_simBase->log_file = fopen (tmp,"a");
+    //char tmp[30];
+    //sprintf(tmp,"log_%d.txt",m_simBase->Mytid);
+    //m_simBase->log_file = fopen (tmp,"a");
 
 
     router_in_buffer = *new GenericBuffer();

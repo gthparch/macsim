@@ -32,6 +32,10 @@
 #include	"../data_types/networkPacket.h"
 #include	"../../../../../global_defs.h"
 //extern class Clock* master_clock;
+
+//class IrisTerminal;
+class NetworkPacket;
+
 class ManifoldProcessor: public IrisTerminal
 {
    private:
