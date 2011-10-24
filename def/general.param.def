@@ -8,8 +8,6 @@ param<REPEAT_TRACE, repeat_trace, bool, false>
 param<REPEAT_TRACE_N, repeat_trace_n, int, 0>
 param<MAX_NUM_CORE_PER_APPL, max_num_core_per_appl, int, 0>
 param<MAX_BLOCKS_TO_SIMULATE, max_blocks_to_simulate, int, 0>
-param<32_64_ISA, 32_64_isa, int, 32>
-param<FEATURE_SIZE, feature_size, int, 32>
 param<STDERR_FILE,                   stderr,                string,               NULL>
 param<STDOUT_FILE,                   stdout,                string,               NULL>
 param<FILE_TAG,                      file_tag,              string,               NULL>

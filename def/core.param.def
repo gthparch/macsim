@@ -103,4 +103,7 @@ param<GPU_USE_SINGLE_ALLOCQ_TYPE, gpu_use_single_iaq_type, bool, true>
 param<GPU_SHARE_ALLOCQS_BETWEEN_THREADS, gpu_share_iaqs_between_threads, bool, true>
 
 
+param<32_64_ISA, 32_64_isa, int, 32>
+param<PHY_ADDR_WIDTH, phy_addr_width, int, 32>
 
+param<FEATURE_SIZE, feature_size, int, 32>
