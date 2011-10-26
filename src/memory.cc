@@ -160,21 +160,14 @@ memory_c *default_mem(macsim_c* m_simBase)
 }
 
 
+// Default LLC constructor function
 cache_c *default_llc(macsim_c* m_simBase)
 {
   string llc_type = KNOB(KNOB_LLC_TYPE)->getValue();
   assert(llc_type == "default");
-  cache_c* llc = new cache_c("llc_default",
-                             *KNOB(KNOB_L3_NUM_SET),
-                             *KNOB(KNOB_L3_ASSOC),
-                             *KNOB(KNOB_L3_LINE_SIZE),
-                             sizeof(dcache_data_s),
-                             *KNOB(KNOB_L3_NUM_BANK),
-                             false,
-                             0,
-                             CACHE_DL1,
-                             false,
-                             m_simBase);
+  cache_c* llc = new cache_c("llc_default", *KNOB(KNOB_L3_NUM_SET), *KNOB(KNOB_L3_ASSOC),
+      *KNOB(KNOB_L3_LINE_SIZE), sizeof(dcache_data_s), *KNOB(KNOB_L3_NUM_BANK),
+      false, 0, CACHE_DL1, false, m_simBase);
   return llc;
 }
 
@@ -415,7 +408,8 @@ mem_req_s* dcu_c::search_pref_in_queue()
 }
 
 
-// access function to the data cache.
+// DCACHE (L1) access from the pipeline stage
+// If miss in the cache, it will go thru the memory system.
 int dcu_c::access(uop_c* uop)
 {
   ASSERT(m_level == MEM_L1);
@@ -430,23 +424,21 @@ int dcu_c::access(uop_c* uop)
   Addr line_addr = base_addr(vaddr);
   int bank       = BANK(vaddr, m_banks, 256);
 
-  // access port
+  // -------------------------------------
+  // DCACHE port access
+  // -------------------------------------
   if (*m_simBase->m_knobs->KNOB_DCACHE_INFINITE_PORT || m_disable == true) {
     // do nothing
   }
   else if (IsStore(type) && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) { 
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
-//    DEBUG("L%d[%d] uop_num:%lld addr:%llu port:%d busy\n", m_level, m_id, uop->m_uop_num, \
-//        line_addr, bank);
     uop->m_dcache_bank_id = bank + 64;
     return 0;
   }
   else if (IsLoad(type) && !m_port[bank]->get_read_port(m_simBase->m_simulation_cycle)) {
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
-//    DEBUG("L%d[%d] uop_num:%lld addr:%llu port:%d busy\n", m_level, m_id, uop->m_uop_num, \
-//        line_addr, bank);
     uop->m_dcache_bank_id = bank;
     return 0;
   }
@@ -454,7 +446,9 @@ int dcu_c::access(uop_c* uop)
       line_addr, bank);
 
 
-  // access cache
+  // -------------------------------------
+  // DCACHE access
+  // -------------------------------------
   bool cache_hit = false;
   if (*m_simBase->m_knobs->KNOB_PERFECT_DCACHE) {
     cache_hit = true;
@@ -467,11 +461,14 @@ int dcu_c::access(uop_c* uop)
     line = (dcache_data_s*)m_cache->access_cache(vaddr, &line_addr, true, appl_id);
     cache_hit = (line) ? true : false;
 
+    STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_RA + IsStore(type));
     // prefetch cache should be here
   }
 
 
-  // cache hit
+  // -------------------------------------
+  // DCACHE hit
+  // -------------------------------------
   if (cache_hit) {
     STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
     DEBUG("L%d[%d] uop_num:%lld cache hit\n", m_level, m_id, uop->m_uop_num);
@@ -481,7 +478,9 @@ int dcu_c::access(uop_c* uop)
     if (line && IsStore(type))
       line->m_dirty = true;
 
+    // -------------------------------------
     // hardware prefetcher training
+    // -------------------------------------
     m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(MEM_L1, uop->m_thread_id, \
         line_addr, uop->m_pc, uop, true);
 
@@ -491,12 +490,17 @@ int dcu_c::access(uop_c* uop)
 
     return m_latency;
   }
-  // cache miss
+  // -------------------------------------
+  // DCACHE miss
+  // -------------------------------------
   else { // !cache_hit
+    STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_RM + IsStore(type));
     STAT_EVENT(L1_MISS_CPU + this->m_ptx_sim);
     DEBUG("L%d[%d] uop_num:%lld cache miss\n", m_level, m_id, uop->m_uop_num);
 
+    // -------------------------------------
     // hardware prefetcher training
+    // -------------------------------------
     if (!m_disable) {
       m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(MEM_L1, uop->m_thread_id, line_addr, \
           uop->m_pc, uop, false);
@@ -525,7 +529,9 @@ int dcu_c::access(uop_c* uop)
         ASSERTM(0, "type:%d\n", req_type);
     }
 
+    // -------------------------------------
     // set address and size
+    // -------------------------------------
     int req_size;
     Addr req_addr;
     if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
@@ -537,8 +543,8 @@ int dcu_c::access(uop_c* uop)
       req_addr = line_addr;
     }
 
-    function<bool (mem_req_s*)> done_func = dcache_fill_line_wrapper;
 
+    // FIXME (jaekyu, 10-26-2011)
     if (m_id == *m_simBase->m_knobs->KNOB_HETERO_GPU_CORE_DISABLE) {
       uop->m_bypass_llc = true;
     }
@@ -547,17 +553,25 @@ int dcu_c::access(uop_c* uop)
       uop->m_skip_llc = true;
     }
 
+    // -------------------------------------
+    // Generate a new memory request (MSHR access)
+    // -------------------------------------
+    function<bool (mem_req_s*)> done_func = dcache_fill_line_wrapper;
     int result;
     result = m_simBase->m_memory->new_mem_req(
         req_type, req_addr, req_size, m_latency, uop, done_func, uop->m_unique_num, NULL, m_id, 
         uop->m_thread_id, m_ptx_sim);
 
+    // -------------------------------------
     // MSHR full
+    // -------------------------------------
     if (!result) {
       uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
       return 0;
     }
-    // In case of prefetch, generate pref request and retire the instruction
+    // -------------------------------------
+    // In case of software prefetch, generate pref request and retire the instruction
+    // -------------------------------------
     else if (req_type == MRT_DPRF) {
       return m_latency;
     }
@@ -566,37 +580,6 @@ int dcu_c::access(uop_c* uop)
 
   return -1; // cache miss
 }
-
-
-// search matching entry.
-#if 0
-mem_req_s* dcu_c::search(Addr addr, int size)
-{
-  mem_req_s* matching_entry = NULL;
-
-  matching_entry = m_wb_queue->search(addr, size);
-  if (matching_entry != NULL) {
-    return matching_entry;
-  }
- 
-  matching_entry = m_in_queue->search(addr, size);
-  if (matching_entry != NULL) {
-    return matching_entry;
-  }
-
-  matching_entry = m_fill_queue->search(addr, size);
-  if (matching_entry != NULL) {
-    return matching_entry;
-  }
-
-  matching_entry = m_out_queue->search(addr, size);
-  if (matching_entry != NULL) {
-    return matching_entry;
-  }
-
-  return NULL;
-}
-#endif
 
 
 // fill a cache line (fill_queue)
@@ -652,10 +635,11 @@ void dcu_c::run_a_cycle()
 }
 
 
-// process input queue
-// access the cache
-// fill flow : in case of hit (upper)
-// miss flow : in case of miss (lower)
+// process requests in the input queue
+// input queue: 
+//   1) to access the cache
+//   2) requests originated from upper-level cache misses
+//   3) will go to the output queue on cache misses
 void dcu_c::process_in_queue()
 {
   list<mem_req_s*> done_list;
@@ -702,6 +686,7 @@ void dcu_c::process_in_queue()
           req->m_type == MRT_WB ? false : true, req->m_appl_id);
       cache_hit = (line) ? true : false;
       STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_RA + m_level*2 + (req->m_type == MRT_DSTORE));
     }
 
 
@@ -778,6 +763,7 @@ void dcu_c::process_in_queue()
       }
 
       STAT_EVENT(L1_HIT_CPU + (m_level - 1)*4 + 2 + req->m_ptx);
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_RM + m_level*2 + (req->m_type == MRT_DSTORE));
 
 
       // -------------------------------------
@@ -876,6 +862,8 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 
 
 // process out queue
+// output request
+//   request that are waiting to be sent to the router 
 void dcu_c::process_out_queue()
 {
   list<mem_req_s*> done_list;
@@ -993,6 +981,9 @@ void dcu_c::process_out_queue()
 
 
 // process fill queue
+// fill queue
+//   request that come from the memory or write back from the upper-level cache
+//   to fill a cache line
 void dcu_c::process_fill_queue()
 {
   list<mem_req_s*> done_list;
@@ -1032,14 +1023,19 @@ void dcu_c::process_fill_queue()
             continue;
           }
 
+          // -------------------------------------
           // Insert a cache line
+          // -------------------------------------
           dcache_data_s* data;
           data = (dcache_data_s*)m_cache->insert_cache(req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id, req->m_ptx);
       
           STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
 
+          // -------------------------------------
           // If there is a victim line, we do the write-back.
+          // -------------------------------------
           if (victim_line_addr) {
+            STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C + m_level*2);
             if (data->m_dirty) {
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, m_ptx_sim, data);
               if (!m_wb_queue->push(wb))
@@ -1053,7 +1049,9 @@ void dcu_c::process_fill_queue()
             }
           }
 
+          // -------------------------------------
           // cache line setup 
+          // -------------------------------------
           data->m_dirty       = req->m_dirty;
           data->m_fetch_cycle = m_simBase->m_simulation_cycle;
           data->m_core_id     = req->m_core_id;
@@ -1182,6 +1180,8 @@ void dcu_c::process_fill_queue()
 
 
 // process write-back queue
+// write-back queue
+//   destination would be either the output queue or the fill queue of the next-level cache
 void dcu_c::process_wb_queue()
 {
   list<mem_req_s*> done_list;
@@ -1230,7 +1230,8 @@ void dcu_c::process_wb_queue()
 }
 
 
-// done function for data cache miss request
+// done function for DCACHE miss (look process_fill_queue() for L2 and L3 caches) request
+// resolve DCACHE miss and set miss-uop ready
 bool dcu_c::done(mem_req_s* req)
 {
   int bank;
@@ -1244,7 +1245,9 @@ bool dcu_c::done(mem_req_s* req)
   bank = m_cache->get_bank_num(req->m_addr);
 
 
-  // write port access
+  // -------------------------------------
+  // DCACHE write port access
+  // -------------------------------------
   if (!m_disable && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) {
     STAT_EVENT(CACHE_BANK_BUSY);
     return false;
@@ -1254,20 +1257,27 @@ bool dcu_c::done(mem_req_s* req)
     // do nothing
   }
   else {
+    // for the safety check, do not insert duplicate blocks
     line = (dcache_data_s*)m_cache->access_cache(addr, &line_addr, false, req->m_appl_id);
 
     if (!line) {
+      // -------------------------------------
+      // DCACHE insertion
+      // -------------------------------------
       data = (dcache_data_s*)m_cache->insert_cache(addr, &line_addr, &repl_line_addr,
           req->m_appl_id, req->m_ptx);
 
       if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
       }
 
+      // -------------------------------------
+      // evict a line
+      // -------------------------------------
       if (repl_line_addr) {
+        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C)
         if (data->m_dirty == 1) {
-          // FIXME
-          // queue rejection
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, m_ptx_sim, data);
+          // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb))
             ASSERT(0);
           DEBUG("L%d[%d] (done) new_wb_req:%d addr:%s by req:%d type:%s\n", 
