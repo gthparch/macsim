@@ -74,11 +74,12 @@ macsim_c::macsim_c()
 	m_end_simulation = false;
 	m_repeat_done = false;
 
-	m_core_cycle[MAX_NUM_CORES] = {0};
-
-	m_core_end_trace[MAX_NUM_CORES] = {false};
-	m_sim_end[MAX_NUM_CORES] = {false};
-	m_core_started[MAX_NUM_CORES] = {false};
+	for (int i=0; i<MAX_NUM_CORES; i++) {	
+		m_core_cycle[i] = 0;
+		m_core_end_trace[i] = false;
+		m_sim_end[i] = false;
+		m_core_started[i] = false;
+	}
 
 	m_simulation_cycle = 1;
 	m_core0_inst_count = 0;
