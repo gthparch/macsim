@@ -6,10 +6,26 @@
 GenericRC::GenericRC()
 {
     srand(time(NULL));
-    rc_method = XY;
+    rc_method = RING_ROUTING;
     do_request_reply_network = false;
+    
+    
 }
 
+void GenericRC::init()
+{
+    if( rc_method == XY_ROUTING )
+    {
+        grid_xloc.resize(no_nodes);
+        grid_yloc.resize(no_nodes);
+        for( uint i = 0; i < no_nodes; i++ )
+        {
+            grid_xloc[i] = i % grid_size;
+            grid_yloc[i] = i / grid_size;
+        }
+//        possible_out_vcs.push_back(0);
+    }
+}
 uint
 GenericRC::route_x_y(uint dest)
 {
@@ -336,10 +352,12 @@ GenericRC::push (Flit* f, uint ch )
             addresses[ch].possible_out_vcs.push_back(possible_out_vcs.at(0));
             addresses[ch].possible_out_ports.push_back(possible_out_ports.at(0));
         }
-        if( rc_method == XY)
+        if( rc_method == XY_ROUTING)
         {
             addresses [ch].out_port = route_x_y(header->dst_node );
+            addresses[ch].possible_out_vcs.push_back(0);
             addresses [ch].possible_out_ports.push_back(route_x_y(header->dst_node));
+
         }
         if( rc_method == TORUS_ROUTING)
         {
@@ -416,7 +434,7 @@ GenericRC::get_virtual_channel ( uint ch )
     uint och = -1;
     if (addresses[ch].last_vc == addresses[ch].possible_out_vcs.size())
         addresses[ch].last_vc = 0;
-
+    
     och = addresses[ch].possible_out_vcs[addresses[ch].last_vc];
     addresses[ch].last_vc++;
 

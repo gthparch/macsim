@@ -151,8 +151,10 @@ Ring::connect_routers()
         printf ( "\n Connect %d p%d -> %d p%d", tmp6,2, tmp4, 2*ports+1);
         printf ( "\n Connect %d p%d -> %d p%d", tmp6,ports+2, tmp4, 3*ports+1);
 #endif
+
         // going west  <-
         /* Router->Router DATA */
+        
         manifold::kernel::Manifold::Connect(router_ids.at(i), 1, 
                                             router_ids.at(i-1), 2*ports+2,
                                             &IrisRouter::handle_link_arrival , static_cast<manifold::kernel::Ticks_t>(LATENCY));

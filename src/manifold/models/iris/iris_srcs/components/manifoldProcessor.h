@@ -31,7 +31,6 @@
 #include	"kernel/manifold.h"
 #include	"../data_types/networkPacket.h"
 #include	"../../../../../global_defs.h"
-//extern class Clock* master_clock;
 
 //class IrisTerminal;
 class NetworkPacket;
@@ -60,7 +59,7 @@ class ManifoldProcessor: public IrisTerminal
 
         /* ====================  Setup functions  ======================================= */
         void init ( void );
-        void parse_config(std::map<std::string,std::string>& params);
+        void parse_config( std::map<std::string,std::string> & params);
         std::string print_stats( void ) const;
 
 	manifold::kernel::Component *ni;

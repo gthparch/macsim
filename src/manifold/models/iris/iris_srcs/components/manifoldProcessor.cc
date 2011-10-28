@@ -31,12 +31,12 @@ ManifoldProcessor::~ManifoldProcessor ()
 }
 
 void
-ManifoldProcessor::parse_config(std::map<std::string,std::string>& p)
+ManifoldProcessor::parse_config( std::map<std::string,std::string> & p)
 {
     // default
     ni_buffer_width = 2;
     no_nodes = 1;
-
+#if 1
     std::map<std::string,std::string>::iterator it;
     it = p.find("int_buff_width");
     if ( it != p.end())
@@ -47,7 +47,7 @@ ManifoldProcessor::parse_config(std::map<std::string,std::string>& p)
     it = p.find("no_mcs");
     if ( it != p.end())
         no_mcs = atoi((it->second).c_str());
-
+#endif
     return;
 }
 

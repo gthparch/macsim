@@ -261,7 +261,7 @@ void macsim_c::init_cores(int num_max_core)
 
 	// based on the core type, add cores into type-specific core pools
 	
-	// large cores
+	// large coresno_mcs
 	for (int ii = 0; ii < num_large_cores; ++ii) { 
 		m_core_pointers[ii] = new core_c(ii, m_simBase, UNIT_LARGE);
 		m_core_pointers[ii]->pref_init();
@@ -330,6 +330,8 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
               params.insert(pair<string,string>("topology",value));
           if (! key.compare("-iris:no_mcs"))
               params.insert(pair<string,string>("no_mcs",value));
+          if (! key.compare("-iris:grid_size"))
+              params.insert(pair<string,string>("grid_size",value));
           if (! key.compare("-iris:no_ports"))
               params.insert(pair<string,string>("no_ports",value));
           if (! key.compare("-iris:no_vcs"))
@@ -340,6 +342,8 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
               params.insert(pair<string,string>("int_buff_width",value));
           if (! key.compare("-iris:mean_irt"))
               params.insert(pair<string,string>("link_width",value));
+          if (! key.compare("-iris:rc_method"))
+              params.insert(pair<string,string>("rc_method",value));
           if (! key.compare("-iris:self_assign_dest_id"))
               params.insert(pair<string,string>("self_assign_dest_id",value));
           if (! key.compare("-iris:mapping"))
@@ -368,19 +372,21 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
 //IRIS
 // initialize Iris/manifold network
 
-void macsim_c::init_network(string topology_type)
+void macsim_c::init_network(void)
 {
 
 	init_iris_config(m_iris_params);
 
 	map<std::string, std::string>:: iterator it;
+	
 	it = m_iris_params.find("topology");
-	if ( it != m_iris_params.end())
-		  topology_type = it->second;
-		  
 	if ((it->second).compare("ring") == 0)
 	{
 		m_iris_network = new Ring(m_simBase);
+	} 
+	else if ((it->second).compare("mesh") == 0)
+	{
+		m_iris_network = new Mesh(m_simBase);
 	} 
 	else if ((it->second).compare("torus") == 0)
 	{
@@ -389,6 +395,8 @@ void macsim_c::init_network(string topology_type)
 
 	//initialize iris network
 	m_iris_network->parse_config(m_iris_params);
+
+cout << "number of macsim terminals: " << m_macsim_terminals.size() << "\n";
 
 	for (int i=0; i<m_macsim_terminals.size(); i++)
 	{
@@ -459,7 +467,6 @@ void macsim_c::init_sim(void)
 void macsim_c::compute_power(void)
 {
 	m_ei_power = new ei_power_c(m_simBase);
-	m_ei_power->ei_config_gen_top();
 	m_ei_power->ei_main();
 }
 
@@ -581,7 +588,7 @@ void macsim_c::initialize(int argc, char** argv)
 	REPORT("Initializing sim IRIS\n");
 	manifold::kernel::Manifold::Init(0, NULL);
 	// initialize interconnect network
-	init_network("ring");
+	init_network();
 #endif
 
 

@@ -38,6 +38,8 @@ class GenericRC
         uint no_adaptive_vcs( uint ch );
         bool is_empty();
         std::string toString() const;
+        void init(void);
+        
         uint node_id;
         uint address;
         uint no_nodes;

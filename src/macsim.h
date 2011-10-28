@@ -24,6 +24,7 @@
 #include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
 #include "manifold/models/iris/iris_srcs/topology/ring.h"
 #include "manifold/models/iris/iris_srcs/topology/torus.h"
+#include "manifold/models/iris/iris_srcs/topology/mesh.h"
 #include "manifold/kernel/include/kernel/manifold.h"
 #include "manifold/kernel/include/kernel/component.h"
 #include "manifold/models/iris/iris_srcs/components/ninterface.h"
@@ -48,7 +49,7 @@ class macsim_c
 		void init_memory(void);
 		void init_output_streams(void);
 		void init_cores(int num_core);
-		void init_network(string topology);
+		void init_network(void);
 		void open_traces(string trace_file);
 		void deallocate_memory(void);
 		void compute_power(void);

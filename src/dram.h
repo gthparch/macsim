@@ -229,7 +229,7 @@ class dram_controller_c
     int m_starvation_cycle; /**< number of cycles without completed requests*/
     int m_total_req; /**< total pending requests */
 
-    ManifoldProcessor* m_terminal; /**< connects to Iris router */
+    ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
 
     Counter m_avg_latency;
     Counter m_avg_latency_base;

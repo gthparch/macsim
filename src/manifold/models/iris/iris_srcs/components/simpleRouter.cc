@@ -19,6 +19,15 @@ SimpleRouter::SimpleRouter ( macsim_c* simBase )
 
 SimpleRouter::~SimpleRouter ()
 {
+	for ( uint i=0; i<ports; i++)
+    {
+        delete &in_buffers[i];
+        delete &decoders[i];
+        downstream_credits[i].clear();
+        delete &vca;
+        delete &swa;
+    }
+    input_buffer_state.clear();
 }
 
 void
@@ -56,6 +65,8 @@ SimpleRouter::parse_config(map<string,string>& p)
             rc_method = RING_ROUTING;
         if(it->second.compare("TORUS_ROUTING") == 0)
             rc_method = TORUS_ROUTING;
+        if(it->second.compare("XY_ROUTING") == 0)
+            rc_method = XY_ROUTING;
     }
 
 
@@ -72,6 +83,7 @@ SimpleRouter::init( void )
     vca.setup( ports, vcs );
     swa.resize(ports,vcs);
     downstream_credits.resize(ports);
+    stat_pp_avg_buff.resize(ports);
     stat_pp_packets_out.resize(ports);
     stat_pp_pkt_out_cy.resize(ports);
     stat_pp_avg_lat.resize(ports);
@@ -83,6 +95,8 @@ SimpleRouter::init( void )
         decoders[i].address = 0;
         decoders[i].rc_method = rc_method;
         decoders[i].no_nodes = no_nodes;
+        decoders[i].init();
+        stat_pp_avg_buff[i].resize(vcs);
         stat_pp_packets_out[i].resize(vcs);
         stat_pp_pkt_out_cy[i].resize(vcs);
         stat_pp_avg_lat[i].resize(vcs);
@@ -105,29 +119,51 @@ SimpleRouter::init( void )
             downstream_credits[i][j] = credits;
             input_buffer_state[i*vcs+j].pipe_stage = INVALID;
             input_buffer_state[i*vcs+j].clear_message = true;
+            input_buffer_state[i*vcs+j].address = -1 ;
             input_buffer_state[i*vcs+j].input_port = -1;
             input_buffer_state[i*vcs+j].input_channel = -1;
             input_buffer_state[i*vcs+j].output_port = -1;
             input_buffer_state[i*vcs+j].output_channel = -1;
         }
 
+    reset_stats();
+
+    return ;
+}
+
+void
+SimpleRouter::reset_stats ( void )
+{
     // stats init
+    stat_avg_buff = 0;
     stat_packets_out = 0;
     stat_packets_in = 0;
     stat_flits_out = 0;
     stat_flits_in = 0;
     avg_router_latency = 0;
     stat_last_flit_out_cycle= 0;
+    stat_3d_packets_out = 0;
+    stat_2d_packets_out = 0;
+    stat_3d_flits_out = 0;
+    stat_2d_flits_out = 0;
+
+    ib_cycles = 0;
+    vca_cycles = 0;
+    sa_cycles = 0;
+    st_cycles = 0;
+
     for(uint i=0; i<ports; i++)
         for(uint j=0; j<vcs; j++)
         {
+            stat_pp_avg_buff[i][j]=0;
             stat_pp_packets_out[i][j]=0;
             stat_pp_pkt_out_cy[i][j]=0;
             stat_pp_avg_lat[i][j]=0;
         }
 
     return ;
-}
+}		/* -----  end of method SimpleRouter::reset_stats  ----- */
+
 const char *mem_state_copy[] = {
   "MEM_INV",
   "MEM_NEW",
@@ -154,6 +190,7 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 //_DBG("FLIT came in inport is %d from source %d", port, data->src);
                 /* Stats update */
                 stat_flits_in++;
+                ib_cycles++;
                 
                 if ( data->f->type == TAIL ) stat_packets_in++;
 
@@ -165,9 +202,6 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 if ( data->f->type == HEAD )
                 {
                 #if 1
-                    if ( manifold::kernel::Manifold::NowTicks() == 404 )
-                        cout << "404!! pkt 33 is getting stuck somewhere" << endl;
-                    
                 	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
                 		<< ((HeadFlit*)data->f)->req->m_id 
                 		<< " arrived @ node " << node_id 
@@ -175,7 +209,14 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state]
                 		<< " msg type " << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << "\n";
                 		//<< " vc: " << data->vc << "\n";
-                #else
+                    //for stats collection/visualization
+//                    cout << manifold::kernel::Manifold::NowTicks() << "," 
+//                        << ((HeadFlit*)data->f)->req->m_id << ","
+//                        << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
+//                        << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
+//                        << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
+//                        << "R" << "," << "0" << "\n";
+                #else 
                   //for debugging only!
                   int stage = -1;
                   static const int stage_state[3][3] = {    //transposed array for column major order
@@ -260,7 +301,10 @@ SimpleRouter::do_input_buffering(HeadFlit* hf, uint inport, uint invc)
 void SimpleRouter::do_vc_allocation()
 {
     if(!vca.is_empty())
+    {
         vca.pick_winner();
+        vca_cycles++;
+    }
 
     for( uint i=0; i<ports; i++)
         for ( uint ai=0; ai<vca.current_winners[i].size(); ai++)
@@ -360,6 +404,10 @@ SimpleRouter::do_switch_traversal()
                     stat_pp_pkt_out_cy[op][oc] = manifold::kernel::Manifold::NowTicks();
                     stat_pp_avg_lat[op][oc] += lat;
 
+                    if  ( op != 5 && op != 0)  stat_2d_packets_out++; else if ( op == 5) stat_3d_packets_out++;
+//                    printf("Time%lld node:%d stat_3d_packets_out %lld stat_2d_packets_out:%lld op%d addr:%llx\n",
+//                           manifold::kernel::Manifold::NowTicks(), node_id, stat_3d_packets_out,stat_2d_packets_out,op, input_buffer_state[i].address);
+                    
                     input_buffer_state[i].clear_message = true;
                     input_buffer_state[i].pipe_stage = EMPTY;
                     input_buffer_state[i].input_port = -1;
@@ -373,6 +421,8 @@ SimpleRouter::do_switch_traversal()
                 }
 
                 stat_flits_out++;
+                st_cycles++;
+                if  ( op != 5 && op != 0)  stat_2d_flits_out++; else if ( op == 5) stat_3d_flits_out++;
 
                 LinkData* ld = new LinkData();
                 ld->type = FLIT;
@@ -416,6 +466,8 @@ SimpleRouter::do_switch_allocation()
         if( input_buffer_state[i].pipe_stage == SWA_REQUESTED)
             if ( !swa.is_empty())
             {
+                sa_cycles++;    // stat
+                
                 uint op = -1, oc = -1;
                 SA_unit sa_winner;
                 uint ip = input_buffer_state[i].input_port;
@@ -483,7 +535,13 @@ SimpleRouter::tock ( void )
      dump_state_at_deadlock(m_simBase);
      }
      /* */
-
+    for(uint i=0; i<ports; i++)
+        for(uint j=0; j<vcs; j++)
+        {
+            stat_pp_avg_buff[i][j] += in_buffers[i].get_occupancy(j);
+            stat_avg_buff += in_buffers[i].get_occupancy(j);
+        }
+        
     do_switch_traversal();
     do_switch_allocation();
     do_vc_allocation();
@@ -501,7 +559,25 @@ SimpleRouter::print_stats ( void ) const
         << "\n SimpleRouter[" << node_id << "] flits_out: " << stat_flits_out
         << "\n SimpleRouter[" << node_id << "] avg_router_latency: " << (avg_router_latency+0.0)/stat_packets_out
         << "\n SimpleRouter[" << node_id << "] last_pkt_out_cy: " << stat_last_flit_out_cycle
+        << "\n SimpleRouter[" << node_id << "] stat_3d_packets_out: " << stat_3d_packets_out 
+        << "\n SimpleRouter[" << node_id << "] stat_2d_packets_out: " << stat_2d_packets_out 
+        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out 
+        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out 
+        << "\n SimpleRouter[" << node_id << "] inj_nodes_packets_out: " << stat_packets_out - ( stat_2d_packets_out + stat_3d_packets_out )
+        << "\n SimpleRouter[" << node_id << "] local_remote_ratio: " << stat_3d_packets_out*1.0/stat_2d_packets_out 
+        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out
+        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out
+        << "\n SimpleRouter[" << node_id << "] ib_cycles: " << ib_cycles
+        << "\n SimpleRouter[" << node_id << "] sa_cycles: " << sa_cycles 
+        << "\n SimpleRouter[" << node_id << "] vca_cycles: " << vca_cycles
+        << "\n SimpleRouter[" << node_id << "] st_cycles: " << st_cycles
         ;
+    str << "\n SimpleRouter[" << node_id << "] per_port_avg_buff: ";
+    
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            str << stat_pp_avg_buff[i][j]*1.0/manifold::kernel::Manifold::NowTicks() << " ";
+
     str << "\n SimpleRouter[" << node_id << "] per_port_pkts_out: ";
         for ( uint i=0; i<ports; i++)
             for ( uint j=0; j<vcs; j++)

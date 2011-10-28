@@ -791,9 +791,8 @@ void dram_controller_c::create_network_interface(void)
   manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
       &ManifoldProcessor::tock);
 
+  m_terminal->mclass = MC_RESP; //PROC_REQ;//
   m_simBase->m_macsim_terminals.push_back(m_terminal);
-
-  m_terminal->mclass = PROC_REQ;//MC_RESP;
 
   m_noc_id = static_cast<int>(processor_id);
 #endif

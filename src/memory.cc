@@ -878,33 +878,23 @@ void dcu_c::process_out_queue()
       continue;
 
     ASSERT(m_has_router == true);
-
-#if 0
+#if DEBUG_SI
+if (1)
     //req->m_uop-> (in uop.h) Mem_Type to see if it's going to global mem
     //m_type: in memory.h NOC_NEW is requesting, NOC_FILL is servicing
     
     //if(m_level == MEM_MC )
     {
-    	cout << "Sim_Cycle: " << m_simBase->m_simulation_cycle << " NOC: " << m_noc_id << 
-	" req_id: " << req->m_id << " core: " << req->m_core_id  << 
-	" block: " << req->m_block_id << " Address: " << req->m_addr << 
-	" size: " << req->m_size;
-	
-//	    if( req->m_uop != NULL)  
-	    {
-	      cout << " mem_state: " << mem_req_c::mem_state[req->m_state];
-	       
-	    }
-	    //si debug
-//	    if(req->m_id == 150)
-//	    {
-//	      cout << "150!\n";
-//	    }
-	    
-	    cout << "\n";
-	    
+        cout << "Sim_Cycle: " << m_simBase->m_simulation_cycle << " NOC: " << m_noc_id << 
+        " req_id: " << req->m_id << " core: " << req->m_core_id  << 
+        " block: " << req->m_block_id << " Address: " << req->m_addr << 
+        " size: " << req->m_size;
+
+        cout << " mem_state: " << mem_req_c::mem_state[req->m_state];
+        cout << "\n";
     }
-//#else 
+else
+{
     static long int core_reqs[] = {0,0,0,0,0,0,0,0,0,0};
     static long long int prev_gsc = -1;
     //if( req->m_msg_type == NOC_FILL  
@@ -912,20 +902,20 @@ void dcu_c::process_out_queue()
 	//&& ( req->m_uop->m_mem_type == MEM_ST_GM 
 	//|| req->m_uop->m_mem_type == MEM_LD_GM ) )    		
     {
-	core_reqs[req->m_core_id]++;
-	  if( prev_gsc != m_simBase->m_simulation_cycle )
-      {
-    	prev_gsc = m_simBase->m_simulation_cycle;
-    	cout << "MACSIM, " << m_simBase->m_simulation_cycle << " cycle: ";
-    	for(int i=0; i<10; i++)
-    	{
-   	 	cout << core_reqs[i] << ", ";
-    	}
-    	cout << "\n";
-	  }
+        core_reqs[req->m_core_id]++;
+        if( prev_gsc != m_simBase->m_simulation_cycle )
+        {
+            prev_gsc = m_simBase->m_simulation_cycle;
+            cout << "MACSIM, " << m_simBase->m_simulation_cycle << " cycle: ";
+            for(int i=0; i<10; i++)
+            {
+                cout << core_reqs[i] << ", ";
+            }
+            cout << "\n";
+        }
     }
+}
 #endif
-
 
     // -------------------------------------
     // NEW request : send to lower level
@@ -1166,11 +1156,11 @@ void dcu_c::process_fill_queue()
       DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
           m_simBase->m_simulation_cycle - (*I)->m_in);
-      //DEBUG_SI
-   /*   printf("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
+#if DEBUG_SI
+      printf("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
           m_simBase->m_simulation_cycle - (*I)->m_in);
-     */     
+#endif
       m_memory->free_req((*I)->m_core_id, (*I));
     }
   }
@@ -1346,7 +1336,6 @@ bool dcu_c::create_network_interface(void)
 
 	m_terminal->init();
     m_simBase->m_macsim_terminals.push_back(m_terminal);
-
     m_terminal->mclass = PROC_REQ;
 
     m_noc_id = static_cast<int>(processor_id);
@@ -1490,6 +1479,7 @@ void memory_c::init(void)
   }
 
   report("L2 " << total_num_router);
+  
   m_noc_id_base[MEM_L3] = total_num_router;
   for (int ii = 0; ii < m_num_l3; ++ii) {
     if (m_l3_cache[ii]->create_network_interface())
@@ -1497,9 +1487,11 @@ void memory_c::init(void)
   }
 
   report("L3 " << total_num_router);
+  
   m_noc_id_base[MEM_MC] = total_num_router;
   for (int ii = 0; ii < m_num_mc; ++ii) {
     m_dram_controller[ii]->create_network_interface();
+    ++total_num_router;
   }
   report("DC " << total_num_router);
 #endif

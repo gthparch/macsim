@@ -113,9 +113,20 @@ class SimpleRouter: public IrisRouter
         uint64_t stat_packets_out;
         uint64_t stat_flits_in;
         uint64_t stat_flits_out;
-
+        
+        uint64_t ib_cycles;
+        uint64_t vca_cycles;
+        uint64_t sa_cycles;
+        uint64_t st_cycles;
+        uint64_t stat_3d_packets_out;
+        uint64_t stat_2d_packets_out;
+        uint64_t stat_3d_flits_out;
+        uint64_t stat_2d_flits_out;
+        uint64_t stat_avg_buff;
+        
         uint64_t avg_router_latency;
         uint64_t stat_last_flit_out_cycle;
+        vector< vector<uint64_t> > stat_pp_avg_buff;
         vector< vector<uint64_t> > stat_pp_packets_out;
         vector< vector<uint64_t> > stat_pp_pkt_out_cy;
         vector< vector<uint64_t> > stat_pp_avg_lat;
@@ -133,13 +144,15 @@ class SimpleRouter: public IrisRouter
         void do_switch_allocation();
         void do_vc_allocation();
         void do_input_buffering(HeadFlit*, uint, uint);
-
+        void reset_stats();
+        
         uint ports;
         uint vcs;
         uint credits;
         ROUTING_SCHEME rc_method;
         uint no_nodes;
         uint grid_size;
+        uint dim;
 
         // stats
         uint64_t stat_last_packet_out_cycle;
