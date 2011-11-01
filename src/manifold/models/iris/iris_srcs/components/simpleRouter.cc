@@ -202,20 +202,20 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 if ( data->f->type == HEAD )
                 {
                 #if 1
-                	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
-                		<< ((HeadFlit*)data->f)->req->m_id 
-                		<< " arrived @ node " << node_id 
-                		<< " bound for " << ((HeadFlit*)data->f)->dst_node 
-                		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state]
-                		<< " msg type " << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << "\n";
-                		//<< " vc: " << data->vc << "\n";
+//                	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
+//                		<< ((HeadFlit*)data->f)->req->m_id 
+//                		<< " arrived @ node " << node_id 
+//                		<< " bound for " << ((HeadFlit*)data->f)->dst_node 
+//                		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state]
+//                		<< " msg type " << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << "\n";
+//                		//<< " vc: " << data->vc << "\n";
                     //for stats collection/visualization
-//                    cout << manifold::kernel::Manifold::NowTicks() << "," 
-//                        << ((HeadFlit*)data->f)->req->m_id << ","
-//                        << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
-//                        << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
-//                        << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
-//                        << "R" << "," << "0" << "\n";
+                    cout << manifold::kernel::Manifold::NowTicks() << "," 
+                        << ((HeadFlit*)data->f)->req->m_id << ","
+                        << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
+                        << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
+                        << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
+                        << "R" << "," << "0" << "\n";
                 #else 
                   //for debugging only!
                   int stage = -1;
