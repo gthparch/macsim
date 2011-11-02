@@ -14,6 +14,7 @@
 
 
 #include "bp.h"
+#include "bp_targ.h"
 #include "bp_gshare.h"
 #include "uop.h"
 #include "factory_class.h"
@@ -28,6 +29,7 @@ bp_dir_base_c *default_bp(macsim_c* simBase)
 
   return new_bp;
 }
+
 
 
 // bp_recovery_info_c constructor
@@ -51,6 +53,7 @@ bp_data_c::bp_data_c(int core_id, macsim_c* simBase)
 {
   m_core_id = core_id;
   m_bp      = bp_factory_c::get()->allocate(simBase->m_knobs->KNOB_BP_DIR_MECH->getValue(), simBase);
+  m_bp_targ_pred = new bp_targ_c(m_core_id, simBase); 
 }
 
 

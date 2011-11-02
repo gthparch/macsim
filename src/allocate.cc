@@ -18,12 +18,14 @@
 
 
 #include "allocate.h"
+#include "allocate_interface.h"
 #include "core.h"
 #include "pqueue.h"
 #include "rob.h"
 #include "uop.h"
 #include "utils.h"
 #include "statistics.h"
+#include "bp.h"
 
 #include "debug_macros.h"
 #include "all_knobs.h"
@@ -187,6 +189,30 @@ void allocate_c::run_a_cycle(void)
 
     DEBUG("core_id:%d thread_id:%d id:%lld uop is pushed. inst_count:%lld\n", 
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
+  
+
+    // BTB miss is resolved 
+    if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) {
+      
+      // indirect branch and indirect call cannot resolve the target address in the decode stage 
+      if ((uop->m_cf_type < CF_IBR) && 
+	   (uop->m_cf_type > CF_ICO)) {
+	
+	m_bp_data->m_bp_targ_pred->update(uop); 
+	m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
+	  m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES; // redirect cycle 
+	uop->m_uop_info.m_btb_miss_resolved = true; 
+	
+	DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld btb_miss resolved redirect_cycle:%lld\n", 
+        
+        m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, 
+	      m_bp_data->m_bp_redirect_cycle[uop->m_thread_id]); 
+	
+	STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
+      }
+    }
+
+
   }
 }
 

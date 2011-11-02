@@ -90,7 +90,7 @@ class allocate_c
     bool            m_allocate_running; /**< Enable allocation stage */
     Counter         m_cur_core_cycle; /**< current core cycle */
     int             m_num_queues; /**< number of allocation queue types */
-    
+    bp_data_c*      m_bp_data;  /**< branch predictor data structure */ 
     macsim_c*       m_simBase; /**< macsim_c base class for simulation globals */
 
 };

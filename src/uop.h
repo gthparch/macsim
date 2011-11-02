@@ -193,6 +193,7 @@ class  uop_info_c
     bool  m_originally_mispred; /**< branch was originally mispredicted */
     bool  m_originally_misfetch; /**< branch was originally misfetched */
     bool  m_btb_miss;           /**< target is not known at prediction time */
+    bool  m_btb_miss_resolved;  /**< btb miss is handled */ 
     bool  m_no_target;          /**< no target for this branch at prediction time */
     bool  m_ibp_miss;           /**< indirect branch miss */
     bool  m_icmiss;             /**< instruction cache miss */
@@ -201,6 +202,7 @@ class  uop_info_c
     uns32 m_pred_global_hist;   /**< global branch history 32-bit */
     uns64 m_pred_global_hist_64; /**< global branch history 64-bit */
     int32 m_perceptron_output;  /**< perceptron bp output */
+    uns   m_btb_set;            /**< btb set address */
 };
 
 

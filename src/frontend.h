@@ -262,6 +262,8 @@ class frontend_c
      * Choose a thread id to fetch (SMT, GPU)
      */
     virtual int fetch();
+    
+    bool btb_access(uop_c *uop); 
 
     /**
      * Get the uop pool

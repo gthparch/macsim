@@ -578,6 +578,7 @@ void core_c::allocate_thread_data(int tid)
   bp_recovery_info->m_redirect_cycle   = MAX_CTR;
   m_bp_recovery_info[tid]              = bp_recovery_info;
   m_bp_data->m_bp_recovery_cycle[tid]  = 0;
+  m_bp_data->m_bp_redirect_cycle[tid]  = 0; 
   m_bp_data->m_bp_cause_op[tid]        = 0;
 
   // allocate retire data

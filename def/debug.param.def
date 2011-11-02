@@ -13,6 +13,7 @@ param<DEBUG_TRACE_READ,        debug_trace_read,         uns,             0>
 param<DEBUG_SIM,               debug_sim,                uns,             1>
 param<DEBUG_CACHE_LIB,         debug_cache_lib,          uns,             0>
 param<DEBUG_BP_DIR,            debug_bp_dir,             uns,             0>
+param<DEBUG_BTB,               debug_btb,                uns,             0>
 param<DEBUG_MAP_STAGE,         debug_map_stage,          uns,             0> 
 param<DEBUG_PORT,              debug_port,               uns,             0> 
 param<DEBUG_CORE_ID,           debug_core_id,            uns,             0> 

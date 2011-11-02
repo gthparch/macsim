@@ -370,7 +370,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
       }
 
       DEBUG("m_core_id:%d thread_id:%d vaddr:%s uop_num:%lld inst_num:%lld "
-          "uop->uop_info.dcmiss:%d latency:%d done_cycle:%lld\n",
+          "uop->m_uop_info.dcmiss:%d latency:%d done_cycle:%lld\n",
           m_core_id, uop->m_thread_id, hexstr64s(uop->m_vaddr), uop->m_uop_num, 
           uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle);
     }
@@ -466,8 +466,26 @@ void exec_c::br_exec(uop_c *uop)
           m_core_id, uop->m_thread_id, unsstr64(m_cur_core_cycle), 
           m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
   }
+  // handle misfetched branch  (miss target prediction: indirect branches) 
+  if (uop->m_uop_info.m_btb_miss) { 
+    
+    if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) { 
+      
+      STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
+      
+      m_bp_data->m_bp_targ_pred->update (uop);  // update 
+      m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
+	m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES; // redirect cycle 
+      uop->m_uop_info.m_btb_miss_resolved = true; 
+      DEBUG("_core_id:%d thread_id:%d cur_core_cycle:%s branch misprediction is resolved: "
+          "redirect_cycle:%lld uop_num:%lld\n", 
+          m_core_id, uop->m_thread_id, unsstr64(m_cur_core_cycle), 
+          m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
+    }
+      
 
-
+  }
+  
   // GPU : stall on branch policy
   if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
     m_frontend->set_br_ready(uop->m_thread_id);

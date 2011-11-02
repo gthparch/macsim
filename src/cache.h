@@ -25,7 +25,8 @@ typedef enum Cache_Type_enum
   CACHE_DL3, 
   CACHE_CONST,
   CACHE_TEXTURE,
-  CACHE_SW_MANAGED
+  CACHE_SW_MANAGED,
+  CACHE_BTB
 } Cache_Type;
 
 /* set data pointers to this initially */

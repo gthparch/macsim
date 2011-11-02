@@ -7,4 +7,11 @@ param<EXTRA_RECOVERY_CYCLES, extra_recovery_cycles, uns,    0>
 param<USE_BRANCH_PREDICTION, use_branch_prediction, bool,   true>
 param<PERFECT_BP,            perfect_bp,            bool,   false> 
 
+param<PERFECT_BTB,           perfect_btb,           bool,   true> 
+param<BTB_ENTRIES,           btb_entries,           uns,    1024>
+param<BTB_ASSOC,             btb_assoc,             uns,    4>
+param<BTB_BANK_NUM,          btb_bank_num,          uns,    1>
+
+
+
 

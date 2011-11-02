@@ -303,11 +303,14 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
   // -------------------------------------
   // check whether previous branch misprediction has been resolved
   // -------------------------------------
-  if (m_bp_data->m_bp_recovery_cycle[tid] > m_cur_core_cycle) {
+  if ((m_bp_data->m_bp_recovery_cycle[tid] > m_cur_core_cycle) || 
+      (m_bp_data->m_bp_redirect_cycle[tid] > m_cur_core_cycle) ) {
     DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d frontend is returned because "
-        "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld\n",
+	       "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld" 
+	       "bp_redirect_cycle is not ready yet:%lld \n",
         m_core_id, tid, m_bp_data->m_bp_recovery_cycle[tid], m_cur_core_cycle, 
-        m_bp_data->m_bp_cause_op[tid]);
+	       m_bp_data->m_bp_cause_op[tid],
+	       m_bp_data->redirect_cycle[tid]);
 
     STAT_CORE_EVENT(m_core_id, BP_MISPRED_STALL);
 
@@ -401,28 +404,49 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
         // -------------------------------------
         int br_mispred = false;
         if (new_uop->m_cf_type) {
+	  // btb prediction 
+	  bool btb_miss = btb_access(new_uop); 
+
+	  // branch prediction 
           br_mispred = predict_bpu(new_uop);
           if (new_uop->m_cf_type == CF_CBR) {
             STAT_CORE_EVENT(m_core_id, BP_ON_PATH_CORRECT+br_mispred+(new_uop->m_off_path)*3);
           }
-        }
+	  
+	  // BTB miss is MISFETCH. In theory, the processor should access the bp only if btb hits 
+	  // However, just to get some stats, we allow bp accesses. 
+	  // This might be changed in future 
+	  
+	  if (btb_miss & !br_mispred)
+	    STAT_CORE_EVENT(m_core_id, BP_ON_PATH_MISFETCH+(new_uop->m_off_path)*3);
+	  
 
-        // set frontend misprediction */
-        if (br_mispred) {
-          /*! should be per core */
-          m_bp_data->m_bp_recovery_cycle[new_uop->m_thread_id] = MAX_CTR;
-          m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
+	  // set frontend misprediction */
+	  if (br_mispred) {
+	    /*! should be per core */
+	    m_bp_data->m_bp_recovery_cycle[new_uop->m_thread_id] = MAX_CTR;
+	    m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
+	    
+	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is mispredicted inst_num:%lld "
+		       "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
+		       new_uop->m_uop_num);
+	  } 
+	  else if (btb_miss) { 
+	    m_bp_data->m_bp_redirect_cycle[new_uop->m_thread_id] = MAX_CTR; 
+	    m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
+	    
+	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is misfetched(btb_miss) inst_num:%lld "
+		       "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
+		       new_uop->m_uop_num);
+	  }
+	  else {
+	    fetch_data->m_MT_scheduler.m_next_fetch_addr = new_uop->m_npc;
+	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d MT_scheduler[%d]->0x%s \n",
+		       m_core_id, new_uop->m_thread_id, tid, hexstr64s(new_uop->m_npc));
+	  }
 
-          DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is mispredicted inst_num:%lld "
-              "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
-              new_uop->m_uop_num);
-        } 
-        else {
-          fetch_data->m_MT_scheduler.m_next_fetch_addr = new_uop->m_npc;
-          DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d MT_scheduler[%d]->0x%s \n",
-              m_core_id, new_uop->m_thread_id, tid, hexstr64s(new_uop->m_npc));
-        }
-
+	  
+	}
 
         // -------------------------------------
         // push the uop into the front_end_queue */
@@ -588,7 +612,7 @@ int frontend_c::predict_bpu(uop_c *uop)
     case CF_BR:
       // 100 % accurate
     case CF_CBR:
-      pred_dir = (m_bp_data->m_bp)->pred(uop);
+      pred_dir = (m_bp_data->m_bp_targ_pred)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
       STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
@@ -636,6 +660,25 @@ int frontend_c::predict_bpu(uop_c *uop)
   return uop->m_mispredicted;
 }
 
+// btb accesses 
+bool frontend_c::btb_access(uop_c *uop)
+{
+  bool btb_miss = false; 
+  Addr pred_targ_addr = m_bp_data->m_bp_targ_pred->pred(uop);
+  if (pred_targ_addr != uop->m_npc) 
+    btb_miss = true; 
+  
+  uop->m_uop_info.m_btb_miss = btb_miss; 
+  
+  DEBUG("m_core_id:%d tid:%d uop_num:%s pc:0x%s cf_type:%d dir:%d oracle_npc:%s pred_targ:%s btb_miss:%d \n", 
+	uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), hexstr64s(uop->m_pc), 
+	uop->m_cf_type, uop->m_dir, hexstr64s(uop->m_npc), hexstr64s(pred_targ_addr), btb_miss);
+
+  // need to set up redirect 
+
+  return uop->m_uop_info.m_btb_miss; 
+
+}
 
 // FIXME
 // every 4 cycles, controll will go to the next thread always

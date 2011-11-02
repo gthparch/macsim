@@ -163,6 +163,7 @@ void uop_c::init()
   m_uop_info.m_originally_mispred     = false;
   m_uop_info.m_originally_misfetch    = false;
   m_uop_info.m_btb_miss               = false;
+  m_uop_info.m_btb_miss_resolved      = false; 
   m_uop_info.m_no_target              = false;
   m_uop_info.m_ibp_miss               = false;
   m_uop_info.m_icmiss                 = false;
