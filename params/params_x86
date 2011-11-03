@@ -9,19 +9,13 @@ large_core_type x86
 cpu_frequency 4 
 gpu_frequency 1.5
 sim_cycle_count 0 
-num_sim_traces  80
 max_insts 200000000
 heartbeat_interval 1000000
-collect_num_busy_banks 0
-collect_thread_start_end_cycles 1
 forward_progress_limit 50000
-trace_mode text
-print_info_with_heartbeat 1
 
 
 # Common Core Configuration
 fetch_policy rr
-in_order_processing 0
 mt_no_fetch_br 1
 one_cycle_exec 0
 
@@ -54,12 +48,9 @@ ptx_common_cache 0 # GPU Only
 const_cache_size 1024 # GPU Only
 texture_cache_size 256 # GPU Only
 shared_mem_size 4096 # GPU Only
-collect_bar_wait_cycles 0
-collect_mlp_stats 0
 blocks_to_simulate 0
 ptx_exec_ratio 2
 num_warp_scheduler 2
-schedule_until_block 1
 
 
 # Large Core Configuration
@@ -138,9 +129,7 @@ debug_map_stage 0
 debug_mem  0
 debug_trace_read 0
 debug_sim_thread_schedule 0
-debug_list_lib 0
 debug_cache_lib 0
-debug_uop_pool 0
 debug_bp_dir 0
 
 
