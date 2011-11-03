@@ -1,0 +1,121 @@
+Orion: A Power-Performance Simulator for Interconnection Networks
+=================================================================
+(c) Princeton University, 2005.
+
+This is a draft document and it describes the network power models of Orion, coded in C. 
+For specific information on bus power models, please see README.bus.
+For specific information on static power models, please see README.static.
+----------
+
+
+(I) FILES
+
+There are some PARM() macros and FUNC() macros which seem unnatural and make the structure more complicated.  They are the requirements of Liberty since this power library is developed as a part of it.  When I try to exact a stand-alone power library, I have to keep these macros to ensure compatibility.
+
+File SIM_port.h defines the router.  Please see the sample SIM_port.h for explanations of all parameters.  Parameters between /* RF module parameters */ and /* router module parameters */ do not pertain to router power models.
+
+There are 2 real router configurations: SIM_port_alpha.h (the Alpha 21364 router) and SIM_port_ibm.h (the IBM InfiniBand 8-port 12X router).  To use them, copy to SIM_port.h and recompile your program.
+
+
+File SIM_router_power.c defines the top level functions and also some interface functions to router power models.  FUNC(SIM_router_power_init) initialize the router data structure from parameters in SIM_port.h.  FUNC(SIM_buf_power_data_read) and FUNC(SIM_buf_power_data_write) provide interface functions to the array power model since they are not only developed for routers.  Each time there is a buffer read/write, they should be called.
+
+File SIM_power_router.c (sorry for the confusing names) defines all router component models except the array model.  *_record and *_report functions are the interface for a simulator to use the models.
+
+
+(II) FUNCTIONS
+
+Some explanation of function formals:
+
+FUNC(SIM_buf_power_data_read)
+    SIM_power_array_info_t *info -> information structure of an array, if this is an input
+                                    buffer, then &in_buf_info in the SIM_power_router_info_t
+				    structure.
+    SIM_power_array_t *arr -> array structure, if this is an input buffer, then &in_buf in
+                              the SIM_power_router_t structure.
+    LIB_Type_max_uint data -> the flit which is read.  LIB_Type_max_uint is u_int64_t on x86
+                              architecture.  This is how Liberty try to achieve architecture
+			      independence.
+
+(SIM_power_X_info_t contains the information extracted from parameters, which completely define an instance of component X, while SIM_power_X_t contains derived information and run time information, usually capacitance, switching activities and energy dissipation.)
+
+FUNC(SIM_buf_power_data_write)
+    char *data_line -> last written flit converted to char* type.
+    char *old_data  -> last written flit in the same address (row), converted to char* type.
+    char *new_data  -> the flit which is written, converted to char* type.
+
+(We use char* to adapt arbitrarily long flits.)
+
+	
+SIM_crossbar_record()
+    SIM_power_crossbar_t *xb -> crossbar structure, &crossbar in the SIM_power_router_t
+                                structure.
+    int io -> boolean flag.  1 means sending flit, 0 means receiving flit.
+    LIB_Type_max_uint new_data -> the flit which is sent/received.
+    LIB_Type_max_uint old_data -> last sent/received flit.
+    u_int new_port -> only used for receiving, port from which the flit comes.
+    u_int old_port -> only used for receiving, port from which the last flit comes.
+
+(Each time a flit is sent to or received from the crossbar, this function should be called.  So a complete traversal invokes this function twice.)
+
+(FUNC(SIM_buf_power_data_read) and SIM_crossbar_record() cannot handle flits wider than 64-bit, which can be seen from their formal types.  This is no problem for buffers if using double-ended bitlines since "data" is not really used.  For crossbars, we mimic wide flits by calling SIM_crossbar_record() multiple times.  I will fix this problem soon.)
+
+
+SIM_arbiter_record()
+    SIM_power_arbiter_t *arb -> arbiter structure.  If this is an output side arbiter, then
+                                &out_arb in the SIM_power_router_t structure.
+    LIB_Type_max_uint new_req -> current request bit map, i.e. each bit representing whether
+                                 a requester is requesting (1) or nor (0).
+    LIB_Type_max_uint old_req -> last request bit map.
+    u_int new_grant -> id of the current granted requester.
+    u_int old_grant -> id of the last granted requester.
+
+(This function should be called for each arbitration.)
+
+
+SIM_crossbar_report() and SIM_arbiter_report() return the total energy dissipated so far by the corresponding crossbar and arbiter respectively.  To get the energy report of an input buffer, use SIM_array_power_report(), which is defined in SIM_power_array_l.c.  If you uncomment all fprintf calls in that function, it will print out energy dissipation of each sub-component for debuging purpose. 
+
+
+There are also average/maximum power estimation functions.  Read test_router.c for an example of how to use SIM_router_stat_energy().
+
+
+(III) UTILITIES
+
+(1) test_router
+
+    SYNOPSIS  test_router [-pm] [-d print_depth] [-l load] <router_name>
+
+    -p: output buffer power, crossbar power, arbiter power, total power, buffer power percentage, crossbar power percentage and arbiter power percentage.
+    -m: if present, compute maximum power rather than average power.	
+    -d depth: output detailed component energy dissipation with depth depth.  Try different numbers to see the effects.
+    -l load: load is in the range of (0,1], and the default value is 1.  Here load means at what probability flits arrive in each ports.
+    router_name: an arbitrary string as the name of the router.
+
+test_router outputs power in W and energy in J.
+
+(2) test_router_area
+
+    SYNOPSIS  test_router_area <port>
+
+    port: the number of router ports.
+
+test_router_area estimates the router area.  It only outputs a number.  The area unit is um^2.
+
+
+(IV) BUILD
+
+There are 2 parameters that can only be passed through the makefile: PARM_TECH_POINT, the processing technology (10 is 0.1u), and PARM_Freq, the frequency in Hz.  You can optionally define Vdd in makefile, which is recommended, since otherwise the power library needs to guess Vdd according to the processing technology, which may not be accurate.  Not all processing technologies are supported, please read SIM_power.h for a complete list of supported processing technologies.
+
+Procedure to build:
+(0) cd power
+(1) make depend
+(2) make
+(3) make test_router, this is optional.
+then you will get libpower.a which is the power library.
+
+SIM_port.h defines the router.  The power library does not depend on SIM_port.h so that you do not need to keep a library for each router configuration.  But the program which uses the power library, e.g. test_router, depends on SIM_port.h.
+
+I believe there are bugs.  If you have any question about the code or find some bugs, please let me know.  I will answer your question or fix the bug as soon as possible.  Thanks.
+
+
+Hangsheng Wang
+hangshen@princeton.edu

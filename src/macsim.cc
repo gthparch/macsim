@@ -301,6 +301,8 @@ void macsim_c::init_cores(int num_max_core)
 	}
 }
 #ifdef IRIS
+
+
 //initialize IRIS parameters (with config file, preferrably)
 void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_params here
 {
@@ -544,6 +546,14 @@ void macsim_c::fini_sim(void)
 	{
 		compute_power();
 	}
+	
+#ifdef IRIS
+    for(int i=0; i<m_iris_network->routers.size(); i++)
+    {
+        m_iris_network->routers[i]->print_stats();
+    }
+	
+#endif
 }
 
 //Initialization before simulation run

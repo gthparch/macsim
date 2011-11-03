@@ -3,6 +3,17 @@
 
 #include	"simpleRouter.h"
 
+extern "C" {
+#include "SIM_router.h"
+#include "SIM_router_power.h"
+#include "SIM_parameter.h"
+#include "SIM_array.h"
+#include "SIM_misc.h"
+#include "SIM_static.h"
+#include "SIM_clock.h"
+#include "SIM_util.h"
+}
+//double SIM_router_stat_energy(SIM_router_info_t*, SIM_router_power_t*, int, char*, int, double, int, double);
 
 // memory request state noc string
 const char* mem_req_noc_type_name[MAX_NOC_STATE] = {
@@ -69,14 +80,12 @@ SimpleRouter::parse_config(map<string,string>& p)
             rc_method = XY_ROUTING;
     }
 
-
     return;
 }
 
 void
 SimpleRouter::init( void )
 {
-
     in_buffers.resize(ports);
     decoders.resize(ports);
     input_buffer_state.resize(ports*vcs);
@@ -256,7 +265,7 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 break;
             }
 
-        default:	
+        default:
             cerr << " ERROR: SimpleRouter::handle_link_arrival" << endl;
             break;
     }				/* -----  end switch  ----- */
@@ -573,6 +582,21 @@ SimpleRouter::print_stats ( void ) const
         << "\n SimpleRouter[" << node_id << "] st_cycles: " << st_cycles
         ;
     str << "\n SimpleRouter[" << node_id << "] per_port_avg_buff: ";
+    /////////////////energy//////////////////////////
+    
+//    SIM_router_power_t router_power;
+//    SIM_router_info_t router_info;
+    double ret = SIM_router_init(&GLOB(router_info), &GLOB(router_power), NULL);
+    ret = SIM_router_stat_energy(&GLOB(router_info), &GLOB(router_power), 1, "testing", AVG_ENERGY, 0.5, 0, PARM(Freq));
+    
+
+//    Eavg += sa_cycles * SIM_arbiter_init(&router->sw_in_arb, info->sw_in_arb_model, info->sw_in_arb_ff_model, info->n_v_channel*info->n_v_class, 0, &info->sw_in_arb_queue_info);
+//    
+//    Eavg += vca_cycles * SIM_arbiter_init(&router->sw_in_arb, info->sw_in_arb_model, info->sw_in_arb_ff_model, info->n_v_channel*info->n_v_class, 0, &info->sw_in_arb_queue_info);
+//    
+//    Eavg += st_cycles * SIM_crossbar_stat_energy(&router->crossbar, next_depth, SIM_strcat(path, "crossbar"), max_avg, e_cbuf_fin);
+//    
+//    Eavg += ib_cycles * 
     
     for ( uint i=0; i<ports; i++)
         for ( uint j=0; j<vcs; j++)

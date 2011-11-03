@@ -19,6 +19,19 @@ Ring::~Ring()
 
 }
 
+vector<uint> &Ring::split(const string &s, char delim, vector<uint> &elems) {
+    stringstream ss(s);
+    string item;
+    while(getline(ss, item, delim)) {
+        elems.push_back(atoi(item.c_str()));
+    }
+    return elems;
+}
+
+vector<uint> Ring::split(const std::string &s, char delim) {
+    vector<uint> elems;
+    return split(s, delim, elems);
+}
 void
 Ring::parse_config(std::map<std::string, std::string>& p)
 {
@@ -47,6 +60,10 @@ Ring::parse_config(std::map<std::string, std::string>& p)
     it = p.find("no_vcs");
     if ( it != p.end())
         vcs = atoi((it->second).c_str());
+    
+    it = p.find("mapping");
+    if ( it != p.end())
+        mapping = split(it->second, ',');
 
 
     return;
@@ -65,12 +82,6 @@ Ring::print_stats()
 void
 Ring::connect_interface_terminal()//std::vector <ManifoldProcessor*> &g_macsim_terminals)
 {
-    //read from config file and fill these data structures
-    std::vector <manifold::kernel::CompId_t> mapping(m_simBase->m_macsim_terminals.size());//[num_core];	//example: core_mapping[0] == 3 (node id)
-
-    //TODO: must initialize this via a config file 
-    for(uint i=0; i<m_simBase->m_macsim_terminals.size(); i++)
-	mapping[i] = i;
 
     /* Connect INTERFACE -> TERMINAL*/
     for( uint i=0; i < m_simBase->m_macsim_terminals.size(); i++)

@@ -88,9 +88,9 @@ class Mesh : public Topology
         
         
     protected:
-            vector<int> &split(const string &s, char delim, vector<int> &elems);
-            vector<int> split(const std::string &s, char delim);
-
+            vector<uint> &split(const string &s, char delim, vector<uint> &elems);
+            vector<uint> split(const std::string &s, char delim);
+    
     private:
         uint ports;
         uint vcs;
@@ -100,7 +100,7 @@ class Mesh : public Topology
         uint no_nodes;
         uint dim;
         uint grid_size;
-        vector<int> mapping;
+        vector<uint> mapping;
         
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

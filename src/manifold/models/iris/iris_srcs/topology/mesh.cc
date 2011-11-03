@@ -42,7 +42,8 @@ Mesh::~Mesh()
     }
 
 }
-vector<int> &Mesh::split(const string &s, char delim, vector<int> &elems) {
+
+vector<uint> &Mesh::split(const string &s, char delim, vector<uint> &elems) {
     stringstream ss(s);
     string item;
     while(getline(ss, item, delim)) {
@@ -51,10 +52,11 @@ vector<int> &Mesh::split(const string &s, char delim, vector<int> &elems) {
     return elems;
 }
 
-vector<int> Mesh::split(const std::string &s, char delim) {
-    vector<int> elems;
+vector<uint> Mesh::split(const std::string &s, char delim) {
+    vector<uint> elems;
     return split(s, delim, elems);
 }
+
 void
 Mesh::parse_config(std::map<std::string, std::string>& p)
 {
@@ -92,6 +94,13 @@ Mesh::parse_config(std::map<std::string, std::string>& p)
     if ( it != p.end())
         mapping = split(it->second, ',');
 
+    cout << "mapping " << mapping.size() << " " << m_simBase->m_macsim_terminals.size() << ": ";
+    assert(mapping.size() >= m_simBase->m_macsim_terminals.size());
+    for(int i=0; i<mapping.size(); i++)
+    {
+        cout << mapping[i] << ", ";
+    }
+    cout << "\n";
 
     return;
 }
@@ -110,8 +119,8 @@ Mesh::print_stats(component_type ty)
             break;
 
         case IRIS_ROUTER:	 
-//            for( uint i=0; i<routers.size(); i++)
-//                str << routers[i]->print_stats();
+            for( uint i=0; i<routers.size(); i++)
+                str << routers[i]->print_stats();
             break;
 
         default:	
@@ -134,20 +143,13 @@ Mesh::print_stats()
 void
 Mesh::connect_interface_terminal()
 {
-    //read from config file and fill these data structures
-    std::vector <manifold::kernel::CompId_t> mapping(m_simBase->m_macsim_terminals.size());//[num_core];	//example: core_mapping[0] == 3 (node id)
-
-    //TODO: must initialize this via a config file 
-    for(uint i=0; i<m_simBase->m_macsim_terminals.size(); i++)
-	mapping[i] = i;
-
     /* Connect INTERFACE -> TERMINAL*/
     for( uint i=0; i < m_simBase->m_macsim_terminals.size(); i++)
     { 
         m_simBase->m_macsim_terminals.at(i)->ni = static_cast<manifold::kernel::Component*>(interfaces.at(mapping[i]));
         interfaces.at(mapping[i])->terminal = static_cast<manifold::kernel::Component*>(m_simBase->m_macsim_terminals.at(i));
         
-	      m_simBase->m_macsim_terminals.at(i)->node_id = mapping[i];
+        m_simBase->m_macsim_terminals.at(i)->node_id = mapping[i];
     }
     return;
 }

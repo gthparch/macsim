@@ -1,0 +1,210 @@
+ORION 2.0: A Fast and Accurate NoC Power and Area Model for Early-Stage Design Space Exploration 
+================================================================= 
+(c) Princeton University, and University of California, San Diego, 2009. 
+ 
+ 
+(1) OVERVIEW  
+ORION 2.0 is a power and area simulator for interconnection networks built on top of ORION 1.0. We  
+kept the original structure of ORION 1.0 while providing significant enhancements compared to ORION 1.0.  
+Here is a summary of the major improvements: 
+ -- We provide accurate technology parameters for 90nm and 65nm technologies.  
+ -- 45nm and 32nm are scaled from 65nm based on scaling factors obtained from ITRS2007/MASTAR5.0 
+ -- We provide three operating types: high performance (high power), normal performance, and low  
+	power low performance.   
+ -- Added router area model 
+ -- Added link power and area model
+ -- Added clock power model
+
+Details of ORION 2.0 can be obtained from our DATE'09 paper. 
+(http://www.princeton.edu/~peh/publications/orion2.pdf)
+ 
+(2) BUILD  
+
+    ORION 2.0 runs under RedHat Linux Enterprise CentOS (5.0 and below). It should also run 
+    under other standard Linux distributions with the addition of the correct libraries. 
+ 
+    Before building ORION 2.0, you need to specify router configurations in SIM_port.h file.
+    SIM_port.h file defines the router and link microarchitectural parameters as well as
+    technology parameters. Some explanations about how to choose the parameters are provided 
+    in Section (4) below.
+ 
+    Procedure to build: just type "make" and this will generate three executable files: 
+    (1) orion_router_power for router power estimation, (2) orion_router_area for router area 
+    estimation, and (3) orion_link for link power and area estimation.
+ 
+(3) USAGE  
+ 
+(3.1) orion_router_power
+ 
+    command: orion_router_power [-pm] [-d print_depth] [-l load] <router_name> 
+ 
+    -p: output buffer power, crossbar power, virtual channel allocator power, switch 
+		allocator power, clock power and total power. 
+    -m: if present, compute maximum power rather than average power. 
+    -d depth: output detailed component energy dissipation with varying depth. Try 
+		different numbers to see the effects on printout 
+    -l load: load is in the range of (0,1), and the default value is 1. Here load 
+		corresponds to the probability at which flits arrive at each port. ORION 
+		assumes 0.5 switching probability for each arrived flit internally.
+    router_name: an arbitrary string as the name of the router. 
+ 
+    orion_router_power outputs power in W and energy in J. 
+
+(3.2) orion_router_area 
+ 
+    command: orion_router_area  
+ 
+    orion_router_area estimates router area. The unit of area is um^2. 
+    Note that router area is supported for 90nm, 65nm, 45nm and 32nm.
+ 
+(3.2) orion_link 
+	 
+    command: orion_link <link_length> <load> 
+ 	 
+    link_length: the length between two routers	in um. 
+	 
+    load is in the range of (0,1). Here load indicates the probability at which 
+    flits traverse the links. 
+ 
+    Note that this returns link power and area for links connected to the input port 
+    part of the router. It doesn't account for the links at the output ports because 
+    we assume that the output link power can be calculated at the router to which it is 
+    connected.  
+
+	orion_link outputs power in W and area in um^2. Note that link power and area are 
+	supported only for 90nm, 65nm, 45nm and 32nm.
+	 
+ 
+(4) FILES 
+ 
+    In SIM_port.h file, we provide various router microarchitectural choices as 
+    well as technological choices. Here, we list several parameter choices for 
+    your reference: 
+
+(4.1) technology parameters 
+
+    (a) PARM_TECH_POINT 
+  
+    For PARM_TECH_POINT, we provide 800nm, 400nm, 350nm, 250nm, 180nm, 110nm,
+    90nm, 65nm, 45nm and 32nm technologies. ORION 2.0 updates values for 90nm, 
+    65nm, 45nm and 32nm while keeping the original values from ORION 1.0 for 800nm to 110nm.
+ 
+    (b) PARM_TRANSISTOR_TYPE  
+   	
+    PARM_TRANSISTOR_TYPE can be set to HVT, NVT, or LVT. Here HVT means high VT, NVT means 
+    normal VT and LVT means low VT. LVT corresponds to high performance router. NVT 
+    corresponds to normal operating performance router and HVT corresponds to low 
+    power low performance router. 
+
+    (c) PARM_Vdd
+	
+    PARM_Vdd is the operating voltage in Volt.
+
+    (d) PARM_Freq
+
+    PARM_Freq is the operating frequency in Hz. 
+
+    Note that if your router operates at high frequency, you should use LVT and set
+    PARM_Vdd to a higher value. If your router operates at low frequency, you should
+    use HVT and set PARM_Vdd to a lower value. If your router operates at normal
+    frequency, you should use NVT and set PARM_Vdd to the value in between the LVT and
+    HVT's PARM_Vdd values. For example, if you simulate the router at 65nm technology,
+    reasonable settings for PARM_Vdd could be 1.2V for LVT and 0.8V for HVT.
+
+(4.2) router parameters
+
+    (a) PARM_v_class 
+		
+    PARM_v_class is the number of message classes in each router. 
+
+    (b) PARM_v_channel 
+
+    PARM_v_channel is the number of virtual channels within each message class.
+
+    (c) PARM_in_buf_set 
+
+    PARM_in_buf_set is the number of buffers. Note that if you set PARM_in_share_buf 
+    to 0, which means that input virtual channels don't physically share buffers, then 
+    PARM_in_buf_set is the number of buffers per virtual channel. If you set 
+    PARM_in_share_buf to 1, which means that input virtual channels physically share 
+    buffers, then PARM_in_buf_set is the total number of buffers that are shared.
+
+(4.3) link wire parameters 
+    
+    (a) WIRE_LAYER_TYPE 
+    	
+    WIRE_LAYER_TYPE can be set to INTERMEDIATE or GLOBAL. INTERMEDIATE and GLOBAL 
+    wiring regimes are used for on chip interconnection.  When selecting these 
+    regimes, appropriate wire dimensions will be used to derive the interconnect 
+    capacitance that is used in link power calculation. The values to use should 
+    be either INTERMEDIATE or GLOBAL depending on the application. Typically, 
+    in a 9-layer design, M2-M6 represent INTERMEDIATE, and M7-M9 represent GLOBAL 
+    wiring regimes, respectively. 
+ 
+
+    (b) PARM_width_spacing 
+ 
+    Choices for PARM_width_spacing are SWIDTH_SSPACE, SWIDTH_DSPACE, DWIDTH_SSPACE
+    and DWIDTH_DSPACE. "S" and "D" stand for single and double, respectively.
+    Width-spacing configuration is a design style which enable designers to meet
+    certain design constraints. For example, if signal integrity is of interest,
+    the designer could use SWIDTH_DSPACE which spreads the wires farther apart
+    from each other, or to reduce wire parasitics (i.e., RC), the designer can use
+    DWIDTH_SSPACE.
+
+ 
+    (c) PARM_buffering_scheme 
+
+    PARM_buffering_scheme can be set to MIN_DELAY or STAGGERED.  
+    MIN_DELAY buffering scheme uses the traditional buffering in which the number 
+    and size of buffers are chosen such that the point-to-point delay is minimized.  
+    The STAGGERED buffering scheme uses a circuit technique (cf. Kahng et al. DATE-1998) 
+    to improve global interconnect performance. The idea is to reduce the worst-case 
+    Miller coupling by offsetting the inverters on adjacent lines. 
+
+ 
+    (d) PARM_shielding 
+
+    PARM_shielding can be set to TRUE or FALSE. Shielding is the use of a grounded 
+    wire between two wires of interest. Shielding will reduce crosstalk effects and 
+    improve signal integrity.  However, it increases the area (i.e., adding another 
+    wire) and also takes up a routing track.  The default value should be set to FALSE 
+    to assess the worst-case impact on performance and power. 
+
+
+(4.4) clock power parameters  
+
+    (a) PARM_pipeline_stages 
+	
+    This is the number of pipeline stages in the router. 
+    
+    (b) PARM_H_tree_clock 
+
+    PARM_H_tree_clock defines whether H_tree_clock power is included in the total
+    clock power. If set to 1, router_diagonal value needs to be provided. 
+
+    (c) PARM_router_diagonal 
+
+    PARM_router_diagonal is the square root of the routing area in micro-meter. This value 
+    is used to calculate H_tree_clock power for the router. 
+		 
+(5) MISC 
+   
+    This document provides what's new in ORION2.0. For more general information about ORION, 
+    please refer to README.ORION1.0  
+ 
+    SIM_technology_v1.h file provides the technology parameters for 110nm and above. These were 
+    copied from ORION 1.0 and thus remain the same. SIM_technology_v2.h file contains the technology 
+    parameters we updated for 90nm, 65nm, 45nm and 32nm. Several parameters in the SIM_technology_v2.h 
+    file were derived from Cacti 5.3 (Rnchannelon, Rpchannelon, CamCellHeight, CamCellWidth, 
+    Rbitmetal, Rwordmetal).  
+
+    We also like to thank our colleague Chia-Hsin Owen Chen for providing useful feedbacks as well 
+	as helping to improve ORION 2.0 code. 
+
+(6) Contacts  
+    If you have any questions, please feel free to email us. Also, if you find bugs, please 
+    let us know and we'll fix them as soon as possible. Thanks very much. 
+ 
+Bin Li, binl@princeton.edu 
+Kambiz Samadi, kambiz@vlsicad.ucsd.edu  

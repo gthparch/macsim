@@ -42,7 +42,8 @@ Torus::~Torus()
     }
 
 }
-vector<int> &Torus::split(const string &s, char delim, vector<int> &elems) {
+
+vector<uint> &Torus::split(const string &s, char delim, vector<uint> &elems) {
     stringstream ss(s);
     string item;
     while(getline(ss, item, delim)) {
@@ -51,10 +52,11 @@ vector<int> &Torus::split(const string &s, char delim, vector<int> &elems) {
     return elems;
 }
 
-vector<int> Torus::split(const std::string &s, char delim) {
-    vector<int> elems;
+vector<uint> Torus::split(const std::string &s, char delim) {
+    vector<uint> elems;
     return split(s, delim, elems);
 }
+
 void
 Torus::parse_config(std::map<std::string, std::string>& p)
 {
@@ -130,12 +132,6 @@ Torus::print_stats()
 void
 Torus::connect_interface_terminal()
 {
-    //read from config file and fill these data structures
-    std::vector <manifold::kernel::CompId_t> mapping(m_simBase->m_macsim_terminals.size());//[num_core];	//example: core_mapping[0] == 3 (node id)
-
-    //TODO: must initialize this via a config file 
-    for(uint i=0; i<m_simBase->m_macsim_terminals.size(); i++)
-	mapping[i] = i;
 
     /* Connect INTERFACE -> TERMINAL*/
     for( uint i=0; i < m_simBase->m_macsim_terminals.size(); i++)

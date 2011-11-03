@@ -23,6 +23,7 @@
 #include	"manifold/models/iris/interfaces/irisTerminal.h"
 #include	"manifold/models/iris/interfaces/irisInterface.h"
 #include	"manifold/models/iris/interfaces/irisRouter.h"
+#include	"manifold/models/iris/iris_srcs/components/simpleRouter.h"
 
 class Topology
 {
@@ -39,7 +40,7 @@ class Topology
 
             virtual std::string print_stats(void) = 0;
 
-            std::vector <IrisRouter*> routers;
+            std::vector <SimpleRouter*> routers;        //originally IrisRouter
             std::vector <IrisInterface*> interfaces;
             std::vector <IrisTerminal*> terminals;
 
