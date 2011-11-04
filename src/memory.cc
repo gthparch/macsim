@@ -840,11 +840,13 @@ void dcu_c::receive_packet(void)
 bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 {
   req->m_msg_type = msg_type;
+#ifndef IRIS
   req->m_msg_src = m_noc_id;
-#ifdef IRIS
+#else
+  req->m_msg_src = m_terminal->node_id;
   req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
 #endif
-  assert(m_noc_id != -1 && req->m_msg_dst != -1);
+  assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
   int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
 #ifndef IRIS
@@ -1324,7 +1326,7 @@ bool dcu_c::done(mem_req_s* req)
 
 
 // create the network interface
-bool dcu_c::create_network_interface(void)
+bool dcu_c::create_network_interface(int mclass)
 {
   if (m_has_router) {
 #ifdef IRIS
@@ -1335,8 +1337,8 @@ bool dcu_c::create_network_interface(void)
         &ManifoldProcessor::tock);
 
 	m_terminal->init();
+    m_terminal->mclass = (message_class)mclass; //PROC_REQ;
     m_simBase->m_macsim_terminals.push_back(m_terminal);
-    m_terminal->mclass = PROC_REQ;
 
     m_noc_id = static_cast<int>(processor_id);
 #endif
@@ -1466,7 +1468,7 @@ void memory_c::init(void)
   int total_num_router = 0;
   m_noc_id_base[MEM_L1] = 0;
   for (int ii = 0; ii < m_num_core; ++ii) { 
-    if (m_l1_cache[ii]->create_network_interface())
+    if (m_l1_cache[ii]->create_network_interface((int)L1_REQ))
       ++total_num_router;
   }
 
@@ -1474,7 +1476,7 @@ void memory_c::init(void)
   
   m_noc_id_base[MEM_L2] = total_num_router;
   for (int ii = 0; ii < m_num_core; ++ii) {
-    if (m_l2_cache[ii]->create_network_interface())
+    if (m_l2_cache[ii]->create_network_interface(L2_REQ))
       ++total_num_router;
   }
 
@@ -1482,7 +1484,7 @@ void memory_c::init(void)
   
   m_noc_id_base[MEM_L3] = total_num_router;
   for (int ii = 0; ii < m_num_l3; ++ii) {
-    if (m_l3_cache[ii]->create_network_interface())
+    if (m_l3_cache[ii]->create_network_interface(L3_REQ))
       ++total_num_router;
   }
 
@@ -1835,7 +1837,16 @@ int memory_c::get_dst_id(int level, int id)
 
 int memory_c::get_dst_router_id(int level, int id)
 {
+#ifndef IRIS
+//  cout << "dst: level" << level << " id:" << id
+//        << " node:" << m_noc_id_base[level] + id << "\n";
   return m_noc_id_base[level] + id;
+#else
+//  cout << "dst: level:" << level << " id:" << id
+//        << " manifoldnode:" << m_noc_id_base[level] + id 
+//        << " iris node: " << m_iris_node_id[m_noc_id_base[level] + id] << "\n";
+  return m_iris_node_id[m_noc_id_base[level] + id];
+#endif
 }
 
 

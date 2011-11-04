@@ -86,7 +86,10 @@ NetworkPacket::to_flit_level_packet(FlitLevelPacket* flp, uint lw)
     uint extra_flits = 0;
     uint no_bf = 0;
     switch ( mclass  ) {
-        case PROC_REQ:	
+        case PROC_REQ:
+        case L1_REQ:
+        case L2_REQ:
+        case L3_REQ:
             extra_flits+=2;
             break;
 

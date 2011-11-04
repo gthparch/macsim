@@ -520,6 +520,7 @@ bool dram_controller_c::send_packet(drb_entry_s* dram_req)
   dram_req->m_req->m_msg_type = NOC_FILL;
   dram_req->m_req->m_msg_src = m_noc_id;
 #ifdef IRIS
+  dram_req->m_req->m_msg_src = m_terminal->node_id;
   dram_req->m_req->m_msg_dst = 
     m_simBase->m_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
 #endif

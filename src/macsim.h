@@ -132,6 +132,7 @@ class macsim_c
 		uint no_nodes;
 		int Mytid;
 		FILE* log_file;
+		string network_filename;
 
 		vector<ManifoldProcessor*> m_macsim_terminals;
     cache_partition_framework_c* m_PCL;

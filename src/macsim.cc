@@ -306,7 +306,7 @@ void macsim_c::init_cores(int num_max_core)
 //initialize IRIS parameters (with config file, preferrably)
 void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_params here
 {
-  ifstream fd("network_params.in");
+  ifstream fd(network_filename);
   string data;
   if(!fd.is_open())
   {
@@ -598,6 +598,7 @@ void macsim_c::initialize(int argc, char** argv)
 	REPORT("Initializing sim IRIS\n");
 	manifold::kernel::Manifold::Init(0, NULL);
 	// initialize interconnect network
+	network_filename = "network_params.in";
 	init_network();
 #endif
 

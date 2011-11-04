@@ -305,12 +305,12 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
   // -------------------------------------
   if ((m_bp_data->m_bp_recovery_cycle[tid] > m_cur_core_cycle) || 
       (m_bp_data->m_bp_redirect_cycle[tid] > m_cur_core_cycle) ) {
-    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d frontend is returned because "
-	       "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld" 
-	       "bp_redirect_cycle is not ready yet:%lld \n",
-        m_core_id, tid, m_bp_data->m_bp_recovery_cycle[tid], m_cur_core_cycle, 
-	       m_bp_data->m_bp_cause_op[tid],
-	       m_bp_data->redirect_cycle[tid]);
+//    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d frontend is returned because "
+//	       "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld" 
+//	       "bp_redirect_cycle is not ready yet:%lld \n",
+//        m_core_id, tid, m_bp_data->m_bp_recovery_cycle[tid], m_cur_core_cycle, 
+//	       m_bp_data->m_bp_cause_op[tid],
+//	       m_bp_data->redirect_cycle[tid]);
 
     STAT_CORE_EVENT(m_core_id, BP_MISPRED_STALL);
 

@@ -204,7 +204,7 @@ class dcu_c
     /**
      * Create the network interface
      */
-    bool create_network_interface(void);
+    bool create_network_interface(int);
 
     /**
      * Send a packet to the NoC
@@ -403,6 +403,8 @@ class memory_c
 
   public:
     static int m_unique_id; /**< unique memory request id */
+    
+    int *m_iris_node_id; /**< noc id for iris network nodes */
 
   protected:
     /**

@@ -587,8 +587,9 @@ SimpleRouter::print_stats ( void ) const
 //    SIM_router_power_t router_power;
 //    SIM_router_info_t router_info;
     double ret = SIM_router_init(&GLOB(router_info), &GLOB(router_power), NULL);
-    ret = SIM_router_stat_energy(&GLOB(router_info), &GLOB(router_power), 1, "testing", AVG_ENERGY, 0.5, 0, PARM(Freq));
-    
+    char path[80] = "testing";
+    ret = SIM_router_stat_energy(&GLOB(router_info), &GLOB(router_power), 10, path, AVG_ENERGY, 1050.0, 1, PARM(Freq));
+//    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
 
 //    Eavg += sa_cycles * SIM_arbiter_init(&router->sw_in_arb, info->sw_in_arb_model, info->sw_in_arb_ff_model, info->n_v_channel*info->n_v_class, 0, &info->sw_in_arb_queue_info);
 //    
@@ -623,6 +624,7 @@ SimpleRouter::print_stats ( void ) const
         if ( ( stat_packets_in - stat_packets_out ) > ports*vcs ) str << "\n ERROR pkts_in-pkts_out > buffering available";
         str << std::endl;
 
+    cout << str.str();
         return str.str();
 } /* ----- end of function GenericPktGen::toString ----- */
 
