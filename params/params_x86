@@ -9,7 +9,7 @@ large_core_type x86
 cpu_frequency 4 
 gpu_frequency 1.5
 sim_cycle_count 0 
-max_insts 200000000
+max_insts 500000000
 heartbeat_interval 1000000
 forward_progress_limit 50000
 
