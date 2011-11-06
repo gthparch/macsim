@@ -568,14 +568,14 @@ SimpleRouter::print_stats ( void ) const
         << "\n SimpleRouter[" << node_id << "] flits_out: " << stat_flits_out
         << "\n SimpleRouter[" << node_id << "] avg_router_latency: " << (avg_router_latency+0.0)/stat_packets_out
         << "\n SimpleRouter[" << node_id << "] last_pkt_out_cy: " << stat_last_flit_out_cycle
-        << "\n SimpleRouter[" << node_id << "] stat_3d_packets_out: " << stat_3d_packets_out 
-        << "\n SimpleRouter[" << node_id << "] stat_2d_packets_out: " << stat_2d_packets_out 
-        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out 
-        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out 
-        << "\n SimpleRouter[" << node_id << "] inj_nodes_packets_out: " << stat_packets_out - ( stat_2d_packets_out + stat_3d_packets_out )
-        << "\n SimpleRouter[" << node_id << "] local_remote_ratio: " << stat_3d_packets_out*1.0/stat_2d_packets_out 
-        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out
-        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out
+//        << "\n SimpleRouter[" << node_id << "] stat_3d_packets_out: " << stat_3d_packets_out 
+//        << "\n SimpleRouter[" << node_id << "] stat_2d_packets_out: " << stat_2d_packets_out 
+//        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out 
+//        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out 
+//        << "\n SimpleRouter[" << node_id << "] inj_nodes_packets_out: " << stat_packets_out - ( stat_2d_packets_out + stat_3d_packets_out )
+//        << "\n SimpleRouter[" << node_id << "] local_remote_ratio: " << stat_3d_packets_out*1.0/stat_2d_packets_out 
+//        << "\n SimpleRouter[" << node_id << "] stat_3d_flits_out: " << stat_3d_flits_out
+//        << "\n SimpleRouter[" << node_id << "] stat_2d_flits_out: " << stat_2d_flits_out
         << "\n SimpleRouter[" << node_id << "] ib_cycles: " << ib_cycles
         << "\n SimpleRouter[" << node_id << "] sa_cycles: " << sa_cycles 
         << "\n SimpleRouter[" << node_id << "] vca_cycles: " << vca_cycles

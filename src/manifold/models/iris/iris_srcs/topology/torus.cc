@@ -136,6 +136,7 @@ Torus::connect_interface_terminal()
 {
 
     /* Connect INTERFACE -> TERMINAL*/
+    m_simBase->m_memory->m_iris_node_id = (int*)malloc(sizeof(int)*m_simBase->m_macsim_terminals.size());
     for( uint i=0; i < m_simBase->m_macsim_terminals.size(); i++)
     { 
         m_simBase->m_macsim_terminals.at(i)->ni = static_cast<manifold::kernel::Component*>(interfaces.at(mapping[i]));
