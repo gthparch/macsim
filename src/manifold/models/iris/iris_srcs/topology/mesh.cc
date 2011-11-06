@@ -95,13 +95,21 @@ Mesh::parse_config(std::map<std::string, std::string>& p)
     if ( it != p.end())
         mapping = split(it->second, ',');
 
-//    cout << "mapping " << mapping.size() << " " << m_simBase->m_macsim_terminals.size() << ": ";
-//    assert(mapping.size() >= m_simBase->m_macsim_terminals.size());
-//    for(int i=0; i<mapping.size(); i++)
-//    {
-//        cout << mapping[i] << ", ";
-//    }
-//    cout << "\n";
+
+    /*print asci map of network */
+    cout << "Mesh network\n";
+    char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+    for(int i=0; i<grid_size; i++)
+    {
+        for(int j=0; j<grid_size; j++)
+        {
+//            cout << mapping[i] << "\t"; // << mapping[i*grid_size+j] << ":" 
+            int macsim_node_id = mapping[i*grid_size+j];
+            int type = m_simBase->m_macsim_terminals.at(macsim_node_id)->mclass;
+            cout << message_class_type[type] << ":" << macsim_node_id <<"\t";
+        }
+        cout << "\n";
+    }
 
     return;
 }
@@ -145,8 +153,6 @@ void
 Mesh::connect_interface_terminal()
 {
     /* Connect INTERFACE -> TERMINAL*/
-    vector<uint> networkMap;
-    networkMap.resize(m_simBase->m_macsim_terminals.size());
     m_simBase->m_memory->m_iris_node_id = (int*)malloc(sizeof(int)*m_simBase->m_macsim_terminals.size());
     for( uint i=0; i < m_simBase->m_macsim_terminals.size(); i++)
     { 
@@ -155,22 +161,8 @@ Mesh::connect_interface_terminal()
         
         m_simBase->m_macsim_terminals.at(mapping[i])->node_id = i;
         m_simBase->m_memory->m_iris_node_id[i] = mapping[i];
-        networkMap[mapping[i]] = i;
     }
     
-    /*print asci map of network */
-    char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
-    for(int i=0; i<grid_size; i++)
-    {
-        for(int j=0; j<grid_size; j++)
-        {
-//            cout << mapping[i] << "\t"; // << mapping[i*grid_size+j] << ":" 
-            int macsim_node_id = mapping[i*grid_size+j];
-            int type = m_simBase->m_macsim_terminals.at(macsim_node_id)->mclass;
-            cout << message_class_type[type] << "  ";
-        }
-        cout << "\n";
-    }
     return;
 }
 

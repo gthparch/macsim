@@ -3,7 +3,7 @@
 
 #include        "ring.h"
 #include	"../components/manifoldProcessor.h"
-
+#include  "memory.h"
 Ring::Ring(macsim_c* simBase)
 {
 	m_simBase = simBase;
@@ -65,6 +65,26 @@ Ring::parse_config(std::map<std::string, std::string>& p)
     if ( it != p.end())
         mapping = split(it->second, ',');
 
+    /*print asci map of network */
+    cout << "Ring network\n";
+    char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+    int j;
+    for( j=0; j<no_nodes/2; j++)
+    {
+        int macsim_node_id = mapping[j];
+        int type = m_simBase->m_macsim_terminals.at(macsim_node_id)->mclass;
+        cout << message_class_type[type] << ":" << macsim_node_id;
+        if (j+1 < no_nodes/2 ) cout <<" <--> ";
+    }
+    cout << " <-v\n^\n|-> ";
+    for( int i=no_nodes-1; i>= j; i--)
+    {
+        int macsim_node_id = mapping[i];
+        int type = m_simBase->m_macsim_terminals.at(macsim_node_id)->mclass;
+        cout << message_class_type[type] << ":" << macsim_node_id;
+        if (i-1 >= j ) cout <<" <--> ";
+    }
+    cout << "<-^\n";
 
     return;
 }
@@ -88,9 +108,8 @@ Ring::connect_interface_terminal()//std::vector <ManifoldProcessor*> &g_macsim_t
     { 
         m_simBase->m_macsim_terminals.at(i)->ni = static_cast<manifold::kernel::Component*>(interfaces.at(mapping[i]));
         interfaces.at(mapping[i])->terminal = static_cast<manifold::kernel::Component*>(m_simBase->m_macsim_terminals.at(i));
-        
-	      m_simBase->m_macsim_terminals.at(i)->node_id = mapping[i];
-	      
+        m_simBase->m_macsim_terminals.at(mapping[i])->node_id = i;
+        m_simBase->m_memory->m_iris_node_id[i] = mapping[i];
 	      //handled in init_network in main.cc
 	      //interfaces.at(mapping[i])->node_id = mapping[i];
         //assert ( interfaces.at(i)->terminal != NULL );

@@ -3,6 +3,7 @@
 
 #include  "torus.h"
 #include	"manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
+#include  "memory.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -91,6 +92,7 @@ Torus::parse_config(std::map<std::string, std::string>& p)
         mapping = split(it->second, ',');
 
 
+    cout << "Torus network\n";
     return;
 }
 
@@ -139,7 +141,8 @@ Torus::connect_interface_terminal()
         m_simBase->m_macsim_terminals.at(i)->ni = static_cast<manifold::kernel::Component*>(interfaces.at(mapping[i]));
         interfaces.at(mapping[i])->terminal = static_cast<manifold::kernel::Component*>(m_simBase->m_macsim_terminals.at(i));
         
-	      m_simBase->m_macsim_terminals.at(i)->node_id = mapping[i];
+        m_simBase->m_macsim_terminals.at(mapping[i])->node_id = i;
+        m_simBase->m_memory->m_iris_node_id[i] = mapping[i];
     }
     return;
 }
