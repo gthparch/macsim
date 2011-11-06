@@ -22,10 +22,12 @@ SRCS         = $(ARRAY_MODEL) $(ROUTER_MODEL) $(POWER_MODEL) $(ALU_MODEL) $(OTHE
 
 OBJS      = $(SRCS:.c=.o)
 
+
 all: 
 	make orion_router_power
 	make orion_router_area
 	make orion_link 
+	make liborion
 
 TEST_SRCS   = orion_router_power.c orion_router_area.c orion_link.c test_permu.c test_alu.c dump_para.c 
 TEST_EXEC   = $(TEST_SRCS:.c=)
@@ -51,6 +53,10 @@ test_alu: test_alu.o $(OBJS)
 dump_para: dump_para.o $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
+liborion: $(OBJS)
+	ar qcv liborion.a $(OBJS)
+	ranlib liborion.a	
+
 clean:
-	$(RM) $(ALL_OBJS) $(TEST_EXEC) *~ *.bak core
+	$(RM) $(ALL_OBJS) $(TEST_EXEC) *~ *.bak *.a core
 
