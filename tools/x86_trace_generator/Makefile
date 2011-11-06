@@ -39,7 +39,7 @@ endif
 ##############################################################
 
 
-TOOL_ROOTS = trace_generator 
+TOOL_ROOTS = trace_generator xed_extractor 
 
 TOOLS = $(TOOL_ROOTS:%=$(OBJDIR)%$(PINTOOL_SUFFIX))
 STATIC_TOOLS = $(STATIC_TOOL_ROOTS:%=$(OBJDIR)%$(SATOOL_SUFFIX))

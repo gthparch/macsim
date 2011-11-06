@@ -1,0 +1,42 @@
+Note
+
+  1. As the pin version changes, we need to consider few things.
+     Ideally, everything should be okay, but sometime there are
+     changes in the xed files (especially opcode or instruction
+     category). In this case, we need to update few fields in the
+     pintool as well as the simulator.
+
+     1) Sanity check will be failed if there are changes.
+
+     2) The compilation might be failed as well.
+
+     Once fixing pintool, also some simulator logic needs to be modified.
+
+     Simulator
+       trace_read.h : 
+
+         1) enum TR_OPCODE_ENUM
+
+       trace_read.cc :
+     
+         1) init_pin_convert
+         2) g_tr_reg_name
+         3) g_tr_opcode_names
+     
+
+Changes
+
+  1. November 2011 
+
+    Register compression logic is replace by REG_FullRegName, which
+    translate partial register to full register.
+
+
+How to generate x86 traces
+
+  1. Simpoint - Mostly we use SimPoint (PinPoint). Follow instruction
+     in $PINHOME/source/tools/PinPoints
+
+  2. Otherwise - Fix trace generator module based on your needs. Then,
+     pin -t trace_generator.so -- $BIN $ARGS
+

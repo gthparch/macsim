@@ -182,10 +182,11 @@ void IncrementNumInstruction(THREADID threadid)
   if (tid == 100000)
     return ;
 
+  g_inst_count[tid]++;
+
   if (!g_enable_thread_instrument[tid])
     return ;
 
-  g_inst_count[tid]++;
 
 
   if (Knob_max.Value() != 0 && Knob_max.Value() > g_inst_count[tid]) {
@@ -679,6 +680,21 @@ void Trace(TRACE trace, void *v)
   }
 }
 
+VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
+{
+  THREADID tid = threadMap[PIN_ThreadId()];
+  if (tid == 100000)
+    return ;
+
+  g_inst_count[tid] += count;
+}
+
+VOID INST_trace(TRACE trace, VOID *v)
+{
+  for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
+    BBL_InsertCall(bbl, IPOINT_ANYWHERE, AFUNPTR(INST_count), IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_END);
+  }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -689,7 +705,7 @@ void Instruction(INS ins, void* v)
   if (!g_enable_instrument)
     return;
 
-  INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)IncrementNumInstruction, IARG_THREAD_ID, IARG_END);
+//  INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)IncrementNumInstruction, IARG_THREAD_ID, IARG_END);
   instrument(ins);
 }
 
@@ -1035,6 +1051,7 @@ int main(int argc, char *argv[])
   PIN_AddThreadFiniFunction(ThreadEnd, 0);
 
   // instrumentation option
+  TRACE_AddInstrumentFunction(INST_trace, 0);
   INS_AddInstrumentFunction(Instruction, 0);
   control.CheckKnobs(Handler, 0);
 
