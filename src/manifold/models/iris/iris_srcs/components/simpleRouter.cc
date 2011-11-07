@@ -584,11 +584,190 @@ SimpleRouter::print_stats ( void ) const
     str << "\n SimpleRouter[" << node_id << "] per_port_avg_buff: ";
     /////////////////energy//////////////////////////
     
-//    SIM_router_power_t router_power;
-//    SIM_router_info_t router_info;
-    double ret = SIM_router_init(&GLOB(router_info), &GLOB(router_power), NULL);
+    SIM_router_power_t router_power;
+    SIM_router_info_t router_info;
+    SIM_router_power_t *router = &router_power;
+    SIM_router_info_t *info = &router_info;
+    
+    double Pbuf = 0, Pxbar = 0, Pvc_arbiter = 0, Psw_arbiter = 0, Pclock = 0, Ptotal = 0;
+	double Pbuf_static = 0, Pxbar_static = 0, Pvc_arbiter_static = 0, Psw_arbiter_static = 0, Pclock_static = 0;
+	double Pbuf_dyn = 0, Pxbar_dyn = 0, Pvc_arbiter_dyn = 0, Psw_arbiter_dyn = 0, Pclock_dyn = 0;
+	
+    int total_cycles = manifold::kernel::Manifold::NowTicks();
+    double e_in_buf_rw = ib_cycles / total_cycles;
+    double e_cbuf_fin = st_cycles /total_cycles;
+    double e_fin = sa_cycles / total_cycles;
+    double e_vca = vca_cycles /total_cycles;
+    
+    double Eavg = 0, Eatomic, Estruct, Estatic = 0;
+    double freq = 1.3e9;
+    int vc_allocator_enabled = 1;
+    int max_avg = 0;
     char path[80] = "testing";
-    ret = SIM_router_stat_energy(&GLOB(router_info), &GLOB(router_power), 10, path, AVG_ENERGY, 1050.0, 1, PARM(Freq));
+    
+    double ret = SIM_router_init(info, router, NULL);
+    
+    info->n_total_in = ports;
+    info->n_total_out = ports;
+    info->n_switch_out = ports;
+    
+	if(info->sw_out_arb_model || info->sw_out_arb_model){
+		Psw_arbiter_dyn = Eavg * freq - Pbuf_dyn - Pxbar_dyn;
+		Psw_arbiter_static = router->I_sw_arbiter_static * Vdd * SCALE_S;
+		Psw_arbiter = Psw_arbiter_dyn + Psw_arbiter_static;
+	}
+
+    
+//    ret = SIM_router_stat_energy(&GLOB(info), &GLOB(router_power), 10, path, AVG_ENERGY, 1050.0, 1, PARM(Freq));
+    uint path_len = SIM_strlen(path);
+    int next_depth = 0;
+    
+    if (info->in_buf) {
+		Eavg += SIM_array_stat_energy(&info->in_buf_info, &router->in_buf, e_in_buf_rw, e_in_buf_rw, next_depth, SIM_strcat(path, "input buffer"), max_avg); 
+		SIM_res_path(path, path_len); //resets path string
+	}
+	
+	Pbuf_dyn = Eavg * freq;
+	Pbuf_static = router->I_buf_static * Vdd * SCALE_S;
+	Pbuf = Pbuf_dyn + Pbuf_static;
+
+	/* main crossbar */
+	if (info->crossbar_model) {
+		Eavg += SIM_crossbar_stat_energy(&router->crossbar, next_depth, SIM_strcat(path, "crossbar"), max_avg, e_cbuf_fin);
+		SIM_res_path(path, path_len);
+	}
+	
+    Pxbar_dyn = (Eavg * freq - Pbuf_dyn);
+	Pxbar_static = router->I_crossbar_static * Vdd * SCALE_S;
+	Pxbar = Pxbar_dyn + Pxbar_static;
+
+	/* switch allocation (arbiter energy only) */
+	/* input (local) arbiter for switch allocation*/
+	if (info->sw_in_arb_model) {
+		/* assume # of active input arbiters is (info->in_n_switch * info->n_in * e_fin) 
+		 * assume (info->n_v_channel*info->n_v_class)/2 vcs are making request at each arbiter */
+
+		Eavg += SIM_arbiter_stat_energy(&router->sw_in_arb, &info->sw_in_arb_queue_info, (info->n_v_channel*info->n_v_class)/2, next_depth, SIM_strcat(path, "switch allocator input arbiter"), max_avg) * info->in_n_switch * info->n_in * e_fin;
+		SIM_res_path(path, path_len);
+    }
+    
+    /* output (global) arbiter for switch allocation*/
+	if (info->sw_out_arb_model) {
+		/* assume # of active output arbiters is (info->n_switch_out * (e_cbuf_fin/info->n_switch_out)) 
+		 * assume (info->n_in)/2 request at each output arbiter */
+
+		Eavg += SIM_arbiter_stat_energy(&router->sw_out_arb, &info->sw_out_arb_queue_info, info->n_in / 2, next_depth, SIM_strcat(path, "switch allocator output arbiter"), max_avg) * info->n_switch_out * (e_cbuf_fin / info->n_switch_out);
+
+		SIM_res_path(path, path_len); 
+	}
+
+	if(info->sw_out_arb_model || info->sw_out_arb_model){
+		Psw_arbiter_dyn = Eavg * freq - Pbuf_dyn - Pxbar_dyn;
+		Psw_arbiter_static = router->I_sw_arbiter_static * Vdd * SCALE_S;
+		Psw_arbiter = Psw_arbiter_dyn + Psw_arbiter_static;
+	}
+	
+	/* virtual channel allocation (arbiter energy only) */
+	/* HACKs:
+	 *   - assume 1 header flit in every 5 flits for now, hence * 0.2  */
+
+	if(info->vc_allocator_type == ONE_STAGE_ARB && info->vc_out_arb_model  ){
+		/* one stage arbitration (vc allocation)*/
+		/* # of active arbiters */
+		double nActiveArbs = e_fin * info->n_in * 0.2 / 2; //flit_rate * n_in * 0.2 / 2
+
+		/* assume for each active arbiter, there is 2 requests on average (should use expected value from simulation) */	
+		Eavg += SIM_arbiter_stat_energy(&router->vc_out_arb, &info->vc_out_arb_queue_info,
+				1, next_depth,
+				SIM_strcat(path, "vc allocation arbiter"),
+				max_avg) * nActiveArbs;
+
+		SIM_res_path(path, path_len);
+	}
+	else if(info->vc_allocator_type == TWO_STAGE_ARB && info->vc_in_arb_model && info->vc_out_arb_model){
+		/* first stage arbitration (vc allocation)*/
+		if (info->vc_in_arb_model) {
+			// # of active stage-1 arbiters (# of new header flits)
+			double nActiveArbs = e_fin * info->n_in * 0.2;
+
+
+			/* assume an active arbiter has n_v_channel/2 requests on average (should use expected value from simulation) */
+			Eavg += SIM_arbiter_stat_energy(&router->vc_in_arb, &info->vc_in_arb_queue_info, info->n_v_channel/2, next_depth, 
+					SIM_strcat(path, "vc allocation arbiter (stage 1)"),
+					max_avg) * nActiveArbs; 
+
+			SIM_res_path(path, path_len);
+		}
+
+		/* second stage arbitration (vc allocation)*/
+		if (info->vc_out_arb_model) {
+			/* # of active stage-2 arbiters */
+			double nActiveArbs = e_fin * info->n_in * 0.2 / 2; //flit_rate * n_in * 0.2 / 2
+
+			/* assume for each active arbiter, there is 2 requests on average (should use expected value from simulation) */
+			Eavg += SIM_arbiter_stat_energy(&router->vc_out_arb, &info->vc_out_arb_queue_info,
+					2, next_depth, 
+					SIM_strcat(path, "vc allocation arbiter (stage 2)"),
+					max_avg) * nActiveArbs;
+
+			SIM_res_path(path, path_len);
+		}
+	}
+	else if(info->vc_allocator_type == VC_SELECT && info->n_v_channel > 1 && info->n_in > 1){
+		double n_read = e_fin * info->n_in * 0.2;
+		double n_write = e_fin * info->n_in * 0.2;
+		Eavg += SIM_array_stat_energy(&info->vc_select_buf_info, &router->vc_select_buf, n_read , n_write, next_depth, SIM_strcat(path, "vc selection"), max_avg);
+		SIM_res_path(path, path_len);
+
+	}
+	else{
+		vc_allocator_enabled = 0; //set to 0 means no vc allocator is used
+	}
+
+	if(info->n_v_channel > 1 && vc_allocator_enabled){
+		Pvc_arbiter_dyn = Eavg * freq - Pbuf_dyn - Pxbar_dyn - Psw_arbiter_dyn; 
+		Pvc_arbiter_static = router->I_vc_arbiter_static * Vdd * SCALE_S;
+		Pvc_arbiter = Pvc_arbiter_dyn + Pvc_arbiter_static;
+	}
+
+	/*router clock power (supported for 90nm and below) */
+	if(PARM(TECH_POINT) <=90){
+		Eavg += SIM_total_clockEnergy(info, router);
+		Pclock_dyn = Eavg * freq - Pbuf_dyn - Pxbar_dyn - Pvc_arbiter_dyn - Psw_arbiter_dyn;
+		Pclock_static = router->I_clock_static * Vdd * SCALE_S;
+		Pclock = Pclock_dyn + Pclock_static;
+	}
+
+	/* static power */
+	Estatic = router->I_static * Vdd * Period * SCALE_S;
+	SIM_print_stat_energy(SIM_strcat(path, "static energy"), Estatic, next_depth);
+	SIM_res_path(path, path_len);
+	Eavg += Estatic;
+	Ptotal = Eavg * freq;
+	
+	//try using a more general activity factor
+//	double activity_factor = stat_packets_in / total_cycles;
+//	
+//	Eavg = SIM_router_stat_energy(info, router, 0, path, AVG_ENERGY, activity_factor, 1, PARM(Freq));
+	cout << "Node:" << node_id << "Packets: " << stat_packets_in << " Total Power:" << Eavg * freq << "\n";
+	
+	m_simBase->total_energy += Eavg * total_cycles;
+	m_simBase->avg_power += Eavg * freq;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 //    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
 
 //    Eavg += sa_cycles * SIM_arbiter_init(&router->sw_in_arb, info->sw_in_arb_model, info->sw_in_arb_ff_model, info->n_v_channel*info->n_v_class, 0, &info->sw_in_arb_queue_info);
@@ -628,5 +807,31 @@ SimpleRouter::print_stats ( void ) const
         return str.str();
 } /* ----- end of function GenericPktGen::toString ----- */
 
+void SimpleRouter::power_stats()
+{
+    SIM_router_power_t router_power;
+    SIM_router_info_t router_info;
+    SIM_router_power_t *router = &router_power;
+    SIM_router_info_t *info = &router_info;
+    char path[80] = "router_power";
+    double freq = 1.3e9;
+    int total_cycles = manifold::kernel::Manifold::NowTicks();
+    
+    double ret = SIM_router_init(info, router, NULL);
+    
+    info->n_total_in = ports;
+    info->n_total_out = ports;
+    info->n_switch_out = ports;
+    
+//    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
+    
+    
+    double activity_factor = stat_packets_in / total_cycles;
+    double Eavg = SIM_router_stat_energy(info, router, 0, path, AVG_ENERGY, activity_factor, 0, freq);
+	cout << "Node:" << node_id << "Packets: " << stat_packets_in << " Total Power:" << Eavg * freq << "\n";
+	
+	m_simBase->total_energy += Eavg * total_cycles;
+	m_simBase->avg_power += Eavg * freq;
+}
 #endif   /* ----- #ifndef SIMPLEROUTER_CC_INC  ----- */
 

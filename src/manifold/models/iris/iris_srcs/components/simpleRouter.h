@@ -107,6 +107,7 @@ class SimpleRouter: public IrisRouter
         void init( void );
         void parse_config(std::map<std::string,std::string>& p);
         string print_stats() const;
+        void power_stats();
 
         /*! These are the statistics variables */
         uint64_t stat_packets_in;
