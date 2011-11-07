@@ -182,3 +182,5 @@ param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>
  
 param<LOAD_BUF_SIZE, load_buf_size, int, 16>
 param<STORE_BUF_SIZE, store_buf_size, int, 12>
+
+param<USE_INCOMING_TID_CID_FOR_WB, use_incoming_tid_cid_for_wb, bool, false>
