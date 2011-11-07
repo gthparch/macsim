@@ -1029,6 +1029,10 @@ void dcu_c::process_fill_queue()
           if (victim_line_addr) {
             STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C + m_level*2);
             if (data->m_dirty) {
+              if (*(m_simBase->m_knobs->KNOB_USE_INCOMING_TID_CID_FOR_WB)) {
+                data->m_core_id = req->m_core_id;
+                data->m_tid = req->m_thread_id;
+              } 
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, m_ptx_sim, data);
               if (!m_wb_queue->push(wb))
                 ASSERT(0);
@@ -1268,6 +1272,10 @@ bool dcu_c::done(mem_req_s* req)
       if (repl_line_addr) {
         STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C)
         if (data->m_dirty == 1) {
+          if (*(m_simBase->m_knobs->KNOB_USE_INCOMING_TID_CID_FOR_WB)) {
+            data->m_core_id = req->m_core_id;
+            data->m_tid = req->m_thread_id;
+          } 
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, m_ptx_sim, data);
           // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb))

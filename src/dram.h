@@ -194,6 +194,20 @@ class dram_controller_c
      */
     void receive_packet(void);
 
+    /**
+     * Function to do any book-keeping that might be needed by scheduling policies
+     */
+    virtual void on_insert(mem_req_s* req, int bid, int rid, int cid);
+
+    /**
+     * Function to do any book-keeping that might be needed by scheduling policies
+     */
+    virtual void on_complete(drb_entry_s* req);
+
+    /**
+     * Function to do any book-keeping that might be needed by scheduling policies
+     */
+    virtual void on_run_a_cycle();
 
   protected:
     list<drb_entry_s*> *m_buffer; /**< Dram request buffer (DRB) */

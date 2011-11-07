@@ -134,7 +134,7 @@ void drb_entry_s::set(mem_req_s *mem_req, int bid, int rid, int cid)
   m_priority  = dram_controller_c::dram_req_priority[mem_req->m_type];
 
   switch (mem_req->m_type) {
-    case MRT_DSTORE:
+    //case MRT_DSTORE:
     case MRT_WB:
       m_read = false;
       break;
@@ -293,6 +293,7 @@ bool dram_controller_c::insert_new_req(mem_req_s* mem_req)
 
   // insert a new request to DRB
   insert_req_in_drb(mem_req, bid, rid, cid);
+  on_insert(mem_req, bid, rid, cid);
 
   STAT_EVENT(TOTAL_DRAM);
 
@@ -363,6 +364,7 @@ void dram_controller_c::run_a_cycle()
       STAT_EVENT(DRAM_CHANNEL0_DBUS_IDLE + ii);
     }
   }
+  on_run_a_cycle();
 }
 
 
@@ -442,6 +444,7 @@ void dram_controller_c::bank_schedule_complete(void)
         list<drb_entry_s*> temp_list;
         for (auto I = m_buffer[ii].begin(), E  = m_buffer[ii].end(); I != E; ++I) {
           if ((*I)->m_addr == m_current_list[ii]->m_addr) {
+            on_complete(*I);
             if ((*I)->m_req->m_type == MRT_WB) {
               DEBUG("MC[%d] merged_req:%d addr:%s type:%s done\n", \
                   m_id, (*I)->m_req->m_id, hexstr64s((*I)->m_req->m_addr), \
@@ -484,6 +487,7 @@ void dram_controller_c::bank_schedule_complete(void)
       m_avg_latency += m_simBase->m_simulation_cycle - m_current_list[ii]->m_timestamp;
       ++m_avg_latency_base;
 
+      on_complete(m_current_list[ii]);
       // wb request will be retired immediately
       if (m_current_list[ii]->m_req->m_type == MRT_WB) {
         DEBUG("MC[%d] req:%d addr:%s type:%s done\n", 
@@ -797,6 +801,21 @@ void dram_controller_c::create_network_interface(void)
 
   m_noc_id = static_cast<int>(processor_id);
 #endif
+}
+
+void dram_controller_c::on_insert(mem_req_s* req, int bid, int rid, int cid)
+{
+  // empty
+}
+
+void dram_controller_c::on_complete(drb_entry_s* req)
+{
+  // empty
+}
+
+void dram_controller_c::on_run_a_cycle()
+{
+  // empty
 }
 
 
