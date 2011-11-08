@@ -443,6 +443,10 @@ cout << "number of macsim terminals: " << m_macsim_terminals.size() << "\n";
 	m_iris_network->connect_interface_routers();
 	m_iris_network->connect_routers();
 
+    //initialize power stats
+    avg_power = 0;
+    total_energy = 0;
+    total_packets = 0;
 }
 #endif
 
@@ -550,8 +554,12 @@ void macsim_c::fini_sim(void)
 #ifdef IRIS
     for(int i=0; i<m_iris_network->routers.size(); i++)
     {
-        m_iris_network->routers[i]->print_stats();
+//        m_iris_network->routers[i]->print_stats();
+        m_iris_network->routers[i]->power_stats();
     }
+    cout << "Average Network power: " << avg_power << "W\n"
+        << "Total Network Energy: " << total_energy << "J\n"
+        << "Total packets " << total_packets << "\n";
 	
 #endif
 }

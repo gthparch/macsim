@@ -12,6 +12,7 @@ extern "C" {
 #include "SIM_static.h"
 #include "SIM_clock.h"
 #include "SIM_util.h"
+#include "SIM_link.h"
 }
 //double SIM_router_stat_energy(SIM_router_info_t*, SIM_router_power_t*, int, char*, int, double, int, double);
 
@@ -211,6 +212,7 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 if ( data->f->type == HEAD )
                 {
                 #if 1
+                //csv logging for statistics visualization/analysis
 //                	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
 //                		<< ((HeadFlit*)data->f)->req->m_id 
 //                		<< " arrived @ node " << node_id 
@@ -218,7 +220,8 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 //                		<< " mem state " << mem_state_copy[((HeadFlit*)data->f)->req->m_state]
 //                		<< " msg type " << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << "\n";
 //                		//<< " vc: " << data->vc << "\n";
-                    //for stats collection/visualization
+
+                    //for csv stats collection/visualization
                     cout << manifold::kernel::Manifold::NowTicks() << "," 
                         << ((HeadFlit*)data->f)->req->m_id << ","
                         << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
@@ -813,25 +816,34 @@ void SimpleRouter::power_stats()
     SIM_router_info_t router_info;
     SIM_router_power_t *router = &router_power;
     SIM_router_info_t *info = &router_info;
+    double Pdynamic, Pleakage, Plink;
     char path[80] = "router_power";
     double freq = 1.3e9;
+    double link_len = .005;     //unit meter
+    uint data_width = 128;
     int total_cycles = manifold::kernel::Manifold::NowTicks();
+    double activity_factor = (double)stat_packets_in / total_cycles;
     
     double ret = SIM_router_init(info, router, NULL);
     
     info->n_total_in = ports;
     info->n_total_out = ports;
     info->n_switch_out = ports;
-    
 //    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
     
-    
-    double activity_factor = stat_packets_in / total_cycles;
+    //link power
+    Pdynamic = 0.5 * activity_factor * LinkDynamicEnergyPerBitPerMeter(link_len, Vdd) * freq * link_len * (double)data_width;
+	Pleakage = LinkLeakagePowerPerMeter(link_len, Vdd) * link_len * data_width;
+	Plink = (Pdynamic + Pleakage) * PARM(in_port);
+	
     double Eavg = SIM_router_stat_energy(info, router, 0, path, AVG_ENERGY, activity_factor, 0, freq);
-	cout << "Node:" << node_id << "Packets: " << stat_packets_in << " Total Power:" << Eavg * freq << "\n";
+	cout << "Node:" << node_id << " Packets: " << stat_packets_in 
+	    << " Router Power:" << Eavg * freq 
+	    << " Link Power:" << Plink << "\n";
 	
 	m_simBase->total_energy += Eavg * total_cycles;
-	m_simBase->avg_power += Eavg * freq;
+	m_simBase->avg_power += Eavg * freq + Plink;
+	m_simBase->total_packets += stat_packets_in;
 }
 #endif   /* ----- #ifndef SIMPLEROUTER_CC_INC  ----- */
 

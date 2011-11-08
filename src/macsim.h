@@ -138,6 +138,11 @@ class macsim_c
     cache_partition_framework_c* m_PCL;
 
 		manifold::kernel::Clock* master_clock;// = new manifold::kernel::Clock(1); //clock has to be global or static
+		
+		//power stats
+		double avg_power;
+		double total_energy;
+		int total_packets;
 	private:
 		macsim_c* m_simBase; // self-reference for macro usage
 };
