@@ -1,3 +1,12 @@
+How to generate x86 traces
+
+  1. Simpoint - Mostly we use SimPoint (PinPoint). Follow instruction
+     in $PINHOME/source/tools/PinPoints
+
+  2. Otherwise - Fix trace generator module based on your needs. Then,
+     pin -t trace_generator.so -- $BIN $ARGS
+
+
 Note
 
   1. As the pin version changes, we need to consider few things.
@@ -32,11 +41,4 @@ Changes
     translate partial register to full register.
 
 
-How to generate x86 traces
-
-  1. Simpoint - Mostly we use SimPoint (PinPoint). Follow instruction
-     in $PINHOME/source/tools/PinPoints
-
-  2. Otherwise - Fix trace generator module based on your needs. Then,
-     pin -t trace_generator.so -- $BIN $ARGS
 
