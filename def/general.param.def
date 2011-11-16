@@ -13,3 +13,4 @@ param<STDOUT_FILE,                   stdout,                string,             
 param<FILE_TAG,                      file_tag,              string,               NULL>
 param<STATISTICS_OUT_DIRECTORY,      out,                   string,               .>
 param<MAX_BLOCK_PER_CORE, max_block_per_core, int, 4>
+param<MAX_INSTS1, max_insts1, uns64, 0>

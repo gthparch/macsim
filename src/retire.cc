@@ -209,7 +209,8 @@ void retire_c::run_a_cycle()
 
         // all threads in an application have been retired. Thus, we can retire an appliacation
         if (process->m_no_of_threads_terminated == process->m_no_of_threads_created) {
-          if (process->m_current_vector_index == process->m_applications.size()) {
+          if (process->m_current_vector_index == process->m_applications.size() 
+            || (*m_simBase->m_ProcessorStats)[INST_COUNT_TOT].getCount() >= *KNOB(KNOB_MAX_INSTS1)) {
             update_stats(process);
             m_simBase->m_process_manager->terminate_process(process);
             if (m_simBase->m_process_count_without_repeat == 0) {

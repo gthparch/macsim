@@ -613,7 +613,8 @@ bool process_manager_c::terminate_process(process_s* process)
 
   // Since there are more kernels within an application, we need to finish these
   // before terminate this application
-  if (process->m_current_vector_index < process->m_applications.size()) {
+  if (process->m_current_vector_index < process->m_applications.size() &&
+      (*m_simBase->m_ProcessorStats)[INST_COUNT_TOT].getCount() < *KNOB(KNOB_MAX_INSTS1)) {
     setup_process(process);
 
     return false;
