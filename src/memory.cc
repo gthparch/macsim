@@ -519,6 +519,8 @@ int dcu_c::access(uop_c* uop)
         req_type = MRT_DFETCH; break;
       case MEM_ST:
       case MEM_ST_LM:
+      case MEM_ST_GM:
+        cout << "asdf\n";
         req_type = MRT_DSTORE; break;
       case MEM_SWPREF_NTA:
       case MEM_SWPREF_T0:
@@ -635,6 +637,8 @@ void dcu_c::run_a_cycle()
 }
 
 
+
+// Main cache access function
 // process requests in the input queue
 // input queue: 
 //   1) to access the cache
@@ -703,6 +707,16 @@ void dcu_c::process_in_queue()
           req->m_addr, req->m_pc, req->m_uop ? req->m_uop : NULL, true);
 
       STAT_EVENT(L1_HIT_CPU + (m_level - 1)*4 + req->m_ptx);
+      
+      if (line && req->m_type == MRT_DSTORE) {
+        line->m_dirty = true;
+        cout << "fuck\n";
+      }
+    
+
+      
+      
+//      handle_coherence(m_level, false, );
 
       // -------------------------------------
       // WB reqeust: the line should be changed to the dirty state and retire (no further act.)
@@ -765,13 +779,14 @@ void dcu_c::process_in_queue()
       STAT_EVENT(L1_HIT_CPU + (m_level - 1)*4 + 2 + req->m_ptx);
       STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_RM + m_level*2 + (req->m_type == MRT_DSTORE));
 
+//      handle_coherence(m_level, false, );
 
       // -------------------------------------
       // If there is a direct link from current level and next lower level,
       // directly insert current request to the input queue of lower level
       // -------------------------------------
       if ((m_coupled_down && m_next_id == req->m_cache_id[m_level+1]) || !m_has_router) {
-        ASSERT(m_level != MEM_L3);
+        ASSERT(m_level != MEM_L3); // L3 is always connected to memory controllers via noc
         if (!m_next[req->m_cache_id[m_level+1]]->insert(req)) {
           continue;
         }
@@ -784,6 +799,7 @@ void dcu_c::process_in_queue()
       // Because there is no direct link to the next level, send a request thru NoC
       // -------------------------------------
       else {
+
         if (!m_out_queue->push(req)) {
           continue;
         }
@@ -2027,6 +2043,65 @@ void memory_c::flush_prefetch(int core_id)
     }
   }
 }
+
+
+#if 0
+void memory_c::handle_coherence()
+{
+  if (*KNOB(KNOB_ENABLE_CACHE_COHERENCE) == false)
+    return ;
+
+  // assume that all write-back requests are in M-state (single-copy in the system)
+  if (write_back == true)
+    return ;
+        
+  int state = m_memory->get_td_state(req->m_addr); 
+  if (m_level == MEM_L3) {
+    // L3 Read Miss
+    if (!store) {
+      if (state == COHE_M) {
+        // TD -> M-state block : forward-data-cmd
+        // M-state block -> Memory controller : write-back
+        // M-state block -> Requestor : forward-data
+        // Requestor -> TD : confirmation
+        // Update TD
+      }
+      else if (state == COHE_S) {
+        // TD -> any S-state block : forward-data-cmd
+        // Any S-state block -> Requestor : forward-data
+        // Requestor -> TD : confirmation
+        // Update TD
+      }
+      else if (state == COHE_I) {
+        // Memory controller -> L1, L2, L3 : provide-data
+        // L1 -> TD : confirmation
+        // Update TD
+      }
+    }
+    // L3 Write Miss
+    else {
+      if (state == COHE_M) {
+        // TD -> M-state block : forward data cmd
+        // M-state block -> requestor : forward data / invalidate self
+        // Requestor -> TD : confirmation
+        // Update TD
+      }
+      else if (state == COHE_S) {
+        // TD -> one S-state block : forward data cmd
+        // TD -> all S-state blocks : invalidation
+        // One S-state block -> requestor : forward data / invalidate self
+        // Requestor -> TD : confirmation
+        // Update TD
+      }
+      else if (state == COHE_I) {
+        // Memory controller -> L1 : provide-data
+        // L1 -> TD : confirmation
+        // Update TD
+      }
+    }
+  }
+}
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
