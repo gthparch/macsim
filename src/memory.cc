@@ -520,7 +520,6 @@ int dcu_c::access(uop_c* uop)
       case MEM_ST:
       case MEM_ST_LM:
       case MEM_ST_GM:
-        cout << "asdf\n";
         req_type = MRT_DSTORE; break;
       case MEM_SWPREF_NTA:
       case MEM_SWPREF_T0:
@@ -710,12 +709,8 @@ void dcu_c::process_in_queue()
       
       if (line && req->m_type == MRT_DSTORE) {
         line->m_dirty = true;
-        cout << "fuck\n";
       }
     
-
-      
-      
 //      handle_coherence(m_level, false, );
 
       // -------------------------------------
