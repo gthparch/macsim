@@ -31,8 +31,14 @@ param<ICACHE_WRITE_PORTS, icache_write_ports, uns, 1 >
 
 /* DCACHE */
 param<PERFECT_DCACHE, perfect_dcache, bool, false>
-param<DCACHE_READ_PORTS, dcache_read_ports, int, 4>
-param<DCACHE_WRITE_PORTS, dcache_write_ports, int, 4>
+
+param<L1_READ_PORTS, l1_read_ports, int, 4>
+param<L2_READ_PORTS, l2_read_ports, int, 2>
+param<L3_READ_PORTS, l3_read_ports, int, 1>
+
+param<L1_WRITE_PORTS, l1_write_ports, int, 4>
+param<L2_WRITE_PORTS, l2_write_ports, int, 2>
+param<L3_WRITE_PORTS, l3_write_ports, int, 1>
 
 param<L1_SMALL_NUM_SET,   l1_small_num_set,   int, 64>
 param<L1_SMALL_ASSOC,     l1_small_assoc,     int, 8>

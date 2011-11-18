@@ -296,13 +296,9 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   }
 
   // allocate port
-  // FIXME (jaekyu, 10-4-2011) 
-  // change # ports per cache level
   m_port = new port_c* [m_banks]; 
   for (int ii = 0; ii < m_banks; ++ii) {
-    m_port[ii] = new port_c("dcache_port", (uns)*m_simBase->m_knobs->KNOB_DCACHE_READ_PORTS, 
-                            (uns)*m_simBase->m_knobs->KNOB_DCACHE_WRITE_PORTS, false,
-                             m_simBase);
+    m_port[ii] = new port_c("dcache_port", m_num_read_port, m_num_write_port, false, simBase);
   }
 
   m_id     = id;
@@ -1044,7 +1040,10 @@ void dcu_c::process_fill_queue()
                 data->m_core_id = req->m_core_id;
                 data->m_tid = req->m_thread_id;
               } 
-              mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, m_ptx_sim, data);
+
+              // new write-back request
+              mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, 
+                  m_ptx_sim, data, m_level);
               if (!m_wb_queue->push(wb))
                 ASSERT(0);
 
@@ -1287,10 +1286,16 @@ bool dcu_c::done(mem_req_s* req)
             data->m_core_id = req->m_core_id;
             data->m_tid = req->m_thread_id;
           } 
-          mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, m_ptx_sim, data);
+
+          // new write back request
+          mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, 
+              m_ptx_sim, data, m_level);
           // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb))
             ASSERT(0);
+
+          cout << "wb in " << m_level << "\n";
+
           DEBUG("L%d[%d] (done) new_wb_req:%d addr:%s by req:%d type:%s\n", 
               m_level, m_id, wb->m_id, hexstr64s(repl_line_addr), req->m_id, \
               mem_req_c::mem_req_type_name[MRT_WB]);
@@ -1957,9 +1962,10 @@ mem_req_s* memory_c::evict_prefetch(int core_id)
 
 // new write-back request
 #define GET_APPL_ID(xx, yy) (m_simBase->m_core_pointers[(xx)]->get_appl_id((yy)))
-mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* data)
+mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* data, int level)
 {
   STAT_EVENT(TOTAL_WB);
+  STAT_EVENT(L1_WB + (level-1));
   mem_req_s* req = new mem_req_s(m_simBase);
   
   req->m_id                     = m_unique_id++;

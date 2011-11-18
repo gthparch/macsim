@@ -18,6 +18,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L1_SMALL_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L1_SMALL_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L1_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS); \
       } \
       else if (level == MEM_L2) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L2_SMALL_NUM_SET; \
@@ -27,6 +29,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L2_SMALL_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L2_SMALL_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L2_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS); \
       } \
       else if (m_level == MEM_L3) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L3_NUM_SET; \
@@ -35,6 +39,8 @@
         m_banks     = *m_simBase->m_knobs->KNOB_L3_NUM_BANK; \
         m_latency   = *m_simBase->m_knobs->KNOB_L3_LATENCY; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L3_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS); \
       } \
     } \
     else if (type == UNIT_MEDIUM) { \
@@ -46,6 +52,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L1_MEDIUM_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L1_MEDIUM_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L1_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS); \
       } \
       else if (level == MEM_L2) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L2_MEDIUM_NUM_SET; \
@@ -55,6 +63,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L2_MEDIUM_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L2_MEDIUM_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L2_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS); \
       } \
       else if (level == MEM_L3) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L3_NUM_SET; \
@@ -63,6 +73,8 @@
         m_banks     = *m_simBase->m_knobs->KNOB_L3_NUM_BANK; \
         m_latency   = *m_simBase->m_knobs->KNOB_L3_LATENCY; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L3_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS); \
       } \
     } \
     else if (type == UNIT_LARGE) { \
@@ -74,6 +86,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L1_LARGE_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L1_LARGE_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L1_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS); \
       } \
       else if (level == MEM_L2) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L2_LARGE_NUM_SET; \
@@ -83,6 +97,8 @@
         m_latency   = *m_simBase->m_knobs->KNOB_L2_LARGE_LATENCY; \
         m_bypass    = *m_simBase->m_knobs->KNOB_L2_LARGE_BYPASS; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L2_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS); \
       } \
       else if (level == MEM_L3) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L3_NUM_SET; \
@@ -91,6 +107,8 @@
         m_banks     = *m_simBase->m_knobs->KNOB_L3_NUM_BANK; \
         m_latency   = *m_simBase->m_knobs->KNOB_L3_LATENCY; \
         m_ptx_sim   =  m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L3_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS); \
       } \
     } \
   } 
