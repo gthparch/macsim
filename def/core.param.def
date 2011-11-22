@@ -107,3 +107,46 @@ param<32_64_ISA, 32_64_isa, int, 32>
 param<PHY_ADDR_WIDTH, phy_addr_width, int, 32>
 
 param<FEATURE_SIZE, feature_size, int, 32>
+param<PCIE_BUS_SIZE, pcie_bus_size, int, 1>
+param<PCIE_TR, pcie_tr, int, 16>
+param<PCIE_INIT, pcie_init, int, 33250>
+
+
+// for mcpat config
+param<HOMOGENEOUS_CCS, homogeneous_ccs, int, 1>
+param<INST_LENGTH, inst_length, int, 32>
+param<OPCODE_WIDTH, opcode_width, int, 16>
+param<MICRO_OPCODE_WIDTH, micro_opcode_width, int, 8>
+param<PIPELINE_DEPTH_INT, pipeline_depth_int, int, 31>
+param<PIPELINE_DEPTH_FP, pipeline_depth_fp, int, 31>
+param<ALU_PER_CORE, alu_per_core, int, 6>
+param<MUL_PER_CORE, mul_per_core, int, 1>
+param<FPU_PER_CORE, fpu_per_core, int, 2>
+param<INST_BUF_SIZE, inst_buf_size, int, 32>
+param<DEC_STREAM_BUF_SIZE, dec_stream_buf_size, int, 16>
+param<INST_WINDOW_SIZE, inst_window_size, int, 64>
+param<FP_INST_WINDOW_SIZE, fp_inst_window_size, int, 64>
+param<RAS_SIZE, ras_size, int, 64>
+param<IFU_DUTY_CYCLE, ifu_duty_cycle, float, 1.0>
+param<LSU_DUTY_CYCLE, lsu_duty_cycle, float, 0.5>
+param<MEM_I_DUTY_CYCLE, mem_i_duty_cycle, float, 1.0>
+param<MEM_D_DUTY_CYCLE, mem_d_duty_cycle, float, 0.5>
+param<ALU_DUTY_CYCLE, alu_duty_cycle, float, 1.0>
+param<MUL_DUTY_CYCLE, mul_duty_cycle, float, 0.3>
+param<FPU_DUTY_CYCLE, fpu_duty_cycle, float, 0.3>
+param<ALU_CDB_DUTY_CYCLE, alu_cdb_duty_cycle, float, 1.0>
+param<MUL_CDB_DUTY_CYCLE, mul_cdb_duty_cycle, float, 0.3>
+param<FPU_CDB_DUTY_CYCLE, fpu_cdb_duty_cycle, float, 0.3>
+param<ICACHE_THROUGHPUT, icache_throughput, int, 8>
+param<DCACHE_THROUGHPUT, dcache_throughput, int, 3>
+param<L2_THROUGHPUT, l2_throughput, int, 8> 
+param<L3_THROUGHPUT, l3_throughput, int, 16>
+param<L2_CLOCKRATE, l2_clockrate, float, 3.4>
+param<L3_CLOCKRATE, l3_clockrate, float, 0.85>
+param<DRAM_CLOCKRATE, dram_clockrate, float, 0.2>
+param<IS_GPU, is_gpu, int, 0> 
+param<GPU_WIDTH, gpu_width, int, 32> 
+
+
+
+// param<, , int, >
