@@ -53,9 +53,12 @@ class static_pc_c : public trace_reader_c
     ~static_pc_c();
     void inst_event(trace_info_s* inst);
 
+
   private:
     std::unordered_map<Addr, bool> m_static_pc;
     std::unordered_map<Addr, bool> m_static_mem_pc;
+    uint64_t m_total_inst_count;
+    uint64_t m_total_store_count;
 };
 
 

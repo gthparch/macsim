@@ -24,6 +24,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+enum COHERENCE_STATE {
+  I_STATE,
+  M_STATE,
+  S_STATE,
+}; 
+
 
 bool IsStore(Mem_Type type);
 bool IsLoad(Mem_Type type);

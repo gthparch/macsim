@@ -25,6 +25,7 @@ int read_trace(string trace_path)
   string type;
   int max_block_per_core;
   int inst_count = 0;
+  int store_count = 0;
 
   // read number of threads and type of trace
   trace_file >> num_thread >> type;
@@ -61,6 +62,9 @@ int read_trace(string trace_path)
         trace_info_s trace_info;
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
         trace_reader_c::Singleton.inst_event(&trace_info);
+
+        if (trace_info.m_has_st == true)
+          ++store_count;
       } 
       
       if (byte_read != trace_buffer_size) {
@@ -69,7 +73,7 @@ int read_trace(string trace_path)
     } 
     gzclose(gztrace);
   }
-//  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << "\n";
+  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << " store_count:" << store_count << "\n";
 
   return inst_count;
 }

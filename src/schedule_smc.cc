@@ -390,13 +390,21 @@ void schedule_smc_c::run_a_cycle(void)
   // each warp scheduler should be different. 
   int count = 0;
   for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) { 
-    if (!m_num_in_sched || m_first_schlist == m_last_schlist || count == *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER) 
+    // -------------------------------------
+    // Schedule stops when
+    // 1) no uops in the scheduler (m_num_in_sched and first == last)
+    // 2) # warp scheduler
+    // 3) FIXME add width condition
+    // -------------------------------------
+    if (!m_num_in_sched || 
+        m_first_schlist == m_last_schlist || 
+        count == *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER) 
       break;
 
     SCHED_FAIL_TYPE sched_fail_reason;
 
-    int thread_id = m_schlist_tid[m_first_schlist];
-    int entry = m_schlist_entry[m_first_schlist];
+    int thread_id = m_schlist_tid[ii];
+    int entry = m_schlist_entry[ii];
 
     bool uop_scheduled = false;
     bool scheduled = false;

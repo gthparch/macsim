@@ -68,7 +68,6 @@ reuse_distance_c::~reuse_distance_c()
 
 void reuse_distance_c::inst_event(trace_info_s* inst)
 {
-  return ;
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
     ++m_self_counter;
     Addr addr;
@@ -110,12 +109,19 @@ void reuse_distance_c::reset()
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-static_pc_c::static_pc_c() {}
+static_pc_c::static_pc_c() 
+{
+  m_total_inst_count = 0;
+  m_total_store_count = 0;
+}
 
 static_pc_c::~static_pc_c() 
 {
   cout << "Total static pc:" << m_static_pc.size() << "\n";
   cout << "Total static memory pc:" << m_static_mem_pc.size() << "\n";
+
+  cout << "Total instruction count:" << m_total_inst_count << "\n";
+  cout << "Total store count:" << m_total_store_count << "\n";
 
   m_static_pc.clear();
   m_static_mem_pc.clear();
@@ -127,5 +133,10 @@ void static_pc_c::inst_event(trace_info_s* inst)
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
     m_static_mem_pc[inst->m_instruction_addr] = true;
   }
+
+
+  ++m_total_inst_count;
+  if (inst->m_has_st == true)
+    ++m_total_store_count;
 }
 

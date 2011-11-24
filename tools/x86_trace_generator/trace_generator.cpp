@@ -98,6 +98,7 @@ Trace_info* trace_info_array[MAX_THREADS];
 map<ADDRINT, Inst_info*> g_inst_storage[MAX_THREADS];
 PIN_LOCK g_lock;
 UINT64 g_inst_count[MAX_THREADS]={0};
+INT64 g_start_inst_count[MAX_THREADS] = {-1};
 map<THREADID, THREADID> threadMap;
 THREADID main_thread_id;
 Thread_info thread_info[MAX_THREADS];
@@ -129,6 +130,7 @@ KNOB<string> Knob_compiler          (KNOB_MODE_WRITEONCE, "pintool", "compiler",
 KNOB<string> Knob_pl                (KNOB_MODE_WRITEONCE, "pintool", "pl", "normal", "Programming Language");
 KNOB<string> Knob_function1         (KNOB_MODE_WRITEONCE, "pintool", "func1", "", "Function to instrument");
 KNOB<string> Knob_function2         (KNOB_MODE_WRITEONCE, "pintool", "func2", "", "Function to instrument");
+KNOB<UINT64> Knob_skip              (KNOB_MODE_WRITEONCE, "pintool", "skipinst", "0", "Instructions to skip");
 KNOB<UINT64> Knob_max               (KNOB_MODE_WRITEONCE, "pintool", "max", "0", "Max number of instruction to collect");
 KNOB<UINT64> Knob_rtn_min           (KNOB_MODE_WRITEONCE, "pintool", "rmin", "0", "Max number of function calls to collect data");
 KNOB<UINT64> Knob_rtn_max           (KNOB_MODE_WRITEONCE, "pintool", "rmax", "0", "Max number of function calls to collect data");
@@ -149,6 +151,7 @@ void sanity_check(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Handler(CONTROL_EVENT ev, void * v, CONTEXT * ctxt, void * ip, THREADID tid)
 {
+  
   switch (ev) {
     case CONTROL_START: {
       cerr << "-> Trace Generation Starts at icount " << g_inst_count[tid] << endl;
@@ -161,7 +164,9 @@ void Handler(CONTROL_EVENT ev, void * v, CONTEXT * ctxt, void * ip, THREADID tid
       g_enable_instrument = 0;
       PIN_RemoveInstrumentation();
       //ThreadEnd();
-      //Finish();
+      finish();
+      PIN_Detach();
+//      detach();
       //exit(0);
       break;
     }
@@ -181,6 +186,7 @@ void IncrementNumInstruction(THREADID threadid)
   THREADID tid = threadMap[PIN_ThreadId()];
   if (tid == 100000)
     return ;
+
 
   g_inst_count[tid]++;
 
@@ -345,8 +351,10 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
   // once accumulated instructions exceed the buffer size, write instructions to the file
   // ----------------------------------------
   if (trace_info->bytes_accumulated == BUF_SIZE) {
-    if (gzwrite(trace_info->trace_stream, trace_info->trace_buf, BUF_SIZE) != BUF_SIZE) {
-      cerr << "-> TID - " << tid << " Error when writing instruction " << trace_info->inst_count << endl;
+    int write_size = gzwrite(trace_info->trace_stream, trace_info->trace_buf, BUF_SIZE);
+    if (write_size != BUF_SIZE) {
+      cerr << "-> TID - " << tid << " Error when writing instruction " << trace_info->inst_count << " write_size:" << write_size << " " << BUF_SIZE << endl;
+      exit(0);
     }
     trace_info->bytes_accumulated = 0;
   }
@@ -386,7 +394,7 @@ void instrument(INS ins)
 
   if (!g_enable_thread_instrument[tid])
     return;
-
+  
   set<LEVEL_BASE::REG> src_regs;
   set<LEVEL_BASE::REG> dst_regs;
   const ADDRINT iaddr = INS_Address(ins);
@@ -664,29 +672,52 @@ void instrument(INS ins)
 }
 
 
+UINT64 last_count = -1;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Instrumentation Site
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Trace(TRACE trace, void *v)
-{
-  if (!g_enable_instrument)
-    return;
-
-  for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
-    for (INS ins = BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins)) { 
-      INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)IncrementNumInstruction, IARG_THREAD_ID, IARG_END);
-      instrument(ins);
-    }
-  }
-}
-
 VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
   if (tid == 100000)
     return ;
+  
+
+  if (!g_enable_instrument)
+    return;
 
   g_inst_count[tid] += count;
+
+  if (Knob_max.Value() > 0 && g_inst_count[tid] >= Knob_max.Value()) {
+    finish();
+    exit(0);
+  }
+
+  if (g_inst_count[tid] >= last_count + 500000) {
+    cout << g_inst_count[tid] << "\n";
+    last_count = g_inst_count[tid];
+  }
+
+#if 0
+  if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
+    if (g_start_inst_count[tid] == -1) {
+      cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << "\n";
+      g_start_inst_count[tid] = g_inst_count[tid];
+      g_enable_thread_instrument[tid] = true;
+    }
+  } else {
+    g_enable_thread_instrument[tid] = false;
+  } 
+
+
+  if (Knob_max.Value() > 0 && g_start_inst_count[tid] != -1 && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid]) {
+    g_enable_thread_instrument[tid] = false; 
+    cout << "-> Thread " << tid << " reachea at max instrunction count " << g_inst_count[tid] << endl;
+    finish();
+    exit(0);
+  }
+#endif
 }
 
 VOID INST_trace(TRACE trace, VOID *v)
@@ -704,6 +735,7 @@ void Instruction(INS ins, void* v)
 {
   if (!g_enable_instrument)
     return;
+
 
 //  INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)IncrementNumInstruction, IARG_THREAD_ID, IARG_END);
   instrument(ins);
@@ -1054,6 +1086,8 @@ int main(int argc, char *argv[])
   TRACE_AddInstrumentFunction(INST_trace, 0);
   INS_AddInstrumentFunction(Instruction, 0);
   control.CheckKnobs(Handler, 0);
+
+  cout << "ASDF " << g_enable_instrument << "\n";
 
   PIN_AddDetachFunction(Detach, 0);
   PIN_AddFiniFunction(Fini, 0);

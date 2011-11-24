@@ -2046,6 +2046,60 @@ void memory_c::flush_prefetch(int core_id)
 }
 
 
+void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache)
+{
+  int state;
+
+  // READ Hit
+  if (!store && hit) {
+    if (level == MEM_L1) {
+      assert(state != I_STATE);
+      // do nothing
+    }
+    else if (level == MEM_L2) {
+      assert(state != I_STATE);
+      if (state == M_STATE) {
+        // L2 : Write-back to memory
+        // L2 -> L1
+        // Update TD L1:S L2:S
+        // Lock TD // Free when L1 insert
+      }
+      else if (state == S_STATE) {
+        // L2 -> L1
+        // Update TD L1:S L2:S
+        // Lock TD // Free when L1 insert
+      }
+    }
+    else if (level == MEM_L3) {
+      assert(state != I_STATE);
+      if (state == M_STATE) {
+      }
+      else if (state == S_STATE) {
+      }
+    }
+  }
+
+  // Write Hit
+  if (store && hit) {
+    if (level == MEM_L1) {
+    }
+    else if (level == MEM_L2) {
+    }
+    else if (level == MEM_L3) {
+    }
+  }
+
+  // Read Miss
+  if (!store && !hit && level == MEM_L3) {
+  }
+
+  // Write Miss
+  if (store && !hit && level == MEM_L3) {
+  }
+
+
+
+}
 #if 0
 void memory_c::handle_coherence()
 {
