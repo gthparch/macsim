@@ -1,0 +1,57 @@
+
+\documentclass[11pt, letterpaper]{article}
+
+
+%% packages
+\usepackage[pagebackref=true,bookmarks=true]{hyperref}
+
+\setlength{\textheight}{8.5in}
+\setlength{\textwidth}{5.5in}
+\setlength{\columnsep}{0.3125in}
+\setlength{\topmargin}{0.5in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\parindent}{1pc}
+\setlength{\oddsidemargin}{0.3in}
+\setlength{\evensidemargin}{0.3in}
+
+
+\begin{document}
+
+\title{Macsim: A CPU-GPU Heterogeneous Simulation Framework}
+
+\author{Hyesoon Kim\\
+Jaekyu Lee\\
+Nagesh B. Laksiminarayana\\
+Jaewoong Sim\\
+Jieun Lim}
+
+\maketitle
+\thispagestyle{empty}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+%% inputs
+\input{intro}
+\input{trace}
+\input{process}
+\input{pipeline}
+\input{gpu}
+\input{memory}
+\input{hetero}
+\input{knob}
+\input{sst}
+\input{tool}
+\input{ack}
+
+\clearpage
+%% bib
+\bibliographystyle{ieee}
+\bibliography{ref}
+
+
+\end{document}
