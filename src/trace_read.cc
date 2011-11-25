@@ -1329,7 +1329,6 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
   ASSERT(uop);
 
   trace_uop_s *trace_uop;
-  trace_uop_s *next_trace_uop;
   int num_uop  = 0;
   core_c* core = m_simBase->m_core_pointers[core_id];
   inst_info_s *info;
@@ -1339,7 +1338,6 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     return false;
 
   trace_info_s trace_info;
-  trace_info_s next_inst_trace_info;
   bool read_success = true;
   thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -1353,7 +1351,6 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
   ///
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
-    int stride;
     
     if (core->m_inst_fetched[sim_thread_id] < *m_simBase->m_knobs->KNOB_MAX_INSTS)  {
       // read next instruction

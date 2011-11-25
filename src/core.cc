@@ -435,7 +435,7 @@ void core_c::thread_heartbeat(int tid, bool final)
                         m_inst_count - m_heartbeat[tid]->m_printed_inst_count : 0);
 
   /* print heartbeat message if necessary */
-  if (*m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL && inst_diff >= *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL || final) {
+  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) && inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) || final) {
     time_t cur_time = time(NULL);
     double int_ipc = (double)(m_inst_count - m_heartbeat[tid]->m_last_inst_count) / 
                              (m_core_cycle_count - m_heartbeat[tid]->m_last_cycle_count);
@@ -479,7 +479,7 @@ void core_c::core_heartbeat(bool final)
                       m_inst_count - m_heartbeat_printed_inst_count_core : 0); 
 
   /* print heartbeat message if necessary */
-  if (*m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL && inst_diff >= *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL || final) { 
+  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) && inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) || final) { 
     time_t cur_time = time(NULL);
     double int_ipc = (double)(m_inst_count - m_heartbeat_last_inst_count_core) / 
                              (m_core_cycle_count - m_heartbeat_last_cycle_count_core); 
