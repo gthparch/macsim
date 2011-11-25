@@ -63,7 +63,7 @@ Addr bp_targ_c::pred (uop_c *uop)
   
   // debug 
   Addr tag; 
-  uns set; 
+  int set; 
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
   /*
   if (uop->m_pc == 0x401aa5) lca_count++; 
@@ -96,7 +96,7 @@ void bp_targ_c::update (uop_c *uop)
   if (uop->m_off_path) return; 
   
   Addr tag; 
-  uns set; 
+  int set; 
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
 
   int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);

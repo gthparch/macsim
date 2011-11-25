@@ -104,9 +104,9 @@ class schedule_smc_c : public schedule_c
   private:
     static const int MAX_GPU_SCHED_SIZE = 128; /**< max sched table size */
 
+    smc_rob_c*      m_gpu_rob;  /**< gpu rob */
     pqueue_c<gpu_allocq_entry_s>**   m_gpu_allocq; /**< gpu allocation queue */ 
 
-    smc_rob_c*      m_gpu_rob;  /**< gpu rob */
     int             knob_num_threads; /**< number of maximum thread per core */
 
 #if 0

@@ -197,16 +197,16 @@ class AbstractStat
     }
 
   protected:
-    bool m_bCoreWide; /**< when set, add suffix to the name of a stat */
-    unsigned int m_coreID; /**< core id */
     string m_name; /**< name of stat */
     unsigned long long m_count; /**< count during the current stat interval */
     unsigned long long m_total_count; /**< total count from beginning of run */
     AbstractStat* m_pRatioStat; /**< stat that to use in the ratio */
     string m_fileName; /**< name of file to print stats */
     long m_ID; /**< stat id */
-    string m_suffix; /**< stat suffix */
+    bool m_bCoreWide; /**< when set, add suffix to the name of a stat */
+    unsigned int m_coreID; /**< core id */
     bool m_isTemplate; /**< is template */
+    string m_suffix; /**< stat suffix */
 };
 
 

@@ -70,13 +70,13 @@ class readonly_cache_c
 
   private:
     int        m_core_id; /**< core id */
-    Cache_Type m_cache_type; /**< cache type */
-    cache_c   *m_cache; /**< cache data structure */
     uns32      m_cache_size; /**< cache size */
     uns8       m_cache_assoc; /**< associativity */
     uns8       m_cache_line_size; /**< cache line size */
     uns8       m_cache_banks; /**< number of cache banks */
     uns8       m_cache_cycles; /**< cache latency */
+    Cache_Type m_cache_type; /**< cache type */
+    cache_c   *m_cache; /**< cache data structure */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

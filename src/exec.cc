@@ -72,24 +72,16 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 // exec_c constructor
 exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT()
 {
-  int int_sched_rate;
-  int mem_sched_rate;
-  int fp_sched_rate;
-
   m_simBase = simBase;
 
   EXEC_CONFIG();
-
-  m_max_port[gen_ALLOCQ] = int_sched_rate;
-  m_max_port[mem_ALLOCQ] = mem_sched_rate;
-  m_max_port[fp_ALLOCQ]  = fp_sched_rate;
 
   clear_ports();
 
 
   // latency binding
   if (m_ptx_sim) {
-    int factor             = *m_simBase->m_knobs->KNOB_PTX_EXEC_RATIO;
+    int factor             = *KNOB(KNOB_PTX_EXEC_RATIO);
     int latency_array_size = (sizeof uop_latencybinding_init_ptx /
         sizeof (uop_latencybinding_init_ptx[0]));
 
@@ -448,6 +440,7 @@ void exec_c::br_exec(uop_c *uop)
     case CF_ICO:
     case CF_RET:
     case CF_MITE:
+    default:
       break;
   }
 
@@ -508,6 +501,9 @@ void exec_c::update_memory_stats(uop_c* uop)
 
     case MEM_LD_TM:
       STAT_EVENT(TEXTURE_CACHE_ACCESS);
+      break;
+
+    default:
       break;
   }
 }

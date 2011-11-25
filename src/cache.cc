@@ -44,8 +44,8 @@ cache_set_c::cache_set_c(int assoc)
 
 
 // cache_c constructor
-cache_c::cache_c(string name, uns num_set, uns assoc, uns line_size, 
-    uns data_size, uns bank_num, bool cache_by_pass, int core_id, Cache_Type cache_type_info,
+cache_c::cache_c(string name, int num_set, int assoc, int line_size, 
+    int data_size, int bank_num, bool cache_by_pass, int core_id, Cache_Type cache_type_info,
     bool enable_partition, macsim_c* simBase) 
 {
   m_simBase = simBase;
@@ -78,7 +78,7 @@ cache_c::cache_c(string name, uns num_set, uns assoc, uns line_size,
     m_set[ii] = new cache_set_c(m_assoc); 
 
     // Allocating memory for all of the data elements in each line
-    for (uns jj = 0; jj < assoc; ++jj) {
+    for (int jj = 0; jj < assoc; ++jj) {
       m_set[ii]->m_entry[jj].m_valid          = false;
       m_set[ii]->m_entry[jj].m_access_counter = false;
       if (data_size > 0) {
@@ -108,7 +108,7 @@ cache_c::~cache_c()
 
 
 // parse tag address and set index from an address
-void cache_c::find_tag_and_set(Addr addr, Addr *tag, uns *set) 
+void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) 
 {
   *tag = addr >> m_shift_bits & m_tag_mask;
   *set = addr >> m_shift_bits & m_set_mask;
@@ -123,7 +123,7 @@ void* cache_c::access_cache(Addr addr, Addr *line_addr, bool update_repl, int ap
     return NULL;
 
   Addr tag;
-  uns set;
+  int set;
 
   // Get Tag and set to check if the addr exists in cache
   find_tag_and_set(addr, &tag, &set);
@@ -178,7 +178,7 @@ void cache_c::update_cache_on_miss(int set_id, int appl_id)
 
 
 // find an entry to be replaced based on the policy
-cache_entry_c* cache_c::find_replacement_line(uns set, int appl_id) 
+cache_entry_c* cache_c::find_replacement_line(int set, int appl_id) 
 {
   if (*m_simBase->m_knobs->KNOB_CACHE_USE_PSEUDO_LRU) {
     while (1) {
@@ -197,7 +197,7 @@ cache_entry_c* cache_c::find_replacement_line(uns set, int appl_id)
   }
   else {
     int i = 0;
-    uns lru_ind = 0;
+    int lru_ind = 0;
     Counter lru_time = MAX_INT;
     while (i < m_assoc) {
       cache_entry_c* line = &(m_set[set]->m_entry[i]);
@@ -221,7 +221,7 @@ cache_entry_c* cache_c::find_replacement_line(uns set, int appl_id)
 
 int special_adjust = 0;
 
-cache_entry_c* cache_c::find_replacement_line_from_same_type(uns set, int appl_id, 
+cache_entry_c* cache_c::find_replacement_line_from_same_type(int set, int appl_id, 
     bool gpuline) 
 {
   int current_type_count; 
@@ -302,7 +302,7 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
     bool gpuline, bool skip) 
 {
   Addr tag;
-  uns set;
+  int set;
   cache_entry_c *ins_line;
   *line_addr = base_cache_line (addr);
 
@@ -389,7 +389,7 @@ bool cache_c::null_cache_line_fields(cache_entry_c *line)
 bool cache_c::invalidate_cache_line(Addr addr)
 {
   Addr tag;
-  uns set;
+  int set;
 
   // Get the set where the addr maps and tag to asssociate 
   // to the new cache line being returned
@@ -439,7 +439,7 @@ int cache_c::get_bank_num(Addr addr)
 
 
 // find lru counter value
-Counter cache_c::find_min_lru(uns set) 
+Counter cache_c::find_min_lru(int set) 
 {
   Counter lru_time = MAX_INT;
   for (int ii = 0; ii < m_assoc; ++ii) {

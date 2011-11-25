@@ -115,7 +115,6 @@ hwp_common_c::~hwp_common_c()
 // initialize all prefetchers enabled
 void hwp_common_c::pref_init(bool ptx)
 {
-  int ii, jj, kk;
   static char pref_trace_filename[] = "mem_trace";
   static char pref_acc_filename[]   = "pref_acc";
 
@@ -175,7 +174,7 @@ void hwp_common_c::pref_init(bool ptx)
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) {
     region_info = new pref_region_info_s[*m_simBase->m_knobs->KNOB_PREF_NUMTRACKING_REGIONS];
     ASSERT(region_info);
-    for (ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_NUMTRACKING_REGIONS; ++ii) {
+    for (int ii = 0; ii < *KNOB(KNOB_PREF_NUMTRACKING_REGIONS); ++ii) {
       region_info[ii].status = new pref_region_line_status_s[*m_simBase->m_knobs->KNOB_PREF_REGION_SIZE];
       ASSERT(region_info[ii].status);	    
       region_info[ii].trained  = false;
@@ -794,7 +793,7 @@ void hwp_common_c::pref_update_queues(void)
         info.m_loadPC        = m_l2req_queue[q_index].loadPC;
         info.m_core_id       = m_l2req_queue[q_index].core_id;
 
-        bool (*done)(struct mem_req_s *) = NULL;
+        // bool (*done)(struct mem_req_s *) = NULL; // currently not used
         bool result;
 
         // FIXME

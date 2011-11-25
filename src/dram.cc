@@ -215,27 +215,6 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_precharge_latency_gpu = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_PRECHARGE);
   m_activate_latency_gpu  = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_ACTIVATE);
   m_column_latency_gpu    = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_COLUMN);
-
-
-  // Jaekyu's bandwidth study
-  m_num_completed_in_last_cycle = 0;
-  m_starvation_cycle = 0;
-  m_total_req = 0;
-
-  m_avg_latency = 0;
-  m_avg_latency_base = 0;
-
-  m_prev_avg_latency = 0;
-  m_dram_state = 0;
-
-  m_band = 0;
-  m_band_base = 0;
-  m_prev_band = 0;
-  m_prev_stable_band = 0;
-  m_avg_band = 0;
-  m_stable_counter = 0;
-
-  temp_out.open("band.out");
 }
 
 
@@ -342,12 +321,6 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 }
 
 
-// Jaekyu's bandwidth study
-static Counter acc_bandwidth = 0;
-static bool latency_dir = false;
-extern int special_adjust;
-static bool bandwidth_cp_first = true;
-
 // tick a cycle
 void dram_controller_c::run_a_cycle()
 {
@@ -430,7 +403,7 @@ void dram_controller_c::bank_schedule()
 // check completed request. 
 void dram_controller_c::bank_schedule_complete(void)
 {
-  m_num_completed_in_last_cycle = 0;;
+  m_num_completed_in_last_cycle = 0;
   for (int ii = 0; ii < m_num_bank; ++ii) {
     if (m_current_list[ii] == NULL)
       continue;
@@ -462,7 +435,7 @@ void dram_controller_c::bank_schedule_complete(void)
                   mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
             }
             temp_list.push_back((*I));
-            m_num_completed_in_last_cycle;
+            m_num_completed_in_last_cycle = m_simBase->m_simulation_cycle;
           }
         }
 

@@ -166,8 +166,8 @@ void map_c::add_src_from_uop (uop_c *uop, uop_c *src_uop, Dep_Type type)
       src_num, MAX_UOP_SRC_DEPS);
 
   ASSERTM(src_uop->m_uop_num < uop->m_uop_num ||
-      uop->m_thread_id != -1 && src_uop->m_thread_id != -1 ||
-      uop->m_off_path && src_uop->m_thread_id != -1,
+      (uop->m_thread_id != -1 && src_uop->m_thread_id != -1) ||
+      (uop->m_off_path && src_uop->m_thread_id != -1),
       "uop:%s  src_uop:%s\n", 
       unsstr64(uop->m_uop_num), unsstr64(src_uop->m_uop_num));
 
@@ -346,7 +346,7 @@ void map_c::update_store_hash (uop_c *uop)
 
 
   if (new_entry) {
-    ASSERT(!*m_simBase->m_knobs->KNOB_USE_NEW_ORACLE || off_path && !MEM_GEN_OFF_PATH_VALS);
+    ASSERT(!*KNOB(KNOB_USE_NEW_ORACLE) || (off_path && !MEM_GEN_OFF_PATH_VALS));
     DEBUG("core_id:%d thread_id:%d update_store_hash uop:%s inst:%s va:%s first_byte:%s\n",
           uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), 
           unsstr64(uop->m_inst_num), hexstr64s(va), hexstr64s(first_byte)); 

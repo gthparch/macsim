@@ -115,6 +115,8 @@
 
 
 #define ROB_CONFIG() \
+  uns16 m_knob_meu_nsb = 0; \
+  uns16 m_knob_meu_nlb = 0; \
   switch (m_unit_type) {\
     case UNIT_SMALL: \
       m_knob_rob_size = *m_simBase->m_knobs->KNOB_ROB_SIZE; \
@@ -155,6 +157,9 @@
 
 
 #define EXEC_CONFIG() \
+  int int_sched_rate = 0; \
+  int mem_sched_rate = 0; \
+  int fp_sched_rate  = 0; \
   switch (m_unit_type) { \
     case UNIT_SMALL: \
       int_sched_rate  = *m_simBase->m_knobs->KNOB_ISCHED_RATE; \
@@ -182,16 +187,19 @@
       m_ptx_sim        = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx" ? true : false; \
       break; \
-  }
+  } \
+  m_max_port[gen_ALLOCQ] = int_sched_rate; \
+  m_max_port[mem_ALLOCQ] = mem_sched_rate; \
+  m_max_port[fp_ALLOCQ]  = fp_sched_rate;
   
 
 #define SCHED_CONFIG() \
-  uns16 int_sched_size; \
-  uns16 mem_sched_size; \
-  uns16 fp_sched_size; \
-  uns16 int_sched_rate; \
-  uns16 mem_sched_rate; \
-  uns16 fp_sched_rate; \
+  uns16 int_sched_size = 0; \
+  uns16 mem_sched_size = 0; \
+  uns16 fp_sched_size  = 0; \
+  uns16 int_sched_rate = 0; \
+  uns16 mem_sched_rate = 0; \
+  uns16 fp_sched_rate  = 0; \
   \
   switch (m_unit_type) { \
     case UNIT_SMALL: \
@@ -286,7 +294,6 @@
   uns giaq_size; \
   uns miaq_size; \
   uns fq_size; \
-  int max_threads_per_core; \
   string m_knob_schedule = ""; \
   uns m_knob_fetch_latency; \
   uns m_knob_alloc_latency; \

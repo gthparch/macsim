@@ -19,8 +19,8 @@
 sw_managed_cache_c::sw_managed_cache_c(string name, int c_id, uns32 c_size, uns8 c_assoc, 
     uns8 c_line_size, uns8 c_banks, uns8 c_cycles, bool by_pass, Cache_Type c_type, 
     uns n_read_ports, uns n_write_ports, int c_data_size, macsim_c* simBase) :
-  m_core_id(c_id), m_num_banks(c_banks), m_cache_cycles(c_cycles), 
-  m_cache_line_size(c_line_size)
+  m_core_id(c_id), m_cache_cycles(c_cycles), m_cache_line_size(c_line_size), 
+  m_num_banks(c_banks) 
 {
   //Reference to simulation-scoped members
   m_simBase = simBase;

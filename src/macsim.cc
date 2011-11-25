@@ -62,23 +62,22 @@ macsim_c::macsim_c()
 {
 	m_simBase = this;
 	
-	m_num_active_threads = 0; 
+	m_num_active_threads             = 0; 
 	m_num_waiting_dispatched_threads = 0;
-	m_total_num_application;
-	m_process_count = 0; 
-	m_process_count_without_repeat = 0;
-	m_all_threads = 0;
-	m_no_threads_per_block;
-	m_total_retired_block = 0;
+	m_total_num_application          = 0;
+	m_process_count                  = 0; 
+	m_process_count_without_repeat   = 0;
+	m_all_threads                    = 0;
+	m_no_threads_per_block           = 0;
+	m_total_retired_block            = 0;
+	m_end_simulation                 = false;
+	m_repeat_done                    = false;
 
-	m_end_simulation = false;
-	m_repeat_done = false;
-
-	for (int i=0; i<MAX_NUM_CORES; i++) {	
-		m_core_cycle[i] = 0;
-		m_core_end_trace[i] = false;
-		m_sim_end[i] = false;
-		m_core_started[i] = false;
+	for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {	
+		m_core_cycle[ii]     = 0;
+		m_core_end_trace[ii] = false;
+		m_sim_end[ii]        = false;
+		m_core_started[ii]   = false;
 	}
 
 	m_simulation_cycle = 1;

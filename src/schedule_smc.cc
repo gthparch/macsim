@@ -40,8 +40,9 @@
 // schedule_smc_c constructor
 schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_allocq,
     smc_rob_c* gpu_rob, exec_c* exec, Unit_Type unit_type, frontend_c* frontend, 
-    macsim_c* simBase) :  m_gpu_rob(gpu_rob), m_gpu_allocq(gpu_allocq), 
-    schedule_c(exec, core_id, unit_type, frontend, NULL, simBase)
+    macsim_c* simBase) :  
+    schedule_c(exec, core_id, unit_type, frontend, NULL, simBase),
+    m_gpu_rob(gpu_rob), m_gpu_allocq(gpu_allocq)
 {
 
   m_simBase = simBase;
@@ -67,7 +68,7 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_a
   fill_n(m_schedule_arbiter, static_cast<int>(*m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER), -1);
 #endif
   m_schedule_modulo = (*m_simBase->m_knobs->KNOB_GPU_SCHEDULE_RATIO - 1); 
-  m_schlist_size = MAX_GPU_SCHED_SIZE, knob_num_threads;
+  m_schlist_size    = MAX_GPU_SCHED_SIZE * knob_num_threads;
   m_schlist_entry   = new int[m_schlist_size];
   m_schlist_tid     = new int[m_schlist_size];
   m_first_schlist   = 0;
@@ -407,7 +408,6 @@ void schedule_smc_c::run_a_cycle(void)
     int entry = m_schlist_entry[ii];
 
     bool uop_scheduled = false;
-    bool scheduled = false;
 
     if (entry != -1) {
       // schedule a uop from a thread

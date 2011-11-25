@@ -100,7 +100,7 @@ class cache_c
      *  \param simBase - Pointer to base simulation class for perf/stat counters
      *  \return void (Called with new operator)
      */
-    cache_c(string name, uns num_set, uns assoc, uns line_size, uns data_size, uns bank_num, 
+    cache_c(string name, int num_set, int assoc, int line_size, int data_size, int bank_num, 
         bool cache_by_pass, int core_id, Cache_Type cache_type_info, bool enable_partition,
         macsim_c* simBase); 
 
@@ -116,14 +116,14 @@ class cache_c
       m_core_id = c_id; 
     } 
 
-    /*! \fn void* cache_c::find_tag_and_set (Addr addr, Addr *tag, uns *set)
+    /*! \fn void* cache_c::find_tag_and_set (Addr addr, Addr *tag, int *set)
      *  \brief Function to find tag and set from a given address.
      *  \param addr - Address
      *  \param tag - Tag extracted from the address(updated by the function)
      *  \param set - set associated to the address(updated by the function)
      *  \return void 
      */
-    void find_tag_and_set(Addr addr, Addr *tag, uns *set);
+    void find_tag_and_set(Addr addr, Addr *tag, int *set);
 
     /**
      *  \brief Cache look-up based on address.
@@ -158,7 +158,7 @@ class cache_c
      *  \param appl_id - application id
      *  \return cache_entry_c - find replaceable entry in set 
      */
-    virtual cache_entry_c* find_replacement_line(uns set, int appl_id);
+    virtual cache_entry_c* find_replacement_line(int set, int appl_id);
 
     /**
      * Find replace-line from the same type
@@ -166,7 +166,7 @@ class cache_c
      * @param appl_id - application id
      * @param gpuline - gpu cache line
      */
-    cache_entry_c* find_replacement_line_from_same_type(uns set, int appl_id, bool gpuline);
+    cache_entry_c* find_replacement_line_from_same_type(int set, int appl_id, bool gpuline);
 
     /*
      *  \brief Funtion to initialize a new cache line.
@@ -247,12 +247,12 @@ class cache_c
      */
     int get_bank_num(Addr addr);
 
-    /*! \fn void cache_c::find_min_lru (uns set) 
+    /*! \fn void cache_c::find_min_lru (int set) 
      *  \brief Function to find the line with least access time in the set. 
      *  \param set - Set
      *  \return int - lower of (Least access time in the set or current cycle) 
      */
-    Counter find_min_lru (uns set);
+    Counter find_min_lru (int set);
 
     /**
      * Print out cache information
@@ -265,16 +265,16 @@ class cache_c
 
   protected:
     string  m_name;              /**< cache name */ 
-    uns     m_data_size;         /**< cache data size */
-    uns     m_assoc;             /**< associativity */                
-    uns     m_num_sets;          /**< number of sets */             
-    uns     m_line_size;         /**< cache line size */            
-    uns     m_set_bits;          /**< cache set bits */    
-    uns     m_shift_bits;        /**< cache shift mask */
+    int     m_data_size;         /**< cache data size */
+    int     m_assoc;             /**< associativity */                
+    int     m_num_sets;          /**< number of sets */             
+    int     m_line_size;         /**< cache line size */            
+    int     m_set_bits;          /**< cache set bits */    
+    int     m_shift_bits;        /**< cache shift mask */
     Addr    m_set_mask;          /**< cache set mask */
     Addr    m_tag_mask;          /**< cache tag mask */
     Addr    m_offset_mask;       /**< cache offset mask */
-    uns     m_bank_num;          /**< number of banks */             
+    int     m_bank_num;          /**< number of banks */             
     bool    m_perfect;           /**< Enable perfect cache */              
     int     m_core_id;           /**< core id */
     bool    m_cache_by_pass;     /**< bypass (disable) cache */ 

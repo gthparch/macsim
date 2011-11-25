@@ -98,8 +98,6 @@ inline bool IsLoad(Mem_Type type)
 // dcache fill wrapper function
 bool dcache_fill_line_wrapper(mem_req_s* req)
 {
-	macsim_c* m_simBase = req->m_simBase;
-
 	bool result = true;
   DEBUG("req:%d type:%s called done_func\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
   list<mem_req_s*> done_list;
@@ -413,7 +411,7 @@ int dcu_c::access(uop_c* uop)
 
   uop->m_state = OS_DCACHE_BEGIN;
 
-  dcache_data_s* line;
+  dcache_data_s* line = NULL;
 
   Addr vaddr     = uop->m_vaddr;
   Mem_Type type  = uop->m_mem_type;
@@ -523,7 +521,7 @@ int dcu_c::access(uop_c* uop)
       case MEM_SWPREF_T2:
         req_type = MRT_DPRF; break;
       default:
-        ASSERTM(0, "type:%d\n", req_type);
+        ASSERTM(0, "type:%d\n", type);
     }
 
     // -------------------------------------
@@ -604,10 +602,6 @@ bool dcu_c::fill(mem_req_s* req)
 // insert to the cache (in_queue)
 bool dcu_c::insert(mem_req_s* req)
 {
-  // FIXME (jaekyu, 9-3-2011)
-  // do we need this?
-  macsim_c* m_simBase = req->m_simBase;
-
   if (m_in_queue->push(req)) {
     req->m_queue = m_in_queue;
     DEBUG("L%d[%d] (->in_queue) req:%d type:%s\n", 
@@ -763,7 +757,7 @@ void dcu_c::process_in_queue()
       if (!m_disable) {
         m_simBase->m_core_pointers[req->m_core_id]->train_hw_pref(m_level, req->m_thread_id, \
             req->m_addr, req->m_pc, req->m_uop ? req->m_uop : NULL, false);
-        //g_core_pointers[req->m_core_id]->m_hw_pref->train(m_level, req->m_thread_id, \
+        //g_core_pointers[req->m_core_id]->m_hw_pref->train(m_level, req->m_thread_id, 
         //    req->m_addr, req->m_pc, req->m_uop ? req->m_uop : NULL, false);
       }
 
@@ -1162,6 +1156,8 @@ void dcu_c::process_fill_queue()
         ++count;
         break;
       }
+      default:
+        break;
     }
   }
   
@@ -1749,7 +1745,7 @@ void memory_c::set_cache_id(mem_req_s* req)
 // based on the destination id, call appropiriate component (L1, L2, L3, Memory Controller)
 bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
 {
-  bool result;
+  bool result = false;
   int level;
   int id;
   int src_level;
@@ -2048,7 +2044,7 @@ void memory_c::flush_prefetch(int core_id)
 
 void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache)
 {
-  int state;
+  int state = I_STATE;
 
   // READ Hit
   if (!store && hit) {

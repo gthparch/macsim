@@ -25,8 +25,6 @@
 // rob_c constructor
 rob_c::rob_c(Unit_Type type, macsim_c* simBase) 
 {
-  uns16 m_knob_meu_nsb;
-  uns16 m_knob_meu_nlb;
 
   m_simBase = simBase;
 
