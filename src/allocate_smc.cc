@@ -79,7 +79,7 @@ void smc_allocate_c::run_a_cycle(void)
 
     // fetch an uop from frontend queue
     uop_c *uop = (uop_c *) m_frontend_q->peek(0);
-    DEBUG("core_id:%d thread_id:%d uop_num:%s inst_num:%s is peeked\n", 
+    DEBUG("core_id:%d thread_id:%d inst_num:%s uop_num:%s is peeked\n", 
         m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num),
         unsstr64(uop->m_uop_num));
     ASSERT(uop);
