@@ -49,15 +49,10 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// global variables
-//  TDP: moved to member variable
-//Counter macsim_c::g_simulation_cycle = 1;
-//Counter macsim_c::g_core0_inst_count = 0;
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-
+// =======================================
+// Macsim constructor
+// =======================================
 macsim_c::macsim_c()
 {
 	m_simBase = this;
@@ -85,12 +80,17 @@ macsim_c::macsim_c()
 }
 
 
+// =======================================
+// Macsim destructor
+// =======================================
 macsim_c::~macsim_c()
 {
 }
 
 
+// =======================================
 // initialize knobs
+// =======================================
 void macsim_c::init_knobs(int argc, char** argv)
 {
 	report("initialize knobs");
@@ -133,7 +133,9 @@ void macsim_c::init_knobs(int argc, char** argv)
 }
 
 
+// =======================================
 // register wrapper functions to allocate objects later
+// =======================================
 void macsim_c::register_functions(void)
 {
 	mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
@@ -154,7 +156,9 @@ void macsim_c::register_functions(void)
 }
 
 
+// =======================================
 // memory allocation
+// =======================================
 void macsim_c::init_memory(void)
 {
 	// pool allocation
@@ -180,14 +184,15 @@ void macsim_c::init_memory(void)
 
 	// main memory
 	m_memory = mem_factory_c::get()->allocate(m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue(), m_simBase);
-#ifdef IRIS
-  m_memory->init();
-#endif
+
 	// interconnection network
-	m_noc = new noc_c(m_simBase);
+  if (*KNOB(KNOB_ENABLE_IRIS))
+    m_memory->init();
+  else
+    m_noc = new noc_c(m_simBase);
 
 	// bug detector
-	if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE) {
+	if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
 		printf("enabling bug detector\n");
 		m_bug_detector = new bug_detector_c(m_simBase);
 	}
@@ -196,7 +201,9 @@ void macsim_c::init_memory(void)
 }
 
 
+// =======================================
 // initialize output streams 
+// =======================================
 void macsim_c::init_output_streams()
 {
 	string stderr_file = *m_simBase->m_knobs->KNOB_STDERR_FILE;
@@ -245,17 +252,19 @@ void macsim_c::init_output_streams()
 }
 
 
+// =======================================
 // initialize cores 
+// =======================================
 void macsim_c::init_cores(int num_max_core)
 {
-	int num_large_cores        = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
-	int num_large_medium_cores = (*m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES);
+	int num_large_cores        = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+	int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
 	report("initialize cores (" << num_large_cores << "/" 
 			<< (num_large_medium_cores - num_large_cores) << "/" << *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES <<")");
 
 	ASSERT(num_max_core == 
-			(*m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES));
+			(*KNOB(KNOB_NUM_SIM_SMALL_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) + *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
 
 
 	// based on the core type, add cores into type-specific core pools
@@ -299,10 +308,11 @@ void macsim_c::init_cores(int num_max_core)
 			m_x86_core_pool.push(ii + total_core);
 	}
 }
-#ifdef IRIS
 
 
-//initialize IRIS parameters (with config file, preferrably)
+// =======================================
+// initialize IRIS parameters (with config file, preferrably)
+// =======================================
 void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_params here
 {
   ifstream fd(network_filename);
@@ -370,37 +380,34 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   params.insert(pair<string,string>("no_nodes",s));
 }
 
-//IRIS
-// initialize Iris/manifold network
 
+// =======================================
+// IRIS
+// initialize Iris/manifold network
+// =======================================
 void macsim_c::init_network(void)
 {
-
 	init_iris_config(m_iris_params);
 
 	map<std::string, std::string>:: iterator it;
 	
 	it = m_iris_params.find("topology");
-	if ((it->second).compare("ring") == 0)
-	{
+	if ((it->second).compare("ring") == 0) {
 		m_iris_network = new Ring(m_simBase);
 	} 
-	else if ((it->second).compare("mesh") == 0)
-	{
+	else if ((it->second).compare("mesh") == 0) {
 		m_iris_network = new Mesh(m_simBase);
 	} 
-	else if ((it->second).compare("torus") == 0)
-	{
+	else if ((it->second).compare("torus") == 0) {
 		m_iris_network = new Torus(m_simBase);
 	} 
 
 	//initialize iris network
 	m_iris_network->parse_config(m_iris_params);
 
-cout << "number of macsim terminals: " << m_macsim_terminals.size() << "\n";
+  report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
 
-	for (int i=0; i<m_macsim_terminals.size(); i++)
-	{
+	for (int i=0; i<m_macsim_terminals.size(); i++) {
 		//create component id
 		manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
 		manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
@@ -435,22 +442,23 @@ cout << "number of macsim terminals: " << m_macsim_terminals.size() << "\n";
 	}
 
 	//initialize router outports
-	for (int i=0; i<m_macsim_terminals.size(); i++)
+	for (int i = 0; i < m_macsim_terminals.size(); i++)
 		m_iris_network->set_router_outports(i);
 
 	m_iris_network->connect_interface_terminal();
 	m_iris_network->connect_interface_routers();
 	m_iris_network->connect_routers();
 
-    //initialize power stats
-    avg_power = 0;
-    total_energy = 0;
-    total_packets = 0;
+  //initialize power stats
+  avg_power     = 0;
+  total_energy  = 0;
+  total_packets = 0;
 }
-#endif
 
 
+// =======================================
 // initialize simulation
+// =======================================
 void macsim_c::init_sim(void)
 {
 	report("initialize simulation");
@@ -469,13 +477,19 @@ void macsim_c::init_sim(void)
 	ASSERTU(sizeof(int64) == 8);
 }
 
+
+// =======================================
+// =======================================
 void macsim_c::compute_power(void)
 {
 	m_ei_power = new ei_power_c(m_simBase);
 	m_ei_power->ei_main();
 }
 
+
+// =======================================
 // open traces from trace_file_list file
+// =======================================
 void macsim_c::open_traces(string trace_list)
 {
 	fstream tracefile(trace_list.c_str(), ios::in);
@@ -491,7 +505,10 @@ void macsim_c::open_traces(string trace_list)
 	}
 }
 
+
+// =======================================
 // deallocate memory
+// =======================================
 void macsim_c::deallocate_memory(void)
 {
 	// memory deallocation
@@ -504,7 +521,10 @@ void macsim_c::deallocate_memory(void)
 	delete m_uop_pool;
 	delete m_invalid_uop;
 	delete m_memory;
-	delete m_noc;
+
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+    delete m_noc;
+
 	if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
 		delete m_bug_detector;
 	
@@ -528,7 +548,9 @@ void macsim_c::deallocate_memory(void)
 }
 
 
+// =======================================
 // finalize simulation 
+// =======================================
 void macsim_c::fini_sim(void)
 {
 	report("finalize simulation");
@@ -545,25 +567,25 @@ void macsim_c::fini_sim(void)
 	STAT_EVENT_N(EXE_TIME, second);
 
 	// compute power if enable_energy_introspector is enabled
-	if(*m_simBase->m_knobs->KNOB_ENABLE_ENERGY_INTROSPECTOR)
-	{
+	if (*KNOB(KNOB_ENABLE_ENERGY_INTROSPECTOR)) {
 		compute_power();
 	}
 	
-#ifdef IRIS
-    for(int i=0; i<m_iris_network->routers.size(); i++)
-    {
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
 //        m_iris_network->routers[i]->print_stats();
-        m_iris_network->routers[i]->power_stats();
+      m_iris_network->routers[ii]->power_stats();
     }
     cout << "Average Network power: " << avg_power << "W\n"
-        << "Total Network Energy: " << total_energy << "J\n"
-        << "Total packets " << total_packets << "\n";
-	
-#endif
+      << "Total Network Energy: " << total_energy << "J\n"
+      << "Total packets " << total_packets << "\n";
+  }
 }
 
+
+// =======================================
 //Initialization before simulation run
+// =======================================
 void macsim_c::initialize(int argc, char** argv) 
 {
  	g_mystdout = stdout;
@@ -588,9 +610,10 @@ void macsim_c::initialize(int argc, char** argv)
 
 	// initialize simulation
 	init_sim();
-#ifdef IRIS
+
+  if (*KNOB(KNOB_ENABLE_IRIS))
     master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
-#endif
+
 	// init memory
 	init_memory();
 
@@ -601,13 +624,14 @@ void macsim_c::initialize(int argc, char** argv)
 	init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
 
 
-#ifdef IRIS
-	REPORT("Initializing sim IRIS\n");
-	manifold::kernel::Manifold::Init(0, NULL);
-	// initialize interconnect network
-	network_filename = "network_params.in";
-	init_network();
-#endif
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    REPORT("Initializing sim IRIS\n");
+    manifold::kernel::Manifold::Init(0, NULL);
+
+    // initialize interconnect network
+    network_filename = "network_params.in";
+    init_network();
+  }
 
 
 	// open traces
@@ -619,8 +643,9 @@ void macsim_c::initialize(int argc, char** argv)
 }
 
 
-//Single cycle step of simulation state
-// returns running status
+// =======================================
+// Single cycle step of simulation state : returns running status
+// =======================================
 int macsim_c::run_a_cycle() 
 {
 	//report("run core (single threads)");
@@ -639,12 +664,16 @@ int macsim_c::run_a_cycle()
 	// run memory system
 	m_memory->run_a_cycle();
 
-	// run interconnection network
-	m_noc->run_a_cycle();
-#ifdef IRIS
-	manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
-	manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
-#endif
+  // interconnection
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
+  }
+  else {
+    // run interconnection network
+    m_noc->run_a_cycle();
+  }
+
 	// core execution loop
 	for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
 		// use pivot to randomize core run_cycle pattern 
@@ -718,7 +747,10 @@ int macsim_c::run_a_cycle()
 
 }
 
-//Simulation end cleanup
+
+// =======================================
+// Simulation end cleanup
+// =======================================
 void macsim_c::finalize()
 {
 	// deallocate memory

@@ -31,6 +31,9 @@
 #include "manifold/models/iris/iris_srcs/components/simpleRouter.h"
 #endif
 
+
+#define CYCLE m_simBase->m_simulation_cycle
+
 class Topology;
 
 class macsim_c

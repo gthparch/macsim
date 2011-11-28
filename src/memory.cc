@@ -99,7 +99,7 @@ inline bool IsLoad(Mem_Type type)
 bool dcache_fill_line_wrapper(mem_req_s* req)
 {
 	bool result = true;
-  DEBUG("req:%d type:%s called done_func\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+//  DEBUG("req:%d type:%s called done_func\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
   list<mem_req_s*> done_list;
   for (auto I = req->m_merge.begin(), E = req->m_merge.end(); I != E; ++I) {
     if ((*I)->m_done_func && !((*I)->m_done_func((*I)))) {
@@ -613,16 +613,18 @@ bool dcu_c::insert(mem_req_s* req)
 }
 
 
+// =======================================
 // cache run_a_cycle
+// =======================================
 void dcu_c::run_a_cycle()
 {
   process_wb_queue();
   process_fill_queue();
   process_out_queue();
   process_in_queue();
-#ifdef IRIS
-  receive_packet();
-#endif
+
+  if (*KNOB(KNOB_ENABLE_IRIS))
+    receive_packet();
 }
 
 
@@ -828,39 +830,52 @@ void dcu_c::receive_packet(void)
   if (req != NULL) {
     if (req->m_msg_type == NOC_FILL) {
       req->m_state = MEM_NOC_DONE;
-      fill(req);
+      if (!fill(req)) assert(0);
     }
     else if (req->m_msg_type == NOC_NEW) {
-      insert(req);
+      if (!insert(req)) assert(0);
+    }
+    else {
+      assert(0);
     }
   }
 }
 
 
+// =======================================
 // send a packet to the NoC
+// =======================================
 bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 {
   req->m_msg_type = msg_type;
-#ifndef IRIS
-  req->m_msg_src = m_noc_id;
-#else
-  req->m_msg_src = m_terminal->node_id;
-  req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
-#endif
+
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    req->m_msg_src = m_terminal->node_id;
+    req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
+  }
+  else {
+    req->m_msg_src = m_noc_id;
+  }
   assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
   int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
-#ifndef IRIS
-  if (!m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req)) { 
-#else
-  if (!m_terminal->send_packet(req)) {
-#endif
-    return false;
+
+  bool packet_insert = false;
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    packet_insert = m_terminal->send_packet(req);
+  }
+  else {
+    packet_insert = m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req);  
   }
 
-  req->m_state = MEM_IN_NOC;
-
-  return true;
+  if (packet_insert) {
+//    cout << "L" << m_level << " " << m_id << " " << req->m_msg_dst << "\n";
+    req->m_state = MEM_IN_NOC;
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 
@@ -881,44 +896,6 @@ void dcu_c::process_out_queue()
       continue;
 
     ASSERT(m_has_router == true);
-#if DEBUG_SI
-if (1)
-    //req->m_uop-> (in uop.h) Mem_Type to see if it's going to global mem
-    //m_type: in memory.h NOC_NEW is requesting, NOC_FILL is servicing
-    
-    //if(m_level == MEM_MC )
-    {
-        cout << "Sim_Cycle: " << m_simBase->m_simulation_cycle << " NOC: " << m_noc_id << 
-        " req_id: " << req->m_id << " core: " << req->m_core_id  << 
-        " block: " << req->m_block_id << " Address: " << req->m_addr << 
-        " size: " << req->m_size;
-
-        cout << " mem_state: " << mem_req_c::mem_state[req->m_state];
-        cout << "\n";
-    }
-else
-{
-    static long int core_reqs[] = {0,0,0,0,0,0,0,0,0,0};
-    static long long int prev_gsc = -1;
-    //if( req->m_msg_type == NOC_FILL  
-	//&& req->m_uop != NULL )
-	//&& ( req->m_uop->m_mem_type == MEM_ST_GM 
-	//|| req->m_uop->m_mem_type == MEM_LD_GM ) )    		
-    {
-        core_reqs[req->m_core_id]++;
-        if( prev_gsc != m_simBase->m_simulation_cycle )
-        {
-            prev_gsc = m_simBase->m_simulation_cycle;
-            cout << "MACSIM, " << m_simBase->m_simulation_cycle << " cycle: ";
-            for(int i=0; i<10; i++)
-            {
-                cout << core_reqs[i] << ", ";
-            }
-            cout << "\n";
-        }
-    }
-}
-#endif
 
     // -------------------------------------
     // NEW request : send to lower level
@@ -990,14 +967,14 @@ void dcu_c::process_fill_queue()
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle) 
       continue;
-    
+
     STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
 
     switch (req->m_state) {
       // -------------------------------------
       // MEM_FILL_NEW : just inserted to the fill queue
       // -------------------------------------
-      case MEM_FILL_NEW: {
+      case MEM_FILL_NEW: { 
         Addr line_addr, victim_line_addr;
         dcache_data_s* line = NULL;
         bool cache_hit = true;
@@ -1021,7 +998,7 @@ void dcu_c::process_fill_queue()
           // -------------------------------------
           dcache_data_s* data;
           data = (dcache_data_s*)m_cache->insert_cache(req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id, req->m_ptx);
-      
+
           STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
 
           // -------------------------------------
@@ -1116,9 +1093,10 @@ void dcu_c::process_fill_queue()
         ++count;
         break;
       }
-      // -------------------------------------
-      // MEM_FILL_NEW -> MEM_FILL_WAIT_DONE : waiting done_func is successfully done
-      // -------------------------------------
+
+        // -------------------------------------
+        // MEM_FILL_NEW -> MEM_FILL_WAIT_DONE : waiting done_func is successfully done
+        // -------------------------------------
       case MEM_FILL_WAIT_DONE: {
         if (req->m_done_func && !req->m_done_func(req))
           continue;
@@ -1127,10 +1105,11 @@ void dcu_c::process_fill_queue()
         done_list.push_back(req);
         ++count;
         break;
+
+        // -------------------------------------
+        // MEM_FILL_NEW -> MEM_FILL_WAIT_FILL : waiting for sending to next/prev level
+        // -------------------------------------
       }
-      // -------------------------------------
-      // MEM_FILL_NEW -> MEM_FILL_WAIT_FILL : waiting for sending to next/prev level
-      // -------------------------------------
       case MEM_FILL_WAIT_FILL: {
         // COUPLED L3 OR without router: fill upper level cache
         if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level-1]) || !m_has_router) {
@@ -1156,11 +1135,12 @@ void dcu_c::process_fill_queue()
         ++count;
         break;
       }
-      default:
+      default: {
         break;
+      }
     }
   }
-  
+
 
   for (auto I = done_list.begin(), E = done_list.end(); I != E; ++I) {
     m_fill_queue->pop((*I));
@@ -1198,7 +1178,7 @@ void dcu_c::process_wb_queue()
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
       continue;
-    
+
     STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
 
     // L1 and L2 : insert next level's in_queue
@@ -1276,7 +1256,7 @@ bool dcu_c::done(mem_req_s* req)
       // evict a line
       // -------------------------------------
       if (repl_line_addr) {
-        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C)
+        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C);
         if (data->m_dirty == 1) {
           if (*(m_simBase->m_knobs->KNOB_USE_INCOMING_TID_CID_FOR_WB)) {
             data->m_core_id = req->m_core_id;
@@ -1289,8 +1269,6 @@ bool dcu_c::done(mem_req_s* req)
           // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb))
             ASSERT(0);
-
-          cout << "wb in " << m_level << "\n";
 
           DEBUG("L%d[%d] (done) new_wb_req:%d addr:%s by req:%d type:%s\n", 
               m_level, m_id, wb->m_id, hexstr64s(repl_line_addr), req->m_id, \
@@ -1345,23 +1323,25 @@ bool dcu_c::done(mem_req_s* req)
 }
 
 
+// =======================================
 // create the network interface
+// =======================================
 bool dcu_c::create_network_interface(int mclass)
 {
   if (m_has_router) {
-#ifdef IRIS
-    manifold::kernel::CompId_t processor_id = 
-      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
-    m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
-    manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
-        &ManifoldProcessor::tock);
+    if (*KNOB(KNOB_ENABLE_IRIS)) {
+      manifold::kernel::CompId_t processor_id = 
+        manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
+      m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
+      manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
+          &ManifoldProcessor::tock);
 
-	m_terminal->init();
-    m_terminal->mclass = (message_class)mclass; //PROC_REQ;
-    m_simBase->m_macsim_terminals.push_back(m_terminal);
+      m_terminal->init();
+      m_terminal->mclass = (message_class)mclass; //PROC_REQ;
+      m_simBase->m_macsim_terminals.push_back(m_terminal);
 
-    m_noc_id = static_cast<int>(processor_id);
-#endif
+      m_noc_id = static_cast<int>(processor_id);
+    }
     return true;
   }
   else {
@@ -1377,7 +1357,9 @@ bool dcu_c::create_network_interface(int mclass)
 int memory_c::m_unique_id = 0;
 
 
+// =======================================
 // memory_c constructor
+// =======================================
 memory_c::memory_c(macsim_c* simBase)
 {
   m_simBase = simBase;
@@ -1387,19 +1369,19 @@ memory_c::memory_c(macsim_c* simBase)
   m_num_l3   = *m_simBase->m_knobs->KNOB_NUM_L3;
   m_num_mc   = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
 
-//  ASSERT(m_num_core == m_num_l3);
+  //  ASSERT(m_num_core == m_num_l3);
 
   // allocate mshr
   m_mshr = new list<mem_req_s*>[m_num_core];
   m_mshr_free_list = new list<mem_req_s*>[m_num_core];
-  
+
   for (int ii = 0; ii < m_num_core; ++ii) {
     for (int jj = 0; jj < *m_simBase->m_knobs->KNOB_MEM_MSHR_SIZE; ++jj) {
       mem_req_s* entry = new mem_req_s(simBase);
       m_mshr_free_list[ii].push_back(entry);
     }
   }
-  
+
   int num_large_core = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
   int num_medium_core = *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
   int num_small_core = *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES;
@@ -1408,7 +1390,7 @@ memory_c::memory_c(macsim_c* simBase)
   m_l1_cache = new dcu_c*[m_num_core]; 
   m_l2_cache = new dcu_c*[m_num_core]; 
   m_l3_cache = new dcu_c*[m_num_l3]; 
-  
+
   int id = 0;
   for (int ii = 0; ii < num_large_core; ++id, ++ii) {
     m_l1_cache[id] = new dcu_c(id, UNIT_LARGE, MEM_L1, this, id, m_l2_cache, NULL, simBase);
@@ -1427,7 +1409,7 @@ memory_c::memory_c(macsim_c* simBase)
     m_l2_cache[id] = new dcu_c(id, UNIT_SMALL, MEM_L2, this, id + m_num_core, m_l3_cache, \
         m_l1_cache, simBase);
   }
-  
+
 
   // l3 cache
   id += m_num_core;
@@ -1480,11 +1462,14 @@ memory_c::~memory_c()
 }
 
 
-// initialize the memory system
-// 1. initialize interconnection interface
+// =======================================
+// initialize the memory system (noc interface)
+// =======================================
 void memory_c::init(void)
 {
-#ifdef IRIS
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+    return;
+
   int total_num_router = 0;
   m_noc_id_base[MEM_L1] = 0;
   for (int ii = 0; ii < m_num_core; ++ii) { 
@@ -1492,31 +1477,30 @@ void memory_c::init(void)
       ++total_num_router;
   }
 
-  report("L1 " << total_num_router);
-  
+  report("Number of L1 routers: " << total_num_router);
+
   m_noc_id_base[MEM_L2] = total_num_router;
   for (int ii = 0; ii < m_num_core; ++ii) {
     if (m_l2_cache[ii]->create_network_interface(L2_REQ))
       ++total_num_router;
   }
 
-  report("L2 " << total_num_router);
-  
+  report("Number of L2 routers: " << total_num_router);
+
   m_noc_id_base[MEM_L3] = total_num_router;
   for (int ii = 0; ii < m_num_l3; ++ii) {
     if (m_l3_cache[ii]->create_network_interface(L3_REQ))
       ++total_num_router;
   }
 
-  report("L3 " << total_num_router);
-  
+  report("Number of L3 routers: " << total_num_router);
+
   m_noc_id_base[MEM_MC] = total_num_router;
   for (int ii = 0; ii < m_num_mc; ++ii) {
     m_dram_controller[ii]->create_network_interface();
     ++total_num_router;
   }
-  report("DC " << total_num_router);
-#endif
+  report("Number of MC routers: " << total_num_router);
 }
 
 
@@ -1531,7 +1515,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
 
   if (m_stop_prefetch > m_simBase->m_simulation_cycle && type == MRT_DPRF)
     return true;
-  
+
   // find a matching request
   mem_req_s* matching_req = search_req(core_id, addr, size);
 
@@ -1539,7 +1523,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   else { STAT_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG); }
   STAT_CORE_EVENT(core_id, POWER_LOAD_QUEUE_R_TAG);
   STAT_CORE_EVENT(core_id, POWER_STORE_QUEUE_R_TAG);
-  
+
   if (matching_req) {
     ASSERT(type != MRT_WB);
     // redundant hardware prefetch request
@@ -1572,8 +1556,8 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
       }
     }
   }
-  
-  
+
+
   // allocate an entry
   mem_req_s* new_req = allocate_new_entry(core_id);
 
@@ -1591,7 +1575,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
       return false;
     }
   }
-  
+
 
   if (type == MRT_IFETCH) { 
     STAT_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_W); 
@@ -1855,18 +1839,17 @@ int memory_c::get_dst_id(int level, int id)
 }
 
 
+// =======================================
+// Get destination router ID
+// =======================================
 int memory_c::get_dst_router_id(int level, int id)
 {
-#ifndef IRIS
-//  cout << "dst: level" << level << " id:" << id
-//        << " node:" << m_noc_id_base[level] + id << "\n";
-  return m_noc_id_base[level] + id;
-#else
-//  cout << "dst: level:" << level << " id:" << id
-//        << " manifoldnode:" << m_noc_id_base[level] + id 
-//        << " iris node: " << m_iris_node_id[m_noc_id_base[level] + id] << "\n";
-  return m_iris_node_id[m_noc_id_base[level] + id];
-#endif
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    return m_iris_node_id[m_noc_id_base[level] + id];
+  }
+  else {
+    return m_noc_id_base[level] + id;
+  }
 }
 
 
@@ -1911,11 +1894,11 @@ bool memory_c::get_read_port(int core_id, int bank_id)
 {
   return m_l1_cache[core_id]->get_read_port(bank_id);
 }
-    
+
 
 // access data cache
 dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr *line_addr, \
-        bool update, int appl_id)
+    bool update, int appl_id)
 {
   return m_l1_cache[core_id]->access_cache(addr, line_addr, update, appl_id);
 }
@@ -1939,8 +1922,8 @@ void memory_c::run_a_cycle(void)
     m_l2_cache[ii % m_num_core]->run_a_cycle();
     m_l1_cache[ii % m_num_core]->run_a_cycle();
   }
-  
-  
+
+
 }
 
 
@@ -1963,7 +1946,7 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
   STAT_EVENT(TOTAL_WB);
   STAT_EVENT(L1_WB + (level-1));
   mem_req_s* req = new mem_req_s(m_simBase);
-  
+
   req->m_id                     = m_unique_id++;
   req->m_appl_id                = GET_APPL_ID(data->m_core_id, data->m_tid);
   req->m_core_id                = data->m_core_id;
@@ -2003,7 +1986,7 @@ void memory_c::print_mshr(void)
     fprintf(fp, "%-20s %-10s %-10s %-15s %-15s %-7s %-20s %-15s %-15s\n", \
         "ID", "IN_TIME", "DELTA", "TYPE", "STATE", "MERGED", "MERGED_ID", \
         "MERGED_TYPE", "MERGED_STATE");
-    
+
     for (auto I = m_mshr[ii].begin(), E = m_mshr[ii].end(); I != E; ++I) {
       mem_req_s* req = (*I);
       fprintf(fp, "%-20d %-10llu %-10llu %-15s %-15s %-7d %-20d %-15s %-15s\n",
@@ -2105,7 +2088,7 @@ void memory_c::handle_coherence()
   // assume that all write-back requests are in M-state (single-copy in the system)
   if (write_back == true)
     return ;
-        
+
   int state = m_memory->get_td_state(req->m_addr); 
   if (m_level == MEM_L3) {
     // L3 Read Miss
@@ -2185,7 +2168,7 @@ l3_decoupled_network_c::l3_decoupled_network_c(macsim_c* simBase) : memory_c(sim
     m_l1_cache[ii]->init(ii, -1, false, false, true,  false, true);
     m_l2_cache[ii]->init(-1, ii, true,  true,  false, false, true);
   }
-    
+
   for (int ii = 0; ii < m_num_l3; ++ii) {
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
@@ -2267,7 +2250,7 @@ l2_decoupled_network_c::l2_decoupled_network_c(macsim_c* simBase) : memory_c(sim
   }
 
   for (int ii = 0; ii < m_num_l3; ++ii) { 
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+    // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
 }

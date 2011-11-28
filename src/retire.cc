@@ -250,6 +250,7 @@ void retire_c::run_a_cycle()
 
     if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
 			m_simBase->m_bug_detector->deallocate(cur_uop);
+
     delete [] cur_uop->m_child_uops;
     m_uop_pool->release_entry(cur_uop->free());
   

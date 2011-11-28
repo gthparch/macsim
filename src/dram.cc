@@ -496,39 +496,25 @@ bool dram_controller_c::send_packet(drb_entry_s* dram_req)
 {
   dram_req->m_req->m_msg_type = NOC_FILL;
   dram_req->m_req->m_msg_src = m_noc_id;
-#ifdef IRIS
-  dram_req->m_req->m_msg_src = m_terminal->node_id;
-  dram_req->m_req->m_msg_dst = 
-    m_simBase->m_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
-#endif
+
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    dram_req->m_req->m_msg_src = m_terminal->node_id;
+    dram_req->m_req->m_msg_dst = 
+      m_simBase->m_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
+  }
+
   int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
   assert(dram_req->m_req->m_msg_src != -1 && dram_req->m_req->m_msg_dst != -1);
 
-#ifndef IRIS
-#if 0
-    //print out of memory req trace
-    const int size = 4;
-    static long int noc_id[size];
-    static long long int prev_gsc = -1;
-    //if(prev_gsc != m_simBase->m_simulation_cycle && ) )
-	
-    {
-	noc_id[m_noc_id%size]++;
-    	prev_gsc = m_simBase->m_simulation_cycle;
-    	cout << "Sim_Cycle, " << m_simBase->m_simulation_cycle << ", ";
-    	for(int i=0; i<size; i++)
-    	{
-    		cout << noc_id[i] << ", ";
-    	}
-    	cout << "\n";
-    }
-#endif
-#endif
-#ifndef IRIS
-  if (!m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, dram_req->m_req)) {
-#else
-  if (!m_terminal->send_packet(dram_req->m_req)) {
-#endif
+  bool insert_packet = false;
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    insert_packet = m_terminal->send_packet(dram_req->m_req);
+  }
+  else {
+    insert_packet = m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, dram_req->m_req);
+  }
+
+  if (!insert_packet) {
     DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
         m_id, dram_req->m_req->m_id, hexstr64s(dram_req->m_req->m_addr), \
         mem_req_c::mem_req_type_name[dram_req->m_req->m_type]);
@@ -540,7 +526,9 @@ bool dram_controller_c::send_packet(drb_entry_s* dram_req)
 
 void dram_controller_c::receive_packet(void)
 {
-#ifdef IRIS
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+    return ;
+
   // check router queue every cycle
   if (!m_terminal->receive_queue.empty()) {
     mem_req_s* req = m_terminal->receive_queue.front();
@@ -548,7 +536,6 @@ void dram_controller_c::receive_packet(void)
       m_terminal->receive_queue.pop();
     }
   }
-#endif
 }
 
 
@@ -762,7 +749,9 @@ Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool g
 // create the network interface
 void dram_controller_c::create_network_interface(void)
 {
-#ifdef IRIS
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+    return ;
+
   manifold::kernel::CompId_t processor_id = 
     manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
   m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
@@ -773,7 +762,6 @@ void dram_controller_c::create_network_interface(void)
   m_simBase->m_macsim_terminals.push_back(m_terminal);
 
   m_noc_id = static_cast<int>(processor_id);
-#endif
 }
 
 void dram_controller_c::on_insert(mem_req_s* req, int bid, int rid, int cid)
