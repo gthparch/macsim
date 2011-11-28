@@ -532,7 +532,9 @@ void core_c::check_forward_progress()
     m_simBase->m_memory->print_mshr();
 
     // print all remaining uop states
-    m_simBase->m_bug_detector->print(m_core_id, m_last_terminated_tid);
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+      m_simBase->m_bug_detector->print(m_core_id, m_last_terminated_tid);
+    }
 
     ASSERTM(m_core_cycle_count - m_last_forward_progress <= *m_simBase->m_knobs->KNOB_FORWARD_PROGRESS_LIMIT,
         "core_id:%d core_cycle_count:%s last_forward_progress:%s last_tid:%d "

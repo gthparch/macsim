@@ -103,7 +103,7 @@ bool sort_uop(uop_c* a, uop_c* b)
 // print all bug information
 void bug_detector_c::print(int core_id, int thread_id)
 {
-  if (!*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) == false)
     return ;
 
 
@@ -123,6 +123,7 @@ void bug_detector_c::print(int core_id, int thread_id)
     out 
       << setw(10) << left << "INST_NUM"
       << setw(10) << left << "UOP_NUM"
+      << setw(10) << left << "TID"
       << setw(15) << left << "CYCLE"
       << setw(15) << left << "DELTA"
       << setw(25) << left << "STATE"
@@ -150,6 +151,7 @@ void bug_detector_c::print(int core_id, int thread_id)
       out
         << setw(10) << left << uop->m_inst_num
         << setw(10) << left << uop->m_uop_num
+        << setw(10) << left << uop->m_thread_id
         << setw(15) << left << (*m_uop_table[ii])[(*I)]
         << setw(15) << left << m_simBase->m_simulation_cycle - (*m_uop_table[ii])[(*I)]
         << setw(25) << left << uop_c::g_uop_state_name[uop->m_state] 
@@ -160,7 +162,7 @@ void bug_detector_c::print(int core_id, int thread_id)
         << setw(20) << left << uop_c::g_dep_type_name[uop->m_bar_type]
         << setw(6)  << left << uop->m_num_child_uops
         << setw(10) << left << (uop->m_parent_uop == NULL ? 0 : uop->m_parent_uop->m_uop_num)
-        << "\n";
+        << endl;
     }
     out << "\n\n";
     temp_list1.clear();
