@@ -151,6 +151,9 @@ void schedule_smc_c::advance(int q_index) {
     m_last_schlist %= m_schlist_size;
     ++m_num_in_sched;
     ++m_num_per_sched[allocq];
+    
+    DEBUG("core_id:%d thread_id:%d uop_num:%lld inserted into scheduler\n",
+        m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
    	
     STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
 
@@ -405,7 +408,7 @@ void schedule_smc_c::run_a_cycle(void)
     SCHED_FAIL_TYPE sched_fail_reason;
 
     int thread_id = m_schlist_tid[ii];
-    int entry = m_schlist_entry[ii];
+    int entry     = m_schlist_entry[ii];
 
     bool uop_scheduled = false;
 
@@ -427,6 +430,9 @@ void schedule_smc_c::run_a_cycle(void)
         STAT_CORE_EVENT(m_core_id, 
             SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 2));
       }
+    }
+    else if (ii == m_first_schlist) {
+      m_first_schlist = (m_first_schlist + 1) % m_schlist_size;
     }
   }
 

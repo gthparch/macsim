@@ -108,8 +108,8 @@ void smc_allocate_c::run_a_cycle(void)
     pqueue_c<gpu_allocq_entry_s>* gpu_alloc_q;
     ALLOCQ_Type gpu_alloc_q_type;
 
-    if (*m_simBase->m_knobs->KNOB_GPU_USE_SINGLE_ALLOCQ_TYPE && 
-        *m_simBase->m_knobs->KNOB_GPU_SHARE_ALLOCQS_BETWEEN_THREADS) {
+    if (*KNOB(KNOB_GPU_USE_SINGLE_ALLOCQ_TYPE) && 
+        *KNOB(KNOB_GPU_SHARE_ALLOCQS_BETWEEN_THREADS)) {
       gpu_alloc_q      = m_gpu_alloc_q[*m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX];
       gpu_alloc_q_type = gen_ALLOCQ;
     }
@@ -119,17 +119,17 @@ void smc_allocate_c::run_a_cycle(void)
       // multiple Alloc queues
       if (req_fp_reg) {
         gpu_alloc_q_type = fp_ALLOCQ;  
-        q_type           = *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX;
+        q_type           = *KNOB(KNOB_FLOAT_ALLOCQ_INDEX);
       }   
       else if (req_sb || req_lb) {
         gpu_alloc_q_type = mem_ALLOCQ;
-        q_type           = *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX;
+        q_type           = *KNOB(KNOB_MEM_ALLOCQ_INDEX);
       }     
       else {
         gpu_alloc_q_type = gen_ALLOCQ;
-        q_type           = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
+        q_type           = *KNOB(KNOB_GEN_ALLOCQ_INDEX);
       }   
-      gpu_alloc_q = m_gpu_alloc_q[req_fp_reg ? *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX: *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX];
+      gpu_alloc_q = m_gpu_alloc_q[req_fp_reg ? *KNOB(KNOB_FLOAT_ALLOCQ_INDEX): *KNOB(KNOB_GEN_ALLOCQ_INDEX)];
     }
 
     // FIXME
