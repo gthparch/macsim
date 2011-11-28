@@ -10,7 +10,76 @@ Describe pin
 
 \subsection{GPU (PTX) Traces}
 
-Describe gpuocelot
+GPU traces are generated using Ocelot~\cite{}, which is a dynamic compilation
+framework for heterogenous system. 
+
+\subsubsection{Installing Ocelot}
+
+Ocelot can be installed either using ubuntu packages provided by the official
+page or via its SVN repository. To install the latest version, check out 
+source files using the following command:
+
+\smallskip
+\begin{lstlisting}
+svn checkout http://gpuocelot.googlecode.com/svn/trunk/ gpuocelot
+\end{lstlisting}
+\smallskip
+
+After checking out source files, you can build Ocelot and trace generator libraries using the following commands:
+
+\smallskip
+\begin{lstlisting}
+cd gpuocelot/ocelot; sudo ./build.py --install
+cd gpuocelot/trace-generators; libtoolize; aclocal; autoconf; automake; ./configure; 
+make; sudo make install
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{Generating Traces}
+
+CUDA executables which are targeted to generate traces should be linked against
+libocelot.so and libocelotTrace.so.
+
+In order to generate traces, the following four environment variables need to be set.
+
+\begin{itemize}\itemsep2pt
+\item TRACE\_PATH : directory to store generated traces. If not specified, current directory is used by default.
+\item TRACE\_NAME : prefix name for generated traces. If not specified, "Trace" is used by default.
+\item KERNEL\_INFO\_PATH : file that contains kernel information (must be specified)
+\item COMPUTE\_VERSION : compute capability (must be specified)
+\end{itemize}
+
+The following shows an example of how to set up the environment variables.
+
+\smallskip
+\begin{lstlisting}
+export TRACE_PATH="/storage/traces/"     # Create a trace directory in the /storage/traces
+export KERNEL_INFO_PATH="kernel_info"    # kernel_info has the kernel information
+export COMPUTE_VERSION="2.0"             # Calculate occupancy based on compute capability 2.0
+\end{lstlisting}
+\smallskip
+
+The kernel information file (kernel\_info) should contain the following
+information: kernel name, register usage (per thread), and shared memory usage
+(per thread).
+
+\smallskip
+\begin{lstlisting}
+_Z9Memcpy_SWPfS_i 14 52 
+\end{lstlisting}
+\smallskip
+
+Running CUDA application creates a directory with the kernel name, where traces 
+are generated, and kernel\_config.txt which is a configuration used for MacSim.
+
+\smallskip
+\begin{lstlisting}
+drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
+-rw-r--r--   1 anonymous group    66 Sep 09 22:29 kernel_config.txt
+\end{lstlisting}
+\smallskip
+
 
 \subsection{Trace Format}
 
