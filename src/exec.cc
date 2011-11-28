@@ -190,15 +190,18 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
   Mem_Type type = uop->m_mem_type;
 
-
+  // -------------------------------------
   // execute memory instructions
+  // -------------------------------------
   if (type != NOT_MEM) { 
     // perfect dcache
-    if (*m_simBase->m_knobs->KNOB_PERFECT_DCACHE) {
+    if (*KNOB(KNOB_PERFECT_DCACHE)) {
       uop_latency = 1;
     }
     else {
+      // -------------------------------------
       // single uop in an instruction
+      // -------------------------------------
       if (uop->m_num_child_uops == 0) {
         // shared memory access
         if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
@@ -242,10 +245,12 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
           }
         }
       }
+      // -------------------------------------
       // memory instructions that result in multiple memory requests
       // are represented by a parent uop (to make it easy to handle 
       // these instructions in schedule and retire stages) and a list 
       // of child uops for the addresses to be accessed
+      // -------------------------------------
       else {
         uop_latency      = 0;
         int latency      = -1;
@@ -257,11 +262,15 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
         // executing children uops
         while (-1 != next_set_bit) {
+          // -------------------------------------
           // shared memory access
+          // -------------------------------------
           if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
             latency = core->get_shared_memory()->load(uop->m_child_uops[next_set_bit]);
           }
+          // -------------------------------------
           // other types of memory access
+          // -------------------------------------
           else {
             // access can return
             // -1 - cache miss
