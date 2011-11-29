@@ -298,7 +298,6 @@ bool retire_c::is_running()
 {
   return m_retire_running;
 }
-    
 
 #if 0
 // return number of retired instructions per thread
