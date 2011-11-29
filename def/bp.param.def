@@ -12,6 +12,6 @@ param<BTB_ENTRIES,           btb_entries,           uns,    1024>
 param<BTB_ASSOC,             btb_assoc,             uns,    4>
 param<BTB_BANK_NUM,          btb_bank_num,          uns,    1>
 
-
+param<ENABLE_BTB,            enable_btb,            bool,   false>
 
 
