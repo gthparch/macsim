@@ -222,12 +222,14 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 //                		//<< " vc: " << data->vc << "\n";
 
                     //for csv stats collection/visualization
+#if DBG
                     cout << manifold::kernel::Manifold::NowTicks() << "," 
                         << ((HeadFlit*)data->f)->req->m_id << ","
                         << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
                         << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
                         << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
                         << "R" << "," << "0" << "\n";
+#endif
                 #else 
                   //for debugging only!
                   int stage = -1;
@@ -546,7 +548,7 @@ SimpleRouter::tock ( void )
      fprintf(stderr,"\n\nDeadlock at Router %d node %d Msg id %d Fid%d", GetComponentId(), node_id, i, input_buffer_state[i].fid);
      dump_state_at_deadlock(m_simBase);
      }
-     /* */
+     */
     for(uint i=0; i<ports; i++)
         for(uint j=0; j<vcs; j++)
         {
