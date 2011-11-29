@@ -299,6 +299,7 @@ bool retire_c::is_running()
   return m_retire_running;
 }
 
+
 #if 0
 // return number of retired instructions per thread
 inline Counter retire_c::get_instrs_retired(int thread_id) 
