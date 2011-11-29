@@ -52,7 +52,8 @@ Addr bp_targ_c::pred (uop_c *uop)
 
   if (perfect_pred) 
   {
-    return_addr = uop->m_target_addr; 
+    // return_addr = uop->m_target_addr; 
+    return_addr = uop->m_npc; 
     STAT_CORE_EVENT(m_core_id, PERFECT_TARGET_PRED); 
   }
   else { 
@@ -63,7 +64,7 @@ Addr bp_targ_c::pred (uop_c *uop)
   
   // debug 
   Addr tag; 
-  int set; 
+  uns set; 
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
   /*
   if (uop->m_pc == 0x401aa5) lca_count++; 
@@ -96,7 +97,7 @@ void bp_targ_c::update (uop_c *uop)
   if (uop->m_off_path) return; 
   
   Addr tag; 
-  int set; 
+  uns set; 
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
 
   int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
