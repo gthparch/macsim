@@ -55,7 +55,6 @@
 #include "retire.h"
 #include "rob.h"
 #include "rob_smc.h"
-#include "trace_read.h"
 #include "uop.h"
 
 #include "config.h"

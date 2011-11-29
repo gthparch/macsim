@@ -47,11 +47,11 @@
 #include "knob.h"
 #include "core.h"
 #include "utils.h"
-#include "trace_read.h"
 #include "statistics.h"
 #include "frontend.h"
 #include "process_manager.h"
 #include "pref_common.h"
+#include "trace_read.h"
 
 #include "debug_macros.h"
 

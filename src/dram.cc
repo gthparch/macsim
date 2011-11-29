@@ -14,7 +14,6 @@
 #include "memreq_info.h"
 #include "noc.h"
 #include "utils.h"
-#include "trace_read.h"
 
 #include "all_knobs.h"
 #include "statistics.h"

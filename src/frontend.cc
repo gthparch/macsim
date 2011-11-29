@@ -404,49 +404,47 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
         // -------------------------------------
         int br_mispred = false;
         if (new_uop->m_cf_type) {
-	  // btb prediction 
-	  bool btb_miss = btb_access(new_uop); 
+          // btb prediction 
+          bool btb_miss = btb_access(new_uop); 
 
-	  // branch prediction 
+          // branch prediction 
           br_mispred = predict_bpu(new_uop);
           if (new_uop->m_cf_type == CF_CBR) {
             STAT_CORE_EVENT(m_core_id, BP_ON_PATH_CORRECT+br_mispred+(new_uop->m_off_path)*3);
           }
-	  
-	  // BTB miss is MISFETCH. In theory, the processor should access the bp only if btb hits 
-	  // However, just to get some stats, we allow bp accesses. 
-	  // This might be changed in future 
-	  
-	  if (btb_miss & !br_mispred)
-	    STAT_CORE_EVENT(m_core_id, BP_ON_PATH_MISFETCH+(new_uop->m_off_path)*3);
-	  
 
-	  // set frontend misprediction */
-	  if (br_mispred) {
-	    /*! should be per core */
-	    m_bp_data->m_bp_recovery_cycle[new_uop->m_thread_id] = MAX_CTR;
-	    m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
-	    
-	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is mispredicted inst_num:%lld "
-		       "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
-		       new_uop->m_uop_num);
-	  } 
-	  else if (btb_miss) { 
-	    m_bp_data->m_bp_redirect_cycle[new_uop->m_thread_id] = MAX_CTR; 
-	    m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
-	    
-	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is misfetched(btb_miss) inst_num:%lld "
-		       "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
-		       new_uop->m_uop_num);
-	  }
-	  else {
-	    fetch_data->m_MT_scheduler.m_next_fetch_addr = new_uop->m_npc;
-	    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d MT_scheduler[%d]->0x%s \n",
-		       m_core_id, new_uop->m_thread_id, tid, hexstr64s(new_uop->m_npc));
-	  }
+          // BTB miss is MISFETCH. In theory, the processor should access the bp only if btb hits 
+          // However, just to get some stats, we allow bp accesses. 
+          // This might be changed in future 
 
-	  
-	}
+          if (btb_miss & !br_mispred)
+            STAT_CORE_EVENT(m_core_id, BP_ON_PATH_MISFETCH+(new_uop->m_off_path)*3);
+
+
+          // set frontend misprediction */
+          if (br_mispred) {
+            /*! should be per core */
+            m_bp_data->m_bp_recovery_cycle[new_uop->m_thread_id] = MAX_CTR;
+            m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
+
+            DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is mispredicted inst_num:%lld "
+                "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
+                new_uop->m_uop_num);
+          } 
+          else if (btb_miss) { 
+            m_bp_data->m_bp_redirect_cycle[new_uop->m_thread_id] = MAX_CTR; 
+            m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
+
+            DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is misfetched(btb_miss) inst_num:%lld "
+                "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
+                new_uop->m_uop_num);
+          }
+          else {
+            fetch_data->m_MT_scheduler.m_next_fetch_addr = new_uop->m_npc;
+            DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d MT_scheduler[%d]->0x%s \n",
+                m_core_id, new_uop->m_thread_id, tid, hexstr64s(new_uop->m_npc));
+          }
+        }
 
         // -------------------------------------
         // push the uop into the front_end_queue */
@@ -478,7 +476,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
   Addr new_fetch_addr;
   icache_data_c *icache_line;
   bool cache_miss = CACHE_MISS;
-  
+
   if (fetch_addr == 0) 
     return CACHE_HIT;
 
@@ -488,7 +486,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
   // access instruction cache
   // -------------------------------------
   STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R_TAG);
-  
+
   // -------------------------------------
   // perfect icache
   // -------------------------------------
@@ -522,8 +520,8 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
 
     // send a new icache miss memory request
     int result = m_simBase->m_memory->new_mem_req(MRT_IFETCH, line_addr, 
-                 m_knob_icache_line_size, 0, NULL, icache_fill_line_wrapper, 
-                 m_core->get_unique_uop_num(), NULL, m_core_id, tid, m_knob_ptx_sim);
+        m_knob_icache_line_size, 0, NULL, icache_fill_line_wrapper, 
+        m_core->get_unique_uop_num(), NULL, m_core_id, tid, m_knob_ptx_sim);
 
     // mshr full
     if (!result) 
@@ -612,7 +610,10 @@ int frontend_c::predict_bpu(uop_c *uop)
     case CF_BR:
       // 100 % accurate
     case CF_CBR:
-      pred_dir = (m_bp_data->m_bp_targ_pred)->pred(uop);
+      if (*KNOB(KNOB_ENABLE_BTB))
+        pred_dir = (m_bp_data->m_bp_targ_pred)->pred(uop);
+      else
+        pred_dir = (m_bp_data->m_bp)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
       STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
@@ -633,7 +634,7 @@ int frontend_c::predict_bpu(uop_c *uop)
       break;
   }
 
-  
+
   if (*m_simBase->m_knobs->KNOB_USE_BRANCH_PREDICTION) {
     // do nothing
   }
@@ -663,16 +664,19 @@ int frontend_c::predict_bpu(uop_c *uop)
 // btb accesses 
 bool frontend_c::btb_access(uop_c *uop)
 {
+  if (!*KNOB(KNOB_ENABLE_BTB))
+    return false;
+
   bool btb_miss = false; 
   Addr pred_targ_addr = m_bp_data->m_bp_targ_pred->pred(uop);
   if (pred_targ_addr != uop->m_npc) 
     btb_miss = true; 
-  
+
   uop->m_uop_info.m_btb_miss = btb_miss; 
-  
+
   DEBUG("m_core_id:%d tid:%d uop_num:%s pc:0x%s cf_type:%d dir:%d oracle_npc:%s pred_targ:%s btb_miss:%d \n", 
-	uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), hexstr64s(uop->m_pc), 
-	uop->m_cf_type, uop->m_dir, hexstr64s(uop->m_npc), hexstr64s(pred_targ_addr), btb_miss);
+      uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), hexstr64s(uop->m_pc), 
+      uop->m_cf_type, uop->m_dir, hexstr64s(uop->m_npc), hexstr64s(pred_targ_addr), btb_miss);
 
   // need to set up redirect 
 
@@ -694,7 +698,7 @@ int frontend_c::fetch(void)
       m_fetching_thread_num, m_unique_scheduled_thread_num);
 
   int max_try = m_unique_scheduled_thread_num - m_last_terminated_tid;
-  
+
   while (m_fetching_thread_num && try_again && try_again <= max_try) {
     // find next thread id to fetch
     fetch_id = m_fetch_arbiter % m_unique_scheduled_thread_num;
@@ -755,7 +759,7 @@ int frontend_c::fetch(void)
   // no thread to fetch
   if (try_again > max_try) 
     fetch_id = -1;
-  
+
   DEBUG_CORE(m_core_id, "m_core_id:%d try_agin:%d tid:%d\n", m_core_id, try_again, fetch_id);
 
   return fetch_id;
