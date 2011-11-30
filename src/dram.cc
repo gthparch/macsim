@@ -14,6 +14,7 @@
 #include "memreq_info.h"
 #include "noc.h"
 #include "utils.h"
+#include "bug_detector.h"
 
 #include "all_knobs.h"
 #include "statistics.h"
@@ -514,11 +515,17 @@ bool dram_controller_c::send_packet(drb_entry_s* dram_req)
   }
 
   if (!insert_packet) {
+//    report("core_id:" << dram_req->m_req->m_core_id << " req_id:" << dram_req->m_req->m_id);
     DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
         m_id, dram_req->m_req->m_id, hexstr64s(dram_req->m_req->m_addr), \
         mem_req_c::mem_req_type_name[dram_req->m_req->m_type]);
     return false;
   }
+
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+    m_simBase->m_bug_detector->allocate_noc(dram_req->m_req);
+  }
+
   return true;
 }
 
@@ -533,6 +540,9 @@ void dram_controller_c::receive_packet(void)
     mem_req_s* req = m_terminal->receive_queue.front();
     if (insert_new_req(req)) {
       m_terminal->receive_queue.pop();
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+        m_simBase->m_bug_detector->deallocate_noc(req);
+      }
     }
   }
 }

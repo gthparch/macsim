@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include "macsim.h"
 #include "global_types.h"
@@ -51,11 +52,18 @@ class bug_detector_c
      */
     void print(int core_id, int thread_id);
 
+    void allocate_noc(mem_req_s* req);
+    void deallocate_noc(mem_req_s* req);
+    void print_noc();
+
   private:
     int m_num_core; /**< number of simulating cores */
     vector<map<uop_c*, uint64_t> *> m_uop_table; /**< uop table */
     uint64_t *m_latency_sum; /**< sum of each uop's execution latency */
     uint64_t *m_latency_count; /**< total uop count */
+
+    unordered_map<mem_req_s*, uint64_t>* m_packet_table; /**< memeory requests in noc */
+
     
     macsim_c* m_simBase;
 };

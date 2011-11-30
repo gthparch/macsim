@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <iomanip>
+#include <list>
 
 #include "bug_detector.h"
 #include "memreq_info.h"
@@ -40,6 +41,9 @@ bug_detector_c::bug_detector_c(macsim_c* simBase)
   
   std::fill_n(m_latency_sum, m_num_core, 0);
   std::fill_n(m_latency_count, m_num_core, 0);
+
+  // noc request
+  m_packet_table = new unordered_map<mem_req_s*, uint64_t>; 
 }
 
 
@@ -59,6 +63,11 @@ bug_detector_c::~bug_detector_c()
     new_map->clear();
     delete new_map;
   }
+
+
+  // noc request
+  m_packet_table->clear();
+  delete m_packet_table;
 }
 
 
@@ -169,4 +178,62 @@ void bug_detector_c::print(int core_id, int thread_id)
   }
   out.close();
 }
+
+
+void bug_detector_c::allocate_noc(mem_req_s* req)
+{
+  assert(m_packet_table->find(req) == m_packet_table->end());
+
+  (*m_packet_table)[req] = CYCLE;
+}
+
+
+void bug_detector_c::deallocate_noc(mem_req_s* req)
+{
+  assert(m_packet_table->find(req) != m_packet_table->end());
+
+  m_packet_table->erase(req);
+}
+
+bool sort_noc(pair<mem_req_s*, uint64_t>& a, pair<mem_req_s*, uint64_t>& b)
+{
+  return a.second < b.second;
+}
+
+
+void bug_detector_c::print_noc()
+{
+  ofstream out("bug_detect_noc.out");
+
+  list<pair<mem_req_s*, uint64_t> > result_list;
+  for (auto I = m_packet_table->begin(), E = m_packet_table->end(); I != E; ++I) {
+    mem_req_s* req = (*I).first;
+    uint64_t cycle = (*I).second;
+    result_list.push_back(pair<mem_req_s*, uint64_t>(req, cycle));
+  } 
+  result_list.sort(sort_noc);
+
+
+  out << "Current cycle:" << CYCLE << "\n";
+  out << left << setw(15) << "ID"
+    << left << setw(15) << "CYCLE"
+    << left << setw(15) << "DELTA"
+    << left << setw(4) << "SRC"
+    << left << setw(4) << "DST"
+    << "\n";
+  for (auto I = result_list.begin(), E = result_list.end(); I != E; ++I) {
+    mem_req_s* req = (*I).first;
+    uint64_t cycle = (*I).second;
+    out << left << setw(15) << req->m_id
+      << left << setw(15) << cycle
+      << left << setw(15) << CYCLE - cycle
+      << left << setw(4) << req->m_msg_src
+      << left << setw(4) << req->m_msg_dst
+      << "\n";
+  }
+
+  out.close();
+}
+
+
 

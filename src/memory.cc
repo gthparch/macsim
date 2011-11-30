@@ -20,6 +20,7 @@
 #include "port.h"
 #include "uop.h"
 #include "factory_class.h"
+#include "bug_detector.h"
 
 #include "config.h"
 
@@ -827,7 +828,13 @@ void dcu_c::receive_packet(void)
     return ;
     
   mem_req_s* req = m_terminal->check_queue();
+
   if (req != NULL) {
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+      m_simBase->m_bug_detector->deallocate_noc(req);
+    }
+
+
     if (req->m_msg_type == NOC_FILL) {
       req->m_state = MEM_NOC_DONE;
       if (!fill(req)) assert(0);
@@ -869,6 +876,10 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
   }
 
   if (packet_insert) {
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+      m_simBase->m_bug_detector->allocate_noc(req);
+    }
+
 //    cout << "L" << m_level << " " << m_id << " " << req->m_msg_dst << "\n";
     req->m_state = MEM_IN_NOC;
     return true;
@@ -1477,23 +1488,17 @@ void memory_c::init(void)
       ++total_num_router;
   }
 
-  report("Number of L1 routers: " << total_num_router);
-
   m_noc_id_base[MEM_L2] = total_num_router;
   for (int ii = 0; ii < m_num_core; ++ii) {
     if (m_l2_cache[ii]->create_network_interface(L2_REQ))
       ++total_num_router;
   }
 
-  report("Number of L2 routers: " << total_num_router);
-
   m_noc_id_base[MEM_L3] = total_num_router;
   for (int ii = 0; ii < m_num_l3; ++ii) {
     if (m_l3_cache[ii]->create_network_interface(L3_REQ))
       ++total_num_router;
   }
-
-  report("Number of L3 routers: " << total_num_router);
 
   m_noc_id_base[MEM_MC] = total_num_router;
   for (int ii = 0; ii < m_num_mc; ++ii) {
@@ -1980,6 +1985,11 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
 // print all mshr entries
 void memory_c::print_mshr(void)
 {
+  // print noc entries
+  m_simBase->m_bug_detector->print_noc();
+  
+
+  // print mshr
   FILE* fp = fopen("bug_detect_mem.out", "w");
   for (int ii = 0; ii < m_num_core; ++ii) {
     fprintf(fp, "== Core %d ==\n", ii);
@@ -2146,11 +2156,13 @@ l3_coupled_network_c::l3_coupled_network_c(macsim_c* simBase) : memory_c(simBase
   ASSERT(m_num_core == m_num_l3);
   // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
   for (int ii = 0; ii < m_num_core; ++ii) {
-    m_l1_cache[ii]->init(ii, -1, false, false, true, false, true);
+    m_l1_cache[ii]->init(ii, -1, false, false, true, false, false);
     m_l2_cache[ii]->init(ii, ii, true,  true,  true, false, true);
     m_l3_cache[ii]->init(-1, ii, false, true,  false,false, true);
   }
 }
+//void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coupled_down, \
+//    bool disable, bool has_router)
 
 
 l3_coupled_network_c::~l3_coupled_network_c()
@@ -2165,7 +2177,7 @@ l3_decoupled_network_c::l3_decoupled_network_c(macsim_c* simBase) : memory_c(sim
 {
   // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
   for (int ii = 0; ii < m_num_core; ++ii) {
-    m_l1_cache[ii]->init(ii, -1, false, false, true,  false, true);
+    m_l1_cache[ii]->init(ii, -1, false, false, true,  false, false);
     m_l2_cache[ii]->init(-1, ii, true,  true,  false, false, true);
   }
 
