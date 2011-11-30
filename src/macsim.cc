@@ -315,69 +315,46 @@ void macsim_c::init_cores(int num_max_core)
 // =======================================
 void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_params here
 {
-  ifstream fd(network_filename);
-  string data;
-  if(!fd.is_open())
-  {
-    cout<<"Invalid iris file\n";
-    exit(1);
-  }
-  
-  while(!fd.eof())
-  {
-    getline(fd,data);
-    string simknob = data.substr(0,data.find("#"));
+  params["topology"] = KNOB(KNOB_IRIS_TOPOLOGY)->getValue();
 
-    if ( simknob.find('-') == 0 )
-    {
-        string key,value;
-        istringstream iss( simknob, istringstream::in);
-        iss >> key;
-        string sim_string = key.substr(0,key.find(":"));
-        if ( sim_string.compare("-iris") == 0 )
-        {
-          iss >> value;
-          if (! key.compare("-iris:noc_topology"))
-              params.insert(pair<string,string>("topology",value));
-          if (! key.compare("-iris:no_mcs"))
-              params.insert(pair<string,string>("no_mcs",value));
-          if (! key.compare("-iris:grid_size"))
-              params.insert(pair<string,string>("grid_size",value));
-          if (! key.compare("-iris:no_ports"))
-              params.insert(pair<string,string>("no_ports",value));
-          if (! key.compare("-iris:no_vcs"))
-              params.insert(pair<string,string>("no_vcs",value));
-          if (! key.compare("-iris:credits"))
-              params.insert(pair<string,string>("credits",value));
-          if (! key.compare("-iris:int_buff_width"))
-              params.insert(pair<string,string>("int_buff_width",value));
-          if (! key.compare("-iris:mean_irt"))
-              params.insert(pair<string,string>("link_width",value));
-          if (! key.compare("-iris:rc_method"))
-              params.insert(pair<string,string>("rc_method",value));
-          if (! key.compare("-iris:self_assign_dest_id"))
-              params.insert(pair<string,string>("self_assign_dest_id",value));
-          if (! key.compare("-iris:mapping"))
-              params.insert(pair<string,string>("mapping",value));
-        }
-        else if ( sim_string.compare("-mc") == 0 )
-        {
-          iss >> value;
+  // todo
+  // 1. mapping function
+  // 2. # port for torus
+  // 3. rc method
+  // 4. other knobs
+  if (params["topology"] == "ring") {
+    params["no_ports"] = "3";
+    params["mapping"]  = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+//    params["mapping"] = ;
+  }
+  else if (params["topology"] == "mesh" || params["topology"] == "torus") {
+    params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
+    params["no_ports"]  = "5"; // check for torus
+    // params["rc_method"] = KNOB(KNOB_IRIS_RC_METHOD)->getValue();
+//    params["mapping"] = ;
+  }
+  params["no_vcs"]         = KNOB(KNOB_IRIS_NUM_VC)->getValue();
+  params["credits"]        = KNOB(KNOB_IRIS_CREDIT)->getValue();
+  params["int_buff_width"] = KNOB(KNOB_IRIS_INT_BUFF_WIDTH)->getValue();
+  params["link_width"]     = KNOB(KNOB_IRIS_LINK_WIDTH)->getValue();
+
+  string s;
+  ToString(s, KNOB(KNOB_DRAM_NUM_MC)->getValue());
+  params["no_mcs"] = s; 
+
+  //number of nodes depends on MacSim configuration (# of L1+L3(acts as L2))+MC nodes)
+  ToString(s, m_macsim_terminals.size());
+  params["no_nodes"] = s;
+          
+          
+#if 0
+  //if (! key.compare("-iris:self_assign_dest_id"))
+   //           params.insert(pair<string,string>("self_assign_dest_id",value));
           if (! key.compare("-mc:resp_payload_len"))
               params.insert(pair<string,string>("resp_payload_len",value));
           if (! key.compare("-mc:memory_latency"))
               params.insert(pair<string,string>("memory_latency",value));
-        }
-        else
-          cerr << " config line unknown" << endl;
-    }
-  }
-  
-  //number of nodes depends on MacSim configuration (# of L1+L3(acts as L2))+MC nodes)
-  stringstream out;
-  out << m_macsim_terminals.size();
-  string s = out.str();
-  params.insert(pair<string,string>("no_nodes",s));
+#endif
 }
 
 
@@ -629,7 +606,6 @@ void macsim_c::initialize(int argc, char** argv)
     manifold::kernel::Manifold::Init(0, NULL);
 
     // initialize interconnect network
-    network_filename = "network_params.in";
     init_network();
   }
 

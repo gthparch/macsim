@@ -34,6 +34,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+#if 0
+string ToString(int val)
+{
+  stringstream sstr;
+  sstr << val;
+  string result = sstr.str();
+
+  sstr.flush();
+  return result;
+}
+#endif
+
 stringstream util_sstr;
 char str_buffer[1000][100];
 int str_buffer_index = 0;

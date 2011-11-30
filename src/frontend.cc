@@ -125,7 +125,7 @@ frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) : FRONTEN
   m_simBase = simBase;
 
   string name;
-  STRING_STREAM(name, "sync_info_" << m_core_id);
+  ToString(name, "sync_info_" << m_core_id);
 
   m_sync_info = new hash_c<sync_thread_s>(name);
 

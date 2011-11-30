@@ -32,12 +32,14 @@
 
 
 // macro definitions
-#define STRING_STREAM(var, arg) \
+#define ToString(var, arg) \
   { \
     stringstream sstr; \
     sstr << arg; \
     sstr >> var; \
   }
+
+//string ToString(int);
 
 #define N_BIT_MASK(N)			((0x1ULL << (N)) - 1)
 #define N_BIT_MASK_64			(0xffffffffffffffffULL)
