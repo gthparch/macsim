@@ -27,6 +27,7 @@ class macsimComponent : public SST::Component {
 		std::string  tracePath;
 		std::string outputPath;
 		macsim_c* macsim;
+		bool simRunning;
 		
 		//FOR SERIALIZATION
 		friend class boost::serialization::access;

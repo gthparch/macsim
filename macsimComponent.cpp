@@ -5,6 +5,7 @@
 
 #include "macsimComponent.h"
 
+#include <sys/time.h>
 using namespace SST;
 
 macsimComponent::macsimComponent(ComponentId_t id, Params_t& params) : Component(id) {
@@ -40,13 +41,17 @@ macsimComponent::macsimComponent(ComponentId_t id, Params_t& params) : Component
 	
 	//Instantiate Macsim Simulator
 	macsim = new macsim_c();
-	
+	simRunning = false;
+
 }
 
 macsimComponent::macsimComponent() : Component(-1) {} //for serialization only
 
-
 int macsimComponent::Setup() {
+
+	//Ensure that this component must finish before SST kernel can terminate
+	registerExit();
+
 	printf("Initializing macsim simulation state\n");
 	
 	//Format for initialization protocol
@@ -80,12 +85,20 @@ int macsimComponent::Finish() {
  *      false : component not done yet
  *******************************************************/
 bool macsimComponent::ticReceived( Cycle_t ) {
-	
-	//Run a cycle of the simulator
-	bool simRunning = macsim->run_a_cycle();
 
-	//true indicates -> end of life for component 
-	return (simRunning==false);
+	//Run a cycle of the simulator
+	simRunning = macsim->run_a_cycle();
+
+	//Still has more cycles to run
+	if (simRunning) {
+		return false;
+	}
+
+	//Let SST know that this component is done and could be terminated
+	else {
+		unregisterExit();
+		return true;
+	}
 
 }
 
