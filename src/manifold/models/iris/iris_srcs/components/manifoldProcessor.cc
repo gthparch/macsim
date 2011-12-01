@@ -161,7 +161,7 @@ ManifoldProcessor::send_packet(mem_req_s *req)
 
         np->dst_component_id = 3;       // can use this for further splitting at the interface
         np->address = req->m_addr; 
-        np->mclass = mclass;	
+        np->mclass = req->m_size;	
         np->proc_buffer_id = send_buffer_id;
         np->payload_length = 64;
         np->enter_network_time = manifold::kernel::Manifold::NowTicks();

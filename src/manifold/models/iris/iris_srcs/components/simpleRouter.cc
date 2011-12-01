@@ -14,8 +14,6 @@ extern "C" {
 #include "SIM_util.h"
 #include "SIM_link.h"
 }
-//double SIM_router_stat_energy(SIM_router_info_t*, SIM_router_power_t*, int, char*, int, double, int, double);
-
 // memory request state noc string
 const char* mem_req_noc_type_name[MAX_NOC_STATE] = {
   "NOC_FILL",
@@ -222,13 +220,21 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 //                		//<< " vc: " << data->vc << "\n";
 
                     //for csv stats collection/visualization
-#if DBG
-                    cout << manifold::kernel::Manifold::NowTicks() << "," 
-                        << ((HeadFlit*)data->f)->req->m_id << ","
+                if (0)
+                {
+                    m_simBase->network_trace << manifold::kernel::Manifold::NowTicks() << "," 
+                        << ((HeadFlit*)data->f)->req->m_id << "," 
+                        << ((HeadFlit*)data->f)->req->m_ptx << ","
                         << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
                         << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
                         << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
-                        << "R" << "," << "0" << "\n";
+                        << "R";
+                    for(uint i=0; i<ports; i++)
+                        for(uint j=0; j<vcs; j++)
+                            m_simBase->network_trace << in_buffers[i].get_occupancy(j) << ",";
+                    
+                    m_simBase->network_trace << "\n";
+                }
 #endif
                 #else 
                   //for debugging only!
@@ -587,6 +593,78 @@ SimpleRouter::print_stats ( void ) const
         << "\n SimpleRouter[" << node_id << "] st_cycles: " << st_cycles
         ;
     str << "\n SimpleRouter[" << node_id << "] per_port_avg_buff: ";
+    
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            str << stat_pp_avg_buff[i][j]*1.0/manifold::kernel::Manifold::NowTicks() << " ";
+
+    str << "\n SimpleRouter[" << node_id << "] per_port_pkts_out: ";
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            str << stat_pp_packets_out[i][j] << " ";
+
+    str << "\n SimpleRouter[" << node_id << "] per_port_avg_lat: ";
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            if ( stat_pp_packets_out[i][j] ) 
+                str  << (stat_pp_avg_lat[i][j]+0.0)/stat_pp_packets_out[i][j] << " ";
+            else
+                str  << "0 ";
+
+    str << "\n SimpleRouter[" << node_id << "] per_port_last_pkt_out_cy: ";
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            str << stat_pp_pkt_out_cy[i][j] << " ";
+
+    if ( ( stat_packets_in - stat_packets_out ) > ports*vcs ) str << "\n ERROR pkts_in-pkts_out > buffering available";
+    str << std::endl;
+    
+    cout << str.str();
+    return str.str();
+}
+
+std::string
+SimpleRouter::print_csv_stats ( void ) const
+{
+    std::stringstream str;
+    str << node_id << ","
+        << stat_packets_out << "," << stat_flits_in << "," << stat_flits_out << "," 
+        << ib_cycles << "," << sa_cycles << "," << vca_cycles << "," << st_cycles << ",";
+
+    double buff = 0.0;
+    double lat = 0.0;
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            buff += stat_pp_avg_buff[i][j]*1.0/manifold::kernel::Manifold::NowTicks();
+    buff /= ports*vcs;
+    
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            if ( stat_pp_packets_out[i][j] ) 
+                lat += (stat_pp_avg_lat[i][j]+0.0)/stat_pp_packets_out[i][j];
+    lat /= ports*vcs;
+    
+    str << buff << "," << (avg_router_latency+0.0)/stat_packets_out << "," << lat;
+    
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            str << stat_pp_avg_buff[i][j]*1.0/manifold::kernel::Manifold::NowTicks() << ",";
+    
+    for ( uint i=0; i<ports; i++)
+        for ( uint j=0; j<vcs; j++)
+            if ( stat_pp_packets_out[i][j] ) 
+                str << (stat_pp_avg_lat[i][j]+0.0)/stat_pp_packets_out[i][j] << ",";
+    
+    str << endl;
+
+    //cout << str.str();
+    return str.str();
+}
+
+
+#if 0 
+void alt_energy_stat()
+{
     /////////////////energy//////////////////////////
     
     SIM_router_power_t router_power;
@@ -622,7 +700,6 @@ SimpleRouter::print_stats ( void ) const
 		Psw_arbiter = Psw_arbiter_dyn + Psw_arbiter_static;
 	}
 
-    
 //    ret = SIM_router_stat_energy(&GLOB(info), &GLOB(router_power), 10, path, AVG_ENERGY, 1050.0, 1, PARM(Freq));
     uint path_len = SIM_strlen(path);
     int next_depth = 0;
@@ -758,21 +835,7 @@ SimpleRouter::print_stats ( void ) const
 	
 	m_simBase->total_energy += Eavg * total_cycles;
 	m_simBase->avg_power += Eavg * freq;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 //    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
 
 //    Eavg += sa_cycles * SIM_arbiter_init(&router->sw_in_arb, info->sw_in_arb_model, info->sw_in_arb_ff_model, info->n_v_channel*info->n_v_class, 0, &info->sw_in_arb_queue_info);
@@ -783,34 +846,9 @@ SimpleRouter::print_stats ( void ) const
 //    
 //    Eavg += ib_cycles * 
     
-    for ( uint i=0; i<ports; i++)
-        for ( uint j=0; j<vcs; j++)
-            str << stat_pp_avg_buff[i][j]*1.0/manifold::kernel::Manifold::NowTicks() << " ";
-
-    str << "\n SimpleRouter[" << node_id << "] per_port_pkts_out: ";
-        for ( uint i=0; i<ports; i++)
-            for ( uint j=0; j<vcs; j++)
-                str << stat_pp_packets_out[i][j] << " ";
-
-        str << "\n SimpleRouter[" << node_id << "] per_port_avg_lat: ";
-        for ( uint i=0; i<ports; i++)
-            for ( uint j=0; j<vcs; j++)
-                if ( stat_pp_packets_out[i][j] ) 
-                    str  << (stat_pp_avg_lat[i][j]+0.0)/stat_pp_packets_out[i][j] << " ";
-                else
-                    str  << "0 ";
-
-        str << "\n SimpleRouter[" << node_id << "] per_port_last_pkt_out_cy: ";
-        for ( uint i=0; i<ports; i++)
-            for ( uint j=0; j<vcs; j++)
-                str << stat_pp_pkt_out_cy[i][j] << " ";
-
-        if ( ( stat_packets_in - stat_packets_out ) > ports*vcs ) str << "\n ERROR pkts_in-pkts_out > buffering available";
-        str << std::endl;
-
-    cout << str.str();
-        return str.str();
 } /* ----- end of function GenericPktGen::toString ----- */
+#endif
+
 
 void SimpleRouter::power_stats()
 {
@@ -831,7 +869,6 @@ void SimpleRouter::power_stats()
     info->n_total_in = ports;
     info->n_total_out = ports;
     info->n_switch_out = ports;
-//    double SIM_router_stat_energy(SIM_router_info_t *info, SIM_router_power_t *router, int print_depth, char *path, int max_avg, double e_fin, int plot_flag, double freq)
     
     //link power
     Pdynamic = 0.5 * activity_factor * LinkDynamicEnergyPerBitPerMeter(link_len, Vdd) * freq * link_len * (double)data_width;

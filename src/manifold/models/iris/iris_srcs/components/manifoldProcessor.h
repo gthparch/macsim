@@ -68,6 +68,7 @@ class ManifoldProcessor: public IrisTerminal
  	std::queue <mem_req_s*> receive_queue;
  	
  	message_class mclass;
+ 	bool ptx;
  	
     protected:
 
