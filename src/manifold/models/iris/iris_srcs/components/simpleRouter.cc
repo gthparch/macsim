@@ -220,8 +220,7 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 //                		//<< " vc: " << data->vc << "\n";
 
                     //for csv stats collection/visualization
-                if (0)
-                {
+#if _DBG
                     m_simBase->network_trace << manifold::kernel::Manifold::NowTicks() << "," 
                         << ((HeadFlit*)data->f)->req->m_id << "," 
                         << ((HeadFlit*)data->f)->req->m_ptx << ","
@@ -234,7 +233,6 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                             m_simBase->network_trace << in_buffers[i].get_occupancy(j) << ",";
                     
                     m_simBase->network_trace << "\n";
-                }
 #endif
                 #else 
                   //for debugging only!
@@ -554,7 +552,7 @@ SimpleRouter::tock ( void )
      fprintf(stderr,"\n\nDeadlock at Router %d node %d Msg id %d Fid%d", GetComponentId(), node_id, i, input_buffer_state[i].fid);
      dump_state_at_deadlock(m_simBase);
      }
-     */
+     /* */
     for(uint i=0; i<ports; i++)
         for(uint j=0; j<vcs; j++)
         {
