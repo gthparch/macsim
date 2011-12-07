@@ -1,0 +1,48 @@
+
+\clearpage
+\section{The Statistics}
+\label{sec:stat}
+
+To record a variety of architectural events, we provide a way to
+collect the statistics.
+
+
+\subsection{The Statistics Types}
+
+\begin{itemize}
+  \item COUNT
+  \item RATIO
+  \item DIST
+  \item PER\_CORE
+\end{itemize}
+
+
+\subsection{How to add a new stat}
+
+\smallskip
+\begin{lstlisting}
+DEF_STAT( STAT, TYPE, {NO_RATIO, BASE_STAT} [, PER_CORE] )
+\end{lstlisting}
+\smallskip
+
+
+
+\subsection{How to collect events}
+
+\smallskip
+\begin{lstlisting}
+STAT_EVENT(stat)
+STAT_CORE_EVENT(core_id, stat)
+\end{lstlisting}
+\smallskip
+
+
+\subsection{The Output}
+
+*.stat.out file will be generated.
+
+\smallskip
+\begin{lstlisting}
+STAT ROW_COUNT RATIO (if the type is ratio)
+\end{lstlisting}
+\smallskip

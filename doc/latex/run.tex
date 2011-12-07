@@ -1,0 +1,94 @@
+
+\clearpage
+\section{How to run Macsim?}
+
+\subsection{Directory Structure}
+
+This section explains the directory structure of \SIM simulator.
+
+\smallskip
+\begin{lstlisting}
+macsim/
+  tag/ branch/ trunk/
+\end{lstlisting}
+\smallskip
+
+\textit{Tag} directory has tagged version of \SIM
+simulators. \textit{Branch} directory is for diverged \SIM, which is
+currently empty. \textit{Trunk} directory is current working directory
+for \SIM.
+
+Follwing is more detailed information about \textit{Trunk} directory.
+
+\smallskip
+\begin{lstlisting}
+trunk/
+  bin/ def/ doc/ params/ scripts/ src/ tools/
+\end{lstlisting}
+\smallskip
+
+\textit{Bin} directory contains the \SIM binary after the building
+process. \textit{def} directory has knob (Section~\ref{sec:knob}) and
+statistics (Section~\ref{sec:stat}) definitions. \textit{doc} has the
+documentation. \textit{scripts} includes several scripts files that
+are using during the building process. \textit{src} contains all
+source files. \textit{tools} has several useful tools
+(Section~\ref{sec:tool}).
+
+
+
+\subsection{Build Process}
+
+The GNU Autotools (automake, autoconf) have been used for building
+\SIM simulator. 
+
+\smallskip
+\begin{lstlisting}
+aclocal
+automake --add-missing
+autoconf
+./configure
+make
+\end{lstlisting}
+\smallskip
+
+You can combine above commands in a line:
+
+\smallskip
+\begin{lstlisting}
+aclocal && automake --add-missing && autoconf && ./configure && make
+\end{lstlisting}
+\smallskip
+
+We provide autogen.sh script file to simplify the building process.
+
+\smallskip
+\begin{lstlisting}
+./autogen.sh
+make
+\end{lstlisting}
+\smallskip
+
+The binary \textit{macsim} will be generated in the
+\textit{trunk/bin/} directory.
+
+
+\subsection{Build Types}
+
+There are three different build types.
+
+\begin{itemize}
+  \item opt : default, optimized version (-O3 flag)
+  \item dbg : debug version (-g3 flag)
+  \item gpf : gprof version (-pg flag)
+\end{itemize}
+
+To build a certain type, you need to specify option after \textit{make} command. For example, 
+
+\smallskip
+\begin{lstlisting}
+make opt
+make dbg
+make gpf
+\end{lstlisting}
+\smallskip

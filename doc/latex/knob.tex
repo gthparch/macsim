@@ -1,9 +1,77 @@
 
 \clearpage
-\section{The Knobs and Statistics}
+\section{The Knobs}
 
 
 Describe knob variables and statistics.
 
+
+
+\subsection{The Knobs}
+\label{sec:knob}
+
+To control various architectural parameters, we use multiple knob
+variabls, which are defined in \textit{trunk/def/*.param.def}.
+
+\subsubsection{How to add a new knob}
+\label{sec:knob1}
+
+A new knob variable can be defined in the following format:
+
+\smallskip
+\begin{lstlisting}
+param<{variable used in the \SIM}, {variable used in the commandline}, {type}, {default value}>
+\end{lstlisting}
+\smallskip
+
+We recommend first two arguments are same, but the former is in the
+upper case and the latter is in the lower case. For example,
+
+\smallskip
+\begin{lstlisting}
+param<L2_ASSOC, l2_assoc, int, 8>
+\end{lstlisting}
+\smallskip
+
+
+However, one restriction is this new varialbe must be defined
+in \textit{trunk/def} directory and the file name should
+be \textit{*.param.def} to parse variables correctly.
+
+
+\subsubsection{How to use a new knob in the simulator}
+
+All knob variables will have \textit{KNOB\_} prefix. For example,
+L2\_ASSOC in Section~\ref{sec:knob1} will be KNOB\_L2\_ASSOC in the
+simulator code.
+
+
+\subsubsection{How to apply different value to a knob variables}
+
+There are two ways of modifying the default value of a knob variable.
+
+\begin{enumerate}
+  \item params.in - this file must be supplied to the macsim binary
+  for the execution. You can find sample parameter files
+  in \textit{trunk/params} directory. In this file, variable names and
+  the values are paired in each line. For example,
+
+\smallskip
+\begin{lstlisting}
+l1_assoc 8
+l2_assoc 16
+\end{lstlisting}
+\smallskip
+
+
+  \item command line - instead, you can also supply the knobs in the command line, for example,
+
+\smallskip
+\begin{lstlisting}
+./macsim --l1_assoc=8 --l2_assoc=16
+\end{lstlisting}
+\smallskip
+
+\end{enumerate}
 
 

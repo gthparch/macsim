@@ -7,19 +7,26 @@
 
 \usepackage{color}
 \usepackage{xcolor}
+\usepackage{xspace}
 \usepackage{listings}
 \lstset{columns=fullflexible,basicstyle=\footnotesize\ttfamily}
+\usepackage{paralist}
+%\usepackage[compact]{titlesec}
+%\titlespacing{\section}{0pt}{2}{2}
+%\titlespacing{\subsection}{0pt}{2}{2}
 
 \setlength{\textheight}{8.5in}
-\setlength{\textwidth}{5.5in}
+\setlength{\textwidth}{6.5in}
 \setlength{\columnsep}{0.3125in}
-\setlength{\topmargin}{0.5in}
+\setlength{\topmargin}{0in}
 \setlength{\headheight}{0in}
 \setlength{\headsep}{0in}
 \setlength{\parindent}{1pc}
-\setlength{\oddsidemargin}{0.3in}
-\setlength{\evensidemargin}{0.3in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
 
+\newcommand{\SIM}{Macsim\xspace}
+\newcommand{\ignore}[1]{}
 
 \begin{document}
 
@@ -42,6 +49,7 @@ Jieun Lim}
 
 %% inputs
 \input{intro}
+\input{run}
 \input{trace}
 \input{process}
 \input{pipeline}
@@ -49,6 +57,7 @@ Jieun Lim}
 \input{memory}
 \input{hetero}
 \input{knob}
+\input{stat}
 \input{sst}
 \input{tool}
 \input{ack}
