@@ -1,48 +1,129 @@
-
 \clearpage
 \section{The Statistics}
 \label{sec:stat}
 
-To record a variety of architectural events, we provide a way to
-collect the statistics.
+We provide a simple framework for collecting statistics during simulation.
+Statistics can be either global (common counter for all cores) or per core
+(each core has its own counter).
+
+\subsection{Statistic Types}
+
+The following statistic types are supported:
+
+\begin{description}
+
+  \item [COUNT] for counting the number of occurances of an event. Eg. number
+  of cache hits. 
+
+  \item [RATIO] for calculating the ratio of number of occurances of one event
+  over another. Eg. (number of cache hits / number of cache accesses) i.e.,
+  cache hit ratio.
+
+  \item [DIST]  for defining a group of related events and calculating the
+  number of occurances of each event in the as a percent of the sum of the
+  number of occurances of all events in the group.  Eg. If we want to know what
+  percent of L1 data cache accesses (in a 2-level hierarchy) resulted in L1
+  hits, L2 hits or memory accesses, we should define a distribution consisting
+  on three events - L1 hits, L2 hits and L2 misses  - and update the
+  counter for each event correctly. 
+
+\end{description}
 
 
-\subsection{The Statistics Types}
-
-\begin{itemize}
-  \item COUNT
-  \item RATIO
-  \item DIST
-  \item PER\_CORE
-\end{itemize}
+Note that the simulation will output two values for each statistic. One is the
+raw value i.e. the number of occurances of the statistic and the other output
+value is the value calculated based on the type of the statistic.
 
 
 \subsection{How to add a new stat}
 
+New statistics can be defined by adding definitions to any of the
+\textit{*.stat.def} files in the \textit{trunk/def/} directory or by creating a
+\textit{.stat.def} file including the definitions in the \textit{trunk/def/}
+directory.  In order to define a per core statistic specify PER\_CORE at the
+end of each DEF\_STAT statement below.
+
+
 \smallskip
+\begin{description}
+
+\item[COUNT Stat:] 
 \begin{lstlisting}
-DEF_STAT( STAT, TYPE, {NO_RATIO, BASE_STAT} [, PER_CORE] )
+ DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])
 \end{lstlisting}
-\smallskip
 
-
-
-\subsection{How to collect events}
-
-\smallskip
+Eg: 
 \begin{lstlisting}
-STAT_EVENT(stat)
-STAT_CORE_EVENT(core_id, stat)
+DEF_STAT(INST_COUNT_TOT, COUNT, NO_RATIO)
+DEF_STAT(INST_COUNT, COUNT, NO_RATIO, PER_CORE)
+\end{lstlisting}
+
+\item[RATIO Stat:] 
+\begin{lstlisting}
+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])
+\end{lstlisting}
+
+In addition to defining the RATIO stat itself, a base stat of type COUNT has to
+be defined as well. The value of the base stat is used as the denominator in
+calculating the ratio. 
+
+Eg: 
+\begin{lstlisting}
+DEF_STAT(DISPATCHED_INST, COUNT, NO_RATIO)
+DEF_STAT(DISPATCH_WAIT, RATIO, DISPATCHED_INST)
+\end{lstlisting}
+
+\item[DIST Stat:] 
+\begin{lstlisting}
+DEF_STAT(STAT_NAME_START, DIST, NO_RATIO [, PER_CORE])
+DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])*
+DEF_STAT(STAT_NAME_END, DIST, NO_RATIO [, PER_CORE])
+\end{lstlisting}
+
+The definition of a DIST stat requires at least two stats.
+
+Eg: 
+\begin{lstlisting}
+DEF_STAT(SCHED_FAILED_REASON_SUCCESS, DIST, NO_RATIO, PER_CORE)
+DEF_STAT(SCHED_FAILED_OPERANDS_NOT_READY, COUNT, NO_RATIO, PER_CORE)
+DEF_STAT(SCHED_FAILED_NO_PORTS, DIST, NO_RATIO, PER_CORE)
+\end{lstlisting}
+
+\end{description}
+
+
+\smallskip
+
+
+
+\subsection{How to update statistics}
+
+\smallskip
+
+Macros are provided to update the value of statistics. STAT\_EVENT and
+STAT\_EVENT\_M increment and decrement the value of a global statistic by 1 and
+take the name of the stat to be updated as their one and only argument.
+STAT\_EVENT\_N is used to increment the value of a global statistic by more
+than than 1. It takes the name of the statistic to be incremented and the value
+by which the statistic is to be incremented as its parameters.
+STAT\_CORE\_EVENT and STAT\_CORE\_EVENT\_M increment and decrement the value of
+a per core stat by 1. These take core id and the name of the statistic to be
+incremented/decremented as their parameters.
+
+Eg:
+\begin{lstlisting}
+STAT_EVENT(INST_COUNT_TOT)
+STAT_EVENT_N(INST_COUNT_TOT, 2)
+STAT_CORE_EVENT(1, INST_COUNT)
 \end{lstlisting}
 \smallskip
 
 
 \subsection{The Output}
 
-*.stat.out file will be generated.
+At the end of the simulation *.stat.out are generated, these files include the
+statistic values at the end of the simulation. As mentioned, for each stat two
+values are generated, one is the raw statistic value and other is a value
+calculated based on the type of the stat.
 
-\smallskip
-\begin{lstlisting}
-STAT ROW_COUNT RATIO (if the type is ratio)
-\end{lstlisting}
-\smallskip
+
