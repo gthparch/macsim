@@ -4,19 +4,92 @@
 
 
 We model our GPU cores similar to NVIDIA Fermi~\cite{fermi}.
+%Figure~\ref{fig:g80} shows an overview of the GPU architecture that we modeled in our simulator. 
+The GPU architecture consists of a scalable number of {\em streaming
+multiprocessors} (SMs), each containing eight {\em streaming processor}
+(SP) cores, two special function units (SFUs), a multithreaded
+instruction fetch and issue unit, a read-only constant cache, and a
+16KB read/write shared memory~\cite{lin:nic08}.
+In our simulator SMs are names as cores and SPs are just one of the functional units. 
+
+
+\ignore{
+\begin{figure}[htb]
+\centering
+\psfig{file=figs/g80, angle=0, width=\figwidth}
+\caption{An overview of the GPU architecture}
+\label{fig:g80}
+\end{figure}
+}
+
+The SM executes a batch of 32 threads together called a {\em
+warp}. In the simulator, one warp is treated as one thread. 
+The trace generator already formed a warp and stored them. 
+
+\subsection{Changes to support GPU}
+\subsubsection{Front-end changes}
+The following components are modified to support GPUs. 
+\begin{enumerate}
+\item Handling divergent branch
+\item Fetch scheduling (when to block a thread)
+\end{enumerate}
+\subsubsection{Scheduler}
+Different scheduling policy can be implemented. The default is the round-robin policy. 
+
+\subsubsection{Process Manager}
+
+\begin{enumerate}
+\item Block Dispatch: Threads are dispatched as a block granularity. 
+The simulator waits until all threads within a block are finished 
+before it dispatches another block. 
+\item Occupancy: When a trace is generated from Ocelot, it also emits the number of required 
+physical registers and memory usages. So the simulator uses that information to decide 
+how many blocks can be allocated for each core. This value can be overwritten by a KNOB as well. 
+\end{enumerate}
+
+\subsubsection{Execution Stage}
+Since one warp is treated as a functional unit, execution stage itself does not require too much change. Major changes are in handling uncoalesced memory  requests. 
+
+\subsubsection{Memory system}
+The simulator includes read-only cache, texture cache and constant cache to model GPUs. 
+
+\ignore{
 
 
 
-\subsection{The Shared Memory (Scratchpad Memory)}
+Executing a warp instruction applies the instruction to 32
+threads, similar to executing a SIMD instruction like an SSE
+instruction~\cite{sse} in X86. However, unlike SIMD instructions, the
+concept of warp is not exposed to the programmers, rather programmers
+write a program for one thread, and then specify the number of
+parallel threads in a block, and the number of blocks in a kernel
+grid. The Tesla architecture forms a warp using a batch of 32
+threads~\cite{cuda:course, sc2008_cuda} and in the rest of the paper
+we also use a warp as a batch of 32 threads.\ignore{\footnote{The CUDA
+manual~\cite{cuda_manual} describes a half warp (16 threads) as a
+minimum unit of execution. However, to simplify the model, we use only
+warp as a minimum unit of execution.}}
+
+All the threads in one block are executed on one SM together. One SM
+can also have multiple concurrently running blocks. The number of
+blocks that are running on one SM is determined by the resource
+requirements of each block such as the number of registers and shared
+memory usage. The blocks that are running on one SM at a given time
+are called {\em active blocks} in this paper. Since one block
+typically has several warps (the number of warps is the same as the
+number of threads in a block divided by 32), the total number of
+active warps per SM is equal to the number of warps per block times
+the number of active blocks.
+
+The shared memory is implemented within each SM multiprocessor as an
+SRAM and the global memory is part of the offchip DRAM. The shared
+memory has very low access latency (almost the same as that of
+register) and high bandwidth. However, since a warp of 32 threads
+access the shared memory together, when there is a bank conflict
+within a warp, accessing the shared memory takes multiple cycles.
+
+}
 
 
-\subsection{The Texture Memory}
-
-
-\subsection{The Constant Memory}
-
-
-
-
-
-% LocalWords:  GPU NVIDIA
+% LocalWords:  GPU NVIDIA SMs SFUs multithreaded SPs GPUs uncoalesced SIMD CUDA
+% LocalWords:  SRAM offchip
