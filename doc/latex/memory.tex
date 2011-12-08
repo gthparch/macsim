@@ -75,21 +75,51 @@ All cache accesses flow from one queue to the other queue.
 
 \SIM maintains very flexible memory hierarchy. Each level of cache 
 hierarchy is independent and \SIM defines the link between the
-levels. Here are some basics.
+levels. Figure~\ref{fig:memory} shows the diagram of the memory
+hierarchy in \SIM.
+
+\begin{figure*}[htb]
+\centering
+\includegraphics[width=6.5in]{figs/memory}
+\caption{The memory system in \SIM.}
+\label{fig:memory}
+\end{figure*}
+
+
+
+Here are some basics.
 
 
 \begin{itemize}
   \item There are three levels (L1, L2, and L3) of caches in the \SIM
   although L2 cache might be disabled in some configurations.
 
+  \item All these caches and memory controllers are connected via
+  on-chip interconnection network (currently, the default topology is
+  ring).
+
   \item L1 and L2 caches are always private to each processors.
 
   \item The local router within a cache structure is enabled when
   necessary.
 
-  \item L3 is unified (shared by all cores), but tiles. 
+  \item L3 cache is unified (shared by all cores), but tiled based on
+  the static bank partition. In other words, address regions are
+  statically partitioned and each tile is responsible for sub regions.
 
 \end{itemize}
 
 
+For example, Figure~\ref{fig:level2cache} shows the example of 2-level
+caches. Even though there are 3-level caches, L2 cache is disabled and
+only its router is used by the L1 cache to access the interconnection
+network. Since there is no additional latency between L1 and L2, we
+can flexibly configure 2-level caches.
 
+
+\begin{figure*}[htb]
+\centering
+\includegraphics{figs/level2cache}
+\caption{2-Level cache hierarchy.}
+\label{fig:level2cache}
+\end{figure*}
