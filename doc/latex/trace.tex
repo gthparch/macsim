@@ -83,9 +83,185 @@ drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
 
 \subsection{Trace Format}
 
-Describe the trace format.
+The generated MacSim traces contain various information to execute an instruction.
+Tables~\ref{table:trace_format} and ~\ref{table:trace_desc} show the trace format 
+for each instruction and the description of each field, respectively.
 
+\begin{table*}[htb]
+\begin{footnotesize}
+\begin{center}
+\textsf{
+  \caption{MacSim trace format.}
+  \label{table:trace_format}
+}
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+nSR & nDR & SR\_IDs & DR\_IDs & BrType & bImm & Opcode & bStore & bFP & WF & nLD  \\ \hline \hline
+InstSize & LAddr\_1 & LAddr\_2 & SAddr & PCAddr & BrAddr & MemRSize & MemWSize & RepDir & BrActT & \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table*}
 
+\vspace{-0.2in}
+\begin{table*}[htb]
+\begin{footnotesize}
+\begin{center}
+\textsf{
+  \caption{Descriptions of each field in the trace.}
+  \label{table:trace_desc}
+}
+\begin{tabular}{|l|l|l|} 
+\hline
+Field     & Size (Bytes)       & Description \\ \hline 
+nSR       & 1                  & number of source registers \\ \hline
+nDR       & 1                  & number of destiantion registers \\ \hline
+SR\_IDs   & 9                  & source register IDs \\ \hline
+DR\_IDs   & 6                  & destination register IDs \\ \hline
+BrType    & 1                  & branch type \\ \hline
+bImm      & 1                  & indicates whether this instruction has immediate field \\ \hline
+Opcode    & 1                  & opcode \\ \hline
+bStore    & 1                  & indicates whether this instruction has store operation \\ \hline
+bFP       & 1                  & indicates whether this instruction is FP operation \\ \hline
+WriteFlag & 1                  & write flag \\ \hline
+nLD       & 1                  & number of load opeartions \\ \hline
+InstSize  & 1                  & instruction size \\ \hline
+LAddr\_1  & 4                  & load address 1 \\ \hline
+LAddr\_2  & 4                  & load address 2 \\ \hline
+SAddr     & 4                  & store address \\ \hline
+PCAddr    & 4                  & PC address \\ \hline
+BrAddr    & 4                  & branch target address \\ \hline
+MemRSize  & 4                  & memory read size \\ \hline
+MemWSize  & 1                  & memory write size \\ \hline
+RepDir    & 1                  & repetition direction  \\ \hline
+BrActT    & 1                  & indicates whether branch is actually taken \\ \hline
 
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table*}
+
+While running a simulation, each instruction in the above \emph{raw trace} is converted 
+into one or more micro-ops. MacSim stores such decoded micro-uops into a MacSim-specific
+trace structure to facilitate the simulation by populating each field, which is shown 
+in Table~\ref{table:trace_uops}.
+
+\begin{table*}[htb]
+\begin{footnotesize}
+\begin{center}
+\textsf{
+  \caption{MacSim-specific data structure for micro-ops.}
+  \label{table:trace_uops}
+}
+\begin{tabular}{|l|l|l|} 
+\hline
+Type      & Variable                 & Description \\ \hline 
+uint8\_t  & m\_opcode                & opcode \\ \hline
+Uop\_Type & m\_op\_type              & type of operation \\ \hline
+Mem\_Type & m\_mem\_type             & type of memory instruction \\ \hline
+Cf\_Type  & m\_cf\_type              & type of control flow instruction \\ \hline
+Bar\_Type & m\_bar\_type             & type of barrier caused by instruction \\ \hline
+uns       &   m\_num\_dest\_regs     & number of destination registers written \\ \hline
+uns       &   m\_num\_src\_regs      & number of source registers read \\ \hline
+uns       &   m\_mem\_size           & number of bytes read/written by a memory instruction \\ \hline
+uns       &   m\_inst\_size          & instruction size \\ \hline
+Addr      &   m\_addr                & pc address  \\ \hline
+reg\_info\_s&   m\_srcs[MAX\_SRCS]   & source register information \\ \hline
+reg\_info\_s&   m\_dests[MAX\_DESTS] & destination register information \\ \hline
+Addr      &   m\_va;                 & virtual address \\ \hline
+bool      &   m\_actual\_taken       & branch actually taken \\ \hline
+Addr      &   m\_target              & branch target address \\ \hline
+Addr      &   m\_npc                 & next pc address  \\ \hline
+bool      &   m\_pin\_2nd\_mem       & has second memory operation \\ \hline
+inst\_info\_s& *m\_info              & pointer to the instruction hash table  \\ \hline
+int       &   m\_rep\_uop\_num       & repeated uop number \\ \hline
+bool      &   m\_eom                 & end of macro \\ \hline
+bool      &   m\_alu\_uop            & alu uop  \\ \hline
+uint32\_t  &   m\_active\_mask       & active mask \\ \hline
+uint32\_t  &   m\_taken\_mask        & branch taken mask \\ \hline
+Addr      &   m\_reconverge\_addr    & address of reconvergence \\ \hline
+bool      &   m\_mul\_mem\_uops      & multiple memory transactions \\ \hline
+
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table*}
+
+\ignore{
+The following shows the data structure for micro-uops. 
+
+\smallskip
+\begin{lstlisting}
+  uint8_t      m_opcode;        /**< opcode */
+  Uop_Type     m_op_type;       /**< type of operation */
+  Mem_Type     m_mem_type;      /**< type of memory instruction */
+  Cf_Type      m_cf_type;       /**< type of control flow instruction */ 
+  Bar_Type     m_bar_type;      /**< type of barrier caused by instruction */
+  uns          m_num_dest_regs; /**< number of destination registers written */
+  uns          m_num_src_regs;  /**< number of source registers read */
+  uns          m_mem_size;      /**< number of bytes read/written by a memory instruction */
+  uns          m_inst_size;     /**< instruction size */
+  Addr         m_addr;          /**< pc address */ 
+  reg_info_s   m_srcs[MAX_SRCS]; /**< source register information */
+  reg_info_s   m_dests[MAX_DESTS]; /**< destination register information */
+  Addr         m_va;            /**< virtual address */
+  bool         m_actual_taken;  /**< branch actually taken */
+  Addr         m_target;        /**< branch target address */
+  Addr         m_npc;           /**< next pc address */ 
+  bool         m_pin_2nd_mem;   /**< has second memory operation */
+  inst_info_s *m_info;          /**< pointer to the instruction hash table */ 
+  int          m_rep_uop_num;   /**< repeated uop number */
+  bool         m_eom;           /**< end of macro */
+  bool         m_alu_uop;       /**< alu uop */ 
+  // GPU simulation
+  uint32_t     m_active_mask;   /**< active mask */
+  uint32_t     m_taken_mask;    /**< branch taken mask */
+  Addr         m_reconverge_addr; /**< address of reconvergence */
+  bool         m_mul_mem_uops;  /**< multiple memory transactions */
+\end{lstlisting}
+\smallskip
+}
 
 % LocalWords:  GPU PTX gpuocelot
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ignore{
+\begin{table*}[htb]
+\begin{footnotesize}
+\begin{center}
+\textsf{
+  \caption{MacSim trace format.}
+  \label{table:trace_format}
+}
+\begin{tabular}{|l|l|} 
+\hline
+Type               & Description \\ \hline 
+uint8\_t           & number of source registers \\ \hline
+uint8\_t           & number of destiantion registers \\ \hline
+uint8\_t[9]        & source register IDs \\ \hline
+uint8\_t[6]        & destination register IDs \\ \hline
+uint8\_t           & branch type \\ \hline
+bool               & indicates whether this instruction has immediate field \\ \hline
+uint8\_t           & opcode \\ \hline
+bool               & indicates whether this instruction has store operation \\ \hline
+bool               & indicates whether this instruction is FP operation \\ \hline
+bool               & write flag \\ \hline
+uint8\_t           & number of load opeartions \\ \hline
+uint8\_t           & instruction size \\ \hline
+uint32\_t          & load address 1 \\ \hline
+uint32\_t          & load address 2 \\ \hline
+uint32\_t          & store address \\ \hline
+uint32\_t          & PC address \\ \hline
+uint32\_t          & branch target address \\ \hline
+uint32\_t          & memory read size \\ \hline
+uint8\_t           & memory write size \\ \hline
+uint8\_t           & repetition direction  \\ \hline
+uint8\_t           & indicates whether branch is actually taken \\ \hline
+
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table*}
+}
+
