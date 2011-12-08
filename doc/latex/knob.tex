@@ -1,19 +1,12 @@
 
 \clearpage
 \section{The Knobs}
-
-
-Describe knob variables and statistics.
-
-
-
-\subsection{The Knobs}
 \label{sec:knob}
 
 To control various architectural parameters, we use multiple knob
 variabls, which are defined in \textit{trunk/def/*.param.def}.
 
-\subsubsection{How to add a new knob}
+\subsection{How to add a new knob}
 \label{sec:knob1}
 
 A new knob variable can be defined in the following format:
@@ -39,14 +32,14 @@ in \textit{trunk/def} directory and the file name should
 be \textit{*.param.def} to parse variables correctly.
 
 
-\subsubsection{How to use a new knob in the simulator}
+\subsection{How to use a new knob in the simulator}
 
 All knob variables will have \textit{KNOB\_} prefix. For example,
 L2\_ASSOC in Section~\ref{sec:knob1} will be KNOB\_L2\_ASSOC in the
 simulator code.
 
 
-\subsubsection{How to apply different value to a knob variables}
+\subsection{How to apply different value to a knob variables}
 
 There are two ways of modifying the default value of a knob variable.
 

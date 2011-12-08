@@ -1,7 +1,70 @@
 
 \clearpage
-\section{How to run Macsim?}
+\section{Macsim Installation and Run}
 
+\subsection{Download}
+
+\SIM source code is maintained using the subversion. 
+You can check out the \SIM copy by
+
+\smallskip
+\begin{lstlisting}
+svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --username readonly
+\end{lstlisting}
+\smallskip
+
+
+\subsection{Wiki and Other Supports}
+
+We manage the google project page in the following url:
+
+\smallskip
+\begin{lstlisting}
+http://code.google.com/p/macsim/
+\end{lstlisting}
+\smallskip
+
+
+\subsection{Build Requirement}
+
+\SIM requires following to build properly.
+
+\begin{enumerate}
+
+  \item Operating System - Currently, we only support linux
+  distributions. Tested systems are as follows.
+
+  \smallskip
+  \begin{lstlisting}
+  Ubuntu
+  Redhat (todo)
+  \end{lstlisting}
+  \smallskip
+
+  \item Compiler - Any compiler that can supports the C++0x (or C++11)
+  standard library. Currently, we tested
+        
+  \smallskip 
+  \begin{lstlisting}
+  gcc   
+  icc (todo)
+  \end{lstlisting} 
+  \smallskip
+
+  \item Autotools - You need to have autotools (automake, autoconf,
+  ...) version 2.65 or higher. You can install autotools by
+
+  \smallskip
+  \begin{lstlisting}
+  Ubuntu: apt-get install autotools-dev automake autoconf
+  Redhat: todo
+  \end{lstlisting}
+  \smallskip
+
+
+\end{enumerate}
+
+\ignore{
 \subsection{Directory Structure}
 
 This section explains the directory structure of \SIM simulator.
@@ -18,7 +81,7 @@ simulators. \textit{Branch} directory is for diverged \SIM, which is
 currently empty. \textit{Trunk} directory is current working directory
 for \SIM.
 
-Follwing is more detailed information about \textit{Trunk} directory.
+Following is more detailed information about \textit{Trunk} directory.
 
 \smallskip
 \begin{lstlisting}
@@ -32,22 +95,26 @@ process. \textit{def} directory has knob (Section~\ref{sec:knob}) and
 statistics (Section~\ref{sec:stat}) definitions. \textit{doc} has the
 documentation. \textit{scripts} includes several scripts files that
 are using during the building process. \textit{src} contains all
-source files. \textit{tools} has several useful tools
-(Section~\ref{sec:tool}).
+source files. \textit{tools} has several useful tools.
+\ignore{ (Section~\ref{sec:tool}) }
+}
 
 
 
-\subsection{Build Process}
+
+
+\subsection{Installation}
 
 The GNU Autotools (automake, autoconf) have been used for building
-\SIM simulator. 
+\SIM simulator. After initial check out of the \SIM copy, following commands are necessary.
 
 \smallskip
 \begin{lstlisting}
-aclocal
-automake --add-missing
-autoconf
-./configure
+aclocal 
+automake 
+--add-missing 
+autoconf 
+./configure 
 make
 \end{lstlisting}
 \smallskip
@@ -73,9 +140,12 @@ The binary \textit{macsim} will be generated in the
 \textit{trunk/bin/} directory.
 
 
+
+
+
 \subsection{Build Types}
 
-There are three different build types.
+We provide three different build types.
 
 \begin{itemize}
   \item opt : default, optimized version (-O3 flag)
@@ -83,7 +153,8 @@ There are three different build types.
   \item gpf : gprof version (-pg flag)
 \end{itemize}
 
-To build a certain type, you need to specify option after \textit{make} command. For example, 
+To build a certain type, you need to specify the option
+after \textit{make} command. For example,
 
 \smallskip
 \begin{lstlisting}
@@ -92,3 +163,109 @@ make dbg
 make gpf
 \end{lstlisting}
 \smallskip
+
+
+
+
+
+\subsection{How To Run \SIM}
+
+To run \textit{macsim} binary, two additional files are required in
+the same directory.
+
+\begin{itemize}
+  \item params.in - defines architectural parameters that will
+  overwrite the default value.
+
+  \item trace\_file\_list - defines the number of traces to run and
+  the path of each trace
+\end{itemize}
+
+\subsubsection{params.in}
+
+We provide sample parameter files for various architectures (Intel
+CPUs, NVIDIA GPUs, ...) in
+the \textit{macsim-top/trunk/params}. Following is sample content of
+params.in file.
+
+\smallskip
+\begin{lstlisting}
+# Simulation Configuration
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+core_type ptx
+large_core_type x86
+cpu_frequency 4
+gpu_frequency 1.5
+sim_cycle_count 0
+max_insts 500000000
+heartbeat_interval 1000000
+forward_progress_limit 50000
+
+
+# Common Core Configuration
+fetch_policy rr
+mt_no_fetch_br 1
+one_cycle_exec 0
+\end{lstlisting}
+\smallskip
+
+The first literal is the name of parameter and the second literal is a
+value that will overwrite the default value. Section~\ref{sec:knob}
+details how to add, modify, and use these parameters.
+
+
+\subsubsection{trace\_file\_list}
+
+Following is the content of a sample trace\_file\_list.
+
+\smallskip
+\begin{lstlisting}
+2
+/trace/ptx/cuda2.2/FastWalshTransform/kernel_config.txt
+/trace/ptx/cuda2.2/BlackScholes/kernel_config.txt
+\end{lstlisting}
+\smallskip
+
+The first line is the number of traces that \SIM will run and
+following lines are the path of each traces. Each top level trace
+configuration file contains various information. Following is the
+content of a top-level trace information file.
+
+
+\smallskip
+\begin{lstlisting}
+1 x86
+0 0
+\end{lstlisting}
+\smallskip
+
+In the first line, the first number indicates the number of threads in
+the application and second literal specifies the type of the
+application. Trailing lines are the information of each thread
+({thread id}, {thread starting point in terms of the instruction count
+of the main thread (thread 0)}).
+
+
+
+\subsubsection{Run}
+
+The following is the sample command lines to run \SIM simulator.
+
+\smallskip
+\begin{lstlisting}
+./macsim [additional commands]
+./macsim --l2_assoc=8 --stdout=stdout --stderr=stderr
+./macsim --l1_assoc=4 
+\end{lstlisting}
+\smallskip
+
+
+
+
+% LocalWords:  Macsim svn macsim readonly username params src Autotools aclocal
+% LocalWords:  automake autoconf autogen dbg gpf gprof CPUs NVIDIA GPUs num sim
+% LocalWords:  ptx cpu gpu insts rr br Wiki google url linux Redhat todo gcc
+% LocalWords:  icc autotools dev stdout stderr
