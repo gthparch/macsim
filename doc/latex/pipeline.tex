@@ -2,16 +2,101 @@
 \clearpage
 \section{The Pipeline Stages}
 
-Describe pipeline stages
+This section describes the basic feature of each pipeline stage. 
+Table~\ref{table:pipeline} shows the list of files that are relevant to each pipeline stage. 
+Please see the doxygen file to get the up-to-date information. 
+
+
+\begin{table}[htb]
+\begin{tabular}{|c||c|}
+\hline 
+
+pipeline stage & file names \\ \hline \hline 
+main simulator & main.cc, core.cc  \\ \hline 
+
+fetch stage & frontend.cc, fetch\_factor.cc bp.cc bp\_*.cc   \\ \hline 
+decode stage &  allocate.cc \\ \hline 
+allocate stage & allocate.cc allocate\_*.cc rob.cc rob\_*.cc map.cc  \\ \hline 
+schedule stage & schedule.cc schedule\_*.cc  \\ \hline 
+execution stage & exec.cc \\ \hline 
+retire stage & retire.cc \\ \hline 
+memory system &  port.cc cache.cc *\_cache.cc dram.cc memory.cc \\ 
+
+other supporting files &  statistics.cc bug\_detector.cc   \\  \hline \hline 
+
+process manager & process\_manager.cc \\ \hline 
+\end{tabular}
+\caption{Pipeline stage and corresponding source code names}
+\label{table:pipeline}
+\end{table}
+
+
 
 \subsection{Fetch Stage}
+This pipeline stage models the instruction fetch stage. 
 
-\subsection{Decode Stage}
+The main tasks of this stage are 
+\begin{enumerate}
+\item Determine a thread from which instructions are fetched 
+\item Check whether the thread can actually fetch a new instruction or not  
+\item access I-cache  (when icache miss, the front-end cannot fetch an instruction) 
+\item read a uop from trace from (call {\tt get\_uops\_from\_traces})
+\item BTB access and branch prediction 
+\item send uop to {\tt q\_fe} to model the depth of front-end 
+\end{enumerate}
+The depth of front-end stage is set by {\tt fetch\_latency} and it basically sets the length of 
+{\tt q\_fe  }
 
-\subsection{Allocate Stage}
+Different fetch polices are implemented using virtual function. {\tt fetch\_factory} function sets 
+different {\tt frontend\_c}. Currently, a thread is selected based on the round-robin policy. If the next thread is blocked to fetch, the next candidate is selected based on the round-robin policy. 
+
+ Different branch predictor policies are also implemented and it is also set by {\tt bp\_factory}. The type of branch predictor or the fetch polices are set by knobs. 
+
+
+
+\subsubsection{Trace Read} 
+Trace read is mainly performed in trace\_read.cc. 
+The main task of trace read is reading an macro instruction from trace file and convert it to uops. 
+A simple decoding algorithm is used to generate micro uops. 
+To improve the simulation speed, decoded uops are stored in a hash table. 
+Which trace file to open is decided in process\_manager.cc 
+
+
+
+\subsection{Decode and  Allocate Stage }
+This stage is simply implemented with {\tt  allocate queue}.
+At the end of this stage,  the simulator performs resource allocations such as rob entry and load-store buffer. 
+Branch target is resolved in this stage as well. 
 
 \subsection{Schedule Stage}
+The scheduler stage implements scheduling logic. Currently it supports in-order, out-of-order, and GPU scheduling mechanism. 
+First, it checks the source code availability and then functional unit availability-by checking ports. 
+ The scheduler is implemented in a virtual function so different scheduling policies overload the scheduling functions. 
 
 \subsection{Execution Stage}
 
+In this stage, both memory instructions and other instructions are executed. 
+\begin{enumerate} 
+
+\item The latency of uop is checked in this stage. 
+{\tt ../def/uoplatency\_ptx.def} includes the latency of uops. 
+{\tt uop->m\_done\_cycle} indicates the end of execution time. 
+
+\item This stage also controls the number of function units by using the following three parameters. 
+{\tt int\_sched\_rate, mem\_sched\_rate, fp\_sched\_rate}
+
+\item For memory instructions, the simulator checks dcache at the beginning of the execution cycle 
+and if there is a dcache miss, it is handled separately. Memory system is explained in Section~\ref{sec:memory}
+
+\item This stages also handles uncoalesced memory operations. Uncoalesced memory requests are handed 
+by using children uop structures. In {\tt trace\_read.cc} file already generated children uop when it detects uncoalesced memory requests. 
+
+\item Branch instructions are resolved in this stage as well. 
+\end{enumerate} 
+
 \subsection{Retire Stage}
+This stage handles retiring uops. It supports in-order retirement. 
+This stage also frees uop structures. 
+
+% LocalWords:  doxygen frontend bp uops  GPU uop dcache uncoalesced BTB fe mem
+% LocalWords:  sched fp icache ptx
