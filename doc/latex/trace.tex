@@ -7,10 +7,14 @@ The following sections explain how to generate CPU and GPU traces.
 
 \subsection{CPU (X86) Traces}
 
-CPU (X86) traces are generated with the aid of Pin~\cite{}, which is a binary instrumentation tool.
-The detail descriptions of Pin including installation can be found in http://www.pintool.org. 
-After installing Pin, we need to build the X86 trace generator module (trace\_generator.so) for MacSim, which can be 
-simply done with the following commands.
+CPU (X86) traces are generated with the aid of Pin~\cite{pin}, which
+is a binary instrumentation tool.  The detail descriptions of Pin
+including installation can be found in http://www.pintool.org.  After
+installing Pin\footnote{Note that our CPU trace generator may not be
+backward/forward compatible with the pin version. Currently, pin 41150
+revision (Jun 07, 2011) must be used.}, we need to build the X86 trace
+generator module (trace\_generator.so) for MacSim, which can be simply
+done with the following commands.
 
 \smallskip
 \begin{lstlisting}
@@ -47,7 +51,7 @@ When finishing the trace generation, the trace.txt and trace\_0.raw are created 
 
 \subsection{GPU (PTX) Traces}
 
-GPU (PTX) traces are generated using Ocelot~\cite{}, which is a dynamic compilation
+GPU (PTX) traces are generated using Ocelot~\cite{ocelot}, which is a dynamic compilation
 framework for heterogenous system. 
 
 \subsubsection{Installing Ocelot}
@@ -118,6 +122,7 @@ drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
 
 
 \subsection{Trace Format}
+\label{sec:traceformat}
 
 In the generated trace, there are mainly two different types of files.
 \begin{itemize}\itemsep2pt
