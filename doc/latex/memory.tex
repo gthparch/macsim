@@ -73,7 +73,23 @@ All cache accesses flow from one queue to the other queue.
 
 \subsection{The Hierarchy}
 
-\SIM maintains very flexible memory hierarchy.
+\SIM maintains very flexible memory hierarchy. Each level of cache 
+hierarchy is independent and \SIM defines the link between the
+levels. Here are some basics.
+
+
+\begin{itemize}
+  \item There are three levels (L1, L2, and L3) of caches in the \SIM
+  although L2 cache might be disabled in some configurations.
+
+  \item L1 and L2 caches are always private to each processors.
+
+  \item The local router within a cache structure is enabled when
+  necessary.
+
+  \item L3 is unified (shared by all cores), but tiles. 
+
+\end{itemize}
 
 
 

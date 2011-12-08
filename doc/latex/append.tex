@@ -1,0 +1,423 @@
+
+
+\clearpage
+\appendix
+
+\section{Coding Style Guideline}
+
+
+\subsection{Naming Conventions}
+
+Names should be as descriptive as possible, do not hesitate to use
+long names.  Shorten names only when the purpose of the name can still
+be understood clearly.
+
+
+\subsubsection{Classes}
+
+\begin{itemize}
+
+  \item \textbf{Class names} should use lower case alphabets only.  If the name
+consists of multiple words, then the words should be separated using
+the underscore character. Class names should end with c.  Eg.
+
+\smallskip
+\begin{lstlisting}
+class  my_class_c;
+\end{lstlisting}
+\smallskip
+
+
+  \item \textbf{Class member variables} should use the prefix m .  Member variable
+names should use lower case alphabets only, multiple words should be
+separated using the underscore character.  Eg.
+
+\smallskip
+\begin{lstlisting}
+int  m_instance_variable;
+\end{lstlisting}
+\smallskip
+
+
+  \item \textbf{Accessor i.e, get/set, member functions} should use
+the names of the corresponding member variables without the m
+suffix. In addition, the set functions should use the prefix set ,
+while no prefix is needed for the get functions.  Eg.
+
+
+\smallskip
+\begin{lstlisting}
+int  m_my_variable;
+...
+...
+void  set_my_variable(int);
+int  my_variable();
+\end{lstlisting}
+\smallskip
+
+
+  \item \textbf{Other member functions} should always start with a
+verb, multiple words should be separated with the underscore character
+and no upper case letters are allowed.  Eg.
+
+\smallskip
+\begin{lstlisting}
+int  access_cache();
+\end{lstlisting}
+\smallskip
+
+
+  \item Example class declaration
+
+\smallskip
+\begin{lstlisting}
+class  my_class_c  {
+  private:
+    int  m_var_one;
+    bool  m_var_two;
+    ...
+    ...
+
+    void  set_var_one(int);
+    int  var_one();
+    ...
+    int  check_values();
+};
+\end{lstlisting}
+\smallskip
+
+\end{itemize}
+
+
+
+
+
+\subsubsection{Structures}
+
+\begin{itemize}
+
+  \item Structure names should use lower case alphabets only. If the
+name consists of multiple words, then the words should be separated
+using the underscore character. Structure names should end with s. Eg.
+
+\smallskip
+\begin{lstlisting}
+struct  my_struct_s;
+\end{lstlisting}
+\smallskip
+
+  \item Do not use any prefix or suffix for structure member
+  variables.
+
+  \item Example structure declaration
+
+\smallskip
+\begin{lstlisting}
+typedef struct my_type_s  {
+  type field_one;
+  type field_two;
+}  my_type_s;
+\end{lstlisting}
+\smallskip
+
+\end{itemize}
+
+
+
+
+
+\subsubsection{Other Types}
+
+Other user defined types should use only lower case letters with
+multiple words being separated by the underscore character. These
+types should use the suffix t.  Eg.
+
+\smallskip
+\begin{lstlisting}
+typedef  std::map<int,  std::list<int>  > my_type_t;
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{Global Variables}
+
+Global variable names should use the prefix g and use lower case
+letters only, multiple words should be separated by the underscore
+character.  Eg.
+
+\smallskip
+\begin{lstlisting}
+int  g_my_global_variable;
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{Local Variables}
+
+Local variables follow the same convention as global variables, except
+that they do not require the g prefix.  Eg.
+
+\smallskip
+\begin{lstlisting}
+int  my_local_variable;
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{Constant  Variables}
+
+Constant variables follow the same convention as global variables,
+except that they use the prefix k , instead of g .  Eg.
+
+\smallskip
+\begin{lstlisting}
+const  int  k_my_const  = 25;
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{Macros}
+
+Macro names should use upper case letters only with multiple words
+being separated my underscores. Eg.
+
+\smallskip
+\begin{lstlisting}
+#define  MAX_NUM_THREADS  8192
+\end{lstlisting}
+\smallskip
+
+
+
+
+\subsection{Formatting and Readability}
+
+\subsubsection{Indentation}
+
+Use only spaces for indentation, do not use tabs.  The indentation
+must be two spaces wide.
+
+
+\subsubsection{Variable Declaration}
+
+Variables should be declared at the point in the code where they are
+needed, and should be assigned an initial value at the time of
+declaration.
+
+
+\subsubsection{Control Statements and Function Definitions}
+
+\begin{itemize}
+
+  \item For \textit{if}, \textit{for}, \textit{while}
+and \textit{switch} statements, there should be a single single space
+between the keyword and the opening parenthesis.  The opening curly
+brace should appear on the same line as the statement and there should
+be a single space between the closing parenthesis and the opening
+curly brace.  The opening curly brace following a do statement must
+also follow the same rules.  The \textit{while} of a \textit{do while}
+loop should be on the same line as the closing parenthesis of the loop
+body and should be separated from the closing parenthesis by a single
+space.  Eg.
+
+\smallskip
+\begin{lstlisting}
+//correct
+if (condition)  { 
+  statement 1; 
+  statement 2;
+}
+
+//correct
+for  (int  ii = 0;  ii < N;  ++ii)  {
+  statement 1;
+  statement 2;
+}
+
+//correct
+while  (condition)  { 
+  statement 1; 
+  statement 2;
+}
+
+//correct
+switch  (variable)  {
+  condition 1: 
+    statement 1; 
+    break;
+  condition 2: 
+    statement 2; 
+    break;
+  default: 
+    statement 3; 
+    break;
+}
+
+//correct 
+do {
+  statement 1;
+  statement 2;
+} while (condition);
+\end{lstlisting}
+\smallskip
+
+
+
+  \item \textit{else} statements should be on the line following the
+closing parenthesis of the corresponding if block. There should be a
+single space between the else keyword and the opening curly brace of
+the else block. The same rules apply for \textit{else if} statements
+as well.  Eg.
+
+\smallskip
+\begin{lstlisting}
+//correct
+if (test_cond)  {
+...
+}
+else  {
+...
+
+}
+
+//correct
+if (test_cond)  {
+...
+}
+else  if (another_cond)  {
+...
+}
+\end{lstlisting}
+\smallskip
+
+  \item When defining functions, there should be no spaces between the
+function name and the opening parenthesis, there should be a single
+space between the closing parenthesis and the opening curly brace which
+should appear on the same line as the function name.  Eg.
+
+\smallskip
+\begin{lstlisting}
+//correct
+int  my_func_defn(int  arg_a,  int  arg_b)  {
+  ...
+}
+\end{lstlisting}
+\smallskip
+\end{itemize}
+
+
+\subsubsection{Horizontal Spacing}
+
+Except for when using the operators listed below use a single space
+between the operator and the operands (note the slight difference in
+using the comma operator).  For the operands listed below, spaces
+should not be used.  List of operators which do not need horizontal
+spacing:
+
+\smallskip
+\begin{lstlisting}
+() [] ->    ++ -- + - ! ~  (type)  *  &   sizeof
+\end{lstlisting}
+\smallskip
+
+Eg.
+
+\smallskip
+\begin{lstlisting}
+i = j + k * i;     // correct 
+i = j+k*i;         // wrong
+
+array[i]  = j;     // correct 
+array [i] = j;     // wrong
+
+my_func(a, b, c);  // correct 
+my_func(a,b,c);    // wrong
+\end{lstlisting}
+\smallskip
+
+
+
+\subsubsection{Statements}
+
+Each statement should be on its own line, this applies to variable
+declarations as well. Eg.
+
+\smallskip
+\begin{lstlisting}
+int i = 0;          // correct 
+int j = 0;          // correct
+int i = 0,  j = 0;  // wrong 
+i++;                // correct
+j++;                // correct
+
+i++;  j++;          // wrong 
+i = 0;  j = 0;      // Wrong
+\end{lstlisting}
+\smallskip
+
+
+
+\subsubsection{Column Length}
+
+Lines should not exceed more than 80 characters in length.  If a line
+is longer than 80 characters, split it into multiple lines.
+
+
+\subsection{Header Files and Include Directives}
+
+\begin{itemize}
+
+  \item All header files should have an ``include guard'' to prevent
+  accidental inclusion of the file multiple times in a single
+  compilation unit.  The include guard should be named after the file
+  name.  Eg.
+
+\smallskip
+\begin{lstlisting}
+// in  pref_common.h
+#ifndef  PREF_COMMON_H  #define  PREF_COMMON_H
+...
+...
+#endif
+\end{lstlisting}
+\smallskip
+
+
+  \item Avoid including header files in other header files by using
+  forward declaration.
+
+  \item All include directives should be grouped with system files
+  listed first, followed by normal simulator header files.
+\end{itemize}
+
+\subsection{Comments}
+
+Use Doxygen style comments. More to be added.
+
+
+\subsection{Other Rules}
+
+\begin{itemize}
+
+  \item Avoid C style coding, try to build and use classes as much as
+    possible.
+
+  \item Define types which will not have functions other that accessor
+    functions (and constructor and destructor) as structures. Use
+    classes only if functions other than set/get will be needed.
+
+  \item Definition of constructors and destructors (for both classes
+    and structs) and class member functions should not be included in
+    header files, unless the definitions are very small.
+
+  \item Declare all global variables in global vars.h and define them
+    in main.cc.
+
+  \item More to be added.
+\end{itemize}
+
+
+
+
+% LocalWords:  Eg Accessor bool struct typedef const NUM cond func defn arg
+% LocalWords:  sizeof ifndef endif Doxygen accessor destructors structs
