@@ -8,26 +8,24 @@ Please see the doxygen file to get the up-to-date information.
 
 
 \begin{table}[htb]
+\begin{center}
+\caption{Pipeline stage and corresponding source code names.}
+\label{table:pipeline}
 \begin{tabular}{|c||c|}
 \hline 
-
-pipeline stage & file names \\ \hline \hline 
-main simulator & main.cc, core.cc  \\ \hline 
-
-fetch stage & frontend.cc, fetch\_factor.cc bp.cc bp\_*.cc   \\ \hline 
-decode stage &  allocate.cc \\ \hline 
-allocate stage & allocate.cc allocate\_*.cc rob.cc rob\_*.cc map.cc  \\ \hline 
-schedule stage & schedule.cc schedule\_*.cc  \\ \hline 
-execution stage & exec.cc \\ \hline 
-retire stage & retire.cc \\ \hline 
-memory system &  port.cc cache.cc *\_cache.cc dram.cc memory.cc \\ 
-
-other supporting files &  statistics.cc bug\_detector.cc   \\  \hline \hline 
-
-process manager & process\_manager.cc \\ \hline 
+pipeline stage         & file names                                             \\ \hline \hline 
+main simulator         & macsim.cc, core.cc                                     \\ \hline 
+fetch stage            & frontend.cc, fetch\_factory.cc, bp.cc, bp\_*.cc        \\ \hline 
+decode stage           & allocate.cc                                            \\ \hline 
+allocate stage         & allocate.cc, allocate\_*.cc, rob.cc, rob\_*.cc, map.cc \\ \hline 
+schedule stage         & schedule.cc, schedule\_*.cc                            \\ \hline 
+execution stage        & exec.cc                                                \\ \hline 
+retire stage           & retire.cc                                              \\ \hline 
+memory system          & port.cc, cache.cc *\_cache.cc, dram.cc, memory.cc      \\ \hline \hline
+other supporting files & statistics.cc, bug\_detector.cc                        \\ \hline \hline 
+process manager        & process\_manager.cc                                    \\ \hline 
 \end{tabular}
-\caption{Pipeline stage and corresponding source code names}
-\label{table:pipeline}
+\end{center}
 \end{table}
 
 
