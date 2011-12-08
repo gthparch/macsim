@@ -1,8 +1,53 @@
 
 \clearpage
-\section{Process and Thread Scheduler}
+\section{Process Manager/Thread Scheduler}
 
-Describe process and thread scheduler
+MacSim uses a common Process Manager/Thread Scheduler for both CPU threads and
+GPU warps. For each application that is to be simulated, the Process Manager
+creates a process and also creates the threads/warps in the application. Based
+on the simulation configuration, the Process Manager assigns cores to each
+application, these cores are dedicated to the application. In case of CPU
+applications, only the main thread of the application is launched first. The
+trace config that is input to the simulator specifies in terms of instructions
+executed by the main thread when each child thread should be started. When a
+child thread becomes ready for execution, the Process Manager is responsible
+for assigning the child threads to cores. In case of GPU applications, the
+Process Manager creates warps and forms thread blocks from these warps. The
+thread blocks are assigned to cores according to the maximum number of blocks
+supported by the core. Though the term core is commonly used for both X86 cores
+and GPU cores, we want to clarify that a X86 thread can run only on a core
+specified as X86 and a warp/block can run only a core specified as a GPU core.
+Threads/warps once assigned to a core, remain attached to the core until they
+terminate. When a thread or a warp terminates, the Process Manager is invoked
+again for updating bookkeeping information. When it is determined that an
+application can terminated, based on the simulation parameters, the Process
+Manager could repeat the simulation of the application until the termination
+condition is met.
 
 
+
+Some of the key data structures used by the Process Manager are:
+
+\begin{description}
+
+\item [process\_s] For each application that is to be simulated, the process manager
+creates a instance of type process\_s. This structure includes information such
+as process id, start information of threads, number of threads (warps) in
+application, number of threads (warps) created, number of threads (warps)
+  terminated, list of cores on which the application can run and so on.
+
+\item [thread\_s] This structure is analogous to the task struct maintained by an
+operating system kernel. Each CPU thread and GPU warp has an instance of
+thread\_s structure. This structure includes fields for thread id, block id,
+  pointer to trace file, process to which the thread belongs and other fields. 
+
+\item [block\_schedule\_info\_s] Bookkeeping structure representing thread blocks in
+a GPGPU application. This structure contains fields for number of warps in a
+block, number of terminated warps, core to which the block is assigned and so
+on.
+
+\item [thread\_trace\_info\_node\_s] Wrapper structure around thread\_s used by
+Process manager to track threads/warps yet to be assigned cores.
+
+\end{description}
 
