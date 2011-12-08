@@ -1,0 +1,29 @@
+
+\clearpage
+\section{Internal Users Only Manual}
+\subsection{Regression Tests}
+\label{sec:regression}
+
+Let's say your current working directory name is macsim-working
+
+\begin{enumerate}
+
+\item Step 1: you need to get a clean copy of macsim again. let's say you are getting a new copy in macsim-regression directory.
+
+{\tt svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-regression --username user }
+
+\item Step 2: you have to get a simulator tool, which is still in the hparch svn repository.
+
+\item Step 3: go to macsim-regression/trunk/bin directory and execute regression\_gen.py which is in your tool directory.
+
+\item Step 4: go to macsim-working/trunk/bin directory and execute regression\_test.py which is in your tool directory. 
+
+\end{enumerate}
+
+
+\subsection{How to Add New Files in MacSim}
+
+\begin{verbatim}  run 'patch -p0 -i macsim-internal.patch', this will update <macsim_root>/.obj/Makefile.am to include the internal files in the build \end{verbatim}
+
+
+\subsection{What to use internal directory}

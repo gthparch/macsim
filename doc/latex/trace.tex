@@ -145,6 +145,8 @@ generated, and the value is the same as the number of following lines. The trace
 type is filled by either x86 and ptx according to the type of the trace. The following
 lines indicate the thread ID and the number of instructions to skip in each thread's trace.
 
+
+
 \begin{table*}[htb]
 \begin{footnotesize}
 \begin{center}
@@ -163,6 +165,12 @@ For each thread ID, there exists a corresponding trace\_xx.raw file which
 contains various information to execute an instruction.
 Tables~\ref{table:trace_format} and ~\ref{table:trace_desc} show the trace
 format for each instruction and the description of each field, respectively.
+
+
+
+
+
+
 
 \begin{table*}[htb]
 \begin{footnotesize}
@@ -277,6 +285,16 @@ The following shows the data structure for micro-uops.
 \end{lstlisting}
 \smallskip
 }
+
+\subsubsection{Internals of Trace File Examples?}
+
+TBD: 
+CPU traces including child thread 
+and GPU traces including child thread ...
+
+
+
+
 
 % LocalWords:  GPU PTX gpuocelot
 
