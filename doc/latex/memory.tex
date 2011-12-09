@@ -289,8 +289,34 @@ We provide several example of the cache hierarchy.
 
 \subsection{DRAM Module} 
 
+\SIM also models detail memory controllers: timing constraint, 
+bandwidth, and scheduling. Section~\ref{sec:param-dram} describes how
+to configure DRAM parameters.
+
+The DRAM controller consists of multiple banks with one ore more
+channels. Each bank has own request buffer and bank scheduler picked
+
+\begin{itemize}
+  \item The bank scheduler picks a request based on the policy (FCFS,
+  FRFCFS, ...) if nothing is served now.
+
+  \item The channel scheduler picks a request from command-ready banks
+  (usually oldest request first). Based on the command, appropriate
+  timing constraint is enforced to the bank.
+
+  \item Once the column access signal is sent, the data is prepared
+  from the DRAM chip (load) or the data is sent to the DRAM chip
+  (store). Among multiple data-ready banks, the channel scheduler
+  picks a request based on the policy (oldest-first).
+
+  \item When the data is ready/sent for a request, the data is
+  supplied to the cache (load) or the request is completed (store).
+
+  \item If there are memory requests with the same address, these
+  requests are merged into one dram request. 
+
+\end{itemize}
 
 
 
-
-% LocalWords:  prev bool microarchitecture Nehalem num init NVIDIA
+% LocalWords:  prev bool microarchitecture Nehalem num init NVIDIA FCFS FRFCFS
