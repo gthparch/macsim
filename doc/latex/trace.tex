@@ -1,6 +1,7 @@
 
 \clearpage
 \section{Trace Generation}
+\label{sec:trace_generation}
 
 MacSim needs the trace of running applications in order to run a simulation.
 The following sections explain how to generate CPU and GPU traces.
@@ -49,6 +50,7 @@ dump.txt_0.dump  pin.log  trace_0.raw  trace_generator.o  trace_generator.so  xe
 After the trace generation is done, Trace.txt and trace\_0.raw are created in the directory.
 
 \subsection{GPU (PTX) Traces}
+\label{sec:gpu_traces}
 
 GPU (PTX) traces are generated using Ocelot~\cite{ocelot}, which is a dynamic compilation
 framework for heterogeneous system. 
@@ -123,54 +125,75 @@ drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
 \subsection{Trace Format}
 \label{sec:traceformat}
 
-In the generated trace, there are mainly two different types of files.
+There are mainly two different kinds of files in both X86 and PTX traces as
+below, which will be explained in the following subsections.
+
 \begin{itemize}\itemsep2pt
-\item Trace.txt : contains the overall information of the trace (\#thread, trace type, ...).
-\item Trace\_xx.raw : contains instruction for a thread and is generated for each thread (warp in case of GPU)
+\item Trace.txt (info trace): contains the outline information of the trace (\#thread, trace type, ...).
+\item Trace\_xx.raw (raw trace): contains instructions for a thread and is generated for each thread (warp\footnote{A warp consists of 32 threads in CUDA.} in case of GPU)
 \end{itemize}
 
-First, Trace.txt contains the outline of the generated trace and the format looks as follows: 
+\subsubsection{Trace.txt}
+\begin{figure*}[htb]
+\centering
+\includegraphics{figs/trace_format}
+\caption{Trace.txt format.}
+\label{fig:trace_format}
+\end{figure*}
+
+Figure~\ref{fig:trace_format} shows the format of Trace.txt and its CPU and GPU
+examples.  As shown in Figure~\ref{fig:trace_format}-(a), the first line in the
+Trace.txt file has different fields from the rest of lines.
+
+\begin{itemize}\itemsep2pt
+\item \#Threads: indicates the number of threads whose trace is generated, and the value 
+is the same as the number of following lines. 
+\item Trace Type: indicates whether the generated trace is either x86 or ptx.
+\item Optional Fields: are currently used for PTX traces, which indicates the number of thread blocks
+which will be assigned to a streaming multiprocessor(SM) core (occupancy).
+\end{itemize}
+
+From the second line, there are two fields in each line: thread ID and start
+instruction number.  For each thread ID, there exists a trace\_xx.raw where
+dynamic instructions for the thread are stored. Finally, Start Instruction No.
+indicates the number of instructions to skip when executing instructions in the
+Trace\_xx.raw file.
+
+For instance, in Figure~\ref{fig:trace_format}-(b), we can see that the CPU
+trace has four threads and its type is set to x86. Optional Fields are not used 
+since they are only for GPU traces. We also know that Trace\_0.raw$-$Trace\_3.raw 
+exist because \#Thread indicates that there are raw traces for four threads. 
+Finally, for each raw trace, we start to execute instructions from the beginning
+since the Start Instruction No. field is zero.
+
+In the GPU example, the number of raw traces are 2048 since \#Threads is 2048.
+Note that \#Threads indeed means \#Warp in case of GPU traces, so that raw traces
+are generated for each warp. In addition, the optional field implies that eight 
+thread blocks can be assigned to a SM core. 
+
+In the GPU trace, thread ID is calculated by thread block ID * 65536 + warp ID (in a block). 
+In the example, warps 0, 1, 2 and 3 are comprised of a thread block, and warps 65536, 65537, 65538
+and 65539 forms another thread block.
+
+\subsubsection{Trace\_xx.raw}
+
+Trace\_xx.raw is generated for each thread/warp and contains a raw information
+of dynamic instructions executed for the thread. This raw trace contains various
+information such as opcode and source registers for each instruction, whose format 
+is the same between x86 and PTX traces and looks as follows:
+
 \smallskip
 \begin{lstlisting}
-#Threads | Trace Type | (Optional Fields)
-1st Thread ID         | Start Instruction No.
-2nd Thread ID         | Start Instruction No.
-...
-nth Thread ID         | Start Instruction No.
+trace format for an instruction in trace_xx.raw
+
+nSR | nDR | SR_IDs | DR_IDs | BrType | bImm | Opcode | bStore | bFP | WF | nLD | InstSize |
+LAddr_1 | LAddr_2 | SAddr | PCAddr | BrAddr | MemRSize | MemWSize | RepDir | BrActT 
 \end{lstlisting}
 \smallskip
 
-\#Threads in the first line indicates the number of threads whose trace is 
-generated, and the value is the same as the number of following lines. The trace
-type is filled by either x86 and ptx according to the type of the trace. The following
-lines indicate the thread ID and the number of instructions to skip in each thread's trace.
-
-
-
-\begin{table*}[htb]
-\begin{footnotesize}
-\begin{center}
-\caption{MacSim trace format.}
-\label{table:trace_format}
-\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
-\hline
-nSR & nDR & SR\_IDs & DR\_IDs & BrType & bImm & Opcode & bStore & bFP & WF & nLD  \\ \hline \hline
-InstSize & LAddr\_1 & LAddr\_2 & SAddr & PCAddr & BrAddr & MemRSize & MemWSize & RepDir & BrActT & \\ \hline
-\end{tabular}
-\end{center}
-\end{footnotesize}
-\end{table*}
-
-For each thread ID, there exists a corresponding trace\_xx.raw file which
-contains various information to execute an instruction.
-Tables~\ref{table:trace_format} and ~\ref{table:trace_desc} show the trace
-format for each instruction and the description of each field, respectively.
-
-
-
-
-
-
+Table~\ref{table:trace_desc} summarizes the size of each field and its description.
+Note that the raw trace is compressed with zlib to reduce the size when generated, and
+the size of each field in the table is before the compression.
 
 \begin{table*}[htb]
 \begin{footnotesize}
@@ -207,8 +230,45 @@ BrActT    & 1                  & indicates whether branch is actually taken \\ \
 \end{footnotesize}
 \end{table*}
 
-While running a simulation, each instruction in the above \emph{raw trace} is converted 
-into one or more micro-ops. MacSim stores such decoded micro-uops into a MacSim-specific
+\subsubsection{kernel\_config.txt (only for PTX)}
+
+For PTX traces, as described in Section~\ref{sec:gpu_traces}, a directory is
+created for each kernel invocation, where Trace.txt and Trace\_xx.raw are
+generated. Since typical GPU applications usually invoke several kernels (or
+    execute the same kernel repeatedly), PTX traces can have multiple kernel
+directories. Thus, in order to simulate all invoked kernels for a GPU
+application, the PTX trace generator creates kernel\_config.txt which contains
+the information of invoked kernels.
+
+\smallskip
+\begin{lstlisting}
+/trace/ptx/parboil/bfs
+drwxr-xr-x  4 4294967294 4294967294 4096 Sep 21 13:21 .
+drwxr-xr-x 11 4294967294 4294967294 4096 Sep 13 18:02 ..
+drwxr-xr-x  2 4294967294 4294967294 4096 Apr  7  2011 _Z17BFS_in_GPU_kernelPiS_P4int2S1_S_S_iS_ii_0
+drwxr-xr-x  2 4294967294 4294967294 4096 Apr  7  2011 _Z26BFS_kernel_multi_blk_inGPUPiS_P4int2S1_S_S_S_S_iiS_S_S__0
+-rw-r--r--  1 4294967294 4294967294  184 Apr  7  2011 kernel_config.txt
+
+In kernel_config.txt
+
+-1 newptx
+/trace/ptx/parboil/bfs/_Z17BFS_in_GPU_kernelPiS_P4int2S1_S_S_iS_ii_0/Trace.txt
+/trace/ptx/parboil/bfs/_Z26BFS_kernel_multi_blk_inGPUPiS_P4int2S1_S_S_S_S_iiS_S_S__0/Trace.txt
+\end{lstlisting}
+\smallskip
+
+As shown above, all the invoked kernels are enumerated in kernel\_config.txt.
+The first line indicates that this is a wrapper file which contains (multiple) trace.txt files, and
+the traces are read one by one when finishing the previous trace in MacSim.
+In the above example (bfs), kernel\_config.txt indicates that there are two different
+kernels in bfs, each of which was invoked once. When running a GPU simulation, we put 
+the kernel\_config.txt file into trace\_file\_list (Section~\ref{sec:trace_file_list}). 
+Also, we can simulate specific kernels by modifying the kernel\_config.txt file.
+
+\subsubsection{Trace for micro-ops}
+
+While running a simulation, each instruction in the \emph{raw trace} is converted 
+into one or more micro-ops internally. MacSim stores such decoded micro-uops into a MacSim-specific
 trace structure to facilitate the simulation by populating each field, which is shown 
 in Table~\ref{table:trace_uops}.
 
@@ -286,16 +346,6 @@ The following shows the data structure for micro-uops.
 \smallskip
 }
 
-\subsubsection{Internals of Trace File Examples?}
-
-TBD: 
-CPU traces including child thread 
-and GPU traces including child thread ...
-
-
-
-
-
 % LocalWords:  GPU PTX gpuocelot
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -336,4 +386,25 @@ uint8\_t           & indicates whether branch is actually taken \\ \hline
 \end{footnotesize}
 \end{table*}
 }
+
+\ignore{
+\begin{table*}[htb]
+\begin{footnotesize}
+\begin{center}
+\caption{MacSim trace format.}
+\label{table:trace_format}
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+nSR & nDR & SR\_IDs & DR\_IDs & BrType & bImm & Opcode & bStore & bFP & WF & nLD  \\ \hline \hline
+InstSize & LAddr\_1 & LAddr\_2 & SAddr & PCAddr & BrAddr & MemRSize & MemWSize & RepDir & BrActT & \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table*}
+
+Tables~\ref{table:trace_format} and ~\ref{table:trace_desc} show the trace
+format for each instruction and the description of each field, respectively.
+}
+
+
 
