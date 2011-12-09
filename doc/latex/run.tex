@@ -265,7 +265,34 @@ The following is the sample command lines to run \SIM simulator.
 
 
 
-\subsubsection{Runnint Repeat Traces} 
+\subsubsection{Repeating Trace}
+
+For multiple-application simulations, early terminated applications
+sometimes need to be re-executed to model resource contention (cache,
+on-chip interconnection, and memory controller) until all applications
+finish. This is a common methodology to evaluate multi-program
+workloads in the literature. \SIM also supports this feature. To
+enable this feature, you need to
+
+\begin{itemize}
+  \item Specify the configuration in the command line by
+  \smallskip
+  \begin{lstlisting}
+  ./macsim --repeat_trace=1
+  \end{lstlisting}
+  \smallskip
+
+  \item Or you can write this in \textit{params.in} file
+  \smallskip
+  \begin{lstlisting}
+  repeat_trace 1
+  \end{lstlisting}
+  \smallskip
+\end{itemize}
+
+
+
+ 
 
 % LocalWords:  Macsim svn macsim readonly username params src Autotools aclocal
 % LocalWords:  automake autoconf autogen dbg gpf gprof CPUs NVIDIA GPUs num sim

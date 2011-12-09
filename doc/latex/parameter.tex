@@ -2,31 +2,233 @@
 \clearpage
 \section{Setting up Parameters}
 \label{sec:parameter}
-This section provides sample examples for parameters to run different types of simulations.
 
-\subsection{Basic Experiments}
-\subsubsection{One x86 Core}
+This section provides sample examples for parameters to run different
+types of simulations.
 
-\subsection{Multi-core simulations}
-\subsubsection{Multiple x86 cores}
 
-\subsection{GPU Simulation}
-\subsubsection{GPUs with one application}
-\subsubsection{GPUs with multipe application}
+
+\subsection{\cpu Experiments}
+
+\subsubsection{One \cpu Core}
+
+Usually, we use large core configurations for specifying x86 cores
+(however, it does not have to).
+
+\smallskip
+\begin{lstlisting}
+// macsim-top/trunk/params/params_x86
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+large_core_type x86
+\end{lstlisting}
+\smallskip
+
+\subsubsection{Multiple \cpu cores}
+
+Multiple core simulations are very similar to single core simulations,
+but you need to specify the number of cores differently.
+
+\smallskip
+\begin{lstlisting}
+// 4-core simulation
+num_sim_cores 4
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 4
+large_core_type x86
+repeat_trace 1
+\end{lstlisting}
+\smallskip
+
+
+\subsubsection{2-way SMT x86 Core}
+
+\SIM also supports the simultaneous multi-threading (SMT) features. 
+There parameters are used for the SMT configurations: 
+\textsf{max\_threads\_per\_core}, \textsf{max\_threads\_per\_medium\_core}, 
+and \\\textsf{max\_thread\_per\_large\_core}. For example,
+
+\smallskip
+\begin{lstlisting}
+// 1-core 2-way SMT configuration
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+large_core_type x86
+max_threads_per_large_core 2
+repeat_trace 1
+\end{lstlisting}
+\smallskip
+
+
+
+\subsection{\gpu Simulation}
+
+Usually, we use small core configurations for \gpu cores. We provide
+several pre-defined configuration files for NVIDIA architectures. Here
+are the list of sample files.
+
+\smallskip
+\begin{lstlisting}
+params_8800gt // NVIDIA GeForce 8800GT (G80 architecture)
+params_gtx280 // NVIDIA GeForce GTX280 (GT200 architecture)
+params_gtx465, params_gtx480 // NVIDIA GeForece GTX465, GTX480 (Fermi architecture)
+\end{lstlisting}
+\smallskip
+
+\subsubsection{\gpu with One Application}
+\smallskip
+\begin{lstlisting}
+// 12-SM simulations
+num_sim_cores 12
+num_sim_small_cores 12
+core_type ptx
+max_threads_per_core 80 // set the max number of warps 
+\end{lstlisting}
+\smallskip
+
+
+
+\subsubsection{\gpu with Multipe Applications}
+
+\smallskip
+\begin{lstlisting}
+// 12-SM simulations, 6 SMs for each application
+num_sim_cores 12
+num_sim_small_cores 12
+core_type ptx
+max_threads_per_core 80 // set the max number of warps 
+max_num_core_per_appl 6 // 6 SMs for each application
+repeat_trace 1 // for multi-program workload simulation
+\end{lstlisting}
+\smallskip
 
 
 \subsection{Heterogeneous Simulation}
+
+For the CPU-GPU heterogeneous simulations, we model the architecture
+similar to Intel's Sandy Bridge~\cite{sandybridge}. However, we
+model \gpu cores similar to NVIDIA Fermi~\cite{fermi} architecture. We
+also provide sample files for the heterogeneous simulations.
+
+\smallskip
+\begin{lstlisting}
+params_hetero_1_6 // 1-CPU, 6-GPU cores
+params_hetero_4c_4g // 4-CPU, 4-GPU cores
+\end{lstlisting}
+\smallskip
+
 \subsubsection{One CPU application + One GPU application}
+
+Following example shows simple heterogeneous configuration.
+
+\smallskip
+\begin{lstlisting}
+num_sim_cores 2
+num_sim_small_cores 1
+num_sim_medium_cores 0
+num_sim_large_cores 1
+core_type ptx
+large_core_type x86
+cpu_frequency 3
+gpu_frequency 1.5
+repeat_trace 1
+\end{lstlisting}
+\smallskip
+
+Although above configurations set up the number of CPU and GPU cores
+correctly, you need to setup each core types indivisually. Please
+refer to sample files.
+
 \subsubsection{Multiple CPU applications + Multiple GPU applications}
 
+\smallskip
+\begin{lstlisting}
+num_sim_cores 8
+num_sim_small_cores 4
+num_sim_medium_cores 0
+num_sim_large_cores 4
+core_type ptx
+large_core_type x86
+cpu_frequency 3
+gpu_frequency 1.5
+repeat_trace 1
+\end{lstlisting}
+\smallskip
+
+
 \subsection{Micro-architecture configuration}
+
 \subsubsection{Number of blocks per core}
+
+The Maximum number blocks per core will be determined by several
+factors: 1) the number of threads per thread block, 2) the number of
+register used, 3) the number of shared memory usage, and 4) NVIDIA
+CUDA computing version. NVIDIA provides the occupancy calculator to
+get the number. \SIM uses this value to allocate a number of thread
+blocks in each core. Since this value is per-application
+characteristic, it is not possible to use single value nor provide the
+value individually. Instead, our approach is that using information
+provided by GPUOcelot~\cite{ocelot} while generating traces. This
+information is written in the trace file and \SIM uses it. However, we
+also provide a way to override the value by
+setting \textsf{max\_block\_per\_core\_super}.
+
+
+
 \subsubsection{DRAM configuration}
-channel/bank latency configuration
-Data bus width 
 
-\subsubsection{Several different policies}
- branch predictor, scheduling 
-
+We model three key components in the memory scheduler: timing
+constraints, bandwidth, and scheduling policy. Following are key
+parameters used in the \SIM.
 
 
+\smallskip
+\begin{lstlisting}
+dram_frequency 0.8 // dram frequency
+dram_bus_width 4 // dram bus width
+dram_column 11 // column access (CL) latency
+dram_activate 25 // row activate (RCD) latency
+dram_precharge 10 // precharge (RP) latency
+dram_num_mc 2 // number of memory controllers
+dram_num_banks 8 // number of banks per controller
+dram_num_channel 2 // number of dram channels per controller
+dram_rowbuffer_size 2048 // row buffer size
+dram_scheduling_policy FRFCFS // dram scheduling policy
+\end{lstlisting}
+\smallskip
+
+Dram timings using three parameters: precharge ($t_{RP}$), activate
+($t_{RCD}$), and column access ($t_{CL}$) latency. DRAM bandwidth is
+modeled using three
+parameters: \textsf{dram\_frequency}, \textsf{dram\_bus\_width},
+and \textsf{dram\_num\_channel}. The maximum DRAM bandwidth can be
+calculated using Equation~\ref{eq:bandwidth}.
+
+\begin{equation}
+\label{eq:bandwidth}
+max\_bandwidth = dram\_frequency \times dram\_bus\_width \times dram\_num\_mc \times dram\_num\_channel 
+\end{equation}
+
+For example, the maximum bandwidth from above parameters can
+be \textsf{800 MHz (0.8 GHz)} $\times$ \textsf{4 Bytes}
+$\times$ \textsf{2 MCs} $\times$ \textsf{2 Channels}
+= \textsf{12.8GB/s}. Finally, \SIM provides multiple DRAM scheduling
+policies: FCFS (First-Come-First-Serve) and FR-FCFS (First-Ready
+First-Come-First-Serve).
+
+
+\subsubsection{Branch Predictor}
+
+
+\ignore{
+\subsubsection{Hardware Prefetching}
+
+We provide stride hardware prefetcher~\cite{iac:spr04}. 
+}
+
+\subsubsection{Thread Fetch Policy}
