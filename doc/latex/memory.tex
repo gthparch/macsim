@@ -73,6 +73,7 @@ All cache accesses flow from one queue to the other queue.
 
 
 \subsection{The Hierarchy}
+\label{sec:memhierarchy}
 
 \SIM maintains very flexible memory hierarchy. Each level of cache 
 hierarchy is independent and \SIM defines the link between the
@@ -126,10 +127,170 @@ can flexibly configure 2-level caches.
 \end{figure*}
 
 
-\subsection{Terminology Explanations} 
-coupled ?? 
-link level. 
+\subsection{How to Configure Cache Hierarchy} 
 
-\subsubsection{Example of Different Topology Setting}
+The cache hierarchy can be configured by setting 1) the link between
+upper/lower level cache, 2) disability, and 3) router. The following
+code is used in the \SIM cache initialization.
+
+\smallskip
+\begin{lstlisting}
+void dcu_c::init(
+  int next_id, // next level cache id
+  int prev_id, // previous level cache id
+  bool done, 
+  bool coupled_up, // direct link with upper level cache
+  bool coupled_down, // direct link with lower level cache
+  bool disable, // disability
+  bool has_router // router
+);
+\end{lstlisting}
+\smallskip
+
+\begin{description}
+  \item[Router] When \textsf{has\_router} is set to \textit{false},
+  the cache cannot directly access to the on-chip
+  interconnection. Instead, it has to go through lower-level cache's
+  interface. Therefore, \textsf{coupled\_down} must set
+  to \textit{true} and appropriate \textsf{next\_id} must be set. In
+  this way, the output queue of the cache is connected directly to the
+  input queue of the next level (lower) cache.
+
+  \item[Disability] When \textsf{disable} is set to \textit{true}, the
+  cache is disabled. When a request is inserted from the upper level
+  cache, it will be directly inserted into the output queue. This
+  feature has been used for modeling 2-level cache hierarchy. As
+  Figure~\ref{fig:level2cache} shown, L1 and L3 caches are active, but
+  L2 cache is disabled. However, the L1 cache does not have a router,
+  so it needs to use the router of the L2
+  cache. Therefore, \textsf{has\_router} must be set to \textit{true}.
+
+  \item[Link] As mentioned in the Section~\ref{sec:memhierarchy}, the
+  L1 and L2 caches are always private to a processor. All L1 misses
+  should go through the L2 cache without accessing the interconnection
+  network. To this end, the direct link must be set between the L1 and
+  L2 caches. Therefore, \textsf{coupled\_down} and \textsf{next\_id}
+  must be set for the L1 cache and \textsf{coupled\_up}
+  and \textsf{prev\_id} must be set for the L2 cache. Note that the
+  link is always bi-directional.
+
+\end{description}
+
+\subsubsection{Example of Different Cache Hierarchy}
+
+We provide several example of the cache hierarchy.
+
+\begin{itemize}
+\ignore{
+  \item Intel Core~\cite{core2duo} microarchitecture has two-level of
+  caches. The last-level cache might be tiled, but if the L2 cache
+  tries to access the closest the L3 tile, it does not have to access
+  through the interconnection. All communications will be made through
+  the direct link. However, if the L2 cache accesses the remote L3
+  tile, it goes through the interconnection. Note that the number of
+  cores (L1 and L2 caches) and the number of the L3 tiles must be the
+  same.
+
+  \smallskip
+  \begin{lstlisting}
+  // class l2_coupled_local_c
+  \end{lstlisting}
+  \smallskip
+}
+
+  \item Intel Nehalem~\cite{nehalem} and Sandy
+  Bridge~\cite{sandybridge} microarchitecture have three-level of
+  caches. The last-level cache is tiled, but if the L2 cache tries to
+  access the closest L3 tile, it does not have to access through the
+  interconnection. All communications will be made through the direct
+  link. However, if the L2 cache accesses the remote L3 tile, it goes
+  through the interconnection. Note that the number of cores (L1 and
+  L2 caches) and the number of the L3 tiles must be the same in this
+  configuration.
+
+  \smallskip
+  \begin{lstlisting}
+  // class l3_coupled_network_c
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+    m_l1_cache[ii]->init(ii, -1, false, false, TRUE, false, false);
+    m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE, false, TRUE);
+    m_l3_cache[ii]->init(-1, ii, false, TRUE,  false,false, TRUE);
+  }
+
+  \end{lstlisting}
+  \smallskip
+
+  \item NVIDIA G80~\cite{g80} architecture does not have
+  hardware-managed caches. Thus, all three levels are connected each
+  other and disabled. Only the L3 cache has a router to access DRAM.
+
+  \smallskip
+  \begin{lstlisting}
+  // class no_cache_c
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+    m_l1_cache[ii]->init(ii, -1, false, false, TRUE,  TRUE, false);
+    m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE,  TRUE, false);
+    m_l3_cache[ii]->init(-1, ii, false, TRUE,  false, TRUE, TRUE);
+  }
+
+  \end{lstlisting}
+  \smallskip
+
+  \item NVIDIA Fermi~\cite{fermi} architecture has private L1 cache
+  and unified L2 cache shared by all cores. The L1 and L2 caches are
+  linked. The L2 cache has been disabled, but has a router
+  enabled. The L3 is not linked with others, but it is enabled and has
+  a router.
+
+  \smallskip
+  \begin{lstlisting}
+  // class l2_decoupled_network_c
+  // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    m_l1_cache[ii]->init(ii, -1, false, false, TRUE,  false, false);
+    m_l2_cache[ii]->init(-1, ii, true,  TRUE,  false, true,  true);
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii) {
+    // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+    m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+  }
+
+  \end{lstlisting}
+  \smallskip
+  
+  \item In general 2-D Topology (Mesh, Torus), we assume each core has
+  private L1 and L2 caches, but access to the L3 cache must be
+  communicated through the interconnection network. The L1 and L2
+  caches are both enabled and linked, but only the L2 cache has a
+  router. The L3 cache is not linked with others and the communication
+  is made through the interconnection network.
+
+  \smallskip
+  \begin{lstlisting}
+  // class l3_decoupled_network_c
+  // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    m_l1_cache[ii]->init(ii, -1, false, false, TRUE,  false, false);
+    m_l2_cache[ii]->init(-1, ii, true,  TRUE,  false, false, TRUE);
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii) {
+    // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+    m_l3_cache[ii]->init(-1, -1, false, false, false, false, TRUE);
+  }
+
+  \end{lstlisting}
+  \smallskip
+
+\end{itemize}
 
 \subsection{DRAM Module} 
+
+
+
+
+
+% LocalWords:  prev bool microarchitecture Nehalem num init NVIDIA
