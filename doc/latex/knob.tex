@@ -38,6 +38,13 @@ All knob variables will have \textit{KNOB\_} prefix. For example,
 L2\_ASSOC in Section~\ref{sec:knob1} will be KNOB\_L2\_ASSOC in the
 simulator code.
 
+\subsubsection{Adding a New String Type Knob}
+Several knobs especially setting policies use {\tt string} type. 
+Examples are branch predictor, instruction scheduler, dram scheduler, and llc setting. Please see {\tt factory\_class.cc/h} and {\tt bp.cc}. 
+
+
+
+
 
 \subsection{How to apply different value to a knob variables}
 
