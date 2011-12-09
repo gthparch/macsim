@@ -180,6 +180,43 @@ setting \textsf{max\_block\_per\_core\_super}.
 
 
 
+\subsubsection{Cache configuration}
+
+The cache can be configured by following parameters.
+
+\smallskip
+\begin{lstlisting}
+l{1,2}_{small, medium, large}_num_set // number of sets
+l{1,2}_{small, medium, large}_assoc // asoociativity
+l{1,2}_{small, medium, large}_line_size // cache line size
+l{1,2}_{small, medium, large}_num_bank // number of banks  
+l{1,2}_{small, medium, large}_latency // cache latency
+l{1,2}_{small, medium, large}_bypass // cache bypass (if set, always miss)
+num_l3 // number of l3 cache tiles
+l3_num_Set // number of l3 cache sets
+l3_assoc // l3 asociativity
+l3_line_size // l3 line size
+l3_num_bank // l3 number of banks
+l3_latency // l3 latency
+l{1,2,3}_{read,write}_port // the number of read / write port
+\end{lstlisting}
+\smallskip
+
+The cache size can be calculated by the Equation~\ref{eq:cachesize}.
+
+\begin{equation}
+\label{eq:cachesize}
+cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only)
+\end{equation}
+
+For example, to configure 16-way 1MB cache with 64B line
+size, \textsf{1MB cache} = \textsf{256 sets} $\times$ \textsf{16 way}
+$\times$ \textsf{64 B} $\times$ \textsf{4 tiles}. Also, the cache
+latency is determined by several factors including the size,
+technology, and the number of ports. Cacti~\cite{cacti} can be used to
+model accurate cache latency.
+
+
 \subsubsection{DRAM configuration}
 \label{sec:param-dram}
 
