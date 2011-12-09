@@ -187,18 +187,20 @@ The cache can be configured by following parameters.
 \smallskip
 \begin{lstlisting}
 l{1,2}_{small, medium, large}_num_set // number of sets
-l{1,2}_{small, medium, large}_assoc // asoociativity
+l{1,2}_{small, medium, large}_assoc // associativity
 l{1,2}_{small, medium, large}_line_size // cache line size
 l{1,2}_{small, medium, large}_num_bank // number of banks  
 l{1,2}_{small, medium, large}_latency // cache latency
 l{1,2}_{small, medium, large}_bypass // cache bypass (if set, always miss)
 num_l3 // number of l3 cache tiles
 l3_num_Set // number of l3 cache sets
-l3_assoc // l3 asociativity
+l3_assoc // l3 associativity
 l3_line_size // l3 line size
 l3_num_bank // l3 number of banks
 l3_latency // l3 latency
 l{1,2,3}_{read,write}_port // the number of read / write port
+icache_num_set  8 // 4KB I-cache 
+icache_assoc   8 // I cache set associativity 
 \end{lstlisting}
 \smallskip
 
@@ -206,15 +208,16 @@ The cache size can be calculated by the Equation~\ref{eq:cachesize}.
 
 \begin{equation}
 \label{eq:cachesize}
-cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only)
+cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only, otherwise 1)
 \end{equation}
 
-For example, to configure 16-way 1MB cache with 64B line
+For example, to configure a 16-way 1MB cache with 64B line
 size, \textsf{1MB cache} = \textsf{256 sets} $\times$ \textsf{16 way}
 $\times$ \textsf{64 B} $\times$ \textsf{4 tiles}. Also, the cache
 latency is determined by several factors including the size,
 technology, and the number of ports. Cacti~\cite{cacti} can be used to
-model accurate cache latency.
+model accurate cache latency. The cache line size is set as 64B by default. 
+\TODO{Question: can we change the cache line size or is it hard coded? } 
 
 
 \subsubsection{DRAM configuration}
@@ -260,7 +263,52 @@ policies: FCFS (First-Come-First-Serve) and FR-FCFS (First-Ready
 First-Come-First-Serve).
 
 
-\subsubsection{Branch Predictor}
+\subsubsection{Microarchitecture Setting Parameters}
+
+\noindent 
+{\bf CPU Core Parameters} 
+By default these configurations are applied to small cores. 
+
+\smallskip
+\begin{lstlisting}
+width   2 // pipeline width (the entire pipelines use the same width) 
+fetch_latency 5 // front-end depth 
+alloc_latency 5 // decode/allocation depth  
+bp_dir_mech   gshare 
+bp_hist_length 14 // branch history length 
+isched_rate 4  // # of integer instructions that can be executed per cycle 
+msched_rate 2  // # of memory instructions that can be executed per cycle 
+fsched_rate  2  // # of FP instructions that can be executed per cycle 
+schedule  io, ooo // instruction scheduling policy 
+rob_size    96  // ROB size 
+fetch_policy rr // SMT(MT) thread fetch policy  by default: round-robin 
+\end{lstlisting}
+\smallskip
+
+\noindent  
+{\bf GPU Core Parameters} 
+
+\TODO{Question: is constant cache size is per SM? How does a core share the constant cache, texture cache, what is ptx\_exec\_ratio? } 
+
+\smallskip
+\begin{lstlisting}
+schedule_ratio 4 \\ Every 4th cycle, one thread (warp) is scheduled 
+fetch_ratio  4 \\ Every 4th cycle, one thread (warp) is fetched 
+gpu_sched   1 \\ set GPU scheduler 
+ptx_common_cache \\ 
+const_cache_size  1024 \\ 1024B constant cache  
+texture_cache_size 1024  \\ 1024B texture cache
+shared_mem_size 4096  \\ 4096B shared memory size 
+ptx_exec_ratio  \\ 
+num_warp_scheduler \\ the number of warps (threads) can be scheduled  
+\end{lstlisting}
+\smallskip
+
+
+
+
+
+
 
 
 \ignore{
@@ -269,8 +317,10 @@ First-Come-First-Serve).
 We provide stride hardware prefetcher~\cite{iac:spr04}. 
 }
 
-\subsubsection{Thread Fetch Policy}
+
 
 % LocalWords:  macsim num sim SMT multi pre NVIDIA params GeForce gtx GTX ptx
 % LocalWords:  GeForece Multipe SMs appl GPU cpu gpu CUDA GPUOcelot RCD mc GHz
-% LocalWords:  precharge rowbuffer FRFCFS MCs FCFS Prefetching prefetcher
+% LocalWords:  precharge rowbuffer FRFCFS MCs FCFS Prefetching prefetcher alloc
+% LocalWords:  icache Microarchitecture bp dir mech gshare isched msched fsched
+% LocalWords:  FP io ooo rr th sched const mem
