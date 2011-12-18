@@ -138,7 +138,9 @@ ManifoldProcessor::send_packet(mem_req_s *req)
 {
     bool is_buffer_empty = false;
     uint send_buffer_id = -1;
-    for ( uint i=0; i<ni_buffer_width ; i++ )
+    
+    uint i = (req->m_noc_type == PROC_REQ) ? 0 : ni_buffer_width/2;
+    for ( uint count=0; count < ni_buffer_width/2 ; count++,i++ )
     {
         if ( ni_buffers[i] )
         {
@@ -161,9 +163,9 @@ ManifoldProcessor::send_packet(mem_req_s *req)
 
         np->dst_component_id = 3;       // can use this for further splitting at the interface
         np->address = req->m_addr; 
-        np->mclass = mclass;	
+        np->mclass = (message_class)req->m_noc_type;	
         np->proc_buffer_id = send_buffer_id;
-        np->payload_length = req->m_size;
+        np->payload_length = 128;//req->m_size*8; FIXME: use m_size when macsim is updated
         np->enter_network_time = manifold::kernel::Manifold::NowTicks();
 
         ni_buffers[send_buffer_id] = false;

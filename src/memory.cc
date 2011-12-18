@@ -859,6 +859,18 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     req->m_msg_src = m_terminal->node_id;
     req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
+    //if node type is mc and destination is a proc, then mclass should be reply type
+    if ( m_terminal->mclass == L3_REQ )
+    {
+        if ( dir == 1)                      //to MC
+            req->m_noc_type = PROC_REQ;
+        else                                //to proc
+            req->m_noc_type = MC_RESP;
+    } else
+    {
+        req->m_noc_type = m_terminal->mclass;
+    }
+    
   }
   else {
     req->m_msg_src = m_noc_id;
@@ -1348,7 +1360,7 @@ bool dcu_c::create_network_interface(int mclass)
           &ManifoldProcessor::tock);
 
       m_terminal->init();
-      m_terminal->mclass = (message_class)mclass; //PROC_REQ;
+      m_terminal->mclass = (message_class)mclass; //PROC_REQ
       m_simBase->m_macsim_terminals.push_back(m_terminal);
 
       m_noc_id = static_cast<int>(processor_id);
@@ -1458,10 +1470,7 @@ memory_c::~memory_c()
     delete m_l1_cache[ii];
     delete m_l2_cache[ii];
     m_mshr_free_list[ii].clear();
-    m_mshr[ii].clear();
-  }
-
-  for (int ii = 0; ii < m_num_l3; ++ii) {
+    m_mshr[ii].clear(); } for (int ii = 0; ii < m_num_l3; ++ii) {
     delete m_l3_cache[ii];
   }
 
@@ -1484,19 +1493,19 @@ void memory_c::init(void)
   int total_num_router = 0;
   m_noc_id_base[MEM_L1] = 0;
   for (int ii = 0; ii < m_num_core; ++ii) { 
-    if (m_l1_cache[ii]->create_network_interface((int)L1_REQ))
+    if (m_l1_cache[ii]->create_network_interface(PROC_REQ))
       ++total_num_router;
   }
 
   m_noc_id_base[MEM_L2] = total_num_router;
   for (int ii = 0; ii < m_num_core; ++ii) {
-    if (m_l2_cache[ii]->create_network_interface(L2_REQ))
+    if (m_l2_cache[ii]->create_network_interface(PROC_REQ))     //represents GPU
       ++total_num_router;
   }
 
   m_noc_id_base[MEM_L3] = total_num_router;
   for (int ii = 0; ii < m_num_l3; ++ii) {
-    if (m_l3_cache[ii]->create_network_interface(L3_REQ))
+    if (m_l3_cache[ii]->create_network_interface(L3_REQ))       //represents L2 cache
       ++total_num_router;
   }
 

@@ -14,6 +14,9 @@ extern "C" {
 #include "SIM_util.h"
 #include "SIM_link.h"
 }
+
+#define NETVIS 0
+
 // memory request state noc string
 const char* mem_req_noc_type_name[MAX_NOC_STATE] = {
   "NOC_FILL",
@@ -45,11 +48,12 @@ SimpleRouter::parse_config(map<string,string>& p)
 {
     ports = 3;
     vcs = 4;
-    credits = 1;
+    credits = 4;
     rc_method = RING_ROUTING;
     no_nodes = 16;
     grid_size = no_nodes;
 
+    
     map<string,string>::iterator it;
     it = p.find("no_nodes");
     if ( it != p.end())
@@ -69,6 +73,8 @@ SimpleRouter::parse_config(map<string,string>& p)
     it = p.find("rc_method");
     if ( it != p.end())
     {
+        if(it->second.compare("RING_ROUTING_UNI") == 0)
+            rc_method = RING_ROUTING_UNI;
         if(it->second.compare("TWONODE_ROUTING") == 0)
             rc_method = TWONODE_ROUTING;
         if(it->second.compare("RING_ROUTING") == 0)
@@ -77,8 +83,11 @@ SimpleRouter::parse_config(map<string,string>& p)
             rc_method = TORUS_ROUTING;
         if(it->second.compare("XY_ROUTING") == 0)
             rc_method = XY_ROUTING;
+        
+        cout << endl << "Routing method: " << it->second << endl;
     }
 
+    numFlits.resize(ports);
     return;
 }
 
@@ -113,7 +122,6 @@ SimpleRouter::init( void )
     // useful when debugging the swa and vca... but not needed for operation
     swa.node_ip = node_id; 
     vca.node_ip = node_id; 
-
     for(uint i=0; i<ports; i++)
     {
         downstream_credits[i].resize(vcs);
@@ -203,12 +211,16 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 if ( data->f->type == TAIL ) stat_packets_in++;
 
                 uint inport = port%ports;
+                
+                numFlits[inport]++; //hack FIXME
+                
                 //push the flit into the buffer. Init for buffer state done
                 //inside do_input_buffering
                 in_buffers[inport].change_push_channel( data->vc );
                 in_buffers[inport].push(data->f);
                 if ( data->f->type == HEAD )
                 {
+		((HeadFlit*)data->f)->req->m_noc_cycle = manifold::kernel::Manifold::NowTicks();
                 #if 1
                 //csv logging for statistics visualization/analysis
 //                	cout << manifold::kernel::Manifold::NowTicks() << " IRIS pkt " 
@@ -220,19 +232,21 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 //                		//<< " vc: " << data->vc << "\n";
 
                     //for csv stats collection/visualization
-#if _DBG
-                    m_simBase->network_trace << manifold::kernel::Manifold::NowTicks() << "," 
+#if NETVIS
+                    cout << manifold::kernel::Manifold::NowTicks() << ",p," 
                         << ((HeadFlit*)data->f)->req->m_id << "," 
                         << ((HeadFlit*)data->f)->req->m_ptx << ","
                         << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
                         << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
                         << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
-                        << "R";
+                        << endl;
+                    
+		    cout << manifold::kernel::Manifold::NowTicks() << ",b," << node_id << ","; 
                     for(uint i=0; i<ports; i++)
                         for(uint j=0; j<vcs; j++)
-                            m_simBase->network_trace << in_buffers[i].get_occupancy(j) << ",";
+                            cout << in_buffers[i].get_occupancy(j) << ",";
                     
-                    m_simBase->network_trace << "\n";
+                    cout << "\n";
 #endif
                 #else 
                   //for debugging only!
@@ -271,6 +285,10 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
                 uint inport = port%ports;
                 downstream_credits[inport][data->vc]++;
 
+		if(0)//node_id == 4)
+		{
+		  cout << manifold::kernel::Manifold::NowTicks() << ", node:4 credit received" << downstream_credits[inport][data->vc] <<  endl;
+		}
                 break;
             }
 
@@ -297,7 +315,7 @@ SimpleRouter::do_input_buffering(HeadFlit* hf, uint inport, uint invc)
     input_buffer_state[inport*vcs+invc].pkt_arrival_time = manifold::kernel::Manifold::NowTicks();
     input_buffer_state[inport*vcs+invc].clear_message = false;
     input_buffer_state[inport*vcs+invc].sa_head_done = false;
-#ifdef _DEBUG
+#ifdef _DEBUG_IRIS
     input_buffer_state[inport*vcs+invc].fid= hf->flit_id;
 #endif
 
@@ -320,7 +338,7 @@ void SimpleRouter::do_vc_allocation()
 {
     if(!vca.is_empty())
     {
-        vca.pick_winner();
+        vca.pick_winner(in_buffers);
         vca_cycles++;
     }
 
@@ -377,6 +395,7 @@ void SimpleRouter::do_vc_allocation()
             for ( uint ab=0; ab<input_buffer_state[i].possible_ovcs.size();ab++)
             {
                 oc = input_buffer_state[i].possible_ovcs[ab];
+//		cout << "node:" << node_id << ",vc" << oc << endl;
                 //                if( downstream_credits[op][oc] == credits &&
                 if ( !vca.is_requested(op, oc, ip, ic) ) 
                 {
@@ -458,15 +477,26 @@ SimpleRouter::do_switch_traversal()
                  * downstream router buffer */
                 downstream_credits[op][oc]--;
 
-                LinkData* ldc = new LinkData();
-                ldc->type = CREDIT;
-                ldc->src = this->GetComponentId();
-                ldc->vc = ic;
-_DBG(" FLIT out %d=%d", op,oc);
+//                if (numFlits[ip]-- < MAX_NUM_FLITS)
+                {
+                    LinkData* ldc = new LinkData();
+                    ldc->type = CREDIT;
+                    ldc->src = this->GetComponentId();
+                    ldc->vc = ic;
+    _DBG(" FLIT out %d=%d", op,oc);
 
-                Send(signal_outports.at(ip),ldc);   /* Int not on same LP */
-                stat_last_flit_out_cycle= manifold::kernel::Manifold::NowTicks();
+                    Send(signal_outports.at(ip),ldc);   /* Int not on same LP */
+                    stat_last_flit_out_cycle= manifold::kernel::Manifold::NowTicks();
+                }
 
+#if NETVIS
+                    cout << manifold::kernel::Manifold::NowTicks() << ",b," << node_id << ","; 
+                    for(uint i=0; i<ports; i++)
+                        for(uint j=0; j<vcs; j++)
+                            cout << in_buffers[i].get_occupancy(j) << ",";
+                    
+                    cout << "\n";
+#endif
             }
             else
             {
@@ -480,6 +510,11 @@ void
 SimpleRouter::do_switch_allocation()
 {
     /* Switch Allocation */
+    if(node_id == 4)
+{ 
+//cout << "node:4 print0" << endl;
+}
+
     for( uint i=0; i<ports*vcs; i++)
         if( input_buffer_state[i].pipe_stage == SWA_REQUESTED)
             if ( !swa.is_empty())
@@ -493,6 +528,7 @@ SimpleRouter::do_switch_allocation()
                 op = input_buffer_state[i].output_port;
                 oc= input_buffer_state[i].output_channel;
                 sa_winner = swa.pick_winner(op);
+
 
                 bool alloc_done = false;
                 if(input_buffer_state[i].sa_head_done)
@@ -509,11 +545,36 @@ SimpleRouter::do_switch_allocation()
                 {
                     if( sa_winner.port == ip && sa_winner.ch == ic
                         //                        && in_buffers[ip].get_occupancy(ic) > 0
-                        && downstream_credits[op][oc]==credits )
+                        && downstream_credits[op][oc]== credits )
                     {
+		if(node_id == 4)
+		{
+		  //cout << "node:4 print1-3" << endl;
+		}
                         input_buffer_state[i].sa_head_done = true;
                         input_buffer_state[i].pipe_stage = SW_TRAVERSAL;
                         alloc_done = true;
+			//*
+	/*	        Flit* f = in_buffers[ip].buffers[ic].front();
+    	                if( f != NULL && f->type == HEAD )
+                        {
+                            //cout << "swa winner:" << ((HeadFlit*)f)->req->m_id <<  ",src:" << node_id << ",dst:" << ((HeadFlit*)f)->dst_node <<  endl;
+                        }
+			for(int i=0; i<ports; i++)
+			{
+			    for(int j=0; j<vcs; j++)
+			    {
+				for (auto I = in_buffers[i].buffers[j].begin(), E = in_buffers[i].buffers[j].end(); I != E; ++I) {
+					if( (*I) != NULL && (*I)->type == HEAD )
+					{
+					    HeadFlit* H = (HeadFlit*)(*I);
+					    cout << "node:" << node_id << ",m_id:" << H->req->m_id << "," << H->req->m_noc_cycle << endl;
+					}
+				}
+			    }
+			}
+
+	*/
 #if 0                       
                         cout << "IRIS packet " << ((HeadFlit*)f)->req->m_id << " @ node "
 		                    << node_id << " in oport " << data_outports.at(op)
@@ -528,7 +589,13 @@ SimpleRouter::do_switch_allocation()
                     swa.clear_requestor(op, ip,oc);
                 }
 
-            }
+            }else{
+
+		if(node_id == 4)
+		{
+		  //cout << "node:4 print5 swa empty" << endl;
+		}
+	}
 }
 void
 SimpleRouter::tick ( void )
@@ -547,12 +614,12 @@ SimpleRouter::tock ( void )
      for ( uint i=0; i<input_buffer_state.size(); i++)
      if (input_buffer_state[i].pipe_stage != EMPTY
      && input_buffer_state[i].pipe_stage != INVALID
-     && input_buffer_state[i].pkt_arrival_time+100 < manifold::kernel::Manifold::NowTicks())
+     && input_buffer_state[i].pkt_arrival_time+1000 < manifold::kernel::Manifold::NowTicks())
      {
      fprintf(stderr,"\n\nDeadlock at Router %d node %d Msg id %d Fid%d", GetComponentId(), node_id, i, input_buffer_state[i].fid);
      dump_state_at_deadlock(m_simBase);
      }
-     /* */
+      /**/
     for(uint i=0; i<ports; i++)
         for(uint j=0; j<vcs; j++)
         {
@@ -563,6 +630,7 @@ SimpleRouter::tock ( void )
     do_switch_traversal();
     do_switch_allocation();
     do_vc_allocation();
+
     return ;
 }
 

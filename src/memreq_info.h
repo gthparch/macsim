@@ -21,6 +21,7 @@
 #include "global_defs.h"
 #include "global_types.h"
 
+#define _DEBUG_IRIS
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Memory component type
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +139,9 @@ typedef struct mem_req_s {
   int           m_msg_dst;      /**< destination node id */
   int           m_bypass;       /**< bypass last level cache */
   bool          m_skip; 
+  int           m_noc_type;         /**< noc request type: req or reply */
+  
+  Counter        m_noc_cycle;
 
   macsim_c*     m_simBase;      /**< reference to macsim base class for sim globals */
   

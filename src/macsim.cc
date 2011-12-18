@@ -325,13 +325,13 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   if (params["topology"] == "ring") {
     params["no_ports"] = "3";
     params["mapping"]  = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
-//    params["mapping"] = ;
+
   }
   else if (params["topology"] == "mesh" || params["topology"] == "torus") {
     params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
     params["no_ports"]  = "5"; // check for torus
     // params["rc_method"] = KNOB(KNOB_IRIS_RC_METHOD)->getValue();
-//    params["mapping"] = ;
+    params["mapping"]  = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
   }
   params["no_vcs"]         = KNOB(KNOB_IRIS_NUM_VC)->getValue();
   params["credits"]        = KNOB(KNOB_IRIS_CREDIT)->getValue();
@@ -383,7 +383,7 @@ void macsim_c::init_network(void)
 	m_iris_network->parse_config(m_iris_params);
 
   report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
-
+    m_simBase->no_nodes = m_macsim_terminals.size();
 	for (int i=0; i<m_macsim_terminals.size(); i++) {
 		//create component id
 		manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
@@ -417,7 +417,7 @@ void macsim_c::init_network(void)
 		rr->parse_config(m_iris_params);
 		rr->init();
 	}
-
+    
 	//initialize router outports
 	for (int i = 0; i < m_macsim_terminals.size(); i++)
 		m_iris_network->set_router_outports(i);

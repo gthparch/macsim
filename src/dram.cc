@@ -15,6 +15,7 @@
 #include "noc.h"
 #include "utils.h"
 #include "bug_detector.h"
+//#include "router.h"
 
 #include "all_knobs.h"
 #include "statistics.h"
@@ -215,6 +216,9 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_precharge_latency_gpu = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_PRECHARGE);
   m_activate_latency_gpu  = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_ACTIVATE);
   m_column_latency_gpu    = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_COLUMN);
+
+  // output buffer
+  m_output_buffer = new list<mem_req_s*>;
 }
 
 
@@ -231,6 +235,8 @@ dram_controller_c::~dram_controller_c()
   delete[] m_bank_timestamp;
 
   temp_out.close();
+
+  delete m_output_buffer;
 }
 
 
@@ -324,6 +330,7 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 // tick a cycle
 void dram_controller_c::run_a_cycle()
 {
+  send_packet();
   channel_schedule();
   bank_schedule();
 
@@ -352,6 +359,8 @@ void dram_controller_c::progress_check(void)
 
   // if counter exceeds N, raise exception
   if (m_starvation_cycle >= 5000) {
+  //  if (*KNOB(KNOB_ENABLE_NEW_NOC))
+  //    m_simBase->m_router->print();
     print_req();
     ASSERT(0);
   }
@@ -380,6 +389,16 @@ void dram_controller_c::print_req(void)
         (int)m_buffer[ii].size(), \
         (m_current_list[ii] ? dram_state[m_current_list[ii]->m_state] : "NULL"), \
         m_bank_ready[ii], m_data_ready[ii], m_data_avail[ii], m_bank_timestamp[ii]);
+  }
+
+
+  // print all requests
+  for (int ii = 0; ii < m_num_bank; ++ii) {
+    fprintf(fp, "bank_id:%d\n", ii);
+    for (auto I = m_buffer[ii].begin(), E  = m_buffer[ii].end(); I != E; ++I) {
+      fprintf(fp, "req_id:%-10d state:%-15s time:%lld delta:%lld\n", 
+          (*I)->m_req->m_id, dram_state[(*I)->m_state], (*I)->m_timestamp, CYCLE - (*I)->m_timestamp);
+    }
   }
 
   fclose(fp);
@@ -412,7 +431,6 @@ void dram_controller_c::bank_schedule_complete(void)
       ASSERT(m_current_list[ii]->m_state == DRAM_DATA_WAIT);
 
       // find same address entries
-      bool need_to_stop = false;
       if (*m_simBase->m_knobs->KNOB_DRAM_MERGE_REQUESTS) {
         list<drb_entry_s*> temp_list;
         for (auto I = m_buffer[ii].begin(), E  = m_buffer[ii].end(); I != E; ++I) {
@@ -425,10 +443,7 @@ void dram_controller_c::bank_schedule_complete(void)
               m_simBase->m_memory->free_req((*I)->m_req->m_core_id, (*I)->m_req);
             }
             else {
-              if (send_packet((*I)) == false) {
-                need_to_stop = true;
-                continue;
-              }
+              m_output_buffer->push_back((*I)->m_req);
               (*I)->m_req->m_state = MEM_DRAM_DONE;
               DEBUG("MC[%d] merged_req:%d addr:%s typs:%s done\n", \
                   m_id, (*I)->m_req->m_id, hexstr64s((*I)->m_req->m_addr), \
@@ -450,9 +465,6 @@ void dram_controller_c::bank_schedule_complete(void)
         temp_list.clear();
       }
 
-      if (need_to_stop) {
-        continue;
-      }
       
       STAT_EVENT(DRAM_AVG_LATENCY_BASE);
       STAT_EVENT_N(DRAM_AVG_LATENCY, m_simBase->m_simulation_cycle - m_current_list[ii]->m_timestamp);
@@ -471,9 +483,7 @@ void dram_controller_c::bank_schedule_complete(void)
       }
       // otherwise, send back to interconnection network
       else {
-        if (send_packet(m_current_list[ii]) == false) {
-          continue;
-        }
+        m_output_buffer->push_back(m_current_list[ii]->m_req);
         m_current_list[ii]->m_req->m_state = MEM_DRAM_DONE;
         DEBUG("MC[%d] req:%d addr:%s type:%s bank:%d done\n", 
             m_id, m_current_list[ii]->m_req->m_id, \
@@ -492,59 +502,113 @@ void dram_controller_c::bank_schedule_complete(void)
 }
 
 
-bool dram_controller_c::send_packet(drb_entry_s* dram_req)
+void dram_controller_c::send_packet(void)
 {
-  dram_req->m_req->m_msg_type = NOC_FILL;
-  dram_req->m_req->m_msg_src = m_noc_id;
+  bool req_type_checked[2];
+  req_type_checked[0] = false;
+  req_type_checked[1] = false;
+  
+  bool req_type_allowed[2];
+  req_type_allowed[0] = true;
+  req_type_allowed[1] = true;
 
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    dram_req->m_req->m_msg_src = m_terminal->node_id;
-    dram_req->m_req->m_msg_dst = 
-      m_simBase->m_memory->get_dst_router_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
+  int max_iter = 1;
+  //if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
+  //  max_iter = 2;
+
+    vector<mem_req_s*> temp_list;
+
+  // when virtual channels are partitioned for CPU and GPU requests,
+  // we need to check individual buffer entries
+  // if not, sequential search would be good enough
+  for (int ii = 0; ii < max_iter; ++ii) {
+    req_type_allowed[0] = !req_type_checked[0];
+    req_type_allowed[1] = !req_type_checked[1];
+    // check both CPU and GPU requests
+    if (req_type_checked[0] == true && req_type_checked[1] == true)
+      break;
+
+    for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+      mem_req_s* req = (*I);
+      if (req_type_allowed[req->m_ptx] == false)
+        continue;
+
+      req_type_checked[req->m_ptx] = true;
+      req->m_msg_type = NOC_FILL;
+      req->m_msg_src = m_noc_id;
+
+      if (*KNOB(KNOB_ENABLE_IRIS)) {
+        req->m_msg_src = m_terminal->node_id;
+        req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
+      }
+      /*else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+        req->m_msg_src = m_router->get_id();
+        req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
+      }
+	*/
+      assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
+
+      bool insert_packet = false;
+      if (*KNOB(KNOB_ENABLE_IRIS)) {
+        insert_packet = m_terminal->send_packet(req);
+      }
+      /*else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+        insert_packet = m_router->send_packet(req);
+      }*/
+      else {
+        int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, req->m_cache_id[MEM_L3]);
+        insert_packet = m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, req);
+      }
+
+      if (!insert_packet) {
+        DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
+            m_id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);
+        break;
+      }
+
+      temp_list.push_back(req);
+      
+	if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) &&
+          (*KNOB(KNOB_ENABLE_IRIS)  )) {
+        m_simBase->m_bug_detector->allocate_noc(req);
+      }
+    }
   }
 
-  int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, dram_req->m_req->m_cache_id[MEM_L3]);
-  assert(dram_req->m_req->m_msg_src != -1 && dram_req->m_req->m_msg_dst != -1);
-
-  bool insert_packet = false;
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    insert_packet = m_terminal->send_packet(dram_req->m_req);
+  for (auto I = temp_list.begin(), E = temp_list.end(); I != E; ++I) {
+    m_output_buffer->remove((*I));
   }
-  else {
-    insert_packet = m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, dram_req->m_req);
-  }
-
-  if (!insert_packet) {
-//    report("core_id:" << dram_req->m_req->m_core_id << " req_id:" << dram_req->m_req->m_id);
-    DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
-        m_id, dram_req->m_req->m_id, hexstr64s(dram_req->m_req->m_addr), \
-        mem_req_c::mem_req_type_name[dram_req->m_req->m_type]);
-    return false;
-  }
-
-  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-    m_simBase->m_bug_detector->allocate_noc(dram_req->m_req);
-  }
-
-  return true;
 }
 
 
 void dram_controller_c::receive_packet(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)// && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
 
   // check router queue every cycle
-  if (!m_terminal->receive_queue.empty()) {
-    mem_req_s* req = m_terminal->receive_queue.front();
-    if (insert_new_req(req)) {
-      m_terminal->receive_queue.pop();
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    if (!m_terminal->receive_queue.empty()) {
+      mem_req_s* req = m_terminal->receive_queue.front();
+      if (insert_new_req(req)) {
+        m_terminal->receive_queue.pop();
+        if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+          m_simBase->m_bug_detector->deallocate_noc(req);
+        }
+      }
+    }
+  }
+/*
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    mem_req_s* req = m_router->receive_req();
+    if (req && insert_new_req(req)) {
+      m_router->pop_req();
       if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
         m_simBase->m_bug_detector->deallocate_noc(req);
       }
     }
   }
+*/
 }
 
 
@@ -758,19 +822,26 @@ Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool g
 // create the network interface
 void dram_controller_c::create_network_interface(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+  if (*KNOB(KNOB_ENABLE_IRIS) == false)// && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
 
-  manifold::kernel::CompId_t processor_id = 
-    manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
-  m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
-  manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
-      &ManifoldProcessor::tock);
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    manifold::kernel::CompId_t processor_id = 
+      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
+    m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
+    manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
+        &ManifoldProcessor::tock);
 
-  m_terminal->mclass = MC_RESP; //PROC_REQ;//
-  m_simBase->m_macsim_terminals.push_back(m_terminal);
+    m_terminal->mclass = MC_RESP; //PROC_REQ;//
+    m_simBase->m_macsim_terminals.push_back(m_terminal);
 
-  m_noc_id = static_cast<int>(processor_id);
+    m_noc_id = static_cast<int>(processor_id);
+  }
+
+/*  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    m_router = m_simBase->create_router(MC_ROUTER);
+    m_noc_id = m_router->get_id(); 
+  }*/
 }
 
 void dram_controller_c::on_insert(mem_req_s* req, int bid, int rid, int cid)

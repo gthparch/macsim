@@ -53,6 +53,9 @@
 #include	"genericRC.h"
 #include	"genericVcAllocator.h"
 
+#define MAX_NUM_FLITS (vcs)*4*ports
+
+#define _DEBUG_IRIS
 //extern class Clock* master_clock;
 class HeadFlit;
 
@@ -79,7 +82,7 @@ class InputBufferState
 
         std::string toString() const;
 	
-#ifdef _DEBUG
+#ifdef _DEBUG_IRIS
         uint fid;
 #endif
 };
@@ -156,6 +159,9 @@ class SimpleRouter: public IrisRouter
         uint grid_size;
         uint dim;
 
+        //hack: to keep router from filling up and jamming the system
+        std::vector<uint> numFlits; //1 per port
+        
         // stats
         uint64_t stat_last_packet_out_cycle;
 

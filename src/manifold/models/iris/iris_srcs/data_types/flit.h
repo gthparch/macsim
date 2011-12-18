@@ -68,7 +68,7 @@ class Flit
         uint pkt_length;
         string toString() const;
 
-#ifdef _DEBUG
+#ifdef _DEBUG_IRIS
         uint flit_id;
 #endif
 

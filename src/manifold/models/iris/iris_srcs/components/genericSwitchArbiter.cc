@@ -93,6 +93,7 @@ GenericSwitchArbiter::do_round_robin_arbitration( uint oport)
         }
     }
 
+
     if(!winner_found)
         for( uint i=0; i<=last_port_winner[oport]; i++)
         {

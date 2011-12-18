@@ -2,11 +2,11 @@
 param<ENABLE_IRIS,              enable_iris,                    bool,   true>
 
 param<IRIS_TOPOLOGY,            iris_topology,                  string, ring>
-param<IRIS_GRIDSIZE,            iris_gridsize,                  string, 4>
+param<IRIS_GRIDSIZE,            iris_gridsize,                  string, 3>
 param<IRIS_NUM_VC,              iris_num_vc,                    string, 4>
 param<IRIS_CREDIT,              iris_credit,                    string, 4>
-param<IRIS_INT_BUFF_WIDTH,      iris_int_buff_width,         string, 1>
-param<IRIS_LINK_WIDTH,          iris_link_widthiris_link_width, string, 128>
+param<IRIS_INT_BUFF_WIDTH,      iris_int_buff_width,            string, 4>
+param<IRIS_LINK_WIDTH,          iris_link_width,                string, 128>
 param<IRIS_RC_METHOD,           iris_rc_method,                 string, ring_routing>
 param<IRIS_SELF_ASSIGN_DEST_ID, iris_self_assign_dest_id,       string, 1>
 param<IRIS_RESP_PAYLOAD_LEN,    iris_resp_payload_len,          string, 1>

@@ -187,7 +187,7 @@ class dram_controller_c
      * Send a packet to the NoC
      * @param req memory request
      */
-    bool send_packet(drb_entry_s* req);
+    void send_packet(void);
 
     /**
      * Receive a packet from the NoC
@@ -244,6 +244,7 @@ class dram_controller_c
     int m_total_req; /**< total pending requests */
 
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
+    //router_c* m_router;
 
     Counter m_avg_latency;
     Counter m_avg_latency_base;
@@ -259,6 +260,8 @@ class dram_controller_c
     
     int m_dram_state;
     ofstream temp_out;
+
+    list<mem_req_s*>* m_output_buffer; /**< output buffer */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 };

@@ -192,6 +192,7 @@ void bug_detector_c::deallocate_noc(mem_req_s* req)
 {
   assert(m_packet_table->find(req) != m_packet_table->end());
 
+//  cout << CYCLE - (*m_packet_table)[req] << " src:" << req->m_msg_src << "  dst:" << req->m_msg_dst << "\n";
   m_packet_table->erase(req);
 }
 

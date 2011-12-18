@@ -20,6 +20,8 @@
 #define  _genericvcallocator_h_INC
 
 #include	"../../interfaces/genericHeader.h"
+#include	"genericBuffer.h"
+#include	"manifold/models/iris/iris_srcs/data_types/flit.h"
 #include	<algorithm>
 
 
@@ -51,7 +53,7 @@ class GenericVcAllocator
                                                             \param in_vc: Requesting in_vc.*/
         bool is_empty( void );                                   /* \fn Checks if the vca unit has requests */
         bool is_empty( uint i );                                   /* \fn Checks if the vca unit has requests for the ith row ( i=out_port*ports+out_vc) */
-        void pick_winner( void );
+        void pick_winner( std::vector <GenericBuffer> &in_buffers );
         void clear_winner( uint op, uint ovc, uint ip, uint ivc);                                   /* \fn Clear winner */
         std::string toString() const;        
         bool is_requested ( uint op, uint ovc, uint ip, uint ivc);

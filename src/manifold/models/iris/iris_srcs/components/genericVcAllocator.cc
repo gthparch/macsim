@@ -87,8 +87,10 @@ GenericVcAllocator::no_requestors(uint op)
             no++;
     return no;
 }
+
+
 void
-GenericVcAllocator::pick_winner()
+GenericVcAllocator::pick_winner(std::vector <GenericBuffer> &in_buffers)
 {
     if( !is_empty())
     {
@@ -125,6 +127,13 @@ GenericVcAllocator::pick_winner()
                             current_winners[i].push_back(tmp);
                             last_winner[i][j] = jj;
                             found = true;
+			    /*
+			    Flit* f = in_buffers[jj%ports].buffers[jj/ports].front();
+			    if( f->type == HEAD )
+			    {
+			    	cout << "vca winner:" << ((HeadFlit*)f)->req->m_id <<  ",src:" << node_ip << ",dst:" << ((HeadFlit*)f)->dst_node <<  endl;
+			    }
+			   // */
                             break;
                         }
 

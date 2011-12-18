@@ -23,6 +23,7 @@ void GenericRC::init()
             grid_xloc[i] = i % grid_size;
             grid_yloc[i] = i / grid_size;
         }
+        
 //        possible_out_vcs.push_back(0);
     }
 }
@@ -195,6 +196,8 @@ GenericRC::route_ring_uni(HeadFlit* hf)
 
         /*  Decide the vc  */
         possible_out_vcs.resize(1);
+	possible_out_vcs[0] = rand() % 4;
+	return;
 
         if ( destx > myx )
         {
@@ -259,6 +262,8 @@ GenericRC::route_ring(HeadFlit* hf)
 
         /*  Decide the vc  */
         possible_out_vcs.resize(1);
+//        possible_out_vcs[0] = rand() % 4;
+//		return;
         if(  possible_out_ports[0] == 1)
         {
             destx = (grid_size-destx)%grid_size;
@@ -268,10 +273,14 @@ GenericRC::route_ring(HeadFlit* hf)
         if ( destx > myx )
         {
             if ( hf->mclass == PROC_REQ )
-                possible_out_vcs[0] = 2;
-            else
-                possible_out_vcs[0] = 3;
-        }   
+	        {
+                possible_out_vcs[0] = 2;//rand() % 2;
+            }
+	        else
+	        {
+                possible_out_vcs[0] = 3;// + rand() % 3;
+	        }
+        }//*   
         else
         {
             if ( hf->mclass == PROC_REQ)
@@ -279,7 +288,7 @@ GenericRC::route_ring(HeadFlit* hf)
             else
                 possible_out_vcs[0] = 1;
         }
-
+        //*/
         return;
     } 
     cout << "ERROR: dint return yet " << endl;
