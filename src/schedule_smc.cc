@@ -120,6 +120,19 @@ void schedule_smc_c::advance(int q_index) {
     STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
     STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
+	switch (cur_uop->m_uop_type){
+		case UOP_FMEM:
+		case UOP_FCF:
+		case UOP_FCVT:
+		case UOP_FADD:    
+		case UOP_FMUL:    
+		case UOP_FDIV:    
+		case UOP_FCMP:    
+		case UOP_FBIT:    
+		case UOP_FCMOV:
+			STAT_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
+			break;
+	} 
     ALLOCQ_Type allocq = (*m_rob)[allocq_entry.m_rob_entry]->m_allocq_num;
     if ((m_count[allocq] >= m_sched_rate[allocq]) ||
     	(m_num_per_sched[allocq] >= m_sched_size[allocq])) {

@@ -460,7 +460,10 @@ void macsim_c::init_sim(void)
 void macsim_c::compute_power(void)
 {
 	m_ei_power = new ei_power_c(m_simBase);
+	m_ei_power->ei_config_gen_top();	// to make config file for EI
 	m_ei_power->ei_main();
+	
+	delete m_ei_power;
 }
 
 
@@ -557,6 +560,7 @@ void macsim_c::fini_sim(void)
       << "Total Network Energy: " << total_energy << "J\n"
       << "Total packets " << total_packets << "\n";
   }
+  
 }
 
 

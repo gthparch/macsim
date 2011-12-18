@@ -390,15 +390,15 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
       case UOP_FCMP:
       case UOP_FBIT:
       case UOP_FCMOV:
-        STAT_CORE_EVENT(m_core_id, POWER_EX_P0_FU_R);
+        STAT_CORE_EVENT(m_core_id, POWER_EX_FPU_R);
         break;
 
       case UOP_IMUL:
-        STAT_CORE_EVENT(m_core_id, POWER_EX_P2_FU_R);
+        STAT_CORE_EVENT(m_core_id, POWER_EX_MUL_R);
         break;
 
       default:
-        STAT_CORE_EVENT(m_core_id, POWER_EX_P1_FU_R);
+        STAT_CORE_EVENT(m_core_id, POWER_EX_ALU_R);
         break;
     }
   }

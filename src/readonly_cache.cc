@@ -81,6 +81,19 @@ int readonly_cache_c::load(uop_c *uop)
   int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
   line_data = m_cache->access_cache(vaddr, &line_addr, true, appl_id);
 
+
+  // only read acesses!!!
+  if (uop->m_mem_type == MEM_LD_CM) {
+	  //STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_R_ACCESS);
+	  STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_R);
+	  STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_R_TAG);
+  }
+  else {
+	  //STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_R_ACCESS);
+	  STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_R);
+	  STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_R_TAG);
+  }
+
   // cache miss
   if (line_data == NULL) {
     DEBUG_MEM("core_id:%d tid:%d addr:%s type:%d [readonly cache miss]\n",
@@ -160,6 +173,17 @@ bool readonly_cache_c::cache_fill_line(mem_req_s *req)
     DEBUG("uop:%lld done\n", uop->m_uop_num);
     uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
     uop->m_state = OS_SCHEDULED;
+
+	if (uop->m_mem_type == MEM_LD_CM) {
+		//STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CONFLICT);
+		STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W);
+		STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W_TAG);
+	}
+	else {
+		//STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CONFLICT);
+		STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W);
+		STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W_TAG);
+	}
 
     // multiple uops case : let parent uop know
     if (uop->m_parent_uop) {
