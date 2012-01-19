@@ -1,44 +1,38 @@
 
-\clearpage
-\section{SST-Macsim}
+\chapter{SST-Macsim}
 
 Macsim is a part of SST simulation framework~\cite{sst}.
 
-\subsection{How to install SST}
+\section{How to install SST}
 
 Follow the instructions provided in wiki page at
 the \textit{sst-simulator} GoogleCode repository~\cite{sst-google}.
 
-\subsection{How to install \SIM in SST}
+\section{How to install \SIM in SST}
 
 Check out the svn copy of \SIM in \textit{sst-top/sst/elements} and
 apply a patch. 
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 cd sst-top/sst/elements
 svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim
 cd macsim
 patch -p0 -i macsim-sst.patch
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 Then, re-run the SST build procedure.
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 cd sst-top
 ./autogen.sh
 ./configure --prefix=/usr/local --with-boost=/usr/local --with-zoltan=/usr/local --with-parmetis=/usr/local
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
-\subsection{How to configure the \SIM SST component}
+\section{How to configure the \SIM SST component}
 
 An example SST sdl configuration file is as follows:
 
-\smallskip
-\begin{lstlisting}[language=xml]
+\begin{Verbatim}
 <?xml version="1.0"?>
 <sdl version="2.0"/>
 
@@ -57,25 +51,24 @@ An example SST sdl configuration file is as follows:
     </params>
   </component>
 </sst>
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 In this manner, an SST simulation configuration file can declare multiple 
 instances of \SIM as well as define what traces are run on each \SIM instance.
 
-\subsection{How to run a \SIM simulation in SST}
+\section{How to run a \SIM simulation in SST}
 
 Ensure SST and \SIM components are compiled and/or installed.  
 Ensure that the paths and contents of both SST configuration sdl file and
 \SIM \textit{params.in} configuration file are correct. Start the SST simulation 
 either standalone or through MPI.
 
-\begin{lstlisting}
+\begin{Verbatim}
 sst.x [sdl-file]
-\end{lstlisting}
+\end{Verbatim}
 or
-\begin{lstlisting}
+\begin{Verbatim}
 mpirun -np [x] sst.x [sdl-file]
-\end{lstlisting}
+\end{Verbatim}
 
 % LocalWords:  Macsim

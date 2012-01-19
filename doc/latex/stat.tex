@@ -1,12 +1,13 @@
-\clearpage
-\section{The Statistics}
+
+
+\chapter{The Statistics}
 \label{sec:stat}
 
 We provide a simple framework for collecting statistics during simulation.
 Statistics can be either global (common counter for all cores) or per core
 (each core has its own counter).
 
-\subsection{Statistic Types}
+\section{Statistic Types}
 
 The following statistic types are supported:
 
@@ -35,7 +36,7 @@ raw value i.e. the number of occurances of the statistic and the other output
 value is the value calculated based on the type of the statistic.
 
 
-\subsection{How to add a new stat}
+\section{How to add a new stat}
 
 New statistics can be defined by adding definitions to any of the
 \textit{*.stat.def} files in the \textit{trunk/def/} directory or by creating a
@@ -44,61 +45,58 @@ directory.  In order to define a per core statistic specify PER\_CORE at the
 end of each DEF\_STAT statement below.
 
 
-\smallskip
+
 \begin{description}
 
 \item[COUNT Stat:] 
-\begin{lstlisting}
- DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])
-\end{lstlisting}
+
+\Verb+DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])+
 
 Eg: 
-\begin{lstlisting}
+\begin{Verbatim}
 DEF_STAT(INST_COUNT_TOT, COUNT, NO_RATIO)
 DEF_STAT(INST_COUNT, COUNT, NO_RATIO, PER_CORE)
-\end{lstlisting}
+\end{Verbatim}
 
-\item[RATIO Stat:] 
-\begin{lstlisting}
-DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])
-\end{lstlisting}
+\item[RATIO Stat:] \Verb+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])+
+
 
 In addition to defining the RATIO stat itself, a base stat of type COUNT has to
 be defined as well. The value of the base stat is used as the denominator in
 calculating the ratio. 
 
 Eg: 
-\begin{lstlisting}
+\begin{Verbatim}
 DEF_STAT(DISPATCHED_INST, COUNT, NO_RATIO)
 DEF_STAT(DISPATCH_WAIT, RATIO, DISPATCHED_INST)
-\end{lstlisting}
+\end{Verbatim}
 
 \item[DIST Stat:] 
-\begin{lstlisting}
+\begin{Verbatim}
 DEF_STAT(STAT_NAME_START, DIST, NO_RATIO [, PER_CORE])
 DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])*
 DEF_STAT(STAT_NAME_END, DIST, NO_RATIO [, PER_CORE])
-\end{lstlisting}
+\end{Verbatim}
 
 The definition of a DIST stat requires at least two stats.
 
 Eg: 
-\begin{lstlisting}
+\begin{Verbatim}
 DEF_STAT(SCHED_FAILED_REASON_SUCCESS, DIST, NO_RATIO, PER_CORE)
 DEF_STAT(SCHED_FAILED_OPERANDS_NOT_READY, COUNT, NO_RATIO, PER_CORE)
 DEF_STAT(SCHED_FAILED_NO_PORTS, DIST, NO_RATIO, PER_CORE)
-\end{lstlisting}
+\end{Verbatim}
 
 \end{description}
 
 
-\smallskip
 
 
 
-\subsection{How to update statistics}
 
-\smallskip
+\section{How to update statistics}
+
+
 
 Macros are provided to update the value of statistics. STAT\_EVENT and
 STAT\_EVENT\_M increment and decrement the value of a global statistic by 1 and
@@ -111,15 +109,15 @@ a per core stat by 1. These take core id and the name of the statistic to be
 incremented/decremented as their parameters.
 
 Eg:
-\begin{lstlisting}
+\begin{Verbatim}
 STAT_EVENT(INST_COUNT_TOT)
 STAT_EVENT_N(INST_COUNT_TOT, 2)
 STAT_CORE_EVENT(1, INST_COUNT)
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 
-\subsection{The Output}
+
+\section{The Output}
 
 At the end of the simulation *.stat.out are generated, these files include the
 statistic values at the end of the simulation. As mentioned, for each stat two
@@ -128,7 +126,7 @@ calculated based on the type of the stat.
 
 
 
-\subsection{Important Stats}
+\section{Important Stats}
 
 \begin{table}[htb]
 \begin{center}

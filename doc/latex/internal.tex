@@ -1,7 +1,6 @@
 
-\clearpage
-\section{Internal Users Only Manual}
-\subsection{Regression Tests}
+\chapter{Internal Users Only Manual}
+\section{Regression Tests}
 \label{sec:regression}
 
 Let's say your current working directory name is macsim-working
@@ -10,7 +9,7 @@ Let's say your current working directory name is macsim-working
 
 \item Step 1: you need to get a clean copy of macsim again. let's say you are getting a new copy in macsim-regression directory.
 
-{\tt svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-regression --username user }
+{\texttt svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-regression --username user }
 
 \item Step 2: you have to get a simulator tool, which is still in the hparch svn repository.
 
@@ -21,9 +20,14 @@ Let's say your current working directory name is macsim-working
 \end{enumerate}
 
 
-\subsection{How to Add New Files in MacSim}
+\section{How to Add New Files in MacSim}
 
-\begin{verbatim}  run 'patch -p0 -i macsim-internal.patch', this will update <macsim_root>/.obj/Makefile.am to include the internal files in the build \end{verbatim}
+\begin{Verbatim} 
+run 'patch -p0 -i macsim-internal.patch', this will update <macsim_root>/.obj/Makefile.am to include the internal files in the build 
+\end{Verbatim}
 
 
-\subsection{What to use internal directory}
+\section{What to use internal directory}
+
+TBD
+

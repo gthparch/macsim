@@ -1,9 +1,9 @@
 
-\clearpage
-\section{The Memory System}
+
+\chapter{The Memory System}
 \label{sec:memory}
 
-\subsection{The Cache Structure}
+\section{The Cache Structure}
 
 Each cache structure consists of the cache and multiple
 queues. Figure~\ref{fig:cache} shows the overall cache structure in
@@ -22,7 +22,7 @@ cache.
 \end{figure*}
 
 
-\subsubsection{The Queues}
+\subsection{The Queues}
 \label{sec:queue}
 
 All cache accesses flow from one queue to the other queue. 
@@ -48,7 +48,7 @@ All cache accesses flow from one queue to the other queue.
 \end{itemize}
 
 
-\subsubsection{The Flows in the Cache Structure}
+\subsection{The Flows in the Cache Structure}
 \label{sec:cache-flow}
 
 \begin{itemize}
@@ -72,7 +72,7 @@ All cache accesses flow from one queue to the other queue.
 \end{itemize}
 
 
-\subsection{The Hierarchy}
+\section{The Hierarchy}
 \label{sec:memhierarchy}
 
 \SIM maintains very flexible memory hierarchy. Each level of cache 
@@ -127,14 +127,13 @@ can flexibly configure 2-level caches.
 \end{figure*}
 
 
-\subsection{How to Configure Cache Hierarchy} 
+\section{How to Configure Cache Hierarchy} 
 
 The cache hierarchy can be configured by setting 1) the link between
 upper/lower level cache, 2) disability, and 3) router. The following
 code is used in the \SIM cache initialization.
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 void dcu_c::init(
   int next_id, // next level cache id
   int prev_id, // previous level cache id
@@ -144,8 +143,7 @@ void dcu_c::init(
   bool disable, // disability
   bool has_router // router
 );
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 \begin{description}
   \item[Router] When \textsf{has\_router} is set to \textit{false},
@@ -176,7 +174,7 @@ void dcu_c::init(
 
 \end{description}
 
-\subsubsection{Example of Different Cache Hierarchy}
+\subsection{Example of Different Cache Hierarchy}
 
 We provide several example of the cache hierarchy.
 
@@ -287,7 +285,7 @@ We provide several example of the cache hierarchy.
 
 \end{itemize}
 
-\subsection{DRAM Module} 
+\section{DRAM Module} 
 
 \SIM also models detail memory controllers: timing constraint, 
 bandwidth, and scheduling. Section~\ref{sec:param-dram} describes how

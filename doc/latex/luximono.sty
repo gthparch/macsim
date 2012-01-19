@@ -1,0 +1,32 @@
+\ProvidesPackage{luximono}[2004/01/26 loading LuxiMono as tt font (WaS)]
+\RequirePackage{keyval}
+\define@key{UlIX}{scaled}[0.87]{%
+  \expandafter\def\csname ul9@Scale\endcsname{#1}}
+\def\ProcessOptionsWithKV#1{%
+  \let\@tempc\relax
+  \let\UlIX@tempa\@empty
+  \@for\CurrentOption:=\@classoptionslist\do{%
+    \@ifundefined{KV@#1@\CurrentOption}%
+    {}%
+    {%
+      \edef\UlIX@tempa{\UlIX@tempa,\CurrentOption,}%
+      \@expandtwoargs\@removeelement\CurrentOption
+        \@unusedoptionlist\@unusedoptionlist
+    }%
+  }%
+  \edef\UlIX@tempa{%
+    \noexpand\setkeys{#1}{%
+      \UlIX@tempa\@ptionlist{\@currname.\@currext}%
+    }%
+  }%
+  \UlIX@tempa
+  \let\CurrentOption\@empty
+}
+\ProcessOptionsWithKV{UlIX}
+\AtEndOfPackage{%
+  \let\@unprocessedoptions\relax
+}
+
+\renewcommand{\ttdefault}{ul9}
+\endinput
+   

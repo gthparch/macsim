@@ -1,65 +1,334 @@
+%%
+%% This file can be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2003/12/01 or later.
+%% 
+%% This work has the LPPL maintenance status "maintained".
+%% 
+%% The Current Maintainer of this work is Lars Madsen (daleif@imf.au.dk).
+%%
+%% $LastChangedDate: 2010-05-10 11:02:27 +0200 (Mon, 10 May 2010) $
+%% $LastChangedRevision: 784 $
+%%
+%$
+\documentclass[letterpaper,11pt,openany]{memoir}
+\def\MyFileVersion{Version 1.7b, 2010/05/10}
+\setlrmarginsandblock{2.5cm}{*}{1} 
+\setulmarginsandblock{2.5cm}{2.5cm}{*}
+\setmarginnotes{2.5mm}{2cm}{1em}
+\checkandfixthelayout
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{
+  calc,
+  graphicx,
+  url,
+  fancyvrb,
+  multicol,
+  kvsetkeys
+}
+\usepackage[svgnames,dvipsnames]{xcolor}
+\definecolor{felinesrcbgcolor}{rgb}{1,1,0.85}
+\definecolor{felinesrcbgcolor}{rgb}{0.94,0.97,1}
+\definecolor{felineframe}{rgb}{0.79,0.88,1}
+\definecolor{myorange}{rgb}{1,0.375,0}
+\definecolor{mycolor}{rgb}{0,0.4,0.2}
 
-\documentclass[11pt, letterpaper]{article}
+\usepackage[draft]{fixme}
+\usepackage{fourier}
+\usepackage[scaled]{luximono}
+\newcommand\starbreak{\fancybreak{\decosix\quad\decosix\quad\decosix}}
+
+%\newcommand\starbreak{\fancybreak{$*\quad*\quad*$}}
+
+\usepackage[scaled]{berasans}
+
+\chapterstyle{ell}
+\renewcommand\tocheadstart{}
+\renewcommand\printtoctitle[1]{}
+
+\raggedbottom
+\fvset{frame=lines,
+  framesep=-0.05in,
+  framerule=0pt,
+  fontsize=\small,
+  rulecolor=\color{myorange},
+%  formatcom=\color{DarkGreen},
+  formatcom=\color{mycolor},
+}
+\newoutputstream{StyleList}
+ \newoutputstream{OutputStyle}%
+ \openoutputfile{\jobname.styles}{StyleList}
+\def\OutputStylePostfix{-style}
+\def\CurrentChapterStyle{}
+\makeatletter
+\kv@set@family@handler{MCS}{%
+  \xdef\CurrentChapterStyle{#1}%
+}
+\define@key{MCS}{pages}{%\typeout{xxx: #1}
+  \global\@namedef{MCS@pages@\CurrentChapterStyle}{#1}%
+}
+\newif\ifSCS@full
+\newcounter{MCS}
+\newenvironment{@showchapterstyle}[1]{%
+  \kvsetkeys{MCS}{#1}%
+  \ifSCS@full%
+    \edef\hest{\CurrentChapterStyle\OutputStylePostfix\space page \@nameuse{MCS@pages@\CurrentChapterStyle}}
+    \addtostream{StyleList}{\hest}%
+  \else%
+    \addtostream{StyleList}{\CurrentChapterStyle\OutputStylePostfix}%
+  \fi%
+  \openoutputfile{\CurrentChapterStyle\OutputStylePostfix.tex}{OutputStyle}%
+  \ifSCS@full%
+    \addtostream{OutputStyle}{%
+      \protect\let\protect\STARTCODE\relax^^J%
+      \protect\let\protect\STOPCODE\relax^^J%
+      \protect\STARTCODE%
+    }%
+  \else%
+    \addtostream{OutputStyle}{%
+      \protect\documentclass{memoir}^^J%
+      \protect\let\protect\STARTCODE\relax^^J%
+      \protect\let\protect\STOPCODE\relax^^J%
+      \protect\STARTCODE%
+    }%
+  \fi%
+  \writeverbatim{OutputStyle}%
+}{%
+  \endwriteverbatim\relax%
+  \ifSCS@full%
+    \addtostream{OutputStyle}{%
+      \protect\STOPCODE%
+    }
+  \else% 
+    \addtostream{OutputStyle}{%
+      \protect\chapterstyle{\CurrentChapterStyle}^^J%
+      \protect\STOPCODE^^J%
+      \protect\setlength\afterchapskip{\onelineskip}^^J%
+      \protect\setlength\beforechapskip{\onelineskip}^^J%
+      \protect\usepackage{lipsum}^^J%
+      \protect\begin{document}^^J%
+      \protect\input{chapterexample.tex}^^J%
+      \protect\end{document}%
+    }%
+  \fi%
+  \closeoutputstream{OutputStyle}%
+  \edef\FancyVerbStartString{\string\STARTCODE}%
+  \edef\FancyVerbStopString{\string\STOPCODE}%
+  \vskip\z@\@plus\bottomsectionskip
+  \penalty\z@
+  \vskip\z@\@plus -\bottomsectionskip
+  \phantomsection
+  \addcontentsline{toc}{section}{\CurrentChapterStyle}
+  \VerbatimInput[label={\small Source for the \textsf{\CurrentChapterStyle} style}]{\CurrentChapterStyle-style.tex}%%
+  \par\noindent%
+  \IfFileExists{\CurrentChapterStyle\OutputStylePostfix.pdf}{%
+    \fboxsep=4pt%
+    \begin{adjustwidth}{-\fboxsep-\fboxrule}{-\fboxsep-\fboxrule}%
+%      \begin{framed}%
+        \@ifundefined{MCS@pages@\CurrentChapterStyle}{%
+          \fcolorbox{felineframe}{felinesrcbgcolor}{\includegraphics[width=\textwidth]{\CurrentChapterStyle\OutputStylePostfix}}%
+        }{%
+          \edef\nisse{\@nameuse{MCS@pages@\CurrentChapterStyle}}
+          \@for\ITEM:=\nisse\do{
+            \ifpdf%
+              \fcolorbox{felineframe}{felinesrcbgcolor}{\includegraphics%
+              [width=\textwidth,page=\ITEM]{\CurrentChapterStyle\OutputStylePostfix}}%
+            \else%
+              \fcolorbox{felineframe}{felinesrcbgcolor}{\includegraphics%
+              [width=\textwidth]{\CurrentChapterStyle\OutputStylePostfix-\ITEM}}%
+            \fi%
+            \bigskip%
+            \fancybreak{$***$}%
+            \bigskip
+          }%
+        }%
+%      \end{framed}%
+    \end{adjustwidth}
+  }{\fbox{File \CurrentChapterStyle-style.* does not exist}}
+  \vskip1em plus 1em minus -.5em\noindent%
+}
+% the two actual environments, the stared one will let you add entire
+% documents, while the unstared one will only display sniplets
+\newenvironment{showchapterstyle}[1]{%
+\SCS@fullfalse\@showchapterstyle{#1}}{\end@showchapterstyle}
+\newenvironment{showchapterstyle*}[1]{%
+\SCS@fulltrue\@showchapterstyle{#1}}{\end@showchapterstyle\SCS@fullfalse}
+\newcommand\@Arg[1]{\textnormal{$\langle$\textit{#1}$\rangle$}}
+\newcommand\@Args[1]{\texttt{\{\textnormal{$\langle$\textit{#1}$\rangle$}\}}}
+\newcommand\Arg{\@ifstar{\@Args}{\@Arg}}
+\renewcommand\cs[1]{\texttt{\textbackslash #1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% for continuous numbering
+\counterwithout*{figure}{chapter}
+\counterwithout*{table}{chapter}
+\counterwithout*{equation}{chapter}
+\renewcommand{\thefigure}{\@arabic\c@figure}
+\renewcommand{\thetable}{\@arabic\c@table}
+\renewcommand{\theequation}{\@arabic\c@equation}
+\setcounter{secnumdepth}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatother
+\newenvironment{syntax}{%
+  \vskip.5\onelineskip%
+  \begin{adjustwidth}{0pt}{0pt}
+    \parindent=0pt%
+    \obeylines%
+    \let\\=\relax%
+  }{%
+  \end{adjustwidth}%
+  \vskip.5\onelineskip%
+}
+\newenvironment{syntax*}{%
+  \vskip.5\onelineskip%
+  \begin{adjustwidth}{0pt}{0pt}
+    \parindent=0pt%
+  }{%
+  \end{adjustwidth}%
+  \vskip.5\onelineskip%
+}
+
+\newtheorem{remark}{Remark}
+
+\AtEndDocument{\closeoutputstream{StyleList}}
+\pagestyle{plain}
+
+\ifpdf
+\usepackage[colorlinks]{hyperref}
+\fi
 
 
-%% packages
-\usepackage[pagebackref=true,bookmarks=true]{hyperref}
-\usepackage{graphicx}
-\usepackage{color}
-\usepackage{xcolor}
-\usepackage{xspace}
-\usepackage{listings}
-\lstset{columns=fullflexible,basicstyle=\footnotesize\ttfamily}
-\usepackage{paralist}
-\usepackage[labelsep=period, font={singlespacing}, labelfont={bf}, textfont={rm}, skip=5pt]{caption}
-%\captionsetup[table]{position=top, aboveskip=0pt}
-%\captionsetup[figure]{position=below, aboveskip=5pt, belowskip=-5pt}
-%\usepackage[compact]{titlesec}
-%\titlespacing{\section}{0pt}{2}{2}
-%\titlespacing{\subsection}{0pt}{2}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\TODO}[1]{{\color{red}#1}}
 \newcommand{\todo}[1]{{\color{red}#1}}
-
-\setlength{\textheight}{8.5in}
-\setlength{\textwidth}{6.5in}
-\setlength{\columnsep}{0.3125in}
-\setlength{\topmargin}{0in}
-\setlength{\headheight}{0in}
-\setlength{\headsep}{0in}
-\setlength{\parindent}{1pc}
-\setlength{\oddsidemargin}{0in}
-\setlength{\evensidemargin}{0in}
-
 \newcommand{\SIM}{MacSim\xspace}
 \newcommand{\ignore}[1]{}
 \newcommand{\cpu}{x86\xspace}
 \newcommand{\gpu}{GPU\xspace}
 
+\usepackage{
+  xspace,
+  graphicx,
+  color,
+  xcolor,
+  listings,
+  paralist,
+  cite
+}
+
+%\lhead{}
+%\chead{\small In the proceedings of the 18th IEEE International Symposium on High Performance Computer Architecture (HPCA), February 2012}
+%\rhead{}
+%\lfoot{}
+%\cfoot{\thepage}
+%\rfoot{}
+%\renewcommand{\headrulewidth}{0pt}
+%\renewcommand{\footrulewidth}{0.4pt}
+%\pagestyle{myheadings}
+%\pagenumbering{arabic}
+%\setlength{\headsep}{0.35in}
+%\setlength{\voffset}{-0.35in}
+
+
+
+\usepackage[labelsep=period, font={singlespacing}, labelfont={bf}, textfont={rm}, skip=5pt]{caption}
+
+
+%\usepackage{graphicx}
+%\usepackage{color}
+%\usepackage{xcolor}
+%\usepackage{xspace}
+%\usepackage{listings}
+\lstset{columns=fullflexible,basicstyle=\footnotesize\ttfamily}
+%\usepackage{paralist}
+%\usepackage{cite}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
-\title{MacSim: A CPU-GPU Heterogeneous Simulation Framework}
-
-\author{Hyesoon Kim\\
-Jaekyu Lee\\
-Nagesh B. Lakshminarayana\\
-Jaewoong Sim\\
-Jieun Lim\\
-Tri Pho}
-
-\maketitle
 \thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+\HUGE\textsf{MacSim: A CPU-GPU Heterogeneous Simulation Framework}\par
+\end{center}
 
+\begin{center}
+\Huge\textsf{User Guide}\par
+\end{center}
+
+\begin{center}
+\LARGE\textsf{Hyesoon Kim}\par
+\LARGE\textsf{Jaekyu Lee}\par
+\LARGE\textsf{Nagesh B. Lakshminarayana}\par
+\LARGE\textsf{Jaewoong Sim}\par
+\LARGE\textsf{Jieun Lim}\par
+\LARGE\textsf{Tri Pho}\par
+\end{center}
+\vspace*{\fill}
+\begin{center}
+\textrm{HPArch research group} \\
+\textsf{Georgia Institute of Technology} \\[0.2\baselineskip]
+\setlength{\droptitle}{0pt}%
+\end{center}
 \clearpage
 
-\tableofcontents
 
-\clearpage
+%\starbreak
+%The sample text used is
+%\VerbatimInput[
+%label={chapterexample.tex},
+%fontsize=\small
+%]{chapterexample.tex}
 
-%% inputs
+%\begin{Verbatim}
+%\let\STARTCODE\relax 
+%\let\STOPCODE\relax 
+%\STARTCODE
+%...
+%\STOPCODE  
+%\end{Verbatim}
+
+
+%\begingroup
+%\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
+%\begin{description}\firmlist
+%\item[beforechapskip] length, self explanatory,usually set using
+%  \verb+\chapterheadstart+, default 50pt
+%\item[midchapskip] length, distance between the chapter name / number and the
+%title, usually set using \verb+\afterchapternum+, default 20pt
+%\item[afterchapskip] length, distance between the chapter title and
+%  the following text, usually set using \verb+\afterchaptertitle+,
+%  default 40pt
+%\item[chapnamefont] the font setting used for \emph{Chapter} or
+%  similar, default \verb+\normalfont\huge\bfseries+
+%\item[chapnumfont] same for the chapter number, default
+%  \verb+\normalfont\huge\bfseries+
+%\item[chaptitlefont] same for the chapter title, default
+%  \verb+\normalfont\Huge\bfseries+ 
+%\end{description}
+%\endgroup
+
+
+
+\chapter*{\contentsname}
+
+
+\setlength\columnsep{8mm}
+\begin{multicols}{2}
+  \tableofcontents*
+\end{multicols}
+
+\newpage
+
 \input{intro}
-\input{run}
-\input{parameter}
+%\input{run}
+%\input{parameter}
 \input{trace}
 %\input{hetero}
 \input{knob}
@@ -75,12 +344,24 @@ Tri Pho}
 \input{faq}
 %\input{tool}
 %\input{ack}
-\clearpage
-%% bib
+
 \bibliographystyle{ieee}
 \bibliography{ref}
 
+
+%\begin{thebibliography}{9}
+%\bibliography{ref}
+%\end{thebibliography}
+
 \input{append}
 
-
 \end{document}
+
+%\bibliographystyle{ieee}
+%\bibliography{ref}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

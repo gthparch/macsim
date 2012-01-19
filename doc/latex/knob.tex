@@ -1,30 +1,26 @@
 
-\clearpage
-\section{The Knobs}
+
+\chapter{The Knobs}
 \label{sec:knob}
 
 To control various architectural parameters, we use multiple knob
 variabls, which are defined in \textit{trunk/def/*.param.def}.
 
-\subsection{How to add a new knob}
+\section{How to add a new knob}
 \label{sec:knob1}
 
 A new knob variable can be defined in the following format:
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 param<{variable used in the \SIM}, {variable used in the commandline}, {type}, {default value}>
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 We recommend first two arguments are same, but the former is in the
 upper case and the latter is in the lower case. For example,
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 param<L2_ASSOC, l2_assoc, int, 8>
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 
 However, one restriction is this new varialbe must be defined
@@ -32,21 +28,21 @@ in \textit{trunk/def} directory and the file name should
 be \textit{*.param.def} to parse variables correctly.
 
 
-\subsection{How to use a new knob in the simulator}
+\section{How to use a new knob in the simulator}
 
 All knob variables will have \textit{KNOB\_} prefix. For example,
 L2\_ASSOC in Section~\ref{sec:knob1} will be KNOB\_L2\_ASSOC in the
 simulator code.
 
-\subsubsection{Adding a New String Type Knob}
-Several knobs especially setting policies use {\tt string} type. 
-Examples are branch predictor, instruction scheduler, dram scheduler, and llc setting. Please see {\tt factory\_class.cc/h} and {\tt bp.cc}. 
+\subsection{Adding a New String Type Knob}
+Several knobs especially setting policies use {\texttt string} type. 
+Examples are branch predictor, instruction scheduler, dram scheduler, and llc setting. Please see {\texttt factory\_class.cc/h} and {\texttt bp.cc}. 
 
 
 
 
 
-\subsection{How to apply different value to a knob variables}
+\section{How to apply different value to a knob variables}
 
 There are two ways of modifying the default value of a knob variable.
 
@@ -56,21 +52,17 @@ There are two ways of modifying the default value of a knob variable.
   in \textit{trunk/params} directory. In this file, variable names and
   the values are paired in each line. For example,
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 l1_assoc 8
 l2_assoc 16
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 
   \item command line - instead, you can also supply the knobs in the command line, for example,
 
-\smallskip
-\begin{lstlisting}
+\begin{Verbatim}
 ./macsim --l1_assoc=8 --l2_assoc=16
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 \end{enumerate}
 
