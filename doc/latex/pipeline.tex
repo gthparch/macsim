@@ -9,6 +9,7 @@ Please see the doxygen file to get the up-to-date information.
 
 
 \begin{table}[htb]
+\begin{footnotesize}
 \begin{center}
 \caption{Pipeline stage and corresponding source code names.}
 \label{table:pipeline}
@@ -27,14 +28,15 @@ other supporting files & statistics.cc, bug\_detector.cc                        
 process manager        & process\_manager.cc                                    \\ \hline 
 \end{tabular}
 \end{center}
+\end{footnotesize}
 \end{table}
 
 
 
 \section{Fetch Stage}
-This pipeline stage models the instruction fetch stage. 
+This pipeline stage models the instruction fetch stage. The main tasks
+of this stage are as follows:
 
-The main tasks of this stage are 
 \begin{enumerate}
 \item Determine a thread from which instructions are fetched 
 \item Check whether the thread can actually fetch a new instruction or not  

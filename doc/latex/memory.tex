@@ -206,25 +206,21 @@ We provide several example of the cache hierarchy.
   L2 caches) and the number of the L3 tiles must be the same in this
   configuration.
 
-  \smallskip
-  \begin{lstlisting}
-  // class l3_coupled_network_c
-  for (int ii = 0; ii < m_num_core; ++ii) {
-    // next_id, prev_id, done, coupled_up, coupled_down, disable, router
-    m_l1_cache[ii]->init(ii, -1, false, false, TRUE, false, false);
-    m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE, false, TRUE);
-    m_l3_cache[ii]->init(-1, ii, false, TRUE,  false,false, TRUE);
-  }
-
-  \end{lstlisting}
-  \smallskip
+\begin{Verbatim}
+// class l3_coupled_network_c
+for (int ii = 0; ii < m_num_core; ++ii) {
+  // next_id, prev_id, done, coupled_up, coupled_down, disable, router
+  m_l1_cache[ii]->init(ii, -1, false, false, TRUE, false, false);
+  m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE, false, TRUE);
+  m_l3_cache[ii]->init(-1, ii, false, TRUE,  false,false, TRUE);
+}
+\end{Verbatim}
 
   \item NVIDIA G80~\cite{g80} architecture does not have
   hardware-managed caches. Thus, all three levels are connected each
   other and disabled. Only the L3 cache has a router to access DRAM.
 
-  \smallskip
-  \begin{lstlisting}
+  \begin{Verbatim}
   // class no_cache_c
   for (int ii = 0; ii < m_num_core; ++ii) {
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
@@ -232,9 +228,7 @@ We provide several example of the cache hierarchy.
     m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE,  TRUE, false);
     m_l3_cache[ii]->init(-1, ii, false, TRUE,  false, TRUE, TRUE);
   }
-
-  \end{lstlisting}
-  \smallskip
+  \end{Verbatim}
 
   \item NVIDIA Fermi~\cite{fermi} architecture has private L1 cache
   and unified L2 cache shared by all cores. The L1 and L2 caches are
@@ -242,8 +236,7 @@ We provide several example of the cache hierarchy.
   enabled. The L3 is not linked with others, but it is enabled and has
   a router.
 
-  \smallskip
-  \begin{lstlisting}
+  \begin{Verbatim}
   // class l2_decoupled_network_c
   // next_id, prev_id, done, coupled_up, coupled_down, disable, router
   for (int ii = 0; ii < m_num_core; ++ii) {
@@ -255,9 +248,7 @@ We provide several example of the cache hierarchy.
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
-
-  \end{lstlisting}
-  \smallskip
+  \end{Verbatim}
   
   \item In general 2-D Topology (Mesh, Torus), we assume each core has
   private L1 and L2 caches, but access to the L3 cache must be
@@ -266,8 +257,7 @@ We provide several example of the cache hierarchy.
   router. The L3 cache is not linked with others and the communication
   is made through the interconnection network.
 
-  \smallskip
-  \begin{lstlisting}
+  \begin{Verbatim}
   // class l3_decoupled_network_c
   // next_id, prev_id, done, coupled_up, coupled_down, disable, router
   for (int ii = 0; ii < m_num_core; ++ii) {
@@ -279,10 +269,7 @@ We provide several example of the cache hierarchy.
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, TRUE);
   }
-
-  \end{lstlisting}
-  \smallskip
-
+  \end{Verbatim}
 \end{itemize}
 
 \section{DRAM Module} 

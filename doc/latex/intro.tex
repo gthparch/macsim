@@ -177,6 +177,7 @@ We provide three different build types.
   \item gpf : gprof version (-pg flag)
 \end{itemize}
 
+\noindent
 To build a certain type, you need to specify the option
 after \textit{make} command. For example,
 
@@ -236,6 +237,7 @@ mt_no_fetch_br 1
 one_cycle_exec 0
 \end{Verbatim}
 
+\noindent
 The first literal is the name of parameter and the second literal is a
 value that will overwrite the default value. Section~\ref{sec:knob}
 details how to add, modify, and use these parameters.
@@ -367,10 +369,14 @@ repeat_trace 1
 
 \subsubsection{2-way SMT x86 Core}
 
-\SIM also supports the simultaneous multi-threading (SMT) features. 
-There parameters are used for the SMT configurations: 
-\textsf{max\_threads\_per\_core}, \textsf{max\_threads\_per\_medium\_core}, 
-and \\\textsf{max\_thread\_per\_large\_core}. For example,
+\SIM also supports the simultaneous multi-threading (SMT) features.
+These parameters are used for the SMT configurations:
+
+\Verb+ max_threads_per_core+, \Verb+max_threads_per_medium_core+, and
+\Verb+max_thread_per_large_core+. 
+
+\noindent
+For example,
 
 \begin{Verbatim}
 // 1-core 2-way SMT configuration
@@ -488,7 +494,7 @@ repeat_trace 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Number of blocks per core}
+\subsubsection{Number of Thread Blocks Per Core}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The Maximum number blocks per core will be determined by several
@@ -507,7 +513,7 @@ setting \Verb+max_block_per_core_super+.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Cache configuration}
+\subsubsection{Cache Configuration}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The cache can be configured by following parameters.
@@ -531,7 +537,8 @@ icache_assoc   8 // I cache set associativity
 \end{Verbatim}
 
 
-The cache size can be calculated by the Equation~\ref{eq:cachesize}.
+The effective cache size can be calculated by the
+Equation~\ref{eq:cachesize}.
 
 \begin{equation}
 \label{eq:cachesize}
@@ -539,16 +546,19 @@ cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only
 \end{equation}
 
 
-
+\noindent
 For example, to configure a 16-way 1MB cache with 64B line size,
+
 \Verb+ 1MB cache = 256 sets * 16 way *+ \Verb+64B * 4 tiles+
 %\Verb+\textsf{16 way} $\times$ \textsf{64 B}+ $\times$
-%\Verb+\textsf{4 tiles}+. Also, the cache latency is determined by
-several factors including the size, technology, and the number of
-ports. Cacti~\cite{cacti} can be used to model accurate cache
-latency. The cache line size is set as 64B by default. Although the
-cache line size can be any power of 2, all cache levels should have
-the same size.
+%\Verb+\textsf{4 tiles}+. 
+
+\noindent
+Also, the cache latency is determined by several factors including the
+size, technology, and the number of ports. Cacti~\cite{cacti} can be
+used to model accurate cache latency. The cache line size is set as
+64B by default. Although the cache line size can be any power of 2,
+all cache levels should have the same size.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -578,8 +588,8 @@ dram_scheduling_policy FRFCFS // dram scheduling policy
 Dram timings using three parameters: precharge ($t_{RP}$), activate
 ($t_{RCD}$), and column access ($t_{CL}$) latency. DRAM bandwidth is
 modeled using three
-parameters: \textsf{dram\_frequency}, \textsf{dram\_bus\_width},
-and \textsf{dram\_num\_channel}. The maximum DRAM bandwidth can be
+parameters: \Verb+dram_frequency+, \Verb+dram_bus_width+,
+and \Verb+dram_num_channel+. The maximum DRAM bandwidth can be
 calculated using Equation~\ref{eq:bandwidth}.
 
 \begin{equation}
@@ -595,11 +605,8 @@ For example, the maximum bandwidth from above parameters can be
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Microarchitecture Setting Parameters}
+\subsubsection{Setting \cpu Core Parameters}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\noindent 
-{\textbf CPU Core Parameters} 
 
 By default these configurations are applied to small cores. 
 
@@ -617,13 +624,16 @@ rob_size    96  // ROB size
 fetch_policy rr // SMT(MT) thread fetch policy  by default: round-robin 
 \end{Verbatim}
 
-\noindent  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Setting GPU Core Parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\textbf GPU Core Parameters} 
 
 \TODO{Question: is constant cache size is per SM? How does a core share the constant cache, texture cache, what is ptx\_exec\_ratio? } 
 
-\smallskip
-\begin{lstlisting}
+
+\begin{Verbatim}
 schedule_ratio 4 \\ Every 4th cycle, one thread (warp) is scheduled 
 fetch_ratio  4 \\ Every 4th cycle, one thread (warp) is fetched 
 gpu_sched   1 \\ set GPU scheduler 
@@ -633,8 +643,7 @@ texture_cache_size 1024  \\ 1024B texture cache
 shared_mem_size 4096  \\ 4096B shared memory size 
 ptx_exec_ratio  \\ 
 num_warp_scheduler \\ the number of warps (threads) can be scheduled  
-\end{lstlisting}
-\smallskip
+\end{Verbatim}
 
 
 

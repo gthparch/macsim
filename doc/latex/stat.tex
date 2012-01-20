@@ -1,13 +1,17 @@
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{The Statistics}
 \label{sec:stat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 We provide a simple framework for collecting statistics during simulation.
 Statistics can be either global (common counter for all cores) or per core
 (each core has its own counter).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Statistic Types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The following statistic types are supported:
 
@@ -36,7 +40,9 @@ raw value i.e. the number of occurances of the statistic and the other output
 value is the value calculated based on the type of the statistic.
 
 
-\section{How to add a new stat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Add a New Stat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 New statistics can be defined by adding definitions to any of the
 \textit{*.stat.def} files in the \textit{trunk/def/} directory or by creating a
@@ -48,7 +54,7 @@ end of each DEF\_STAT statement below.
 
 \begin{description}
 
-\item[COUNT Stat:] 
+\item[COUNT Stat:] \Verb+ +
 
 \Verb+DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])+
 
@@ -58,7 +64,9 @@ DEF_STAT(INST_COUNT_TOT, COUNT, NO_RATIO)
 DEF_STAT(INST_COUNT, COUNT, NO_RATIO, PER_CORE)
 \end{Verbatim}
 
-\item[RATIO Stat:] \Verb+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])+
+\item[RATIO Stat:] \Verb+ +
+
+\Verb+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])+
 
 
 In addition to defining the RATIO stat itself, a base stat of type COUNT has to
@@ -71,7 +79,8 @@ DEF_STAT(DISPATCHED_INST, COUNT, NO_RATIO)
 DEF_STAT(DISPATCH_WAIT, RATIO, DISPATCHED_INST)
 \end{Verbatim}
 
-\item[DIST Stat:] 
+\item[DIST Stat:] \Verb+ +
+
 \begin{Verbatim}
 DEF_STAT(STAT_NAME_START, DIST, NO_RATIO [, PER_CORE])
 DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])*
@@ -90,12 +99,9 @@ DEF_STAT(SCHED_FAILED_NO_PORTS, DIST, NO_RATIO, PER_CORE)
 \end{description}
 
 
-
-
-
-
-\section{How to update statistics}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Update Statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 Macros are provided to update the value of statistics. STAT\_EVENT and
@@ -106,9 +112,8 @@ than than 1. It takes the name of the statistic to be incremented and the value
 by which the statistic is to be incremented as its parameters.
 STAT\_CORE\_EVENT and STAT\_CORE\_EVENT\_M increment and decrement the value of
 a per core stat by 1. These take core id and the name of the statistic to be
-incremented/decremented as their parameters.
+incremented/decremented as their parameters. For example,
 
-Eg:
 \begin{Verbatim}
 STAT_EVENT(INST_COUNT_TOT)
 STAT_EVENT_N(INST_COUNT_TOT, 2)
@@ -117,7 +122,9 @@ STAT_CORE_EVENT(1, INST_COUNT)
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The Output}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 At the end of the simulation *.stat.out are generated, these files include the
 statistic values at the end of the simulation. As mentioned, for each stat two
@@ -126,50 +133,49 @@ calculated based on the type of the stat.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Important Stats}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{table}[htb]
+\begin{footnotesize}
 \begin{center}
-\caption{Important Stats} 
+\caption{Important Stats.} 
 \label{table:stats}
-\begin{tabular}{|p{2in}||p{2.5in}|p{0.5in}|p{1in}|}
+\begin{tabular}{|l||l|c|l|}
 \hline 
-INST\_COUNT\_TOT & \# of instructions &  & general.stat.out  \\ \hline 
-INST\_COUNT\_CORE\_[0-11] & \# of instructions in only the specificed core [0-11] & core  & general.stat.out  \\ \hline 
-CYC\_COUNT\_TOT &  simulated cycles &  & general.stat.out \\ \hline 
-CYC\_COUNT\_CORE\_[0-11] & simulated cycles in only the specificed core [0-11]&  & general.stat.out \\ \hline 
-CYC\_COUNT\_X86 & simulated cycles for x86 only &  & general.stat.out \\ \hline 
-CYC\_COUNT\_PTX & simulated cycles for ptx only &  & general.stat.out \\ \hline \hline 
-
-                & \# of fp instructions &   &  \\ \hline 
-                & \# of int instructions &   &  \\ \hline 
-                & \# of load instructions &   &  \\ \hline  
-                & \# of store instructions &   &  \\ \hline  
-
-BP\_ON\_PATH\_CORRECT                & \# of correctly predicted branches (DIST) &  core  & bp.stat.def \\ \hline  
-BP\_ON\_PATH\_MISPREDICT                & \# of mis-predicted branches (DIST) &  core  & bp.stat.def \\ \hline  
-BP\_ON\_PATH\_MISFETCHT                & \# of mis-fetch branches (BTB MISS)(DIST) &  core  & bp.stat.def \\ \hline  
-                
-ICACHE\_HIT, ICACHE\_MISS                & \# of I-cache hitt,miss (DIST) &   & memory.stat.def  \\ \hline  
-L[1-3]\_HIT\_CPU                & \# of l[1-3]cache hits from CPU &   & memory.stat.def \\ \hline 
-L[1-3]\_HIT\_GPU                & \# of l[1-3]cache hits from GPU &   & memory.stat.def \\ \hline 
-L[1-3]\_MISS\_CPU                & \# of l[1-3]cache misses from CPU &   & memory.stat.def \\ \hline 
-L[1-3]\_MISS\_GPU                & \# of l[1-3]cache misses from GPU &   & memory.stat.def \\ \hline  \hline 
-
-${AVG\_MEMORY\_LATENCY}/{AVG_MEMORY\_LATENCY\_BASE}$ & average memory latency &   & memory. stat.def \\ \hline \hline 
-TOTAL\_DRAM                & \# of DRAM accesses&   & memory.stat.def \\ \hline  
-TOTAL\_DRAM\_READ                & \# of DRAM reads &   & memory.stat.def \\ \hline  
-TOTAL\_DRAM\_WB                 & \# of DRAM write backs &   & memory.stat.def \\ \hline  
-                & \# of register reads &   &  \\ \hline  
-                & \# of register writes  &   &  \\ \hline   \hline 
-
-COAL\_INST, UNCOAL\_INST & coalesced/uncoalesced mem requests (DIST) &   & memory.stat.def  \\ \hline 
+INST\_COUNT\_TOT            & \# of instructions                                    &      & general.stat.out \\ \hline 
+INST\_COUNT\_CORE\_[0-11]   & \# of instructions in only the specificed core [0-11] & core & general.stat.out \\ \hline 
+CYC\_COUNT\_TOT             & simulated cycles                                      &      & general.stat.out \\ \hline 
+CYC\_COUNT\_CORE\_[0-11]    & simulated cycles in only the specificed core [0-11]   &      & general.stat.out \\ \hline 
+CYC\_COUNT\_X86             & simulated cycles for x86 only                         &      & general.stat.out \\ \hline 
+CYC\_COUNT\_PTX             & simulated cycles for ptx only                         &      & general.stat.out \\ \hline \hline 
+                            & \# of fp instructions                                 &      &                  \\ \hline 
+                            & \# of int instructions                                &      &                  \\ \hline 
+                            & \# of load instructions                               &      &                  \\ \hline  
+                            & \# of store instructions                              &      &                  \\ \hline  
+BP\_ON\_PATH\_CORRECT       & \# of correctly predicted branches (DIST)             & core & bp.stat.def      \\ \hline  
+BP\_ON\_PATH\_MISPREDICT    & \# of mis-predicted branches (DIST)                   & core & bp.stat.def      \\ \hline  
+BP\_ON\_PATH\_MISFETCHT     & \# of mis-fetch branches (BTB MISS)(DIST)             & core & bp.stat.def      \\ \hline  
+ICACHE\_HIT, ICACHE\_MISS   & \# of I-cache hitt,miss (DIST)                        &      & memory.stat.def  \\ \hline  
+L[1-3]\_HIT\_CPU            & \# of l[1-3]cache hits from CPU                       &      & memory.stat.def  \\ \hline 
+L[1-3]\_HIT\_GPU            & \# of l[1-3]cache hits from GPU                       &      & memory.stat.def  \\ \hline 
+L[1-3]\_MISS\_CPU           & \# of l[1-3]cache misses from CPU                     &      & memory.stat.def  \\ \hline 
+L[1-3]\_MISS\_GPU           & \# of l[1-3]cache misses from GPU                     &      & memory.stat.def  \\ \hline  \hline 
+AVG\_MEMORY\_LATENCY        & average memory latency                                &      & memory.stat.def  \\ \hline \hline 
+TOTAL\_DRAM                 & \# of DRAM accesses                                   &      & memory.stat.def  \\ \hline  
+TOTAL\_DRAM\_READ           & \# of DRAM reads                                      &      & memory.stat.def  \\ \hline  
+TOTAL\_DRAM\_WB             & \# of DRAM write backs                                &      & memory.stat.def  \\ \hline  
+                            & \# of register reads                                  &      &                  \\ \hline  
+                            & \# of register writes                                 &      &                  \\ \hline   \hline 
+COAL\_INST, UNCOAL\_INST    & coalesced/uncoalesced mem requests (DIST)             &      & memory.stat.def  \\ \hline 
 
 
 
 
 \end{tabular}
 \end{center}
+\end{footnotesize}
 \end{table} 
 
 
