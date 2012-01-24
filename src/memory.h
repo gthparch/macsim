@@ -67,7 +67,7 @@ class queue_c
     /**
      * Memory queue constructor
      */
-    queue_c(macsim_c* simBase);
+    queue_c(macsim_c* simBase, int size);
 
     /**
      * Memory queue destructor
@@ -285,6 +285,7 @@ class dcu_c
     memory_c* m_memory; /**< pointer to the memory system */
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
     ManifoldProcessor* m_terminal; /**< terminal to the NoC router */
+    router_c* m_router;
 };
 
 
@@ -408,6 +409,7 @@ class memory_c
     void init(void);
 
     void handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache);
+    
 
   public:
     static int m_unique_id; /**< unique memory request id */
@@ -472,11 +474,11 @@ class memory_c
     Counter m_stop_prefetch; /**< when set, no prefetches will be inserted */
     int m_l3_interleave_factor; /**< mask bit for L3 id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+    map<int, int>* m_dst_map;
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
     unordered_map<Addr, bool> m_td_pending_req; /**< pending requests in tag directory */
-
 };
 
 

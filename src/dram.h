@@ -244,7 +244,7 @@ class dram_controller_c
     int m_total_req; /**< total pending requests */
 
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
-    //router_c* m_router;
+    router_c* m_router;
 
     Counter m_avg_latency;
     Counter m_avg_latency_base;

@@ -1,5 +1,5 @@
 
-param<ENABLE_IRIS,              enable_iris,                    bool,   true>
+param<ENABLE_IRIS,              enable_iris,                    bool,   false>
 
 param<IRIS_TOPOLOGY,            iris_topology,                  string, ring>
 param<IRIS_GRIDSIZE,            iris_gridsize,                  string, 3>
@@ -11,3 +11,49 @@ param<IRIS_RC_METHOD,           iris_rc_method,                 string, ring_rou
 param<IRIS_SELF_ASSIGN_DEST_ID, iris_self_assign_dest_id,       string, 1>
 param<IRIS_RESP_PAYLOAD_LEN,    iris_resp_payload_len,          string, 1>
 param<IRIS_MEMORY_LATENCY,      iris_memory_latencY,            string, 1>
+
+
+
+
+param<ENABLE_NEW_NOC, enable_new_noc, bool, true>
+param<NUM_VC, num_vc, int, 4>
+param<NUM_PORT, num_port, int, 3>
+param<LINK_LATENCY, link_latency, int, 2>
+param<LINK_WIDTH, link_width, int, 16>
+
+param<ENABLE_HETEROGENEOUS_LINK, enable_heterogeneous_link, bool, false>
+param<NUM_SWITCH, num_switch, int, 1>
+param<NUM_SWITCH_CPU, num_switch_cpu, int, 1>
+param<NUM_SWITCH_GPU, num_switch_gpu, int, 1>
+param<NUM_SWITCH_MEM, num_switch_mem, int, 1>
+
+param<ENABLE_HETEROGENEOUS_LINK_WIDTH, enable_heterogeneous_link_width, bool, false>
+param<NUM_SWITCH_ITER,     num_switch_iter, int, 1>
+param<NUM_SWITCH_ITER_CPU, num_switch_iter_cpu, int, 1>
+param<NUM_SWITCH_ITER_GPU, num_switch_iter_gpu, int, 1>
+param<NUM_SWITCH_ITER_MEM, num_switch_iter_mem, int, 1>
+
+
+param<ENABLE_NOC_VC_PARTITION,  enable_noc_vc_partition, bool, false>
+param<CPU_VC_PARTITION,         cpu_vc_partition,        int,  2>
+param<GPU_VC_PARTITION,         gpu_vc_partition,        int,  2>
+
+param<ENABLE_CHANNEL_PARTITION, enable_channel_partition, bool, false>
+param<NUM_CHANNEL_CPU, num_channel_cpu, int, 1>
+param<NUM_CHANNEL_GPU, num_channel_gpu, int, 1>
+
+
+
+param<ENABLE_ADAPTIVE_RING_ROUTING, enable_adaptive_ring_routing, bool, false>
+param<ARR_THRESHOLD, arr_threshold, int, 50>
+param<ARR_DELTA, arr_delta, bool, false>
+param<ARR_ADV, arr_adv, bool, false>
+param<ARR_100, arr_100, bool, false>
+
+
+param<ARBITRATION_POLICY, arbitration_policy, int, 0>
+
+param<ROUTER_PLACEMENT, router_placement, int, 0>
+
+param<CORE_ENABLE_BEGIN, core_enable_begin, int, 0>
+param<CORE_ENABLE_END, core_enable_end, int, 0>

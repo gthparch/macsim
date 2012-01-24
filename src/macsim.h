@@ -57,6 +57,7 @@ class macsim_c
 		void deallocate_memory(void);
 		void compute_power(void);
 		void fini_sim(void);
+    router_c* create_router(int type);
 
 	public:
 		int m_num_active_threads; // number of active threads
@@ -124,6 +125,8 @@ class macsim_c
 		struct timeval m_end_sim; // simulation termination time
 
 		trace_read_c* m_trace_reader;
+
+    router_wrapper_c* m_router;
                 
 		// interconnect
 	public:

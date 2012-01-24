@@ -50,6 +50,8 @@ class port_c;
 class retire_c;
 class recovery_info_c;
 class rob_c;
+class router_c;
+class router_wrapper_c;
 class schedule_c;
 class tlb_c;
 class uop_c;

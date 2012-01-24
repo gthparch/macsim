@@ -21,6 +21,7 @@
 #include "uop.h"
 #include "factory_class.h"
 #include "bug_detector.h"
+#include "router.h"
 
 #include "config.h"
 
@@ -196,10 +197,11 @@ bool queue_c::sort_func::operator()(mem_req_s* a, mem_req_s* b)
 }
 
 
-queue_c::queue_c(macsim_c* simBase)
+queue_c::queue_c(macsim_c* simBase, int size)
 {
   m_simBase = simBase;
-  m_size = 1024;
+  m_size = size;
+//  m_size = 1024;
   //m_size = *m_simBase->m_knobs->KNOB_MEM_QUEUE_SIZE;
 }
 
@@ -279,10 +281,10 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   CREATE_CACHE_CONFIGURATION();
   
   // instantiate queues
-  m_in_queue = new queue_c(simBase);
-  m_wb_queue = new queue_c(simBase);
-  m_fill_queue = new queue_c(simBase);
-  m_out_queue = new queue_c(simBase);
+  m_in_queue = new queue_c(simBase, 1024);
+  m_wb_queue = new queue_c(simBase, 2048);
+  m_fill_queue = new queue_c(simBase, 1024);
+  m_out_queue = new queue_c(simBase, 2048);
 
   if (level == MEM_L3) {
     string llc_policy = *KNOB(KNOB_LLC_TYPE);
@@ -649,7 +651,7 @@ void dcu_c::run_a_cycle()
   process_out_queue();
   process_in_queue();
 
-  if (*KNOB(KNOB_ENABLE_IRIS))
+  if (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))
     receive_packet();
 }
 
@@ -862,27 +864,43 @@ void dcu_c::process_in_queue()
 // receive a packet from the NoC
 void dcu_c::receive_packet(void)
 {
-
   if (!m_has_router)
     return ;
     
-  mem_req_s* req = m_terminal->check_queue();
+
+  mem_req_s* req = NULL;
+  
+  if (*KNOB(KNOB_ENABLE_IRIS)) 
+    req = m_terminal->check_queue();
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    req = m_router->receive_req();
+  }
 
   if (req != NULL) {
-    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-      m_simBase->m_bug_detector->deallocate_noc(req);
-    }
-
-
+    req->m_state = MEM_NOC_DONE;
+    bool insert_done = false;
     if (req->m_msg_type == NOC_FILL) {
-      req->m_state = MEM_NOC_DONE;
-      if (!fill(req)) assert(0);
+      insert_done = fill(req);
     }
     else if (req->m_msg_type == NOC_NEW) {
-      if (!insert(req)) assert(0);
+      insert_done = insert(req);
     }
     else {
       assert(0);
+    }
+
+    if (insert_done) {
+      if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+        m_router->pop_req();
+      }
+    
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+        m_simBase->m_bug_detector->deallocate_noc(req);
+      }
+    }
+    else {
+      if (*KNOB(KNOB_ENABLE_IRIS))
+        assert(0);
     }
   }
 }
@@ -911,6 +929,14 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
     }
     
   }
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    req->m_msg_src = m_router->get_id();
+    req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
+
+//    cout << "level:" << m_level << " id:" << m_id << " src:" << req->m_msg_src << "\n";
+//    cout << "level:" << m_level+dir << " id:" << req->m_cache_id[m_level+dir] << " dst:" << req->m_msg_dst << "\n";
+//    cout << "-----\n";
+  }
   else {
     req->m_msg_src = m_noc_id;
   }
@@ -922,12 +948,16 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     packet_insert = m_terminal->send_packet(req);
   }
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    packet_insert = m_router->send_packet(req);
+  }
   else {
     packet_insert = m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req);  
   }
 
   if (packet_insert) {
-    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && 
+        (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))) {
       m_simBase->m_bug_detector->allocate_noc(req);
     }
 
@@ -1047,7 +1077,9 @@ void dcu_c::process_fill_queue()
 		STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_R );
 	}
 
-
+    // MEM_FILL_NEW
+    // MEM_FILL_WAIT_DONE
+    // MEM_FILL_WAIT_FILL
     switch (req->m_state) {
       // -------------------------------------
       // MEM_FILL_NEW : just inserted to the fill queue
@@ -1228,6 +1260,8 @@ void dcu_c::process_fill_queue()
         break;
       }
       default: {
+        ASSERTM(0, "req_id:%d state:%d\n", req->m_id, req->m_state);
+        assert(0);
         break;
       }
     }
@@ -1463,6 +1497,27 @@ bool dcu_c::create_network_interface(int mclass)
 
       m_noc_id = static_cast<int>(processor_id);
     }
+    
+    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      int type;
+      if (mclass == L1_REQ || mclass == L2_REQ) {
+        if (m_ptx_sim) {
+          type = GPU_ROUTER;
+        }
+        else {
+          type = CPU_ROUTER;
+        }
+      }
+      else if (mclass == L3_REQ) {
+        type = L3_ROUTER;
+      } 
+      else {
+        type = MC_ROUTER;
+      }
+      m_router = m_simBase->create_router(type);
+      m_noc_id = m_router->get_id(); 
+    }
+
     return true;
   }
   else {
@@ -1558,6 +1613,9 @@ memory_c::memory_c(macsim_c* simBase)
 
   m_l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
   m_l3_interleave_factor = static_cast<int>(pow(2, m_l3_interleave_factor));
+    
+  // destination router map
+  m_dst_map = new map<int, int>;
 }
 
 
@@ -1585,7 +1643,7 @@ memory_c::~memory_c()
 // =======================================
 void memory_c::init(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)
+  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return;
 
   int total_num_router = 0;
@@ -1612,7 +1670,65 @@ void memory_c::init(void)
     m_dram_controller[ii]->create_network_interface();
     ++total_num_router;
   }
-  report("Number of MC routers: " << total_num_router);
+
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 0) { // GPU_FRIENDLY
+      for (int ii = 0; ii < m_num_core; ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+      }
+      for (int ii = 0; ii < m_num_l3; ++ii) {
+        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+      }
+      for (int ii = 0; ii < m_num_mc; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+      }
+    }
+    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1) { // CPU_FRIENDLY
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = *KNOB(KNOB_NUM_SIM_SMALL_CORES) + ii;
+      } 
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii;
+      }
+      for (int ii = 0; ii < m_num_l3; ++ii) {
+        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+      }
+      for (int ii = 0; ii < m_num_mc; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+      }
+    }
+    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 2) { // MIXED
+      int count = 0;
+      for (int ii = 0; ii < m_num_core; ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+        count++;
+      }
+      for (int ii = 0; ii < m_num_mc/2; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + ii;
+        count++;
+      }
+      for (int ii = 0; ii < m_num_l3; ++ii) {
+        (*m_dst_map)[MEM_L3 * 100 + ii] = count++;
+      } 
+      for (int ii = m_num_mc/2; ii < m_num_mc; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = count++;
+      }
+    }
+    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 3) { // INTERLEAVE
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = ii*2;
+      } 
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii*2 + 1;
+      }
+      for (int ii = 0; ii < m_num_l3; ++ii) {
+        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+      }
+      for (int ii = 0; ii < m_num_mc; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+      }
+    }
+  }
 }
 
 
@@ -1959,6 +2075,10 @@ int memory_c::get_dst_router_id(int level, int id)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     return m_iris_node_id[m_noc_id_base[level] + id];
   }
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    return (*m_dst_map)[level * 100 + id];
+//    return m_noc_id_base[level] + id;
+  }
   else {
     return m_noc_id_base[level] + id;
   }
@@ -2140,6 +2260,8 @@ void memory_c::flush_prefetch(int core_id)
     }
   }
 }
+
+
 
 
 void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache)

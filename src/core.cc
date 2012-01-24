@@ -60,6 +60,7 @@
 #include "fetch_factory.h"
 #include "readonly_cache.h"
 #include "sw_managed_cache.h"
+#include "router.h"
 
 #include "config.h"
 
@@ -534,6 +535,10 @@ void core_c::check_forward_progress()
     // print all remaining uop states
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
       m_simBase->m_bug_detector->print(m_core_id, m_last_terminated_tid);
+    }
+
+    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      m_simBase->m_router->print();
     }
 
     ASSERTM(m_core_cycle_count - m_last_forward_progress <= *m_simBase->m_knobs->KNOB_FORWARD_PROGRESS_LIMIT,

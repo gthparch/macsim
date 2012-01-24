@@ -141,7 +141,7 @@ typedef struct mem_req_s {
   bool          m_skip; 
   int           m_noc_type;         /**< noc request type: req or reply */
   
-  Counter        m_noc_cycle;
+  Counter       m_noc_cycle;
 
   macsim_c*     m_simBase;      /**< reference to macsim base class for sim globals */
   

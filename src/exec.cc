@@ -411,7 +411,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   // set uop done cycle
   if (uop_latency > 0) {
     int max_latency = std::max(uop_latency, static_cast<int>(*m_simBase->m_knobs->KNOB_EXEC_RETIRE_LATENCY));
-    uop->m_done_cycle = m_cur_core_cycle +  max_latency;
+    uop->m_done_cycle = m_cur_core_cycle + max_latency;
   }
 
   DEBUG("done_exec m_core_id:%d thread_id:%d core_cycle_count:%lld uop_num:%lld"

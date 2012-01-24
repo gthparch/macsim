@@ -15,7 +15,7 @@
 #include "noc.h"
 #include "utils.h"
 #include "bug_detector.h"
-//#include "router.h"
+#include "router.h"
 
 #include "all_knobs.h"
 #include "statistics.h"
@@ -359,8 +359,8 @@ void dram_controller_c::progress_check(void)
 
   // if counter exceeds N, raise exception
   if (m_starvation_cycle >= 5000) {
-  //  if (*KNOB(KNOB_ENABLE_NEW_NOC))
-  //    m_simBase->m_router->print();
+    if (*KNOB(KNOB_ENABLE_NEW_NOC))
+      m_simBase->m_router->print();
     print_req();
     ASSERT(0);
   }
@@ -513,8 +513,8 @@ void dram_controller_c::send_packet(void)
   req_type_allowed[1] = true;
 
   int max_iter = 1;
-  //if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
-  //  max_iter = 2;
+  if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
+    max_iter = 2;
 
     vector<mem_req_s*> temp_list;
 
@@ -541,20 +541,19 @@ void dram_controller_c::send_packet(void)
         req->m_msg_src = m_terminal->node_id;
         req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
       }
-      /*else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
         req->m_msg_src = m_router->get_id();
         req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
       }
-	*/
       assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
       bool insert_packet = false;
       if (*KNOB(KNOB_ENABLE_IRIS)) {
         insert_packet = m_terminal->send_packet(req);
       }
-      /*else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
         insert_packet = m_router->send_packet(req);
-      }*/
+      }
       else {
         int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, req->m_cache_id[MEM_L3]);
         insert_packet = m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, req);
@@ -567,9 +566,8 @@ void dram_controller_c::send_packet(void)
       }
 
       temp_list.push_back(req);
-      
-	if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) &&
-          (*KNOB(KNOB_ENABLE_IRIS)  )) {
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) &&
+          (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))) {
         m_simBase->m_bug_detector->allocate_noc(req);
       }
     }
@@ -583,7 +581,7 @@ void dram_controller_c::send_packet(void)
 
 void dram_controller_c::receive_packet(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)// && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
+  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
 
   // check router queue every cycle
@@ -598,7 +596,6 @@ void dram_controller_c::receive_packet(void)
       }
     }
   }
-/*
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     mem_req_s* req = m_router->receive_req();
     if (req && insert_new_req(req)) {
@@ -608,7 +605,6 @@ void dram_controller_c::receive_packet(void)
       }
     }
   }
-*/
 }
 
 
@@ -822,7 +818,7 @@ Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool g
 // create the network interface
 void dram_controller_c::create_network_interface(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)// && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
+  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
 
   if (*KNOB(KNOB_ENABLE_IRIS)) {
@@ -838,10 +834,10 @@ void dram_controller_c::create_network_interface(void)
     m_noc_id = static_cast<int>(processor_id);
   }
 
-/*  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     m_router = m_simBase->create_router(MC_ROUTER);
     m_noc_id = m_router->get_id(); 
-  }*/
+  }
 }
 
 void dram_controller_c::on_insert(mem_req_s* req, int bid, int rid, int cid)

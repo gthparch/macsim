@@ -949,6 +949,12 @@ void process_manager_c::sim_thread_schedule(void)
   // assign the fetched thread to that core's active queue
   for (int core_id = 0; core_id < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++core_id)  {
     core_c* core = m_simBase->m_core_pointers[core_id];
+
+    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 &&
+        core->get_core_type() != "ptx" &&
+        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) || core_id > *KNOB(KNOB_CORE_ENABLE_END))) 
+        continue;
+
     if (core->m_running_thread_num < core->get_max_threads_per_core()) {
       // schedule a thread to x86 core
       if (core->get_core_type() != "ptx") {

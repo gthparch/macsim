@@ -31,6 +31,7 @@
 #include "factory_class.h"
 #include "dram.h"
 #include "ei_power.h"
+#include "router.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
@@ -185,8 +186,11 @@ void macsim_c::init_memory(void)
 	// main memory
 	m_memory = mem_factory_c::get()->allocate(m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue(), m_simBase);
 
+  if (*KNOB(KNOB_ENABLE_NEW_NOC))
+    m_router = new router_wrapper_c(m_simBase);
+
 	// interconnection network
-  if (*KNOB(KNOB_ENABLE_IRIS))
+  if (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))
     m_memory->init();
   else
     m_noc = new noc_c(m_simBase);
@@ -364,72 +368,79 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
 // =======================================
 void macsim_c::init_network(void)
 {
-	init_iris_config(m_iris_params);
+  if (*KNOB(KNOB_ENABLE_IRIS)) {
+    init_iris_config(m_iris_params);
 
-	map<std::string, std::string>:: iterator it;
-	
-	it = m_iris_params.find("topology");
-	if ((it->second).compare("ring") == 0) {
-		m_iris_network = new Ring(m_simBase);
-	} 
-	else if ((it->second).compare("mesh") == 0) {
-		m_iris_network = new Mesh(m_simBase);
-	} 
-	else if ((it->second).compare("torus") == 0) {
-		m_iris_network = new Torus(m_simBase);
-	} 
+    map<std::string, std::string>:: iterator it;
 
-	//initialize iris network
-	m_iris_network->parse_config(m_iris_params);
+    it = m_iris_params.find("topology");
+    if ((it->second).compare("ring") == 0) {
+      m_iris_network = new Ring(m_simBase);
+    } 
+    else if ((it->second).compare("mesh") == 0) {
+      m_iris_network = new Mesh(m_simBase);
+    } 
+    else if ((it->second).compare("torus") == 0) {
+      m_iris_network = new Torus(m_simBase);
+    } 
 
-  report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
+    //initialize iris network
+    m_iris_network->parse_config(m_iris_params);
     m_simBase->no_nodes = m_macsim_terminals.size();
-	for (int i=0; i<m_macsim_terminals.size(); i++) {
-		//create component id
-		manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
-		manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
+    report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
 
-		//create component
-		NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
-		SimpleRouter* rr =manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
+    for (int i=0; i<m_macsim_terminals.size(); i++) {
+      //create component id
+      manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
+      manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
 
-		//set node id
-		interface->node_id = i;
-		rr->node_id = i;
+      //create component
+      NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
+      SimpleRouter* rr =manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
 
-		//register clock
-		manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
-		manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
+      //set node id
+      interface->node_id = i;
+      rr->node_id = i;
 
-		//push back
-		m_iris_network->terminals.push_back(m_macsim_terminals[i]);
-		m_iris_network->terminal_ids.push_back(m_macsim_terminals[i]->GetComponentId());
-		m_iris_network->interfaces.push_back(interface);
-		m_iris_network->interface_ids.push_back(interface_id);
-		m_iris_network->routers.push_back(rr);
-		m_iris_network->router_ids.push_back(router_id);
+      //register clock
+      manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
+      manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
 
-		//init
-		m_macsim_terminals[i]->parse_config(m_iris_params);
-		m_macsim_terminals[i]->init();
-		interface->parse_config(m_iris_params);
-		interface->init();
-		rr->parse_config(m_iris_params);
-		rr->init();
-	}
+      //push back
+      m_iris_network->terminals.push_back(m_macsim_terminals[i]);
+      m_iris_network->terminal_ids.push_back(m_macsim_terminals[i]->GetComponentId());
+      m_iris_network->interfaces.push_back(interface);
+      m_iris_network->interface_ids.push_back(interface_id);
+      m_iris_network->routers.push_back(rr);
+      m_iris_network->router_ids.push_back(router_id);
     
-	//initialize router outports
-	for (int i = 0; i < m_macsim_terminals.size(); i++)
-		m_iris_network->set_router_outports(i);
+      //init
+      m_macsim_terminals[i]->parse_config(m_iris_params);
+      m_macsim_terminals[i]->init();
+      interface->parse_config(m_iris_params);
+      interface->init();
+      rr->parse_config(m_iris_params);
+      rr->init();
+    }
 
-	m_iris_network->connect_interface_terminal();
-	m_iris_network->connect_interface_routers();
-	m_iris_network->connect_routers();
+    //initialize router outports
+    for (int i = 0; i < m_macsim_terminals.size(); i++)
+      m_iris_network->set_router_outports(i);
 
-  //initialize power stats
-  avg_power     = 0;
-  total_energy  = 0;
-  total_packets = 0;
+    m_iris_network->connect_interface_terminal();
+    m_iris_network->connect_interface_routers();
+    m_iris_network->connect_routers();
+
+    //initialize power stats
+    avg_power     = 0;
+    total_energy  = 0;
+    total_packets = 0;
+  }
+
+
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    m_router->init();
+  }
 }
 
 
@@ -438,20 +449,20 @@ void macsim_c::init_network(void)
 // =======================================
 void macsim_c::init_sim(void)
 {
-	report("initialize simulation");
+  report("initialize simulation");
 
-	// start measuring time
-	gettimeofday(&m_begin_sim, NULL);
+  // start measuring time
+  gettimeofday(&m_begin_sim, NULL);
 
-	// make sure all the variable sizes are what we expect
-	ASSERTU(sizeof(uns8)  == 1);
-	ASSERTU(sizeof(uns16) == 2);
-	ASSERTU(sizeof(uns32) == 4);
-	ASSERTU(sizeof(uns64) == 8);
-	ASSERTU(sizeof(int8)  == 1);
-	ASSERTU(sizeof(int16) == 2);
-	ASSERTU(sizeof(int32) == 4);
-	ASSERTU(sizeof(int64) == 8);
+  // make sure all the variable sizes are what we expect
+  ASSERTU(sizeof(uns8)  == 1);
+  ASSERTU(sizeof(uns16) == 2);
+  ASSERTU(sizeof(uns32) == 4);
+  ASSERTU(sizeof(uns64) == 8);
+  ASSERTU(sizeof(int8)  == 1);
+  ASSERTU(sizeof(int16) == 2);
+  ASSERTU(sizeof(int32) == 4);
+  ASSERTU(sizeof(int64) == 8);
 }
 
 
@@ -472,17 +483,17 @@ void macsim_c::compute_power(void)
 // =======================================
 void macsim_c::open_traces(string trace_list)
 {
-	fstream tracefile(trace_list.c_str(), ios::in);
+  fstream tracefile(trace_list.c_str(), ios::in);
 
-	tracefile >> m_total_num_application;
+  tracefile >> m_total_num_application;
 
-	// create processes
-	for (int ii = 0; ii < m_total_num_application; ++ii) {
-		string line;
-		tracefile >> line;
-		m_process_manager->create_process(line);
-		m_process_manager->sim_thread_schedule();
-	}
+  // create processes
+  for (int ii = 0; ii < m_total_num_application; ++ii) {
+    string line;
+    tracefile >> line;
+    m_process_manager->create_process(line);
+    m_process_manager->sim_thread_schedule();
+  }
 }
 
 
@@ -491,40 +502,43 @@ void macsim_c::open_traces(string trace_list)
 // =======================================
 void macsim_c::deallocate_memory(void)
 {
-	// memory deallocation
-	delete m_thread_pool;
-	delete m_section_pool; 
-	delete m_mem_map_entry_pool;
-	delete m_heartbeat_pool;
-	delete m_bp_recovery_info_pool;
-	delete m_trace_node_pool;
-	delete m_uop_pool;
-	delete m_invalid_uop;
-	delete m_memory;
+  // memory deallocation
+  delete m_thread_pool;
+  delete m_section_pool; 
+  delete m_mem_map_entry_pool;
+  delete m_heartbeat_pool;
+  delete m_bp_recovery_info_pool;
+  delete m_trace_node_pool;
+  delete m_uop_pool;
+  delete m_invalid_uop;
+  delete m_memory;
 
   if (*KNOB(KNOB_ENABLE_IRIS) == false)
     delete m_noc;
 
-	if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
-		delete m_bug_detector;
-	
-	// deallocate cores
-	int num_large_cores        = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
-	int num_large_medium_cores = (*m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES);
-	for (int ii = 0; ii < num_large_cores; ++ii) {
-		delete m_core_pointers[ii];
-		m_core_pointers[ii] = NULL;
-	}
+  if (*KNOB(KNOB_ENABLE_NEW_NOC))
+    delete m_router;
 
-	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES; ++ii) {
-		delete m_core_pointers[ii + num_large_cores];
-		m_core_pointers[ii + num_large_cores] = NULL;
-	}
+  if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
+    delete m_bug_detector;
 
-	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES; ++ii) {
-		delete m_core_pointers[ii + num_large_medium_cores];
-		m_core_pointers[ii + num_large_medium_cores] = NULL;
-	}
+  // deallocate cores
+  int num_large_cores        = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
+  int num_large_medium_cores = (*m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES);
+  for (int ii = 0; ii < num_large_cores; ++ii) {
+    delete m_core_pointers[ii];
+    m_core_pointers[ii] = NULL;
+  }
+
+  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES; ++ii) {
+    delete m_core_pointers[ii + num_large_cores];
+    m_core_pointers[ii + num_large_cores] = NULL;
+  }
+
+  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES; ++ii) {
+    delete m_core_pointers[ii + num_large_medium_cores];
+    m_core_pointers[ii + num_large_medium_cores] = NULL;
+  }
 }
 
 
@@ -533,27 +547,27 @@ void macsim_c::deallocate_memory(void)
 // =======================================
 void macsim_c::fini_sim(void)
 {
-	report("finalize simulation");
+  report("finalize simulation");
 
-	// execution time calculation
-	gettimeofday(&m_end_sim, NULL);
-	REPORT("elapsed time:%.1f seconds\n", \
-		((m_end_sim.tv_sec - m_begin_sim.tv_sec)*1000000 + \
-		m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
+  // execution time calculation
+  gettimeofday(&m_end_sim, NULL);
+  REPORT("elapsed time:%.1f seconds\n", \
+      ((m_end_sim.tv_sec - m_begin_sim.tv_sec)*1000000 + \
+       m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
 
-	int second = static_cast<int>(
-			((m_end_sim.tv_sec - m_begin_sim.tv_sec)*1000000 + 
-			m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
-	STAT_EVENT_N(EXE_TIME, second);
+  int second = static_cast<int>(
+      ((m_end_sim.tv_sec - m_begin_sim.tv_sec)*1000000 + 
+       m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
+  STAT_EVENT_N(EXE_TIME, second);
 
-	// compute power if enable_energy_introspector is enabled
-	if (*KNOB(KNOB_ENABLE_ENERGY_INTROSPECTOR)) {
-		compute_power();
-	}
-	
+  // compute power if enable_energy_introspector is enabled
+  if (*KNOB(KNOB_ENABLE_ENERGY_INTROSPECTOR)) {
+    compute_power();
+  }
+
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
-//        m_iris_network->routers[i]->print_stats();
+      //        m_iris_network->routers[i]->print_stats();
       m_iris_network->routers[ii]->power_stats();
     }
     cout << "Average Network power: " << avg_power << "W\n"
@@ -569,40 +583,40 @@ void macsim_c::fini_sim(void)
 // =======================================
 void macsim_c::initialize(int argc, char** argv) 
 {
- 	g_mystdout = stdout;
-	g_mystderr = stderr;
-	g_mystatus = NULL;
+  g_mystdout = stdout;
+  g_mystderr = stderr;
+  g_mystatus = NULL;
 
-	// initialize knobs
-	init_knobs(argc, argv);
+  // initialize knobs
+  init_knobs(argc, argv);
 
-	// initialize stats
-	m_coreStatsTemplate = new CoreStatistics(m_simBase);
-	m_ProcessorStats = new ProcessorStatistics(m_simBase);
+  // initialize stats
+  m_coreStatsTemplate = new CoreStatistics(m_simBase);
+  m_ProcessorStats = new ProcessorStatistics(m_simBase);
 
-	m_allStats = new all_stats_c(m_ProcessorStats);
-	m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
+  m_allStats = new all_stats_c(m_ProcessorStats);
+  m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
 
-	init_per_core_stats(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES, m_simBase);
+  init_per_core_stats(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES, m_simBase);
 
 
-	// register wrapper functions
-	register_functions();
+  // register wrapper functions
+  register_functions();
 
-	// initialize simulation
-	init_sim();
+  // initialize simulation
+  init_sim();
 
   if (*KNOB(KNOB_ENABLE_IRIS))
     master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
 
-	// init memory
-	init_memory();
+  // init memory
+  init_memory();
 
-	// initialize some of my output streams to the standards */
-	init_output_streams();
-	
-	// initialize cores
-	init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
+  // initialize some of my output streams to the standards */
+  init_output_streams();
+
+  // initialize cores
+  init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
 
 
   if (*KNOB(KNOB_ENABLE_IRIS)) {
@@ -613,13 +627,18 @@ void macsim_c::initialize(int argc, char** argv)
     init_network();
   }
 
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    report("Initializing new noc\n");
+    init_network();
+  }
 
-	// open traces
-	string trace_name_list = static_cast<string>(*m_simBase->m_knobs->KNOB_TRACE_NAME_FILE);
-	open_traces(trace_name_list);
 
-	// any number other than 0, to pass the first simulation loop iteration
-	m_num_running_core = 10000; 
+  // open traces
+  string trace_name_list = static_cast<string>(*m_simBase->m_knobs->KNOB_TRACE_NAME_FILE);
+  open_traces(trace_name_list);
+
+  // any number other than 0, to pass the first simulation loop iteration
+  m_num_running_core = 10000; 
 }
 
 
@@ -628,103 +647,111 @@ void macsim_c::initialize(int argc, char** argv)
 // =======================================
 int macsim_c::run_a_cycle() 
 {
-	//report("run core (single threads)");
+  //report("run core (single threads)");
 
-	// termination condition check
-	// 1. no active threads in the system
-	// 2. repetition has been done (in case of multiple applications simulation)
-	// 3. no core has been executed in the last cycle;
-	if (m_num_active_threads == 0 || m_repeat_done || m_num_running_core == 0)  {
-		return 0; //simulation finished
-	}
+  // termination condition check
+  // 1. no active threads in the system
+  // 2. repetition has been done (in case of multiple applications simulation)
+  // 3. no core has been executed in the last cycle;
+  if (m_num_active_threads == 0 || m_repeat_done || m_num_running_core == 0)  {
+    return 0; //simulation finished
+  }
 
-	int pivot = m_core_cycle[0]+1;
-	m_num_running_core = 0;
-		
-	// run memory system
-	m_memory->run_a_cycle();
+  int pivot = m_core_cycle[0]+1;
+  m_num_running_core = 0;
+
 
   // interconnection
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
   }
+  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+    m_router->run_a_cycle();
+  }
   else {
     // run interconnection network
     m_noc->run_a_cycle();
   }
 
-	// core execution loop
-	for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
-		// use pivot to randomize core run_cycle pattern 
-		int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
-				
-		core_c *core = m_core_pointers[ii];
+  // run memory system
+  m_memory->run_a_cycle();
 
-		// increment core cycle
-		core->inc_core_cycle_count();
-		m_core_cycle[ii]++;
+  // core execution loop
+  for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
+    // use pivot to randomize core run_cycle pattern 
+    int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
 
-		// core ended or not started	
-		if (m_sim_end[ii] || !m_core_started[ii]) {
-			continue;
-		}
-			
-		// check whether all ops in this core have been completed.
-		if (core->m_running_thread_num == 0 && (core->m_unique_scheduled_thread_num >= 1)) { 
-			if (m_num_waiting_dispatched_threads == 0)  {
-				m_sim_end[ii] = true;
-			}
-		}
-			
-		// active core : running a cycle and update stats
-		if (!m_sim_end[ii])  {
-			// run a cycle
-			core->run_a_cycle();
+    core_c *core = m_core_pointers[ii];
 
-			m_num_running_core++;
-			STAT_CORE_EVENT(ii, CYC_COUNT);
-			STAT_CORE_EVENT(ii, NUM_SAMPLES);
-			STAT_CORE_EVENT_N(ii, NUM_ACTIVE_BLOCKS, core->m_running_block_num);
-			STAT_CORE_EVENT_N(ii, NUM_ACTIVE_THREADS, core->m_running_thread_num);
-		}
+    // increment core cycle
+    core->inc_core_cycle_count();
+    m_core_cycle[ii]++;
 
-		// checking for threads 
-		if (m_sim_end[ii] != true) {
-			// when *m_simBase->m_knobs->KNOB_MAX_INSTS is set, execute each thread for *m_simBase->m_knobs->KNOB_MAX_INSTS instructions
-			if (*m_simBase->m_knobs->KNOB_MAX_INSTS && 
-					core->m_num_thread_reach_end == core->m_unique_scheduled_thread_num) {
-				m_sim_end[ii] = true;
-			}
-			// when *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT is set, execute only *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT cycles
-			else if (*m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT && m_simulation_cycle >= *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT) {
-				m_sim_end[ii] = true;
-			}
-		}
+    // core ended or not started	
+    if (m_sim_end[ii] || !m_core_started[ii]) {
+      continue;
+    }
 
-		if (!m_sim_end[ii]) { 
-			// advance queues to prepare for the next cycle
-			core->advance_queues();
+    // check whether all ops in this core have been completed.
+    if (core->m_running_thread_num == 0 && (core->m_unique_scheduled_thread_num >= 1)) { 
+      if (m_num_waiting_dispatched_threads == 0)  {
+        m_sim_end[ii] = true;
+      }
+    }
 
-			// check heartbeat
-			core->check_heartbeat(false);
+    // active core : running a cycle and update stats
+    if (!m_sim_end[ii])  {
+      // run a cycle
+      core->run_a_cycle();
 
-			// forward progress check in every 10000 cycles
-			if (!(m_core_cycle[ii] % 10000))  
-				core->check_forward_progress();
-		} 
+      m_num_running_core++;
+      STAT_CORE_EVENT(ii, CYC_COUNT);
+      STAT_CORE_EVENT(ii, NUM_SAMPLES);
+      STAT_CORE_EVENT_N(ii, NUM_ACTIVE_BLOCKS, core->m_running_block_num);
+      STAT_CORE_EVENT_N(ii, NUM_ACTIVE_THREADS, core->m_running_thread_num);
+    }
 
-		// when a core has been completed, do last print heartbeat 
-		if (m_sim_end[ii] || m_core_end_trace[ii]) 
-			core->check_heartbeat(true);
-	}
+    // checking for threads 
+    if (m_sim_end[ii] != true) {
+      // when *m_simBase->m_knobs->KNOB_MAX_INSTS is set, execute each thread for *m_simBase->m_knobs->KNOB_MAX_INSTS instructions
+      if (*m_simBase->m_knobs->KNOB_MAX_INSTS && 
+          core->m_num_thread_reach_end == core->m_unique_scheduled_thread_num) {
+        m_sim_end[ii] = true;
+      }
+      // when *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT is set, execute only *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT cycles
+      else if (*m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT && m_simulation_cycle >= *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT) {
+        m_sim_end[ii] = true;
+      }
+    }
 
-	// increase simulation cycle
-	m_simulation_cycle++;
-	STAT_EVENT(CYC_COUNT_TOT);
+    if (!m_sim_end[ii]) { 
+      // advance queues to prepare for the next cycle
+      core->advance_queues();
 
-	return 1; //simulation not finished
+      // check heartbeat
+      core->check_heartbeat(false);
 
+      // forward progress check in every 10000 cycles
+      if (!(m_core_cycle[ii] % 10000))  
+        core->check_forward_progress();
+    } 
+
+    // when a core has been completed, do last print heartbeat 
+    if (m_sim_end[ii] || m_core_end_trace[ii]) 
+      core->check_heartbeat(true);
+  }
+
+  // increase simulation cycle
+  m_simulation_cycle++;
+  STAT_EVENT(CYC_COUNT_TOT);
+
+  return 1; //simulation not finished
+}
+
+router_c* macsim_c::create_router(int type)
+{
+  return m_router->create_router(type);
 }
 
 
@@ -733,14 +760,14 @@ int macsim_c::run_a_cycle()
 // =======================================
 void macsim_c::finalize()
 {
-	// deallocate memory
-	deallocate_memory();
-			
-	// finalize simulation
-	fini_sim();
+  // deallocate memory
+  deallocate_memory();
 
-	// dump out stat files at the end of simulation
-	m_ProcessorStats->saveStats();
+  // finalize simulation
+  fini_sim();
+
+  // dump out stat files at the end of simulation
+  m_ProcessorStats->saveStats();
 
   cout << "Done\n";
 }

@@ -11,7 +11,7 @@ gpu_frequency 1.5
 sim_cycle_count 0 
 max_insts 200000000
 heartbeat_interval 1000000
-forward_progress_limit 50000
+forward_progress_limit 500000
 
 
 # Common Core Configuration
@@ -63,7 +63,7 @@ fsched_large_rate 2
 bp_hist_length 16
 rob_large_size 256                     
 large_core_schedule ooo
-max_threads_per_large_core 1
+max_threads_per_large_core 2
 icache_large_num_set 64 # 64 KB
 icache_large_assoc 8
 l1_large_num_set 64 # 64 KB L1 Cache
