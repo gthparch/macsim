@@ -15,11 +15,68 @@
 #include <queue>
 #include <unordered_map>
 
-#include "retire_interface.h"
-
 #include "global_types.h"
-
 #include "debug_macros.h"
+
+
+#define RETIRE_INTERFACE_PARAMS() \
+    int m_core_id, \
+    pqueue_c<int*>* m_q_frontend, \
+    pqueue_c<int>** m_q_iaq, \
+    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq, \
+    pool_c<uop_c>* m_uop_pool, \
+    rob_c* m_rob, \
+    smc_rob_c* m_gpu_rob, \
+    Unit_Type m_unit_type \
+// end macro
+
+
+#define RETIRE_INTERFACE_DECL() \
+    int m_core_id; \
+    pqueue_c<int*>* m_q_frontend; \
+    pqueue_c<int>** m_q_iaq; \
+    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; \
+    pool_c<uop_c>* m_uop_pool; \
+    rob_c* m_rob; \
+    smc_rob_c* m_gpu_rob; \
+    Unit_Type m_unit_type; \
+// end macro
+
+
+#define RETIRE_INTERFACE_ARGS() \
+    m_core_id, \
+    m_q_frontend, \
+    m_q_iaq, \
+    m_gpu_q_iaq, \
+    m_uop_pool, \
+    m_rob, \
+    m_gpu_rob, \
+    m_unit_type \
+// end macro
+
+
+#define RETIRE_INTERFACE_INIT() \
+    m_core_id ( m_core_id ), \
+    m_q_frontend ( m_q_frontend ), \
+    m_q_iaq ( m_q_iaq ), \
+    m_gpu_q_iaq ( m_gpu_q_iaq ), \
+    m_uop_pool ( m_uop_pool ), \
+    m_rob ( m_rob ), \
+    m_gpu_rob ( m_gpu_rob ), \
+    m_unit_type ( m_unit_type ) \
+// end macro
+
+
+#define RETIRE_INTERFACE_CAST() \
+    static_cast<void>(m_core_id); \
+    static_cast<void>(m_q_frontend); \
+    static_cast<void>(m_q_iaq); \
+    static_cast<void>(m_gpu_q_iaq); \
+    static_cast<void>(m_uop_pool); \
+    static_cast<void>(m_rob); \
+    static_cast<void>(m_gpu_rob); \
+    static_cast<void>(m_unit_type); \
+// end macro
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

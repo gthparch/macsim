@@ -18,7 +18,6 @@
 
 
 #include "allocate.h"
-#include "allocate_interface.h"
 #include "core.h"
 #include "pqueue.h"
 #include "rob.h"

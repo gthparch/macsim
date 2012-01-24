@@ -15,11 +15,95 @@
 
 #include "macsim.h"
 #include "global_types.h"
-#include "frontend_interface.h"
 
 
 // FIXME
 // icache tlb
+
+
+#define FRONTEND_INTERFACE_PARAMS() \
+    int m_core_id, \
+    frontend_c* m_frontend, \
+    cache_c* m_icache, \
+    pqueue_c<int*>* m_q_frontend, \
+    pool_c<uop_c>* m_uop_pool, \
+    exec_c* m_exec, \
+    bp_data_c* m_bp_data, \
+    map_c* m_map, \
+    int& m_running_thread_num, \
+    int& m_fetching_thread_num, \
+    int& m_unique_scheduled_thread_num, \
+    int& m_last_terminated_tid, \
+    Unit_Type m_unit_type \
+// end macro
+
+#define FRONTEND_INTERFACE_DECL() \
+    int m_core_id; \
+    frontend_c* m_frontend; \
+    cache_c* m_icache; \
+    pqueue_c<int*>* m_q_frontend; \
+    pool_c<uop_c>* m_uop_pool; \
+    exec_c* m_exec; \
+    bp_data_c* m_bp_data; \
+    map_c* m_map; \
+    int& m_running_thread_num; \
+    int& m_fetching_thread_num; \
+    int& m_unique_scheduled_thread_num; \
+    int& m_last_terminated_tid; \
+    Unit_Type m_unit_type; \
+// end macro
+
+#define FRONTEND_INTERFACE_ARGS() \
+    m_core_id, \
+    m_frontend, \
+    m_icache, \
+    m_q_frontend, \
+    m_uop_pool, \
+    m_exec, \
+    m_bp_data, \
+    m_map, \
+    m_running_thread_num, \
+    m_fetching_thread_num, \
+    m_unique_scheduled_thread_num, \
+    m_last_terminated_tid, \
+    m_unit_type \
+// end macro
+
+#define FRONTEND_INTERFACE_INIT() \
+    m_core_id ( m_core_id ), \
+    m_frontend ( m_frontend ), \
+    m_icache ( m_icache ), \
+    m_q_frontend ( m_q_frontend ), \
+    m_uop_pool ( m_uop_pool ), \
+    m_exec ( m_exec ), \
+    m_bp_data ( m_bp_data ), \
+    m_map ( m_map ), \
+    m_running_thread_num ( m_running_thread_num ), \
+    m_fetching_thread_num ( m_fetching_thread_num ), \
+    m_unique_scheduled_thread_num ( m_unique_scheduled_thread_num ), \
+    m_last_terminated_tid ( m_last_terminated_tid ), \
+    m_unit_type ( m_unit_type ) \
+// end macro
+
+#define FRONTEND_INTERFACE_CAST() \
+    static_cast<void>(m_core_id); \
+    static_cast<void>(m_frontend); \
+    static_cast<void>(m_icache); \
+    static_cast<void>(m_q_frontend); \
+    static_cast<void>(m_uop_pool); \
+    static_cast<void>(m_exec); \
+    static_cast<void>(m_bp_data); \
+    static_cast<void>(m_map); \
+    static_cast<void>(m_running_thread_num); \
+    static_cast<void>(m_fetching_thread_num); \
+    static_cast<void>(m_unique_scheduled_thread_num); \
+    static_cast<void>(m_last_terminated_tid); \
+    static_cast<void>(m_unit_type); \
+// end macro
+
+
+
+
 
 
 // fetch allocation wrapper function

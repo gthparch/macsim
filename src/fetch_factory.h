@@ -16,8 +16,7 @@
 #include "macsim.h"
 #include "global_defs.h"
 #include "global_types.h"
-
-#include "frontend_interface.h"
+#include "frontend.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

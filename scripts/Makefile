@@ -1,21 +1,26 @@
 
 all:
-	./run_interface
+	perl knobgen.pl
+	perl statgen.pl
 
 install:
-	./run_interface
+	perl knobgen.pl
+	perl statgen.pl
 
 dbg:
-	./run_interface
+	perl knobgen.pl
+	perl statgen.pl
 
 opt:
-	./run_interface
+	perl knobgen.pl
+	perl statgen.pl
 
 gpf:
-	./run_interface
+	perl knobgen.pl
+	perl statgen.pl
 
 clean:
-	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.* ../src/all_stats.* ../src/*_interface.h ../src/statsEnums.h
+	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.* ../src/all_stats.* ../src/statsEnums.h
 
 clean-local:
-	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.cc ../src/all_stats.cc ../src/*_interface.h ../src/statsEnums.h
+	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.cc ../src/all_stats.cc ../src/statsEnums.h
