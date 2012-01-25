@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : debug_macros.h
- * Author       : Robert S. Chappell
+ * Author       : HPArch
  * Date         : 4/14/1998
  * CVS          : $Id: debug_macros.h,v 1.4 2008-09-12 03:07:29 kacear Exp $:
  * Description  : This file contains a debugging macro that is intended to be used in

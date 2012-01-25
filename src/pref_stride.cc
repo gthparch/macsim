@@ -28,8 +28,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : pref_stride.c
- * Author       : Santhosh Srinath
+ * File         : pref_stride.cc
+ * Author       : HPArch
  * Date         : 1/23/2005
  * CVS          : $Id: pref_stride.cc,v 1.2 2008/09/12 03:42:01 kacear Exp $:
  * Description  : Stride Prefetcher - Based on RPT Prefetcher ( ICS'04 )

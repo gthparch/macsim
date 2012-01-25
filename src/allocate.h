@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : allocate.h
- * Author       : Hyesoon Kim
+ * Author       : HPArch
  * Date         : 1/1/2008 
  * SVN          : $Id: main.cc,v 1.26 2008-09-21 00:02:54 kacear Exp $:
  * Description  : allocate an instruction (uop) into reorder buffer

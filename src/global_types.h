@@ -29,11 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : global_types.h
- * Author       : Hyesoon Kim 
+ * Author       : HPArch 
  * Date         : 12/16/2007 
  * CVS          : $Id: global_types.h,v 1.1 2008-02-22 22:51:06 hyesoon Exp $:
  * Description  : Global type declarations intended to be included in every source file.
-                  origial author: Robert S. Chappell  imported from 
  *********************************************************************************************/
 
 #ifndef GLOBALS_H_INCLUDED 

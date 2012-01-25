@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : pref_common.h
- * Author       : Santhosh Srinath
+ * Author       : HPArch
  * Date         : 11/30/2004
  * CVS          : $Id: pref_common.h,v 1.2 2008/09/12 03:42:01 kacear Exp $:
  * Description  : Common framework for working with prefetchers - less stuff to mess with

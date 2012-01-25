@@ -28,8 +28,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : utils.c
- * Author       : Robert S. Chappell
+ * File         : utils.cc
+ * Author       : HPArch
  * Date         : 10/19/1997
  * CVS          : $Id: utils.cc,v 1.2 2008-04-04 22:58:50 gth672e Exp $:
  * Description  : Utility functions.

@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /***************************************************************************************
  * File         : pref_stride.h
- * Author       : Santhosh Srinath
+ * Author       : HPArch
  * Date         : 1/23/2005
  * CVS          : $Id: pref_stride.h,v 1.1 2008/07/30 14:18:16 kacear Exp $:
  * Description  : Stride prefetcher 

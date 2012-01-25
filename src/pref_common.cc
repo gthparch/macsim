@@ -28,8 +28,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /***************************************************************************************
- * File         : pref_common.c
- * Author       : Santhosh Srinath
+ * File         : pref_common.cc
+ * Author       : HPArch
  * Date         : 11/30/2004
  * CVS          : $Id: pref_common.cc,v 1.2 2008/09/12 03:42:01 kacear Exp $:
  * Description  : Common framework for working with prefetchers - less stuff to *mess* with

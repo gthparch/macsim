@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : assert.h
- * Author       : Robert S. Chappell
+ * Author       : HPArch
  * Date         : 10/15/1997
  * SVN          : $Id: assert.h,v 1.2 2008-09-12 03:07:28 kacear Exp $:
  * Description  : This is my own set of assert macros.  They print out the usual 'assert'

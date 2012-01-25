@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : core.h
- * Author       : Hyesoon Kim
+ * Author       : HPArch
  * Date         : 12/16/2007
  * SVN          : $Id: core.h 867 2009-11-05 02:28:12Z kacear $:
  * Description  : core structure

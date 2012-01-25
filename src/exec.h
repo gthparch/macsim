@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : exec.h
- * Author       : Hyesoon Kim
+ * Author       : HPArch
  * Date         : 1/26/2008
  * SVN          : $Id: exec.h,v 1.4 2008-09-10 02:19:37 kacear Exp $:
  * Description  : execution unit 

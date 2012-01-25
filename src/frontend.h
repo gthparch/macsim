@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : frontend.h
- * Author       : Hyesoon Kim 
+ * Author       : HPArch 
  * Date         : 12/18/2007 
  * SVN          : $Id: frontend.h 915 2009-11-20 19:13:07Z kacear $:
  * Description  : frontend 

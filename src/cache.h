@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : cache.h
- * Author       : Harsh Murarka  
+ * Author       : HPArch 
  * Date         : 03/03/2010 
  * SVN          : $Id: cache.h,
  * Description  : cache structure (based on cache_lib at scarab) 

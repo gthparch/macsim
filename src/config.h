@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : config.h 
- * Author       : Jaekyu Lee
+ * Author       : HPArch
  * Date         : 3/9/2011
  * SVN          : $Id: dram.h 912 2009-11-20 19:09:21Z kacear $
  * Description  : Macros for configurations (to avoid dirty codes in core files)
