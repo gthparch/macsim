@@ -5,8 +5,86 @@
 TBD 
 \section{Forward Prgress Error}
 TBD 
+
+
+
 \section{Debugging with Debugging Messages}
-the meanting of debug statements. 
-How to turn on debug flags for different modules
+
+To check the correctness of the module, We provide debugging features
+with text-based debugging messages. For example,
+
+\begin{Verbatim}
+debug message example
+\end{Verbatim}
+
+You can define anywhere. Opt version will nullify these statement for
+performance purpose.
+
+enable variable
+
+To enable debug messages \Verb+make dbg+ and 
+
+\begin{Verbatim}
+debug_cycle_start
+debug_cycle_end
+\end{Verbatim}
+
+debug macros are defined in \Verb+macsim-top/trunk/def/src/debug_macros.h+
+
+debug macro is very similar to \Verb+printf+ function.
+
+\begin{Verbatim}
+_debug(debug_variable, const char * format, ... )
+\end{Verbatim}
+
+\begin{Verbatim}
+#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args)
+\end{Verbatim}
 
 
+useful data for 
+
+\begin{Verbatim}
+core id
+thread id
+uop num
+inst num
+vaddr
+req_id
+\end{Verbatim}
+
+
+To add a new debug stage, you need to add a debug knob variable in debug.param.def
+
+
+%\begin{Verbatim}
+%DEBUG(
+%\end{Verbatim}
+
+%the meanting of debug statements. 
+%How to turn on debug flags for different modules
+
+%\subsection{DE
+
+
+%\subsection{Debug Knob Variables}
+
+%All debug variabls are defined in \Verb+macsim-top/trunk/def/debug.param.def+
+
+
+
+%how to enable
+
+%debug_start_cycle debug_end_cycle
+
+%grep core_id thread_id
+
+%how to add a new stage
+
+
+%\subsection{How to Add Debugging Messages}
+
+%\begin{enumerate}
+%\item Add a new debug variable
+%\item Add debug macro in files
+%\item DEBUG

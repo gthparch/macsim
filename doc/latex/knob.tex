@@ -1,6 +1,6 @@
 
 
-\chapter{The Knobs}
+\chapter{The Knobs and Parameters}
 \label{sec:knob}
 
 To control various architectural parameters, we use multiple knob
@@ -65,5 +65,389 @@ l2_assoc 16
 \end{Verbatim}
 
 \end{enumerate}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Setting up Parameters}
+\label{sec:parameter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This section provides sample examples for parameters to run different
+types of simulations.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Repeating Trace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For multiple-application simulations, early terminated applications
+sometimes need to be re-executed to model resource contention (cache,
+on-chip interconnection, and memory controller) until all applications
+finish. This is a common methodology to evaluate multi-program
+workloads in the literature. \SIM also supports this feature. To
+enable this feature, you need to
+
+\begin{itemize}
+  \item Specify the configuration in the command line by
+  \begin{Verbatim}
+  ./macsim --repeat_trace=1
+  \end{Verbatim}
+
+  \item Or you can write this in \textit{params.in} file
+  \begin{Verbatim}
+  repeat_trace 1
+  \end{Verbatim}
+\end{itemize}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\cpu Experiments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{One \cpu Core}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Usually, we use large core configurations for specifying x86 cores
+(however, it does not have to).
+
+\begin{Verbatim}
+// macsim-top/trunk/params/params_x86
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+large_core_type x86
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Multiple \cpu cores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multiple core simulations are very similar to single core simulations,
+but you need to specify the number of cores differently.
+
+
+\begin{Verbatim}
+// 4-core simulation
+num_sim_cores 4
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 4
+large_core_type x86
+repeat_trace 1
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{2-way SMT x86 Core}
+
+\SIM also supports the simultaneous multi-threading (SMT) features.
+These parameters are used for the SMT configurations:
+
+\Verb+ max_threads_per_core+, \Verb+max_threads_per_medium_core+, and
+\Verb+max_thread_per_large_core+. 
+
+\noindent
+For example,
+
+\begin{Verbatim}
+// 1-core 2-way SMT configuration
+num_sim_cores 1
+num_sim_small_cores 0
+num_sim_medium_cores 0
+num_sim_large_cores 1
+large_core_type x86
+max_threads_per_large_core 2
+repeat_trace 1
+\end{Verbatim}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\gpu Simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Usually, we use small core configurations for \gpu cores. We provide
+several pre-defined configuration files for NVIDIA architectures. Here
+are the list of sample files.
+
+\begin{Verbatim}
+params_8800gt // NVIDIA GeForce 8800GT (G80 architecture)
+params_gtx280 // NVIDIA GeForce GTX280 (GT200 architecture)
+params_gtx465, params_gtx480 // NVIDIA GeForece GTX465, GTX480 (Fermi architecture)
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\gpu with One Application}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{Verbatim}
+// 12-SM simulations
+num_sim_cores 12
+num_sim_small_cores 12
+core_type ptx
+max_threads_per_core 80 // set the max number of warps 
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\gpu with Multiple Applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{Verbatim}
+// 12-SM simulations, 6 SMs for each application
+num_sim_cores 12
+num_sim_small_cores 12
+core_type ptx
+max_threads_per_core 80 // set the max number of warps 
+max_num_core_per_appl 6 // 6 SMs for each application
+repeat_trace 1 // for multi-program workload simulation
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Heterogeneous Simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the CPU-GPU heterogeneous simulations, we model the architecture
+similar to Intel's Sandy Bridge~\cite{sandybridge}. However, we
+model \gpu cores similar to NVIDIA Fermi~\cite{fermi} architecture. We
+also provide sample files for the heterogeneous simulations.
+
+\begin{Verbatim}
+params_hetero_1_6 // 1-CPU, 6-GPU cores
+params_hetero_4c_4g // 4-CPU, 4-GPU cores
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{One CPU application + One GPU application}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Following example shows simple heterogeneous configuration.
+
+\begin{Verbatim}
+num_sim_cores 2
+num_sim_small_cores 1
+num_sim_medium_cores 0
+num_sim_large_cores 1
+core_type ptx
+large_core_type x86
+cpu_frequency 3
+gpu_frequency 1.5
+repeat_trace 1
+\end{Verbatim}
+
+
+Although above configurations set up the number of CPU and GPU cores
+correctly, you need to setup each core types individually. Please
+refer to sample files.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Multiple CPU applications + Multiple GPU applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{Verbatim}
+num_sim_cores 8
+num_sim_small_cores 4
+num_sim_medium_cores 0
+num_sim_large_cores 4
+core_type ptx
+large_core_type x86
+cpu_frequency 3
+gpu_frequency 1.5
+repeat_trace 1
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Micro-architecture configuration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Number of Thread Blocks Per Core}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Maximum number blocks per core will be determined by several
+factors: 1) the number of threads per thread block, 2) the number of
+register used, 3) the number of shared memory usage, and 4) NVIDIA
+CUDA computing version. NVIDIA provides the occupancy calculator to
+get the number. \SIM uses this value to allocate a number of thread
+blocks in each core. Since this value is per-application
+characteristic, it is not possible to use single value nor provide the
+value individually. Instead, our approach is that using information
+provided by GPUOcelot~\cite{ocelot} while generating traces. This
+information is written in the trace file and \SIM uses it. However, we
+also provide a way to override the value by
+setting \Verb+max_block_per_core_super+.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cache Configuration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cache can be configured by following parameters.
+
+\begin{Verbatim}
+l{1,2}_{small, medium, large}_num_set // number of sets
+l{1,2}_{small, medium, large}_assoc // associativity
+l{1,2}_{small, medium, large}_line_size // cache line size
+l{1,2}_{small, medium, large}_num_bank // number of banks  
+l{1,2}_{small, medium, large}_latency // cache latency
+l{1,2}_{small, medium, large}_bypass // cache bypass (if set, always miss)
+num_l3 // number of l3 cache tiles
+l3_num_Set // number of l3 cache sets
+l3_assoc // l3 associativity
+l3_line_size // l3 line size
+l3_num_bank // l3 number of banks
+l3_latency // l3 latency
+l{1,2,3}_{read,write}_port // the number of read / write port
+icache_num_set  8 // 4KB I-cache 
+icache_assoc   8 // I cache set associativity 
+\end{Verbatim}
+
+
+The effective cache size can be calculated by the
+Equation~\ref{eq:cachesize}.
+
+\begin{equation}
+\label{eq:cachesize}
+cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only, otherwise 1)
+\end{equation}
+
+
+\noindent
+For example, to configure a 16-way 1MB cache with 64B line size,
+
+\Verb+ 1MB cache = 256 sets * 16 way *+ \Verb+64B * 4 tiles+
+%\Verb+\textsf{16 way} $\times$ \textsf{64 B}+ $\times$
+%\Verb+\textsf{4 tiles}+. 
+
+\noindent
+Also, the cache latency is determined by several factors including the
+size, technology, and the number of ports. Cacti~\cite{cacti} can be
+used to model accurate cache latency. The cache line size is set as
+64B by default. Although the cache line size can be any power of 2,
+all cache levels should have the same size.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{DRAM configuration}
+\label{sec:param-dram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We model three key components in the memory scheduler: timing
+constraints, bandwidth, and scheduling policy. Following are key
+parameters used in the \SIM.
+
+
+\begin{Verbatim}
+dram_frequency 0.8 // dram frequency
+dram_bus_width 4 // dram bus width
+dram_column 11 // column access (CL) latency
+dram_activate 25 // row activate (RCD) latency
+dram_precharge 10 // precharge (RP) latency
+dram_num_mc 2 // number of memory controllers
+dram_num_banks 8 // number of banks per controller
+dram_num_channel 2 // number of dram channels per controller
+dram_rowbuffer_size 2048 // row buffer size
+dram_scheduling_policy FRFCFS // dram scheduling policy
+\end{Verbatim}
+
+
+Dram timings using three parameters: precharge ($t_{RP}$), activate
+($t_{RCD}$), and column access ($t_{CL}$) latency. DRAM bandwidth is
+modeled using three
+parameters: \Verb+dram_frequency+, \Verb+dram_bus_width+,
+and \Verb+dram_num_channel+. The maximum DRAM bandwidth can be
+calculated using Equation~\ref{eq:bandwidth}.
+
+\begin{equation}
+\label{eq:bandwidth}
+max\_bandwidth = dram\_frequency \times dram\_bus\_width \times dram\_num\_mc \times dram\_num\_channel 
+\end{equation}
+
+For example, the maximum bandwidth from above parameters can be
+\Verb+ 800 MHz (0.8 GHz)} * 4 Bytes+
+  \Verb+* 2 MCs * 2 Channels = 12.8GB/s+ . Finally, \SIM provides
+  multiple DRAM scheduling policies: FCFS (First-Come-First-Serve) and
+  FR-FCFS (First-Ready First-Come-First-Serve).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Setting \cpu Core Parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By default these configurations are applied to small cores. 
+
+\begin{Verbatim}
+width   2 // pipeline width (the entire pipelines use the same width) 
+fetch_latency 5 // front-end depth 
+alloc_latency 5 // decode/allocation depth  
+bp_dir_mech   gshare 
+bp_hist_length 14 // branch history length 
+isched_rate 4  // # of integer instructions that can be executed per cycle 
+msched_rate 2  // # of memory instructions that can be executed per cycle 
+fsched_rate  2  // # of FP instructions that can be executed per cycle 
+schedule  io, ooo // instruction scheduling policy 
+rob_size    96  // ROB size
+fetch_policy rr // SMT(MT) thread fetch policy  by default: round-robin 
+\end{Verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Setting GPU Core Parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\textbf GPU Core Parameters} 
+
+\TODO{Question: is constant cache size is per SM? How does a core share the constant cache, texture cache, what is ptx\_exec\_ratio? } 
+
+
+\begin{Verbatim}
+schedule_ratio 4 \\ Every 4th cycle, one thread (warp) is scheduled 
+fetch_ratio  4 \\ Every 4th cycle, one thread (warp) is fetched 
+gpu_sched   1 \\ set GPU scheduler 
+ptx_common_cache \\ 
+const_cache_size  1024 \\ 1024B constant cache  
+texture_cache_size 1024  \\ 1024B texture cache
+shared_mem_size 4096  \\ 4096B shared memory size 
+ptx_exec_ratio  \\ 
+num_warp_scheduler \\ the number of warps (threads) can be scheduled  
+\end{Verbatim}
+
+
+
+
+
+
+
+
+\ignore{
+\subsubsection{Hardware Prefetching}
+
+We provide stride hardware prefetcher~\cite{iac:spr04}. 
+}
+
+
+
+% LocalWords:  macsim num sim SMT multi pre NVIDIA params GeForce gtx GTX ptx
+% LocalWords:  GeForece Multipe SMs appl GPU cpu gpu CUDA GPUOcelot RCD mc GHz
+% LocalWords:  precharge rowbuffer FRFCFS MCs FCFS Prefetching prefetcher alloc
+% LocalWords:  icache Microarchitecture bp dir mech gshare isched msched fsched
+% LocalWords:  FP io ooo rr th sched const mem
+
+
+
 
 

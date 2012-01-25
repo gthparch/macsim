@@ -1,0 +1,492 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Getting Started}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+In this chapter, we provide the basic instruction to install
+\SIM. Then, we explain how to run \SIM and provide tips to analyze
+simulation outcomes.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wiki and Other Supports}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We manage the google project page in the following url:
+\urlc{http://code.google.com/p/macsim}. In this page, we will provide
+detailed information regarding \SIM, including issue/bug tracking,
+sample traces, and other instructions. If you have a question or find
+a bug, you can utilize the project page.
+
+
+
+\section{Installation}
+\label{sec:installation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Download}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\SIM source code is maintained using the subversion. 
+You can check out the \SIM copy by
+
+
+\begin{Verbatim}
+svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --username readonly
+\end{Verbatim}
+
+\noindent
+Initially, read-only permission is given to users. If you want to
+contribute to \SIM, you need to send an email to
+\href{mailto:macsim-dev@googlegroups.com}{macsim-dev@googlegroups.com}
+to acquire such permission.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build Requirement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To build \SIM propery, it requires following supports:
+
+\begingroup
+\renewcommand\descriptionlabel[1]{\textit{\hspace\labelsep{#1}}}
+%\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
+\begin{description}\firmlist
+  \item[Operating System] Currently, we only support linux
+    distributions. Tested systems are as follows: \Verb+Ubuntu+, \Verb+Redhat (TODO)+.
+  \item[Compiler] Any compiler that supports the C++0x (or C++11)
+    standard library. Currently, we tested follwing compilers: \Verb+gcc+, \Verb+icc (TODO)+.
+  \item[Autotools] - You need to have autotools (automake, autoconf,
+    ...) version 2.65 or higher. You can install autotools by
+\begin{Verbatim}
+Ubuntu: apt-get install autotools-dev automake autoconf
+Redhat: todo
+\end{Verbatim}
+  \item[Libraries] - gzip
+\begin{Verbatim}
+Ubuntu: apt-get install zlib1g-dev
+\end{Verbatim}
+\end{description}
+\endgroup
+
+
+
+
+\ignore{
+\subsection{Directory Structure}
+
+This section explains the directory structure of \SIM simulator.
+
+\smallskip
+\begin{lstlisting}
+macsim/
+  tag/ branch/ trunk/
+\end{lstlisting}
+\smallskip
+
+\textit{Tag} directory has tagged version of \SIM
+simulators. \textit{Branch} directory is for diverged \SIM, which is
+currently empty. \textit{Trunk} directory is current working directory
+for \SIM.
+
+Following is more detailed information about \textit{Trunk} directory.
+
+\smallskip
+\begin{lstlisting}
+trunk/
+  bin/ def/ doc/ params/ scripts/ src/ tools/
+\end{lstlisting}
+\smallskip
+
+\textit{Bin} directory contains the \SIM binary after the building
+process. \textit{def} directory has knob (Section~\ref{sec:knob}) and
+statistics (Section~\ref{sec:stat}) definitions. \textit{doc} has the
+documentation. \textit{scripts} includes several scripts files that
+are using during the building process. \textit{src} contains all
+source files. \textit{tools} has several useful tools.
+\ignore{ (Section~\ref{sec:tool}) }
+}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Installation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The GNU Autotools (aclocal, automake, autoconf, ...) have been used to
+build \SIM. After initial check-out of the \SIM copy, following
+commands are necessary (You can refer to \Verb+INSTALL+ file as well).
+
+
+\begin{Verbatim}
+aclocal 
+automake 
+--add-missing 
+autoconf 
+./configure 
+make
+\end{Verbatim}
+
+\noindent
+You can combine above commands in a line:
+
+\begin{Verbatim}
+aclocal && automake --add-missing && autoconf && ./configure && make
+\end{Verbatim}
+
+\noindent
+We provide autogen.sh script file to simplify the building process.
+
+\begin{Verbatim}
+./autogen.sh
+make
+\end{Verbatim}
+
+\noindent
+Then, the binary \bin will be generated in the \Verb+trunk/bin/+
+directory.
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build Types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We provide three different build types: optimized, debug, and gprof
+versions. Based on the type, we provide different compiler flags. For
+example,
+
+\begin{itemize}
+  \item opt : default, optimized version (-O3 flag)
+  \item dbg : debug version (-g3 flag)
+  \item gpf : gprof version (-pg flag)
+\end{itemize}
+
+\noindent
+To build a certain type, you need to specify the option
+after \textit{make} command. For example,
+
+\begin{Verbatim}
+make [opt]
+make dbg
+make gpf
+\end{Verbatim}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How To Run \SIM}
+\label{sec:run}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To run \bin binary, two additional files are required in
+the same directory.
+
+\begin{itemize}
+  \item params.in - defines architectural parameters that will
+  overwrite the default value.
+
+  \item trace\_file\_list - defines the number of traces to run and
+  the path of each trace
+\end{itemize}
+
+
+We provide several pre-defined architecture parameters in
+\Verb+macsim-top/trunk/params+ directory. Table~\ref{table:param}
+shows the list of pre-defined parameter files. If you want to run \SIM
+with a certain configuration, you need to copy the corresponding
+parameter file to \Verb+bin+ directory and rename it as
+\Verb+params.in+. For example, if you want to use NVIDIA's
+Fermi~\cite{fermi} GPU architecture, the following command would be
+sufficient:
+
+\begin{Verbatim}
+cp params/params_gtx465 bin/params.in
+\end{Verbatim}
+
+
+\begin{table}
+\begin{footnotesize}
+\begin{center}
+\caption{Parameter Templates}
+\label{table:param}
+\begin{tabular}{|l|l|l|}
+\hline
+File Name              & Description & Architecture                         \\ \hline \hline
+params\_8800gt         &             & NVIDIA GeForce 8800 GT (G80)         \\
+params\_gtx280         &             & NVIDIA GeForce GTX 280 (GT200)       \\
+params\_gtx465         &             & NVIDIA GeForce GTX 465 (Fermi)       \\
+params\_x86            &             & Intel's Sandy Bridge (CPU part only) \\
+params\_hetero\_4c\_4g &             & Intel's Sandy Bridge (CPU + GPU)     \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table}
+
+
+To specify which trace to run, you need to edit
+\Verb+trace_file_list+. Following is the content of a sample
+\Verb+trace_file_list+.
+
+\begin{Verbatim}
+2 <-- number of traces
+/trace/ptx/cuda2.2/FastWalshTransform/kernel_config.txt <-- trace 1 path
+/trace/ptx/cuda2.2/BlackScholes/kernel_config.txt <-- trace 2 path
+\end{Verbatim}
+
+\noindent
+The first line is the number of traces that \SIM will run and
+following lines are the path of each traces. Each top level trace
+configuration file contains various information. Following is the
+content of a top-level trace information file.
+
+
+\begin{Verbatim}
+1 x86
+0 0
+\end{Verbatim}
+
+\noindent
+In the first line, the first number indicates the number of threads in
+the application and second literal specifies the type of the
+application. Trailing lines are the information of each thread
+({thread id}, {thread starting point in terms of the instruction count
+  of the main thread (thread 0)}).
+
+
+We provide several sample trace files in \urlc{todo}, but these samples
+may not be enough for full simulation. If you want to create your own
+traces, we provide the detailed information in
+Chapter~\ref{sec:trace}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Run}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The following is the sample command lines to run \SIM simulator.
+
+\begin{Verbatim}
+./macsim
+\end{Verbatim}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Analyze Output}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\SIM generates several output files once the simulation is succesfully
+completed. Here are the list of output files.
+
+\begin{Verbatim}
+params.out
+statfile1.stat.out
+statfile2.stat.out
+...
+statfilen.stat.out
+\end{Verbatim}
+
+\noindent
+\Verb+params.out+ enumerates all configurations with their
+values. Other files are statistics outputs, which is mostly the number
+of occurrence for architectural events during the simulation. Each
+stat out file consists of following lines:
+
+\begin{Verbatim}
+STAT     Raw_counter_value     Value_per_type
+\end{Verbatim}
+
+\noindent
+, where \Verb+STAT+ is the name of stat, \Verb+Raw_counter_value+ is
+the raw value of the counter, and \Verb+Value_per_type+ is the value
+based on the each stat type. There are three types of statistics:
+
+\begin{itemize}
+
+  \item COUNT - for counting the number of occurances of an event. Eg. number
+  of cache hits. 
+
+  \item RATIO - for calculating the ratio of number of occurances of one event
+  over another. Eg. (number of cache hits / number of cache accesses) i.e.,
+  cache hit ratio.
+
+  \item DIST - for defining a group of related events and calculating the
+  number of occurances of each event in the as a percent of the sum of the
+  number of occurances of all events in the group.  Eg. If we want to know what
+  percent of L1 data cache accesses (in a 2-level hierarchy) resulted in L1
+  hits, L2 hits or memory accesses, we should define a distribution consisting
+  on three events - L1 hits, L2 hits and L2 misses  - and update the
+  counter for each event correctly. 
+\end{itemize}
+
+
+\noindent
+We sometimes need to measure a certain event per core, so we further
+categorize statistics into either global (common counter for all
+cores) or per core (each core has its own counter). The suffix of all
+per core stats is \Verb+_CORE_#+. Chapter~\ref{sec:stat} details
+regarding statistics.
+
+
+\begin{table}[htb]
+\begin{footnotesize}
+\begin{center}
+\caption{Important Stats.} 
+\label{table:stats}
+\begin{tabular}{|l||l|c|l|}
+\hline 
+STAT & Description & Per-Core & Filename \\ \hline \hline
+INST\_COUNT\_TOT            & \# of instructions                                    &      & general.stat.out \\ \hline 
+INST\_COUNT\_CORE\_[0-11]   & \# of instructions in only the specificed core [0-11] & core & general.stat.out \\ \hline 
+CYC\_COUNT\_TOT             & simulated cycles                                      &      & general.stat.out \\ \hline 
+CYC\_COUNT\_CORE\_[0-11]    & simulated cycles in only the specificed core [0-11]   &      & general.stat.out \\ \hline 
+CYC\_COUNT\_X86             & simulated cycles for x86 only                         &      & general.stat.out \\ \hline 
+CYC\_COUNT\_PTX             & simulated cycles for ptx only                         &      & general.stat.out \\ \hline \hline 
+                            & \# of fp instructions                                 &      &                  \\ \hline 
+                            & \# of int instructions                                &      &                  \\ \hline 
+                            & \# of load instructions                               &      &                  \\ \hline  
+                            & \# of store instructions                              &      &                  \\ \hline  
+BP\_ON\_PATH\_CORRECT       & \# of correctly predicted branches (DIST)             & core & bp.stat.def      \\ \hline  
+BP\_ON\_PATH\_MISPREDICT    & \# of mis-predicted branches (DIST)                   & core & bp.stat.def      \\ \hline  
+BP\_ON\_PATH\_MISFETCHT     & \# of mis-fetch branches (BTB MISS)(DIST)             & core & bp.stat.def      \\ \hline  
+ICACHE\_HIT, ICACHE\_MISS   & \# of I-cache hitt,miss (DIST)                        &      & memory.stat.def  \\ \hline  
+L[1-3]\_HIT\_CPU            & \# of l[1-3]cache hits from CPU                       &      & memory.stat.def  \\ \hline 
+L[1-3]\_HIT\_GPU            & \# of l[1-3]cache hits from GPU                       &      & memory.stat.def  \\ \hline 
+L[1-3]\_MISS\_CPU           & \# of l[1-3]cache misses from CPU                     &      & memory.stat.def  \\ \hline 
+L[1-3]\_MISS\_GPU           & \# of l[1-3]cache misses from GPU                     &      & memory.stat.def  \\ \hline  \hline 
+AVG\_MEMORY\_LATENCY        & average memory latency                                &      & memory.stat.def  \\ \hline \hline 
+TOTAL\_DRAM                 & \# of DRAM accesses                                   &      & memory.stat.def  \\ \hline  
+TOTAL\_DRAM\_READ           & \# of DRAM reads                                      &      & memory.stat.def  \\ \hline  
+TOTAL\_DRAM\_WB             & \# of DRAM write backs                                &      & memory.stat.def  \\ \hline  
+                            & \# of register reads                                  &      &                  \\ \hline  
+                            & \# of register writes                                 &      &                  \\ \hline   \hline 
+COAL\_INST, UNCOAL\_INST    & coalesced/uncoalesced mem requests (DIST)             &      & memory.stat.def  \\ \hline 
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\end{table} 
+
+
+You can 
+
+
+\begin{Verbatim}
+IPC = INST_COUNT_TOT / CYC_COUNT_TOT
+CPI = CYC_COUNT_TOT / INST_COUNT_TOT
+\end{Verbatim}
+
+\begin{Verbatim}
+IPC_1 = INST_COUNT_CORE_1 / CYC_COUNT_CORE_1
+IPC_2 = INST_COUNT_CORE_2 / CYC_COUNT_CORE_2
+...
+IPC = harmonic_mean(IPC_1, IPC_2, ..., IPC_n)
+
+\end{Verbatim}
+
+
+Table~\ref{table:stats} shows important stats.
+
+
+
+\section{SST-Macsim}
+
+Macsim is a part of SST simulation framework~\cite{sst}. This section
+is intended for SST users who want to use \SIM for GPU simulations.
+
+\subsection{How to install SST}
+
+Follow the instructions provided in wiki page at the
+\textit{sst-simulator} GoogleCode repository~\cite{sst-google} at
+\urlc{http://code.google.com/p/sst-simulator}.
+
+\subsection{How to install \SIM in SST}
+
+Check out the svn copy of \SIM in \textit{sst-top/sst/elements} and
+apply a patch. 
+
+\begin{Verbatim}
+cd sst-top/sst/elements
+svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim
+cd macsim
+patch -p0 -i macsim-sst.patch
+\end{Verbatim}
+
+Then, re-run the SST build procedure.
+
+\begin{Verbatim}
+cd sst-top
+./autogen.sh
+./configure --prefix=/usr/local --with-boost=/usr/local --with-zoltan=/usr/local --with-parmetis=/usr/local
+\end{Verbatim}
+
+\subsection{How to configure the \SIM SST component}
+
+An example SST sdl configuration file is as follows:
+
+\begin{Verbatim}
+<?xml version="1.0"?>
+<sdl version="2.0"/>
+
+<config>
+  stopAtCycle=1000s
+  partitioner=self
+</config>
+
+<sst>
+  <component name=gpu0 type=macsimComponent.macsimComponent rank=0 >
+    <params>
+      <paramPath>./params.in</paramPath>
+      <tracePath>./trace_file_list</tracePath>
+      <outputPath>./results/</outputPath>
+      <clock>1.4Ghz</clock>
+    </params>
+  </component>
+</sst>
+\end{Verbatim}
+
+In this manner, an SST simulation configuration file can declare multiple 
+instances of \SIM as well as define what traces are run on each \SIM instance.
+
+\subsection{How to run a \SIM simulation in SST}
+
+Ensure SST and \SIM components are compiled and/or installed.  
+Ensure that the paths and contents of both SST configuration sdl file and
+\SIM \textit{params.in} configuration file are correct. Start the SST simulation 
+either standalone or through MPI.
+
+\begin{Verbatim}
+sst.x [sdl-file]
+\end{Verbatim}
+or
+\begin{Verbatim}
+mpirun -np [x] sst.x [sdl-file]
+\end{Verbatim}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Get Memory Traces Using \SIM}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TODO{TODO}
+
+
+
+
+
+
+
+
+
+

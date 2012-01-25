@@ -48,6 +48,9 @@
 
 \usepackage[scaled]{berasans}
 
+%\renewcommand*{\cftchaptername}{\textcolor{black}{\chaptername}~}
+%\renewcommand*{\cftchapterfont}{\textcolor{black}{}}
+
 \chapterstyle{ell}
 \renewcommand\tocheadstart{}
 \renewcommand\printtoctitle[1]{}
@@ -172,6 +175,12 @@
 \renewcommand{\thetable}{\@arabic\c@table}
 \renewcommand{\theequation}{\@arabic\c@equation}
 \setcounter{secnumdepth}{3}
+\g@addto@macro{\appendixpage}{%
+  \addtocontents{toc}{%
+    \protect\renewcommand{\protect\cftchapterfont}{}%
+  }%
+}
+\newcommand{\urlc}[1]{\textcolor{WildStrawberry}{\url{#1}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \makeatother
 \newenvironment{syntax}{%
@@ -199,14 +208,21 @@
 \pagestyle{plain}
 
 \ifpdf
-\usepackage[colorlinks]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+%  colorlinks,
+%  citecolor=PineGreen,
+%  linkcolor=black,
+%  urlcolor=WildStrawberry,
+  urlbordercolor=white,
+  citebordercolor=PineGreen,
+}
 \fi
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\TODO}[1]{{\color{red}#1}}
 \newcommand{\todo}[1]{{\color{red}#1}}
 \newcommand{\SIM}{MacSim\xspace}
+\newcommand{\bin}{\textcolor{MidnightBlue}{macsim}\xspace}
 \newcommand{\ignore}[1]{}
 \newcommand{\cpu}{x86\xspace}
 \newcommand{\gpu}{GPU\xspace}
@@ -320,23 +336,30 @@
 
 
 \chapter*{\contentsname}
+\tableofcontents*
 
 
-\setlength\columnsep{8mm}
-\begin{multicols}{2}
-  \tableofcontents*
-\end{multicols}
+%setlength\columnsep{8mm}
+%begin{multicols}{1}
+% \tableofcontents*
+%end{multicols}
 
 \newpage
 
 \input{intro}
+\input{basic}
+
+
+\input{trace}
+
+
 %\input{run}
 %\input{parameter}
-\input{trace}
 %\input{hetero}
 \input{knob}
 \input{stat}
-\input{sst}
+
+%\input{sst}
 \input{code_top}
 \input{process}
 \input{pipeline}
