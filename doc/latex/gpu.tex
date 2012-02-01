@@ -2,15 +2,13 @@
 \clearpage
 \section{The GPU Model}
 
-
-We model our GPU cores similar to NVIDIA Fermi~\cite{fermi}.
-%Figure~\ref{fig:g80} shows an overview of the GPU architecture that we modeled in our simulator. 
-The GPU architecture consists of a scalable number of {\em streaming
-multiprocessors} (SMs), each containing eight {\em streaming processor}
-(SP) cores, two special function units (SFUs), a multithreaded
-instruction fetch and issue unit, a read-only constant cache, and a
-16KB read/write shared memory~\cite{lin:nic08}.
-In our simulator SMs are names as cores and SPs are just one of the functional units. 
+MacSim can model GPUs similar to NVIDIA's Tesla~\cite{lin:nic08} and
+Fermi~\cite{fermi} architectures.  In these architectures the GPU consists of a
+scalable number of {\em Streaming Multiprocessors} (SMs), each containing
+several{\em Scalar Processors} (SP) and Special Function Units (SFUs), a
+multithreaded instruction fetch and issue unit, a read-only constant cache, and
+a read/write scratch pad memory called Shared Memory.  In our simulator, SMs
+are modeled as cores and SPs as just one of the functional units. 
 
 
 \ignore{
@@ -22,9 +20,73 @@ In our simulator SMs are names as cores and SPs are just one of the functional u
 \end{figure}
 }
 
-The SM executes a batch of 32 threads together called a {\em
-warp}. In the simulator, one warp is treated as one thread. 
-The trace generator already formed a warp and stored them. 
+
+\subsection{Changes to support GPUs}
+
+The following parts/units required major changes made to support GPU simulation:
+
+\subsection{Traces}
+
+In NVIDIA GPUs threads are executed in batches of 32 threads called
+\textit{warps}. For simulating execution at warp granularity, for GPU
+applications, we generate traces at warp granularity. What this means is there
+is one trace file per warp and each instruction in a trace file represents an
+instruction executed by a warp. The instruction in the trace file encodes which
+threads in the warp were active during the execution of the instruction. For
+divergent branches, all instructions from one path are written to the trace
+file first and only then are instructions from the other path written to the
+trace file. For memory instructions, multiple instructions are written to the
+trace file since each thread in a warp can access different addresses. Handling
+of memory instructions inside the simulator is explained below.
+
+\subsection{Process Manager}
+
+The Process Manager does assignment of threads to cores (SMs) at block
+granularity - all warps in a thread block are assigned to the same core. The
+number of blocks that can be assigned to each core is determined from the
+resource requirement of each block and the GPU architecture being simulated.
+This number is calculated at the time of trace generation for compute devices
+of capabilility 2.0 and is included in the trace files; it can also be
+specified by setting the knob \TODO{which knobs?}.  For each block, the Process
+Manager tracks the number of completed warps and when all warps in a block have
+completed, the Process Manager retires the block and assigns a new block to the
+core. The policy for assigning blocks to cores can be varied - blocks could
+either be assigned statically to cores, or they could be assigned to the first
+core that can accomodate a new block.
+
+
+\subsection{Memory Hierarchy}
+
+The following new components are added to the memory hierarchy - Shared Memory,
+    Const Cache, Texture Cache.
+
+\subsection{Instruction Scheduler}
+
+A GPU-specific (or a multithreaded architecture specific) instruction scheduler
+is necessary, since neither single-threaded in-order nor single-threaded
+out-of-order schedulers match the requirement of a GPU scheduler. A GPU
+scheduler must be able to schedule instructions from different warps while
+scheduling instructions from the same warp in-order. A GPU-specific scheduler
+is implemented in \textit{schedule\_smc.cc}, this scheduler chooses
+instructions from different warps in \TODO{round-robin order - not true!}.
+
+\subsection{Simulating Memory Instructions}
+
+Due to the execution of threads at warp granularity, the execution of a memory
+instruction generates multiple addresses, one from each thread. In the trace
+file all the generated addresses are included as individual instructions, but
+the addresse are marked as generated from the same memory instruction. During
+simulation when it is detected that a sequence of memory accesses are from the
+same memory instruction, the trace is read ahead until the end of the sequence
+and the individual memory accesses are attached to a main uop as child uops. It
+is the main uop that flows through the pipeline stages until execution. In the
+execution stage it is detected that the main uop has several child uops and the
+child uops that are issued to the memory hierarchy. When all the child uops
+have completed, the main uop is ready for retirement.
+
+
+
+\ignore {
 
 \subsection{Changes to support GPU}
 \subsubsection{Front-end changes}
@@ -52,23 +114,23 @@ Since one warp is treated as a functional unit, execution stage itself does not 
 
 \subsubsection{Memory system}
 The simulator includes read-only cache, texture cache and constant cache to model GPUs. 
+}
 
 \ignore{
 
 
 
-Executing a warp instruction applies the instruction to 32
-threads, similar to executing a SIMD instruction like an SSE
-instruction~\cite{sse} in X86. However, unlike SIMD instructions, the
-concept of warp is not exposed to the programmers, rather programmers
-write a program for one thread, and then specify the number of
-parallel threads in a block, and the number of blocks in a kernel
-grid. The Tesla architecture forms a warp using a batch of 32
-threads~\cite{cuda:course, sc2008_cuda} and in the rest of the paper
-we also use a warp as a batch of 32 threads.\ignore{\footnote{The CUDA
-manual~\cite{cuda_manual} describes a half warp (16 threads) as a
-minimum unit of execution. However, to simplify the model, we use only
-warp as a minimum unit of execution.}}
+Executing a warp instruction applies the instruction to 32 threads, similar to
+  executing a SIMD instruction like an SSE instruction~\cite{sse} in X86.
+  However, unlike SIMD instructions, the concept of warp is not exposed to the
+  programmers, rather programmers write a program for one thread, and then
+  specify the number of parallel threads in a block, and the number of blocks
+  in a kernel grid. The Tesla architecture forms a warp using a batch of 32
+  threads~\cite{cuda:course, sc2008_cuda} and in the rest of the paper we also
+  use a warp as a batch of 32 threads.\ignore{\footnote{The CUDA
+    manual~\cite{cuda_manual} describes a half warp (16 threads) as a minimum
+      unit of execution. However, to simplify the model, we use only warp as a
+      minimum unit of execution.}}
 
 All the threads in one block are executed on one SM together. One SM
 can also have multiple concurrently running blocks. The number of

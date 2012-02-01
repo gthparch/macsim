@@ -1,7 +1,7 @@
 
 
 
-\chapter{The Pipeline Stages}
+\chapter{Pipeline Stages}
 
 This section describes the basic feature of each pipeline stage. 
 Table~\ref{table:pipeline} shows the list of files that are relevant to each pipeline stage. 
@@ -11,7 +11,7 @@ Please see the doxygen file to get the up-to-date information.
 \begin{table}[htb]
 \begin{footnotesize}
 \begin{center}
-\caption{Pipeline stage and corresponding source code names.}
+\caption{Pipeline stage and the corresponding source files.}
 \label{table:pipeline}
 \begin{tabular}{|c||c|}
 \hline 
@@ -31,6 +31,7 @@ process manager        & process\_manager.cc                                    
 \end{footnotesize}
 \end{table}
 
+\TODO{above table lists things other than pipeline stages}
 
 
 \section{Fetch Stage}
@@ -38,66 +39,169 @@ This pipeline stage models the instruction fetch stage. The main tasks
 of this stage are as follows:
 
 \begin{enumerate}
-\item Determine a thread from which instructions are fetched 
-\item Check whether the thread can actually fetch a new instruction or not  
-\item access I-cache  (when icache miss, the front-end cannot fetch an instruction) 
-\item read a uop from trace from (call {\texttt get\_uops\_from\_traces})
-\item BTB access and branch prediction 
-\item send uop to {\texttt q\_fe} to model the depth of front-end 
+
+\item Determine the thread from which instructions will be fetched next (for
+    processors that are not multi-threaded, the same thread is selected
+    always), this involves checking whether a thread can actually fetch a new
+instruction or not.
+
+\ignore{\item Check whether the thread can actually fetch a new instruction or not }
+
+\item access I-cache (when there is an icache miss, the front-end cannot fetch
+    instructions for the selected thread).
+
+\item read a uop from trace (call {\textit get\_uops\_from\_traces()})
+
+\item BTB access and branch prediction. 
+
+\item send uop to queue meant for modeling the depth of front-end.
+
 \end{enumerate}
-The depth of front-end stage is set by {\texttt fetch\_latency} and it basically sets the length of 
-{\texttt q\_fe  }
 
-Different fetch polices are implemented using virtual function. {\texttt fetch\_factory} function sets 
-different {\texttt frontend\_c}. Currently, a thread is selected based on the round-robin policy. If the next thread is blocked to fetch, the next candidate is selected based on the round-robin policy. 
+The depth of front-end stage is set using one of the {\textit fetch\_latency}
+knobs, there is one knob for each core type (small, medium and large).\ignore{
+  and it basically sets the length of {\textit q\_fe }} \TODO {Different fetch
+    policies can be implemented using the factory mechanism explained in
+      Section~\ref{}. } The default fetch policy is round-robin and the policy
+      to be used is specified using the \TODO{....} knobs. Different branch
+      predictors are implemented using the \textit{bp\_factory} and the type of
+      branch predictor to be used is set using the BP\_DIR\_MECH knob.
 
- Different branch predictor policies are also implemented and it is also set by {\texttt bp\_factory}. The type of branch predictor or the fetch polices are set by knobs. 
+\ignore{ Different fetch polices are implemented using virtual function.
+  {\textit fetch\_factory} function sets different {\textit frontend\_c}.
+  Currently, a thread is selected based on the round-robin policy. If the next
+    thread is blocked to fetch, the next candidate is selected based on the
+    round-robin policy.  Different branch predictor policies are also
+    implemented and it is also set by {\textit bp\_factory}. The type of branch
+    predictor or the fetch polices are set by knobs.}
 
 
 
 \subsection{Trace Read} 
-Trace read is mainly performed in trace\_read.cc. 
-The main task of trace read is reading an macro instruction from trace file and convert it to uops. 
-A simple decoding algorithm is used to generate micro uops. 
-To improve the simulation speed, decoded uops are stored in a hash table. 
-Which trace file to open is decided in process\_manager.cc 
+
+Trace read is mainly performed in trace\_read.cc. The main function of this
+step of simulation is to read a macro instruction from the trace file and
+convert it into a sequence of one or more micro-ops (uops). A simple decoding
+algorithm is used for generating uops. To improve the speed of simulation,
+decoded uops are stored in a hash table for reuse when the same
+static instruction is encountered again during simulation. Note that
+dynamic information such as addresses will have to be decoded again. 
+
+\ignore { The main task of trace read is reading an macro instruction from
+  trace file and convert it to uops.  A simple decoding algorithm is used to
+    generate micro uops.  To improve the simulation speed, decoded uops are
+    stored in a hash table.  Which trace file to open is decided in
+    process\_manager.cc }
 
 
+\section{Decode and  Allocate Stage}
 
-\section{Decode and  Allocate Stage }
-This stage is simply implemented with {\texttt  allocate queue}.
+\TODO{Decode is done in frontend.cc!}
+\TODO{renaming!!}
+
+\TODO{according to code, frontend\_q latency = fetch\_latency + alloc\_latency}
+\TODO{according to code, alloc\_q latency = alloc\_to\_exec\_latency}
+
+In the allocation stage, the resource requirement for each uop is calculated
+and space is allocated for the uop in the required structures. At the end of the
+allocation stage, each uop occupies an entry in ROB and one of the issues
+queues - general purpose (integer), floating point or memory. Depending on the
+knob values, there could a unified issue queue of distributed issue queues. For
+conditional branches with BTB misses, the branch target is resolved in this
+stage as well.
+
+
+\ignore{ This stage is simply implemented with {\textit  allocate queue}.
 At the end of this stage,  the simulator performs resource allocations such as rob entry and load-store buffer. 
-Branch target is resolved in this stage as well. 
+\TODO{Branch target is resolved in this stage as well.}}
+
 
 \section{Schedule Stage}
-The scheduler stage implements scheduling logic. Currently it supports in-order, out-of-order, and GPU scheduling mechanism. 
-First, it checks the source code availability and then functional unit availability-by checking ports. 
- The scheduler is implemented in a virtual function so different scheduling policies overload the scheduling functions. 
+
+
+The schedule stage implements the instruction scheduling logic. Currently
+in-order, out-of-order and GPU schedulers are supported. The GPU scheduler
+issues uops from the same warp/SIMD thread in order, but uops from different
+warps/SIMD threads can be issued out of order in comparison to the order in
+which they were dispatched. Before executing an uop the instruction scheduler
+first checks for the availabilty of source operands, and then for the
+availability of ports (functional units) for uop execution. 
+
+\ignore{ The scheduler stage implements scheduling logic. Currently it supports
+  in-order, out-of-order, and GPU scheduling mechanism.  First, it checks the
+    source code availability and then functional unit availability-by checking
+    ports.  The scheduler is implemented in a virtual function so different
+    scheduling policies overload the scheduling functions.}
 
 \section{Execution Stage}
 
+In this stage, all instructions - both non-memory and memory - are executed.
+The member variable \textit{m\_done\_cycle} of the uop structure indicates the
+cycle in which the uop will complete. The following steps are taken for
+execution of instructions:
+
+\begin{enumerate}
+
+\item For non-memory uops, the latency of the the instruction is determined, an
+execution port is marked as in use and the \textit{m\_done\_cycle} of the uop
+is set. The latencies of uops is defined in the file
+\textit{../def/uoplatency\_ptx.def} which gets included during the compilation
+of the MacSim binary. 
+
+\item Branch instructions are resolved in this stage.
+
+\item For memory uops, D-cache (or the appropriate memory structure such as
+    Const cache, Shared Memory and so on) is accessed and an execution port is
+marked as in use. If a D-cache port is available, then the port is marked as
+used, however, if a port is unavailable, the execution of the uop is attempted
+again later on. On D-cache hit, the \textit{m\_done\_cycle} of the uop is set.
+Handling of D-cache misses is explained in Section~\ref{sec:memory}.
+
+
+\item Uncoalesced memory instructions result in multiple accesses to the the D-cache.
+
+\item \TODO{The number of function units can be specified via these knobs for
+  the core type being used - \textit{int\_sched\_rate, mem\_sched\_rate,
+    fp\_sched\_rate} - code does not use these in that sense}.
+
+\end{enumerate}
+
+
+\ignore{
 In this stage, both memory instructions and other instructions are executed. 
 \begin{enumerate} 
 
 \item The latency of uop is checked in this stage. 
-{\texttt ../def/uoplatency\_ptx.def} includes the latency of uops. 
-{\texttt uop->m\_done\_cycle} indicates the end of execution time. 
+{\textit ../def/uoplatency\_ptx.def} includes the latency of uops. 
+{\textit uop->m\_done\_cycle} indicates the end of execution time. 
 
 \item This stage also controls the number of function units by using the following three parameters. 
-{\texttt int\_sched\_rate, mem\_sched\_rate, fp\_sched\_rate}
+{\textit int\_sched\_rate, mem\_sched\_rate, fp\_sched\_rate}
 
 \item For memory instructions, the simulator checks dcache at the beginning of the execution cycle 
 and if there is a dcache miss, it is handled separately. Memory system is explained in Section~\ref{sec:memory}
 
 \item This stages also handles uncoalesced memory operations. Uncoalesced memory requests are handed 
-by using children uop structures. In {\texttt trace\_read.cc} file already generated children uop when it detects uncoalesced memory requests. 
+by using children uop structures. In {\textit trace\_read.cc} file already generated children uop when it detects uncoalesced memory requests. 
 
 \item Branch instructions are resolved in this stage as well. 
 \end{enumerate} 
+}
 
 \section{Retire Stage}
-This stage handles retiring uops. It supports in-order retirement. 
-This stage also frees uop structures. 
+
+This stage handles the in-order retirement of uops. Memory allocated to a uop
+is freed or returned to memory pools. This stage also checks of completion of
+warps, blocks, kernels and the entire application itself.
+
+
+
+\TODO{At present, there are no rename and writeback stages in MacSim since
+  they are not necessary to support correct and accurate simulation. MacSim
+    enforces RAW dependencies, while WAR and WAW dependences can be ignored by
+    assuming that once a instruction completes, its results are available for
+    dependent instructions without being overwritten.}
+
 
 % LocalWords:  doxygen frontend bp uops  GPU uop dcache uncoalesced BTB fe mem
 % LocalWords:  sched fp icache ptx

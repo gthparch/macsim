@@ -1,56 +1,75 @@
 
 
-\chapter{The Knobs and Parameters}
+\chapter{Knobs and Parameters}
 \label{sec:knob}
 
-To control various architectural parameters, we use multiple knob
-variabls, which are defined in \textit{trunk/def/*.param.def}.
+To control simulation and architectural parameters, we use knob variables which
+are defined in \textit{trunk/def/*.param.def} files. The build process automatically 
+converts the knob definitions in these files into c++ source that gets included in 
+the compilation of the simulator binary.
 
 \section{How to add a new knob}
 \label{sec:knob1}
 
-A new knob variable can be defined in the following format:
+A new knob variable can be defined by adding a line in the following format in 
+one of the\textit{param.def} files:
 
 \begin{Verbatim}
-param<{variable used in the \SIM}, {variable used in the commandline}, {type}, {default value}>
+param<{variable used in the \SIM}, {variable used in the commandline or params file}, {type}, {default value}>
 \end{Verbatim}
 
-We recommend first two arguments are same, but the former is in the
-upper case and the latter is in the lower case. For example,
+We recommend that the first two arguments be the same, except that the former
+be in upper case and the latter in lower case. For example,
 
 \begin{Verbatim}
 param<L2_ASSOC, l2_assoc, int, 8>
 \end{Verbatim}
 
 
-However, one restriction is this new varialbe must be defined
-in \textit{trunk/def} directory and the file name should
-be \textit{*.param.def} to parse variables correctly.
+\ignore{ However, one restriction is this new variable must be defined in
+\textit{trunk/def} directory and the file name should be \textit{*.param.def}
+to parse variables correctly.  }
+
+Knobs can be pretty much of any type, to support knobs of type other than the
+basic data types you may have to add code to \textit{src/knob.h}. Knobs of type
+string are already supported, this is helpful for specifying policies and
+configurations such as branch predictor type, instruction scheduler type, dram
+scheduling policy and so on. 
 
 
 \section{How to use a new knob in the simulator}
 
-All knob variables will have \textit{KNOB\_} prefix. For example,
-L2\_ASSOC in Section~\ref{sec:knob1} will be KNOB\_L2\_ASSOC in the
-simulator code.
+In the simulator code, a knob variable is accessed by prefixing its name (in
+uppercase) with \textit{KNOB\_}.  For example, L2\_ASSOC defined in the example
+in Section~\ref{sec:knob1} can be accessed using the name KNOB\_L2\_ASSOC in
+the simulator. To access the value of a knob use the \textit{getValue()}
+function or just the name of the knob (this works because of operator
+overloading).
 
-\subsection{Adding a New String Type Knob}
-Several knobs especially setting policies use {\texttt string} type. 
-Examples are branch predictor, instruction scheduler, dram scheduler, and llc setting. Please see {\texttt factory\_class.cc/h} and {\texttt bp.cc}. 
+\ignore { \subsection{Adding a New String Type Knob} Several knobs especially
+setting policies use {\texttt string} type.  Examples are branch predictor,
+instruction scheduler, dram scheduler, and llc setting. Please see {\texttt
+factory\_class.cc/h} and {\texttt bp.cc}.  }
 
 
 
+\section{How to assign values to knobs?}
+
+When defining a knob, a default value for the knob has to be specified. If a
+user does not set the value of a knob for a simulation, then the knob assumes
+its default value. If a user wishes to change the value of a knob for a
+simulation, there are two ways in which the user can accomplish this:
 
 
-\section{How to apply different value to a knob variables}
-
-There are two ways of modifying the default value of a knob variable.
+\ignore { \section{How to apply different value to a knob variables} There are
+two ways of modifying the default value of a knob variable.  }
 
 \begin{enumerate}
-  \item params.in - this file must be supplied to the macsim binary
-  for the execution. You can find sample parameter files
-  in \textit{trunk/params} directory. In this file, variable names and
-  the values are paired in each line. For example,
+
+  \item edit params.in - this file is read by the macsim binary on startup for
+parameter values.  Sample parameter files can be found in \textit{trunk/params}
+directory. Each line in a parameter file consists of a knob name (in
+lowercase) followed by the value of the parameter.  For example,
 
 \begin{Verbatim}
 l1_assoc 8
@@ -58,7 +77,8 @@ l2_assoc 16
 \end{Verbatim}
 
 
-  \item command line - instead, you can also supply the knobs in the command line, for example,
+  \item specify parameter values from the command line - an user can specify
+  knobs and their values from the command line as shown below.
 
 \begin{Verbatim}
 ./macsim --l1_assoc=8 --l2_assoc=16
@@ -66,8 +86,9 @@ l2_assoc 16
 
 \end{enumerate}
 
-
-
+For a knob specified in both the params.in file and the command line, the value
+specified in the command line takes priority over the value specified in the
+params.in file.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,12 +104,16 @@ types of simulations.
 \subsection{Repeating Trace}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-For multiple-application simulations, early terminated applications
-sometimes need to be re-executed to model resource contention (cache,
-on-chip interconnection, and memory controller) until all applications
-finish. This is a common methodology to evaluate multi-program
-workloads in the literature. \SIM also supports this feature. To
-enable this feature, you need to
+For multiple-application simulations, sometimes, early-terminating applications
+have to be re-executed to model resource contention (cache, on-chip
+    interconnection, and memory controller) until all applications finish. This
+is a common methodology adopted in evaluating multi-program workloads and is
+supported by \SIM also. To enable this feature, you have to turn on
+repeate\_trace knob i.e. set repeat\_trace to 1. This can be done either via
+params.in file or from the command line. 
+
+\ignore
+{
 
 \begin{itemize}
   \item Specify the configuration in the command line by
@@ -101,7 +126,7 @@ enable this feature, you need to
   repeat_trace 1
   \end{Verbatim}
 \end{itemize}
-
+}
 
 
 
@@ -114,8 +139,8 @@ enable this feature, you need to
 \subsubsection{One \cpu Core}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Usually, we use large core configurations for specifying x86 cores
-(however, it does not have to).
+Usually, we configures cores of type large as x86 cores, however, this is not
+mandatory.
 
 \begin{Verbatim}
 // macsim-top/trunk/params/params_x86
@@ -131,8 +156,8 @@ large_core_type x86
 \subsubsection{Multiple \cpu cores}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Multiple core simulations are very similar to single core simulations,
-but you need to specify the number of cores differently.
+Multiple core simulations are very similar to single core simulations, but you
+have to specify the number of cores as greater than 1.
 
 
 \begin{Verbatim}
@@ -176,9 +201,9 @@ repeat_trace 1
 \subsection{\gpu Simulation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Usually, we use small core configurations for \gpu cores. We provide
+Usually, we configure cores of type small as \gpu cores. We provide
 several pre-defined configuration files for NVIDIA architectures. Here
-are the list of sample files.
+is the list of sample files.
 
 \begin{Verbatim}
 params_8800gt // NVIDIA GeForce 8800GT (G80 architecture)
@@ -196,7 +221,7 @@ params_gtx465, params_gtx480 // NVIDIA GeForece GTX465, GTX480 (Fermi architectu
 num_sim_cores 12
 num_sim_small_cores 12
 core_type ptx
-max_threads_per_core 80 // set the max number of warps 
+max_threads_per_core 80 // set the max number of warps per SM
 \end{Verbatim}
 
 
@@ -234,7 +259,7 @@ params_hetero_4c_4g // 4-CPU, 4-GPU cores
 \subsubsection{One CPU application + One GPU application}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Following example shows simple heterogeneous configuration.
+Following example shows a simple heterogeneous configuration.
 
 \begin{Verbatim}
 num_sim_cores 2
@@ -411,7 +436,7 @@ fetch_policy rr // SMT(MT) thread fetch policy  by default: round-robin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\textbf GPU Core Parameters} 
 
-\TODO{Question: is constant cache size is per SM? How does a core share the constant cache, texture cache, what is ptx\_exec\_ratio? } 
+\TODO{Question: is constant cache size is per SM? How does a core share the constant cache, texture cache, what is ptx\_exec\_ratio? have vs need} 
 
 
 \begin{Verbatim}

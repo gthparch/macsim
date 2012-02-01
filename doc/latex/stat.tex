@@ -1,7 +1,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{The Statistics}
+\chapter{Statistics}
 \label{sec:stat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -24,9 +24,11 @@ The following statistic types are supported:
   over another. Eg. (number of cache hits / number of cache accesses) i.e.,
   cache hit ratio.
 
-  \item [DIST]  for defining a group of related events and calculating the
-  number of occurances of each event in the as a percent of the sum of the
-  number of occurances of all events in the group.  Eg. If we want to know what
+  \item [DIST]  for calculating the proportion of each event in a group of
+  events.
+  \ignore{for defining a group of related events and calculating the
+  number of occurances of each event in the group as a percent of the sum of the
+  number of occurances of all events in the group.}  Eg. If we want to know what
   percent of L1 data cache accesses (in a 2-level hierarchy) resulted in L1
   hits, L2 hits or memory accesses, we should define a distribution consisting
   on three events - L1 hits, L2 hits and L2 misses  - and update the
@@ -115,9 +117,10 @@ a per core stat by 1. These take core id and the name of the statistic to be
 incremented/decremented as their parameters. For example,
 
 \begin{Verbatim}
-STAT_EVENT(INST_COUNT_TOT)
-STAT_EVENT_N(INST_COUNT_TOT, 2)
-STAT_CORE_EVENT(1, INST_COUNT)
+STAT_EVENT(INST_COUNT_TOT); // increments global stat INST_COUNT_STAT by 1
+STAT_EVENT_N(INST_COUNT_TOT, 2); // increments global stat INST_COUNT_STAT by 2
+STAT_EVENT_M(INST_COUNT_TOT); // decrements global stat INST_COUNT_STAT by 1
+STAT_CORE_EVENT(0, INST_COUNT); // increments stat INST_COUNT for core 0 by 1
 \end{Verbatim}
 
 
@@ -129,7 +132,15 @@ STAT_CORE_EVENT(1, INST_COUNT)
 At the end of the simulation *.stat.out are generated, these files include the
 statistic values at the end of the simulation. As mentioned, for each stat two
 values are generated, one is the raw statistic value and other is a value
-calculated based on the type of the stat.
+calculated based on the type of the stat. For simulations with multiple
+applications, multiple sets of stat files are generated. Each simulated
+application is assigned an integer id (these ids are assigned according to the
+    order in which the applications appear in the trace\_file\_list), when an
+application terminates (for the first time, note that applications may be
+    repeated), stat files suffixed with the the id of the application, i.e.
+*.stat.out.<appl\_id>, are generated. These stat files contain the value of the
+stats until that point in the simulation. At the end of the simulation,
+      *.stat.out files are generated as usual.
 
 
 

@@ -2,9 +2,84 @@
 \chapter{Overview of MacSim Code Structures}
 \label{sec:codetop}
 
+This section provides a brief overview of the organization of the code in
+MacSim. Code in MacSim is organized into many classes, for a descpription of
+the classes please refer to the doxygen documentation.
 
-\section{sim}
+  \ignore{
+For each simulation, an instance of \textit{macsim\_c} is created.  In
+\textit{macsim\_c}, there is an instance of \textit{process\_s} for each
+application being simulated. An application can contain multiple threads each
+represented by a \textit{thread\_s} structure. In case of GPU applications, an
+instance of \textit{thread\_s} represents a warp. The threads of an application
+can run on multiple cores each of which is an \textit{core\_c} object. For GPU
+applications, each core represents an SM. Each core has a member variable for
+each stage of the pipeline. The classes for the different pipeline stages are:
+\textit{frontend\_c, allocate\_c/smc\_allocate\_c,
+  schedule\_io\_c/schedule\_ooo\_c/schedule\_smc\_c, exec\_c, retire\_c}. A
+  \textit{core\_c} object also contains objects of \textit{rob\_c/smc\_rob\_c}
+  (ROB), \textit{cache\_c} (I-cache), \textit{readonly\_cache\_c} (Const cache
+      and Texture cache), \textit{sw\_managed\_cache\_c} (Shared Memory),
+  \textit{bp\_data\_c} (Branch predictor), \textit{hwp\_common\_c} (Hardware
+      Prefetcher). Note that some of these components are valid for CPUs only,
+  while some others are valid for GPUs only.  According to the speficied memory
+  hierarchy, an instance of a class that derives from \textit{memory\_c} is
+  created. This object is a member of \textit{macsim\_c} and is accessed by all
+  cores in the simulation. The \textit{memory\_c} object includes objects L1,
+  L2 and L3 caches and also DRAM controllers which are objects of classes that
+  derive from \textit{dram\_controller\_c}.
+  }
 
-\section{run\_a\_cycle}
 
-\section{core}
+For each simulation, an instance of \textit{macsim\_c} is created.  In
+\textit{macsim\_c}, there is an instance of \textit{process\_s} for each
+application being simulated. An application can contain multiple threads each
+represented by a \textit{thread\_s} structure. In case of GPU applications, an
+instance of \textit{thread\_s} represents a warp. The threads of an application
+can run on multiple cores each of which is an \textit{core\_c} object. For GPU
+applications, each core represents an SM. Each core has a member variable for
+each stage of the pipeline.  A \textit{core\_c} object also contains objects
+for hardware structures such as ROB, I-cache, Shared Memory, branch predictor
+and so on. Note that some of these components are valid for CPUs only, while
+some others are valid for GPUs only.  According to the speficied memory
+hierarchy, an instance of a class that derives from \textit{memory\_c} is
+created. This object is a member of \textit{macsim\_c} and is accessed by all
+cores in the simulation. The \textit{memory\_c} object includes objects for L1
+D-cache, L2 and L3 caches and also DRAM controllers which are objects of
+classes that derive from \textit{dram\_controller\_c}. 
+
+
+\section{Simulator Execution}
+
+All pipeline stages, units such as cache and memory controller, components such
+as memory system and core implement the \textit{run\_a\_cycle()} function which
+is called every cycle. Within the \textit{run\_a\_cycle()} function of each
+component is the processing done by the component for every simulation cycle.
+\textit{macsim\_c}, the simulation object, calls \textit{run\_a\_cycle()} for
+the memory system, interconnect and cores in the simulation (see
+    \textit{macsim.cc}). Each core in turn calls \textit{run\_a\_cycle()} for
+the individual pipeline stages (see \textit{core.cc}).
+
+
+
+\ignore{
+Below is a list of key data structures used in MacSim along with a brief description:
+
+\begin{description}
+
+\item [core_c]
+
+\item [frontend_c]
+\item [bp_data_c]
+\item [map_c]
+
+\item [allocate_c]
+
+\item [exec_c]
+\item [dcu_c]
+
+\item [retire_c]
+
+
+\end{description}
+}
