@@ -6,31 +6,6 @@ This section provides a brief overview of the organization of the code in
 MacSim. Code in MacSim is organized into many classes, for a descpription of
 the classes please refer to the doxygen documentation.
 
-  \ignore{
-For each simulation, an instance of \textit{macsim\_c} is created.  In
-\textit{macsim\_c}, there is an instance of \textit{process\_s} for each
-application being simulated. An application can contain multiple threads each
-represented by a \textit{thread\_s} structure. In case of GPU applications, an
-instance of \textit{thread\_s} represents a warp. The threads of an application
-can run on multiple cores each of which is an \textit{core\_c} object. For GPU
-applications, each core represents an SM. Each core has a member variable for
-each stage of the pipeline. The classes for the different pipeline stages are:
-\textit{frontend\_c, allocate\_c/smc\_allocate\_c,
-  schedule\_io\_c/schedule\_ooo\_c/schedule\_smc\_c, exec\_c, retire\_c}. A
-  \textit{core\_c} object also contains objects of \textit{rob\_c/smc\_rob\_c}
-  (ROB), \textit{cache\_c} (I-cache), \textit{readonly\_cache\_c} (Const cache
-      and Texture cache), \textit{sw\_managed\_cache\_c} (Shared Memory),
-  \textit{bp\_data\_c} (Branch predictor), \textit{hwp\_common\_c} (Hardware
-      Prefetcher). Note that some of these components are valid for CPUs only,
-  while some others are valid for GPUs only.  According to the speficied memory
-  hierarchy, an instance of a class that derives from \textit{memory\_c} is
-  created. This object is a member of \textit{macsim\_c} and is accessed by all
-  cores in the simulation. The \textit{memory\_c} object includes objects L1,
-  L2 and L3 caches and also DRAM controllers which are objects of classes that
-  derive from \textit{dram\_controller\_c}.
-  }
-
-
 For each simulation, an instance of \textit{macsim\_c} is created.  In
 \textit{macsim\_c}, there is an instance of \textit{process\_s} for each
 application being simulated. An application can contain multiple threads each
@@ -59,6 +34,135 @@ component is the processing done by the component for every simulation cycle.
 the memory system, interconnect and cores in the simulation (see
     \textit{macsim.cc}). Each core in turn calls \textit{run\_a\_cycle()} for
 the individual pipeline stages (see \textit{core.cc}).
+
+
+\section{Adding a new DRAM Policy}
+
+
+\section{Important simulator data structures}
+
+\subsection{uop\_c}
+
+An instance of \textit{uop\_c} defined in \textit{uop.h} is allocated (from a
+    pool) for each uop and is populated with all the information about the uop.
+Each uop is assigned a unique number, \textit{m\_unique\_num}, that is unique
+across all uops in a core. Each uop is also assigned a unique number,
+       \textit{m\_uop\_num}, that is unique across a uops of a thread. To
+       identify a uop from a thread of a core, \textit{m\_core\_id},
+       \textit{m\_thread\_id}, \textit{m\_uop\_num} member variables of the uop
+       have to checked. Users can define new member variables to collect/track
+       information as a uop moves through the pipeline. The \textit{uop\_c}
+       object allocated for a uop is returned to the \textit{uop\_c} pool when
+       the uop retires.  Whenever a new member variable is added to
+       \textit{uop\_c} users should make sure that the member variable is
+       initialized to a default value in \textit{uop\_c::init()}.
+
+\subsection{core\_c}
+
+Each core being simulated is represented by an object of \textit{core\_c}
+declared in \textit{core.h}. Besides pointers to various pipeline stages and
+hardware units, \textit{core\_c} tracks information such as how many threads
+are assigned to the core, how many instructions have been fetched for each
+thread and so on.
+
+
+\subsection{mem\_req\_s}
+
+For each memory request (L1 data cache miss, and write back requests), a
+instance of \textit{mem\_req\_s} declared in \textit{memreq\_info.h} is
+allocated. \textit{mem\_req\_s} contains all information relevant to a memory
+request and an instance allocated to a request is freed only when the memory
+request completes and data is filled in the cache. Users can define new member
+variables to collect/track information as a memory request moves through the
+memory hierarchy.
+
+
+\subsection{drb\_entry\_s}
+
+For each memory request that reaches the DRAM an instance of
+\textit{drb\_entry\_s} declared in \textit{dram.h} is allocated. This instance
+contains information about the bank, row and column of the DRAM request among
+other details and is deallocated (freed) when the DRAM request is serviced.
+
+
+\subsection{rob\_c/smc\_rob\_c}
+
+\textit{rob\_c} declared in \textit{rob.h} and \textit{smc\_rob\_c} declared in
+\textit{rob\_smc.h} are for ROBs in CPUs and GPUs respectively. uops are
+allocated an entry in the ROB in the allocate stage and the allocated entry is
+reclaimed when the uop retires.
+
+\subsection{pool\_c}
+
+\textit{pool\_c} defined \textit{utils.h} is a utility class meant for creating
+memory pools. In Macsim it is used for creating pools of \textit{uop\_c},
+       \textit{thread\_s} and so on.
+
+
+\subsection{Latencies of instructions}
+
+Latencies of X86 and PTX uops are defined in \textit{uoplatency\_x86.def} and
+\textit{uoplatency\_ptx.def} files in \textit{trunk/def}. Users must edit these
+files to modify the latencies of instructions. Note that for PTX instructions,
+      the value defined in \textit{uoplatency\_ptx.def} is multiplied by the
+      value of the knob \textit{PTX\_EXEC\_RATIO}.
+
+
+\subsection{pqueue\_c}
+
+\textit{pqueue\_c} is a utility class for varying the length of the simulated
+pipeline. In MacSim, it is used to vary the length of the fetch (and decode)
+  and allocation stages. At the time of creation of a \textit{pqueue\_c}
+  object, user has to specify the latency of the pqueue in cycles.
+  Objects/values enqueued into the are ready to be dequeued after speficied
+  latency. Besides the object to be enqueued, the enqueue operation takes a
+  priority value as argument as well. Different priority values can be used for
+  objects enqueued in the same cycle to control which object gets dequeued
+  first from the pqueue.
+
+
+\subsection{Adding new dram policy}
+
+To implement a new DRAM scheduling policy, a class that extends
+\textit{dram\_controller\_c} has to be defined. This class should overload the
+\textit{schedule()} function which should return the next DRAM request to be
+serviced according to the policy. Please refer to class \textit{dc\_frfcfs\_s}
+defined in dram.cc/h for a sample. In addition to the class, define a wrapper
+function that returns an instance of the class (see \textit{dram.cc} for an
+    example) and register the class with the DRAM factory (see \textit{see
+      register\_functions() in \textit{macsim.cc}}. 
+
+
+\subsection{Implementing a new instruction scheduler}
+
+Define a class that extends \textit{schedule\_c} and overloads at least the
+\textit{run\_a\_cycle()} function. Other functions may be overloaded to
+maintain a consistent code structure across the different instruction
+schedulers. After defining the new scheduler, add code to \textit{core.cc} to
+instantiate your scheduler instead of one of the provided schedulers.
+
+\subsection{Implementing a new policy for allocating thread blocks to GPU cores}
+
+In \textit{process\_manager\_c::sim\_schedule\_thread\_block()} add (or modify)
+code to determine the id of the block that will be assigned to the core based
+on the new policy. The list of ready blocks can be obtained via
+\textit{m\_block\_schedule\_info} member of the \textit{macsim\_c} object that
+is created for the simulation.
+
+\subsection{Implementing a new fetch policy}
+\TODO{Jaekyu(?)}
+
+\subsection{Implementing a new branch predictor}
+\TODO{Jaekyu(?)}
+
+\subsection{Implementing a few hardware prefetcher}
+\TODO{Jaekyu}
+
+
+
+
+
+
 
 
 
