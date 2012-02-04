@@ -156,7 +156,7 @@ class bp_data_c
 
     int                m_core_id; /**< core id */
     bp_dir_base_c     *m_bp; /**< branch predictor */
-    bp_targ_c         *m_bp_targ_pred;   /* BTB */ 
+    bp_targ_c         *m_bp_targ_pred;   /**< BTB */ 
     
     unordered_map<int, Counter>  m_bp_recovery_cycle; /**< bp recovery cycle per thread */
     unordered_map<int, Counter>  m_bp_redirect_cycle; /**< bp recovery cycle per thread */

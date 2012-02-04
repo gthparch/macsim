@@ -61,14 +61,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define RETIRE_INTERFACE_DECL() \
-    int m_core_id; \
-    pqueue_c<int*>* m_q_frontend; \
-    pqueue_c<int>** m_q_iaq; \
-    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; \
-    pool_c<uop_c>* m_uop_pool; \
-    rob_c* m_rob; \
-    smc_rob_c* m_gpu_rob; \
-    Unit_Type m_unit_type; \
+    int m_core_id; /**< core id */ \
+    pqueue_c<int*>* m_q_frontend; /**< frontend queue */ \
+    pqueue_c<int>** m_q_iaq; /**< ia queue */ \
+    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; /**< gpu ia queue */ \
+    pool_c<uop_c>* m_uop_pool; /**< uop pool */ \
+    rob_c* m_rob; /**< reorder buffer */ \
+    smc_rob_c* m_gpu_rob; /**< gpu reorder buffer */ \
+    Unit_Type m_unit_type; /**< unit type */ \
 // end macro
 
 
@@ -173,6 +173,9 @@ class retire_c
      */
     void deallocate_retire_data(int);
 
+    /**
+     * Get the number of retired instruction periodically
+     */
     int get_periodic_inst_count(void)
     {
       int result = m_period_inst_count;
@@ -203,7 +206,7 @@ class retire_c
     void repeat_traces(process_s*);
 
   private:
-    RETIRE_INTERFACE_DECL();
+    RETIRE_INTERFACE_DECL(); /**< declaration macro */
 
     bool                        m_retire_running; /**< retire enabled */
     Counter                     m_total_insts_retired; /**< total retired instructions */ 
@@ -213,7 +216,7 @@ class retire_c
     unordered_map<int, Counter> m_insts_retired; /**< number of retired inst. per thread */
     unordered_map<int, Counter> m_uops_retired; /**< number of retired uop per thread */
 
-    int m_period_inst_count;
+    int m_period_inst_count; /**< counter for periodic logging number of retired inst. */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

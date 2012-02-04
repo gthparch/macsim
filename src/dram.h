@@ -145,13 +145,16 @@ class dram_controller_c
      */
     void create_network_interface(void);
     
+    /**
+     * Print requests in the buffer
+     */
     void print_req(void);
     
   public:
     #define DRAM_REQ_PRIORITY_COUNT 12
     #define DRAM_STATE_COUNT 5
-    static int dram_req_priority[DRAM_REQ_PRIORITY_COUNT];
-    static const char* dram_state[DRAM_STATE_COUNT];
+    static int dram_req_priority[DRAM_REQ_PRIORITY_COUNT]; /**< dram request priority */
+    static const char* dram_state[DRAM_STATE_COUNT]; /**< dram state string */
 
   protected:
     /**
@@ -214,7 +217,6 @@ class dram_controller_c
 
     /**
      * Send a packet to the NoC
-     * @param req memory request
      */
     void send_packet(void);
 
@@ -272,24 +274,9 @@ class dram_controller_c
     int m_starvation_cycle; /**< number of cycles without completed requests*/
     int m_total_req; /**< total pending requests */
 
+    // interconnection
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
-    router_c* m_router;
-
-    Counter m_avg_latency;
-    Counter m_avg_latency_base;
-    int m_prev_avg_latency;
-    int m_prev_stable_avg_latency;
-    
-    Counter m_band;
-    Counter m_band_base;
-    int m_prev_band;
-    int m_prev_stable_band;
-    int m_avg_band;
-    int m_stable_counter;
-    
-    int m_dram_state;
-    ofstream temp_out;
-
+    router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */

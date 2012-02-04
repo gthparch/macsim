@@ -59,14 +59,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define EXEC_INTERFACE_DECL() \
-    int m_core_id; \
-    pqueue_c<int>** m_q_iaq; \
-    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; \
-    rob_c* m_rob; \
-    smc_rob_c* m_gpu_rob; \
-    bp_data_c* m_bp_data; \
-    frontend_c* m_frontend; \
-    Unit_Type m_unit_type; \
+    int m_core_id; /**< core id */ \
+    pqueue_c<int>** m_q_iaq; /**< ia queue */ \
+    pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; /**< gpu ia queue */ \
+    rob_c* m_rob; /**< reorder buffer */ \
+    smc_rob_c* m_gpu_rob; /**< gpu reorder buffer */ \
+    bp_data_c* m_bp_data; /**< branch prediction data */ \
+    frontend_c* m_frontend; /**< frontend pointer */ \
+    Unit_Type m_unit_type; /**< unit type */ \
 // end macro
 
 
@@ -112,9 +112,9 @@ POSSIBILITY OF SUCH DAMAGE.
 class exec_c
 {
   public:
-    /*! \fn exec_c(EXEC_INTERFACE_PARAMS())
-     *  \brief Constructor to exec_c class    
-     *  \param simBase - Pointer to base simulation class for perf/stat counters
+    /**
+     * \brief Constructor to exec_c class    
+     * \param simBase - Pointer to base simulation class for perf/stat counters
      */
     exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase);
 
@@ -195,7 +195,7 @@ class exec_c
      */
     exec_c& operator=(const exec_c& rhs);
 
-    EXEC_INTERFACE_DECL();
+    EXEC_INTERFACE_DECL(); /**< declaration macro */
 
     uns16   m_int_sched_rate; /**< int schedule rate */
     uns16   m_mem_sched_rate; /**< memory schedule rate */

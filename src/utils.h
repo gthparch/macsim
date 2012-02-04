@@ -211,6 +211,9 @@ class pool_c
       m_poolsize += m_poolexpand_unit;
     }
 
+    /**
+     * Return the size of a pool
+     */
     int size(void)
     {
       return m_poolsize; 
@@ -390,6 +393,9 @@ class multi_key_map_c
      */
     int insert(int key1, int key2);
 
+    /**
+     * Delete an entry with key1
+     */
     void delete_table(int key1);
 
   private:
@@ -404,35 +410,64 @@ class multi_key_map_c
 class cache_partition_framework_c
 {
   public:
+    /**
+     * Constructor
+     */
     cache_partition_framework_c(macsim_c* simBase);
+
+    /**
+     * Destructor
+     */
     ~cache_partition_framework_c();
   
+    /**
+     * Run a cycle (tick)
+     */
     void run_a_cycle();
+
+    /** 
+     * Get PSEL mask value
+     */
     inline bool get_psel_mask(void)
     {
       return m_psel_mask[0];
     }
 
+    /**
+     * Get PSEL mask value with application id
+     */
     inline bool get_psel_mask(int appl_id)
     {
       return m_psel_mask[appl_id];
     }
 
+    /**
+     * Get performance mask
+     */
     inline bool get_performance_mask(void)
     {
       return m_performance_mask[0];
     }
 
+    /**
+     * Get performance mask with application id
+     */
     inline bool get_performance_mask(int appl_id)
     {
       return m_performance_mask[appl_id];
     }
 
+    /**
+     * set application type
+     */
     inline void set_appl_type(int appl_id, bool ptx)
     {
       m_appl_type[appl_id] = ptx;
     }
 
+    /**
+     * get application type
+     */
     inline bool get_appl_type(int appl_id)
     {
       return m_appl_type[appl_id];
@@ -440,10 +475,10 @@ class cache_partition_framework_c
 
 
   private:
-    ofstream m_file;
-    bool m_psel_mask[10];
-    bool m_performance_mask[10]; // true: huge memory-intensity
-    bool m_appl_type[100]; // false: cpu, true: gpu
+    ofstream m_file; /**< output stream */
+    bool m_psel_mask[10]; /**< PSEL mask */
+    bool m_performance_mask[10]; /**< true: huge memory-intensity */
+    bool m_appl_type[100]; /**< false: cpu, true: gpu */
     
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 };

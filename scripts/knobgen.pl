@@ -229,11 +229,24 @@ sub writeHeader
 
   print ALLKNOBS_H "#define KNOB(var) m_simBase->m_knobs->var\n\n"; 
   
+  print ALLKNOBS_H "///////////////////////////////////////////////////////////////////////////////////////////////\n";
+  print ALLKNOBS_H "/// \\brief knob variables holder\n";
+  print ALLKNOBS_H "///////////////////////////////////////////////////////////////////////////////////////////////\n";
   print ALLKNOBS_H "class all_knobs_c {\n";
   
   print ALLKNOBS_H "\tpublic:\n";
-  print ALLKNOBS_H "\t\tall_knobs_c();\n";
+  print ALLKNOBS_H "\t\t/**\n";
+  print ALLKNOBS_H "\t\t * Constructor\n";
+  print ALLKNOBS_H "\t\t */\n";
+  print ALLKNOBS_H "\t\tall_knobs_c();\n\n";
+
+  print ALLKNOBS_H "\t\t/**\n";
+  print ALLKNOBS_H "\t\t * Destructor\n";
+  print ALLKNOBS_H "\t\t */\n";
   print ALLKNOBS_H "\t\t~all_knobs_c();\n\n";
+  print ALLKNOBS_H "\t\t/**\n";
+  print ALLKNOBS_H "\t\t * Register Knob Variables\n";
+  print ALLKNOBS_H "\t\t */\n";
   print ALLKNOBS_H "\t\tvoid registerKnobs(KnobsContainer *container);\n\n";
   
   print ALLKNOBS_H "\tpublic:\n";

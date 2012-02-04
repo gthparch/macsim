@@ -87,8 +87,11 @@ class queue_c
    * Queue sort function based on the priority
    */
   struct sort_func {
-    macsim_c* m_simBase;
-    sort_func(macsim_c* simBase) {m_simBase = simBase;};
+    macsim_c* m_simBase; /**< pointer to the base simulation class */
+    /**
+     * Assign a base class pointer
+     */
+    sort_func(macsim_c* simBase) {m_simBase = simBase;}; 
     bool operator()(mem_req_s* a, mem_req_s* b); /**< comparison function */
   }; /**< sort function */
 
@@ -313,8 +316,10 @@ class dcu_c
 
     memory_c* m_memory; /**< pointer to the memory system */
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
+
+    // interconnection
     ManifoldProcessor* m_terminal; /**< terminal to the NoC router */
-    router_c* m_router;
+    router_c* m_router; /**< router */
 };
 
 
@@ -324,7 +329,14 @@ class dcu_c
 class memory_c
 {
   public:
+    /**
+     * Constructor
+     */
     memory_c(macsim_c* simBase);
+
+    /**
+     * Destructor
+     */
     virtual ~memory_c() = 0;
 
     /**
@@ -437,6 +449,9 @@ class memory_c
      */
     void init(void);
 
+    /**
+     * Handle coherence traffic (currently empty, will support coherence soon)
+     */
     void handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache);
     
 
@@ -503,7 +518,7 @@ class memory_c
     Counter m_stop_prefetch; /**< when set, no prefetches will be inserted */
     int m_l3_interleave_factor; /**< mask bit for L3 id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
-    map<int, int>* m_dst_map;
+    map<int, int>* m_dst_map; /**< destination id mapping function */
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */

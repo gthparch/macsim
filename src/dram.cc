@@ -262,9 +262,6 @@ dram_controller_c::~dram_controller_c()
   delete[] m_data_avail;
   delete[] m_bank_ready;
   delete[] m_bank_timestamp;
-
-  temp_out.close();
-
   delete m_output_buffer;
 }
 
@@ -497,9 +494,6 @@ void dram_controller_c::bank_schedule_complete(void)
       
       STAT_EVENT(DRAM_AVG_LATENCY_BASE);
       STAT_EVENT_N(DRAM_AVG_LATENCY, m_simBase->m_simulation_cycle - m_current_list[ii]->m_timestamp);
-
-      m_avg_latency += m_simBase->m_simulation_cycle - m_current_list[ii]->m_timestamp;
-      ++m_avg_latency_base;
 
       on_complete(m_current_list[ii]);
       // wb request will be retired immediately
@@ -816,7 +810,6 @@ bool dram_controller_c::avail_data_bus(int channel_id)
 // acquire data bus.
 Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool gpu_req)
 {
-  m_band += req_size;
   total_dram_bandwidth += req_size;
   STAT_EVENT_N(BANDWIDTH_TOT, req_size);
   Counter latency;

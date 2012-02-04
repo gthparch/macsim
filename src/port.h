@@ -71,6 +71,7 @@ class port_c
      * @param read number of read ports
      * @param write number of write ports
      * @param writes_prevent_reads write port access will block read port access
+     * @param simBase the pointer to the base simulation class
      */
     port_c (string name, uns read, uns write, bool writes_prevent_reads, macsim_c* simBase);
     

@@ -46,17 +46,20 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_types.h"
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief noc packet information (will be deprecated)
+///////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct noc_entry_s {
-  int     m_src;
-  int     m_dst;
-  int     m_msg;
-  Counter m_rdy;
-  mem_req_s* m_req;
+  int     m_src; /**< packet src */
+  int     m_dst; /**< packet dst */
+  int     m_msg; /**< msg type */
+  Counter m_rdy; /**< ready cycle */
+  mem_req_s* m_req; /**< pointer to the request */
 } noc_entry_s;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// NoC interface class
+/// \brief NoC interface class (will be deprecated)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class noc_c
 {
@@ -82,17 +85,16 @@ class noc_c
     void run_a_cycle();
 
   private:
-    memory_c* m_memory;
-    pool_c<noc_entry_s>* m_pool;
+    memory_c* m_memory; /**< pointer to the memory class */
+    pool_c<noc_entry_s>* m_pool; /**< entry pool */
 
     // uplink
-    list<noc_entry_s*>* m_cpu_entry_up;
-    list<noc_entry_s*>* m_cpu_entry_down;
+    list<noc_entry_s*>* m_cpu_entry_up; /**< cpu request list to upper level */
+    list<noc_entry_s*>* m_cpu_entry_down; /**< cpu request list to lower level */
     
-    list<noc_entry_s*>* m_gpu_entry_up;
-    list<noc_entry_s*>* m_gpu_entry_down;
+    list<noc_entry_s*>* m_gpu_entry_up; /**< gpu request list to upper level */
+    list<noc_entry_s*>* m_gpu_entry_down; /**< cpu request list to lower level */
 
-    macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
-
+    macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };
 #endif

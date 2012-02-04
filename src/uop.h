@@ -284,20 +284,11 @@ class uop_c
      */
     void allocate();
     
-    // uop memory type string
-    static const char *g_mem_type_name[NUM_MEM_TYPES];
-
-    // uop state string
-    static const char *g_uop_state_name[NUM_OP_STATES];
-
-    // branch type string
-    static const char *g_cf_type_name[NUM_CF_TYPES];
-
-    // uop dependence type string
-    static const char *g_dep_type_name[NUM_DEP_TYPES];
-
-    // uop type string
-    static const char *g_uop_type_name[NUM_UOP_TYPES];
+    static const char *g_mem_type_name[NUM_MEM_TYPES]; /**< uop memory type string */
+    static const char *g_uop_state_name[NUM_OP_STATES]; /**< uop state string */
+    static const char *g_cf_type_name[NUM_CF_TYPES]; /**< branch type string */
+    static const char *g_dep_type_name[NUM_DEP_TYPES]; /**< uop dependence type string */
+    static const char *g_uop_type_name[NUM_UOP_TYPES]; /**< uop type string */
 
 
     Counter           m_uop_num; /**< uop number */
@@ -368,7 +359,7 @@ class uop_c
     bool              m_req_fp_reg; /**< need fp register */
     int               m_dcache_bank_id; /**< dcache bank id */
     bool              m_bypass_llc; /**< bypass last level cache */
-    bool              m_skip_llc;
+    bool              m_skip_llc; /**< skip last level cache */
 
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */

@@ -57,6 +57,7 @@ class schedule_ooo_c : public schedule_c
      *  \param exec - Pointer to m_execution unit
      *  \param unit_type - Parameter used to identify knob width
      *  \param frontend - Pointer to front end queue
+     *  \param simBase - simulation base class pointer
      *  \return void 
      */
     schedule_ooo_c(int core_id, pqueue_c<int>** q_iaq, rob_c* rob, exec_c* exec, 

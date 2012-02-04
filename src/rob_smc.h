@@ -59,6 +59,7 @@ class smc_rob_c
      *  \brief Create a Reorder Buffer data structure.
      *  \param type - Core type indicator
      *  \param core_id - core id
+     *  \param simBase - simulation base class
      *  \return void. 
      */
     smc_rob_c(Unit_Type type, int core_id, macsim_c* simBase);

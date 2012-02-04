@@ -81,8 +81,19 @@ class bug_detector_c
      */
     void print(int core_id, int thread_id);
 
+    /**
+     * Record noc packets
+     */
     void allocate_noc(mem_req_s* req);
+
+    /**
+     * Deallocate serviced noc packets
+     */
     void deallocate_noc(mem_req_s* req);
+
+    /**
+     * Print NoC information
+     */
     void print_noc();
 
   private:
@@ -92,8 +103,7 @@ class bug_detector_c
     uint64_t *m_latency_count; /**< total uop count */
 
     unordered_map<mem_req_s*, uint64_t>* m_packet_table; /**< memeory requests in noc */
-
     
-    macsim_c* m_simBase;
+    macsim_c* m_simBase; /**< pointer to the simulation base class */
 };
 #endif

@@ -277,11 +277,11 @@ class trace_read_c
      */
     void setup_trace(int core_id, int sim_thread_id);
 
-    static const char *g_tr_reg_names[MAX_TR_REG];
-    static const char* g_tr_opcode_names[MAX_TR_OPCODE_NAME];
-    static const char* g_tr_cf_names[10];
-    static const char *g_optype_names[37];
-    static const char *g_mem_type_names[20];
+    static const char *g_tr_reg_names[MAX_TR_REG]; /**< register name string */
+    static const char* g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
+    static const char* g_tr_cf_names[10]; /**< cf type string */
+    static const char *g_optype_names[37]; /**< opcode type string */
+    static const char *g_mem_type_names[20]; /**< memeory request type string */
 
   private:
       /**
@@ -367,8 +367,8 @@ class trace_read_c
     int m_int_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping table (int) */
     int m_fp_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping tabpe (fp) */
 
-    uint32_t  dprint_count;
-    ofstream* dprint_output;
+    uint32_t  dprint_count; /**< dumped instruction count */
+    ofstream* dprint_output; /**< dump output file stream */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

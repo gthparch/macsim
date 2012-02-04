@@ -52,11 +52,11 @@ POSSIBILITY OF SUCH DAMAGE.
 class rob_c
 {
   public:
-    /*! \fn void rob_c(Unit_Type type)
-     *  \brief Create a Reorder Buffer data structure.
-     *  \param type - Core type indicator
-     *  \param simBase - Pointer to base simulation class for perf/stat counters     
-     *  \return void. 
+    /**
+     * \brief Create a Reorder Buffer data structure.
+     * \param type - Core type indicator
+     * \param simBase - Pointer to base simulation class for perf/stat counters     
+     * \return void. 
      */
     rob_c(Unit_Type type, macsim_c* simBase);
 

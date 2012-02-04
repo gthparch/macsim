@@ -67,19 +67,19 @@ POSSIBILITY OF SUCH DAMAGE.
 // end macro
 
 #define FRONTEND_INTERFACE_DECL() \
-    int m_core_id; \
-    frontend_c* m_frontend; \
-    cache_c* m_icache; \
-    pqueue_c<int*>* m_q_frontend; \
-    pool_c<uop_c>* m_uop_pool; \
-    exec_c* m_exec; \
-    bp_data_c* m_bp_data; \
-    map_c* m_map; \
-    int& m_running_thread_num; \
-    int& m_fetching_thread_num; \
-    int& m_unique_scheduled_thread_num; \
-    int& m_last_terminated_tid; \
-    Unit_Type m_unit_type; \
+    int m_core_id; /**< core id */ \
+    frontend_c* m_frontend; /**< frontend pointer */ \
+    cache_c* m_icache; /**< icache pointer */ \
+    pqueue_c<int*>* m_q_frontend; /**< frontend queue */ \
+    pool_c<uop_c>* m_uop_pool; /**< uop pool */ \
+    exec_c* m_exec; /**< pointer to execution stage class */ \
+    bp_data_c* m_bp_data; /**< branch prediction data */ \
+    map_c* m_map; /**< dependence information */ \
+    int& m_running_thread_num; /**< number of running threads */ \
+    int& m_fetching_thread_num; /**< number of currently fetching threads */ \
+    int& m_unique_scheduled_thread_num; /**< number of unique threads */ \
+    int& m_last_terminated_tid; /**< lastly terminated thread id */ \
+    Unit_Type m_unit_type; /**< unit type */ \
 // end macro
 
 #define FRONTEND_INTERFACE_ARGS() \
@@ -247,8 +247,8 @@ typedef struct frontend_s {
 class frontend_c
 {
   public:
-    /*! \fn frontend_c(FRONTEND_INTERFACE_PARAMS())
-     *  \brief Constructor to class frontend_c
+    /**
+     * \brief Constructor to class frontend_c
      */
     frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase);
 
@@ -376,6 +376,9 @@ class frontend_c
      */
     virtual int fetch();
     
+    /**
+     * Access BTB (branch target buffer)
+     */
     bool btb_access(uop_c *uop); 
 
     /**
@@ -402,7 +405,7 @@ class frontend_c
      */
     frontend_c();
 
-    /*! \fn FRONTEND_MODE process_ifetch(unsigned int sim_thread_id)
+    /**
      *  \brief Functio to fetch an instruction from a thread
      *  \param sim_thread_id - Thread id
      *  \param fetch_data - fetch information for the thread
@@ -419,7 +422,7 @@ class frontend_c
     void send_uop_to_qfe(uop_c *);
 
   protected:
-    FRONTEND_INTERFACE_DECL();
+    FRONTEND_INTERFACE_DECL(); /**< declaration macro */
 
     bool          m_fe_stall; /**< frontend stalled */
     bool          m_fe_running; /**< enabled frontend */
@@ -438,7 +441,7 @@ class frontend_c
 
     bool          m_dcache_bank_busy[129]; /**< dcache bank busy status */
 
-    macsim_c*     m_simBase; /** macsim base class for simulation globals */
+    macsim_c*     m_simBase; /**< macsim base class for simulation globals */
     
     // FIXME : implement itlb
     // tlb_c            *m_itlb;

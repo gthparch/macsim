@@ -45,24 +45,33 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// \Branch Target Buffer 
+/// \brief Branch Target Buffer 
 /// BTB modeling 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
 class bp_targ_c
 {
-   private:
-     cache_c* btb;
-     uns m_core_id;
-
    public:
+     /**
+      * Constructor
+      */
      bp_targ_c(uns core_id, macsim_c* simBase); 
+
+     /**
+      * branch prediction
+      */
      Addr pred (uop_c *uop); 
-     void  update (uop_c *uop); 
+
+     /**
+      * bp update after it is resolved
+      */
+     void update (uop_c *uop); 
 
    protected:
-     macsim_c* m_simBase; // ** macsim_c base class for simulation globals */ 
+     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */ 
+
+   private:
+     cache_c* btb; /**< BTB */
+     uns m_core_id; /**< Core id */
 };
 
 

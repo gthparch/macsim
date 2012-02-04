@@ -78,7 +78,7 @@ class cache_entry_c
     bool          m_dirty;        //!< data is dirty 
     int           m_appl_id;      //!< application id
     bool          m_gpuline;      //!< gpu cache line
-    bool          m_skip;
+    bool          m_skip; //!< skip LLC
     friend class  cache_c; 
 
     cache_entry_c();
@@ -93,11 +93,18 @@ class cache_set_c
   friend class cache_c;
 
   public:
+    /**
+     * Constructor
+     */
     cache_set_c(int assoc);
+
+    /**
+     * Destructor
+     */
     ~cache_set_c();
 
   public:
-    cache_entry_c* m_entry;
+    cache_entry_c* m_entry; /**< cache entries */
     int m_assoc; /**< associativity */
     int m_num_cpu_line; /**< number of cpu cache line */
     int m_num_gpu_line; /**< number of gpu cache line */
@@ -135,7 +142,7 @@ class cache_c
 
     virtual ~cache_c();
 
-    /*! \fn void set_core_id(int c_id)
+    /**
      *  \brief Function to assign a core id
      *  \param c_id - Core id
      *  \return void 
@@ -145,7 +152,7 @@ class cache_c
       m_core_id = c_id; 
     } 
 
-    /*! \fn void* cache_c::find_tag_and_set (Addr addr, Addr *tag, int *set)
+    /**
      *  \brief Function to find tag and set from a given address.
      *  \param addr - Address
      *  \param tag - Tag extracted from the address(updated by the function)
@@ -164,6 +171,9 @@ class cache_c
      */
     void* access_cache (Addr addr, Addr *line_addr, bool update_repl, int appl_id);
 
+    /**
+     * Update a cache line on access
+     */
     virtual void update_cache_on_access(Addr tag, int set, int appl_id);
 
     /**
@@ -181,11 +191,11 @@ class cache_c
      */
     virtual void update_set_on_replacement(Addr tag, int appl_id, int set_id, bool gpuline);
 
-    /*
-     *  \brief Funtion to find line where a new insert could be performed.
-     *  \param set - Cache set under consideration
-     *  \param appl_id - application id
-     *  \return cache_entry_c - find replaceable entry in set 
+    /**
+     * \brief Funtion to find line where a new insert could be performed.
+     * \param set - Cache set under consideration
+     * \param appl_id - application id
+     * \return cache_entry_c - find replaceable entry in set 
      */
     virtual cache_entry_c* find_replacement_line(int set, int appl_id);
 
@@ -197,15 +207,16 @@ class cache_c
      */
     cache_entry_c* find_replacement_line_from_same_type(int set, int appl_id, bool gpuline);
 
-    /*
-     *  \brief Funtion to initialize a new cache line.
-     *  \param ins_line - Line to be inserted
-     *  \param tag - Tag based on the address
-     *  \param addr - Address
-     *  \param appl_id - application id
-     *  \param gpuline - gpu cache line
-     *  \param set_id - set id
-     *  \return void 
+    /**
+     * \brief Funtion to initialize a new cache line.
+     * \param ins_line - Line to be inserted
+     * \param tag - Tag based on the address
+     * \param addr - Address
+     * \param appl_id - application id
+     * \param gpuline - gpu cache line
+     * \param set_id - set id
+     * \param skip - skip LLC
+     * \return void 
      */
     virtual void initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr, 
         int appl_id, bool gpuline, int set_id, bool skip);
@@ -225,61 +236,74 @@ class cache_c
         bool gpuline);
 #endif
 
-    /*
-     *  \brief Function to insert cache line(wrapper around worker_insert_cache)
+    /**
+     * \brief Function to insert cache line(wrapper around worker_insert_cache)
                To be used only after access_cache returned NULL. 
                Assumes no prefetching 
-     *  \param addr - Address
-     *  \param line_addr - Base line address (Updated by the function)
-     *  \param updated_line - Line replaced (Updated by the function) 
-               - used for write-back
-     *  \return void* - Pointer to the data of the new cache line
+     * \param addr - Address
+     * \param line_addr - Base line address (Updated by the function)
+     * \param repl_line replaced line address
+     * \param appl_id application id
+     * \param gpuline line from gpu cores
+     * \return void* - Pointer to the data of the new cache line
      */
     void * insert_cache (Addr addr, Addr *line_addr, Addr *repl_line, int appl_id, 
         bool gpuline);
     
+    /**
+     * \brief Function to insert cache line(wrapper around worker_insert_cache)
+               To be used only after access_cache returned NULL. 
+               Assumes no prefetching 
+     * \param addr - Address
+     * \param line_addr - Base line address (Updated by the function)
+     * \param repl_line replaced line address
+     * \param appl_id application id
+     * \param gpuline line from gpu cores
+     * \param skip 
+     * \return void* - Pointer to the data of the new cache line
+     */
     void * insert_cache (Addr addr, Addr *line_addr, Addr *repl_line, int appl_id, 
         bool gpuline, bool skip);
 
-    /*! \fn void cache_c::null_cache_line_fields (cache_entry_c *line)
-     *  \brief Function to null out all fields in the caache line 
+    /**
+     * \brief Function to null out all fields in the caache line 
         being invalidated 
-     *  \param line - Cache line being invalidated
-     *  \return bool - Dirty flag
+     * \param line - Cache line being invalidated
+     * \return bool - Dirty flag
      */
     bool null_cache_line_fields(cache_entry_c *line);
 
-    /*! \fn void cache_c::invalidate_cache_line (Addr addr)
-     *  \brief Function to invalidate cache line. 
-     *  \param addr - Address
-     *  \return bool - indicate if the cache line being deleted was dirty
+    /**
+     * \brief Function to invalidate cache line. 
+     * \param addr - Address
+     * \return bool - indicate if the cache line being deleted was dirty
      */
     bool invalidate_cache_line (Addr addr);
 
-    /*! \fn void cache_c::base_cache_line (Addr addr) 
-     *  \brief Function to return base cache line. 
-     *  \param addr - Address
-     *  \return Addr - Base cache line
+    /**
+     * \brief Function to return base cache line. 
+     * \param addr - Address
+     * \return Addr - Base cache line
      */
     Addr base_cache_line (Addr addr);
 
-    /*! \fn void cache_c::invalidate_cache (void) 
-     *  \brief Function to null out cache fields. 
-     *  \return void
+    /**
+     * \brief Function to null out cache fields. 
+     * \return void
      */
     void invalidate_cache(void);
 
-    /*! \fn void cache_c::get_bank_num (Addr addr) 
-     *  \brief Function to get bank number for the addr. 
-     *  \param addr - Address
-     *  \return int - Bank Number
+    /**
+     * \brief Function to get bank number for the addr. 
+     * \param addr - Address
+     * \return int - Bank Number
      */
     int get_bank_num(Addr addr);
 
-    /*! \fn void cache_c::find_min_lru (int set) 
-     *  \brief Function to find the line with least access time in the set. 
-     *  \param set - Set
-     *  \return int - lower of (Least access time in the set or current cycle) 
+    /**
+     * \brief Function to find the line with least access time in the set. 
+     * \param set - Set
+     * \return int - lower of (Least access time in the set or current cycle) 
      */
     Counter find_min_lru (int set);
 
