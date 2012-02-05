@@ -158,7 +158,7 @@ void smc_allocate_c::run_a_cycle(void)
         gpu_alloc_q_type = gen_ALLOCQ;
         q_type           = *KNOB(KNOB_GEN_ALLOCQ_INDEX);
       }   
-      gpu_alloc_q = m_gpu_alloc_q[req_fp_reg ? *KNOB(KNOB_FLOAT_ALLOCQ_INDEX): *KNOB(KNOB_GEN_ALLOCQ_INDEX)];
+      gpu_alloc_q = m_gpu_alloc_q[q_type];
     }
 
     // FIXME

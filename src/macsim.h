@@ -28,12 +28,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
-* File         : macsim.h
-* Author       : Jaekyu Lee
-* Date         : 3/25/2011
-* SVN          : $Id: main.cc 911 2009-11-20 19:08:10Z kacear $:
-* Description  : MacSim Wrapper Class
-*********************************************************************************************/
+ * File         : macsim.h
+ * Author       : Jaekyu Lee
+ * Date         : 3/25/2011
+ * SVN          : $Id: main.cc 911 2009-11-20 19:08:10Z kacear $:
+ * Description  : MacSim Wrapper Class
+ *********************************************************************************************/
 
 #ifndef MACSIM_H_INCLUDED
 #define MACSIM_H_INCLUDED

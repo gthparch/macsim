@@ -330,6 +330,8 @@ class dc_frfcfs_c : public dram_controller_c
 };
 
 
+// wrapper function to allocate a dram scheduler
 dram_controller_c* fcfs_controller(macsim_c* simBase);
 dram_controller_c* frfcfs_controller(macsim_c* simBase);
+
 #endif

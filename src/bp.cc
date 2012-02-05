@@ -81,7 +81,8 @@ bp_recovery_info_c::~bp_recovery_info_c()
 bp_data_c::bp_data_c(int core_id, macsim_c* simBase) 
 {
   m_core_id = core_id;
-  m_bp      = bp_factory_c::get()->allocate(simBase->m_knobs->KNOB_BP_DIR_MECH->getValue(), simBase);
+  string bp_type = simBase->m_knobs->KNOB_BP_DIR_MECH->getValue();
+  m_bp      = bp_factory_c::get()->allocate(bp_type, simBase);
   m_bp_targ_pred = new bp_targ_c(m_core_id, simBase); 
 }
 

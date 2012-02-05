@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "all_knobs.h"
 
-#define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SCHEDULE_STAGE, ## args) 
+#define DEBUG(args...)   _DEBUG(*KNOB(KNOB_DEBUG_SCHEDULE_STAGE), ## args) 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,54 +79,28 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_a
   // configuration
   switch (m_unit_type) {
     case UNIT_SMALL:
-      knob_num_threads      = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_CORE;
+      knob_num_threads      = *KNOB(KNOB_MAX_THREADS_PER_CORE);
       break;
     case UNIT_MEDIUM:
-      knob_num_threads      = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_MEDIUM_CORE;
+      knob_num_threads      = *KNOB(KNOB_MAX_THREADS_PER_MEDIUM_CORE);
       break;
     case UNIT_LARGE:
-      knob_num_threads      = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_LARGE_CORE;
+      knob_num_threads      = *KNOB(KNOB_MAX_THREADS_PER_LARGE_CORE);
       break;
   }
 
-#if 0
-  m_schedule_lists     = new int *[knob_num_threads];
-  m_first_schlist_ptrs = new int[knob_num_threads];
-  m_last_schlist_ptrs  = new int[knob_num_threads];
-  m_schedule_arbiter   = new int[*m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER];
-  fill_n(m_schedule_arbiter, static_cast<int>(*m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER), -1);
-#endif
-  m_schedule_modulo = (*m_simBase->m_knobs->KNOB_GPU_SCHEDULE_RATIO - 1); 
+  m_schedule_modulo = (*KNOB(KNOB_GPU_SCHEDULE_RATIO - 1)); 
   m_schlist_size    = MAX_GPU_SCHED_SIZE * knob_num_threads;
   m_schlist_entry   = new int[m_schlist_size];
   m_schlist_tid     = new int[m_schlist_size];
   m_first_schlist   = 0;
   m_last_schlist    = 0;
-
-#if 0
-  for (int i = 0; i < knob_num_threads; ++i) {
-    m_schedule_lists[i]     = new int[MAX_GPU_SCHED_SIZE];
-    ASSERT(m_schedule_lists[i]);
-
-    fill_n(m_schedule_lists[i], MAX_GPU_SCHED_SIZE, -1);
-    m_first_schlist_ptrs[i] = 0;
-    m_last_schlist_ptrs[i]  = 0;
-    m_free_list.push_back(i);
-  }
-#endif
 }
 
 
 // schedule_smc_c destructor
-schedule_smc_c::~schedule_smc_c(void) {
-#if 0
-  for (int i = 0; i < knob_num_threads; i++) {
-    delete [] m_schedule_lists[i];
-  }
-  delete [] m_schedule_lists;
-  delete [] m_first_schlist_ptrs;
-  delete [] m_last_schlist_ptrs;
-#endif
+schedule_smc_c::~schedule_smc_c(void) 
+{
   delete[] m_schlist_entry;
   delete[] m_schlist_tid;
 }
@@ -149,29 +123,30 @@ void schedule_smc_c::advance(int q_index) {
     STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
     STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
-	switch (cur_uop->m_uop_type){
-		case UOP_FMEM:
-		case UOP_FCF:
-		case UOP_FCVT:
-		case UOP_FADD:    
-		case UOP_FMUL:    
-		case UOP_FDIV:    
-		case UOP_FCMP:    
-		case UOP_FBIT:    
-		case UOP_FCMOV:
-			STAT_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
-			break;
-	} 
+    switch (cur_uop->m_uop_type){
+      case UOP_FMEM:
+      case UOP_FCF:
+      case UOP_FCVT:
+      case UOP_FADD:    
+      case UOP_FMUL:    
+      case UOP_FDIV:    
+      case UOP_FCMP:    
+      case UOP_FBIT:    
+      case UOP_FCMOV:
+        STAT_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
+        break;
+    } 
+
     ALLOCQ_Type allocq = (*m_rob)[allocq_entry.m_rob_entry]->m_allocq_num;
     if ((m_count[allocq] >= m_sched_rate[allocq]) ||
-    	(m_num_per_sched[allocq] >= m_sched_size[allocq])) {
+        (m_num_per_sched[allocq] >= m_sched_size[allocq])) {
       break;
     }
 
 
     // dequeue the element from the alloc queue
     m_gpu_allocq[q_index]->dequeue();
-    
+
 
     // if the entry has been flushed
     if (cur_uop->m_bogus || (cur_uop->m_done_cycle) ) {
@@ -185,7 +160,7 @@ void schedule_smc_c::advance(int q_index) {
     cur_uop->m_in_iaq       = false;
     cur_uop->m_in_scheduler = true;
 
-//    int queue = get_reserved_sched_queue(allocq_entry.m_thread_id);
+    //    int queue = get_reserved_sched_queue(allocq_entry.m_thread_id);
     int entry = allocq_entry.m_rob_entry;
 
     m_schlist_entry[m_last_schlist] = entry;
@@ -198,20 +173,6 @@ void schedule_smc_c::advance(int q_index) {
         m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
    	
     STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
-
-#if 0
-    // update counters 
-    m_schedule_lists[queue][m_last_schlist_ptrs[queue]] = entry;
-    m_last_schlist_ptrs[queue]++;
-    m_last_schlist_ptrs[queue] %= MAX_GPU_SCHED_SIZE;
-    m_num_in_sched++;
-    m_num_per_sched[allocq]++;
-
-    DEBUG("cycle_m_count:%lld m_num_in_sched:%d entry:%d (*m_rob)"
-        "[allocq_entry.rob_entry]->in_scheduler:%d allocq_number:%d q_index:%d \n",
-        m_cur_core_cycle, m_num_in_sched, allocq_entry.m_rob_entry,
-        (*m_rob)[allocq_entry.m_rob_entry]->m_in_scheduler, allocq, q_index);
-#endif
   }
 }
 
@@ -423,7 +384,7 @@ void schedule_smc_c::run_a_cycle(void)
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
 
   // GPU : schedule every N cycles (G80:4, Fermi:2)
-  m_schedule_modulo = (m_schedule_modulo + 1) % *m_simBase->m_knobs->KNOB_GPU_SCHEDULE_RATIO;
+  m_schedule_modulo = (m_schedule_modulo + 1) % *KNOB(KNOB_GPU_SCHEDULE_RATIO);
   if (m_schedule_modulo) 
     return;
 
@@ -444,7 +405,7 @@ void schedule_smc_c::run_a_cycle(void)
     // -------------------------------------
     if (!m_num_in_sched || 
         m_first_schlist == m_last_schlist || 
-        count == *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER) 
+        count == *KNOB(KNOB_NUM_WARP_SCHEDULER)) 
       break;
 
     SCHED_FAIL_TYPE sched_fail_reason;
@@ -493,64 +454,4 @@ void schedule_smc_c::run_a_cycle(void)
 }
 
 
-#if 0
-// when a thread terminates, free the sheduler queue allocated to it
-void schedule_smc_c::free_sched_queue(int thread_id) 
-{
-  auto itr = m_thread_to_list_id_map.find(thread_id);
-  auto end = m_thread_to_list_id_map.end();
-  if (itr != end) {
-    m_free_list.push_back(itr->second);
-    m_thread_to_list_id_map.erase(itr);
-  }
-}
-
-
-// called from : schedule_smc_c::advance()
-// returns the index of the scheduler queue assigned to a thread
-int schedule_smc_c::get_reserved_sched_queue(int thread_id) 
-{
-  auto itr = m_thread_to_list_id_map.find(thread_id);
-  auto end = m_thread_to_list_id_map.end();
-
-  if (itr != end) {
-    return itr->second;
-  }
-  else {
-    return -1;
-  }
-}
-
-
-// called from schedule_smc_c::reserve_sched_queue()
-// initialize a scheduler queue
-void schedule_smc_c::reinit_sched_queue(int entry) 
-{
-  m_first_schlist_ptrs[entry] = 0;
-  m_last_schlist_ptrs[entry]  = 0;
-  fill_n(m_schedule_lists[entry], MAX_GPU_SCHED_SIZE, -1); //not required
-}
-
-
-// called from core_c::allocate_core_data()
-// when a thread is assigned to a core, a sheduler queue is assigned to it
-int schedule_smc_c::reserve_sched_queue(int thread_id) 
-{
-  auto itr = m_thread_to_list_id_map.find(thread_id);
-  auto end = m_thread_to_list_id_map.end();
-  if (itr == end) {
-    ASSERTM(m_free_list.size(), "size:%d\n", 
-        static_cast<int>(m_free_list.size()));
-    ASSERT(m_free_list.size());
-    int index = m_free_list.front();
-    m_free_list.pop_front();
-
-    m_thread_to_list_id_map.insert(pair<int, int>(thread_id, index));
-    reinit_sched_queue(index);
-
-    return index;
-  }
-  return -1; 
-}
-#endif
 

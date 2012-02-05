@@ -267,17 +267,17 @@ void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
       }
     }
 
-    if ((entry->s_cnt[entry->curr_state] >= *m_simBase->m_knobs->KNOB_PREF_STRIDE_SINGLE_THRESH)) {
+    if ((entry->s_cnt[entry->curr_state] >= *KNOB(KNOB_PREF_STRIDE_SINGLE_THRESH))) {
       // single stride stream
       entry->trained = true;
       entry->num_states = 1;
       entry->curr_state = 0;
       entry->stride[0] = entry->stride[entry->curr_state];
       entry->pref_last_index = entry->last_index + 
-                               (entry->stride[0]**m_simBase->m_knobs->KNOB_PREF_STRIDE_STARTDISTANCE);
+                               (entry->stride[0] * *KNOB(KNOB_PREF_STRIDE_STARTDISTANCE));
     }
 
-    if (entry->recnt >= *m_simBase->m_knobs->KNOB_PREF_STRIDE_MULTI_THRESH) {
+    if (entry->recnt >= *KNOB(KNOB_PREF_STRIDE_MULTI_THRESH)) {
       Addr pref_index;
       entry->trained = true;
       entry->pref_count = entry->count;
@@ -305,7 +305,8 @@ void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
     // single stride case
     if (entry->num_states == 1 && stride == entry->stride[0]) {
       for (ii = 0; 
-          (ii < *m_simBase->m_knobs->KNOB_PREF_STRIDE_DEGREE && entry->pref_sent < *m_simBase->m_knobs->KNOB_PREF_STRIDE_DISTANCE); 
+          (ii < *KNOB(KNOB_PREF_STRIDE_DEGREE) && 
+           entry->pref_sent < *KNOB(KNOB_PREF_STRIDE_DISTANCE)); 
           ++ii, entry->pref_sent++) {
         pref_index = entry->pref_last_index + entry->stride[0];
         if (!hwp_common->pref_addto_l2req_queue(pref_index, hwp_info->id))
@@ -328,9 +329,10 @@ void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
       }
       // now send out prefetches
       for (ii = 0; 
-          (ii < *m_simBase->m_knobs->KNOB_PREF_STRIDE_DEGREE && entry->pref_sent < *m_simBase->m_knobs->KNOB_PREF_STRIDE_DISTANCE); 
+          (ii < *KNOB(KNOB_PREF_STRIDE_DEGREE) && 
+           entry->pref_sent < *KNOB(KNOB_PREF_STRIDE_DISTANCE)); 
           ++ii, entry->pref_sent++) { 
-        if (entry->pref_count==entry->s_cnt[entry->pref_curr_state]){
+        if (entry->pref_count == entry->s_cnt[entry->pref_curr_state]){
           pref_index = entry->pref_last_index + entry->strans[entry->pref_curr_state];
           if (!hwp_common->pref_addto_l2req_queue(pref_index, hwp_info->id))
             break; // q is full

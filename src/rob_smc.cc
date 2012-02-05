@@ -69,15 +69,15 @@ smc_rob_c::smc_rob_c(Unit_Type type, int core_id, macsim_c* simBase)
   // configuration
   switch (m_unit_type) {
     case UNIT_SMALL:
-      m_knob_num_threads = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_CORE;
+      m_knob_num_threads = *KNOB(KNOB_MAX_THREADS_PER_CORE);
       break;
 
     case UNIT_MEDIUM:
-      m_knob_num_threads = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_MEDIUM_CORE;
+      m_knob_num_threads = *KNOB(KNOB_MAX_THREADS_PER_MEDIUM_CORE);
       break;
 
     case UNIT_LARGE:
-      m_knob_num_threads = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_LARGE_CORE;
+      m_knob_num_threads = *KNOB(KNOB_MAX_THREADS_PER_LARGE_CORE);
       break;
   }
 
@@ -161,17 +161,14 @@ int smc_rob_c::reserve_rob(int thread_id)
   ASSERT(thread_id >= 0);
   assert(m_thread_to_rob_map.find(thread_id) == m_thread_to_rob_map.end());
 
-//  if (m_thread_to_rob_map.find(thread_id) == m_thread_to_rob_map.end()) {
-    ASSERT(m_free_list.size());
-    int index = m_free_list.front();
-    m_free_list.pop_front();
+  ASSERT(m_free_list.size());
+  int index = m_free_list.front();
+  m_free_list.pop_front();
 
-    m_thread_to_rob_map.insert(std::pair<int, int>(thread_id, index));
-    m_thread_robs[index]->reinit();
-    return index;
-//  }
+  m_thread_to_rob_map.insert(std::pair<int, int>(thread_id, index));
+  m_thread_robs[index]->reinit();
 
-//  return -1;
+  return index;
 }
 
 
@@ -180,14 +177,10 @@ void smc_rob_c::free_rob(int thread_id)
 {
   ASSERT(thread_id >= 0);
 
-//  auto itr = m_thread_to_rob_map.find(thread_id);
-//  auto end = m_thread_to_rob_map.end();
   assert(m_thread_to_rob_map.find(thread_id) != m_thread_to_rob_map.end());
 
-//  if (itr != end) {
-    m_free_list.push_back(m_thread_to_rob_map[thread_id]);
-    m_thread_to_rob_map.erase(thread_id);
-//  }
+  m_free_list.push_back(m_thread_to_rob_map[thread_id]);
+  m_thread_to_rob_map.erase(thread_id);
 }
 
 
@@ -214,8 +207,6 @@ bool sort_uops(uop_c *a, uop_c *b)
 // called by retire stage
 vector<uop_c *>* smc_rob_c::get_n_uops_in_ready_order(int n, Counter core_cycle) 
 {
-//  m_uop_list.clear();
-
   for (auto I = m_thread_to_rob_map.begin(), E = m_thread_to_rob_map.end(); I != E; ++I) {
     int index = I->second;
     rob_c *rob = m_thread_robs[index];

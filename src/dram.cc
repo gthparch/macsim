@@ -185,10 +185,10 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 {
   m_simBase = simBase;
 
-  m_num_bank             = *m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS;
-  m_num_channel          = *m_simBase->m_knobs->KNOB_DRAM_NUM_CHANNEL;
+  m_num_bank             = *KNOB(KNOB_DRAM_NUM_BANKS);
+  m_num_channel          = *KNOB(KNOB_DRAM_NUM_CHANNEL);
   m_num_bank_per_channel = m_num_bank / m_num_channel;
-  m_bus_width            = *m_simBase->m_knobs->KNOB_DRAM_BUS_WIDTH * *m_simBase->m_knobs->KNOB_DRAM_DDR_FACTOR; 
+  m_bus_width            = *KNOB(KNOB_DRAM_BUS_WIDTH) * *KNOB(KNOB_DRAM_DDR_FACTOR); 
   
   // bank
   m_buffer           = new list<drb_entry_s*>[m_num_bank];
@@ -201,7 +201,7 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_bank_timestamp   = new Counter[m_num_bank];
 
   for (int ii = 0; ii < m_num_bank; ++ii) {
-    for (int jj = 0; jj < *m_simBase->m_knobs->KNOB_DRAM_BUFFER_SIZE; ++jj) {
+    for (int jj = 0; jj < *KNOB(KNOB_DRAM_BUFFER_SIZE); ++jj) {
       drb_entry_s* new_entry = new drb_entry_s(m_simBase);
       m_buffer_free_list[ii].push_back(new_entry);
     }
@@ -231,20 +231,17 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
   m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
   m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
-  //m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET);
-//  SIZE/*m_simBase->m_knobs->KNOB_L3_LINE_SIZE/*m_simBase->m_knobs->KNOB_L3_ASSOC); 
-
 
   // latency
-  m_dram_one_cycle_cpu    = *m_simBase->m_knobs->KNOB_CPU_FREQUENCY / *m_simBase->m_knobs->KNOB_DRAM_FREQUENCY;
-  m_precharge_latency_cpu = static_cast<int>(m_dram_one_cycle_cpu * *m_simBase->m_knobs->KNOB_DRAM_PRECHARGE);
-  m_activate_latency_cpu  = static_cast<int>(m_dram_one_cycle_cpu * *m_simBase->m_knobs->KNOB_DRAM_ACTIVATE);
-  m_column_latency_cpu    = static_cast<int>(m_dram_one_cycle_cpu * *m_simBase->m_knobs->KNOB_DRAM_COLUMN);
+  m_dram_one_cycle_cpu    = *KNOB(KNOB_CPU_FREQUENCY) / *KNOB(KNOB_DRAM_FREQUENCY);
+  m_precharge_latency_cpu = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_PRECHARGE));
+  m_activate_latency_cpu  = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_ACTIVATE));
+  m_column_latency_cpu    = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_COLUMN));
   
-  m_dram_one_cycle_gpu    = *m_simBase->m_knobs->KNOB_GPU_FREQUENCY / *m_simBase->m_knobs->KNOB_DRAM_FREQUENCY;
-  m_precharge_latency_gpu = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_PRECHARGE);
-  m_activate_latency_gpu  = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_ACTIVATE);
-  m_column_latency_gpu    = static_cast<int>(m_dram_one_cycle_gpu * *m_simBase->m_knobs->KNOB_DRAM_COLUMN);
+  m_dram_one_cycle_gpu    = *KNOB(KNOB_GPU_FREQUENCY) / *KNOB(KNOB_DRAM_FREQUENCY);
+  m_precharge_latency_gpu = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_PRECHARGE));
+  m_activate_latency_gpu  = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_ACTIVATE));
+  m_column_latency_gpu    = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_COLUMN));
 
   // output buffer
   m_output_buffer = new list<mem_req_s*>;
@@ -289,9 +286,9 @@ bool dram_controller_c::insert_new_req(mem_req_s* mem_req)
           mem_req_c::mem_req_type_name[mem_req->m_type]);
   
   // Permutation-based Interleaving
-  if (*m_simBase->m_knobs->KNOB_DRAM_BANK_XOR_INDEX) {
+  if (*KNOB(KNOB_DRAM_BANK_XOR_INDEX)) {
     bid = bid ^ bid_xor;
-   }
+  }
 
   // check buffer full
   if (m_buffer_free_list[bid].empty()) {
@@ -423,7 +420,8 @@ void dram_controller_c::print_req(void)
     fprintf(fp, "bank_id:%d\n", ii);
     for (auto I = m_buffer[ii].begin(), E  = m_buffer[ii].end(); I != E; ++I) {
       fprintf(fp, "req_id:%-10d state:%-15s time:%lld delta:%lld\n", 
-          (*I)->m_req->m_id, dram_state[(*I)->m_state], (*I)->m_timestamp, CYCLE - (*I)->m_timestamp);
+          (*I)->m_req->m_id, dram_state[(*I)->m_state], (*I)->m_timestamp, 
+          CYCLE - (*I)->m_timestamp);
     }
   }
 
@@ -493,7 +491,7 @@ void dram_controller_c::bank_schedule_complete(void)
 
       
       STAT_EVENT(DRAM_AVG_LATENCY_BASE);
-      STAT_EVENT_N(DRAM_AVG_LATENCY, m_simBase->m_simulation_cycle - m_current_list[ii]->m_timestamp);
+      STAT_EVENT_N(DRAM_AVG_LATENCY, CYCLE - m_current_list[ii]->m_timestamp);
 
       on_complete(m_current_list[ii]);
       // wb request will be retired immediately
@@ -502,7 +500,8 @@ void dram_controller_c::bank_schedule_complete(void)
             m_id, m_current_list[ii]->m_req->m_id, \
             hexstr64s(m_current_list[ii]->m_req->m_addr), \
             mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type]);
-        m_simBase->m_memory->free_req(m_current_list[ii]->m_req->m_core_id, m_current_list[ii]->m_req);
+        m_simBase->m_memory->free_req(m_current_list[ii]->m_req->m_core_id, 
+            m_current_list[ii]->m_req);
       }
       // otherwise, send back to interconnection network
       else {
@@ -786,7 +785,8 @@ void dram_controller_c::channel_schedule_data(void)
         DEBUG("bank[%d] req:%d has acquired data bus\n", \
             bank, m_current_list[bank]->m_req->m_id);
         ASSERT(m_current_list[bank]->m_state == DRAM_DATA);
-        m_data_ready[bank] = acquire_data_bus(ii, m_current_list[bank]->m_size, m_current_list[bank]->m_req->m_ptx);
+        m_data_ready[bank] = acquire_data_bus(ii, m_current_list[bank]->m_size, 
+            m_current_list[bank]->m_req->m_ptx);
         m_data_avail[bank] = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_DATA_WAIT;
       }

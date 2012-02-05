@@ -88,8 +88,6 @@ class bp_gshare_c : public bp_dir_base_c
      * Overridden operator =
      */
     const bp_gshare_c& operator=(const bp_gshare_c& rhs);
-
-
 };
 
 #endif // BP_GSHARE_H_INCLUDED 

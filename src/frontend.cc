@@ -149,7 +149,8 @@ sync_thread_s::sync_thread_s() : m_block_id(-1), m_sync_count(-1), m_num_threads
 
 
 // frontend_c constructor
-frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) : FRONTEND_INTERFACE_INIT() 
+frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) 
+: FRONTEND_INTERFACE_INIT() 
 {
   m_simBase = simBase;
 
@@ -200,7 +201,7 @@ void frontend_c::run_a_cycle(void)
 
   // NVIDIA architecture now support dual warp schedulers
   // In every cycle, 2 instructions will be fetched from N different threads
-  // However, for x86 simulations, *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER is always set to 1
+  // However, for x86 simulations, KNOB_NUM_WARP_SCHEDULER is always set to 1
   // When *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER is one, work as regular fetch unit
   int prev_fetched_tid = -1;
   for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER; ++ii) {
@@ -334,13 +335,6 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
   // -------------------------------------
   if ((m_bp_data->m_bp_recovery_cycle[tid] > m_cur_core_cycle) || 
       (m_bp_data->m_bp_redirect_cycle[tid] > m_cur_core_cycle) ) {
-//    DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d frontend is returned because "
-//	       "bp_recovery_cycle is not ready yet: %lld cur_core_cycle:%lld cause_uop:%lld" 
-//	       "bp_redirect_cycle is not ready yet:%lld \n",
-//        m_core_id, tid, m_bp_data->m_bp_recovery_cycle[tid], m_cur_core_cycle, 
-//	       m_bp_data->m_bp_cause_op[tid],
-//	       m_bp_data->redirect_cycle[tid]);
-
     STAT_CORE_EVENT(m_core_id, BP_MISPRED_STALL);
 
     return FRONTEND_MODE_IFETCH;
@@ -442,7 +436,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
             STAT_CORE_EVENT(m_core_id, BP_ON_PATH_CORRECT+br_mispred+(new_uop->m_off_path)*3);
           }
 
-          // BTB miss is MISFETCH. In theory, the processor should access the bp only if btb hits 
+          // BTB miss is MISFETCH. In theory, processor should access the bp only if btb hits 
           // However, just to get some stats, we allow bp accesses. 
           // This might be changed in future 
 
@@ -464,9 +458,9 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
             m_bp_data->m_bp_redirect_cycle[new_uop->m_thread_id] = MAX_CTR; 
             m_bp_data->m_bp_cause_op[new_uop->m_thread_id] = new_uop->m_uop_num;
 
-            DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is misfetched(btb_miss) inst_num:%lld "
-                "uop_num:%lld\n", m_core_id, new_uop->m_thread_id, new_uop->m_inst_num, 
-                new_uop->m_uop_num);
+            DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d branch is misfetched(btb_miss) "
+                "inst_num:%lld uop_num:%lld\n", m_core_id, new_uop->m_thread_id, 
+                new_uop->m_inst_num, new_uop->m_uop_num);
           }
           else {
             fetch_data->m_MT_scheduler.m_next_fetch_addr = new_uop->m_npc;
@@ -703,7 +697,8 @@ bool frontend_c::btb_access(uop_c *uop)
 
   uop->m_uop_info.m_btb_miss = btb_miss; 
 
-  DEBUG("m_core_id:%d tid:%d uop_num:%s pc:0x%s cf_type:%d dir:%d oracle_npc:%s pred_targ:%s btb_miss:%d \n", 
+  DEBUG("m_core_id:%d tid:%d uop_num:%s pc:0x%s cf_type:%d dir:%d oracle_npc:%s pred_targ:%s "
+      "btb_miss:%d \n", 
       uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), hexstr64s(uop->m_pc), 
       uop->m_cf_type, uop->m_dir, hexstr64s(uop->m_npc), hexstr64s(pred_targ_addr), btb_miss);
 

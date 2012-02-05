@@ -142,41 +142,31 @@ void core_c::init(void)
 // core_c constructor
 core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
 {
-  ///
-  /// Initialization
-  ///
+  // Initialization
   m_core_id         = c_id;
   m_unit_type       = type;
   m_sim_start_time  = time(NULL);
   
-  //Reference to simulation base globals
+
+  // Reference to simulation base globals
   m_simBase         = simBase;
 
-  ///
-  /// configuration
-  ///
-  
+  // configuration
   CORE_CONFIG();
   
 
-  ///
-  ///  memory allocation
-  ///
-  
+  // memory allocation
   // uop pool
   stringstream sstr;
-//  sstr << "core" << m_core_id << " uop pool";
   string name;
-//  sstr >> name;
-  m_uop_pool = new pool_c<uop_c>(1000, "core_uop_pool");//name); 
+  m_uop_pool = new pool_c<uop_c>(1000, "core_uop_pool");
 
   // dependence table
   m_map = new map_c(m_simBase); 
 
   // instruction cache
   m_icache = new cache_c("icache", icache_size, icache_assoc, icache_line_size, 
-                         sizeof(icache_data_c), icache_banks, icache_bypass, c_id, CACHE_IL1, 
-                         false, m_simBase);
+      sizeof(icache_data_c), icache_banks, icache_bypass, c_id, CACHE_IL1, false, m_simBase);
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer
@@ -191,9 +181,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
 
   // frontend queue
   m_q_frontend = new pqueue_c<int*>(*m_simBase->m_knobs->KNOB_FE_SIZE, 
-                                    (m_knob_fetch_latency + m_knob_alloc_latency), 
-                                    "q_frontend", 
-                                    m_simBase); 
+      (m_knob_fetch_latency + m_knob_alloc_latency), "q_frontend", m_simBase); 
 
   // allocation queue
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
@@ -216,9 +204,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
       sstr << "q_iaq" << i;
       sstr >> name;
       m_gpu_q_iaq[i] = new pqueue_c<gpu_allocq_entry_s>(q_iaq_size[i], 
-                                                        (*m_simBase->m_knobs->KNOB_ALLOC_TO_EXEC_LATENCY - *m_simBase->m_knobs->KNOB_SCHED_CLOCK), 
-                                                        name.c_str(),
-                                                        m_simBase);
+          (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)), name.c_str(), m_simBase);
     }
   }
   else {
@@ -226,9 +212,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
       sstr << "q_iaq" << i;
       sstr >> name;
       m_q_iaq[i] = new pqueue_c<int>(q_iaq_size[i],
-                                     (*m_simBase->m_knobs->KNOB_ALLOC_TO_EXEC_LATENCY - *m_simBase->m_knobs->KNOB_SCHED_CLOCK),
-                                     name.c_str(),
-                                     m_simBase);
+          (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)), name.c_str(), m_simBase);
     }
   }
 
@@ -242,11 +226,11 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
     m_allocate = NULL;
     m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq, m_uop_pool, 
-                                        m_gpu_rob, m_unit_type, max_ALLOCQ, m_simBase);
+        m_gpu_rob, m_unit_type, max_ALLOCQ, m_simBase);
   }
   else {
     m_allocate = new allocate_c(m_core_id, m_q_frontend, m_q_iaq, m_uop_pool, m_rob, 
-                                m_unit_type, max_ALLOCQ, m_simBase);
+        m_unit_type, max_ALLOCQ, m_simBase);
     m_gpu_allocate = NULL;
   }
 
@@ -279,13 +263,15 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   
   // const / texture cache
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_USE_CONST_AND_TEX_CACHES) {
-    m_const_cache = new readonly_cache_c("const_cache", m_core_id, *m_simBase->m_knobs->KNOB_CONST_CACHE_SIZE,
-        *m_simBase->m_knobs->KNOB_CONST_CACHE_ASSOC, *m_simBase->m_knobs->KNOB_CONST_CACHE_LINE_SIZE, *m_simBase->m_knobs->KNOB_CONST_CACHE_BANKS, 
-        *m_simBase->m_knobs->KNOB_CONST_CACHE_CYCLES, 0, CACHE_CONST, sizeof(dcache_data_s), m_simBase);
+    m_const_cache = new readonly_cache_c("const_cache", m_core_id, 
+        *KNOB(KNOB_CONST_CACHE_SIZE), *KNOB(KNOB_CONST_CACHE_ASSOC), 
+        *KNOB(KNOB_CONST_CACHE_LINE_SIZE), *KNOB(KNOB_CONST_CACHE_BANKS), 
+        *KNOB(KNOB_CONST_CACHE_CYCLES), 0, CACHE_CONST, sizeof(dcache_data_s), m_simBase);
 
-    m_texture_cache = new readonly_cache_c("texture_cache", m_core_id, *m_simBase->m_knobs->KNOB_TEXTURE_CACHE_SIZE, 
-        *m_simBase->m_knobs->KNOB_TEXTURE_CACHE_ASSOC, *m_simBase->m_knobs->KNOB_TEXTURE_CACHE_LINE_SIZE, *m_simBase->m_knobs->KNOB_TEXTURE_CACHE_BANKS, 
-        *m_simBase->m_knobs->KNOB_TEXTURE_CACHE_CYCLES, 0, CACHE_TEXTURE, sizeof(dcache_data_s), m_simBase);
+    m_texture_cache = new readonly_cache_c("texture_cache", m_core_id, 
+        *KNOB(KNOB_TEXTURE_CACHE_SIZE), *KNOB(KNOB_TEXTURE_CACHE_ASSOC), 
+        *KNOB(KNOB_TEXTURE_CACHE_LINE_SIZE), *KNOB(KNOB_TEXTURE_CACHE_BANKS), 
+        *KNOB(KNOB_TEXTURE_CACHE_CYCLES), 0, CACHE_TEXTURE, sizeof(dcache_data_s), m_simBase);
   }
   else {
     m_const_cache = NULL;
@@ -294,10 +280,11 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
 
   // shared memory
   if (m_core_type == "ptx") {
-    m_shared_memory = new sw_managed_cache_c("shared_memory", m_core_id, *m_simBase->m_knobs->KNOB_SHARED_MEM_SIZE, 
-        *m_simBase->m_knobs->KNOB_SHARED_MEM_ASSOC, *m_simBase->m_knobs->KNOB_SHARED_MEM_LINE_SIZE, *m_simBase->m_knobs->KNOB_SHARED_MEM_BANKS, 
-        *m_simBase->m_knobs->KNOB_SHARED_MEM_CYCLES, 0, CACHE_SW_MANAGED, *m_simBase->m_knobs->KNOB_SHARED_MEM_PORTS,
-        *m_simBase->m_knobs->KNOB_SHARED_MEM_PORTS, sizeof(dcache_data_s), m_simBase);
+    m_shared_memory = new sw_managed_cache_c("shared_memory", m_core_id, 
+        *KNOB(KNOB_SHARED_MEM_SIZE), *KNOB(KNOB_SHARED_MEM_ASSOC), 
+        *KNOB(KNOB_SHARED_MEM_LINE_SIZE), *KNOB(KNOB_SHARED_MEM_BANKS), 
+        *KNOB(KNOB_SHARED_MEM_CYCLES), 0, CACHE_SW_MANAGED, *KNOB(KNOB_SHARED_MEM_PORTS),
+        *KNOB(KNOB_SHARED_MEM_PORTS), sizeof(dcache_data_s), m_simBase);
   }
   else {
     m_shared_memory = NULL;
@@ -476,14 +463,14 @@ void core_c::thread_heartbeat(int tid, bool final)
 
     double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
     if (final) {
-      fprintf(m_simBase->g_mystdout, "**Core %d Thread %d Finished:   insts:%-10s  cycles:%-10s  "
-          "seconds:%-5s -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
+      fprintf(m_simBase->g_mystdout, "**Core %d Thread %d Finished:   insts:%-10s  "
+          "cycles:%-10s  seconds:%-5s -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
           m_core_id, tid, unsstr64(m_inst_count), unsstr64(m_core_cycle_count),
           unsstr64(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
-      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:  Thread:%-6d insts:%-10s  cycles:%-10s  "
-          "seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS) \n",
+      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:  Thread:%-6d insts:%-10s  "
+          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
           m_core_id, tid, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count),
           unsstr64(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
       fflush(m_simBase->g_mystdout);
@@ -519,14 +506,14 @@ void core_c::core_heartbeat(bool final)
     double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
 
     if (final) {
-      fprintf(m_simBase->g_mystdout, "**Core %d Core_Total  Finished:   insts:%-10s  cycles:%-10s  "
-          "seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
+      fprintf(m_simBase->g_mystdout, "**Core %d Core_Total  Finished:   insts:%-10s  "
+          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
           m_core_id,  unsstr64(m_inst_count), unsstr64(m_core_cycle_count),
           unsstr64(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
-      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:                insts:%-10s  cycles:%-10s  "
-          "seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
+      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:        insts:%-10s  "
+          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
           m_core_id, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count),
           unsstr64(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
       fflush(m_simBase->g_mystdout);
@@ -553,9 +540,9 @@ void core_c::check_forward_progress()
     m_last_inst_count       = inst_count;
   }
 
-  // if no instruction has been retired more than *m_simBase->m_knobs->KNOB_FORWARD_PROGRESS_LIMIT cycle,
+  // if no instruction has been retired more than KNOB_FORWARD_PROGRESS_LIMIT cycle,
   // raise forward progress exception
-  if (m_core_cycle_count - m_last_forward_progress > *m_simBase->m_knobs->KNOB_FORWARD_PROGRESS_LIMIT) {
+  if (m_core_cycle_count - m_last_forward_progress > *KNOB(KNOB_FORWARD_PROGRESS_LIMIT)) {
     STAT_EVENT(PROGRESS_ERROR);
 
     // print all mshr entries
@@ -570,7 +557,7 @@ void core_c::check_forward_progress()
       m_simBase->m_router->print();
     }
 
-    ASSERTM(m_core_cycle_count - m_last_forward_progress <= *m_simBase->m_knobs->KNOB_FORWARD_PROGRESS_LIMIT,
+    ASSERTM(m_core_cycle_count - m_last_forward_progress <= *KNOB(KNOB_FORWARD_PROGRESS_LIMIT),
         "core_id:%d core_cycle_count:%s last_forward_progress:%s last_tid:%d "
         "last_inst_count:%s\n", m_core_id, unsstr64(m_core_cycle_count), 
         unsstr64(m_last_forward_progress), m_last_terminated_tid, unsstr64(m_last_inst_count));
@@ -621,16 +608,8 @@ void core_c::allocate_thread_data(int tid)
   m_retire->allocate_retire_data(tid);
 
   // allocate scheduler queue and rob for GPU simulation
-#if TODELETE
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
-    int sched_queue_id = ((schedule_smc_c *)m_schedule)->reserve_sched_queue(tid);
-    int rob_id = m_gpu_rob->reserve_rob(tid);
-    ASSERT(rob_id == sched_queue_id);
-  }
-#else
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) 
-  m_gpu_rob->reserve_rob(tid);
-#endif
+    m_gpu_rob->reserve_rob(tid);
 }
 
 
@@ -664,16 +643,8 @@ void core_c::deallocate_thread_data(int tid)
     m_last_terminated_tid = ++t_id;
   }
 
-#if TODELETE
-  // GPU simulation : deallocate scheduler queue and rob allocated to this thread
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
-    ((schedule_smc_c *)m_schedule)->free_sched_queue(tid);
-    m_gpu_rob->free_rob(tid);
-  }
-#else
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) 
     m_gpu_rob->free_rob(tid);
-#endif
 
   // check forward progress
   if (m_unique_scheduled_thread_num >= m_last_terminated_tid + 1000) {

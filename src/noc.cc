@@ -43,7 +43,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args)
-#define AAA 0
 
 
 // noc_c constructor
@@ -69,29 +68,6 @@ noc_c::noc_c(macsim_c* simBase)
 // noc_c destructor
 noc_c::~noc_c()
 {
-  /*
-  while (!m_entry_up->empty()) {
-    noc_entry_s* entry = m_entry_up->front();
-    m_entry_up->pop_front();
-
-    delete entry;
-  }
-  
-  
-  while (!m_entry_free_list_down->empty()) {
-    noc_entry_s* entry = m_entry_free_list_down->front();
-    m_entry_free_list_down->pop_front();
-
-    delete entry;
-  }
-  
-  while (!m_entry_down->empty()) {
-    noc_entry_s* entry = m_entry_down->front();
-    m_entry_down->pop_front();
-
-    delete entry;
-  }
-  */
 }
 
 
@@ -127,6 +103,7 @@ bool noc_c::insert(int src, int dst, int msg, mem_req_s* req)
 void noc_c::run_a_cycle()
 {
   list<noc_entry_s*> done_list;
+  memory_c* memory = m_simBase->m_memory;
 
   for (auto itr = m_cpu_entry_up->begin(); itr != m_cpu_entry_up->end(); ++itr) {
     if ((*itr)->m_rdy <= m_simBase->m_simulation_cycle) {
@@ -137,7 +114,7 @@ void noc_c::run_a_cycle()
   }
 
   for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-    if (m_simBase->m_memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
       m_cpu_entry_up->remove((*itr));
       m_pool->release_entry((*itr));
     }
@@ -155,7 +132,7 @@ void noc_c::run_a_cycle()
     }
 
     for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-      if (m_simBase->m_memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
         m_gpu_entry_up->remove((*itr));
         m_pool->release_entry((*itr));
       }
@@ -174,7 +151,7 @@ void noc_c::run_a_cycle()
   }
 
   for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-    if (m_simBase->m_memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
       m_cpu_entry_down->remove((*itr));
       m_pool->release_entry((*itr));
     }
@@ -192,7 +169,7 @@ void noc_c::run_a_cycle()
     }
 
     for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-      if (m_simBase->m_memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
         m_gpu_entry_down->remove((*itr));
         m_pool->release_entry((*itr));
       }

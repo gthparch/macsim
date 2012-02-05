@@ -63,17 +63,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#if 0
-string ToString(int val)
-{
-  stringstream sstr;
-  sstr << val;
-  string result = sstr.str();
-
-  sstr.flush();
-  return result;
-}
-#endif
 
 stringstream util_sstr;
 char str_buffer[1000][100];
@@ -156,8 +145,8 @@ FILE *file_tag_fopen (std::string path, char const *const mode, macsim_c* m_simB
 {
   FILE* file = NULL;
   string file_name;
-  string file_tag = *m_simBase->m_knobs->KNOB_FILE_TAG; 
-  string output_dir = *m_simBase->m_knobs->KNOB_STATISTICS_OUT_DIRECTORY; 
+  string file_tag = *KNOB(KNOB_FILE_TAG); 
+  string output_dir = *KNOB(KNOB_STATISTICS_OUT_DIRECTORY); 
   if (!strcmp(file_tag.c_str(), "NULL")) {
     file_tag="";
   } 	
@@ -264,28 +253,26 @@ void multi_key_map_c::delete_table(int key1)
 cache_partition_framework_c::cache_partition_framework_c(macsim_c* simBase)
 {
   m_simBase = simBase;
-//  m_file.open("cpi.out"); 
   for (int ii = 0; ii < 10; ++ii) {
     m_psel_mask[ii]        = false;
     m_performance_mask[ii] = false;
   }
-//  m_file.open("cpi.out"); 
 }
 
 cache_partition_framework_c::~cache_partition_framework_c()
 {
-//  m_file.close();
 }
 
 
 void cache_partition_framework_c::run_a_cycle()
 {
-  if (*m_simBase->m_knobs->KNOB_COLLECT_CPI_INFO > 0 && m_simBase->m_simulation_cycle % *m_simBase->m_knobs->KNOB_COLLECT_CPI_INFO == 0) {
+  if (*KNOB(KNOB_COLLECT_CPI_INFO) > 0 && 
+      CYCLE % *KNOB(KNOB_COLLECT_CPI_INFO) == 0) {
     int max = 0;
     int min = 1000000000;
     int sum = 0;
     int count = 0;
-    for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++ii) {
+    for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_CORES); ++ii) {
       core_c* core = m_simBase->m_core_pointers[ii];
       if (core->get_core_type() == "ptx") {
         retire_c* retire = core->get_retire();
@@ -321,15 +308,13 @@ void cache_partition_framework_c::run_a_cycle()
       }
       STAT_EVENT(CPI_DELTA_BASE0);
       STAT_EVENT_N(CPI_DELTA0, static_cast<int>(value));
-
-//      m_file << fixed << setprecision(2) << value << " " << m_psel_mask << " " << m_performance_mask << "\n";
-//      cout << fixed << setprecision(2) << value << " " << m_psel_mask << " " << m_performance_mask << "\n";
     }
   }
 
 
-  if (*m_simBase->m_knobs->KNOB_COLLECT_CPI_INFO_FOR_MULTI_GPU > 0 && m_simBase->m_simulation_cycle % *m_simBase->m_knobs->KNOB_COLLECT_CPI_INFO_FOR_MULTI_GPU == 0) {
-    int num_core = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES / 2;
+  if (*KNOB(KNOB_COLLECT_CPI_INFO_FOR_MULTI_GPU) > 0 
+      && CYCLE % *KNOB(KNOB_COLLECT_CPI_INFO_FOR_MULTI_GPU) == 0) {
+    int num_core = *KNOB(KNOB_NUM_SIM_CORES) / 2;
     for (int appl = 0; appl < 2; ++appl) {
       int max = 0;
       int min = 1000000000;
@@ -349,14 +334,10 @@ void cache_partition_framework_c::run_a_cycle()
         }
       }
 
-      //sum -= (min + max);
-      //int average = sum / (count - 2);
       int average = sum / count;
 
       if (average > 0) {
         float min_delta = (average - min) * 100.0 / average;
-        //float max_delta = (max - average) * 100.0 / average;
-        //float max_delta = (max - average) * 100.0 / average;
         float max_delta = 0;
         float value = max_delta > min_delta ? max_delta : min_delta;
         if (value <= 10.0) {
@@ -374,7 +355,6 @@ void cache_partition_framework_c::run_a_cycle()
         }
         STAT_EVENT(CPI_DELTA_BASE0 + appl);
         STAT_EVENT_N(CPI_DELTA0 + appl, static_cast<int>(value));
-//        report("appl:" << appl << " value:" << value << " min:" << min << " max:" << max << " psel:" << m_psel_mask[appl] << " perf:" << m_performance_mask[appl]);
       }
     }
   }

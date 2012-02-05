@@ -389,7 +389,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     string kernel_directory;
     while (trace_config_file >> kernel_directory) {
       string kernel_path = appl.substr(0, appl.find_last_of('/'));
-      kernel_path += kernel_directory.substr(kernel_directory.rfind('/', kernel_directory.find_last_of('/')-1), kernel_directory.length());
+      kernel_path += kernel_directory.substr(kernel_directory.rfind('/', 
+            kernel_directory.find_last_of('/')-1), kernel_directory.length());
       // When a trace directory is moved to the different path,
       // since everything is coded in absolute path, this will cause problem.
       // By taking relative path here, the problem can be solved
@@ -592,10 +593,10 @@ void process_manager_c::setup_process(process_s* process)
 
   // TODO (jaekyu, 1-30-2009)
   // FIXME
-  if (trace_type == "ptx" && *m_simBase->m_knobs->KNOB_BLOCKS_TO_SIMULATE) {
-    if ((*m_simBase->m_knobs->KNOB_BLOCKS_TO_SIMULATE * m_simBase->m_no_threads_per_block) < thread_count) { 
+  if (trace_type == "ptx" && *KNOB(KNOB_BLOCKS_TO_SIMULATE)) {
+    if ((*KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block) < thread_count) { 
       uns temp = thread_count;
-      thread_count = *m_simBase->m_knobs->KNOB_BLOCKS_TO_SIMULATE * m_simBase->m_no_threads_per_block;
+      thread_count = *KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block;
 
       //print the thread count of the application at the beginning
       REPORT("new thread count %d\n", thread_count);	
@@ -603,7 +604,7 @@ void process_manager_c::setup_process(process_s* process)
 
       m_simBase->m_all_threads += thread_count;
 
-      if (*m_simBase->m_knobs->KNOB_SIMULATE_LAST_BLOCKS) {
+      if (*KNOB(KNOB_SIMULATE_LAST_BLOCKS)) {
         for (int i = 0; i < thread_count; ++i) {
           process->m_thread_start_info[i].m_thread_id = 
             process->m_thread_start_info[temp - thread_count + i].m_thread_id;
@@ -663,7 +664,6 @@ bool process_manager_c::terminate_process(process_s* process)
   
   hash_c<inst_info_s>* inst_info_hash = m_simBase->m_inst_info_hash[process->m_process_id];
   m_simBase->m_inst_info_hash.erase(process->m_process_id);
-//  delete inst_info_hash;
   inst_info_hash->clear();
   m_inst_hash_pool->release_entry(inst_info_hash);
 
@@ -675,10 +675,10 @@ bool process_manager_c::terminate_process(process_s* process)
 
   int delta;
   if (m_appl_cyccount_info.find(process->m_orig_pid) == m_appl_cyccount_info.end()) {
-    delta = static_cast<int>(m_simBase->m_simulation_cycle);
+    delta = static_cast<int>(CYCLE);
   }
   else {
-    delta = static_cast<int>(m_simBase->m_simulation_cycle - m_appl_cyccount_info[process->m_orig_pid]);
+    delta = static_cast<int>(CYCLE - m_appl_cyccount_info[process->m_orig_pid]);
   }
   m_appl_cyccount_info[process->m_orig_pid] = m_simBase->m_simulation_cycle;
 
@@ -797,7 +797,8 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
   if (trace_info->m_ptx == true) { 
     int t_process_id = trace_info->m_process->m_process_id;
     int t_thread_id  = trace_info->m_unique_thread_id;
-    m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle = core->get_cycle_count();
+    m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle = 
+      core->get_cycle_count();
 
     block_schedule_info_s* block_info = m_simBase->m_block_schedule_info[block_id];
     ++block_info->m_retired_thread_num;
@@ -826,7 +827,7 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
 
 
       // stats
-      STAT_EVENT_N(AVG_BLOCK_EXE_CYCLE, m_simBase->m_simulation_cycle - block_info->m_sched_cycle);
+      STAT_EVENT_N(AVG_BLOCK_EXE_CYCLE, CYCLE - block_info->m_sched_cycle);
       STAT_EVENT(AVG_BLOCK_EXE_CYCLE_BASE);
 
       ++m_simBase->m_total_retired_block;
@@ -922,11 +923,7 @@ void process_manager_c::insert_block(thread_trace_info_node_s *incoming)
     list<thread_trace_info_node_s *> *new_list = new list<thread_trace_info_node_s *>;
     (*m_block_queue)[block_id] = new_list;
   }
-//    new_list->push_back(incoming);
-//  }
-//  else {
-    (*m_block_queue)[block_id]->push_back(incoming);
-//  }
+  (*m_block_queue)[block_id]->push_back(incoming);
 }
 
 
@@ -1111,7 +1108,6 @@ int process_manager_c::sim_schedule_thread_block(int core_id)
 
   // All threads from the currently serveced block should be scheduled before a new block
   // executes. Check currently fetching block has other threads to schedule
-  //if ((fetching_block_id != -1) && !(m_simBase->m_block_schedule_info[fetching_block_id]->m_retired)) {
   if ((fetching_block_id != -1) && 
       m_simBase->m_block_schedule_info.find(fetching_block_id) != m_simBase->m_block_schedule_info.end() &&
       !(m_simBase->m_block_schedule_info[fetching_block_id]->m_retired)) {
@@ -1137,7 +1133,6 @@ int process_manager_c::sim_schedule_thread_block(int core_id)
   process_s* process = m_simBase->m_sim_processes[appl_id];
   for (auto I = process->m_block_list.begin(), E = process->m_block_list.end(); I != E; ++I) {
     int block_id = (*I).first;
-
 
     // this block was not fetched yet and has traces to schedule
     if (!(m_simBase->m_block_schedule_info[block_id]->m_start_to_fetch) && 

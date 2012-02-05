@@ -225,11 +225,6 @@ class dcu_c
     bool full();
 
     /**
-     * Search a request from queues
-     */
-//    mem_req_s* search(Addr addr, int size);
-
-    /**
      * Access the data cache
      */
     dcache_data_s* access_cache(Addr addr, Addr *line_addr, bool update, int appl_id);

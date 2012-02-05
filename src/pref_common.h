@@ -452,7 +452,6 @@ class hwp_common_c
     FILE * PREF_DEGFB_FILE; /**< prefetch degree (with feedback) output stream */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
-
 };
 
 #endif /*  __PREF_COMMON_H__*/

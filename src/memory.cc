@@ -75,6 +75,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define HAS_DONE_FUNC 1
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
 /// \page memory Memory system
 /// memory system
 ///
@@ -129,7 +130,6 @@ inline bool IsLoad(Mem_Type type)
 bool dcache_fill_line_wrapper(mem_req_s* req)
 {
 	bool result = true;
-//  DEBUG("req:%d type:%s called done_func\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
   list<mem_req_s*> done_list;
   for (auto I = req->m_merge.begin(), E = req->m_merge.end(); I != E; ++I) {
     if ((*I)->m_done_func && !((*I)->m_done_func((*I)))) {
@@ -229,8 +229,6 @@ queue_c::queue_c(macsim_c* simBase, int size)
 {
   m_simBase = simBase;
   m_size = size;
-//  m_size = 1024;
-  //m_size = *m_simBase->m_knobs->KNOB_MEM_QUEUE_SIZE;
 }
 
 
@@ -486,17 +484,14 @@ int dcu_c::access(uop_c* uop)
     line = (dcache_data_s*)m_cache->access_cache(vaddr, &line_addr, true, appl_id);
     cache_hit = (line) ? true : false;
 
-	//STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_RA + IsStore(type));
-	if(m_level != MEM_L3)
-	{
-		STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
-	}
-	else
-	{
-		STAT_EVENT(POWER_L3CACHE_R_TAG );
-	}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_R_TAG );
+    }
 
-	// prefetch cache should be here
+    // prefetch cache should be here
   }
 
 
@@ -504,14 +499,12 @@ int dcu_c::access(uop_c* uop)
   // DCACHE hit
   // -------------------------------------
   if (cache_hit) {
-		if(m_level != MEM_L3)
-		{
-			STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_R + (m_level -1));
-		}
-		else
-		{
-			STAT_EVENT(POWER_L3CACHE_R );
-		}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(uop->m_core_id, POWER_DCACHE_R + (m_level -1));
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_R );
+    }
     STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
     DEBUG("L%d[%d] uop_num:%lld cache hit\n", m_level, m_id, uop->m_uop_num);
     // stat
@@ -635,15 +628,12 @@ bool dcu_c::fill(mem_req_s* req)
     DEBUG("L%d[%d] (->fill_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
 
-    //STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
-	if(m_level != MEM_L3)
-	{
-		STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
-	}
-	else
-	{
-		STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_W);
-	}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_W);
+    }
     return true;
   }
 
@@ -736,14 +726,13 @@ void dcu_c::process_in_queue()
       line = (dcache_data_s*)m_cache->access_cache(req->m_addr, &line_addr, 
           req->m_type == MRT_WB ? false : true, req->m_appl_id);
       cache_hit = (line) ? true : false;
-	  if(m_level != MEM_L3)
-	  {
-		  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
-	  }
-	  else
-	  {
-		  STAT_EVENT(POWER_L3CACHE_R_TAG );
-	  }
+
+      if (m_level != MEM_L3) {
+        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R_TAG + (m_level -1));
+      }
+      else {
+        STAT_EVENT(POWER_L3CACHE_R_TAG );
+      }
       //STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_RA + m_level*2 + (req->m_type == MRT_DSTORE));
     }
 
@@ -752,14 +741,12 @@ void dcu_c::process_in_queue()
     // Cache hit
     // -------------------------------------
     if (cache_hit) {
-		if(m_level != MEM_L3)
-		{
-			STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R + (m_level -1));
-		}
-		else
-		{
-			STAT_EVENT(POWER_L3CACHE_R );
-		}
+      if (m_level != MEM_L3) {
+        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_R + (m_level -1));
+      }
+      else {
+        STAT_EVENT(POWER_L3CACHE_R );
+      }
 
       // -------------------------------------
       // hardware prefetcher training
@@ -945,25 +932,19 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
     req->m_msg_src = m_terminal->node_id;
     req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
     //if node type is mc and destination is a proc, then mclass should be reply type
-    if ( m_terminal->mclass == L3_REQ )
-    {
-        if ( dir == 1)                      //to MC
-            req->m_noc_type = PROC_REQ;
-        else                                //to proc
-            req->m_noc_type = MC_RESP;
-    } else
-    {
-        req->m_noc_type = m_terminal->mclass;
+    if (m_terminal->mclass == L3_REQ) {
+      if ( dir == 1)                      //to MC
+        req->m_noc_type = PROC_REQ;
+      else                                //to proc
+        req->m_noc_type = MC_RESP;
+    } 
+    else {
+      req->m_noc_type = m_terminal->mclass;
     }
-    
   }
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     req->m_msg_src = m_router->get_id();
     req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
-
-//    cout << "level:" << m_level << " id:" << m_id << " src:" << req->m_msg_src << "\n";
-//    cout << "level:" << m_level+dir << " id:" << req->m_cache_id[m_level+dir] << " dst:" << req->m_msg_dst << "\n";
-//    cout << "-----\n";
   }
   else {
     req->m_msg_src = m_noc_id;
@@ -989,7 +970,6 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
       m_simBase->m_bug_detector->allocate_noc(req);
     }
 
-//    cout << "L" << m_level << " " << m_id << " " << req->m_msg_dst << "\n";
     req->m_state = MEM_IN_NOC;
     return true;
   }
@@ -1084,26 +1064,22 @@ void dcu_c::process_fill_queue()
 
     mem_req_s* req = (*I);
 
-	if(m_level != MEM_L3)
-	{
-		STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
-	}
-	else
-	{
-		STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_R_TAG );
-	}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_R_TAG );
+    }
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle) 
       continue;
 
-	if(m_level != MEM_L3)
-	{
-		STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
-	}
-	else
-	{
-		STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_R );
-	}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_LINEFILL_BUF_R );
+    }
 
     // MEM_FILL_NEW
     // MEM_FILL_WAIT_DONE
@@ -1137,14 +1113,12 @@ void dcu_c::process_fill_queue()
           dcache_data_s* data;
           data = (dcache_data_s*)m_cache->insert_cache(req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id, req->m_ptx);
 
-		  if(m_level != MEM_L3)
-		  {
-			  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
-		  }
-		  else
-		  {
-			  STAT_EVENT(POWER_L3CACHE_W );
-		  }
+          if (m_level != MEM_L3) {
+            STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
+          }
+          else {
+            STAT_EVENT(POWER_L3CACHE_W );
+          }
 
           // -------------------------------------
           // If there is a victim line, we do the write-back.
@@ -1160,19 +1134,17 @@ void dcu_c::process_fill_queue()
               // new write-back request
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, 
                   m_ptx_sim, data, m_level);
-			  if (!m_wb_queue->push(wb))
-				  ASSERT(0);
+              if (!m_wb_queue->push(wb))
+                ASSERT(0);
 
-			  if(m_level != MEM_L3)
-			  {
-				  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
-			  }
-			  else
-			  {
-				  STAT_EVENT( POWER_L3CACHE_WB_BUF_W );
-			  }
+              if (m_level != MEM_L3) {
+                STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
+              }
+              else {
+                STAT_EVENT( POWER_L3CACHE_WB_BUF_W );
+              }
 
-			  DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:%s type:%s by req:%d\n", 
+              DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:%s type:%s by req:%d\n", 
                   m_level, m_id, wb->m_id, hexstr64s(victim_line_addr), \
                   mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
             }
@@ -1246,9 +1218,9 @@ void dcu_c::process_fill_queue()
         break;
       }
 
-        // -------------------------------------
-        // MEM_FILL_NEW -> MEM_FILL_WAIT_DONE : waiting done_func is successfully done
-        // -------------------------------------
+      // -------------------------------------
+      // MEM_FILL_NEW -> MEM_FILL_WAIT_DONE : waiting done_func is successfully done
+      // -------------------------------------
       case MEM_FILL_WAIT_DONE: {
         if (req->m_done_func && !req->m_done_func(req))
           continue;
@@ -1258,10 +1230,10 @@ void dcu_c::process_fill_queue()
         ++count;
         break;
 
-        // -------------------------------------
-        // MEM_FILL_NEW -> MEM_FILL_WAIT_FILL : waiting for sending to next/prev level
-        // -------------------------------------
       }
+      // -------------------------------------
+      // MEM_FILL_NEW -> MEM_FILL_WAIT_FILL : waiting for sending to next/prev level
+      // -------------------------------------
       case MEM_FILL_WAIT_FILL: {
         // COUPLED L3 OR without router: fill upper level cache
         if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level-1]) || !m_has_router) {
@@ -1302,11 +1274,6 @@ void dcu_c::process_fill_queue()
       DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
           m_simBase->m_simulation_cycle - (*I)->m_in);
-#if DEBUG_SI
-      printf("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
-          m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
-          m_simBase->m_simulation_cycle - (*I)->m_in);
-#endif
       m_memory->free_req((*I)->m_core_id, (*I));
     }
   }
@@ -1328,26 +1295,22 @@ void dcu_c::process_wb_queue()
 
     mem_req_s* req = (*I);
 
-	if(m_level != MEM_L3)
-	{
-		STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R_TAG + m_level - MEM_L1);
-	}
-	else
-	{
-		STAT_EVENT(POWER_L3CACHE_WB_BUF_R_TAG);
-	}
+    if(m_level != MEM_L3) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R_TAG + m_level - MEM_L1);
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_WB_BUF_R_TAG);
+    }
 
     if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
       continue;
 
-   	if(m_level != MEM_L3)
-	{
-    STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
-	}
-	else
-	{
-    STAT_EVENT(POWER_L3CACHE_WB_BUF_R );
-	}
+    if (m_level != MEM_L3) {
+      STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
+    }
+    else {
+      STAT_EVENT(POWER_L3CACHE_WB_BUF_R );
+    }
 
     // L1 and L2 : insert next level's in_queue
     if (m_level != MEM_L3 && 
@@ -1416,17 +1379,16 @@ bool dcu_c::done(mem_req_s* req)
       // -------------------------------------
       data = (dcache_data_s*)m_cache->insert_cache(addr, &line_addr, &repl_line_addr,
           req->m_appl_id, req->m_ptx);
-	  if(m_level != MEM_L3)
-	  {
-		  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
-	  }
-	  else
-	  {
-		  STAT_EVENT(POWER_L3CACHE_W );
-	  }
 
-	  if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
-	  }
+      if (m_level != MEM_L3) {
+        STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level -1));
+      }
+      else {
+        STAT_EVENT(POWER_L3CACHE_W );
+      }
+
+      if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
+      }
 
       // -------------------------------------
       // evict a line
@@ -1450,56 +1412,54 @@ bool dcu_c::done(mem_req_s* req)
               m_level, m_id, wb->m_id, hexstr64s(repl_line_addr), req->m_id, \
               mem_req_c::mem_req_type_name[MRT_WB]);
 
-		  if(m_level != MEM_L3)
-		  {
-			  STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
-		  }
-		  else
-		  {
-			  STAT_EVENT( POWER_L3CACHE_WB_BUF_W );
-		  }
-		}
-	  }
+          if (m_level != MEM_L3) {
+            STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
+          }
+          else {
+            STAT_EVENT( POWER_L3CACHE_WB_BUF_W );
+          }
+        }
+      }
 
-	  data->m_dirty = req->m_dirty;
-	  data->m_fetch_cycle = m_simBase->m_simulation_cycle;
-	  data->m_core_id = req->m_core_id;
-	  data->m_pc = req->m_pc;
-	  data->m_tid = req->m_thread_id;
-	}
-	else {
-		line->m_dirty |= req->m_dirty;
-	}
+      data->m_dirty = req->m_dirty;
+      data->m_fetch_cycle = m_simBase->m_simulation_cycle;
+      data->m_core_id = req->m_core_id;
+      data->m_pc = req->m_pc;
+      data->m_tid = req->m_thread_id;
+    }
+    else {
+      line->m_dirty |= req->m_dirty;
+    }
   }
 
 
   if (req->m_uop) {
-	  uop_c* uop = req->m_uop;
+    uop_c* uop = req->m_uop;
 
-	  DEBUG("uop:%lld done\n", uop->m_uop_num);
-	  uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
-	  uop->m_state = OS_SCHEDULED;
-	  if (m_ptx_sim) {
-		  if (uop->m_parent_uop) {
-			  uop_c* puop = uop->m_parent_uop;
-			  ++puop->m_num_child_uops_done;
-			  if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
-				  if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-					  m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
-							  puop->m_thread_id, puop->m_uop_num);
-				  }
+    DEBUG("uop:%lld done\n", uop->m_uop_num);
+    uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+    uop->m_state = OS_SCHEDULED;
+    if (m_ptx_sim) {
+      if (uop->m_parent_uop) {
+        uop_c* puop = uop->m_parent_uop;
+        ++puop->m_num_child_uops_done;
+        if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
+          if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+            m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
+                puop->m_thread_id, puop->m_uop_num);
+          }
 
-				  puop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
-				  puop->m_state = OS_SCHEDULED;
-			  }
-		  } // uop->m_parent_uop
-		  else {
-			  if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-				  m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
-						  uop->m_thread_id, uop->m_uop_num);
-			  }
-		  }
-	  }
+          puop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+          puop->m_state = OS_SCHEDULED;
+        }
+      } // uop->m_parent_uop
+      else {
+        if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+          m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
+              uop->m_thread_id, uop->m_uop_num);
+        }
+      }
+    }
   }
 
   return true;
@@ -1567,7 +1527,8 @@ int memory_c::m_unique_id = 0;
 memory_c::memory_c(macsim_c* simBase)
 {
   m_simBase = simBase;
-  REPORT("Memory system(%s) has been initialized.\n", m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue().c_str());
+  REPORT("Memory system(%s) has been initialized.\n", 
+      KNOB(KNOB_MEMORY_TYPE)->getValue().c_str());
 
   m_num_core = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
   m_num_l3   = *m_simBase->m_knobs->KNOB_NUM_L3;
@@ -1977,7 +1938,7 @@ void memory_c::set_cache_id(mem_req_s* req)
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
 }
 
 
@@ -2231,7 +2192,7 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
   req->m_cache_id[MEM_L1] = data->m_core_id;
   req->m_cache_id[MEM_L2] = data->m_core_id;
   req->m_cache_id[MEM_L3] = BANK(addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_MC] = BANK(addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
 
   return req;
 } 
@@ -2342,10 +2303,8 @@ void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_
   // Write Miss
   if (store && !hit && level == MEM_L3) {
   }
-
-
-
 }
+
 #if 0
 void memory_c::handle_coherence()
 {
@@ -2418,8 +2377,6 @@ l3_coupled_network_c::l3_coupled_network_c(macsim_c* simBase) : memory_c(simBase
     m_l3_cache[ii]->init(-1, ii, false, true,  false,false, true);
   }
 }
-//void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coupled_down, \
-//    bool disable, bool has_router)
 
 
 l3_coupled_network_c::~l3_coupled_network_c()
@@ -2442,6 +2399,7 @@ l3_decoupled_network_c::l3_decoupled_network_c(macsim_c* simBase) : memory_c(sim
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
 }
+
 
 l3_decoupled_network_c::~l3_decoupled_network_c()
 {

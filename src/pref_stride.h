@@ -169,8 +169,6 @@ class pref_stride_c : public pref_base_c
   private:
     stride_region_table_entry_s *region_table; /**< address region info */
     stride_index_table_entry_s  *index_table; /**< prefetch table */
-
-
 };
 
 #endif

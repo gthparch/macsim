@@ -387,7 +387,5 @@ class core_c
     
     unordered_map<int, thread_s*> m_thread_trace_info; /**< thread trace information */
     unordered_map<int, bp_recovery_info_c*>  m_bp_recovery_info; /**< thread bp recovery info */
-    
-    
 };
 #endif   // CORE_H_INCLUDED

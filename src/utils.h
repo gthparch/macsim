@@ -189,7 +189,6 @@ class pool_c
      */
     void expand_pool(void)
     {
-//      cout << m_name << " expand pool\n";
       for (int ii = 0; ii < m_poolexpand_unit; ++ii) {
         T* entries = new T;
         m_pool->push_back(entries);
@@ -203,7 +202,6 @@ class pool_c
      */
     void expand_pool(macsim_c* m_simBase)
     {
-//      cout << m_name << " expand pool\n";
       for (int ii = 0; ii < m_poolexpand_unit; ++ii) {
         T* entries = new T(m_simBase);
         m_pool->push_back(entries);
@@ -482,9 +480,6 @@ class cache_partition_framework_c
     
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 };
-
-
-
 
 
 #endif // UTILS_H_INCLUDED 

@@ -221,21 +221,6 @@ class cache_c
     virtual void initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr, 
         int appl_id, bool gpuline, int set_id, bool skip);
 
-#if 0
-    /*
-     *  \brief Function to actually do the work i.e., insert cache line. 
-     *  \param addr - Address
-     *  \param line_addr - Base line address (Updated by the function)
-     *  \param updated_line - Base line addr of the line written 
-        (Updated by the function)- used for write-back
-     *  \param appl_id - application id
-     *  \param gpuline - cache line from gpu application
-     *  \return void* - Pointer to the new cache line
-     */
-    void * worker_insert_cache (Addr addr, Addr *line_addr, Addr *updated_line, int appl_id,
-        bool gpuline);
-#endif
-
     /**
      * \brief Function to insert cache line(wrapper around worker_insert_cache)
                To be used only after access_cache returned NULL. 
@@ -337,7 +322,6 @@ class cache_c
     bool    m_enable_partition;  /**< Enable cache partition */
     
     cache_set_c** m_set;       /**< cache data structure */
-//    cache_entry_c **m_entries; /**< cache data structure */              
 
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };

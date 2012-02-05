@@ -77,7 +77,6 @@ allocate_c::allocate_c(int core_id, pqueue_c<int *> *q_frontend, pqueue_c<int> *
   m_unit_type        = unit_type;
   m_allocate_running = true; 
   m_num_queues       = num_queues;
-
   m_simBase          = simBase;
   
   // configuration
@@ -221,26 +220,21 @@ void allocate_c::run_a_cycle(void)
 
     // BTB miss is resolved 
     if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) {
-      
       // indirect branch and indirect call cannot resolve the target address in the decode stage 
-      if ((uop->m_cf_type < CF_IBR) && 
-	   (uop->m_cf_type > CF_ICO)) {
-	
-	m_bp_data->m_bp_targ_pred->update(uop); 
-	m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
-	  m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES; // redirect cycle 
-	uop->m_uop_info.m_btb_miss_resolved = true; 
-	
-	DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld btb_miss resolved redirect_cycle:%lld\n", 
-        
-        m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, 
-	      m_bp_data->m_bp_redirect_cycle[uop->m_thread_id]); 
-	
-	STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
+      if ((uop->m_cf_type < CF_IBR) && (uop->m_cf_type > CF_ICO)) {
+        m_bp_data->m_bp_targ_pred->update(uop); 
+        m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
+          m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES; // redirect cycle 
+        uop->m_uop_info.m_btb_miss_resolved = true; 
+
+        DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld btb_miss "
+            "resolved redirect_cycle:%lld\n", 
+            m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, 
+            m_bp_data->m_bp_redirect_cycle[uop->m_thread_id]); 
+
+        STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
       }
     }
-
-
   }
 }
 

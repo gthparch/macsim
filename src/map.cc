@@ -319,7 +319,7 @@ void map_c::read_store_map(uop_c *uop)
   map_data_c *map_data;
   map_data = m_core_map_data->hash_table_access(uop->m_thread_id);
   ASSERT(NULL != map_data);
-  if (!*m_simBase->m_knobs->KNOB_MEM_OBEY_STORE_DEP || *m_simBase->m_knobs->KNOB_MEM_OOO_STORES) 
+  if (!*KNOB(KNOB_MEM_OBEY_STORE_DEP) || *KNOB(KNOB_MEM_OOO_STORES)) 
     return; 
 
   if (uop->m_mem_type) {

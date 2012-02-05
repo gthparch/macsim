@@ -105,7 +105,8 @@ void bp_gshare_c::update (uop_c *uop)
   uns8  pht_entry   = m_pht[pht_index];
 
   DEBUG("Writing gshare PHT for  op_num:%s  index:%d  dir:%d max value is :%lld \n", 
-        unsstr64(uop->m_uop_num), pht_index, uop->m_dir, N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
+      unsstr64(uop->m_uop_num), pht_index, uop->m_dir, 
+      N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
 
 
   if (uop->m_dir) {

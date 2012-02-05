@@ -497,6 +497,7 @@ void exec_c::br_exec(uop_c *uop)
           m_core_id, uop->m_thread_id, unsstr64(m_cur_core_cycle), 
           m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
   }
+
   // handle misfetched branch  (miss target prediction: indirect branches) 
   if (uop->m_uop_info.m_btb_miss) { 
     
@@ -505,16 +506,17 @@ void exec_c::br_exec(uop_c *uop)
       STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
       
       m_bp_data->m_bp_targ_pred->update (uop);  // update 
+
+      // redirect cycle
       m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
-	m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES; // redirect cycle 
+        m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;
+
       uop->m_uop_info.m_btb_miss_resolved = true; 
       DEBUG("_core_id:%d thread_id:%d cur_core_cycle:%s branch misprediction is resolved: "
           "redirect_cycle:%lld uop_num:%lld\n", 
           m_core_id, uop->m_thread_id, unsstr64(m_cur_core_cycle), 
           m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
     }
-      
-
   }
   
   // GPU : stall on branch policy

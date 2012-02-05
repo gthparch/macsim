@@ -154,15 +154,10 @@ void retire_c::run_a_cycle()
         break;
       }
 
-//      if (uop_list->empty()) {
-//        break;
-//      }
-//      cur_uop = uop_list->front();
       cur_uop = uop_list->at(uop_list_index++);
 
       rob = m_gpu_rob->get_thread_rob(cur_uop->m_thread_id);
       rob->pop();
-//      uop_list->pop_front();
     }
     // retirement logic for x86 simulation
     else {
@@ -201,8 +196,6 @@ void retire_c::run_a_cycle()
       ++m_insts_retired[cur_uop->m_thread_id];
       ++m_total_insts_retired;
       ++m_period_inst_count;
-//      if (!m_knob_ptx_sim)
-//      report("C" << m_core_id << " cpi:" << fixed << setprecision(2) << m_cur_core_cycle / m_total_insts_retired << "(" << m_cur_core_cycle << " " << m_total_insts_retired << ")");
 
       STAT_CORE_EVENT(cur_uop->m_core_id, INST_COUNT);
       STAT_EVENT(INST_COUNT_TOT);
@@ -360,7 +353,7 @@ void retire_c::update_stats(process_s* process)
 
   // repeating traces in case of running multiple applications
   // TOCHECK I will get back to this later
-  if (*m_simBase->m_knobs->KNOB_REPEAT_TRACE && process->m_repeat < *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N &&
+  if (*KNOB(KNOB_REPEAT_TRACE) && process->m_repeat < *KNOB(KNOB_REPEAT_TRACE_N) &&
       core->get_core_type() == "ptx") {
     if ((process->m_repeat+1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
@@ -390,7 +383,7 @@ void retire_c::update_stats(process_s* process)
 // repeat (terminated) trace, if necessary
 void retire_c::repeat_traces(process_s* process)
 {
-  if ((*m_simBase->m_knobs->KNOB_REPEAT_TRACE || (*m_simBase->m_knobs->KNOB_REPEAT_TRACE && *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N > 0)) && 
+  if ((*KNOB(KNOB_REPEAT_TRACE) || (*KNOB(KNOB_REPEAT_TRACE) && *KNOB(KNOB_REPEAT_TRACE_N) > 0)) && 
       m_simBase->m_process_count_without_repeat > 0) {
     // create duplicate process once previous one is terminated
     m_simBase->m_process_manager->create_process(process->m_kernel_config_name, process->m_repeat+1, 

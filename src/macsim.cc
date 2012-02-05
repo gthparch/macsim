@@ -28,8 +28,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
-* File         : main.cc
-* Author       : Hyesoon Kim
+* File         : macsim.cc
+* Author       : HPArch
 * Date         : 1/7/2008
 * SVN          : $Id: main.cc 911 2009-11-20 19:08:10Z kacear $:
 * Description  : main function
@@ -213,7 +213,8 @@ void macsim_c::init_memory(void)
 	m_invalid_uop->init();
 
 	// main memory
-	m_memory = mem_factory_c::get()->allocate(m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue(), m_simBase);
+  string memory_type = m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue();
+	m_memory = mem_factory_c::get()->allocate(memory_type, m_simBase);
 
   if (*KNOB(KNOB_ENABLE_NEW_NOC))
     m_router = new router_wrapper_c(m_simBase);
@@ -294,10 +295,11 @@ void macsim_c::init_cores(int num_max_core)
 	int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
 	report("initialize cores (" << num_large_cores << "/" 
-			<< (num_large_medium_cores - num_large_cores) << "/" << *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES <<")");
+			<< (num_large_medium_cores - num_large_cores) << "/" 
+      << *KNOB(KNOB_NUM_SIM_SMALL_CORES) <<")");
 
-	ASSERT(num_max_core == 
-			(*KNOB(KNOB_NUM_SIM_SMALL_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) + *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
+	ASSERT(num_max_core == (*KNOB(KNOB_NUM_SIM_SMALL_CORES) + \
+        *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) + *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
 
 
 	// based on the core type, add cores into type-specific core pools
@@ -380,7 +382,7 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   params["no_nodes"] = s;
           
           
-#if 0
+#if FIXME
   //if (! key.compare("-iris:self_assign_dest_id"))
    //           params.insert(pair<string,string>("self_assign_dest_id",value));
           if (! key.compare("-mc:resp_payload_len"))
@@ -552,19 +554,19 @@ void macsim_c::deallocate_memory(void)
     delete m_bug_detector;
 
   // deallocate cores
-  int num_large_cores        = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
-  int num_large_medium_cores = (*m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES + *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES);
+  int num_large_cores        = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+  int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
   for (int ii = 0; ii < num_large_cores; ++ii) {
     delete m_core_pointers[ii];
     m_core_pointers[ii] = NULL;
   }
 
-  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES; ++ii) {
+  for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_MEDIUM_CORES); ++ii) {
     delete m_core_pointers[ii + num_large_cores];
     m_core_pointers[ii + num_large_cores] = NULL;
   }
 
-  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES; ++ii) {
+  for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
     delete m_core_pointers[ii + num_large_medium_cores];
     m_core_pointers[ii + num_large_medium_cores] = NULL;
   }
@@ -663,7 +665,7 @@ void macsim_c::initialize(int argc, char** argv)
 
 
   // open traces
-  string trace_name_list = static_cast<string>(*m_simBase->m_knobs->KNOB_TRACE_NAME_FILE);
+  string trace_name_list = static_cast<string>(*KNOB(KNOB_TRACE_NAME_FILE));
   open_traces(trace_name_list);
 
   // any number other than 0, to pass the first simulation loop iteration
@@ -743,13 +745,13 @@ int macsim_c::run_a_cycle()
 
     // checking for threads 
     if (m_sim_end[ii] != true) {
-      // when *m_simBase->m_knobs->KNOB_MAX_INSTS is set, execute each thread for *m_simBase->m_knobs->KNOB_MAX_INSTS instructions
+      // when KNOB_MAX_INSTS is set, execute each thread for KNOB_MAX_INSTS instructions
       if (*m_simBase->m_knobs->KNOB_MAX_INSTS && 
           core->m_num_thread_reach_end == core->m_unique_scheduled_thread_num) {
         m_sim_end[ii] = true;
       }
-      // when *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT is set, execute only *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT cycles
-      else if (*m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT && m_simulation_cycle >= *m_simBase->m_knobs->KNOB_SIM_CYCLE_COUNT) {
+      // when KNOB_SIM_CYCLE_COUNT is set, execute only KNOB_SIM_CYCLE_COUNT cycles
+      else if (*KNOB(KNOB_SIM_CYCLE_COUNT) && m_simulation_cycle >= *KNOB(KNOB_SIM_CYCLE_COUNT)) {
         m_sim_end[ii] = true;
       }
     }
@@ -778,6 +780,10 @@ int macsim_c::run_a_cycle()
   return 1; //simulation not finished
 }
 
+
+// =======================================
+// Create a router
+// =======================================
 router_c* macsim_c::create_router(int type)
 {
   return m_router->create_router(type);

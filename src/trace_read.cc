@@ -61,7 +61,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ## args)
+#define DEBUG(args...)   _DEBUG(*KNOB(KNOB_DEBUG_TRACE_READ), ## args)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,10 +124,8 @@ trace_read_c::trace_read_c(macsim_c* simBase)
 
   // initialization
   dprint_count = 0;
-  dprint_output = new ofstream(*m_simBase->m_knobs->KNOB_STATISTICS_OUT_DIRECTORY + 
-                               "/trace_debug.out");
+  dprint_output = new ofstream(*KNOB(KNOB_STATISTICS_OUT_DIRECTORY) + "/trace_debug.out");
 }
-
 
 
 /**
@@ -155,7 +153,7 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id)
     gzread(thread_trace_info->m_trace_file, thread_trace_info->m_prev_trace_info, 
         TRACE_SIZE);
 
-    if (*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ) {
+    if (*KNOB(KNOB_DEBUG_TRACE_READ)) {
       dprint_inst(thread_trace_info->m_prev_trace_info, core_id, sim_thread_id);
     }
   }
@@ -307,7 +305,7 @@ bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thr
       }
 
 
-      if (*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ)
+      if (*KNOB(KNOB_DEBUG_TRACE_READ))
         dprint_inst(trace_info, core_id, sim_thread_id);
 
 
@@ -380,7 +378,7 @@ bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thr
  */
 void trace_read_c::dprint_inst(trace_info_s *t_info, int core_id, int thread_id) 
 {
-  if (dprint_count++ >= 50000 || !*m_simBase->m_knobs->KNOB_DEBUG_PRINT_TRACE)
+  if (dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE))
     return ;
  
   *dprint_output << "*** begin of the data strcture *** " << endl;
@@ -606,7 +604,7 @@ void trace_read_c::convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uo
   else if (info->m_table_info->m_mem_type) {
     int amp_val = 1;
     if (pi->m_opcode != XED_CATEGORY_STRINGOP) {
-      amp_val = *m_simBase->m_knobs->KNOB_MEM_SIZE_AMP;
+      amp_val = *KNOB(KNOB_MEM_SIZE_AMP);
     }
 
     if (info->m_table_info->m_mem_type == MEM_ST || 
@@ -1381,7 +1379,7 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
     
-    if (core->m_inst_fetched[sim_thread_id] < *m_simBase->m_knobs->KNOB_MAX_INSTS)  {
+    if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
       // read next instruction
       read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
           sim_thread_id, &inst_read);
@@ -1430,7 +1428,7 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
 
     // GPU simulation : if we use common cache for the shared memory
     // Set appropiriate opcode type (not using shared memory)
-    if (core->get_core_type() == "ptx" && *m_simBase->m_knobs->KNOB_PTX_COMMON_CACHE) {
+    if (core->get_core_type() == "ptx" && *KNOB(KNOB_PTX_COMMON_CACHE)) {
       switch (trace_info.m_opcode) {
         case TR_MEM_LD_SM:
           trace_info.m_opcode = TR_MEM_LD_LM;
@@ -1560,11 +1558,11 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
       uop->m_mem_type != MEM_ST_SM && 
       uop->m_mem_type != MEM_LD_CM && 
       uop->m_mem_type != MEM_LD_TM) {
-    int temp_num_req = (uop->m_mem_size + *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE - 1) / 
-      *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE;
+    int temp_num_req = (uop->m_mem_size + *KNOB(KNOB_MAX_TRANSACTION_SIZE) - 1) / 
+      *KNOB(KNOB_MAX_TRANSACTION_SIZE);
 
     ASSERTM(temp_num_req > 0, "size:%d max:%d num:%d type:%d num:%d\n", uop->m_mem_size, 
-        (int)*m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE, temp_num_req, uop->m_mem_type, 
+        (int)*KNOB(KNOB_MAX_TRANSACTION_SIZE), temp_num_req, uop->m_mem_type, 
         trace_uop->m_info->m_trace_info.m_num_uop);
   }
 
@@ -1675,9 +1673,9 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
         break;
       // global memory, parameter memory
       default:
-        if (*m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+        if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
           cache_line_addr = uop->m_vaddr;
-          cache_line_size = *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE;
+          cache_line_size = *KNOB(KNOB_MAX_TRANSACTION_SIZE);
         }
         else {
           cache_line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr);
@@ -1844,10 +1842,10 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
           if (uop->m_mem_type != NOT_MEM && uop->m_mem_type != MEM_LD_SM && 
               uop->m_mem_type != MEM_ST_SM && uop->m_mem_type != MEM_LD_CM && 
               uop->m_mem_type != MEM_LD_TM) {
-            int temp_num_req = (uop->m_mem_size + *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE - 1) / 
-              *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE;
+            int temp_num_req = (uop->m_mem_size + *KNOB(KNOB_MAX_TRANSACTION_SIZE) - 1) / 
+              *KNOB(KNOB_MAX_TRANSACTION_SIZE);
             ASSERTM(temp_num_req > 0, "size:%d max:%d num:%d type:%s\n", 
-                uop->m_mem_size, (int)*m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE, temp_num_req, 
+                uop->m_mem_size, (int)*KNOB(KNOB_MAX_TRANSACTION_SIZE), temp_num_req, 
                 uop_c::g_mem_type_name[uop->m_mem_type]);
 
           }
@@ -1862,10 +1860,10 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
           if (uop->m_mem_type != NOT_MEM && uop->m_mem_type != MEM_LD_SM && 
               uop->m_mem_type != MEM_ST_SM && uop->m_mem_type != MEM_LD_CM && 
               uop->m_mem_type != MEM_LD_TM) {
-            int temp_num_req = (uop->m_mem_size + *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE - 1) / 
-              *m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE;
+            int temp_num_req = (uop->m_mem_size + *KNOB(KNOB_MAX_TRANSACTION_SIZE) - 1) / 
+              *KNOB(KNOB_MAX_TRANSACTION_SIZE);
             ASSERTM(temp_num_req > 0, "size:%d max:%d num:%d type:%s\n", 
-                uop->m_mem_size, (int)*m_simBase->m_knobs->KNOB_MAX_TRANSACTION_SIZE, temp_num_req, 
+                uop->m_mem_size, (int)*KNOB(KNOB_MAX_TRANSACTION_SIZE), temp_num_req, 
                 uop_c::g_mem_type_name[uop->m_mem_type]);
           }
         }
@@ -1894,7 +1892,7 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
             break;
           // global memory, parameter memory
           default:
-            if (*m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+            if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
               cache_line_addr = uop->m_vaddr;
             }
             else {

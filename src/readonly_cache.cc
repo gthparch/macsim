@@ -130,9 +130,10 @@ int readonly_cache_c::load(uop_c *uop)
     Mem_Req_Type req_type = MRT_DFETCH;
 
     // generate a new request
-    int req_status = m_simBase->m_memory->new_mem_req(req_type, line_addr, uop->m_mem_size, \
-        m_cache_cycles - 1 + *m_simBase->m_knobs->KNOB_EXTRA_LD_LATENCY, uop, readonly_cache_fill_line_wrapper, \
-        uop->m_unique_num, NULL, m_core_id, uop->m_thread_id, 1);
+    int req_status = m_simBase->m_memory->new_mem_req(req_type, line_addr, uop->m_mem_size,
+        m_cache_cycles - 1 + *KNOB(KNOB_EXTRA_LD_LATENCY), uop, 
+        readonly_cache_fill_line_wrapper, uop->m_unique_num, NULL, m_core_id, 
+        uop->m_thread_id, 1);
 
     if (!req_status) {
       return 0;
@@ -203,16 +204,16 @@ bool readonly_cache_c::cache_fill_line(mem_req_s *req)
     uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
     uop->m_state = OS_SCHEDULED;
 
-	if (uop->m_mem_type == MEM_LD_CM) {
-		//STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CONFLICT);
-		STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W);
-		STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W_TAG);
-	}
-	else {
-		//STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CONFLICT);
-		STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W);
-		STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W_TAG);
-	}
+    if (uop->m_mem_type == MEM_LD_CM) {
+      //STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CONFLICT);
+      STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W);
+      STAT_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W_TAG);
+    }
+    else {
+      //STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CONFLICT);
+      STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W);
+      STAT_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W_TAG);
+    }
 
     // multiple uops case : let parent uop know
     if (uop->m_parent_uop) {

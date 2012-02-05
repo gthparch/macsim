@@ -248,8 +248,6 @@ cache_entry_c* cache_c::find_replacement_line(int set, int appl_id)
 }
 
 
-int special_adjust = 0;
-
 cache_entry_c* cache_c::find_replacement_line_from_same_type(int set, int appl_id, 
     bool gpuline) 
 {
@@ -258,13 +256,11 @@ cache_entry_c* cache_c::find_replacement_line_from_same_type(int set, int appl_i
 
   if (gpuline) {
     current_type_count = m_set[set]->m_num_gpu_line;
-//    current_type_max   = *m_simBase->m_knobs->KNOB_HETERO_STATIC_GPU_PARTITION;
-    current_type_max   = m_assoc - *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION + special_adjust;
+    current_type_max   = m_assoc - *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
   }
   else {
     current_type_count = m_set[set]->m_num_cpu_line;
-    current_type_max   = *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION - special_adjust;
-    //current_type_max   = m_assoc - *m_simBase->m_knobs->KNOB_HETERO_STATIC_GPU_PARTITION;
+    current_type_max   = *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
   }
     
   int lru_index = -1;
@@ -305,7 +301,8 @@ void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr
   ins_line->m_last_access_time = m_simBase->m_simulation_cycle;
   ins_line->m_pref             = false;
   ins_line->m_skip             = skip;
-#if 1 // HETERO
+
+  // for heterogeneous simulation
   ins_line->m_appl_id          = appl_id;
   ins_line->m_gpuline          = gpuline;
   if (ins_line->m_gpuline) { 
@@ -316,7 +313,6 @@ void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr
     ++m_num_cpu_line;
     ++m_set[set_id]->m_num_cpu_line;
   }
-#endif
 }
 
 
@@ -325,6 +321,7 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
 {
   return insert_cache(addr, line_addr, updated_line, appl_id, gpuline, false);
 }
+
 
 // insert a cache line
 void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int appl_id,
@@ -382,20 +379,6 @@ void cache_c::update_set_on_replacement(Addr tag, int appl_id, int set, bool gpu
     --m_set[set]->m_num_cpu_line;
   }
 }
-
-
-#if 0
-// insert a cache line (wrapper)
-void * cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int appl_id, 
-    bool gpuline) 
-{
-  m_insert_count++;
-  cache_entry_c *ins_line = 
-    (cache_entry_c *)worker_insert_cache (addr, line_addr, updated_line, appl_id, gpuline);
-
-  return ins_line->m_data;
-}
-#endif
 
 
 // initialize (nullify) a cache line
@@ -485,9 +468,11 @@ Counter cache_c::find_min_lru(int set)
 }
 
 
+// print cache information
 void cache_c::print_info(int id)
 {
-  if (*m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO > 0 && ++m_insert_count % *m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO == 0) {
+  if (*m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO > 0 && 
+      ++m_insert_count % *m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO == 0) {
     cout << "CACHE::L" << id << " cpu: " << m_num_cpu_line << " gpu: " << m_num_gpu_line << "\n";
   }
 }

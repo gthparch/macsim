@@ -72,7 +72,8 @@ class pref_factory_c
     /**
      * Register a new hardware prefetcher class
      */
-    void register_class(function<void (vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c*)>);
+    void register_class(function<void (vector<pref_base_c *> &, hwp_common_c *, Unit_Type, 
+          macsim_c*)>);
 
     /**
      * Allocate hardware prefetchers which are registerd
@@ -89,7 +90,7 @@ class pref_factory_c
 
   private:
     /** wrapper function table */
-    list<function<void (vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c*)> > m_func_table;
+    list<function<void (vector<pref_base_c *>&, hwp_common_c*, Unit_Type, macsim_c*)> > m_func_table;
 };
 
 
