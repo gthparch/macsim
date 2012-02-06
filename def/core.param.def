@@ -29,7 +29,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* -*- Mode: c -*- */
 
-
 param<FE_SIZE, 						fe_size, 						uns32, 	256>
 
 param<SCHED_CLOCK, 					sched_clock, 					uns32, 	1>
@@ -48,7 +47,7 @@ param<MIAQ_LARGE_SIZE, 				miaq_large_size, 				uns32, 	KNOB_MIAQ_SIZE>
 param<FQ_LARGE_SIZE, 				fq_large_size, 					uns32, 	KNOB_FQ_SIZE>
 
 
-param<GEN_ALLOCQ_INDEX,               	giaq_index,             		int,    0> 
+param<GEN_ALLOCQ_INDEX,               	giaq_index,             		int,    0>
 param<MEM_ALLOCQ_INDEX,               	miaq_index,             		int,    1>
 param<FLOAT_ALLOCQ_INDEX,               	fiaq_index,             		int,    2>
 
@@ -130,6 +129,8 @@ param<PRINT_HEARTBEAT, print_heartbeat, bool, true>
 param<GPU_SCHED, gpu_sched, bool, false>
 param<GPU_USE_SINGLE_ALLOCQ_TYPE, gpu_use_single_iaq_type, bool, true>
 param<GPU_SHARE_ALLOCQS_BETWEEN_THREADS, gpu_share_iaqs_between_threads, bool, true>
+param<MAX_WARP_PER_SM, max_warp_per_sm, int, 48>
+param<SP_PER_SM, sp_per_sm, int, 8>
 
 
 param<32_64_ISA, 32_64_isa, int, 32>
@@ -141,19 +142,12 @@ param<PCIE_TR, pcie_tr, int, 16>
 param<PCIE_INIT, pcie_init, int, 33250>
 
 
-// for mcpat config
-param<HOMOGENEOUS_CCS, homogeneous_ccs, int, 1>
+// for power config
 param<INST_LENGTH, inst_length, int, 32>
 param<OPCODE_WIDTH, opcode_width, int, 16>
 param<MICRO_OPCODE_WIDTH, micro_opcode_width, int, 8>
-param<PIPELINE_DEPTH_INT, pipeline_depth_int, int, 31>
-param<PIPELINE_DEPTH_FP, pipeline_depth_fp, int, 31>
-param<ALU_PER_CORE, alu_per_core, int, 6>
-param<MUL_PER_CORE, mul_per_core, int, 1>
-param<FPU_PER_CORE, fpu_per_core, int, 2>
 param<INST_BUF_SIZE, inst_buf_size, int, 32>
 param<DEC_STREAM_BUF_SIZE, dec_stream_buf_size, int, 16>
-param<INST_WINDOW_SIZE, inst_window_size, int, 64>
 param<FP_INST_WINDOW_SIZE, fp_inst_window_size, int, 64>
 param<RAS_SIZE, ras_size, int, 64>
 param<IFU_DUTY_CYCLE, ifu_duty_cycle, float, 1.0>
@@ -175,7 +169,11 @@ param<L3_CLOCKRATE, l3_clockrate, float, 0.85>
 param<DRAM_CLOCKRATE, dram_clockrate, float, 0.2>
 param<IS_GPU, is_gpu, int, 0> 
 param<GPU_WIDTH, gpu_width, int, 32> 
+param<ORIG_PIPELINE_STAGES, orig_pipeline_stages, int, 20> 
+param<EI_DECODE_WIDTH, ei_decode_width, int, KNOB_LARGE_WIDTH> 
+param<EI_ISSUE_WIDTH, ei_issue_width, int, KNOB_LARGE_WIDTH> 
+param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH> 
+param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
 
 
 
-// param<, , int, >
