@@ -96,7 +96,7 @@ bool icache_fill_line_wrapper(mem_req_s *req)
 	  result = false;
   }
 	  
-  STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_W);
+  POWER_CORE_EVENT(req->m_core_id, POWER_ICACHE_MISS_BUF_W);
 
   return result;
 }
@@ -267,6 +267,9 @@ void frontend_c::run_a_cycle(void)
   // TONAGESH
   // nagesh - comments for BAR are incomplete...
   if (m_knob_ptx_sim) {
+
+  	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_R);
+  	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_W);
     // handling of BAR instruction in PTX - can/should this be moved?
     // do we have any blocks for which all warps have reached (retired)
     // their next barrier?
@@ -365,7 +368,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     } 
     // instruction cache hit
     else {
-      STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R);
+      POWER_CORE_EVENT(m_core_id, POWER_ICACHE_R);
 
       // -------------------------------------
       // fetch instructions
@@ -373,6 +376,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
       while ((m_q_frontend->space() > 0) && !break_fetch) {
         // allocate a new uop 
         uop_c *new_uop = m_uop_pool->acquire_entry(m_simBase);
+		POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);	// FIXME Jieun 01-13-2012 Read counter should be between ICache and Predecoder
         new_uop->allocate();
         ASSERT(new_uop); 
 
@@ -418,6 +422,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
           m_map->map_uop(new_uop);
           m_map->map_mem_dep(new_uop);
 
+          POWER_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
         }
 
 
@@ -507,7 +512,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
   // -------------------------------------
   // access instruction cache
   // -------------------------------------
-  STAT_CORE_EVENT(m_core_id, POWER_ICACHE_R_TAG);
+  POWER_CORE_EVENT(m_core_id, POWER_ICACHE_R_TAG);
 
   // -------------------------------------
   // perfect icache
@@ -574,7 +579,7 @@ bool frontend_c::icache_fill_line(mem_req_s *req)
   if (m_icache->access_cache(req->m_addr, &line_addr, false, req->m_appl_id) == NULL) {
     m_icache->insert_cache(req->m_addr, &line_addr, &repl_line_addr, req->m_appl_id, 
         req->m_ptx);
-    STAT_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
+    POWER_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
   }
 
   STAT_CORE_EVENT(m_core_id, ICACHE_FILL); 
@@ -612,7 +617,7 @@ bool frontend_c::icache_fill_line(mem_req_s *req)
 inline void frontend_c::send_uop_to_qfe(uop_c *uop)
 {
   bool success = m_q_frontend->enqueue(0, (int*)uop);
-  STAT_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);
+  POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);	// FIXME: Jieun 01-13-2012 Write Counter should be just after ICache. Since one line of ICache has ~4 insts, W Counter is #insts/4
   DEBUG("m_core_id:%d tid:%d inst_num:%s uop_num:%s opcode:%d isitEOM:%d sent to qfe \n", 
       m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num), unsstr64(uop->m_uop_num), 
       (int)uop->m_opcode, uop->m_isitEOM);
@@ -637,7 +642,7 @@ int frontend_c::predict_bpu(uop_c *uop)
       else
         pred_dir = (m_bp_data->m_bp)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
-      STAT_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
+      POWER_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
     case CF_CALL:
       // 100% accurate

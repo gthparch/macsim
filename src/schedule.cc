@@ -126,10 +126,10 @@ bool schedule_c::check_srcs(int entry)
     return true;
   }
 
-  STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_R);
 
   // search all source (dependent) uops
   for (int i = 0; i < cur_uop->m_num_srcs; ++i) {
+
     if (cur_uop->m_map_src_info[i].m_uop == NULL) {
       continue;
     }
@@ -187,9 +187,6 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   bool   bogus       = cur_uop->m_bogus;
   *sched_fail_reason = SCHED_SUCCESS;
 
-  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
-  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
-  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
   DEBUG("cycle_m_count:%llu m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop.va:%s "
       "allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
@@ -231,7 +228,10 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   }
   
   cur_uop->m_state = OS_SCHEDULE;
-  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
+  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
+  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
+  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
 
   // -------------------------------------
@@ -259,8 +259,8 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   // Uop exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
   --m_num_in_sched;
-  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
-  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
+  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
+  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
 
   switch (q_num) {
     case gen_ALLOCQ : 
@@ -300,11 +300,10 @@ void schedule_c::advance(int q_index)
     int entry      = (int) m_alloc_q[q_index]->peek(0);  
     uop_c *cur_uop = (uop_c *)(*m_rob)[entry]; 
 
-    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
-    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
+    POWER_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 	switch (cur_uop->m_uop_type){
 		case UOP_FMEM:
 		case UOP_FCF:
@@ -315,7 +314,7 @@ void schedule_c::advance(int q_index)
 		case UOP_FCMP:                  
 		case UOP_FBIT:                   
 		case UOP_FCMOV:
-			STAT_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
+			POWER_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
 			break;
 	}
 
@@ -353,7 +352,7 @@ void schedule_c::advance(int q_index)
 
     ++m_num_in_sched;
 
-   	STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
+   	POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
    	
     // -------------------------------------
     // Add the uop's entry identifier in the ROB to the schedule list (scheduler insertion) 

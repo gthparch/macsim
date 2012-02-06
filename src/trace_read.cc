@@ -1325,13 +1325,18 @@ inst_info_s* trace_read_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s
     case XED_CATEGORY_SYSTEM:
     case XED_CATEGORY_VTX:
     case XED_CATEGORY_XSAVE:
-      STAT_CORE_EVENT(core_id, POWER_CONTROL_REGISTER_W);
+      POWER_CORE_EVENT(core_id, POWER_CONTROL_REGISTER_W);
       break;
 
   }
 
   if (pi->m_num_ld || pi->m_has_st) {
-    STAT_CORE_EVENT(core_id, POWER_SEGMENT_REGISTER_W);
+    POWER_CORE_EVENT(core_id, POWER_SEGMENT_REGISTER_W);
+  }
+
+  if(pi->m_write_flg)
+  {
+    POWER_CORE_EVENT(core_id, POWER_FLAG_REGISTER_W);
   }
 
   ASSERT(num_uop > 0);
@@ -1457,8 +1462,8 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     thread_trace_info->m_bom             = false;
 
     uop->m_isitBOM = true;
-    STAT_CORE_EVENT(core_id, POWER_INST_DECODER_R);
-    STAT_CORE_EVENT(core_id, POWER_MICRO_OP_SEQ_R);
+    POWER_CORE_EVENT(core_id, POWER_INST_DECODER_R);
+    POWER_CORE_EVENT(core_id, POWER_OPERAND_DECODER_R);
   } // END EOM
   // read remaining uops from the same instruction
   else { 

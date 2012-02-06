@@ -117,11 +117,11 @@ void schedule_smc_c::advance(int q_index) {
     rob_c *m_rob   = m_gpu_rob->get_thread_rob(tid);
     uop_c *cur_uop = (uop_c *) (*m_rob)[allocq_entry.m_rob_entry];
     
-    STAT_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
-    STAT_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
-    STAT_CORE_EVENT(m_core_id, POWER_FREELIST_R);
+    POWER_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
+    POWER_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
     switch (cur_uop->m_uop_type){
       case UOP_FMEM:
@@ -172,7 +172,7 @@ void schedule_smc_c::advance(int q_index) {
     DEBUG("core_id:%d thread_id:%d uop_num:%lld inserted into scheduler\n",
         m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
    	
-    STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
+    POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
   }
 }
 
@@ -256,9 +256,9 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
 
   *sched_fail_reason = SCHED_SUCCESS;
   
-  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
-  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
-  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
+  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
+  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
     
   DEBUG("uop_schedule core_id:%d thread_id:%d uop_num:%lld inst_num:%lld "
       "uop.va:%s allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
@@ -311,7 +311,7 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
   }
 
   cur_uop->m_state = OS_SCHEDULE;
-  STAT_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
+  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R);
 
 
   // -------------------------------------
@@ -341,8 +341,8 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
   // Uop m_exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
   --m_num_in_sched;
-  STAT_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
-  STAT_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
+  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
+  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
 
 
   switch (q_num) {

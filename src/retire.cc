@@ -176,8 +176,8 @@ void retire_c::run_a_cycle()
       }
 
       rob->pop();
-      STAT_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
-      STAT_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_R);
+      POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
+      POWER_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_R);
     }
 
 
@@ -198,6 +198,7 @@ void retire_c::run_a_cycle()
       ++m_period_inst_count;
 
       STAT_CORE_EVENT(cur_uop->m_core_id, INST_COUNT);
+      POWER_CORE_EVENT(cur_uop->m_core_id, POWER_PIPELINE);
       STAT_EVENT(INST_COUNT_TOT);
     }
 
