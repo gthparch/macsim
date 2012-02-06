@@ -1124,7 +1124,6 @@ void dcu_c::process_fill_queue()
           // If there is a victim line, we do the write-back.
           // -------------------------------------
           if (victim_line_addr) {
-            STAT_CORE_EVENT(req->m_core_id, POWER_DCACHE_C + m_level*2);
             if (data->m_dirty) {
               if (*(m_simBase->m_knobs->KNOB_USE_INCOMING_TID_CID_FOR_WB)) {
                 data->m_core_id = req->m_core_id;

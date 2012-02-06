@@ -418,7 +418,6 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
           m_map->map_uop(new_uop);
           m_map->map_mem_dep(new_uop);
 
-          STAT_CORE_EVENT(m_core_id, POWER_DEP_CHECK_LOGIC_W);
         }
 
 
