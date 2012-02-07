@@ -267,9 +267,9 @@ void frontend_c::run_a_cycle(void)
   // TONAGESH
   // nagesh - comments for BAR are incomplete...
   if (m_knob_ptx_sim) {
-
   	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_R);
   	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_W);
+
     // handling of BAR instruction in PTX - can/should this be moved?
     // do we have any blocks for which all warps have reached (retired)
     // their next barrier?
@@ -376,7 +376,9 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
       while ((m_q_frontend->space() > 0) && !break_fetch) {
         // allocate a new uop 
         uop_c *new_uop = m_uop_pool->acquire_entry(m_simBase);
-		POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);	// FIXME Jieun 01-13-2012 Read counter should be between ICache and Predecoder
+        
+        // FIXME Jieun 01-13-2012 Read counter should be between ICache and Predecoder
+        POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);	
         new_uop->allocate();
         ASSERT(new_uop); 
 
@@ -617,7 +619,9 @@ bool frontend_c::icache_fill_line(mem_req_s *req)
 inline void frontend_c::send_uop_to_qfe(uop_c *uop)
 {
   bool success = m_q_frontend->enqueue(0, (int*)uop);
-  POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);	// FIXME: Jieun 01-13-2012 Write Counter should be just after ICache. Since one line of ICache has ~4 insts, W Counter is #insts/4
+  // FIXME: Jieun 01-13-2012 Write Counter should be just after ICache. 
+  // Since one line of ICache has ~4 insts, W Counter is #insts/4
+  POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);	
   DEBUG("m_core_id:%d tid:%d inst_num:%s uop_num:%s opcode:%d isitEOM:%d sent to qfe \n", 
       m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num), unsstr64(uop->m_uop_num), 
       (int)uop->m_opcode, uop->m_isitEOM);

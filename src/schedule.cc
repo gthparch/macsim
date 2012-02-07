@@ -304,24 +304,24 @@ void schedule_c::advance(int q_index)
     POWER_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
     POWER_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
     POWER_CORE_EVENT(m_core_id, POWER_FREELIST_R);
-	switch (cur_uop->m_uop_type){
-		case UOP_FMEM:
-		case UOP_FCF:
-		case UOP_FCVT:
-		case UOP_FADD:                   
-		case UOP_FMUL:                    
-		case UOP_FDIV:                   
-		case UOP_FCMP:                  
-		case UOP_FBIT:                   
-		case UOP_FCMOV:
-			POWER_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
-			break;
-	}
+    switch (cur_uop->m_uop_type) {
+      case UOP_FMEM:
+      case UOP_FCF:
+      case UOP_FCVT:
+      case UOP_FADD:                   
+      case UOP_FMUL:                    
+      case UOP_FDIV:                   
+      case UOP_FCMP:                  
+      case UOP_FBIT:                   
+      case UOP_FCMOV:
+        POWER_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
+        break;
+    }
 
     DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%lld "
         "inst_num:%lld uop.va:%s allocq:%d mem_type:%d \n", m_cur_core_cycle,
         entry, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, 
-          hexstr64s(cur_uop->m_vaddr), cur_uop->m_allocq_num, cur_uop->m_mem_type);
+        hexstr64s(cur_uop->m_vaddr), cur_uop->m_allocq_num, cur_uop->m_mem_type);
 
     // Take out the corresponding entries queue type 
     // and check if the sched queue of the corresponding type has space. 

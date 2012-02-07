@@ -1334,8 +1334,7 @@ inst_info_s* trace_read_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s
     POWER_CORE_EVENT(core_id, POWER_SEGMENT_REGISTER_W);
   }
 
-  if(pi->m_write_flg)
-  {
+  if (pi->m_write_flg) {
     POWER_CORE_EVENT(core_id, POWER_FLAG_REGISTER_W);
   }
 

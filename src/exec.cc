@@ -236,8 +236,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
           // shared memory access
           uop_latency = core->get_shared_memory()->load(uop);
-		  POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R);
-		  POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R_TAG);
+          POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R);
+          POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R_TAG);
           if (uop_latency != 0) {
             uop->m_mem_start_cycle = m_cur_core_cycle;
           }
@@ -276,31 +276,31 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
           }
         }
 
-    switch (type) {
-      case MEM_LD:
-      case MEM_LD_LM:
-      case MEM_LD_SM:
-      case MEM_LD_GM:
-      case MEM_LD_CM:
-      case MEM_LD_TM:
-      case MEM_LD_PM:
-        POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_R);
-        POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_W);
-        POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_R_TAG);
-      	POWER_CORE_EVENT(m_core_id, POWER_DATA_TLB_R);
-        break;
+        switch (type) {
+          case MEM_LD:
+          case MEM_LD_LM:
+          case MEM_LD_SM:
+          case MEM_LD_GM:
+          case MEM_LD_CM:
+          case MEM_LD_TM:
+          case MEM_LD_PM:
+            POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_R);
+            POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_W);
+            POWER_CORE_EVENT(m_core_id, POWER_LOAD_QUEUE_R_TAG);
+            POWER_CORE_EVENT(m_core_id, POWER_DATA_TLB_R);
+            break;
 
-      case MEM_ST:
-      case MEM_ST_LM:
-      case MEM_ST_SM:
-      case MEM_ST_GM:
-        POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_R);
-        POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_W);
-        POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_R_TAG);
-        break;
-      default:
-        break;
-    }
+          case MEM_ST:
+          case MEM_ST_LM:
+          case MEM_ST_SM:
+          case MEM_ST_GM:
+            POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_R);
+            POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_W);
+            POWER_CORE_EVENT(m_core_id, POWER_STORE_QUEUE_R_TAG);
+            break;
+          default:
+            break;
+        }
       }
       // -------------------------------------
       // memory instructions that result in multiple memory requests
@@ -432,12 +432,12 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
           m_core_id, uop->m_thread_id, hexstr64s(uop->m_vaddr), uop->m_uop_num, 
           uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle);
     }
-  	POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_R);
-  	POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_W);
-  	POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
-  	POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
-  	POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
-  	POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_W);
+    POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_R);
+    POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_W);
+    POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
+    POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
+    POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
+    POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_W);
   }
   // non-memory (compute) instructions
   else {
@@ -464,20 +464,20 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         break;
 
       case UOP_IMUL:
-		POWER_CORE_EVENT(m_core_id, POWER_EX_MUL_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
-		POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
-		POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
+        POWER_CORE_EVENT(m_core_id, POWER_EX_MUL_R);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
+        POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
+        POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
         POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_W);
         break;
 
       default:
         POWER_CORE_EVENT(m_core_id, POWER_EX_ALU_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
-		POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_W);
         POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
         POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_R);
         POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_W);

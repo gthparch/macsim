@@ -202,14 +202,14 @@ bool readonly_cache_c::cache_fill_line(mem_req_s *req)
     uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
     uop->m_state = OS_SCHEDULED;
 
-	if (uop->m_mem_type == MEM_LD_CM) {
-		POWER_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W);
-		POWER_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W_TAG);
-	}
-	else {
-		POWER_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W);
-		POWER_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W_TAG);
-	}
+    if (uop->m_mem_type == MEM_LD_CM) {
+      POWER_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W);
+      POWER_CORE_EVENT(uop->m_core_id, POWER_CONST_CACHE_W_TAG);
+    }
+    else {
+      POWER_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W);
+      POWER_CORE_EVENT(uop->m_core_id, POWER_TEXTURE_CACHE_W_TAG);
+    }
 
     // multiple uops case : let parent uop know
     if (uop->m_parent_uop) {
