@@ -1542,7 +1542,7 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     uop->m_target_addr     = trace_uop->m_target;
   }
 
-  if(uop->m_opcode == GPU_EN) {
+  if (uop->m_opcode == GPU_EN) {
     m_simBase->m_gpu_paused = false;	
   }
 
@@ -2080,7 +2080,7 @@ void trace_read_c::init_pin_convert(void)
   m_fp_uop_table[TR_MEM_LD_CM]             = UOP_FADD;
   m_fp_uop_table[TR_MEM_LD_TM]             = UOP_FADD;
   m_fp_uop_table[TR_MEM_LD_PM]             = UOP_FADD;
-  m_fp_uop_table[GPU_EN]             = UOP_FADD;
+  m_fp_uop_table[GPU_EN]                   = UOP_FADD;
 }
 
 

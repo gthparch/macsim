@@ -97,7 +97,7 @@ macsim_c::macsim_c()
 	m_total_retired_block            = 0;
 	m_end_simulation                 = false;
 	m_repeat_done                    = false;
-  m_gpu_paused = true;
+  m_gpu_paused                     = true;
 
 	for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {	
 		m_core_cycle[ii]     = 0;

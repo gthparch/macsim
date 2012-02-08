@@ -365,11 +365,14 @@ void core_c::run_a_cycle(void)
 {
   start();
 
-  if(*m_simBase->m_knobs->KNOB_ENABLE_CONDITIONAL_EXECUTION) {
-    if(m_core_type == "ptx" && m_simBase->m_gpu_paused) {
+  // to simulate kernel invocation from host code
+  if (*KNOB(KNOB_ENABLE_CONDITIONAL_EXECUTION)) {
+    if (m_core_type == "ptx" && m_simBase->m_gpu_paused) {
       m_frontend->stop();
     }
   }
+
+
   // run each pipeline stages in backwards
   
   // execution stage
