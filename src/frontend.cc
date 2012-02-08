@@ -650,14 +650,20 @@ int frontend_c::predict_bpu(uop_c *uop)
       break;
     case CF_CALL:
       // 100% accurate
+      POWER_CORE_EVENT(m_core_id, POWER_RAS_W);
+      break;
     case CF_ICALL :
       // target = bp->ibr_predict_op(uop);
+      POWER_CORE_EVENT(m_core_id, POWER_RAS_W);
+      break;
     case CF_IBR:
       // target = bp->ibr_predict_op(uop);
     case CF_ICO:
       // target = bp->ibr_predict_op(uop);
     case CF_RET:
       // Return address stack : TOBE implemented
+      POWER_CORE_EVENT(m_core_id, POWER_RAS_R);
+      break;
     case CF_MITE:
       break;
 
