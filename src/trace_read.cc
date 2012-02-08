@@ -1542,6 +1542,9 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     uop->m_target_addr     = trace_uop->m_target;
   }
 
+  if(uop->m_opcode == GPU_EN) {
+    m_simBase->m_gpu_paused = false;	
+  }
 
   // address translation
   if (trace_uop->m_va == 0) {
@@ -2011,6 +2014,7 @@ void trace_read_c::init_pin_convert(void)
   m_int_uop_table[TR_MEM_LD_CM]             = UOP_IADD;
   m_int_uop_table[TR_MEM_LD_TM]             = UOP_IADD;
   m_int_uop_table[TR_MEM_LD_PM]             = UOP_IADD;
+  m_int_uop_table[GPU_EN]                   = UOP_IADD;
 
   m_fp_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
   m_fp_uop_table[XED_CATEGORY_3DNOW]       = UOP_FADD;
@@ -2076,6 +2080,7 @@ void trace_read_c::init_pin_convert(void)
   m_fp_uop_table[TR_MEM_LD_CM]             = UOP_FADD;
   m_fp_uop_table[TR_MEM_LD_TM]             = UOP_FADD;
   m_fp_uop_table[TR_MEM_LD_PM]             = UOP_FADD;
+  m_fp_uop_table[GPU_EN]             = UOP_FADD;
 }
 
 
@@ -2333,6 +2338,7 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "TR_MEM_LD_CM",
   "TR_MEM_LD_TM",
   "TR_MEM_LD_PM",
+	"GPU_EN"
 };
 
 

@@ -165,6 +165,7 @@ class macsim_c
 		int m_total_retired_block; /**< number of retired blocks total */
 		int m_num_running_core; /**< set to any non0 number before simulation start */
 		bool m_repeat_done; /**< in trace repeat mode, indicate repetition done */
+		bool m_gpu_paused;  /** indicate whether GPU can start its execution */
 
 		FILE *g_mystdout;	/**< default output stream */
 		FILE *g_mystderr;	/**< default error stream */

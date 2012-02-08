@@ -211,6 +211,7 @@ typedef enum TR_OPCODE_ENUM_ {
   TR_MEM_LD_CM,
   TR_MEM_LD_TM,
   TR_MEM_LD_PM,
+  GPU_EN,
   TR_OPCODE_LAST,
 } TR_OPCODE_ENUM;
 
