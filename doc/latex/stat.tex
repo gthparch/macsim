@@ -1,19 +1,19 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Statistics}
+\chapter{Simulation Statistics}
 \label{sec:stat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We provide a simple framework for collecting statistics during simulation.
-Statistics can be either global (common counter for all cores) or per core
-(each core has its own counter).
+A simple framework for collecting statistics (hereafter referred to as stats)
+  during simulation is provided.  Stats can be either global (includes
+      data from all cores) or per core.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Statistic Types}
+\section{Stat Types}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The following statistic types are supported:
+The following stat types are supported:
 
 \begin{description}
 
@@ -25,31 +25,31 @@ The following statistic types are supported:
   cache hit ratio.
 
   \item [DIST]  for calculating the proportion of each event in a group of
-  events.
-  \ignore{for defining a group of related events and calculating the
-  number of occurances of each event in the group as a percent of the sum of the
-  number of occurances of all events in the group.}  Eg. If we want to know what
-  percent of L1 data cache accesses (in a 2-level hierarchy) resulted in L1
-  hits, L2 hits or memory accesses, we should define a distribution consisting
-  on three events - L1 hits, L2 hits and L2 misses  - and update the
-  counter for each event correctly. 
+  events.  \ignore{for defining a group of related events and calculating the
+    number of occurances of each event in the group as a percent of the sum of
+      the number of occurances of all events in the group.}  Eg. If the user
+      wants to know what percent of L1 data cache accesses (in a 2-level
+          hierarchy) resulted in L1 hits, L2 hits or memory accesses, then the
+      user should define a distribution consisting on three events - L1 hits,
+      L2 hits and L2 misses  - and update the counter for each event correctly. 
 
 \end{description}
 
 
-Note that the simulation will output two values for each statistic. One is the
-raw value i.e. the number of occurances of the statistic and the other output
-value is the value calculated based on the type of the statistic.
+Note that a simulation will output two values for each stat. One is the
+raw value i.e. the number of occurances of the event associated with the
+stat and the other value is the value calculated based on the type
+of the stat.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{How to Add a New Stat}
+\section{Adding a new stat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-New statistics can be defined by adding definitions to any of the
+New stats can be defined by adding DEF\_STAT statements to any of the
 \textit{*.stat.def} files in the \textit{trunk/def/} directory or by creating a
 \textit{.stat.def} file including the definitions in the \textit{trunk/def/}
-directory.  In order to define a per core statistic specify PER\_CORE at the
+directory.  To define a per core statistic specify PER\_CORE at the
 end of each DEF\_STAT statement below.
 
 
@@ -102,18 +102,17 @@ DEF_STAT(SCHED_FAILED_NO_PORTS, DIST, NO_RATIO, PER_CORE)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{How to Update Statistics}
+\section{Updating Stats}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-Macros are provided to update the value of statistics. STAT\_EVENT and
-STAT\_EVENT\_M increment and decrement the value of a global statistic by 1 and
-take the name of the stat to be updated as their one and only argument.
-STAT\_EVENT\_N is used to increment the value of a global statistic by more
-than than 1. It takes the name of the statistic to be incremented and the value
-by which the statistic is to be incremented as its parameters.
+Macros are provided to update the value of stats. STAT\_EVENT and
+STAT\_EVENT\_M increment and decrement the value of a global stat by 1 and take
+the name of the stat to be updated as their argument.  STAT\_EVENT\_N is used
+to increment the value of a global stat by more than than 1. It takes the name
+of the stat to be incremented and the value to be added as its arguments.
 STAT\_CORE\_EVENT and STAT\_CORE\_EVENT\_M increment and decrement the value of
-a per core stat by 1. These take core id and the name of the statistic to be
+a per core stat by 1. These take core id and the name of the stat to be
 incremented/decremented as their parameters. For example,
 
 \begin{Verbatim}
@@ -126,27 +125,30 @@ STAT_CORE_EVENT(0, INST_COUNT); // increments stat INST_COUNT for core 0 by 1
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{The Output}
+\section{Simulation output}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-At the end of the simulation *.stat.out are generated, these files include the
-statistic values at the end of the simulation. As mentioned, for each stat two
-values are generated, one is the raw statistic value and other is a value
-calculated based on the type of the stat. For simulations with multiple
-applications, multiple sets of stat files are generated. Each simulated
-application is assigned an integer id (these ids are assigned according to the
-    order in which the applications appear in the trace\_file\_list), when an
-application terminates (for the first time, note that applications may be
-    repeated), stat files suffixed with the the id of the application, i.e.
-*.stat.out.<appl\_id>, are generated. These stat files contain the value of the
-stats until that point in the simulation. At the end of the simulation,
-      *.stat.out files are generated as usual.
+At the end of a simulation several files with the extension stat.out are
+generated, these files include the stat values at the end of the
+simulation. As mentioned, for each stat two values are generated, one is the
+raw stat value and other is a value calculated based on the type of the
+stat. For simulations with multiple applications, multiple sets of stat files
+are generated. Each simulated application is assigned an integer id (these ids
+    are assigned according to the order in which the applications appear in the
+    trace\_file\_list), when an application terminates (for the first time,
+      note that applications may be repeated), stat files suffixed with the the
+    id of the application, i.e.  *.stat.out.<appl\_id>, are generated. These
+    stat files contain the value of the stats until that point in the
+    simulation. At the end of the simulation, *.stat.out files are generated as
+    usual.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Important Stats}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TODO{better to remove this, adding more stats will be difficult}
 
 \begin{table}[htb]
 \begin{footnotesize}

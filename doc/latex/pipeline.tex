@@ -1,42 +1,16 @@
 
 
 
-\chapter{Pipeline Stages}
+\chapter{Pipeline Stages in \SIM}
 
-This section describes the basic feature of each pipeline stage. 
-Table~\ref{table:pipeline} shows the list of files that are relevant to each pipeline stage. 
-Please see the doxygen file to get the up-to-date information. 
-
-
-\begin{table}[htb]
-\begin{footnotesize}
-\begin{center}
-\caption{Pipeline stage and the corresponding source files.}
-\label{table:pipeline}
-\begin{tabular}{|c||c|}
-\hline 
-pipeline stage         & file names                                             \\ \hline \hline 
-main simulator         & macsim.cc, core.cc                                     \\ \hline 
-fetch stage            & frontend.cc, fetch\_factory.cc, bp.cc, bp\_*.cc        \\ \hline 
-decode stage           & allocate.cc                                            \\ \hline 
-allocate stage         & allocate.cc, allocate\_*.cc, rob.cc, rob\_*.cc, map.cc \\ \hline 
-schedule stage         & schedule.cc, schedule\_*.cc                            \\ \hline 
-execution stage        & exec.cc                                                \\ \hline 
-retire stage           & retire.cc                                              \\ \hline 
-memory system          & port.cc, cache.cc *\_cache.cc, dram.cc, memory.cc      \\ \hline \hline
-other supporting files & statistics.cc, bug\_detector.cc                        \\ \hline \hline 
-process manager        & process\_manager.cc                                    \\ \hline 
-\end{tabular}
-\end{center}
-\end{footnotesize}
-\end{table}
-
-\TODO{above table lists things other than pipeline stages}
-
+\SIM implements a six stage processor whose pipeline depth can be varied using
+knobs. The stages are - Fetch, Decode, Allocate, Schedule and Execute (includes
+    Memory) and Retire. This chapter describes the basic feature of each
+stage.
 
 \section{Fetch Stage}
-This pipeline stage models the instruction fetch stage. The main tasks
-of this stage are as follows:
+This stage models the instruction fetch stage, its main tasks
+are as follows:
 
 \begin{enumerate}
 
@@ -54,18 +28,20 @@ instruction or not.
 
 \item BTB access and branch prediction. 
 
-\item send uop to queue meant for modeling the depth of front-end.
+\item send uop to queue meant for modeling the depth of the processor front-end.
 
 \end{enumerate}
 
-The depth of front-end stage is set using one of the {\textit fetch\_latency}
-knobs, there is one knob for each core type (small, medium and large).\ignore{
-  and it basically sets the length of {\textit q\_fe }} \TODO {Different fetch
-    policies can be implemented using the factory mechanism explained in
-      Section~\ref{}. } The default fetch policy is round-robin and the policy
-      to be used is specified using the \TODO{....} knobs. Different branch
-      predictors are implemented using the \textit{bp\_factory} and the type of
-      branch predictor to be used is set using the BP\_DIR\_MECH knob.
+The depth of the front-end stage is set using one of the {\textit
+  fetch\_latency} knobs, there is one knob for each core type (small, medium
+      and large).\ignore{ and it basically sets the length of {\textit q\_fe }}
+  \TODO {Different fetch policies can be implemented using the factory
+    mechanism explained in Section~\ref{}. } The default fetch policy is
+    round-robin and the policy to be used is specified using the
+    \textit{fetch\_policy} knob. \TODO{there is one common knob for all core
+      types, same for bp\_\_dir\_mech!} Different branch predictors are
+      implemented using the \textit{bp\_factory} and the type of branch
+      predictor to be used is set using the bp\_dir\_mech knob.
 
 \ignore{ Different fetch polices are implemented using virtual function.
   {\textit fetch\_factory} function sets different {\textit frontend\_c}.
@@ -77,15 +53,16 @@ knobs, there is one knob for each core type (small, medium and large).\ignore{
 
 
 
-\subsection{Trace Read} 
+\subsection{Reading Traces} 
 
-Trace read is mainly performed in trace\_read.cc. The main function of this
-step of simulation is to read a macro instruction from the trace file and
-convert it into a sequence of one or more micro-ops (uops). A simple decoding
-algorithm is used for generating uops. To improve the speed of simulation,
-decoded uops are stored in a hash table for reuse when the same
-static instruction is encountered again during simulation. Note that
-dynamic information such as addresses will have to be decoded again. 
+Reading of traces is mainly performed in trace\_read.cc. The main function of
+this step during simulation is to read a macro instruction from the trace file
+and convert it into a sequence of one or more micro-ops (uops). A simple
+decoding algorithm is used for generating uops. To improve the speed of
+simulation, decoded uops are stored in a hash table for reuse when the same
+static instruction is encountered again during simulation. Note that to obtain
+dynamic information such as addresses accessed, uops must be decoded partially
+everytime.
 
 \ignore { The main task of trace read is reading an macro instruction from
   trace file and convert it to uops.  A simple decoding algorithm is used to
@@ -106,7 +83,7 @@ In the allocation stage, the resource requirement for each uop is calculated
 and space is allocated for the uop in the required structures. At the end of the
 allocation stage, each uop occupies an entry in ROB and one of the issues
 queues - general purpose (integer), floating point or memory. Depending on the
-knob values, there could a unified issue queue of distributed issue queues. For
+knob values, there could a unified issue queue or distributed issue queues. For
 conditional branches with BTB misses, the branch target is resolved in this
 stage as well.
 
@@ -144,9 +121,9 @@ execution of instructions:
 
 \item For non-memory uops, the latency of the the instruction is determined, an
 execution port is marked as in use and the \textit{m\_done\_cycle} of the uop
-is set. The latencies of uops is defined in the file
+is set. The latencies of uops are defined in the file
 \textit{../def/uoplatency\_ptx.def} which gets included during the compilation
-of the MacSim binary. 
+of the \SIM binary. 
 
 \item Branch instructions are resolved in this stage.
 
@@ -191,8 +168,9 @@ by using children uop structures. In {\textit trace\_read.cc} file already gener
 \section{Retire Stage}
 
 This stage handles the in-order retirement of uops. Memory allocated to a uop
-is freed or returned to memory pools. This stage also checks of completion of
-warps, blocks, kernels and the entire application itself.
+is freed (returned to memory pool). This stage also checks of completion of
+warps, blocks, kernels and the entire application itself and triggers the
+repetition of applications if the knob for repetition is set.
 
 
 

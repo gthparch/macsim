@@ -3,16 +3,16 @@
 \chapter{The Memory System}
 \label{sec:memory}
 
-\section{The Cache Structure}
 
-Each cache structure consists of the cache and multiple
-queues. Figure~\ref{fig:cache} shows the overall cache structure in
-the \SIM. There are two flows: 1) cache access flow: from a processor
-or upper level cache miss, try to access the cache and 2) cache fill
-flow: in case of a cache miss, the data is supplied from the lower
-level cache or DRAM. Section~\ref{sec:queue} details all queues and
-Section~\ref{sec:cache-flow} describes the flows between queues and a
-cache.
+\section{Caches}
+
+Each cache structure consists of the cache storage (tag and data) and multiple
+queues. Figure~\ref{fig:cache} shows the overall structure of a cache in \SIM.
+There are two flows: 1) cache access flow: from a processor or upper level
+cache miss, to access the cache and 2) cache fill flow: in case of a cache
+miss, data is supplied from the lower level cache or DRAM.
+Section~\ref{sec:queue} details all queues and Section~\ref{sec:cache-flow}
+lists the flows through the queues and the cache.
 
 \begin{figure*}[htb]
 \centering
@@ -25,46 +25,47 @@ cache.
 \subsection{The Queues}
 \label{sec:queue}
 
-All cache accesses flow from one queue to the other queue. 
+All cache accesses flow from one queue to another.
 
 \begin{itemize}
-  \item input queue - to access a cache. Requests due to upper-level
-  cache misses are inserted in this queue.
+  \item input queue - requests forwarded to this cache due to upper-level cache misses are inserted into this queue.
 
-  \item output queue - as a result of a cache-miss, a request will be
-  inserted into the output queue to be supplied data from the
-  lower-level caches or DRAM.
+  \item output queue - requests that miss in this cache are inserted into the
+  output queue to be forwarded to a lower-level cache . If no lower-level cache
+  is available, then requests are forwarded to DRAM.
 
-  \item write-back queue - In \SIM, we model write-back caches. When a
-  cache line is evicted and dirty, this line needs to be written back
-  in the lower level. All write-back requests are initially inserted
-  into the write-back queue.
+  \item write-back queue - \SIM models write-back caches. When a dirty cache
+  line is evicted, the line must be written back into the next level cache (or
+      DRAM). All write-back requests are initially inserted into the write-back
+  queue.
 
-  \item fill queue - requests in this queue tries to fill the data
-  that is returned from the lower-level cache or DRAM.
+  \item fill queue - data returned from the next level cache or DRAM is
+  inserted into the fill queue before updating the cache.
 
-  \item coherence queue - this queue is intended for handling
-  coherence traffics, but this is currently not modeled.
+  \item coherence queue - this queue is intended for handling coherence
+  traffic, but this is currently not modeled \TODO{do you mean not used?}
+  
 \end{itemize}
 
 
-\subsection{The Flows in the Cache Structure}
+\subsection{The Flows}
 \label{sec:cache-flow}
 
 \begin{itemize}
 
-  \item Upper-level cache to input queue : upper-level cache miss
+  \item Upper-level cache to input queue : forwarding of upper-level cache miss \TODO{even writebacks from upper level cache can come here?}
 
-  \item input queue to cache : access the cache
+  \item input queue to cache : accessing the cache
 
-  \item cache to output queue : cache miss and lower-level cache access
+  \item cache to output queue : cache miss, access lower-level cache
 
-  \item cache to write-back queue : write-back requests
+  \item cache to write-back queue : generating write-back requests
 
-  \item write-back queue to output queue : to access lower-level cache
+  \item write-back queue to output queue : write-back request, access the
+  lower-level cache
 
-  \item output queue to the router : to access the lower-level cache
-  through the on-chip interconnection network.
+  \item output queue to the router : access the lower-level cache
+  through the on-chip interconnection network
 
   \item router to the fill queue : the data from the lower-level cache
   or DRAM
@@ -75,10 +76,11 @@ All cache accesses flow from one queue to the other queue.
 \section{The Hierarchy}
 \label{sec:memhierarchy}
 
-\SIM maintains very flexible memory hierarchy. Each level of cache 
-hierarchy is independent and \SIM defines the link between the
-levels. Figure~\ref{fig:memory} shows the diagram of the memory
-hierarchy in \SIM.
+\SIM is very flexible in its support for different memory hierarchies. Each
+level in the cache hierarchy can be configured independently of other levels
+with \TODO{\SIM pre-defining only the links between the different levels}.
+Figure~\ref{fig:memory} shows the base memory hierarchy (without DRAM) which
+can be configured to model numerous other memory hierarchies as well.
 
 \begin{figure*}[htb]
 \centering
@@ -88,35 +90,30 @@ hierarchy in \SIM.
 \end{figure*}
 
 
+\begin{itemize} \item There are three levels (L1, L2, and L3) of caches in the
+\SIM , the L2 cache can be disabled if needed by some configurations.
 
-Here are some basics.
+  \item All the caches \TODO{what about L1?} and memory controllers are
+  connected via an on-chip interconnection network (currently, the default
+      topology is ring).
 
+  \item L1 and L2 caches are always private to each core.
 
-\begin{itemize}
-  \item There are three levels (L1, L2, and L3) of caches in the \SIM
-  although L2 cache might be disabled in some configurations.
-
-  \item All these caches and memory controllers are connected via
-  on-chip interconnection network (currently, the default topology is
-  ring).
-
-  \item L1 and L2 caches are always private to each processors.
-
-  \item The local router within a cache structure is enabled when
+  \item The local router within a cache structure is enabled only when
   necessary.
 
   \item L3 cache is unified (shared by all cores), but tiled based on
-  the static bank partition. In other words, address regions are
+  the static \TODO{bank?} partition. In other words, address regions are
   statically partitioned and each tile is responsible for sub regions.
 
 \end{itemize}
 
 
-For example, Figure~\ref{fig:level2cache} shows the example of 2-level
-caches. Even though there are 3-level caches, L2 cache is disabled and
-only its router is used by the L1 cache to access the interconnection
-network. Since there is no additional latency between L1 and L2, we
-can flexibly configure 2-level caches.
+Figure~\ref{fig:level2cache} shows how to configure a 2-level cache hierarchy.
+Even though there are 3-levels of cache, the L2 cache is disabled and only its
+router is used by the L1 cache to access the interconnection network. Since
+there is no additional latency between L1 and L2 when the L2 is disabled, we
+can flexibly configure 2-level cache hierarchies.
 
 
 \begin{figure*}[htb]
@@ -127,11 +124,11 @@ can flexibly configure 2-level caches.
 \end{figure*}
 
 
-\section{How to Configure Cache Hierarchy} 
+\section{Configuring the Cache Hierarchy} 
 
-The cache hierarchy can be configured by setting 1) the link between
-upper/lower level cache, 2) disability, and 3) router. The following
-code is used in the \SIM cache initialization.
+The cache hierarchy can be configured by 1) setting the link between different
+cache levels, 2) disabling cache levels and 3) enabling/disabling routers. The
+following code is used in \SIM for cache initialization.
 
 \begin{Verbatim}
 void dcu_c::init(
@@ -140,13 +137,13 @@ void dcu_c::init(
   bool done, 
   bool coupled_up, // direct link with upper level cache
   bool coupled_down, // direct link with lower level cache
-  bool disable, // disability
+  bool disable, // disable cache
   bool has_router // router
 );
 \end{Verbatim}
 
 \begin{description}
-  \item[Router] When \textsf{has\_router} is set to \textit{false},
+  \item[Enabling/disabling router] When \textsf{has\_router} is set to \textit{false},
   the cache cannot directly access to the on-chip
   interconnection. Instead, it has to go through lower-level cache's
   interface. Therefore, \textsf{coupled\_down} must set
@@ -154,19 +151,19 @@ void dcu_c::init(
   this way, the output queue of the cache is connected directly to the
   input queue of the next level (lower) cache.
 
-  \item[Disability] When \textsf{disable} is set to \textit{true}, the
-  cache is disabled. When a request is inserted from the upper level
-  cache, it will be directly inserted into the output queue. This
-  feature has been used for modeling 2-level cache hierarchy. As
-  Figure~\ref{fig:level2cache} shown, L1 and L3 caches are active, but
-  L2 cache is disabled. However, the L1 cache does not have a router,
-  so it needs to use the router of the L2
-  cache. Therefore, \textsf{has\_router} must be set to \textit{true}.
+  \item[Disabling cache levels] When \textsf{disable} is set to \textit{true},
+  the cache is disabled. When a request is inserted into the input queue of a
+  disabled cache, the request will be directly inserted into the output queue
+  of the cache. This feature has been used for modeling 2-level cache
+  hierarchies. As Figure~\ref{fig:level2cache} shows, L1 and L3 caches are
+  active, but L2 cache is disabled. However, since the L1 cache does not have a
+  router, it needs to use the router of the L2 cache. Therefore,
+  \textsf{has\_router} must be set to \textit{true} for the L2 cache.
 
-  \item[Link] As mentioned in the Section~\ref{sec:memhierarchy}, the
-  L1 and L2 caches are always private to a processor. All L1 misses
+  \item[Links] As mentioned in the Section~\ref{sec:memhierarchy}, the
+  L1 and L2 caches are always private to a core. All L1 misses
   should go through the L2 cache without accessing the interconnection
-  network. To this end, the direct link must be set between the L1 and
+  network. To this end, a direct link must be set between the L1 and
   L2 caches. Therefore, \textsf{coupled\_down} and \textsf{next\_id}
   must be set for the L1 cache and \textsf{coupled\_up}
   and \textsf{prev\_id} must be set for the L2 cache. Note that the
@@ -174,9 +171,8 @@ void dcu_c::init(
 
 \end{description}
 
-\subsection{Example of Different Cache Hierarchy}
+\subsection{Configuring Different Cache Hierarchies with \SIM}
 
-We provide several example of the cache hierarchy.
 
 \begin{itemize}
 \ignore{
@@ -196,15 +192,14 @@ We provide several example of the cache hierarchy.
   \smallskip
 }
 
-  \item Intel Nehalem~\cite{nehalem} and Sandy
-  Bridge~\cite{sandybridge} microarchitecture have three-level of
-  caches. The last-level cache is tiled, but if the L2 cache tries to
-  access the closest L3 tile, it does not have to access through the
-  interconnection. All communications will be made through the direct
-  link. However, if the L2 cache accesses the remote L3 tile, it goes
-  through the interconnection. Note that the number of cores (L1 and
-  L2 caches) and the number of the L3 tiles must be the same in this
-  configuration.
+  \item Intel Nehalem~\cite{nehalem} and Sandy Bridge~\cite{sandybridge}
+  microarchitectures have three-levels of caches. The last-level cache is tiled
+  and to access the closest L3 tile, a L2 cache does not have to go through the
+  interconnection, it can access the L3 tile through a direct link. However, if
+  a L2 cache accesses a remote L3 tile, it goes through the interconnection.
+  Note that the number of cores (L1 and L2 caches) and the number of the L3
+  tiles must be the same in this configuration. \TODO{how is the direct link
+    configured?}
 
 \begin{Verbatim}
 // class l3_coupled_network_c
@@ -218,7 +213,7 @@ for (int ii = 0; ii < m_num_core; ++ii) {
 
   \item NVIDIA G80~\cite{g80} architecture does not have
   hardware-managed caches. Thus, all three levels are connected each
-  other and disabled. Only the L3 cache has a router to access DRAM.
+  other and disabled. Only the L3 cache has a router to access the DRAM.
 
   \begin{Verbatim}
   // class no_cache_c
@@ -230,11 +225,11 @@ for (int ii = 0; ii < m_num_core; ++ii) {
   }
   \end{Verbatim}
 
-  \item NVIDIA Fermi~\cite{fermi} architecture has private L1 cache
-  and unified L2 cache shared by all cores. The L1 and L2 caches are
-  linked. The L2 cache has been disabled, but has a router
-  enabled. The L3 is not linked with others, but it is enabled and has
-  a router.
+  \item NVIDIA Fermi~\cite{fermi} architecture has private L1 caches and a
+  unified L2 cache shared by all cores. The L1 and L2 caches are linked. The L2
+  cache is been disabled, but has is router enabled. The L3 is not linked with
+  others (it is connected via the interconnect), but it is enabled and has a
+  router.
 
   \begin{Verbatim}
   // class l2_decoupled_network_c
@@ -250,12 +245,12 @@ for (int ii = 0; ii < m_num_core; ++ii) {
   }
   \end{Verbatim}
   
-  \item In general 2-D Topology (Mesh, Torus), we assume each core has
-  private L1 and L2 caches, but access to the L3 cache must be
-  communicated through the interconnection network. The L1 and L2
-  caches are both enabled and linked, but only the L2 cache has a
-  router. The L3 cache is not linked with others and the communication
-  is made through the interconnection network.
+  \item In a general 2-D Topology (Mesh, Torus), it is assumed that each core
+  has private L1 and L2 caches, but access to the L3 cache must be 
+  through the interconnection network. The L1 and L2 caches are both enabled
+  and linked, but only the L2 cache has a router. The L3 cache is not linked
+  with other caches and the communication is made through the interconnection
+  network.
 
   \begin{Verbatim}
   // class l3_decoupled_network_c
@@ -273,21 +268,24 @@ for (int ii = 0; ii < m_num_core; ++ii) {
 \end{itemize}
 
 \section{DRAM Module} 
+\label{sec:dram}
 
-\SIM also models detail memory controllers: timing constraint, 
-bandwidth, and scheduling. Section~\ref{sec:param-dram} describes how
-to configure DRAM parameters.
+\SIM also models detailed memory controllers which consider DRAM timing
+constraints and bandwidth specifications when scheduling requests.\TODO{include
+  timing constraints here} Section~\ref{sec:param-dram} describes how to
+  configure DRAM parameters.
 
-The DRAM controller consists of multiple banks with one ore more
-channels. Each bank has own request buffer and bank scheduler picked
+  A DRAM controller can schedule requests to multiple banks and can include one
+  or more channels. \TODO{incomplete - Each bank has its own request buffer and
+    bank scheduler picked}
 
 \begin{itemize}
   \item The bank scheduler picks a request based on the policy (FCFS,
-  FRFCFS, ...) if nothing is served now.
+  FRFCFS, ...) if no requests are being served currently.
 
-  \item The channel scheduler picks a request from command-ready banks
+  \item \TODO{The channel scheduler picks a request from command-ready banks
   (usually oldest request first). Based on the command, appropriate
-  timing constraint is enforced to the bank.
+  timing constraint is enforced on the bank. - not clear}
 
   \item Once the column access signal is sent, the data is prepared
   from the DRAM chip (load) or the data is sent to the DRAM chip

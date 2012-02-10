@@ -1,0 +1,43 @@
+\chapter{Adding to \SIM}
+\label{sec:add_macsim}
+
+\subsection{New DRAM Policy}
+
+To implement a new DRAM scheduling policy, a class that extends
+\textit{dram\_controller\_c} has to be defined. This class should overload the
+\textit{schedule()} function which should return the next DRAM request to be
+serviced according to the policy. Please refer to class \textit{dc\_frfcfs\_s}
+defined in dram.cc/h for a sample. In addition to the class, define a wrapper
+function that returns an instance of the class (see \textit{dram.cc} for an
+    example) and register the class with the DRAM factory (see \textit{see
+      register\_functions() in \textit{macsim.cc}}. 
+
+
+\subsection{New Instruction Scheduler}
+
+Define a class that extends \textit{schedule\_c} and overloads at least the
+\textit{run\_a\_cycle()} function. Other functions may be overloaded to
+maintain a consistent code structure across the different instruction
+schedulers. After defining the new scheduler, add code to \textit{core.cc} to
+instantiate the new scheduler instead of one of the provided schedulers.
+
+\subsection{New policy for assigning thread blocks to GPU cores}
+
+In \textit{process\_manager\_c::sim\_schedule\_thread\_block()} add (or modify)
+code to determine the id of the block that will be assigned to the core based
+on the new policy. The list of ready blocks can be obtained via
+\textit{m\_block\_schedule\_info} member of the \textit{macsim\_c} object that
+is created for the simulation.
+
+\subsection{New Fetch Policy}
+\TODO{Jaekyu(?)}
+
+\subsection{New Branch Predictor}
+\TODO{Jaekyu(?)}
+
+\subsection{New Hardware Prefetcher}
+\TODO{Jaekyu}
+
+
+
+

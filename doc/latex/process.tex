@@ -1,5 +1,9 @@
 
 \chapter{Process Manager/Thread Scheduler}
+\label{sec:process_manager}
+
+\TODO{Dont think process manager should be a separate chapter, is it a
+  distinguishing/special feature of \SIM? Recommend merging this with the chapter on data structures}
 
 MacSim uses a common Process Manager/Thread Scheduler for both CPU threads and
 GPU warps. For each application that is to be simulated, the Process Manager
@@ -13,9 +17,9 @@ child thread becomes ready for execution, the Process Manager is responsible
 for assigning the child threads to cores. In case of GPU applications, the
 Process Manager creates warps and forms thread blocks from these warps. The
 thread blocks are assigned to cores according to the maximum number of blocks
-supported by the core. Though the term core is commonly used for both X86 cores
-and GPU cores, we want to clarify that a X86 thread can run only on a core
-specified as X86 and a warp/block can run only a core specified as a GPU core.
+supported by the core. Though the term core is commonly used for both x86 cores
+and GPU cores, x86 thread can run only on a core
+specified as x86 and a warp/block can run only a core specified as a GPU core.
 Threads/warps once assigned to a core, remain attached to the core until they
 terminate. When a thread or a warp terminates, the Process Manager is invoked
 again for updating bookkeeping information. When it is determined that an
@@ -60,7 +64,7 @@ the functions in \textit{process\_manager\_c} are:
 \item [create\_process()] allocates \textit{process\_c} node for an
 application. For CPU applications, \textit{create\_process()} reads the trace
 config file and determines the number of threads in the application and their
-start information. On the otherhand, for GPU applications, it reads the trace
+start information. On the other hand, for GPU applications, it reads the trace
 config file of the first kernel in the application and determines the number of
 warps and thread blocks in the kernel (calls \textit{setup\_process()} to do this).
 
@@ -101,7 +105,7 @@ maximum allowed.
 Figure~\ref{not_shown} shows the control flow in the Process Manager on
 simulation start up and during simulation. \textit{create\_process()} is called
 for each application to be simulated. \textit{create\_process()} calls
-\textit{setup\_process()} which inturn calls \textit{create\_thread\_node()}
+\textit{setup\_process()} which in turn calls \textit{create\_thread\_node()}
 for the main thread of the application. \textit{create\_thread\_node()}
 allocates a \textit{thread\_trace\_info\_node\_s} instance for the main thread
 and inserts it into \textit{m\_thread\_queue}. During the simulation of the

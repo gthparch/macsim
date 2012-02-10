@@ -1,16 +1,25 @@
 
-\chapter{Overview of MacSim Code Structures}
+\chapter{\SIM Internals}
 \label{sec:codetop}
 
+This chapter briefly discusses some internals of \SIM including data structures
+and their purposes, important functions and components that will help users
+understand \SIM better.
+
+\ignore
+{
 This section provides a brief overview of the organization of the code in
 MacSim. Code in MacSim is organized into many classes, for a descpription of
 the classes please refer to the doxygen documentation.
 
-For each simulation, an instance of \textit{macsim\_c} is created.  In
+
+In
 \textit{macsim\_c}, there is an instance of \textit{process\_s} for each
 application being simulated. An application can contain multiple threads each
 represented by a \textit{thread\_s} structure. In case of GPU applications, an
-instance of \textit{thread\_s} represents a warp. The threads of an application
+instance of \textit{thread\_s} represents a warp. 
+
+The threads of an application
 can run on multiple cores each of which is an \textit{core\_c} object. For GPU
 applications, each core represents an SM. Each core has a member variable for
 each stage of the pipeline.  A \textit{core\_c} object also contains objects
@@ -23,8 +32,9 @@ cores in the simulation. The \textit{memory\_c} object includes objects for L1
 D-cache, L2 and L3 caches and also DRAM controllers which are objects of
 classes that derive from \textit{dram\_controller\_c}. 
 
+}
 
-\section{Simulator Execution}
+\section{run\_a\_cycle() function}
 
 All pipeline stages, units such as cache and memory controller, components such
 as memory system and core implement the \textit{run\_a\_cycle()} function which
@@ -36,15 +46,76 @@ the memory system, interconnect and cores in the simulation (see
 the individual pipeline stages (see \textit{core.cc}).
 
 
-\section{Adding a new DRAM Policy}
+
+\section{Important data structures and classes}
 
 
-\section{Important simulator data structures}
+\subsection{macsim\_c}
+
+
+For each simulation, an instance of \textit{macsim\_c} is created. This
+instance is responsible for initializing the cores, the memory system, the
+interconnection network and knobs, for registering classes/functions
+implementing various policies with the factory classes (explained in
+    Section~\ref{sec:dont-know} and so on. Every cycle, \textit{macsim\_c} ticks all
+    the other simulation components via the \textit{run\_a\_cycle()} function.
+
+
+\subsection{core\_c}
+
+Each core being simulated is represented by an object of \textit{core\_c}
+declared in \textit{core.h}. Besides pointers to various pipeline stages and
+hardware units, \textit{core\_c} tracks information such as how many threads
+are assigned to the core, how many instructions have been fetched for each
+thread and so on.
+
+
+\subsection{trace\_read\_c}
+
+An single instance of \textit{trace\_read\_c} is created at startup and is used
+for reading the traces of all threads/warp in a simulation. To amortize the
+overhead of reading traces, instructions are read from the trace file in chunks
+instead of single instructions.
+
+Some of the important functions in \textit{trace\_read\_c} are:
+
+\begin{description}
+
+\item [get\_uops\_from\_traces()] called by front-end stage to fetch uops for a
+thread. If a decoded instruction is available, the next uop from the decoded
+instruction is returned to the front-end, otherwise the next instruction from
+the trace is decoded and the first uop from the decoded instruction is returned
+to the front-end.
+
+\item [read\_trace()] returns the next instruction from the trace buffer which
+contains a chunk of instructions read from the trace file. If the trace buffer
+is empty, a chunk is read from the trace file and the first instruction is
+returned.
+
+\item [convert\_pinuop\_to\_t\_uop()] decodes an instruction from a trace into a
+sequence of \textit{trace\_uop\_s} instances and returns the sequence.
+Instructions being decoded for the first time have their decoded information
+stored in a hashtable so that decoding does not have to be repeated when the
+same instruction is encountered again in the trace.
+
+\end{description}
+
+\TODO{add more if possible}
+
+\subsection{map\_c}
+
+An instance of \textit{map\_c} is created for each core in the simulation. This
+instance tracks data and memory dependences between the uops of a thread for all
+threads assigned to a core. After a dependence is identified, the source uop is
+added to a list of uops which should complete execution before the dependent
+uop becomes ready for execution.
+
+\TODO{add more if possible}
 
 \subsection{uop\_c}
 
 An instance of \textit{uop\_c} defined in \textit{uop.h} is allocated (from a
-    pool) for each uop and is populated with all the information about the uop.
+  pool) for each uop and is populated with all the information about the uop.
 Each uop is assigned a unique number, \textit{m\_unique\_num}, that is unique
 across all uops in a core. Each uop is also assigned a unique number,
        \textit{m\_uop\_num}, that is unique across a uops of a thread. To
@@ -56,14 +127,6 @@ across all uops in a core. Each uop is also assigned a unique number,
        the uop retires.  Whenever a new member variable is added to
        \textit{uop\_c} users should make sure that the member variable is
        initialized to a default value in \textit{uop\_c::init()}.
-
-\subsection{core\_c}
-
-Each core being simulated is represented by an object of \textit{core\_c}
-declared in \textit{core.h}. Besides pointers to various pipeline stages and
-hardware units, \textit{core\_c} tracks information such as how many threads
-are assigned to the core, how many instructions have been fetched for each
-thread and so on.
 
 
 \subsection{mem\_req\_s}
@@ -95,17 +158,9 @@ reclaimed when the uop retires.
 \subsection{pool\_c}
 
 \textit{pool\_c} defined \textit{utils.h} is a utility class meant for creating
-memory pools. In Macsim it is used for creating pools of \textit{uop\_c},
-       \textit{thread\_s} and so on.
-
-
-\subsection{Latencies of instructions}
-
-Latencies of X86 and PTX uops are defined in \textit{uoplatency\_x86.def} and
-\textit{uoplatency\_ptx.def} files in \textit{trunk/def}. Users must edit these
-files to modify the latencies of instructions. Note that for PTX instructions,
-      the value defined in \textit{uoplatency\_ptx.def} is multiplied by the
-      value of the knob \textit{PTX\_EXEC\_RATIO}.
+memory pools. Using memory pools reduces the overhead of frequent memory
+allocation and deallocation. In Macsim memory pools are used for uops
+(\textit{uop\_c}), threads/warps (\textit{thread\_s}) and so on.
 
 
 \subsection{pqueue\_c}
@@ -121,69 +176,15 @@ pipeline. In MacSim, it is used to vary the length of the fetch (and decode)
   first from the pqueue.
 
 
-\subsection{Adding new dram policy}
+\section{Instructions Latencies}
 
-To implement a new DRAM scheduling policy, a class that extends
-\textit{dram\_controller\_c} has to be defined. This class should overload the
-\textit{schedule()} function which should return the next DRAM request to be
-serviced according to the policy. Please refer to class \textit{dc\_frfcfs\_s}
-defined in dram.cc/h for a sample. In addition to the class, define a wrapper
-function that returns an instance of the class (see \textit{dram.cc} for an
-    example) and register the class with the DRAM factory (see \textit{see
-      register\_functions() in \textit{macsim.cc}}. 
+Latencies of X86 and PTX uops are defined in \textit{uoplatency\_x86.def} and
+\textit{uoplatency\_ptx.def} files in \textit{trunk/def}. Users must edit these
+files to modify the latencies of instructions. Note that for PTX instructions,
+      the value defined in \textit{uoplatency\_ptx.def} is multiplied by the
+      value of the knob \textit{PTX\_EXEC\_RATIO}.
 
 
-\subsection{Implementing a new instruction scheduler}
-
-Define a class that extends \textit{schedule\_c} and overloads at least the
-\textit{run\_a\_cycle()} function. Other functions may be overloaded to
-maintain a consistent code structure across the different instruction
-schedulers. After defining the new scheduler, add code to \textit{core.cc} to
-instantiate your scheduler instead of one of the provided schedulers.
-
-\subsection{Implementing a new policy for allocating thread blocks to GPU cores}
-
-In \textit{process\_manager\_c::sim\_schedule\_thread\_block()} add (or modify)
-code to determine the id of the block that will be assigned to the core based
-on the new policy. The list of ready blocks can be obtained via
-\textit{m\_block\_schedule\_info} member of the \textit{macsim\_c} object that
-is created for the simulation.
-
-\subsection{Implementing a new fetch policy}
-\TODO{Jaekyu(?)}
-
-\subsection{Implementing a new branch predictor}
-\TODO{Jaekyu(?)}
-
-\subsection{Implementing a few hardware prefetcher}
-\TODO{Jaekyu}
-
-
-
-
-
-
-
-
-
-\ignore{
-Below is a list of key data structures used in MacSim along with a brief description:
-
-\begin{description}
-
-\item [core_c]
-
-\item [frontend_c]
-\item [bp_data_c]
-\item [map_c]
-
-\item [allocate_c]
-
-\item [exec_c]
-\item [dcu_c]
-
-\item [retire_c]
-
-
-\end{description}
-}
+The process manager which is responsible for assigned threads (thread blocks)
+  to cores and data structures related to it are discussed in
+  Chapter~\ref{sec:process_manager}.

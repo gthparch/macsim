@@ -5,68 +5,82 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+This chapter provides instructions for building, installing and running \SIM.
+
+\ignore{
 In this chapter, we provide the basic instruction to install
 \SIM. Then, we explain how to run \SIM and provide tips to analyze
 simulation outcomes.
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Wiki and Other Supports}
+\section{Documentation and Other Support}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\TODO{will google code project not provide source?, Do we have a Wiki? Correct section title}
+
+\SIM is hosted on Google Code at the following URL:
+\urlc{http://code.google.com/p/macsim}. The project page for \SIM on Google
+Code provides detailed documentation, issue/bug tracking, sample traces and
+so on. Users can use the project page for filing issues and for contacting the
+maintainers of \SIM.
+
+\ignore
+{
 We manage the google project page in the following url:
 \urlc{http://code.google.com/p/macsim}. In this page, we will provide
 detailed information regarding \SIM, including issue/bug tracking,
 sample traces, and other instructions. If you have a question or find
 a bug, you can utilize the project page.
+}
 
 
 
-\section{Installation}
+\section{Building \SIM}
 \label{sec:installation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Download}
+\subsection{Obtaining Source}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\SIM source code is maintained using the subversion. 
-You can check out the \SIM copy by
+\SIM source code is maintained using subversion. Users can obtain a copy of the
+source code using this command:
 
-
+\TODO{below command is incorrect, give command for anonymous checkout!}
 \begin{Verbatim}
 svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --username readonly
 \end{Verbatim}
 
 \noindent
-Initially, read-only permission is given to users. If you want to
-contribute to \SIM, you need to send an email to
-\href{mailto:macsim-dev@googlegroups.com}{macsim-dev@googlegroups.com}
-to acquire such permission.
 
+Users will have read-only permission by default and users interested in
+contributing to \SIM must contact
+\href{mailto:macsim-dev@googlegroups.com}{macsim-dev@googlegroups.com}.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Build Requirement}
+\subsection{Requirements}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To build \SIM propery, it requires following supports:
+To build \SIM the following are required:
 
 \begingroup
 \renewcommand\descriptionlabel[1]{\textit{\hspace\labelsep{#1}}}
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
-  \item[Operating System] Currently, we only support linux
-    distributions. Tested systems are as follows: \Verb+Ubuntu+, \Verb+Redhat (TODO)+.
+  \item[Operating System] At present only Linux distributions are supported. \SIM has been tested on:
+   \Verb+Ubuntu+, \Verb+Redhat (TODO)+.
   \item[Compiler] Any compiler that supports the C++0x (or C++11)
-    standard library. Currently, we tested follwing compilers: \Verb+gcc+, \Verb+icc (TODO)+.
-  \item[Autotools] - You need to have autotools (automake, autoconf,
-    ...) version 2.65 or higher. You can install autotools by
+    standard. \SIM has been verified to work with: \Verb+gcc+, \Verb+icc (TODO)+. \TODO{versions?}
+  \item[Autotools] - Autotools (automake, autoconf,
+    ...) version 2.65 or higher is required. Autotools can be installed using the commands:
 \begin{Verbatim}
 Ubuntu: apt-get install autotools-dev automake autoconf
 Redhat: todo
 \end{Verbatim}
-  \item[Libraries] - gzip
+  \item[Libraries] - The zlib library is required and it can be installed using the command:
 \begin{Verbatim}
 Ubuntu: apt-get install zlib1g-dev
 \end{Verbatim}
@@ -111,17 +125,69 @@ source files. \textit{tools} has several useful tools.
 \ignore{ (Section~\ref{sec:tool}) }
 }
 
+\ignore
+{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Source organization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TODO{check this, i'm not sure what is included in the copy that be available
+  publically} 
+
+The top-level source directory of \SIM contains several source, script and tool
+directories, README and INSTALL files and files required for building \SIM
+using autotools. Below is a brief description of the contents of the top-level
+source directory of \SIM.
 
 
+\begin{description}\firmlist
+
+\item [bin] Build output directory.
+
+\item [def] Contains definitions of parameters (see Sections~\ref{sec:run}
+    and~\ref{sec:knob}) and events for statistics (see Section~\ref{sec:stat}).
+
+\item [doc] Contains \SIM documentation.
+
+\item [params] Contains sample parameter (see Sections~\ref{sec:run}
+    and~\ref{sec:knob}) configuration files.
+
+\item [scripts] Contains scripts used in build of \SIM.
+
+\item [src] Contains \SIM source files (.cc and .h files).
+
+\item [tools] Contains x86 trace generator and trace reader.
+
+\item [README, INSTALL] README and INSTALL files containing proceduce to build
+and run \SIM and patch \SIM to make it usable as a SST component (see
+    Section~\ref{sec:sst}).
+
+\item [autogen.sh] Script file to generate makefile to build \SIM.
+
+\item [configure.in aclocal.m4 Makefile.am Makefile.in] Files required by
+autotools to generate makefile to build \SIM.
+
+
+\end{description}
+}
+
+\ignore
+{
+  The top-level source directory of \SIM contains several directories including
+  \Verb+bin+, \Verb+def+, \Verb+doc+, \Verb+params+, \Verb+scripts+, \Verb+src+ and
+  \Verb+tools+ and the \Verb+README+ and \Verb+INSTALL+ files and the files
+  required for building \SIM using autotools.
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Installation}
+\subsection{Build}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The GNU Autotools (aclocal, automake, autoconf, ...) have been used to
-build \SIM. After initial check-out of the \SIM copy, following
-commands are necessary (You can refer to \Verb+INSTALL+ file as well).
+The GNU Autotools (aclocal, automake, autoconf, ...) are used to build \SIM.
+After checking out a copy of the \SIM source code, the following commands have
+to be executed (These instructions are also available in \Verb+INSTALL+ file
+    included in the \SIM source).
 
 
 \begin{Verbatim}
@@ -134,14 +200,14 @@ make
 \end{Verbatim}
 
 \noindent
-You can combine above commands in a line:
+Users can enter all the above commands in one go as shown below:
 
 \begin{Verbatim}
 aclocal && automake --add-missing && autoconf && ./configure && make
 \end{Verbatim}
 
-\noindent
-We provide autogen.sh script file to simplify the building process.
+\noindent Alternatively, users can just run the autogen.sh script file included
+in the \SIM source and then run the \Verb+make+ to build \SIM.
 
 \begin{Verbatim}
 ./autogen.sh
@@ -149,9 +215,8 @@ make
 \end{Verbatim}
 
 \noindent
-Then, the binary \bin will be generated in the \Verb+trunk/bin/+
+On a successful build, the binary \bin will be generated in the \Verb+trunk/bin/+
 directory.
-
 
 
 
@@ -160,9 +225,8 @@ directory.
 \subsection{Build Types}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We provide three different build types: optimized, debug, and gprof
-versions. Based on the type, we provide different compiler flags. For
-example,
+Three types of build, each of which uses different compiler flags are
+supported. The build types are:
 
 \begin{itemize}
   \item opt : default, optimized version (-O3 flag)
@@ -171,12 +235,16 @@ example,
 \end{itemize}
 
 \noindent
-To build a certain type, you need to specify the option
-after \textit{make} command. For example,
+The build type can be specified as an argument to the \textit{make} command.
 
 \begin{Verbatim}
-make [opt]
+To build the optimized version of the binary
+make [opt] 
+
+To build the debug version of the binary
 make dbg
+
+To build the gprof version of the binary
 make gpf
 \end{Verbatim}
 
@@ -185,22 +253,33 @@ make gpf
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{How To Run \SIM}
+\section{Running \SIM}
 \label{sec:run}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To run \bin binary, two additional files are required in
-the same directory.
+To run \bin binary, two additional files are required to be present 
+the same directory as the binary.
 
 \begin{itemize}
-  \item params.in - defines architectural parameters that will
-  overwrite the default value.
+  \item params.in - defines architectural parameter values that will
+  overwrite the default parameter values.
 
-  \item trace\_file\_list - defines the number of traces to run and
-  the path of each trace
+  \item trace\_file\_list - specifies the number of traces to run and
+  the location of each trace.
 \end{itemize}
 
 
+Several pre-defined architectural parameter configuration files are provided in
+\Verb+macsim-top/trunk/params+ directory. Table~\ref{table:param} lists the
+pre-defined parameter files. To run \SIM with a particular architectural
+configuration, users should copy the corresponding parameter file to \Verb+bin+
+directory and rename it as \Verb+params.in+. For example, to use NVIDIA's
+Fermi~\cite{fermi} GPU architecture, \Verb+params/params\_gtx465+ should be
+copied to \Verb+bin+ and renamed as \Verb+params.in+. 
+
+
+
+\ignore{
 We provide several pre-defined architecture parameters in
 \Verb+macsim-top/trunk/params+ directory. Table~\ref{table:param}
 shows the list of pre-defined parameter files. If you want to run \SIM
@@ -213,7 +292,7 @@ sufficient:
 \begin{Verbatim}
 cp params/params_gtx465 bin/params.in
 \end{Verbatim}
-
+}
 
 \begin{table}
 \begin{footnotesize}
@@ -234,9 +313,8 @@ params\_hetero\_4c\_4g &             & Intel's Sandy Bridge (CPU + GPU)     \\ \
 \end{table}
 
 
-To specify which trace to run, you need to edit
-\Verb+trace_file_list+. Following is the content of a sample
-\Verb+trace_file_list+.
+\Verb+trace_file_list+ specifies the list of traces to be simulated. Following is the
+content of a sample \Verb+trace_file_list+.
 
 \begin{Verbatim}
 2 <-- number of traces
@@ -245,36 +323,35 @@ To specify which trace to run, you need to edit
 \end{Verbatim}
 
 \noindent
-The first line is the number of traces that \SIM will run and
-following lines are the path of each traces. Each top level trace
-configuration file contains various information. Following is the
-content of a top-level trace information file.
 
+Above, the first line specifies the number of traces (applications) that will
+be simulated and each line thereafter specifies the path to the trace
+configuration file in the trace directory of an application. The contents of a
+sample trace configuration file are shown below.
 
 \begin{Verbatim}
 1 x86
 0 0
 \end{Verbatim}
 
-\noindent
-In the first line, the first number indicates the number of threads in
-the application and second literal specifies the type of the
-application. Trailing lines are the information of each thread
-({thread id}, {thread starting point in terms of the instruction count
-  of the main thread (thread 0)}).
+\noindent In the first line, the first field indicates the number of threads in
+the application (1 in this case) and the second field specifies the type of the
+application (x86 in this case). Other lines contain a thread id and the starting 
+point of the thread in terms of the instruction count of the main thread
+(thread 0).
 
+\TODO{
+Several sample trace files are available at \urlc{todo}. Users can generate
+their own traces by following instructions in Chapter~\ref{sec:trace}.}
 
-We provide several sample trace files in \urlc{todo}, but these samples
-may not be enough for full simulation. If you want to create your own
-traces, we provide the detailed information in
-Chapter~\ref{sec:trace}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Run}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The following is the sample command lines to run \SIM simulator.
+The \SIM simulator can be run by executing the \bin binary located in the
+\Verb+trunk/bin/+ directory.
 
 \begin{Verbatim}
 ./macsim
@@ -283,11 +360,19 @@ The following is the sample command lines to run \SIM simulator.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{How to Analyze Output}
+\section{Output}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\SIM generates several output files once the simulation is succesfully
-completed. Here are the list of output files.
+\SIM generates a \Verb+params.out+ file and several files \Verb+.stat.out+
+containing statistics at the end of a successful simulation. Users can specify
+the output directory for these files by setting the
+\Verb+STATISTICS\_OUT\_DIRECTORY+ parameter whose default value is the
+directory containing the \bin binary. Simulation parameters are discussed in
+detail in Section~\ref{sec:knob}.
+
+\ignore{
+several output files once the simulation is completed successfully.
+ Here are the list of output files.
 
 \begin{Verbatim}
 params.out
@@ -296,10 +381,18 @@ statfile2.stat.out
 ...
 statfilen.stat.out
 \end{Verbatim}
+}
 
-\noindent
-\Verb+params.out+ enumerates all configurations with their
-values. Other files are statistics outputs, which is mostly the number
+\noindent \Verb+params.out+ enumerates all parameters with their values used
+for the simulation. The \Verb+.stat.out+ contain statistics such as the number
+of simulation cycles and so on. Chapter~\ref{sec:stat} details the kinds of
+statistics supported, how to add new statistics and how to examine and
+interpret the contents of \Verb+.stat.out+ files.
+
+
+\ignore
+{
+ Other files are statistics outputs, which is mostly the number
 of occurrence for architectural events during the simulation. Each
 stat out file consists of following lines:
 
@@ -396,24 +489,26 @@ IPC = harmonic_mean(IPC_1, IPC_2, ..., IPC_n)
 
 
 Table~\ref{table:stats} shows important stats.
-
+}
 
 
 \section{SST-Macsim}
+\label{sec:sst}
 
-Macsim is a part of SST simulation framework~\cite{sst}. This section
-is intended for SST users who want to use \SIM for GPU simulations.
+\TODO{SST or \textit{sst-simulator}?}
+Macsim is a part of the SST simulation framework~\cite{sst} and this section is
+intended for SST users who want to use \SIM for GPU simulations.
 
-\subsection{How to install SST}
+\subsection{Installing SST}
 
-Follow the instructions provided in wiki page at the
-\textit{sst-simulator} GoogleCode repository~\cite{sst-google} at
+Instructions for installing SST are provided in the Wiki
+page at the SST Google Code repository~\cite{sst-google} at
 \urlc{http://code.google.com/p/sst-simulator}.
 
-\subsection{How to install \SIM in SST}
+\subsection{Building \SIM as a SST component}
 
-Check out the svn copy of \SIM in \textit{sst-top/sst/elements} and
-apply a patch. 
+Check out a copy of \SIM from SVN in \textit{sst-top/sst/elements} and
+apply the \Verb+macsim-sst.patch+. 
 
 \begin{Verbatim}
 cd sst-top/sst/elements
@@ -430,9 +525,9 @@ cd sst-top
 ./configure --prefix=/usr/local --with-boost=/usr/local --with-zoltan=/usr/local --with-parmetis=/usr/local
 \end{Verbatim}
 
-\subsection{How to configure the \SIM SST component}
+\subsection{Configuring the SST-\SIM component}
 
-An example SST sdl configuration file is as follows:
+An example SST sdl configuration file setup for simulating \SIM is shown below:
 
 \begin{Verbatim}
 <?xml version="1.0"?>
@@ -455,12 +550,12 @@ An example SST sdl configuration file is as follows:
 </sst>
 \end{Verbatim}
 
-In this manner, an SST simulation configuration file can declare multiple 
-instances of \SIM as well as define what traces are run on each \SIM instance.
+In this manner, an SST simulation configuration file can declare multiple
+instances of \SIM as well as define the traces are run on each \SIM instance.
 
-\subsection{How to run a \SIM simulation in SST}
+\subsection{Running a \SIM simulation in SST}
 
-Ensure SST and \SIM components are compiled and/or installed.  
+Ensure that SST and \SIM components are compiled and/or installed.  
 Ensure that the paths and contents of both SST configuration sdl file and
 \SIM \textit{params.in} configuration file are correct. Start the SST simulation 
 either standalone or through MPI.
