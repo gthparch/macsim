@@ -1,45 +1,25 @@
-\chapter{Source Organization}
+\chapter{\SIM Directory Structure and Source Code}
 
 
-\todo{check this, i'm not sure what is included in the copy that be available
-  publically} 
+\section{Directory Structure}
 
-The top-level source directory of \SIM contains several directories, README and
-INSTALL files and files required for building \SIM using autotools. Below is a
-brief description of the contents of the top-level source directory of \SIM.
+The top-level source directory of \SIM contains several directories. The list of directories is following:
 
+\vspace{0.2in}
+\noindent
+\begin{footnotesize}
+\begin{tabular}{ll}
+\Verb+bin/+     & Build output directory                                                                                                                    \\
+\Verb+def/+     & Contains definitions of parameters (see Sections~\ref{sec:run} and~\ref{sec:knob}) and events for statistics (see Section~\ref{sec:stat}) \\
+\Verb+doc/+     & Contains \SIM documentation.                                                                                                              \\
+\Verb+params/+  & Contains sample parameter (see Sections~\ref{sec:run} and~\ref{sec:knob}) configuration files.                                            \\
+\Verb+scripts/+ & Contains scripts used in build of \SIM.                                                                                                                                           \\
+\Verb+src/+     & Contains \SIM source files (.cc and .h files).                                                                                                                                           \\
+\Verb+tools/+   & Contains x86 trace generator and trace reader.                                                                                                                                           \\
+\end{tabular}
+\end{footnotesize}
 
-\begin{description}\firmlist
-
-\item [bin] Build output directory.
-
-\item [def] Contains definitions of parameters (see Sections~\ref{sec:run}
-    and~\ref{sec:knob}) and events for statistics (see Section~\ref{sec:stat}).
-
-\item [doc] Contains \SIM documentation.
-
-\item [params] Contains sample parameter (see Sections~\ref{sec:run}
-    and~\ref{sec:knob}) configuration files.
-
-\item [scripts] Contains scripts used in build of \SIM.
-
-\item [src] Contains \SIM source files (.cc and .h files).
-
-\item [tools] Contains x86 trace generator and trace reader.
-
-\item [README, INSTALL] README and INSTALL files containing proceduce to build
-and run \SIM and patch \SIM to make it usable as a SST component (see
-    Section~\ref{sec:sst}).
-
-\item [autogen.sh] Script file to generate makefile to build \SIM.
-
-\item [configure.in aclocal.m4 Makefile.am Makefile.in] Files required by
-autotools to generate makefile to build \SIM.
-
-\end{description}
-
-
-
+\vspace{0.2in}
 Table~\ref{table:file_list} shows the list of source file and the purpose/content of
 each file.
 

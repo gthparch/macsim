@@ -26,42 +26,44 @@ instruction or not.
 
 \item read a uop from trace (call {\textit get\_uops\_from\_traces()})
 
-\item BTB access and branch prediction. 
+\item BTB access and branch prediction - Different branch predictors
+  are implemented using the \textit{bp\_factory} and the type of
+  branch predictor to be used is set using the bp\_dir\_mech knob.
 
-\item send uop to queue meant for modeling the depth of the processor front-end.
+\item send uop to queue meant for modeling the depth of the processor
+  front-end - The depth of the front-end stage is set using one of the
+  \Verb+fetch_latency+ knobs.\footnote{There is one knob for each core
+    type, small, medium, and large.} Different thread fetch policies
+  can be implemented, which is described in
+  Section~\ref{sec:modify:fetch}. The default fetch policy is
+  \Verb+round-robin+ and \Verb+fetch_policy+ knob will specify the
+  policy to be used.
+
 
 \end{enumerate}
 
-The depth of the front-end stage is set using one of the {\textit
-  fetch\_latency} knobs, there is one knob for each core type (small, medium
-      and large).\ignore{ and it basically sets the length of {\textit q\_fe }}
-  \todo {Different fetch policies can be implemented using the factory
-    mechanism explained in Section~\ref{}. } The default fetch policy is
-    round-robin and the policy to be used is specified using the
-    \textit{fetch\_policy} knob. \todo{there is one common knob for all core
-      types, same for bp\_\_dir\_mech!} Different branch predictors are
-      implemented using the \textit{bp\_factory} and the type of branch
-      predictor to be used is set using the bp\_dir\_mech knob.
 
-\ignore{ Different fetch polices are implemented using virtual function.
-  {\textit fetch\_factory} function sets different {\textit frontend\_c}.
-  Currently, a thread is selected based on the round-robin policy. If the next
-    thread is blocked to fetch, the next candidate is selected based on the
-    round-robin policy.  Different branch predictor policies are also
-    implemented and it is also set by {\textit bp\_factory}. The type of branch
-    predictor or the fetch polices are set by knobs.}
+\ignore{ Different fetch polices are implemented using virtual
+  function.  {\textit fetch\_factory} function sets different {\textit
+    frontend\_c}.  Currently, a thread is selected based on the
+  round-robin policy. If the next thread is blocked to fetch, the next
+  candidate is selected based on the round-robin policy.  Different
+  branch predictor policies are also implemented and it is also set by
+  {\textit bp\_factory}. The type of branch predictor or the fetch
+  polices are set by knobs.}
 
 
 
 \subsection{Reading Traces} 
 
-Reading of traces is mainly performed in trace\_read.cc. The main function of
-this step during simulation is to read a macro instruction from the trace file
-and convert it into a sequence of one or more micro-ops (uops). A simple
-decoding algorithm is used for generating uops. To improve the speed of
-simulation, decoded uops are stored in a hash table for reuse when the same
-static instruction is encountered again during simulation. Note that to obtain
-dynamic information such as addresses accessed, uops must be decoded partially
+Reading of traces is mainly performed in \Verb+trace_read.cc+. The
+main function of this step during simulation is to read a macro
+instruction from the trace file and convert it into a sequence of one
+or more micro-ops (uops). A simple decoding algorithm is used for
+generating uops. To improve the speed of simulation, decoded uops are
+stored in a hash table for reuse when the same static instruction is
+encountered again during simulation. Note that to obtain dynamic
+information such as addresses accessed, uops must be decoded partially
 everytime.
 
 \ignore { The main task of trace read is reading an macro instruction from

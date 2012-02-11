@@ -5,40 +5,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-This chapter provides instructions for building, installing and running \SIM.
-
-\ignore{
-In this chapter, we provide the basic instruction to install
-\SIM. Then, we explain how to run \SIM and provide tips to analyze
-simulation outcomes.
-}
+This chapter provides instructions for building, installing, and running \SIM.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Documentation and Other Support}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\todo{will google code project not provide source?, Do we have a Wiki? Correct section title}
-
 \SIM is hosted on Google Code at the following URL:
-\urlc{http://code.google.com/p/macsim}. The project page for \SIM on Google
-Code provides detailed documentation, issue/bug tracking, sample traces and
-so on. Users can use the project page for filing issues and for contacting the
-maintainers of \SIM.
-
-\ignore
-{
-We manage the google project page in the following url:
-\urlc{http://code.google.com/p/macsim}. In this page, we will provide
-detailed information regarding \SIM, including issue/bug tracking,
-sample traces, and other instructions. If you have a question or find
-a bug, you can utilize the project page.
-}
+\urlc{http://code.google.com/p/macsim}. The project page for \SIM on
+Google Code provides stable version of \SIM, detailed documentation,
+issue/bug tracking, sample traces and so on. Users can use the project
+page for filing issues and for contacting the maintainers of \SIM.
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Building \SIM}
 \label{sec:installation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Obtaining Source}
@@ -47,15 +32,18 @@ a bug, you can utilize the project page.
 \SIM source code is maintained using subversion. Users can obtain a copy of the
 source code using this command:
 
-\todo{below command is incorrect, give command for anonymous checkout!}
 \begin{Verbatim}
 svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --username readonly
 \end{Verbatim}
 
 \noindent
+Note that currently password is not set for readonly account, so
+`enter' when you prompt password. Due to the technical issue, we do
+not allow anonymous checkout now. As soon as the issue has been
+resolved, we will update this documentation.
 
-Users will have read-only permission by default and users interested in
-contributing to \SIM must contact
+Users will have read-only permission by default and users interested
+in contributing to \SIM must contact
 \href{mailto:macsim-dev@googlegroups.com}{macsim-dev@googlegroups.com}.
 
 
@@ -71,9 +59,9 @@ To build \SIM the following are required:
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
   \item[Operating System] At present only Linux distributions are supported. \SIM has been tested on:
-   \Verb+Ubuntu+, \Verb+Redhat (TODO)+.
+   \Verb+Ubuntu+, \Verb+Redhat (TODO)+
   \item[Compiler] Any compiler that supports the C++0x (or C++11)
-    standard. \SIM has been verified to work with: \Verb+gcc+, \Verb+icc (TODO)+. \todo{versions?}
+    standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (will work on)+
   \item[Autotools] - Autotools (automake, autoconf,
     ...) version 2.65 or higher is required. Autotools can be installed using the commands:
 \begin{Verbatim}
@@ -274,7 +262,7 @@ Several pre-defined architectural parameter configuration files are provided in
 pre-defined parameter files. To run \SIM with a particular architectural
 configuration, users should copy the corresponding parameter file to \Verb+bin+
 directory and rename it as \Verb+params.in+. For example, to use NVIDIA's
-Fermi~\cite{fermi} GPU architecture, \Verb+params/params\_gtx465+ should be
+Fermi~\cite{fermi} GPU architecture, \Verb+params/params_gtx465+ should be
 copied to \Verb+bin+ and renamed as \Verb+params.in+. 
 
 
@@ -340,10 +328,10 @@ application (x86 in this case). Other lines contain a thread id and the starting
 point of the thread in terms of the instruction count of the main thread
 (thread 0).
 
-\todo{
-Several sample trace files are available at \urlc{todo}. Users can generate
-their own traces by following instructions in Chapter~\ref{sec:trace}.}
 
+Several sample trace files are available at
+\urlc{http://code.google.com/p/macsim}. Users can generate their own
+traces by following instructions in Chapter~\ref{ch:trace}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -492,20 +480,31 @@ Table~\ref{table:stats} shows important stats.
 }
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{SST-Macsim}
 \label{sec:sst}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\todo{SST or \textit{sst-simulator}?}
+
 Macsim is a part of the SST simulation framework~\cite{sst} and this section is
 intended for SST users who want to use \SIM for GPU simulations.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Installing SST}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 Instructions for installing SST are provided in the Wiki
 page at the SST Google Code repository~\cite{sst-google} at
 \urlc{http://code.google.com/p/sst-simulator}.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Building \SIM as a SST component}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 Check out a copy of \SIM from SVN in \textit{sst-top/sst/elements} and
 apply the \Verb+macsim-sst.patch+. 
@@ -525,7 +524,10 @@ cd sst-top
 ./configure --prefix=/usr/local --with-boost=/usr/local --with-zoltan=/usr/local --with-parmetis=/usr/local
 \end{Verbatim}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Configuring the SST-\SIM component}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 An example SST sdl configuration file setup for simulating \SIM is shown below:
 

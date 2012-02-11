@@ -1,5 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Traces}
+\label{ch:trace}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For simulations using \SIM, x86 traces are generated using Pin~\cite{pin} and
@@ -124,10 +125,10 @@ cd gpuocelot/trace-generators; libtoolize; aclocal; autoconf; automake; ./config
 make; sudo make install
 \end{Verbatim}
 
-\todo{where do libs go? mention default paths}
 
-More detailed instructions for installing Ocelot are available at the Google
-Code project page for Ocelot.
+All libraries will be installed in the system library path directory
+(\Verb+/usr/local/lib+). More detailed instructions for installing
+Ocelot are available at the Google Code project page for Ocelot.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -225,20 +226,12 @@ drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Supporting Other Architectures}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\todo{This is support for other ISAs? AMD CPUs are also x86..}
 
-To support ISAs such as ARM, a frontend simulator or a functional simulator to
-provide the executed instruction stream is needed. Instructions in this stream
-can be translated by \SIM into its internal RISC style micro-ops and simulated. 
-Currently, plans for supporting ARM ISA are in the pipeline.
-
-\ignore{
-To support other architectures, for example AMD processors or ARM
-processors, we need a frontend simulator or functional emulator. Using
-instruction streams provided by the frontend, we also need to traslate
-each instruction to \SIM-internal RISC style micro-ops. Currently, we
-plan to provide ARM-based architectures.
-}
+To support other ISAs such as ARM, a frontend simulator or a
+functional emulator to provide the executed instruction stream is
+necessary. Instructions in this stream can be translated by \SIM into
+its internal RISC style micro-ops and simulated. Currently, plans for
+supporting ARM ISA and OpenGL programs are in the pipeline.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -246,24 +239,28 @@ plan to provide ARM-based architectures.
 \label{sec:traceformat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\todo{ Though both the x86 and PTX trace generator use the same data structure
-  for storing instruction traces, the meaning of some of the members of this
-    common data structure is different in PTX traces. Efforts to have different
-      data structures for x86 and PTX traces for sake of extensibility and
-      clarity are underway. -- can cause trouble?} On successful trace
-      generation, the x86 trace generator generates a configuration file called
-      Trace.txt and one Trace\_xx.raw file (assuming that \Verb+TRACE\_PATH+
-          was set to "Trace") for each thread of the application in the output
-      directory. On the other hand, the PTX trace generator generates a kernel
-      information file and several directories containing traces of individual
-      kernel invocations. The directory for each kernel invocation contains a
-      Trace.txt file and one Trace\_xx.raw file for each warp in the kernel.
-      Note that in case of PTX kernels, one trace file is generated for each
-      warp, there are no per thread trace files. Further details regarding
-      trace generation for PTX kernels can be found in
-      Section~\ref{sec:ptx_traces}. The purposes of Trace.txt and Trace\_xx.raw
-      are shown below and their formats are explained in detail in subsequent
-      sections.
+\paragraph{Note}
+
+\textit{Although different trace generators use the same data structure for
+storing instruction traces, the meaning of some of the members of this
+common data structure is different in PTX traces. Note that efforts to
+have different data structures for x86 and PTX traces for sake of
+extensibility and clarity are underway.}
+
+
+On successful trace generation, the x86 trace generator generates a
+configuration file called Trace.txt and one Trace\_xx.raw file
+(assuming that \Verb+TRACE\_PATH+ was set to "Trace") for each thread
+of the application in the output directory. On the other hand, the PTX
+trace generator generates a kernel information file and several
+directories containing traces of individual kernel invocations. The
+directory for each kernel invocation contains a Trace.txt file and one
+Trace\_xx.raw file for each warp in the kernel.  Note that in case of
+PTX kernels, one trace file is generated for each warp, there are no
+per thread trace files. Further details regarding trace generation for
+PTX kernels can be found in Section~\ref{sec:ptx_traces}. The purposes
+of Trace.txt and Trace\_xx.raw are shown below and their formats are
+explained in detail in subsequent sections.
 
 
 \begin{itemize}\itemsep2pt
@@ -328,8 +325,8 @@ For GPU traces, the id in the file encodes thread block information as
 well. The warp id and thread block id can be decoded from this id as follows:
 
 \begin{Verbatim}
-warp\_id = id \% (1 << 16)
-block\_id = id / (1 << 16)
+warp_id  = id % (1 << 16)
+block_id = id / (1 << 16)
 \end{Verbatim}
 
 \ignore{
@@ -582,6 +579,4 @@ InstSize & LAddr\_1 & LAddr\_2 & SAddr & PCAddr & BrAddr & MemRSize & MemWSize &
 Tables~\ref{table:trace_format} and ~\ref{table:trace_desc} show the trace
 format for each instruction and the description of each field, respectively.
 }
-
-
 

@@ -1,7 +1,7 @@
 \chapter{Adding to \SIM}
 \label{sec:add_macsim}
 
-\subsection{New DRAM Policy}
+\section{New DRAM Policy}
 
 To implement a new DRAM scheduling policy, a class that extends
 \textit{dram\_controller\_c} has to be defined. This class should overload the
@@ -13,7 +13,7 @@ function that returns an instance of the class (see \textit{dram.cc} for an
       register\_functions() in \textit{macsim.cc}}. 
 
 
-\subsection{New Instruction Scheduler}
+\section{New Instruction Scheduler}
 
 Define a class that extends \textit{schedule\_c} and overloads at least the
 \textit{run\_a\_cycle()} function. Other functions may be overloaded to
@@ -21,7 +21,7 @@ maintain a consistent code structure across the different instruction
 schedulers. After defining the new scheduler, add code to \textit{core.cc} to
 instantiate the new scheduler instead of one of the provided schedulers.
 
-\subsection{New policy for assigning thread blocks to GPU cores}
+\section{New policy for assigning thread blocks to GPU cores}
 
 In \textit{process\_manager\_c::sim\_schedule\_thread\_block()} add (or modify)
 code to determine the id of the block that will be assigned to the core based
@@ -29,15 +29,167 @@ on the new policy. The list of ready blocks can be obtained via
 \textit{m\_block\_schedule\_info} member of the \textit{macsim\_c} object that
 is created for the simulation.
 
-\subsection{New Fetch Policy}
-\todo{Jaekyu(?)}
 
-\subsection{New Branch Predictor}
-\todo{Jaekyu(?)}
-
-\subsection{New Hardware Prefetcher}
-\todo{Jaekyu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{New Fetch Policy}
+\label{sec:modify:fetch}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\todo{simulator code change requires. Jaekyu will fix it later}
+
+There are several steps to add a new thread fetching policy. We will
+provide an example with round-robin fetch policy, which is already
+provided by \SIM.
+
+\begin{enumerate}
+  \item Define a new class which inherits \Verb+class bp_dir_base_c+
+\begin{Verbatim}
+class bp_gshare_c : public bp_dir_base_c {};
+\end{Verbatim}
+
+  \item Define and implement other necessary features of a new branch
+    predictor. Especially, override \Verb+pred()+, \Verb+update()+,
+    and \Verb+recover()+ functions.
+\begin{Verbatim}
+uns8 bp_gshare_c::pred(uop_c* uop) {...}
+void bp_gshare_c::update(uop_c* uop) {...}
+
+\end{Verbatim}
+
+  \item Add a policy to the branch predictor factory in
+    \Verb+macsim.cc+ and to the allocator in \Verb+frontend.cc+.
+
+\begin{Verbatim}
+// macsim.cc macsim_c::register_functions()
+bp_factory_c::get()->register_class(``rr'', fetch_factory);
+
+// frontend.cc
+frontend_c* fetch_factory(...) 
+{
+  ...
+  else if (fetch_policy == ''rr'')
+    new_fe = new frontend_bp_gshare_c(simBase);
+  ...
+}
+\end{Verbatim}
+
+  \item Enable this new branch predictor by setting \Verb+KNOB_BP_DIR_MECH+.
+\begin{Verbatim}
+./macsim --bp_dir_mech=gshare     -- in the commandline
+bp_dir_mech gshare                -- in the params.in
+\end{Verbatim}
+\end{enumerate}
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{New Branch Predictor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are several steps to add a new branch predictor. We will provide
+an example with gshare~\cite{mcf93} branch predictor, which is already
+provided by \SIM.
+
+\begin{enumerate}
+  \item Define a new class which inherits \Verb+class bp_dir_base_c+
+\begin{Verbatim}
+class bp_gshare_c : public bp_dir_base_c {};
+\end{Verbatim}
+
+  \item Define and implement other necessary features of a new branch
+    predictor. Especially, override \Verb+pred()+, \Verb+update()+,
+    and \Verb+recover()+ functions.
+\begin{Verbatim}
+uns8 bp_gshare_c::pred(uop_c* uop) {...}
+void bp_gshare_c::update(uop_c* uop) {...}
+
+\end{Verbatim}
+
+  \item Add a policy to the branch predictor factory in
+    \Verb+macsim.cc+ and to the allocator in \Verb+bp.cc+.
+
+\begin{Verbatim}
+// macsim.cc macsim_c::register_functions()
+bp_factory_c::get()->register_class(``gshare'', default_bp);
+
+// bp.cc
+bp_dir_base_c* default_bp(macsim_c* simBase)
+{
+  ...
+  else if (bp_type == ''gshare'')
+    new_bp = new bp_gshare_c(simBase);
+  ...
+}
+\end{Verbatim}
+
+  \item Enable this new branch predictor by setting \Verb+KNOB_BP_DIR_MECH+.
+\begin{Verbatim}
+./macsim --bp_dir_mech=gshare     -- in the commandline
+bp_dir_mech gshare                -- in the params.in
+\end{Verbatim}
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{New Hardware Prefetcher}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are several steps to add a new branch predictor. We will provide
+an example with a stride~\cite{iac:spr04} branch predictor, which is already
+provided by \SIM.
+
+\begin{enumerate}
+  \item Define a new class which inherits \Verb+class pref_base_c+
+\begin{Verbatim}
+class pref_stride_c : public pref_base_c {};
+\end{Verbatim}
+
+  \item Define and implement other necessary features of a new
+    hardware prefetcher. Especially, override several function.
+\begin{Verbatim}
+void init_func(int);                            // on initiation of prefetch request
+void done_func();                               // when a prefetch request is installed
+void l1_miss_func(int, Addr, Addr, uop_c*);     // on L1 miss
+void l1_hit_func(int, Addr, Addr, uop_c*);      // on L1 hit
+void l1_pref_hit_func(int, Addr, Addr, uop_c*); // on L1 prefetch hit
+void l2_miss_func(int, Addr, Addr, uop_c*);     // on L2 miss
+void l2_hit_func(int, Addr, Addr, uop_c*);      // on L2 hit
+void l2_pref_hit_func(nt, Addr, Addr, uop_c*);  // on L2 prefetch hit
+\end{Verbatim}
+
+  \item Add a prefetcher to the prefetcher factory in \Verb+pref_factory.cc+.
+
+\begin{Verbatim}
+// pref_factory.cc
+void pref_factory(...)
+{
+  pref_base_c* pref_stride = new pref_stride_c(...);
+  pref_table.push_back(pref_stride);
+  ...
+}
+\end{Verbatim}
+
+  \item Enable this new hardware prefetcher by setting
+    \Verb+KNOB_PREF_STRIDE_ON+ (please refer to pref\_stride.cc
+    pref\_stride\_c::pref\_stride\_c()). \textit{Note that the way we
+      simulate hardware prefetchers are not same as other modules. We
+      will provide the detail of hardware prefetcher in
+      Section~\ref{}}.
+\begin{Verbatim}
+switch (type) {
+  case UNIT_SMALL:
+    knob_enable = *m_simBase->m_knobs->KNOB_PREF_STRIDE_ON;
+      break;
+    case UNIT_MEDIUM:
+      knob_enable = *m_simBase->m_knobs->KNOB_PREF_STRIDE_ON_MEDIUM_CORE;
+      break;
+    case UNIT_LARGE:
+      knob_enable = *m_simBase->m_knobs->KNOB_PREF_STRIDE_ON_LARGE_CORE;
+      break;
+}
+
+./macsim --pref_stride_on[,medium_core, large_core]=1
+pref_stride_on[,medium_core, large_core] 1
+\end{Verbatim}
+\end{enumerate}

@@ -42,8 +42,8 @@ All cache accesses flow from one queue to another.
   \item fill queue - data returned from the next level cache or DRAM is
   inserted into the fill queue before updating the cache.
 
-  \item coherence queue - this queue is intended for handling coherence
-  traffic, but this is currently not modeled \todo{do you mean not used?}
+%  \item coherence queue - this queue is intended for handling coherence
+%  traffic, but this is currently not modeled
   
 \end{itemize}
 
@@ -53,7 +53,9 @@ All cache accesses flow from one queue to another.
 
 \begin{itemize}
 
-  \item Upper-level cache to input queue : forwarding of upper-level cache miss \todo{even writebacks from upper level cache can come here?}
+  \item Upper-level cache to input queue : forwarding of upper-level cache misses
+
+  \item Upper-level cache to fill queue : forwarding of upper-level write-back requests
 
   \item input queue to cache : accessing the cache
 
@@ -76,11 +78,11 @@ All cache accesses flow from one queue to another.
 \section{The Hierarchy}
 \label{sec:memhierarchy}
 
-\SIM is very flexible in its support for different memory hierarchies. Each
-level in the cache hierarchy can be configured independently of other levels
-with \todo{\SIM pre-defining only the links between the different levels}.
-Figure~\ref{fig:memory} shows the base memory hierarchy (without DRAM) which
-can be configured to model numerous other memory hierarchies as well.
+\SIM is very flexible in its support for different memory
+hierarchies. Each level in the cache hierarchy can be configured
+independently of other levels (see Section~\ref{sec:knob:cache}).
+Figure~\ref{fig:memory} shows the base memory hierarchy without DRAM
+memory.
 
 \begin{figure*}[htb]
 \centering
@@ -93,18 +95,19 @@ can be configured to model numerous other memory hierarchies as well.
 \begin{itemize} \item There are three levels (L1, L2, and L3) of caches in the
 \SIM , the L2 cache can be disabled if needed by some configurations.
 
-  \item All the caches \todo{what about L1?} and memory controllers are
-  connected via an on-chip interconnection network (currently, the default
-      topology is ring).
+  \item All the caches and memory controllers can be connected via an
+    on-chip interconnection network (currently, the default topology
+    is ring), if the configuration allows.
 
   \item L1 and L2 caches are always private to each core.
 
   \item The local router within a cache structure is enabled only when
   necessary.
 
-  \item L3 cache is unified (shared by all cores), but tiled based on
-  the static \todo{bank?} partition. In other words, address regions are
-  statically partitioned and each tile is responsible for sub regions.
+  \item L3 cache is unified (shared by all cores), but sub banked. In
+    other words, address regions are statically partitioned and each
+    tile is responsible for sub regions. Each cache tile has multiple
+    banks as well.
 
 \end{itemize}
 
@@ -192,14 +195,14 @@ void dcu_c::init(
   \smallskip
 }
 
-  \item Intel Nehalem~\cite{nehalem} and Sandy Bridge~\cite{sandybridge}
-  microarchitectures have three-levels of caches. The last-level cache is tiled
-  and to access the closest L3 tile, a L2 cache does not have to go through the
-  interconnection, it can access the L3 tile through a direct link. However, if
-  a L2 cache accesses a remote L3 tile, it goes through the interconnection.
-  Note that the number of cores (L1 and L2 caches) and the number of the L3
-  tiles must be the same in this configuration. \todo{how is the direct link
-    configured?}
+  \item Intel Nehalem~\cite{nehalem} and Sandy
+    Bridge~\cite{sandybridge} microarchitectures have three-levels of
+    caches. The last-level cache is tiled and to access the closest L3
+    tile, a L2 cache does not have to go through the interconnection,
+    it can access the L3 tile directly. However, if a L2 cache
+    accesses a remote L3 tile, it goes through the interconnection.
+    Note that the number of cores (L1 and L2 caches) and the number of
+    the L3 tiles must be the same in this configuration.
 
 \begin{Verbatim}
 // class l3_coupled_network_c
@@ -267,25 +270,77 @@ for (int ii = 0; ii < m_num_core; ++ii) {
   \end{Verbatim}
 \end{itemize}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{DRAM Module} 
 \label{sec:dram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\SIM also models detailed memory controllers which consider DRAM timing
-constraints and bandwidth specifications when scheduling requests.\todo{include
-  timing constraints here} Section~\ref{sec:param-dram} describes how to
-  configure DRAM parameters.
 
-  A DRAM controller can schedule requests to multiple banks and can include one
-  or more channels. \todo{incomplete - Each bank has its own request buffer and
-    bank scheduler picked}
+\SIM also models detailed memory controllers which consider DRAM
+timing constraints and bandwidth specifications when scheduling
+requests.  Section~\ref{sec:param-dram} describes how to configure
+DRAM parameters.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DRAM Timing Constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We model following three timing constrainsts of DRAM.
+
+\vspace{0.2in}
+\begin{footnotesize}
+\begin{tabular}{llll}
+\Verb+Precharge+     & \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
+\Verb+Activate+      & \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
+\Verb+Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                          \\
+\end{tabular}
+\end{footnotesize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DRAM Bandwidth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+aaa
+
+\ignore{
+\vspace{0.2in}
+\begin{footnotesize}
+\begin{tabular}{llll}
+\Verb+DRAM Frequency+                        & \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
+\Verb+DRAM Data bus width+                   & \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
+\Verb+Number of dram controllers+            & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
+\Verb+Number of dram channels Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
+\end{tabular}
+\end{footnotesize}
+}
+
+\ignore{
+max_bandwidth =dram_f requency×dram_bus_width×dram_num_mc×dram_num_channel
+(2)
+For example, the maximum bandwidth of a DRAM system with the above parameter values is
+800 MHz (0.8 GHz)*4 Bytes*2 MCs*2 Channels = 12.8GB/s.
+Currently, MacSim provides multiple DRAM scheduling policies: FCFS (First-Come-First-Serve) and FR-
+FCFS (First-Ready First-Come-First-Serve).
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Structure of DRAM Controller}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A DRAM controller consists of multiple banks and one or more channels.
+Each bank has its own request buffer and request scheduler. The bank
+scheduler picks a request to service based on the policy.
 
 \begin{itemize}
   \item The bank scheduler picks a request based on the policy (FCFS,
-  FRFCFS, ...) if no requests are being served currently.
+    FRFCFS, ...) if no request is being served currently.
 
-  \item \todo{The channel scheduler picks a request from command-ready banks
-  (usually oldest request first). Based on the command, appropriate
-  timing constraint is enforced on the bank. - not clear}
+  \item The channel scheduler picks a request from command-ready banks
+    usually based on the oldest request firs. Based on the command,
+    appropriate timing constraint (precharge, activate, or column
+    access) is enforced on the bank.
 
   \item Once the column access signal is sent, the data is prepared
   from the DRAM chip (load) or the data is sent to the DRAM chip

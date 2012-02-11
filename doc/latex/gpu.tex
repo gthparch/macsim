@@ -22,7 +22,7 @@ as cores and SPs as just one of the functional units.
 The behavior of certain components is different when simulating GPUs, these
 differences are described briefly below.
 
-\subsection{Traces}
+\section{Traces}
 \label{sec:ptx_traces}
 
 In NVIDIA GPUs threads are executed in batches of 32 threads called
@@ -37,7 +37,7 @@ trace file. For memory instructions, multiple instructions are written to the
 trace file since each thread in a warp can access different addresses. Handling
 of memory instructions inside the simulator is explained below.
 
-\subsection{Process Manager}
+\section{Process Manager}
 
 The Process Manager (explained in Chapter~\ref{sec:process_manager}) does
 assignment of threads to cores (SMs) at block granularity - all warps in a
@@ -54,12 +54,12 @@ be varied - blocks could either be assigned statically to cores, or they could
 be assigned to the first core that can accomodate a new block.
 
 
-\subsection{Memory Hierarchy}
+\section{Memory Hierarchy}
 
 The following new components are added to the memory hierarchy - Shared Memory,
     Const Cache, Texture Cache.
 
-\subsection{Instruction Scheduler}
+\section{Instruction Scheduler}
 
 A GPU-specific (or a multithreaded architecture specific) instruction scheduler
 is necessary, since neither single-threaded in-order nor single-threaded
@@ -69,7 +69,7 @@ scheduling instructions from the same warp in-order. A GPU-specific scheduler
 is implemented in \textit{schedule\_smc.cc}, this scheduler chooses
 instructions from different warps in \todo{round-robin order - not true!}.
 
-\subsection{Simulating Memory Instructions}
+\section{Simulating Memory Instructions}
 
 Due to the execution of threads at warp granularity, the execution of a memory
 instruction generates multiple addresses, one from each thread. In the trace
