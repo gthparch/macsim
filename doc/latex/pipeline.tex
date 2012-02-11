@@ -35,10 +35,10 @@ instruction or not.
 The depth of the front-end stage is set using one of the {\textit
   fetch\_latency} knobs, there is one knob for each core type (small, medium
       and large).\ignore{ and it basically sets the length of {\textit q\_fe }}
-  \TODO {Different fetch policies can be implemented using the factory
+  \todo {Different fetch policies can be implemented using the factory
     mechanism explained in Section~\ref{}. } The default fetch policy is
     round-robin and the policy to be used is specified using the
-    \textit{fetch\_policy} knob. \TODO{there is one common knob for all core
+    \textit{fetch\_policy} knob. \todo{there is one common knob for all core
       types, same for bp\_\_dir\_mech!} Different branch predictors are
       implemented using the \textit{bp\_factory} and the type of branch
       predictor to be used is set using the bp\_dir\_mech knob.
@@ -73,11 +73,11 @@ everytime.
 
 \section{Decode and  Allocate Stage}
 
-\TODO{Decode is done in frontend.cc!}
-\TODO{renaming!!}
+\todo{Decode is done in frontend.cc!}
+\todo{renaming!!}
 
-\TODO{according to code, frontend\_q latency = fetch\_latency + alloc\_latency}
-\TODO{according to code, alloc\_q latency = alloc\_to\_exec\_latency}
+\todo{according to code, frontend\_q latency = fetch\_latency + alloc\_latency}
+\todo{according to code, alloc\_q latency = alloc\_to\_exec\_latency}
 
 In the allocation stage, the resource requirement for each uop is calculated
 and space is allocated for the uop in the required structures. At the end of the
@@ -90,7 +90,7 @@ stage as well.
 
 \ignore{ This stage is simply implemented with {\textit  allocate queue}.
 At the end of this stage,  the simulator performs resource allocations such as rob entry and load-store buffer. 
-\TODO{Branch target is resolved in this stage as well.}}
+\todo{Branch target is resolved in this stage as well.}}
 
 
 \section{Schedule Stage}
@@ -137,7 +137,7 @@ Handling of D-cache misses is explained in Section~\ref{sec:memory}.
 
 \item Uncoalesced memory instructions result in multiple accesses to the the D-cache.
 
-\item \TODO{The number of function units can be specified via these knobs for
+\item \todo[inline]{The number of function units can be specified via these knobs for
   the core type being used - \textit{int\_sched\_rate, mem\_sched\_rate,
     fp\_sched\_rate} - code does not use these in that sense}.
 
@@ -172,9 +172,7 @@ is freed (returned to memory pool). This stage also checks of completion of
 warps, blocks, kernels and the entire application itself and triggers the
 repetition of applications if the knob for repetition is set.
 
-
-
-\TODO{At present, there are no rename and writeback stages in MacSim since
+\todo[inline]{At present, there are no rename and writeback stages in MacSim since
   they are not necessary to support correct and accurate simulation. MacSim
     enforces RAW dependencies, while WAR and WAW dependences can be ignored by
     assuming that once a instruction completes, its results are available for

@@ -124,7 +124,7 @@ cd gpuocelot/trace-generators; libtoolize; aclocal; autoconf; automake; ./config
 make; sudo make install
 \end{Verbatim}
 
-\TODO{where do libs go? mention default paths}
+\todo{where do libs go? mention default paths}
 
 More detailed instructions for installing Ocelot are available at the Google
 Code project page for Ocelot.
@@ -177,7 +177,7 @@ variables have to be set:
 \item COMPUTE\_VERSION : compute capability (must be specified)
 \end{itemize}
 
-\TODO{kernel\_info\_path and compute\_version are not mandatory}
+\todo{kernel\_info\_path and compute\_version are not mandatory}
 
 Examples for setting up these environment variables are shown below.
 
@@ -225,7 +225,7 @@ drwxr-xr-x   2 anonymous group 69632 Sep 00 22:03 _Z9Memcpy_SWPfS_i_0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Supporting Other Architectures}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TODO{This is support for other ISAs? AMD CPUs are also x86..}
+\todo{This is support for other ISAs? AMD CPUs are also x86..}
 
 To support ISAs such as ARM, a frontend simulator or a functional simulator to
 provide the executed instruction stream is needed. Instructions in this stream
@@ -246,7 +246,7 @@ plan to provide ARM-based architectures.
 \label{sec:traceformat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\TODO{ Though both the x86 and PTX trace generator use the same data structure
+\todo{ Though both the x86 and PTX trace generator use the same data structure
   for storing instruction traces, the meaning of some of the members of this
     common data structure is different in PTX traces. Efforts to have different
       data structures for x86 and PTX traces for sake of extensibility and
@@ -285,7 +285,7 @@ plan to provide ARM-based architectures.
 \label{fig:trace_format}
 \end{figure*}
 
-\TODO{clean up thread id, warp id, id confusion}
+\todo{clean up thread id, warp id, id confusion}
 
 Figure~\ref{fig:trace_format} shows the format of Trace.txt and its CPU and GPU
 examples.  As shown in Figure~\ref{fig:trace_format}-(a), the first line in
@@ -310,7 +310,7 @@ file which contains the dynamic instruction trace for the thread. Finally,
      non-zero for all threads except thread 0, which is the main (or parent)
   thread in the application.
 
-\TODO{x86 sample shows that all threads are starting at count 0, update text
+\todo{x86 sample shows that all threads are starting at count 0, update text
   below based on correct example}
 
 In Figure~\ref{fig:trace_format}-(b), the CPU trace has four threads and its
@@ -355,7 +355,7 @@ nSR | nDR | SR_IDs | DR_IDs | BrType | bImm | Opcode | bStore | bFP | WF | nLD |
 LAddr_1 | LAddr_2 | SAddr | PCAddr | BrAddr | MemRSize | MemWSize | RepDir | BrActT 
 \end{Verbatim}
 
-\TODO{are the names same as what is in the actual structure? doesn't seem like that}
+\todo{are the names same as what is in the actual structure? doesn't seem like that}
 
 
 Table~\ref{table:trace_desc} summarizes the size of each field and its

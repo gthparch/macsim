@@ -220,8 +220,6 @@
 }
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\TODO}[1]{{\color{red}#1}}
-\newcommand{\todo}[1]{{\color{red}#1}}
 \newcommand{\SIM}{MacSim\xspace}
 \newcommand{\bin}{\textcolor{MidnightBlue}{macsim}\xspace}
 \newcommand{\ignore}[1]{}
@@ -235,8 +233,11 @@
   xcolor,
   listings,
   paralist,
-  cite
+  cite,
+  todonotes,
 }
+%  palatino,
+
 
 %\lhead{}
 %\chead{\small In the proceedings of the 18th IEEE International Symposium on High Performance Computer Architecture (HPCA), February 2012}
@@ -346,6 +347,8 @@
 %end{multicols}
 
 \newpage
+
+\listoftodos
 
 \input{intro}
 \input{basic}

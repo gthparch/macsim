@@ -46,7 +46,7 @@ assigned to each core is determined from the resource requirement of each block
 and the GPU architecture being simulated.  This number is calculated at the
 time of trace generation for compute devices of capabilility 2.0 and is
 included in the trace files; it can also be specified by setting the knob
-\TODO{max\_block\_per\_core\_super - are there no per application knobs?}.  For each
+\todo{max\_block\_per\_core\_super - are there no per application knobs?}.  For each
 block, the Process Manager tracks the number of completed warps and when all
 warps in a block have completed, the Process Manager retires the block and
 assigns a new block to the core. The policy for assigning blocks to cores can
@@ -67,7 +67,7 @@ out-of-order schedulers match the requirement of a GPU scheduler. A GPU
 scheduler must be able to schedule instructions from different warps while
 scheduling instructions from the same warp in-order. A GPU-specific scheduler
 is implemented in \textit{schedule\_smc.cc}, this scheduler chooses
-instructions from different warps in \TODO{round-robin order - not true!}.
+instructions from different warps in \todo{round-robin order - not true!}.
 
 \subsection{Simulating Memory Instructions}
 

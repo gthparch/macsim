@@ -43,7 +43,7 @@ All cache accesses flow from one queue to another.
   inserted into the fill queue before updating the cache.
 
   \item coherence queue - this queue is intended for handling coherence
-  traffic, but this is currently not modeled \TODO{do you mean not used?}
+  traffic, but this is currently not modeled \todo{do you mean not used?}
   
 \end{itemize}
 
@@ -53,7 +53,7 @@ All cache accesses flow from one queue to another.
 
 \begin{itemize}
 
-  \item Upper-level cache to input queue : forwarding of upper-level cache miss \TODO{even writebacks from upper level cache can come here?}
+  \item Upper-level cache to input queue : forwarding of upper-level cache miss \todo{even writebacks from upper level cache can come here?}
 
   \item input queue to cache : accessing the cache
 
@@ -78,7 +78,7 @@ All cache accesses flow from one queue to another.
 
 \SIM is very flexible in its support for different memory hierarchies. Each
 level in the cache hierarchy can be configured independently of other levels
-with \TODO{\SIM pre-defining only the links between the different levels}.
+with \todo{\SIM pre-defining only the links between the different levels}.
 Figure~\ref{fig:memory} shows the base memory hierarchy (without DRAM) which
 can be configured to model numerous other memory hierarchies as well.
 
@@ -93,7 +93,7 @@ can be configured to model numerous other memory hierarchies as well.
 \begin{itemize} \item There are three levels (L1, L2, and L3) of caches in the
 \SIM , the L2 cache can be disabled if needed by some configurations.
 
-  \item All the caches \TODO{what about L1?} and memory controllers are
+  \item All the caches \todo{what about L1?} and memory controllers are
   connected via an on-chip interconnection network (currently, the default
       topology is ring).
 
@@ -103,7 +103,7 @@ can be configured to model numerous other memory hierarchies as well.
   necessary.
 
   \item L3 cache is unified (shared by all cores), but tiled based on
-  the static \TODO{bank?} partition. In other words, address regions are
+  the static \todo{bank?} partition. In other words, address regions are
   statically partitioned and each tile is responsible for sub regions.
 
 \end{itemize}
@@ -198,7 +198,7 @@ void dcu_c::init(
   interconnection, it can access the L3 tile through a direct link. However, if
   a L2 cache accesses a remote L3 tile, it goes through the interconnection.
   Note that the number of cores (L1 and L2 caches) and the number of the L3
-  tiles must be the same in this configuration. \TODO{how is the direct link
+  tiles must be the same in this configuration. \todo{how is the direct link
     configured?}
 
 \begin{Verbatim}
@@ -271,19 +271,19 @@ for (int ii = 0; ii < m_num_core; ++ii) {
 \label{sec:dram}
 
 \SIM also models detailed memory controllers which consider DRAM timing
-constraints and bandwidth specifications when scheduling requests.\TODO{include
+constraints and bandwidth specifications when scheduling requests.\todo{include
   timing constraints here} Section~\ref{sec:param-dram} describes how to
   configure DRAM parameters.
 
   A DRAM controller can schedule requests to multiple banks and can include one
-  or more channels. \TODO{incomplete - Each bank has its own request buffer and
+  or more channels. \todo{incomplete - Each bank has its own request buffer and
     bank scheduler picked}
 
 \begin{itemize}
   \item The bank scheduler picks a request based on the policy (FCFS,
   FRFCFS, ...) if no requests are being served currently.
 
-  \item \TODO{The channel scheduler picks a request from command-ready banks
+  \item \todo{The channel scheduler picks a request from command-ready banks
   (usually oldest request first). Based on the command, appropriate
   timing constraint is enforced on the bank. - not clear}
 

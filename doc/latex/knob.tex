@@ -185,7 +185,7 @@ repeat_trace 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{2-way SMT x86 Core}
-\TODO{CPU SMT not supported, only GPU SMT supported!!!}
+\todo{CPU SMT not supported, only GPU SMT supported!!!}
 \SIM also supports the simultaneous multi-threading (SMT) features.
 These parameters are used for the SMT configurations:
 
@@ -280,7 +280,7 @@ repeat_trace 1 // for multi-program workload simulation
 \begin{Verbatim}
 schedule_ratio 4 \\ schedule instructions every 4th cycle
 fetch_ratio  4 \\ fetch new instructions every 4th cycle
-gpu_sched   1 \\ use GPU scheduler for GPU cores \TODO{this knob should be removed!, it is unnecessary now}
+gpu_sched   1 \\ use GPU scheduler for GPU cores \todo{this knob should be removed!, it is unnecessary now}
 const_cache_size  1024 \\ 1024B constant cache
 texture_cache_size 1024  \\ 1024B texture cache (currently, each core has a private texture cache)
 shared_mem_size 4096  \\ 4096B shared memory size 
@@ -459,7 +459,6 @@ values is
 \noindent
 Currently, \SIM provides multiple DRAM scheduling policies: FCFS
 (First-Come-First-Serve) and FR-FCFS (First-Ready First-Come-First-Serve).
-
 
 
 
