@@ -106,7 +106,8 @@ bool icache_fill_line_wrapper(mem_req_s *req)
 
 
 // register base fetch policy
-frontend_c *fetch_factory(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) {
+frontend_c *fetch_factory(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase) 
+{
   frontend_c *new_fe = new frontend_c(FRONTEND_INTERFACE_ARGS(), simBase);
 
   return new_fe;
@@ -166,6 +167,14 @@ frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase)
   m_mem_access_thread_num  = 0;
 
   FRONTEND_CONFIG();
+    
+  // setting fetch policy
+  string policy = m_simBase->m_knobs->KNOB_FETCH_POLICY->getValue();
+  if (policy == "rr") {
+    MT_fetch_scheduler = &frontend_c::fetch_rr;
+  }
+  else
+    assert(0);
 }
 
 
@@ -722,11 +731,17 @@ bool frontend_c::btb_access(uop_c *uop)
 
 }
 
+int frontend_c::fetch(void)
+{
+  return (*this.*MT_fetch_scheduler)();
+}
+
+
 // FIXME
 // every 4 cycles, controll will go to the next thread always
 
 // round-robin instruction fetch
-int frontend_c::fetch(void)
+int frontend_c::fetch_rr(void)
 {
   int try_again = 1;
   int fetch_id = -1;

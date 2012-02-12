@@ -54,7 +54,12 @@ POSSIBILITY OF SUCH DAMAGE.
 // register base branch predictor
 bp_dir_base_c *default_bp(macsim_c* simBase) 
 {
-  bp_dir_base_c *new_bp = new bp_gshare_c(simBase);
+  string bp_type = simBase->m_knobs->KNOB_BP_DIR_MECH->getValue();
+  bp_dir_base_c* new_bp;
+  if (bp_type == "gshare")
+    new_bp = new bp_gshare_c(simBase);
+  else
+    assert(0);
 
   return new_bp;
 }

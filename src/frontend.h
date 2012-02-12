@@ -377,6 +377,12 @@ class frontend_c
     virtual int fetch();
     
     /**
+     * Round-robin fetch policy
+     */
+    int fetch_rr();
+    
+    
+    /**
      * Access BTB (branch target buffer)
      */
     bool btb_access(uop_c *uop); 
@@ -442,6 +448,8 @@ class frontend_c
     bool          m_dcache_bank_busy[129]; /**< dcache bank busy status */
 
     macsim_c*     m_simBase; /**< macsim base class for simulation globals */
+    
+    int (frontend_c::*MT_fetch_scheduler)(void); /**< current fetch scheduler */
     
     // FIXME : implement itlb
     // tlb_c            *m_itlb;
