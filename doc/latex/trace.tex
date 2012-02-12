@@ -175,10 +175,9 @@ variables have to be set:
 \item TRACE\_PATH : directory to store generated traces. If not specified, current directory is used by default.
 \item TRACE\_NAME : prefix used in the file name for generated traces. If not specified, "Trace" is used by default.
 \item KERNEL\_INFO\_PATH : name of file that should contain kernel information (must be specified)
-\item COMPUTE\_VERSION : compute capability (must be specified)
+\item COMPUTE\_VERSION : compute capability (default 2.0)
 \end{itemize}
 
-\todo{kernel\_info\_path and compute\_version are not mandatory}
 
 Examples for setting up these environment variables are shown below.
 
@@ -264,8 +263,13 @@ explained in detail in subsequent sections.
 
 
 \begin{itemize}\itemsep2pt
-\item Trace.txt (info trace): contains information about the generated trace files (\#threads, trace type, ...).
-\item Trace\_xx.raw (raw trace): contains instruction trace for a thread and is generated for each thread (warp\footnote{A warp consists of 32 threads in CUDA.} in case of GPU)
+\item Trace.txt (info trace): contains information about the generated
+  trace files (\#threads, trace type, ...).
+
+\item Trace\_xx.raw (raw trace): contains instruction trace for a
+  thread and is generated for each thread.\footnote{In case of GPU, a
+    warp is mapped to a \SIM thread, where a warp consists of 32
+    threads in CUDA.}
 \end{itemize}
 
 
@@ -282,33 +286,35 @@ explained in detail in subsequent sections.
 \label{fig:trace_format}
 \end{figure*}
 
-\todo{clean up thread id, warp id, id confusion}
 
 Figure~\ref{fig:trace_format} shows the format of Trace.txt and its CPU and GPU
 examples.  As shown in Figure~\ref{fig:trace_format}-(a), the first line in
 Trace.txt has different fields from the rest of the lines.
 
 \begin{itemize}\itemsep2pt
-\item \#Threads: indicates the number of threads for which traces have been generated, and this value 
-is equal to the number of lines in the file excluding the first line.
-\item Trace Type: indicates whether the generated traces are for an x86 application or a PTX kernel.
-\item Optional Field(s): currently used for PTX traces only and indicates the number of thread blocks
-that can be assigned to a streaming multiprocessor(SM) core (occupancy).
+\item \#Threads: indicates the number of threads for which traces have
+  been generated, and this value is equal to the number of lines in
+  the file excluding the first line.
+\item Trace Type: indicates whether the generated traces are for an
+  x86 application or a PTX kernel.
+\item Optional Field(s): currently used for PTX traces only and
+  indicates the number of thread blocks that can be assigned to a
+  streaming multiprocessor(SM) core (occupancy).
 \end{itemize}
 
-From the second line onwards, there are two fields in each line: thread id and
-start instruction number. For each thread, there is a Trace\_<thread\_id>.raw
-file which contains the dynamic instruction trace for the thread. Finally,
-     start instruction number indicates when each thread should be started in
-     terms of the number of instructions simulated for the main thread of the
-     application. In a PTX kernel since all warps are ready for execution at
-     the launch of the kernel, the start instruction number for all threads is
-     zero. On the other hand, for a x86 application, the start instruction is
-     non-zero for all threads except thread 0, which is the main (or parent)
-  thread in the application.
+From the second line onwards, there are two fields in each line:
+thread id and start instruction number. For each thread, there is a
+Trace\_<thread\_id>.raw file which contains the dynamic instruction
+trace for the thread. Finally, start instruction number indicates when
+each thread should be started in terms of the number of instructions
+simulated for the main thread of the application. In a PTX kernel
+since all warps are ready for execution at the launch of the kernel,
+the start instruction number for all threads is zero. On the other
+hand, for a x86 application, the start instruction is non-zero for all
+threads except thread 0, which is the main (or parent) thread in the
+application. This is because in most multi-threaded CPU applications,
+main thread (thread id 0) spawns children threads.
 
-\todo{x86 sample shows that all threads are starting at count 0, update text
-  below based on correct example}
 
 In Figure~\ref{fig:trace_format}-(b), the CPU trace has four threads and its
 type is set to x86. The ids of the threads are 0-3 with the corresponding trace
@@ -339,61 +345,48 @@ and 65539 forms another thread block.
 \subsection{Trace\_xx.raw}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Trace\_xx.raw is generated for each thread/warp and contains the dynamic
-instruction trace for the thread/warp in binary. The structure/format for
-encoding instructions is the same in both x86 and PTX traces and looks as
-follows:
+Trace\_xx.raw is generated for each thread/warp and contains the
+dynamic instruction trace for the thread/warp in the binary
+format. The structure/format for encoding instructions is the same in
+both x86 and PTX traces and looks as follows (in order):
 
 
-\begin{Verbatim}
-trace format for an instruction in trace_xx.raw
+%trace format for an instruction in trace_xx.raw
 
-nSR | nDR | SR_IDs | DR_IDs | BrType | bImm | Opcode | bStore | bFP | WF | nLD | InstSize |
-LAddr_1 | LAddr_2 | SAddr | PCAddr | BrAddr | MemRSize | MemWSize | RepDir | BrActT 
-\end{Verbatim}
-
-\todo{are the names same as what is in the actual structure? doesn't seem like that}
-
-
-Table~\ref{table:trace_desc} summarizes the size of each field and its
-description.  Note that the raw trace is compressed with zlib to reduce the
-sizes of the generated trace files, and the size of each field in the table is
-the size before the compression.
-
-\begin{table*}[htb]
+\vspace{0.2in}
 \begin{footnotesize}
-\begin{center}
-\caption{Descriptions of each field in the trace.}
-\label{table:trace_desc}
-\begin{tabular}{|l|l|l|} 
-\hline
-Field     & Size (Bytes)       & Description \\ \hline \hline
-nSR       & 1                  & number of source registers \\ \hline
-nDR       & 1                  & number of destination registers \\ \hline
-SR\_IDs   & 9                  & source register IDs \\ \hline
-DR\_IDs   & 6                  & destination register IDs \\ \hline
-BrType    & 1                  & branch type \\ \hline
-bImm      & 1                  & indicates whether this instruction has immediate field \\ \hline
-Opcode    & 1                  & opcode \\ \hline
-bStore    & 1                  & indicates whether this instruction has store operation \\ \hline
-bFP       & 1                  & indicates whether this instruction is a FP operation \\ \hline
-WriteFlag & 1                  & write flag \\ \hline
-nLD       & 1                  & number of load operations \\ \hline
-InstSize  & 1                  & instruction size \\ \hline
-LAddr\_1  & 4                  & load address 1 \\ \hline
-LAddr\_2  & 4                  & load address 2 \\ \hline
-SAddr     & 4                  & store address \\ \hline
-PCAddr    & 4                  & PC address \\ \hline
-BrAddr    & 4                  & branch target address \\ \hline
-MemRSize  & 4                  & memory read size \\ \hline
-MemWSize  & 1                  & memory write size \\ \hline
-RepDir    & 1                  & repetition direction  \\ \hline
-BrActT    & 1                  & indicates whether branch is actually taken \\ \hline
-
+\begin{tabular}{llll}
+Type            & Size (Bytes) & Field                     & Description                                            \\ \hline
+\Verb+uint8_t+  & 1            & \Verb+m_num_read_regs+    & number of source registers                             \\
+\Verb+uint8_t+  & 1            & \Verb+m_num_dest_regs+    & number of destination registers                        \\
+\Verb+uint8_t+  & 9            & \Verb+m_src[MAX_SRC_NUM]+ & source register IDs                                    \\
+\Verb+uint8_t+  & 6            & \Verb+m_dst[MAX_DST_NUM]+ & destination register IDs                               \\
+\Verb+uint8_t+  & 1            & \Verb+m_cf_type+          & branch type                                            \\
+\Verb+bool+     & 1            & \Verb+m_has_immediate+    & indicates whether this instruction has immediate field \\
+\Verb+uint8_t+  & 1            & \Verb+m_opcode+           & opcode                                                 \\
+\Verb+bool+     & 1            & \Verb+m_has_st+           & indicates whether this instruction has store operation \\
+\Verb+bool+     & 1            & \Verb+m_is_fp+            & indicates whether this instruction is a FP operation   \\
+\Verb+bool+     & 1            & \Verb+m_write_flg+        & write flag                                             \\
+\Verb+uint8_t+  & 1            & \Verb+m_num_ld+           & number of load operations                              \\
+\Verb+uint8_t+  & 1            & \Verb+m_size+             & instruction size                                       \\
+\Verb+uint32_t+ & 4            & \Verb+m_ld_vaddr1+        & load address 1                                         \\
+\Verb+uint32_t+ & 4            & \Verb+m_ld_vaddr2+        & load address 2                                         \\
+\Verb+uint32_t+ & 4            & \Verb+m_st_vaddr+         & store address                                          \\
+\Verb+uint32_t+ & 4            & \Verb+m_instruction_addr+ & PC address                                             \\
+\Verb+uint32_t+ & 4            & \Verb+m_branch_target+    & branch target address                                  \\
+\Verb+uint8_t+  & 1            & \Verb+m_mem_read_size+    & memory read size                                       \\ 
+\Verb+uint8_t+  & 1            & \Verb+m_mem_write_size+   & memory write size                                      \\
+\Verb+bool+     & 1            & \Verb+m_rep_dir+          & repetition direction                                   \\
+\Verb+bool+     & 1            & \Verb+m_actually_taken+   & indicates whether branch is actually taken             \\
 \end{tabular}
-\end{center}
 \end{footnotesize}
-\end{table*}
+\vspace{0.2in}
+
+
+Note that the raw trace is compressed with zlib to reduce the sizes of
+the generated trace files, and the size of each field is the size
+before the compression.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{kernel\_config.txt (only for PTX)}
@@ -442,9 +435,10 @@ The first line indicates that this is a wrapper file which points to (multiple)
 \subsection{Translation into micro-ops}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-During simulation, each instruction in a \emph{raw trace} file is converted
-into one or more micro-ops internally. \SIM stores such decoded micro-uops in
-the MacSim-specific shown in in Table~\ref{table:trace_uops}.
+During simulation, each instruction in a \emph{raw trace} file is
+converted into one or more micro-ops internally. \SIM stores such
+decoded micro-uops in the MacSim-specific structure shown in in
+Table~\ref{table:trace_uops}.
 
 \begin{table*}[htb]
 \begin{footnotesize}

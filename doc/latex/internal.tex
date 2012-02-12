@@ -3,28 +3,60 @@
 \section{Regression Tests}
 \label{sec:regression}
 
-Let's say your current working directory name is macsim-working
+To confirm your change does not affect the behavior of other parts,
+regression test can be an useful tool. Let's say your current working
+directory name is macsim-working. Here are steps to perform regression
+test.
 
-\begin{enumerate}
+\begin{enumerate}[Step 1.]
 
-\item Step 1: you need to get a clean copy of macsim again. let's say you are getting a new copy in macsim-regression directory.
+\item You need to get a clean copy of macsim again. Let's say you are
+  getting a new copy in macsim-regression directory.
 
-{\texttt svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-regression --username user }
+\begin{Verbatim}
+svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-regression --username user
+\end{Verbatim}
 
-\item Step 2: you have to get a simulator tool, which is still in the hparch svn repository.
+\item You have to get a simulator tool, which is in the hparch svn
+  repository.
 
-\item Step 3: go to macsim-regression/trunk/bin directory and execute regression\_gen.py which is in your tool directory.
+\begin{Verbatim}
+svn co https://svn.research.cc.gatech.edu/hparch/sim/trunk/tools tools --username user
+\end{Verbatim}
 
-\item Step 4: go to macsim-working/trunk/bin directory and execute regression\_test.py which is in your tool directory. 
+\item Go to macsim-regression/trunk/bin directory and execute
+  \Verb+regression_gen.py+ which is in your tool directory.
+
+\begin{Verbatim}
+cd macsim-regression/bin
+regression_gen.py
+\end{Verbatim}
+
+\item Go to macsim-working/bin directory and execute
+  \Verb+regression_test.py+ which is in your tool directory.
+
+\begin{Verbatim}
+cd macsim-working/bin
+regression_test.py
+\end{Verbatim}
+
+\item Here is the output.
+
+\begin{Verbatim}
+regression_test.py
+running ptx_fermi_6core BicubicTexture - 1 of 123
+running ptx_fermi_6core BlackScholes1 - 2 of 123
+running ptx_fermi_6core ConvolutionSeparable - 3 of 123
+running ptx_fermi_6core ConvolutionTexture - 4 of 123
+running ptx_fermi_6core Dct8x8 - 5 of 123
+running ptx_fermi_6core Dxtc1 - 6 of 123
+running ptx_fermi_6core FastWalshTransform - 7 of 123
+running ptx_fermi_6core Histogram2561 - 8 of 123
+...
+Summary: total 123 pass 123 diff 0 fail 0
+\end{Verbatim}
 
 \end{enumerate}
-
-
-\section{How to Add New Files in MacSim}
-
-\begin{Verbatim} 
-run 'patch -p0 -i macsim-internal.patch', this will update <macsim_root>/.obj/Makefile.am to include the internal files in the build 
-\end{Verbatim}
 
 
 \section{What to use internal directory}

@@ -37,22 +37,26 @@ trace file. For memory instructions, multiple instructions are written to the
 trace file since each thread in a warp can access different addresses. Handling
 of memory instructions inside the simulator is explained below.
 
+
+
 \section{Process Manager}
 
-The Process Manager (explained in Chapter~\ref{sec:process_manager}) does
-assignment of threads to cores (SMs) at block granularity - all warps in a
-thread block are assigned to the same core. The number of blocks that can be
-assigned to each core is determined from the resource requirement of each block
-and the GPU architecture being simulated.  This number is calculated at the
-time of trace generation for compute devices of capabilility 2.0 and is
-included in the trace files; it can also be specified by setting the knob
-\todo{max\_block\_per\_core\_super - are there no per application knobs?}.  For each
-block, the Process Manager tracks the number of completed warps and when all
-warps in a block have completed, the Process Manager retires the block and
-assigns a new block to the core. The policy for assigning blocks to cores can
-be varied - blocks could either be assigned statically to cores, or they could
-be assigned to the first core that can accomodate a new block.
+The Process Manager (explained in Chapter~\ref{sec:process_manager})
+does assignment of threads to cores (SMs) at block granularity - all
+warps in the same thread block are assigned to the same core. The
+number of blocks that can be assigned to each core is determined from
+the resource requirement of each block and the GPU architecture being
+simulated.  This number is calculated at the time of trace generation
+for compute devices of capabilility 2.0 and is included in the trace
+files; it can also be specified by setting the knob
+\Verb+max_block_per_core_super+.  For each block, the Process Manager
+tracks the number of completed warps and when all warps in a block
+have completed, the Process Manager retires the block and assigns a
+new block to the core. The policy for assigning blocks to cores can be
+varied - blocks could either be assigned statically to cores, or they
+could be assigned to the first core that can accomodate a new block.
 
+\todo[inline]{support ..\_per\_core\_super per application}
 
 \section{Memory Hierarchy}
 
@@ -61,13 +65,14 @@ The following new components are added to the memory hierarchy - Shared Memory,
 
 \section{Instruction Scheduler}
 
-A GPU-specific (or a multithreaded architecture specific) instruction scheduler
-is necessary, since neither single-threaded in-order nor single-threaded
-out-of-order schedulers match the requirement of a GPU scheduler. A GPU
-scheduler must be able to schedule instructions from different warps while
-scheduling instructions from the same warp in-order. A GPU-specific scheduler
-is implemented in \textit{schedule\_smc.cc}, this scheduler chooses
-instructions from different warps in \todo{round-robin order - not true!}.
+A GPU-specific (or a multithreaded architecture specific) instruction
+scheduler is necessary, since neither single-threaded in-order nor
+single-threaded out-of-order schedulers match the requirement of a GPU
+scheduler. A GPU scheduler must be able to schedule instructions from
+different warps while scheduling instructions from the same warp
+in-order. A GPU-specific scheduler is implemented in
+\Verb+schedule_smc.cc+, this scheduler chooses instructions from
+different warps in \todo{round-robin order - not true!}.
 
 \section{Simulating Memory Instructions}
 
@@ -83,6 +88,8 @@ execution stage it is detected that the main uop has several child uops and the
 child uops that are issued to the memory hierarchy. When all the child uops
 have completed, the main uop is ready for retirement.
 
+
+\missingfigure{better to add diagram from slide}
 
 
 \ignore {

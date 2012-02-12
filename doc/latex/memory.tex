@@ -292,9 +292,10 @@ We model following three timing constrainsts of DRAM.
 \vspace{0.2in}
 \begin{footnotesize}
 \begin{tabular}{llll}
+Timing               & Knob variable in \SIM      & Symbol    & Description                         \\ \hline
 \Verb+Precharge+     & \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
 \Verb+Activate+      & \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
-\Verb+Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                          \\
+\Verb+Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
 \end{tabular}
 \end{footnotesize}
 
@@ -302,19 +303,24 @@ We model following three timing constrainsts of DRAM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{DRAM Bandwidth}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-aaa
 
-\ignore{
+DRAM bandwidth can be modeled using several factors:
+
 \vspace{0.2in}
 \begin{footnotesize}
-\begin{tabular}{llll}
-\Verb+DRAM Frequency+                        & \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
-\Verb+DRAM Data bus width+                   & \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
-\Verb+Number of dram controllers+            & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
-\Verb+Number of dram channels Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
+\begin{tabular}{ll}
+Factor                                       & Knob variable in \SIM      \\ \hline
+\Verb+DRAM Frequency+                        & \Verb+KNOB_DRAM_FREQUENCY+ \\
+\Verb+DRAM Data bus width+                   & \Verb+KNOB_DRAM_BUS_WIDTH+  \\
+\Verb+Number of dram controllers+            & \Verb+KNOB_DRAM_NUM_MC+    \\
+\Verb+Number of dram channels Column Access+ & \Verb+KNOB_DRAM_NUM_CHANNEL+    \\
 \end{tabular}
 \end{footnotesize}
-}
+
+\vspace{0.2in}
+\noindent
+, where
+\Verb+Bandwidth = FREQUENCY * BUS_WIDTH * NUM_MC * NUM_CHANNEL+.
 
 \ignore{
 max_bandwidth =dram_f requency×dram_bus_width×dram_num_mc×dram_num_channel

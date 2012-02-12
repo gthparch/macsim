@@ -3,9 +3,19 @@
 \chapter{FAQ}
 \label{sec:faq}
 
-\begin{enumerate}
-\item I'd like to add a new file in Macsim. What should I do? 
+This chapter answers some frequently asked questions.
 
-\begin{verbatim}  run 'patch -p0 -i macsim-internal.patch', this will update <macsim_root>/.obj/Makefile.am to include the internal files in the build 
-\end{verbatim}
+\begin{enumerate}[Q 1.]
+  \item I'd like to add a new file in Macsim. What should I do? 
+
+\begin{enumerate}[1.]
+\item First add files in src directory.
+\item Add an entry in macsim/trunk/.obj/Makefile.am.
+\begin{Verbatim}
+  all_sources = \
+    ... \
+    ../src/new_file.cc
+\end{Verbatim}
+\end{enumerate}
+
 \end{enumerate}

@@ -1,19 +1,32 @@
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Adding to \SIM}
 \label{sec:add_macsim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{New DRAM Policy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 To implement a new DRAM scheduling policy, a class that extends
-\textit{dram\_controller\_c} has to be defined. This class should overload the
-\textit{schedule()} function which should return the next DRAM request to be
-serviced according to the policy. Please refer to class \textit{dc\_frfcfs\_s}
-defined in dram.cc/h for a sample. In addition to the class, define a wrapper
-function that returns an instance of the class (see \textit{dram.cc} for an
-    example) and register the class with the DRAM factory (see \textit{see
-      register\_functions() in \textit{macsim.cc}}. 
+\textit{dram\_controller\_c} has to be defined. This class should
+overload the \textit{schedule()} function which should return the next
+DRAM request to be serviced according to the policy. Please refer to
+class \textit{dc\_frfcfs\_s} defined in dram.cc/h for a sample. In
+addition to the class, define a wrapper function that returns an
+instance of the class (see \textit{dram.cc} for an example) and
+register the class with the DRAM factory (see \textit{see
+  register\_functions() in \textit{macsim.cc}}.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{New Instruction Scheduler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 Define a class that extends \textit{schedule\_c} and overloads at least the
 \textit{run\_a\_cycle()} function. Other functions may be overloaded to
@@ -21,7 +34,11 @@ maintain a consistent code structure across the different instruction
 schedulers. After defining the new scheduler, add code to \textit{core.cc} to
 instantiate the new scheduler instead of one of the provided schedulers.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{New policy for assigning thread blocks to GPU cores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 In \textit{process\_manager\_c::sim\_schedule\_thread\_block()} add (or modify)
 code to determine the id of the block that will be assigned to the core based
@@ -36,62 +53,54 @@ is created for the simulation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\todo{simulator code change requires. Jaekyu will fix it later}
-
 There are several steps to add a new thread fetching policy. We will
 provide an example with round-robin fetch policy, which is already
 provided by \SIM.
 
-\begin{enumerate}
-  \item Define a new class which inherits \Verb+class bp_dir_base_c+
+\begin{enumerate}[Step 1.]
+\item Define a new fetch policy in \Verb+class frontend_c+.
 \begin{Verbatim}
-class bp_gshare_c : public bp_dir_base_c {};
-\end{Verbatim}
-
-  \item Define and implement other necessary features of a new branch
-    predictor. Especially, override \Verb+pred()+, \Verb+update()+,
-    and \Verb+recover()+ functions.
-\begin{Verbatim}
-uns8 bp_gshare_c::pred(uop_c* uop) {...}
-void bp_gshare_c::update(uop_c* uop) {...}
-
-\end{Verbatim}
-
-  \item Add a policy to the branch predictor factory in
-    \Verb+macsim.cc+ and to the allocator in \Verb+frontend.cc+.
-
-\begin{Verbatim}
-// macsim.cc macsim_c::register_functions()
-bp_factory_c::get()->register_class(``rr'', fetch_factory);
-
-// frontend.cc
-frontend_c* fetch_factory(...) 
-{
+// frontend.h
+class frontend_c {
   ...
-  else if (fetch_policy == ''rr'')
-    new_fe = new frontend_bp_gshare_c(simBase);
+  int fetch_rr(void);
   ...
 }
 \end{Verbatim}
 
-  \item Enable this new branch predictor by setting \Verb+KNOB_BP_DIR_MECH+.
+\item Implement this new policy.
+
+\item Register this new policy in \Verb+macsim.cc+.
 \begin{Verbatim}
-./macsim --bp_dir_mech=gshare     -- in the commandline
-bp_dir_mech gshare                -- in the params.in
+fetch_factory_c::get()->register_class("rr", fetch_factory);
+\end{Verbatim}
+
+
+\item Assign this policy to \Verb+MT_fetch_Scheduler+ in \Verb+frontend.cc+.
+\begin{Verbatim}
+if (policy == ``rr'') {
+  MT_fetch_scheduler = &frontend_c::fetch_rr;
+}
+\end{Verbatim}
+
+\item Enable this new branch predictor by setting \Verb+KNOB_FETCH_POLICY+.
+\begin{Verbatim}
+./macsim --fetch_policy=rr     -- in the commandline
+fetch_policy rr                -- in the params.in
 \end{Verbatim}
 \end{enumerate}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{New Branch Predictor}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 There are several steps to add a new branch predictor. We will provide
 an example with gshare~\cite{mcf93} branch predictor, which is already
 provided by \SIM.
 
-\begin{enumerate}
+\begin{enumerate}[Step 1.]
   \item Define a new class which inherits \Verb+class bp_dir_base_c+
 \begin{Verbatim}
 class bp_gshare_c : public bp_dir_base_c {};
@@ -135,11 +144,12 @@ bp_dir_mech gshare                -- in the params.in
 \section{New Hardware Prefetcher}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 There are several steps to add a new branch predictor. We will provide
 an example with a stride~\cite{iac:spr04} branch predictor, which is already
 provided by \SIM.
 
-\begin{enumerate}
+\begin{enumerate}[Step 1.]
   \item Define a new class which inherits \Verb+class pref_base_c+
 \begin{Verbatim}
 class pref_stride_c : public pref_base_c {};
