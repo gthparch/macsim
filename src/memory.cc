@@ -1973,6 +1973,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
   else if (level == MEM_MC) {
     ASSERTM(msg == NOC_NEW || msg == NOC_FILL, "msg:%d", msg);
     result = m_dram_controller[id]->insert_new_req(req);
+    assert(0); // jaekyu (2-15-2012) this will be completely removed
     if (result) {
       DEBUG("MC[%d] new_req:%d addr:%s type:%s\n", 
           id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);

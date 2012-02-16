@@ -278,6 +278,9 @@ class dram_controller_c
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
     router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
+#ifdef SST_DRAMSIM
+    list<mem_req_s*>* m_pending_request; /**< pending request */
+#endif
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 };

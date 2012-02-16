@@ -245,6 +245,9 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 
   // output buffer
   m_output_buffer = new list<mem_req_s*>;
+#ifdef SST_DRAMSIM
+  m_pending_request = new list<mem_req_s*>;
+#endif
 }
 
 
@@ -260,6 +263,9 @@ dram_controller_c::~dram_controller_c()
   delete[] m_bank_ready;
   delete[] m_bank_timestamp;
   delete m_output_buffer;
+#ifdef SST_DRAMSIM
+  delete m_pending_request;
+#endif
 }
 
 
@@ -354,11 +360,14 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 void dram_controller_c::run_a_cycle()
 {
   send_packet();
+#ifndef SST_DRAMSIM
   channel_schedule();
   bank_schedule();
+#endif
 
   receive_packet();
 
+#ifndef SST_DRAMSIM
   // starvation check
   progress_check();
   for (int ii = 0; ii < m_num_channel; ++ii) {
@@ -368,6 +377,7 @@ void dram_controller_c::run_a_cycle()
     }
   }
   on_run_a_cycle();
+#endif
 }
 
 
@@ -526,6 +536,25 @@ void dram_controller_c::bank_schedule_complete(void)
 
 void dram_controller_c::send_packet(void)
 {
+#ifdef SST_DRAMSIM
+  cookie c;
+  while (mc->mem_dev->popCookie(&c)) {
+    Addr return_addr = c.addr; // return address from DRAMSIM
+
+    // find requests with this address
+    auto I = m_pending_request->begin();
+    auto E = m_pending_request->end();
+    while (I != E) {
+      mem_req_s* req = (*I);
+      ++I;
+
+      if (req->m_addr == return_addr) {
+        m_output_buffer->push_back(req);
+        m_pending_request->remove(req);
+      }
+    }
+  }
+#endif
   bool req_type_checked[2];
   req_type_checked[0] = false;
   req_type_checked[1] = false;
@@ -610,7 +639,14 @@ void dram_controller_c::receive_packet(void)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     if (!m_terminal->receive_queue.empty()) {
       mem_req_s* req = m_terminal->receive_queue.front();
+#ifndef SST_DRAMSIM
       if (insert_new_req(req)) {
+#else
+      c = new cont(cond_t);
+      if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
+          (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
+        m_pending_request->push_back(req);
+#endif
         m_terminal->receive_queue.pop();
         if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
           m_simBase->m_bug_detector->deallocate_noc(req);
@@ -620,7 +656,14 @@ void dram_controller_c::receive_packet(void)
   }
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     mem_req_s* req = m_router->receive_req();
+#ifndef STT_DRAMSIM
     if (req && insert_new_req(req)) {
+#else
+    c = new cont(cond_t);
+    if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
+        (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
+      m_pending_request->push_back(req);
+#endif
       m_router->pop_req();
       if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
         m_simBase->m_bug_detector->deallocate_noc(req);
