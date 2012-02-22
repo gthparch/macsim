@@ -56,7 +56,7 @@ new block to the core. The policy for assigning blocks to cores can be
 varied - blocks could either be assigned statically to cores, or they
 could be assigned to the first core that can accomodate a new block.
 
-\todo[inline]{support ..\_per\_core\_super per application}
+\ignore{\todo[inline]{support ..\_per\_core\_super per application}}
 
 \section{Memory Hierarchy}
 
@@ -72,7 +72,7 @@ scheduler. A GPU scheduler must be able to schedule instructions from
 different warps while scheduling instructions from the same warp
 in-order. A GPU-specific scheduler is implemented in
 \Verb+schedule_smc.cc+, this scheduler chooses instructions from
-different warps in \todo{round-robin order - not true!}.
+different warps in \ignore{\todo{round-robin order - not true!}}.
 
 \section{Simulating Memory Instructions}
 

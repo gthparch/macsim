@@ -3,8 +3,8 @@
 
 \chapter{Pipeline Stages in \SIM}
 
-\SIM implements a six stage processor whose pipeline depth can be varied using
-knobs. The stages are - Fetch, Decode, Allocate, Schedule and Execute (includes
+\SIM implements a five stage processor whose pipeline depth can be varied using
+knobs. The stages are - Fetch, Decode, Schedule and Execute (includes
     Memory) and Retire. This chapter describes the basic feature of each
 stage.
 
@@ -75,19 +75,20 @@ everytime.
 
 \section{Decode and  Allocate Stage}
 
+\ignore
+{
 \todo{Decode is done in frontend.cc!}
-\todo{renaming!!}
 
 \todo{according to code, frontend\_q latency = fetch\_latency + alloc\_latency}
 \todo{according to code, alloc\_q latency = alloc\_to\_exec\_latency}
+}
 
-In the allocation stage, the resource requirement for each uop is calculated
-and space is allocated for the uop in the required structures. At the end of the
-allocation stage, each uop occupies an entry in ROB and one of the issues
-queues - general purpose (integer), floating point or memory. Depending on the
-knob values, there could a unified issue queue or distributed issue queues. For
-conditional branches with BTB misses, the branch target is resolved in this
-stage as well.
+In this stage the resource requirement for each uop is calculated and space is
+allocated for the uop in the required structures. At the end of the stage, each
+uop occupies an entry in ROB and one of the issues queues - general purpose
+(integer), floating point or memory. Depending on the knob values, there could
+a unified issue queue or distributed issue queues. For conditional branches
+with BTB misses, the branch target is resolved in this stage as well.
 
 
 \ignore{ This stage is simply implemented with {\textit  allocate queue}.
@@ -139,9 +140,10 @@ Handling of D-cache misses is explained in Section~\ref{sec:memory}.
 
 \item Uncoalesced memory instructions result in multiple accesses to the the D-cache.
 
-\item \todo[inline]{The number of function units can be specified via these knobs for
-  the core type being used - \textit{int\_sched\_rate, mem\_sched\_rate,
-    fp\_sched\_rate} - code does not use these in that sense}.
+\ignore{ \item \todo[inline]{The number of function units can be specified via
+  these knobs for the core type being used - \textit{int\_sched\_rate,
+    mem\_sched\_rate, fp\_sched\_rate} - code does not use these in that
+      sense}.  }
 
 \end{enumerate}
 
@@ -174,12 +176,13 @@ is freed (returned to memory pool). This stage also checks of completion of
 warps, blocks, kernels and the entire application itself and triggers the
 repetition of applications if the knob for repetition is set.
 
+\ignore{
 \todo[inline]{At present, there are no rename and writeback stages in MacSim since
   they are not necessary to support correct and accurate simulation. MacSim
     enforces RAW dependencies, while WAR and WAW dependences can be ignored by
     assuming that once a instruction completes, its results are available for
     dependent instructions without being overwritten.}
-
+}
 
 \section{Queues}
 
