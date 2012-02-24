@@ -104,7 +104,14 @@ maximum allowed.
 \end{description}
 
 
-Figure~\ref{not_shown} shows the control flow in the Process Manager on
+\begin{figure*}[htb]
+\centering
+\includegraphics[height=80mm]{figs/process_creation}
+\caption{Process and Thread Creation}
+\label{fig:process_creation}
+\end{figure*}
+
+Figure~\ref{fig:process_creation} shows the control flow in the Process Manager on
 simulation start up and during simulation. \textit{create\_process()} is called
 for each application to be simulated. \textit{create\_process()} calls
 \textit{setup\_process()} which in turn calls \textit{create\_thread\_node()}
@@ -119,10 +126,18 @@ kernels do not have a main thread, on kernel start up,
 \textit{create\_thread\_node()} is called for the first warp in the
 kernel. 
 
+\begin{figure*}[htb]
+\centering
+\includegraphics[height=80mm]{figs/thread_scheduling}
+\caption{Thread/Thread Block Scheduling}
+\label{fig:thread_scheduling}
+\end{figure*}
+
 When a thread/warp running on a core terminates,
      \textit{sim\_thread\_schedule()} is called to schedule new threads/thread
      blocks onto the core. Note that a new thread block can be assigned to a
      core only when all warps of a previously assigned block have terminated.
      \textit{sim\_thread\_schedule()} removes threads/warps from
-     \textit{m\_thread\_queue/m\_block\_queue} and assigns them the core.
+     \textit{m\_thread\_queue/m\_block\_queue} and assigns them to the core.
+     This flow is shown in Figure~\ref{fig:thread_scheduling}.
 
