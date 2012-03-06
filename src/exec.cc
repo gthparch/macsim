@@ -39,6 +39,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * Summary: Execution stage in the pipeline
+ * TODO:
+ * 1) do not attempt to execute all children uops at one cycle
+ * 2) port check in advance. all children uops access dcache regardless of port status
  */
 
 
@@ -324,6 +327,11 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
           // -------------------------------------
           if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
             latency = core->get_shared_memory()->load(uop->m_child_uops[next_set_bit]);
+            POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R);
+            POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R_TAG);
+            if (latency != 0) {
+              uop->m_mem_start_cycle = m_cur_core_cycle;
+            }
           }
           // -------------------------------------
           // other types of memory access
