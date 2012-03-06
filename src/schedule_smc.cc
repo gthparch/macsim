@@ -111,6 +111,11 @@ void schedule_smc_c::advance(int q_index) {
   fill_n(m_count, static_cast<size_t>(max_ALLOCQ), 0);
 
   while (m_gpu_allocq[q_index]->ready()) {
+    // this prevents scheduler overwritten
+    if ((m_last_schlist + 1) % m_schlist_size == m_first_schlist)
+      break ;
+
+
     gpu_allocq_entry_s  allocq_entry = m_gpu_allocq[q_index]->peek(0); 
 
     int tid        = allocq_entry.m_thread_id; 
@@ -168,6 +173,7 @@ void schedule_smc_c::advance(int q_index) {
     m_last_schlist %= m_schlist_size;
     ++m_num_in_sched;
     ++m_num_per_sched[allocq];
+    assert(m_last_schlist != m_first_schlist);
     
     DEBUG("core_id:%d thread_id:%d uop_num:%lld inserted into scheduler\n",
         m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
@@ -217,7 +223,7 @@ bool schedule_smc_c::check_srcs(int thread_id, int entry)
         src_uop->m_done_cycle, unsstr64(src_uop->m_uop_num), unsstr64(src_uop_num));
 
     // Check if the source uop is ready
-    if ((src_uop->m_done_cycle  == 0) || 
+    if ((src_uop->m_done_cycle == 0) || 
         (m_simBase->m_core_cycle[m_core_id] < src_uop->m_done_cycle))  {
       // Source is not ready. 
       // Hence we update the last_dep_exec field of this uop and return. 

@@ -297,6 +297,10 @@ void schedule_c::advance(int q_index)
 
   // Iterate until alloc queue has ready members
   while (m_alloc_q[q_index]->ready()) {
+    // this prevents scheduler overwritten
+    if ((m_last_schlist_ptr + 1) % MAX_SCHED_SIZE == m_first_schlist_ptr)
+      break ;
+
     int entry      = (int) m_alloc_q[q_index]->peek(0);  
     uop_c *cur_uop = (uop_c *)(*m_rob)[entry]; 
 
