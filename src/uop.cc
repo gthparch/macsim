@@ -153,6 +153,12 @@ uop_c::uop_c(macsim_c* simBase)
   m_valid = false;
 }
 
+uop_c::uop_c()
+{
+  init();
+  m_valid = false;
+}
+
 
 // initialize an uop
 void uop_c::init()

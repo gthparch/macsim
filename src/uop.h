@@ -267,6 +267,11 @@ class uop_c
     /**
      * Constructor
      */
+    uop_c();
+
+    /**
+     * Constructor
+     */
     uop_c(macsim_c* simBase);
 
     /**
