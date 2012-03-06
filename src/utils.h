@@ -237,7 +237,7 @@ class hash_c
      */
     hash_c() 
     {
-      m_pool = new pool_c<T>(15, "hash");
+      m_pool = new pool_c<T>(100, "hash");
     }
 
     /**
@@ -246,7 +246,7 @@ class hash_c
      */
     hash_c(string name)
     {
-      m_pool = new pool_c<T>(15, name);
+      m_pool = new pool_c<T>(100, name);
     }
 
     /**
