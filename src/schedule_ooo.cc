@@ -89,12 +89,10 @@ void schedule_ooo_c::run_a_cycle(void)
 
   int count = 0;
   if (m_num_in_sched) { 
-    for (int i = m_first_schlist_ptr; (i != m_last_schlist_ptr); 
-         i = (i + 1) % MAX_SCHED_SIZE) {
+    for (int i = m_first_schlist_ptr; i != m_last_schlist_ptr; i = (i + 1) % MAX_SCHED_SIZE) {
       if (m_schedule_list[i] != -1) {
         SCHED_FAIL_TYPE sched_fail_reason;
 
-        
         // schedule un uop
         if (uop_schedule(m_schedule_list[i], &sched_fail_reason)) {
           STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS);

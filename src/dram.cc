@@ -603,7 +603,7 @@ void dram_controller_c::send_packet(void)
         insert_packet = m_terminal->send_packet(req);
       }
       else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-        insert_packet = m_router->send_packet(req);
+        insert_packet = m_router->inject_packet(req);
       }
       else {
         int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, req->m_cache_id[MEM_L3]);

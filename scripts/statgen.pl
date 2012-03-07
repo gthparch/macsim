@@ -105,19 +105,19 @@ open(ALLSTATH, ">$allstath") || die("Can not open file $allstath\n");
 	print ALLSTATH "class all_stats_c {\n";
 	  print ALLSTATH "\tpublic:\n";	
 			#prototypes
-      print ALLKNOBS_H "\t\t/**\n";
-      print ALLKNOBS_H "\t\t * Constructor\n";
-      print ALLKNOBS_H "\t\t */\n";
+      print ALLSTATH "\t\t/**\n";
+      print ALLSTATH "\t\t * Constructor\n";
+      print ALLSTATH "\t\t */\n";
 			print ALLSTATH "\t\tall_stats_c(ProcessorStatistics\* procStat);\n\n";
 
-      print ALLKNOBS_H "\t\t/**\n";
-      print ALLKNOBS_H "\t\t * Constructor\n";
-      print ALLKNOBS_H "\t\t */\n";
+      print ALLSTATH "\t\t/**\n";
+      print ALLSTATH "\t\t * Constructor\n";
+      print ALLSTATH "\t\t */\n";
 			print ALLSTATH "\t\t~all_stats_c();\n\n";
 
-      print ALLKNOBS_H "\t\t/**\n";
-      print ALLKNOBS_H "\t\t * Constructor\n";
-      print ALLKNOBS_H "\t\t */\n";
+      print ALLSTATH "\t\t/**\n";
+      print ALLSTATH "\t\t * Constructor\n";
+      print ALLSTATH "\t\t */\n";
 			print ALLSTATH "\t\tvoid initialize(ProcessorStatistics\*, CoreStatistics\*);\n\n";
 		
 			#member stat variables
