@@ -953,7 +953,7 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
     packet_insert = m_terminal->send_packet(req);
   }
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    packet_insert = m_router->send_packet(req);
+    packet_insert = m_router->inject_packet(req);
   }
   else {
     packet_insert = m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req);  
@@ -2440,7 +2440,7 @@ no_cache_c::no_cache_c(macsim_c* simBase) : memory_c(simBase)
   // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
   for (int ii = 0; ii < m_num_core; ++ii) {
     //                   next_id, next,  prev_id, prev,  done,  cup,   cdown, disable
-    m_l1_cache[ii]->init(ii, -1, false, false, true,  true, true);
+    m_l1_cache[ii]->init(ii, -1, false, false, true,  true, false);
     m_l2_cache[ii]->init(ii, ii, true,  true,  true,  true, true);
     m_l3_cache[ii]->init(-1, ii, false, true,  false, true, true);
   }
