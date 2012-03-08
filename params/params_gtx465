@@ -1,8 +1,8 @@
-num_sim_cores 12
-num_sim_small_cores 12
+num_sim_cores 11
+num_sim_small_cores 11
 core_type ptx
 max_threads_per_core 80
-cpu_frequency 1.215
+gpu_frequency 1.215
 
 num_sim_medium_cores 0
 num_sim_large_cores 0
