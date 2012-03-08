@@ -54,8 +54,9 @@ sw_managed_cache_c::sw_managed_cache_c(string name, int c_id, uns32 c_size, uns8
   //Reference to simulation-scoped members
   m_simBase = simBase;
 
+  int num_set = c_size / c_assoc / c_line_size;
   // allocate cache
-  m_cache = new cache_c(name, c_size, c_assoc, c_line_size, c_data_size, 
+  m_cache = new cache_c(name, num_set, c_assoc, c_line_size, c_data_size, 
       m_num_banks, by_pass, m_core_id, c_type, false, m_simBase);
 
   // allocate port

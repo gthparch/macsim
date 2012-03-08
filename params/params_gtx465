@@ -39,9 +39,9 @@ icache_num_set 8
 dram_merge_requests 1
 mem_ooo_stores 0
 ptx_common_cache 0
-const_cache_size 1024
-texture_cache_size 256
-shared_mem_size 4096
+const_cache_size 8192
+texture_cache_size 8192
+shared_mem_size 16384
 byte_level_access 1
 memory_type l2_decoupled_network
 num_l3 4

@@ -384,9 +384,11 @@ bool dcu_c::full(void)
 
 
 // get cache line address.
+// FIXME (jaekyu, 3-7-2012)
+// replace 63 with the cache line size
 Addr dcu_c::base_addr(Addr addr)
 {
-  return m_cache->base_cache_line(addr);
+  return (addr & ~63);
 }
 
 
@@ -1356,22 +1358,22 @@ bool dcu_c::done(mem_req_s* req)
   Addr line_addr;
   Addr repl_line_addr;
 
-  addr = req->m_addr;
-  bank = m_cache->get_bank_num(req->m_addr);
-
-
-  // -------------------------------------
-  // DCACHE write port access
-  // -------------------------------------
-  if (!m_disable && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) {
-    STAT_EVENT(CACHE_BANK_BUSY);
-    return false;
-  }
 
   if (m_disable) {
     // do nothing
   }
   else {
+    addr = req->m_addr;
+    bank = m_cache->get_bank_num(req->m_addr);
+
+    // -------------------------------------
+    // DCACHE write port access
+    // -------------------------------------
+    if (!m_disable && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) {
+      STAT_EVENT(CACHE_BANK_BUSY);
+      return false;
+    }
+
     // for the safety check, do not insert duplicate blocks
     line = (dcache_data_s*)m_cache->access_cache(addr, &line_addr, false, req->m_appl_id);
 
@@ -2038,9 +2040,11 @@ int memory_c::access(uop_c* uop)
 
 
 // get base line address
+// FIXME (jaekyu, 3-7-2012)
+// replace 63 with the cache line size
 Addr memory_c::base_addr(int core_id, Addr addr)
 {
-  return m_l1_cache[core_id]->base_addr(addr);
+  return (addr & ~63); 
 }
 
 

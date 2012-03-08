@@ -45,9 +45,9 @@ schedule_ratio 4 # GPU Only
 fetch_ratio 4 # GPU Only
 gpu_sched 1 # GPU Only
 ptx_common_cache 0 # GPU Only
-const_cache_size 1024 # GPU Only
-texture_cache_size 256 # GPU Only
-shared_mem_size 4096 # GPU Only
+const_cache_size 8192 # GPU Only
+texture_cache_size 8192 # GPU Only
+shared_mem_size 16384 # GPU Only
 blocks_to_simulate 0
 ptx_exec_ratio 2
 num_warp_scheduler 2

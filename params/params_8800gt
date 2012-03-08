@@ -17,7 +17,6 @@ schedule ooo
 isched_rate 4 
 msched_rate 2 
 fsched_rate 2 
-in_order_processing 0
 bp_hist_length 14
 max_block_per_core 4
 fetch_policy rr
@@ -45,17 +44,11 @@ dram_rowbuffer_size 2048
 
 
 sim_cycle_count 0
-num_sim_traces  80
 max_insts 200000000
 heartbeat_interval 1000000
 forward_progress_limit 10000000
-trace_mode text
 bug_detector_enable 0
 
-collect_num_busy_banks 0
-collect_thread_start_end_cycles 1
-collect_bar_wait_cycles 0
-collect_mlp_stats 0
 blocks_to_simulate 0
 
 
@@ -72,21 +65,14 @@ debug_map_stage 0
 debug_mem  0
 debug_trace_read 0
 debug_sim_thread_schedule 0
-debug_list_lib 0
 debug_cache_lib 0
-debug_uop_pool 0
 debug_bp_dir 0
 
 
 gpu_sched 1
-const_cache_size 2048
-texture_cache_size 16384
+const_cache_size 8192
+texture_cache_size 8192
 shared_mem_size 16384
 byte_level_access 1
-invalidate_prefetch_after_use 1
-schedule_until_block 1
-print_info_with_heartbeat 1
 infinite_port 1
 dram_scheduling_policy FRFCFS
-pref_sw_insertion_after 1
-pref_train_inst_once 0

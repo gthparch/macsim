@@ -67,8 +67,8 @@ debug_bp_dir 0
 
 
 gpu_sched 1
-const_cache_size 2048
-texture_cache_size 16384
+const_cache_size 8192
+texture_cache_size 8192
 shared_mem_size 16384
 byte_level_access 1
 infinite_port 1
