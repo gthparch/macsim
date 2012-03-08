@@ -86,8 +86,9 @@ readonly_cache_c::readonly_cache_c(string name, int c_id, uns32 c_size, uns8 c_a
 {
   m_simBase = simBase;
 
+  int num_set = c_size / c_assoc / c_line_size;
   // allocate cache
-  m_cache = new cache_c(name, m_cache_size, m_cache_assoc, m_cache_line_size, c_data_size, 
+  m_cache = new cache_c(name, num_set, m_cache_assoc, m_cache_line_size, c_data_size, 
       m_cache_banks, by_pass, m_core_id, m_cache_type, false, simBase);
 }
 

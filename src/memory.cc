@@ -312,21 +312,6 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   m_fill_queue = new queue_c(simBase, 1024);
   m_out_queue = new queue_c(simBase, 2048);
 
-  if (level == MEM_L3) {
-    string llc_policy = *KNOB(KNOB_LLC_TYPE);
-    m_cache = llc_factory_c::get()->allocate(llc_policy, simBase); 
-    m_cache->set_core_id(id);
-  }
-  else {
-    m_cache = new cache_c("dcache", m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
-        m_banks, false, id, CACHE_DL1, level == MEM_L3 ? true : false, simBase);
-  }
-
-  // allocate port
-  m_port = new port_c* [m_banks]; 
-  for (int ii = 0; ii < m_banks; ++ii) {
-    m_port[ii] = new port_c("dcache_port", m_num_read_port, m_num_write_port, false, simBase);
-  }
 
   m_id     = id;
   m_noc_id = noc_id;
@@ -341,7 +326,11 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
 // dcu_c destructor.
 dcu_c::~dcu_c()
 {
+  if (m_disable)
+    return ;
+  
   delete m_cache;
+  
   for (int ii = 0; ii < m_banks; ++ii) 
     delete m_port[ii];
   delete[] m_port;
@@ -360,7 +349,24 @@ void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coup
   m_disable      = disable;
   m_has_router   = has_router;
 
-  if (m_disable == true) {
+  if (!m_disable) {
+    if (m_level == MEM_L3) {
+      string llc_policy = *KNOB(KNOB_LLC_TYPE);
+      m_cache = llc_factory_c::get()->allocate(llc_policy, m_simBase); 
+      m_cache->set_core_id(m_id);
+    }
+    else {
+      m_cache = new cache_c("dcache", m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
+          m_banks, false, m_id, CACHE_DL1, m_level == MEM_L3 ? true : false, m_simBase);
+    }
+
+    // allocate port
+    m_port = new port_c* [m_banks]; 
+    for (int ii = 0; ii < m_banks; ++ii) {
+      m_port[ii] = new port_c("dcache_port", m_num_read_port, m_num_write_port, false, m_simBase);
+    }
+  }
+  else {
     m_latency = 1;
   }
 

@@ -68,6 +68,11 @@ cache_set_c::cache_set_c(int assoc)
   m_assoc = assoc;
 }
 
+cache_set_c::~cache_set_c()
+{
+  delete m_entry;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -133,6 +138,15 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
 
 cache_c::~cache_c()
 {
+  for (int ii = 0; ii < m_num_sets; ++ii) {
+    for (int jj = 0; jj < m_assoc; ++jj) {
+      if (m_data_size > 0) {
+        free(m_set[ii]->m_entry[jj].m_data);
+      }
+    }
+    delete m_set[ii];
+  }
+  delete[] m_set;
 }
 
 
