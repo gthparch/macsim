@@ -1492,7 +1492,10 @@ bool dcu_c::create_network_interface(int mclass)
     
     if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
       int type;
-      if (mclass == L1_REQ || mclass == L2_REQ) {
+      if (mclass == L3_REQ) {
+        type = L3_ROUTER;
+      }
+      else if (mclass == PROC_REQ) {
         if (m_ptx_sim) {
           type = GPU_ROUTER;
         }
@@ -1500,9 +1503,6 @@ bool dcu_c::create_network_interface(int mclass)
           type = CPU_ROUTER;
         }
       }
-      else if (mclass == L3_REQ) {
-        type = L3_ROUTER;
-      } 
       else {
         type = MC_ROUTER;
       }
