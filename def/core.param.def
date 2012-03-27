@@ -96,6 +96,8 @@ param<HEARTBEAT_INTERVAL,       	heartbeat_interval,     		uns,    false>
 param<GPU_FETCH_RATIO,                      fetch_ratio,                            int,    1> 
 param<GPU_SCHEDULE_RATIO,                   schedule_ratio,                         int,    1> 
 
+param<CPU_FETCH_RATIO,                      cpu_fetch_ratio,                            int,    1> 
+
 param<PTX_EXEC_RATIO,                   ptx_exec_ratio,                     int,         4>
 
 param<NUM_SIM_CORES, 				num_sim_cores, 					uns32, 	80>
