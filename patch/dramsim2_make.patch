@@ -1,0 +1,71 @@
+Index: .obj/Makefile.am
+===================================================================
+--- .obj/Makefile.am	(revision 251)
++++ .obj/Makefile.am	(working copy)
+@@ -3,7 +3,7 @@
+ XFLAGS       = -DLONG_COUNTERS
+ WARN_FLAGS   = -Wunused-function -Wreturn-type -Wpointer-arith -Wno-write-strings
+ DEBUG_FLAGS  = -DNO_DEBUG
+-COMMON_FLAGS = -DNO_MPI 
++COMMON_FLAGS = -DNO_MPI -DDRAMSIM -DNO_OUTPUT
+ 
+ EI_DIR    = energy_introspector
+ ORION_DIR = orion
+@@ -15,7 +15,8 @@
+               -I ../src/manifold/kernel/include/kernel \
+               -I ../src/manifold/kernel/include/ \
+               -I ../src/manifold/models/iris/interfaces \
+-              -I ../src -I /usr/include
++              -I ../src -I /usr/include \
++              -I ../src/DRAMSim2
+ 
+ AM_LDFLAGS = -lz -lpthread -lgsl -lgslc++
+ AM_CFLAGS = 
+@@ -101,7 +102,7 @@
+ all_sources += $(iris_kernel_srcs) $(iris_srcs) $(ei_srcs)
+ 
+ 
+-noinst_LIBRARIES = liborion.a
++noinst_LIBRARIES = liborion.a libdramsim.a
+ liborion_a_SOURCES = \
+   ../src/orion/SIM_router.c          ../src/orion/SIM_arbiter.c \
+   ../src/orion/SIM_crossbar.c        ../src/orion/SIM_router_power.c \
+@@ -115,6 +116,17 @@
+ liborion_a_CFLAGS = 
+ 
+ 
++libdramsim_a_SOURCES = \
++  ../src/DRAMSim2/Bank.cpp             ../src/DRAMSim2/BankState.cpp \
++  ../src/DRAMSim2/BusPacket.cpp        ../src/DRAMSim2/CommandQueue.cpp \
++  ../src/DRAMSim2/IniReader.cpp        ../src/DRAMSim2/MemoryController.cpp \
++  ../src/DRAMSim2/MemorySystem.cpp     ../src/DRAMSim2/Rank.cpp \
++  ../src/DRAMSim2/SimulatorObject.cpp  ../src/DRAMSim2/TraceBasedSim.cpp \
++  ../src/DRAMSim2/Transaction.cpp
++libdramsim_a_CPPFLAGS = -DNO_STORAGE -DDEBUG_BUILD -DLOG_OUTPUT 
++libdramsim_a_CFLAGS = 
++
++
+ # this lists the binaries to produce, the (non-PHONY, binary) targets in
+ # the previous manual Makefile
+ bin_PROGRAMS = macsim_opt
+@@ -125,17 +137,17 @@
+ macsim_opt_CPPFLAGS = -O3 -std=c++0x -funroll-loops -Werror $(DEBUG_FLAGS) $(WARN_FLAGS) $(XFLAGS) $(COMMON_FLAGS) -I .
+ macsim_opt_SOURCES = $(all_sources)
+ macsim_opt_LDFLAGS = -static
+-macsim_opt_LDADD = liborion.a
++macsim_opt_LDADD = liborion.a libdramsim.a
+ 
+ macsim_dbg_CPPFLAGS = -g -std=c++0x $(WARN_FLAGS) $(XFLAGS) $(COMMON_FLAGS) -I .
+ macsim_dbg_SOURCES = $(all_sources)
+ macsim_dbg_LDFLAGS = -g -static
+-macsim_dbg_LDADD = liborion.a
++macsim_dbg_LDADD = liborion.a libdramsim.a
+ 
+ macsim_gpf_CPPFLAGS = $(macsim_opt_CPPFLAGS) $(COMMON_FLAGS) -pg -I .
+ macsim_gpf_SOURCES = $(all_sources)
+ macsim_gpf_LDFLAGS = -pg -static
+-macsim_gpf_LDADD = liborion.a
++macsim_gpf_LDADD = liborion.a libdramsim.a
+ 
+ opt: macsim_opt
+ 

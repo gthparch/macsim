@@ -55,6 +55,16 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "manifold/kernel/include/kernel/manifold.h"
 #include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
 
+#ifdef DRAMSIM
+#include "MemorySystem.h"
+using namespace DRAMSim;
+#undef DEBUG
+#endif
+
+
+#if defined(SST_DRAMSIM) || defined(DRAMSIM)
+#define _DRAMSIM
+#endif
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_DRAM, ## args)
 
@@ -245,10 +255,62 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 
   // output buffer
   m_output_buffer = new list<mem_req_s*>;
-#ifdef SST_DRAMSIM
+#ifdef _DRAMSIM
   m_pending_request = new list<mem_req_s*>;
 #endif
+
+#ifdef DRAMSIM
+  dramsim_instance = new DRAMSim::MemorySystem(
+      0, 
+      "src/DRAMSim2/ini/DDR2_micron_16M_8b_x8_sg3E.ini", 
+      "src/DRAMSim2/system.ini.example", 
+      "..", 
+      "resultsfilename", 
+      2048);
+
+  Callback_t* read_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::read_callback);
+  Callback_t* write_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::write_callback);
+  dramsim_instance->RegisterCallbacks(read_cb, write_cb, NULL);
+#endif
 }
+
+
+#ifdef DRAMSIM
+void dram_controller_c::read_callback(unsigned id, uint64_t address, uint64_t clock_cycle)
+{
+//  cout << "fucking read call back " << id << "\n";
+  // find requests with this address
+  auto I = m_pending_request->begin();
+  auto E = m_pending_request->end();
+  while (I != E) {
+    mem_req_s* req = (*I);
+    ++I;
+
+    if (req->m_addr == address) {
+      m_output_buffer->push_back(req);
+      m_pending_request->remove(req);
+    }
+  }
+}
+
+
+void dram_controller_c::write_callback(unsigned id, uint64_t address, uint64_t clock_cycle)
+{
+//  cout << "fucking write call back " << id << "\n";
+  // find requests with this address
+  auto I = m_pending_request->begin();
+  auto E = m_pending_request->end();
+  while (I != E) {
+    mem_req_s* req = (*I);
+    ++I;
+
+    if (req->m_addr == address) {
+      m_output_buffer->push_back(req);
+      m_pending_request->remove(req);
+    }
+  }
+}
+#endif
 
 
 // dram controller destructor
@@ -263,8 +325,12 @@ dram_controller_c::~dram_controller_c()
   delete[] m_bank_ready;
   delete[] m_bank_timestamp;
   delete m_output_buffer;
-#ifdef SST_DRAMSIM
+#ifdef _DRAMSIM
   delete m_pending_request;
+#endif
+
+#ifdef DRAMSIM
+  delete dramsim_instance;
 #endif
 }
 
@@ -359,15 +425,18 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 // tick a cycle
 void dram_controller_c::run_a_cycle()
 {
+#ifdef DRAMSIM
+  dramsim_instance->update();
+#endif
   send_packet();
-#ifndef SST_DRAMSIM
+#ifndef _DRAMSIM
   channel_schedule();
   bank_schedule();
 #endif
 
   receive_packet();
 
-#ifndef SST_DRAMSIM
+#ifndef _DRAMSIM
   // starvation check
   progress_check();
   for (int ii = 0; ii < m_num_channel; ++ii) {
@@ -536,7 +605,8 @@ void dram_controller_c::bank_schedule_complete(void)
 
 void dram_controller_c::send_packet(void)
 {
-#ifdef SST_DRAMSIM
+#ifdef _DRAMSIM
+#ifdef SST_DRAMSIM // SST DRAMSim2
   cookie c;
   while (mc->mem_dev->popCookie(&c)) {
     Addr return_addr = c.addr; // return address from DRAMSIM
@@ -554,6 +624,9 @@ void dram_controller_c::send_packet(void)
       }
     }
   }
+#else // DRAMSim2
+  // nothing to do
+#endif
 #endif
   bool req_type_checked[2];
   req_type_checked[0] = false;
@@ -639,12 +712,17 @@ void dram_controller_c::receive_packet(void)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     if (!m_terminal->receive_queue.empty()) {
       mem_req_s* req = m_terminal->receive_queue.front();
-#ifndef SST_DRAMSIM
+#ifndef _DRAMSIM // MacSim module
       if (insert_new_req(req)) {
 #else
+#ifdef SST_DRAMSIM // SST-DRAMSim2
       c = new cont(cond_t);
       if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
           (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
+#else // DRAMSim2
+      Transaction tr = Transaction(req->m_type == MRT_WB ? DATA_WRITE : DATA_READ, static_cast<uint64_t>(req->m_addr), NULL);
+      if (dramsim_instance->addTransaction(tr)) {
+#endif
         m_pending_request->push_back(req);
 #endif
         m_terminal->receive_queue.pop();
@@ -656,12 +734,19 @@ void dram_controller_c::receive_packet(void)
   }
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     mem_req_s* req = m_router->receive_req();
-#ifndef STT_DRAMSIM
+    if (!req)
+      return ;
+#ifndef _DRAMSIM
     if (req && insert_new_req(req)) {
 #else
+#ifdef SST_DRAMSIM
     c = new cont(cond_t);
     if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
         (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
+#else
+    Transaction tr = Transaction(req->m_type == MRT_WB ? DATA_WRITE : DATA_READ, static_cast<uint64_t>(req->m_addr), NULL);
+    if (dramsim_instance->addTransaction(tr)) {
+#endif
       m_pending_request->push_back(req);
 #endif
       m_router->pop_req();

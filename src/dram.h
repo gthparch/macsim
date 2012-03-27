@@ -48,6 +48,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_defs.h"
 
 
+#ifdef DRAMSIM
+namespace DRAMSim {
+  class MemorySystem;
+};
+
+//};
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief dram state enumerator
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,6 +158,11 @@ class dram_controller_c
      * Print requests in the buffer
      */
     void print_req(void);
+
+#ifdef DRAMSIM
+    void read_callback(unsigned, uint64_t, uint64_t);
+    void write_callback(unsigned, uint64_t, uint64_t);
+#endif
     
   public:
     #define DRAM_REQ_PRIORITY_COUNT 12
@@ -278,8 +292,12 @@ class dram_controller_c
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
     router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
-#ifdef SST_DRAMSIM
+#if defined(SST_DRAMSIM) || defined(DRAMSIM)
     list<mem_req_s*>* m_pending_request; /**< pending request */
+#endif
+
+#ifdef DRAMSIM
+    DRAMSim::MemorySystem* dramsim_instance;
 #endif
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
