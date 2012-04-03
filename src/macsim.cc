@@ -39,6 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <sys/time.h>
 
 #include "macsim.h"
@@ -360,7 +361,13 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   // 4. other knobs
   if (params["topology"] == "ring") {
     params["no_ports"] = "3";
-    params["mapping"]  = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+    stringstream sstr;
+    for (int ii = 0; ii < 64; ++ii) {
+      sstr << ii;
+      if (ii != 63)
+        sstr << ',';
+    }
+    sstr >> params["mapping"];
 
   }
   else if (params["topology"] == "mesh" || params["topology"] == "torus") {
