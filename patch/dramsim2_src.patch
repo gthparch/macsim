@@ -1,11 +1,11 @@
---- MemorySystem.cpp	2012-03-27 12:30:56.000000000 -0400
-+++ MemorySystem_new.cpp	2012-03-27 12:26:45.000000000 -0400
-@@ -262,7 +262,7 @@
- 	dramsimLogFilename += ".log";
+--- MultiChannelMemorySystem.cpp	2012-04-09 12:45:52.562591519 -0400
++++ MultiChannelMemorySystem.cpp.new	2012-04-09 12:45:44.630021549 -0400
+@@ -235,7 +235,7 @@
  
  	dramsim_log.open(dramsimLogFilename.c_str(), ios_base::out | ios_base::trunc );
+ 
 -	if (!dramsim_log) 
 +	if (!dramsim_log.is_open()) 
  	{
- 		ERROR("Cannot open "<< dramsimLogFilename);
- 		exit(-1); 
+ 	ERROR("Cannot open "<< dramsimLogFilename);
+ 	//	exit(-1); 

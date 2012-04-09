@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DRAMSIM
 namespace DRAMSim {
-  class MemorySystem;
+  class MultiChannelMemorySystem;
 };
 
 //};
@@ -297,7 +297,8 @@ class dram_controller_c
 #endif
 
 #ifdef DRAMSIM
-    DRAMSim::MemorySystem* dramsim_instance;
+//    DRAMSim::MemorySystem* dramsim_instance;
+    DRAMSim::MultiChannelMemorySystem* dramsim_instance;
 #endif
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */

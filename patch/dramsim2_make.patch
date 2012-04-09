@@ -1,6 +1,6 @@
 Index: .obj/Makefile.am
 ===================================================================
---- .obj/Makefile.am	(revision 251)
+--- .obj/Makefile.am	(revision 254)
 +++ .obj/Makefile.am	(working copy)
 @@ -3,7 +3,7 @@
  XFLAGS       = -DLONG_COUNTERS
@@ -30,16 +30,24 @@ Index: .obj/Makefile.am
  liborion_a_SOURCES = \
    ../src/orion/SIM_router.c          ../src/orion/SIM_arbiter.c \
    ../src/orion/SIM_crossbar.c        ../src/orion/SIM_router_power.c \
-@@ -115,6 +116,17 @@
+@@ -115,6 +116,25 @@
  liborion_a_CFLAGS = 
  
  
 +libdramsim_a_SOURCES = \
-+  ../src/DRAMSim2/Bank.cpp             ../src/DRAMSim2/BankState.cpp \
-+  ../src/DRAMSim2/BusPacket.cpp        ../src/DRAMSim2/CommandQueue.cpp \
-+  ../src/DRAMSim2/IniReader.cpp        ../src/DRAMSim2/MemoryController.cpp \
-+  ../src/DRAMSim2/MemorySystem.cpp     ../src/DRAMSim2/Rank.cpp \
-+  ../src/DRAMSim2/SimulatorObject.cpp  ../src/DRAMSim2/TraceBasedSim.cpp \
++  ../src/DRAMSim2/Transaction.cpp \
++  ../src/DRAMSim2/AddressMapping.cpp \
++  ../src/DRAMSim2/Bank.cpp \
++  ../src/DRAMSim2/BankState.cpp \
++  ../src/DRAMSim2/BusPacket.cpp \
++  ../src/DRAMSim2/CommandQueue.cpp \
++  ../src/DRAMSim2/IniReader.cpp \
++  ../src/DRAMSim2/MemoryController.cpp \
++  ../src/DRAMSim2/MemorySystem.cpp \
++  ../src/DRAMSim2/MultiChannelMemorySystem.cpp \
++  ../src/DRAMSim2/Rank.cpp \
++  ../src/DRAMSim2/SimulatorObject.cpp \
++  ../src/DRAMSim2/TraceBasedSim.cpp \
 +  ../src/DRAMSim2/Transaction.cpp
 +libdramsim_a_CPPFLAGS = -DNO_STORAGE -DDEBUG_BUILD -DLOG_OUTPUT 
 +libdramsim_a_CFLAGS = 
@@ -48,7 +56,7 @@ Index: .obj/Makefile.am
  # this lists the binaries to produce, the (non-PHONY, binary) targets in
  # the previous manual Makefile
  bin_PROGRAMS = macsim_opt
-@@ -125,17 +137,17 @@
+@@ -125,17 +145,17 @@
  macsim_opt_CPPFLAGS = -O3 -std=c++0x -funroll-loops -Werror $(DEBUG_FLAGS) $(WARN_FLAGS) $(XFLAGS) $(COMMON_FLAGS) -I .
  macsim_opt_SOURCES = $(all_sources)
  macsim_opt_LDFLAGS = -static

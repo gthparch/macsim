@@ -56,7 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
 
 #ifdef DRAMSIM
-#include "MemorySystem.h"
+#include "DRAMSim.h"
 using namespace DRAMSim;
 #undef DEBUG
 #endif
@@ -260,16 +260,15 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 #endif
 
 #ifdef DRAMSIM
-  dramsim_instance = new DRAMSim::MemorySystem(
-      0, 
+  dramsim_instance = getMemorySystemInstance(
       "src/DRAMSim2/ini/DDR2_micron_16M_8b_x8_sg3E.ini", 
       "src/DRAMSim2/system.ini.example", 
       "..", 
       "resultsfilename", 
-      2048);
+      16384);
 
-  Callback_t* read_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::read_callback);
-  Callback_t* write_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::write_callback);
+	TransactionCompleteCB *read_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::read_callback);
+	TransactionCompleteCB *write_cb = new Callback<dram_controller_c, void, unsigned, uint64_t, uint64_t>(this, &dram_controller_c::write_callback);
   dramsim_instance->RegisterCallbacks(read_cb, write_cb, NULL);
 #endif
 }
@@ -426,6 +425,7 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 void dram_controller_c::run_a_cycle()
 {
 #ifdef DRAMSIM
+  if (CYCLE % 4 == 0)
   dramsim_instance->update();
 #endif
   send_packet();
@@ -720,8 +720,8 @@ void dram_controller_c::receive_packet(void)
       if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
           (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
 #else // DRAMSim2
-      Transaction tr = Transaction(req->m_type == MRT_WB ? DATA_WRITE : DATA_READ, static_cast<uint64_t>(req->m_addr), NULL);
-      if (dramsim_instance->addTransaction(tr)) {
+
+      if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
 #endif
         m_pending_request->push_back(req);
 #endif
@@ -744,8 +744,7 @@ void dram_controller_c::receive_packet(void)
     if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
         (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
 #else
-    Transaction tr = Transaction(req->m_type == MRT_WB ? DATA_WRITE : DATA_READ, static_cast<uint64_t>(req->m_addr), NULL);
-    if (dramsim_instance->addTransaction(tr)) {
+    if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
 #endif
       m_pending_request->push_back(req);
 #endif
