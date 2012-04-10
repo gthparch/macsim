@@ -277,7 +277,6 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 #ifdef DRAMSIM
 void dram_controller_c::read_callback(unsigned id, uint64_t address, uint64_t clock_cycle)
 {
-//  cout << "fucking read call back " << id << "\n";
   // find requests with this address
   auto I = m_pending_request->begin();
   auto E = m_pending_request->end();
@@ -295,7 +294,6 @@ void dram_controller_c::read_callback(unsigned id, uint64_t address, uint64_t cl
 
 void dram_controller_c::write_callback(unsigned id, uint64_t address, uint64_t clock_cycle)
 {
-//  cout << "fucking write call back " << id << "\n";
   // find requests with this address
   auto I = m_pending_request->begin();
   auto E = m_pending_request->end();
