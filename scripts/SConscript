@@ -1,0 +1,18 @@
+#!/usr/bin/python
+
+#########################################################################################
+# Author      : Jaekyu Lee (jq.lee17@gmail.com)
+# Description : scons for generating stats/knobs
+#########################################################################################
+
+import os
+
+
+## clean option
+if GetOption('clean'):
+  os.system('rm -rf ../src/all_knobs.* ../src/all_stats.* ../src/statsEnums.h')
+## otherwise generate stats/knobs
+else:
+  os.system('perl knobgen.pl')
+  os.system('perl statgen.pl')
+
