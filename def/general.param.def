@@ -48,9 +48,9 @@ param<TEMPERATURE, temperature, int, 320>
 
 
 param<CLOCK_CPU, clock_cpu, float, 4.0> 
-param<CLOCK_GPU, clock_gpu, float, 1.5> 
-param<CLOCK_L3,  clock_l3,  float, 1.0> 
-param<CLOCK_NOC, clock_noc, float, 1.0> 
-param<CLOCK_MC,  clock_mc,  float, 1.34> 
+param<CLOCK_GPU, clock_gpu, float, 4.0> 
+param<CLOCK_L3,  clock_l3,  float, 4.0> 
+param<CLOCK_NOC, clock_noc, float, 4.0> 
+param<CLOCK_MC,  clock_mc,  float, 0.8> 
 
 

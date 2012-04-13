@@ -1,9 +1,9 @@
 
 # Simulation Configuration
 num_sim_cores 10 
-num_sim_small_cores 10
+num_sim_small_cores 6
 num_sim_medium_cores 0
-num_sim_large_cores 0
+num_sim_large_cores 4
 core_type ptx
 large_core_type x86
 cpu_frequency 3 
@@ -11,7 +11,14 @@ gpu_frequency 1.5
 sim_cycle_count 0 
 max_insts 200000000
 heartbeat_interval 1000000
-forward_progress_limit 50000
+forward_progress_limit 500000
+
+# frequency
+clock_cpu 4
+clock_gpu 4
+clock_l3  4
+clock_noc 4
+clock_mc  1 
 
 
 # Common Core Configuration
@@ -45,9 +52,9 @@ schedule_ratio 4 # GPU Only
 fetch_ratio 4 # GPU Only
 gpu_sched 1 # GPU Only
 ptx_common_cache 0 # GPU Only
-const_cache_size 1024 # GPU Only
-texture_cache_size 256 # GPU Only
-shared_mem_size 4096 # GPU Only
+const_cache_size 8192 # GPU Only
+texture_cache_size 8192 # GPU Only
+shared_mem_size 16384 # GPU Only
 blocks_to_simulate 0
 ptx_exec_ratio 2
 num_warp_scheduler 2
@@ -63,7 +70,7 @@ fsched_large_rate 2
 bp_hist_length 16
 rob_large_size 256                     
 large_core_schedule ooo
-max_threads_per_large_core 1
+max_threads_per_large_core 2
 icache_large_num_set 64 # 64 KB
 icache_large_assoc 8
 l1_large_num_set 64 # 64 KB L1 Cache

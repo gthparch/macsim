@@ -760,14 +760,17 @@ void macsim_c::init_clock_domain(void)
     m_clock_divisor[ii] = m_clock_lcm / domain_i[ii];
 }
 
+#define CLOCK_CPU 0
+#define CLOCK_GPU 1
+#define CLOCK_L3  2
+#define CLOCK_NOC 3
+#define CLOCK_MC  4
 
 // =======================================
 // Single cycle step of simulation state : returns running status
 // =======================================
 int macsim_c::run_a_cycle() 
 {
-  //report("run core (single threads)");
-
   // termination condition check
   // 1. no active threads in the system
   // 2. repetition has been done (in case of multiple applications simulation)
@@ -781,24 +784,30 @@ int macsim_c::run_a_cycle()
 
 
   // interconnection
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
-    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
-  }
-  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    m_router->run_a_cycle();
-  }
-  else {
-    // run interconnection network
-    m_noc->run_a_cycle();
+  if (m_clock_internal % m_clock_divisor[CLOCK_NOC] == 0) {
+    if (*KNOB(KNOB_ENABLE_IRIS)) {
+      manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
+      manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
+    }
+    else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      m_router->run_a_cycle();
+    }
+    else {
+      // run interconnection network
+      m_noc->run_a_cycle();
+    }
   }
 
   // run memory system
-  m_memory->run_a_cycle();
+  if (m_clock_internal % m_clock_divisor[CLOCK_L3] == 0) {
+    m_memory->run_a_cycle();
+  }
   
   // run dram controllers
-  for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_dram_controller[ii]->run_a_cycle();
+  if (m_clock_internal % m_clock_divisor[CLOCK_MC] == 0) {
+    for (int ii = 0; ii < m_num_mc; ++ii) {
+      m_dram_controller[ii]->run_a_cycle();
+    }
   }
 
 
@@ -808,6 +817,14 @@ int macsim_c::run_a_cycle()
     int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
 
     core_c *core = m_core_pointers[ii];
+    string core_type = core->get_core_type();
+    if (core_type == "ptx" && m_clock_internal % m_clock_divisor[CLOCK_GPU] != 0) {
+      continue;
+    }
+    else if (core_type != "PTX" && m_clock_internal % m_clock_divisor[CLOCK_CPU] != 0) {
+      continue;
+    }
+
 
     // increment core cycle
     core->inc_core_cycle_count();
@@ -867,6 +884,7 @@ int macsim_c::run_a_cycle()
     if (m_sim_end[ii] || m_core_end_trace[ii]) 
       core->check_heartbeat(true);
   }
+
 
   // increase simulation cycle
   m_simulation_cycle++;

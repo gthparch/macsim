@@ -62,10 +62,6 @@ using namespace DRAMSim;
 #endif
 
 
-#if defined(SST_DRAMSIM) || defined(DRAMSIM)
-#define _DRAMSIM
-#endif
-
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_DRAM, ## args)
 
 static int total_dram_bandwidth = 0;
@@ -198,7 +194,7 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_num_bank             = *KNOB(KNOB_DRAM_NUM_BANKS);
   m_num_channel          = *KNOB(KNOB_DRAM_NUM_CHANNEL);
   m_num_bank_per_channel = m_num_bank / m_num_channel;
-  m_bus_width            = *KNOB(KNOB_DRAM_BUS_WIDTH) * *KNOB(KNOB_DRAM_DDR_FACTOR); 
+  m_bus_width            = *KNOB(KNOB_DRAM_BUS_WIDTH);
   
   // bank
   m_buffer           = new list<drb_entry_s*>[m_num_bank];
@@ -242,24 +238,18 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
   m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
   m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
 
+  m_cycle = 0;
+
   // latency
-  m_dram_one_cycle_cpu    = *KNOB(KNOB_CPU_FREQUENCY) / *KNOB(KNOB_DRAM_FREQUENCY);
-  m_precharge_latency_cpu = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_PRECHARGE));
-  m_activate_latency_cpu  = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_ACTIVATE));
-  m_column_latency_cpu    = static_cast<int>(m_dram_one_cycle_cpu * *KNOB(KNOB_DRAM_COLUMN));
-  
-  m_dram_one_cycle_gpu    = *KNOB(KNOB_GPU_FREQUENCY) / *KNOB(KNOB_DRAM_FREQUENCY);
-  m_precharge_latency_gpu = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_PRECHARGE));
-  m_activate_latency_gpu  = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_ACTIVATE));
-  m_column_latency_gpu    = static_cast<int>(m_dram_one_cycle_gpu * *KNOB(KNOB_DRAM_COLUMN));
+  m_precharge_latency = *KNOB(KNOB_DRAM_PRECHARGE);
+  m_activate_latency  = *KNOB(KNOB_DRAM_ACTIVATE);
+  m_column_latency    = *KNOB(KNOB_DRAM_COLUMN);
 
   // output buffer
   m_output_buffer = new list<mem_req_s*>;
-#ifdef _DRAMSIM
-  m_pending_request = new list<mem_req_s*>;
-#endif
 
 #ifdef DRAMSIM
+  m_pending_request = new list<mem_req_s*>;
   dramsim_instance = getMemorySystemInstance(
       "src/DRAMSim2/ini/DDR2_micron_16M_8b_x8_sg3E.ini", 
       "src/DRAMSim2/system.ini.example", 
@@ -322,11 +312,8 @@ dram_controller_c::~dram_controller_c()
   delete[] m_bank_ready;
   delete[] m_bank_timestamp;
   delete m_output_buffer;
-#ifdef _DRAMSIM
-  delete m_pending_request;
-#endif
-
 #ifdef DRAMSIM
+  delete m_pending_request;
   delete dramsim_instance;
 #endif
 }
@@ -423,18 +410,17 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 void dram_controller_c::run_a_cycle()
 {
 #ifdef DRAMSIM
-  if (CYCLE % 4 == 0)
   dramsim_instance->update();
 #endif
   send_packet();
-#ifndef _DRAMSIM
+#ifndef DRAMSIM
   channel_schedule();
   bank_schedule();
 #endif
 
   receive_packet();
 
-#ifndef _DRAMSIM
+#ifndef DRAMSIM
   // starvation check
   progress_check();
   for (int ii = 0; ii < m_num_channel; ++ii) {
@@ -445,6 +431,8 @@ void dram_controller_c::run_a_cycle()
   }
   on_run_a_cycle();
 #endif
+
+  ++m_cycle;
 }
 
 
@@ -603,29 +591,6 @@ void dram_controller_c::bank_schedule_complete(void)
 
 void dram_controller_c::send_packet(void)
 {
-#ifdef _DRAMSIM
-#ifdef SST_DRAMSIM // SST DRAMSim2
-  cookie c;
-  while (mc->mem_dev->popCookie(&c)) {
-    Addr return_addr = c.addr; // return address from DRAMSIM
-
-    // find requests with this address
-    auto I = m_pending_request->begin();
-    auto E = m_pending_request->end();
-    while (I != E) {
-      mem_req_s* req = (*I);
-      ++I;
-
-      if (req->m_addr == return_addr) {
-        m_output_buffer->push_back(req);
-        m_pending_request->remove(req);
-      }
-    }
-  }
-#else // DRAMSim2
-  // nothing to do
-#endif
-#endif
   bool req_type_checked[2];
   req_type_checked[0] = false;
   req_type_checked[1] = false;
@@ -710,17 +675,10 @@ void dram_controller_c::receive_packet(void)
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     if (!m_terminal->receive_queue.empty()) {
       mem_req_s* req = m_terminal->receive_queue.front();
-#ifndef _DRAMSIM // MacSim module
+#ifndef DRAMSIM // MacSim module
       if (insert_new_req(req)) {
 #else
-#ifdef SST_DRAMSIM // SST-DRAMSim2
-      c = new cont(cond_t);
-      if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
-          (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
-#else // DRAMSim2
-
       if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
-#endif
         m_pending_request->push_back(req);
 #endif
         m_terminal->receive_queue.pop();
@@ -734,16 +692,10 @@ void dram_controller_c::receive_packet(void)
     mem_req_s* req = m_router->receive_req();
     if (!req)
       return ;
-#ifndef _DRAMSIM
+#ifndef DRAMSIM
     if (req && insert_new_req(req)) {
 #else
-#ifdef SST_DRAMSIM
-    c = new cont(cond_t);
-    if ((req->m_type == MRT_WB && mc->mem_dev->write(req->m_addr, c)) ||
-        (req->m_type != MRT_WB && mc->mem_dev->read(req->m_addr, c))) {
-#else
     if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
-#endif
       m_pending_request->push_back(req);
 #endif
       m_router->pop_req();
@@ -839,8 +791,7 @@ void dram_controller_c::channel_schedule_cmd(void)
       // activate
       if (m_current_rid[bank] == -1) {
         m_current_rid[bank] = m_current_list[bank]->m_rid;
-        m_bank_ready[bank]  = m_simBase->m_simulation_cycle + 
-          (m_current_list[bank]->m_req->m_ptx ? m_activate_latency_gpu : m_activate_latency_cpu);;
+        m_bank_ready[bank]  = m_cycle + m_activate_latency; 
         m_data_avail[bank]   = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_CMD_WAIT;
         STAT_EVENT(DRAM_ACTIVATE);
@@ -848,8 +799,7 @@ void dram_controller_c::channel_schedule_cmd(void)
       }
       // column access
       else if (m_current_list[bank]->m_rid == m_current_rid[bank]) {
-        m_bank_ready[bank] = m_simBase->m_simulation_cycle + 
-          (m_current_list[bank]->m_req->m_ptx ? m_column_latency_gpu : m_column_latency_cpu);;
+        m_bank_ready[bank] = m_cycle + m_column_latency;
         m_data_avail[bank] = m_bank_ready[bank];
         m_current_list[bank]->m_state = DRAM_DATA;
         STAT_EVENT(DRAM_COLUMN);
@@ -858,8 +808,7 @@ void dram_controller_c::channel_schedule_cmd(void)
       // precharge
       else {
         m_current_rid[bank] = -1;
-        m_bank_ready[bank]  = m_simBase->m_simulation_cycle + 
-          (m_current_list[bank]->m_req->m_ptx ? m_precharge_latency_gpu : m_precharge_latency_cpu);;
+        m_bank_ready[bank]  = m_cycle + m_precharge_latency;
         m_data_avail[bank]   = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_CMD_WAIT;
         STAT_EVENT(DRAM_PRECHARGE);
@@ -937,21 +886,16 @@ Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool g
 {
   total_dram_bandwidth += req_size;
   STAT_EVENT_N(BANDWIDTH_TOT, req_size);
+
   Counter latency;
+
   // when the size of a request is less than bus width, we can have more requests per cycle
   if (req_size < m_byte_avail[channel_id]) {
     m_byte_avail[channel_id] -= req_size;
-    latency = m_simBase->m_simulation_cycle;
+    latency = m_cycle;
   }
   else {
-    int cycle = (req_size - m_byte_avail[channel_id]) / m_bus_width + 1;
-    int dram_cycle;
-    
-    if (gpu_req) 
-      dram_cycle = static_cast<int>(cycle * m_dram_one_cycle_gpu + 0.5);
-    else
-      dram_cycle = static_cast<int>(cycle * m_dram_one_cycle_cpu + 0.5);
-    latency = m_simBase->m_simulation_cycle + dram_cycle;
+    latency = m_cycle + (req_size - m_byte_avail[channel_id]) / m_bus_width + 1; 
     m_byte_avail[channel_id] = m_bus_width - 
       (req_size - m_byte_avail[channel_id]) % m_bus_width;
   }

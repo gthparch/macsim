@@ -274,34 +274,30 @@ class dram_controller_c
     uns m_bid_shift; /**< bank id shift */
     uns m_rid_shift; /**< row id shift */
     uns m_bid_xor_shift; /**< bank id xor factor */
-    float m_dram_one_cycle_cpu; /**< relative dram cycle to cpu cycle */
-    int m_activate_latency_cpu; /**< ACT latency */
-    int m_precharge_latency_cpu; /**< RP latency */
-    int m_column_latency_cpu; /**< CAS latency */
-    float m_dram_one_cycle_gpu; /**< relative dram cycle to cpu cycle */
-    int m_activate_latency_gpu; /**< ACT latency */
-    int m_precharge_latency_gpu; /**< RP latency */
-    int m_column_latency_gpu; /**< CAS latency */
+
     int m_id; /**< dram controller id */
     int m_noc_id; /**< network id */
     int m_num_completed_in_last_cycle; /**< number of requests completed in last cycle */
     int m_starvation_cycle; /**< number of cycles without completed requests*/
     int m_total_req; /**< total pending requests */
 
+    // latency
+    Counter m_cycle; /**< dram clock cycle */
+    int m_activate_latency; /**< activate latency */
+    int m_precharge_latency; /**< precharge latency */
+    int m_column_latency; /**< column access latency */
+
     // interconnection
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
     router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
-#if defined(SST_DRAMSIM) || defined(DRAMSIM)
-    list<mem_req_s*>* m_pending_request; /**< pending request */
-#endif
-
-#ifdef DRAMSIM
-//    DRAMSim::MemorySystem* dramsim_instance;
-    DRAMSim::MultiChannelMemorySystem* dramsim_instance;
-#endif
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+
+#ifdef DRAMSIM
+    list<mem_req_s*>* m_pending_request; /**< pending request */
+    DRAMSim::MultiChannelMemorySystem* dramsim_instance; /**< dramsim2 instance */
+#endif
 };
 
 

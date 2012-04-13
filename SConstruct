@@ -9,7 +9,7 @@
 flags = {}
 flags['debug'] = ARGUMENTS.get('debug', 0)
 flags['gprof'] = ARGUMENTS.get('gprof', 0)
-flags['dram']  = ARGUMENTS.get('dramsim', 0)
+flags['dram']  = ARGUMENTS.get('dram', 0)
 
 
 ## Create stat/knobs
