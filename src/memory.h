@@ -387,6 +387,10 @@ class memory_c
      */
     void run_a_cycle(void);
 
+    void run_a_cycle_core(int);
+
+    void run_a_cycle_uncore();
+
     /**
      * Deallocate completed memory request
      */
@@ -502,7 +506,6 @@ class memory_c
     dcu_c** m_l1_cache; /**< L1 caches */
     dcu_c** m_l2_cache; /**< L2 caches */
     dcu_c** m_l3_cache; /**< L3 caches */
-    dram_controller_c** m_dram_controller; /**< dram controllers */
     list<mem_req_s*>* m_mshr; /**< mshr entry per L1 cache */
     list<mem_req_s*>* m_mshr_free_list; /**< mshr entry free list */
     int m_num_core; /**< number of cores */

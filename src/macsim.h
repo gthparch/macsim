@@ -71,7 +71,14 @@ class Topology;
 class macsim_c
 {
 	public:
+    /**
+     * Constructor
+     */
 		macsim_c();
+
+    /**
+     * Destructor
+     */
 		~macsim_c();
 
     /**
@@ -108,6 +115,11 @@ class macsim_c
      * Initialize memory system
      */
 		void init_memory(void);
+
+    /**
+     * Initialize clock domain for different components (CPU, GPU, L3, NOC, MC)
+     */
+    void init_clock_domain(void);
 
     /**
      * Initialize output streams
@@ -192,8 +204,15 @@ class macsim_c
 
 		core_c *m_core_pointers[MAX_NUM_CORES]; /**< core pointers */
 		memory_c* m_memory; /**< main memory */
+    dram_controller_c** m_dram_controller; /**< dram controller */
+    int m_num_mc; /**< number of memory controllers */
 		noc_c* m_noc; /**<  interconnection network */
 		trace_read_c* m_trace_reader; /**< trace reader */
+
+    // clock handling
+    int m_clock_lcm; /**< main clock period */
+    int m_clock_divisor[5]; /**< clock divisor */
+    int m_clock_internal; /**< internal macsim clock */
 
     // bug detector
 		bug_detector_c *m_bug_detector; /**< bug detector */

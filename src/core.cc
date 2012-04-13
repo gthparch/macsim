@@ -90,6 +90,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "readonly_cache.h"
 #include "sw_managed_cache.h"
 #include "router.h"
+#include "dram.h"
 
 #include "config.h"
 
@@ -555,6 +556,11 @@ void core_c::check_forward_progress()
 
     // print all mshr entries
     m_simBase->m_memory->print_mshr();
+
+    // print all dram requests
+    for (int ii = 0; ii < *KNOB(KNOB_DRAM_NUM_MC); ++ii) {
+      m_simBase->m_dram_controller[ii]->print_req();
+    }
 
     // print all remaining uop states
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {

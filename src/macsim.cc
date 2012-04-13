@@ -53,6 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug_macros.h"
 #include "statistics.h"
 #include "memory.h"
+#include "dram.h"
 #include "utils.h"
 #include "bug_detector.h"
 #include "fetch_factory.h"
@@ -218,10 +219,22 @@ void macsim_c::init_memory(void)
   string memory_type = m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue();
 	m_memory = mem_factory_c::get()->allocate(memory_type, m_simBase);
 
+  // dram controller
+  m_dram_controller = new dram_controller_c*[m_num_mc];
+  m_num_mc = m_simBase->m_knobs->KNOB_DRAM_NUM_MC->getValue();
+  int num_noc_node = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES
+    + *m_simBase->m_knobs->KNOB_NUM_L3;
+  for (int ii = 0; ii < m_num_mc; ++ii) {
+    m_dram_controller[ii] = dram_factory_c::get()->allocate(
+        m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
+    m_dram_controller[ii]->init(ii, num_noc_node + ii);
+  }
+
+
+	// interconnection network
   if (*KNOB(KNOB_ENABLE_NEW_NOC))
     m_router = new router_wrapper_c(m_simBase);
 
-	// interconnection network
   if (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))
     m_memory->init();
   else
@@ -617,6 +630,21 @@ void macsim_c::fini_sim(void)
 }
 
 
+
+int get_gcd(int a, int b)
+{
+  if (b == 0)
+    return a;
+
+  return get_gcd(b, a % b);
+}
+
+int get_lcm(int a, int b)
+{
+  return (a * b) / get_gcd(a, b);
+}
+
+
 // =======================================
 //Initialization before simulation run
 // =======================================
@@ -671,6 +699,9 @@ void macsim_c::initialize(int argc, char** argv)
     init_network();
   }
 
+  // initialize clocks
+  init_clock_domain();
+
 
   // open traces
   string trace_name_list = static_cast<string>(*KNOB(KNOB_TRACE_NAME_FILE));
@@ -678,6 +709,55 @@ void macsim_c::initialize(int argc, char** argv)
 
   // any number other than 0, to pass the first simulation loop iteration
   m_num_running_core = 10000; 
+}
+
+
+// =======================================
+// To maintain different clock frequency for CPU, GPU, NOC, L3, MC
+// =======================================
+void macsim_c::init_clock_domain(void)
+{
+  m_clock_internal = 0;
+  float domain_f[5];
+  domain_f[0] = *KNOB(KNOB_CLOCK_CPU);
+  domain_f[1] = *KNOB(KNOB_CLOCK_GPU);
+  domain_f[2] = *KNOB(KNOB_CLOCK_L3);
+  domain_f[3] = *KNOB(KNOB_CLOCK_NOC);
+  domain_f[4] = *KNOB(KNOB_CLOCK_MC);
+
+
+  // allow only .x format
+  for (int ii = 0; ii < 1; ++ii) {
+    bool found = false;
+    for (int jj = 0; jj < 5; ++jj) {
+      int int_cast = static_cast<int>(domain_f[jj]);
+      float float_cast = static_cast<float>(int_cast);
+      if (domain_f[jj] != float_cast) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      for (int jj = 0; jj < 5; ++jj) {
+        domain_f[jj] *= 10;
+      }
+    }
+    else {
+      break;
+    }
+  }
+
+  int domain_i[5];
+  for (int ii = 0; ii < 5; ++ii)
+    domain_i[ii] = static_cast<int>(domain_f[ii]);
+
+  m_clock_lcm = get_lcm(domain_i[0], domain_i[1]);
+  for (int ii = 2; ii < 5; ++ii)
+    m_clock_lcm = get_lcm(m_clock_lcm, domain_i[ii]);
+
+  for (int ii = 0; ii < 5; ++ii)
+    m_clock_divisor[ii] = m_clock_lcm / domain_i[ii];
 }
 
 
@@ -715,6 +795,12 @@ int macsim_c::run_a_cycle()
 
   // run memory system
   m_memory->run_a_cycle();
+  
+  // run dram controllers
+  for (int ii = 0; ii < m_num_mc; ++ii) {
+    m_dram_controller[ii]->run_a_cycle();
+  }
+
 
   // core execution loop
   for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
@@ -742,6 +828,7 @@ int macsim_c::run_a_cycle()
     // active core : running a cycle and update stats
     if (!m_sim_end[ii])  {
       // run a cycle
+      m_memory->run_a_cycle_core(ii);
       core->run_a_cycle();
 
       m_num_running_core++;
@@ -784,6 +871,8 @@ int macsim_c::run_a_cycle()
   // increase simulation cycle
   m_simulation_cycle++;
   STAT_EVENT(CYC_COUNT_TOT);
+
+  m_clock_internal = (m_clock_internal + 1) % m_clock_lcm;
 
   return 1; //simulation not finished
 }

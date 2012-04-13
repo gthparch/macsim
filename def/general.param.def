@@ -45,3 +45,12 @@ param<MAX_BLOCK_PER_CORE, max_block_per_core, int, 4>
 param<MAX_INSTS1, max_insts1, uns64, 10000000000>
 param<ENABLE_CONDITIONAL_EXECUTION, enable_conditional_execution, bool, false>
 param<TEMPERATURE, temperature, int, 320>
+
+
+param<CLOCK_CPU, clock_cpu, float, 4.0> 
+param<CLOCK_GPU, clock_gpu, float, 1.5> 
+param<CLOCK_L3,  clock_l3,  float, 1.0> 
+param<CLOCK_NOC, clock_noc, float, 1.0> 
+param<CLOCK_MC,  clock_mc,  float, 1.34> 
+
+

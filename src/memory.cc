@@ -1591,16 +1591,6 @@ memory_c::memory_c(macsim_c* simBase)
   m_noc_index_base[MEM_L3] = m_num_core * 2;
   m_noc_index_base[MEM_MC] = m_num_core * 2 + m_num_l3;
 
-
-  // allocate memory controller
-  m_dram_controller = new dram_controller_c*[m_num_mc];
-  for (int ii = 0; ii < m_num_mc; ++ii, ++id) {
-    m_dram_controller[ii] = dram_factory_c::get()->allocate(
-        m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
-    m_dram_controller[ii]->init(ii, id);
-  }
-
-
   // misc
   m_stop_prefetch = 0;
 
@@ -1660,7 +1650,7 @@ void memory_c::init(void)
 
   m_noc_id_base[MEM_MC] = total_num_router;
   for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_dram_controller[ii]->create_network_interface();
+    m_simBase->m_dram_controller[ii]->create_network_interface();
     ++total_num_router;
   }
 
@@ -1980,7 +1970,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
   }
   else if (level == MEM_MC) {
     ASSERTM(msg == NOC_NEW || msg == NOC_FILL, "msg:%d", msg);
-    result = m_dram_controller[id]->insert_new_req(req);
+    result = m_simBase->m_dram_controller[id]->insert_new_req(req);
     assert(0); // jaekyu (2-15-2012) this will be completely removed
     if (result) {
       DEBUG("MC[%d] new_req:%d addr:%s type:%s\n", 
@@ -2134,25 +2124,22 @@ dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr *line_addr, \
 // memory run_a_cycle
 void memory_c::run_a_cycle(void)
 {
-  int index = m_simBase->m_simulation_cycle % m_num_mc;
-  for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_dram_controller[ii]->run_a_cycle();
-  }
+  run_a_cycle_uncore();
+}
 
-  index = m_simBase->m_simulation_cycle % m_num_l3;
+void memory_c::run_a_cycle_core(int core_id)
+{
+  m_l2_cache[core_id]->run_a_cycle();
+  m_l1_cache[core_id]->run_a_cycle();
+}
+
+void memory_c::run_a_cycle_uncore(void)
+{
+  int index = m_simBase->m_simulation_cycle % m_num_l3;
   for (int ii = index; ii < index + m_num_l3; ++ii) {
     m_l3_cache[ii % m_num_l3]->run_a_cycle();
   }
-
-  index = m_simBase->m_simulation_cycle % m_num_core;
-  for (int ii = index; ii < index + m_num_core; ++ii) {
-    m_l2_cache[ii % m_num_core]->run_a_cycle();
-    m_l1_cache[ii % m_num_core]->run_a_cycle();
-  }
-
-
 }
-
 
 // evict a prefetch request
 mem_req_s* memory_c::evict_prefetch(int core_id)
@@ -2231,10 +2218,6 @@ void memory_c::print_mshr(void)
     fprintf(fp, "\n");
   }
   fclose(fp);
-
-  for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_dram_controller[ii]->print_req();
-  }
 }
 
 
