@@ -1,0 +1,136 @@
+
+# Simulation Configuration
+num_sim_cores 10 
+num_sim_small_cores 6
+num_sim_medium_cores 0
+num_sim_large_cores 4
+core_type ptx
+large_core_type x86
+cpu_frequency 3 
+gpu_frequency 1.5
+sim_cycle_count 0 
+max_insts 200000000
+heartbeat_interval 1000000
+forward_progress_limit 500000
+
+
+# Common Core Configuration
+fetch_policy rr
+mt_no_fetch_br 1
+one_cycle_exec 0
+
+
+# Small Core Configuration
+width 1
+fetch_latency 5
+alloc_latency 5
+isched_rate 4 
+msched_rate 2 
+fsched_rate 2 
+bp_hist_length 14
+rob_size 1024
+schedule ooo
+max_threads_per_core 80
+icache_num_set 8 # 4 KB Icache
+icache_assoc 8
+l1_small_num_set 64 # 32 KB L1 Cache
+l1_small_assoc 8
+l1_small_latency 2 
+l1_small_bypass 0
+l2_small_latency 1 # No L2 Cache
+l2_small_bypass 1
+
+fetch_only_load_ready 0 # GPU Only 
+schedule_ratio 4 # GPU Only
+fetch_ratio 4 # GPU Only
+gpu_sched 1 # GPU Only
+ptx_common_cache 0 # GPU Only
+const_cache_size 8192 # GPU Only
+texture_cache_size 8192 # GPU Only
+shared_mem_size 16384 # GPU Only
+blocks_to_simulate 0
+ptx_exec_ratio 2
+num_warp_scheduler 2
+
+
+# Large Core Configuration
+large_width 4
+large_core_fetch_latency 5
+large_core_alloc_latency 10
+isched_large_rate 4 
+msched_large_rate 2 
+fsched_large_rate 2 
+bp_hist_length 16
+rob_large_size 256                     
+large_core_schedule ooo
+max_threads_per_large_core 2
+icache_large_num_set 64 # 64 KB
+icache_large_assoc 8
+l1_large_num_set 64 # 64 KB L1 Cache
+l1_large_assoc 8
+l1_large_latency 3
+l1_large_bypass 0
+l2_large_num_set 256 # 256 KB L2 Cache
+l2_large_assoc 8
+l2_large_latency 8
+l2_large_bypass 0
+
+
+# Memory
+perfect_dcache 0
+enable_cache_coherence 0
+dram_merge_requests 1
+mem_ooo_stores 0
+memory_type l3_decoupled_network
+byte_level_access 0
+infinite_port 0
+
+
+# L3 Cache
+num_l3 4
+l3_num_set 1024
+l3_line_size 64
+l3_assoc 32
+l3_num_bank 8
+l3_latency 30 
+pref_framework_on 1
+pref_ghb_on 0
+enable_pref_small_core 0
+
+
+# DRAM
+dram_num_mc 2
+dram_frequency 1.603
+dram_bus_width 8
+dram_ddr_factor 2
+dram_column 11
+dram_activate 25
+dram_precharge 10
+dram_num_banks 8
+dram_num_channel 2
+dram_rowbuffer_size 2048
+dram_scheduling_policy FRFCFS
+
+
+# ETC
+bug_detector_enable 1
+
+
+# DEBUG
+debug_core_id 0
+debug_cycle_start 1
+debug_cycle_stop 0
+debug_front_stage 0
+debug_alloc_stage 0
+debug_schedule_stage 0
+debug_exec_stage 0
+debug_dcu_stage 0
+debug_retire_stage 0
+debug_map_stage 0
+debug_mem  0
+debug_trace_read 0
+debug_sim_thread_schedule 0
+debug_cache_lib 0
+debug_bp_dir 0
+
+
