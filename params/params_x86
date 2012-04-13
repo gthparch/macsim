@@ -6,12 +6,18 @@ num_sim_medium_cores 0
 num_sim_large_cores 1
 core_type ptx
 large_core_type x86
-cpu_frequency 4 
-gpu_frequency 1.5
 sim_cycle_count 0 
 max_insts 500000000
 heartbeat_interval 1000000
 forward_progress_limit 50000
+
+
+# Clock
+clock_cpu 4
+clock_gpu 4
+clock_l3  1
+clock_noc 1
+clock_mc  0.8
 
 
 # Common Core Configuration
@@ -99,9 +105,7 @@ enable_pref_small_core 0
 
 
 # DRAM
-dram_frequency 0.8
 dram_bus_width 4
-dram_ddr_factor 2
 dram_column 11
 dram_activate 25
 dram_precharge 10

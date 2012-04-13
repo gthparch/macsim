@@ -5,7 +5,6 @@ max_threads_per_core 4
 cpu_frequency 1.2
 dram_frequency 0.8
 dram_bus_width 4
-dram_ddr_factor 2
 dram_column 11
 dram_activate 25
 dram_precharge 10

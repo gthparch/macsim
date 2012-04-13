@@ -1,22 +1,22 @@
+
+# Simulation Configuration
 num_sim_cores 30
 num_sim_small_cores 30
 core_type ptx
 max_threads_per_core 80
-cpu_frequency 1.3
-dram_frequency 1.1
-dram_bus_width 64 
-dram_ddr_factor 2
-dram_column 11
-dram_activate 25
-dram_precharge 10
-dram_num_banks 16
-dram_num_channel 8
-
-
 num_sim_medium_cores 0
 num_sim_large_cores 0
 
 
+# Clock
+clock_cpu 1.3
+clock_gpu 1.3
+clock_l3  1
+clock_noc 1
+clock_mc  1.1
+
+
+# Small Core Configuration
 width 1
 fetch_latency 5
 alloc_latency 5
@@ -32,16 +32,38 @@ mt_no_fetch_br 1
 fetch_only_load_ready 0 
 schedule_ratio 4
 fetch_ratio 4
-
-
-dram_merge_requests 1
 mem_ooo_stores 0
 ptx_common_cache 0
+gpu_sched 1
+const_cache_size 8192
+texture_cache_size 8192
+shared_mem_size 16384
+byte_level_access 1
+infinite_port 1
 
 
+# Memory
+memory_type no_cache
 perfect_dcache 0
+pref_train_inst_once 0
 
 
+# L3
+num_l3 30
+
+
+# DRAM
+dram_bus_width 64 
+dram_column 11
+dram_activate 25
+dram_precharge 10
+dram_num_banks 16
+dram_num_channel 8
+dram_merge_requests 1
+dram_scheduling_policy FRFCFS
+
+
+# Misc
 sim_cycle_count 0
 max_insts 200000000
 heartbeat_interval 1000000
@@ -49,6 +71,7 @@ forward_progress_limit 10000000
 blocks_to_simulate 0
 
 
+# Debug
 debug_core_id 0
 debug_cycle_start 1
 debug_cycle_stop 0
@@ -66,14 +89,4 @@ debug_cache_lib 0
 debug_bp_dir 0
 
 
-gpu_sched 1
-const_cache_size 8192
-texture_cache_size 8192
-shared_mem_size 16384
-byte_level_access 1
-infinite_port 1
-dram_scheduling_policy FRFCFS
-pref_train_inst_once 0
 
-memory_type no_cache
-num_l3 30
