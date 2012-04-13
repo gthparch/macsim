@@ -320,6 +320,9 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   m_memory = mem;
   m_next   = next;
   m_prev   = prev;
+
+  // clock cycle
+  m_cycle = 0;
 }
 
 
@@ -409,7 +412,7 @@ int dcu_c::bank_id(Addr addr)
 // acquire read port.
 bool dcu_c::get_read_port(int bank_id)
 {
-  return m_port[bank_id]->get_read_port(m_simBase->m_simulation_cycle);
+  return m_port[bank_id]->get_read_port(m_cycle);
 }
 
 
@@ -461,13 +464,13 @@ int dcu_c::access(uop_c* uop)
   if (*m_simBase->m_knobs->KNOB_DCACHE_INFINITE_PORT || m_disable == true) {
     // do nothing
   }
-  else if (IsStore(type) && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) { 
+  else if (IsStore(type) && !m_port[bank]->get_write_port(m_cycle)) { 
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank + 64;
     return 0;
   }
-  else if (IsLoad(type) && !m_port[bank]->get_read_port(m_simBase->m_simulation_cycle)) {
+  else if (IsLoad(type) && !m_port[bank]->get_read_port(m_cycle)) {
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank;
@@ -632,6 +635,7 @@ bool dcu_c::fill(mem_req_s* req)
   if (m_fill_queue->push(req)) {
     req->m_queue = m_fill_queue;
     req->m_state = MEM_FILL_NEW;
+    req->m_rdy_cycle = m_cycle + 1;
     DEBUG("L%d[%d] (->fill_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
 
@@ -657,6 +661,7 @@ bool dcu_c::insert(mem_req_s* req)
 {
   if (m_in_queue->push(req)) {
     req->m_queue = m_in_queue;
+    req->m_rdy_cycle = m_cycle + m_latency;
     DEBUG("L%d[%d] (->in_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
     return true;
@@ -678,6 +683,8 @@ void dcu_c::run_a_cycle()
 
   if (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))
     receive_packet();
+
+  ++m_cycle;
 }
 
 
@@ -698,7 +705,7 @@ void dcu_c::process_in_queue()
 
     mem_req_s* req = (*I);
     
-    if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
+    if (req->m_rdy_cycle > m_cycle)
       continue;
 
 
@@ -793,7 +800,6 @@ void dcu_c::process_in_queue()
             mem_req_c::mem_req_type_name[req->m_type], m_level-1);
         if (!m_prev[req->m_cache_id[m_level-1]]->fill(req))
           continue;
-        req->m_rdy_cycle = m_simBase->m_simulation_cycle + m_latency;
       }
       // L3 cache - decoupled 
       // : send to l2 cache fill via NoC
@@ -806,7 +812,7 @@ void dcu_c::process_in_queue()
         DEBUG("L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n", 
             m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_level-1);
         req->m_state = MEM_OUT_FILL;
-        req->m_rdy_cycle = m_simBase->m_simulation_cycle + m_latency;
+        req->m_rdy_cycle = m_cycle + 1;
       }
 
       done_list.push_back(req);
@@ -840,20 +846,18 @@ void dcu_c::process_in_queue()
         DEBUG("L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access miss\n", 
             m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, 
             mem_req_c::mem_req_type_name[req->m_type]);
-        req->m_rdy_cycle = m_simBase->m_simulation_cycle + m_latency;
       }
       // -------------------------------------
       // Because there is no direct link to the next level, send a request thru NoC
       // -------------------------------------
       else {
-
         if (!m_out_queue->push(req)) {
           continue;
         }
         DEBUG("L%d[%d] (in_queue->out_queue) req:%d type:%s access miss\n", 
             m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUTQUEUE_NEW;
-        req->m_rdy_cycle = m_simBase->m_simulation_cycle + m_latency;
+        req->m_rdy_cycle = m_cycle + 1;
       }
 
       done_list.push_back(req);
@@ -870,7 +874,7 @@ void dcu_c::process_in_queue()
     if ((*I)->m_done == true) {
       DEBUG("L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
-          m_simBase->m_simulation_cycle - (*I)->m_in);
+          m_cycle - (*I)->m_in);
       m_simBase->m_memory->free_req((*I)->m_core_id, (*I));
     }
   }
@@ -995,7 +999,7 @@ void dcu_c::process_out_queue()
 
     mem_req_s* req = (*I);
 
-    if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
+    if (req->m_rdy_cycle > m_cycle)
       continue;
 
     ASSERT(m_has_router == true);
@@ -1074,7 +1078,7 @@ void dcu_c::process_fill_queue()
       POWER_EVENT(POWER_L3CACHE_LINEFILL_BUF_R_TAG );
     }
 
-    if (req->m_rdy_cycle > m_simBase->m_simulation_cycle) 
+    if (req->m_rdy_cycle > m_cycle) 
       continue;
 
     if (m_level != MEM_L3) {
@@ -1106,7 +1110,7 @@ void dcu_c::process_fill_queue()
         if (!cache_hit) { // !cache_hit
           // Access write ports
           int bank = m_cache->get_bank_num(req->m_addr);
-          if (!m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) {
+          if (!m_port[bank]->get_write_port(m_cycle)) {
             STAT_EVENT(CACHE_BANK_BUSY);
             continue;
           }
@@ -1158,7 +1162,7 @@ void dcu_c::process_fill_queue()
           // cache line setup 
           // -------------------------------------
           data->m_dirty       = req->m_dirty;
-          data->m_fetch_cycle = m_simBase->m_simulation_cycle;
+          data->m_fetch_cycle = m_cycle;
           data->m_core_id     = req->m_core_id;
           data->m_pc          = req->m_pc;
           data->m_tid         = req->m_thread_id;
@@ -1277,7 +1281,7 @@ void dcu_c::process_fill_queue()
     if ((*I)->m_done == true) {
       DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
           m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
-          m_simBase->m_simulation_cycle - (*I)->m_in);
+          m_cycle - (*I)->m_in);
       m_memory->free_req((*I)->m_core_id, (*I));
     }
   }
@@ -1306,7 +1310,7 @@ void dcu_c::process_wb_queue()
       POWER_EVENT(POWER_L3CACHE_WB_BUF_R_TAG);
     }
 
-    if (req->m_rdy_cycle > m_simBase->m_simulation_cycle)
+    if (req->m_rdy_cycle > m_cycle)
       continue;
 
     if (m_level != MEM_L3) {
@@ -1369,7 +1373,7 @@ bool dcu_c::done(mem_req_s* req)
     // -------------------------------------
     // DCACHE write port access
     // -------------------------------------
-    if (!m_disable && !m_port[bank]->get_write_port(m_simBase->m_simulation_cycle)) {
+    if (!m_disable && !m_port[bank]->get_write_port(m_cycle)) {
       STAT_EVENT(CACHE_BANK_BUSY);
       return false;
     }
@@ -1426,7 +1430,7 @@ bool dcu_c::done(mem_req_s* req)
       }
 
       data->m_dirty = req->m_dirty;
-      data->m_fetch_cycle = m_simBase->m_simulation_cycle;
+      data->m_fetch_cycle = m_cycle;
       data->m_core_id = req->m_core_id;
       data->m_pc = req->m_pc;
       data->m_tid = req->m_thread_id;
@@ -1441,7 +1445,7 @@ bool dcu_c::done(mem_req_s* req)
     uop_c* uop = req->m_uop;
 
     DEBUG("uop:%lld done\n", uop->m_uop_num);
-    uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+    uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
     if (m_ptx_sim) {
       if (uop->m_parent_uop) {
@@ -1453,7 +1457,7 @@ bool dcu_c::done(mem_req_s* req)
                 puop->m_thread_id, puop->m_uop_num);
           }
 
-          puop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+          puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
           puop->m_state = OS_SCHEDULED;
         }
       } // uop->m_parent_uop
@@ -1724,7 +1728,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   DEBUG("MSHR[%d] new_req type:%s (%d)\n", 
       core_id, mem_req_c::mem_req_type_name[type], (int)m_mshr[core_id].size());
 
-  if (m_stop_prefetch > m_simBase->m_simulation_cycle && type == MRT_DPRF)
+  if (m_stop_prefetch > m_cycle && type == MRT_DPRF)
     return true;
 
   // find a matching request
@@ -1760,7 +1764,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
 
   // queue full
   if (m_l2_cache[core_id]->full()) {
-    m_stop_prefetch = m_simBase->m_simulation_cycle + 500;
+    m_stop_prefetch = m_cycle + 500;
     flush_prefetch(core_id);
     if (m_l2_cache[core_id]->full()) {
       STAT_EVENT(MSHR_FULL);
@@ -1776,7 +1780,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
 
   // mshr full
   if (new_req == NULL) {
-    m_stop_prefetch = m_simBase->m_simulation_cycle + 500;
+    m_stop_prefetch = m_cycle + 500;
     flush_prefetch(core_id);
     if (type == MRT_DPRF)
       return true;
@@ -1875,14 +1879,14 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int si
   req->m_priority               = priority;
   req->m_addr                   = addr;
   req->m_size                   = size;
-  req->m_rdy_cycle              = m_simBase->m_simulation_cycle + delay;
+  req->m_rdy_cycle              = m_cycle + delay;
   req->m_pc                     = uop ? uop->m_pc : 0;
   req->m_prefetcher_id          = 0;
   req->m_pref_loadPC            = 0;
   req->m_ptx                    = ptx;
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
-  req->m_in                     = m_simBase->m_simulation_cycle;
+  req->m_in                     = m_cycle;
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -1914,7 +1918,7 @@ void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size
   req->m_ptx                    = ptx;
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
-  req->m_in                     = m_simBase->m_simulation_cycle;
+  req->m_in                     = m_cycle;
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -1948,7 +1952,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
   get_level_id(dst, &level, &id);
   get_level_id(src, &src_level, &src_id);
 
-  req->m_rdy_cycle = m_simBase->m_simulation_cycle + 1;
+  req->m_rdy_cycle = m_cycle + 1;
   if (level == MEM_L1) {
     ASSERT(0);
   }
@@ -1992,7 +1996,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
 void memory_c::free_req(int core_id, mem_req_s* req)
 {
   STAT_EVENT(AVG_MEMORY_LATENCY_BASE);
-  STAT_EVENT_N(AVG_MEMORY_LATENCY, m_simBase->m_simulation_cycle - req->m_in);
+  STAT_EVENT_N(AVG_MEMORY_LATENCY, m_cycle - req->m_in);
 
   // when there are still merged requests, call done wrapper function
   if (!req->m_merge.empty()) {
@@ -2125,6 +2129,7 @@ dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr *line_addr, \
 void memory_c::run_a_cycle(void)
 {
   run_a_cycle_uncore();
+  ++m_cycle;
 }
 
 void memory_c::run_a_cycle_core(int core_id)
@@ -2135,7 +2140,7 @@ void memory_c::run_a_cycle_core(int core_id)
 
 void memory_c::run_a_cycle_uncore(void)
 {
-  int index = m_simBase->m_simulation_cycle % m_num_l3;
+  int index = m_cycle % m_num_l3;
   for (int ii = index; ii < index + m_num_l3; ++ii) {
     m_l3_cache[ii % m_num_l3]->run_a_cycle();
   }
@@ -2171,14 +2176,14 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
   req->m_priority               = g_mem_priority[MRT_WB];
   req->m_addr                   = addr;
   req->m_size                   = size;
-  req->m_rdy_cycle              = m_simBase->m_simulation_cycle + 1;
+  req->m_rdy_cycle              = m_cycle + 1;
   req->m_pc                     = data->m_pc;
   req->m_prefetcher_id          = 0;
   req->m_pref_loadPC            = 0;
   req->m_ptx                    = ptx;
   req->m_done_func              = NULL;
   req->m_uop                    = NULL;
-  req->m_in                     = m_simBase->m_simulation_cycle;
+  req->m_in                     = m_cycle;
   req->m_dirty                  = true;
   req->m_done                   = false;
 
@@ -2209,7 +2214,7 @@ void memory_c::print_mshr(void)
     for (auto I = m_mshr[ii].begin(), E = m_mshr[ii].end(); I != E; ++I) {
       mem_req_s* req = (*I);
       fprintf(fp, "%-20d %-10llu %-10llu %-15s %-15s %-7d %-20d %-15s %-15s\n",
-          req->m_id, req->m_in, m_simBase->m_simulation_cycle - req->m_in, \
+          req->m_id, req->m_in, m_cycle - req->m_in, \
           mem_req_c::mem_req_type_name[req->m_type], mem_req_c::mem_state[req->m_state], \
           (req->m_merged_req ? 1 : 0), (req->m_merged_req ? req->m_merged_req->m_id : -1), \
           (req->m_merged_req ? mem_req_c::mem_req_type_name[req->m_merged_req->m_type] : "NULL"), \

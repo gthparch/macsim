@@ -134,9 +134,6 @@ param<DRAM_BUS_WIDTH, dram_bus_width, uns, 8>
 param<DRAM_COLUMN, dram_column, uns, 6>
 param<DRAM_PRECHARGE, dram_precharge, uns, 6>
 param<DRAM_ACTIVATE, dram_activate, uns, 6>
-param<DRAM_FREQUENCY, dram_frequency, float, 0.4>
-param<CPU_FREQUENCY, cpu_frequency, float, 2.0>
-param<GPU_FREQUENCY, gpu_frequency, float, 1.0>
 param<DRAM_NUM_MC, dram_num_mc, int, 1>
 param<DRAM_INTERLEAVE_FACTOR, dram_interleave_factor, int, 128>
 

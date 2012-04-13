@@ -166,7 +166,6 @@ void drb_entry_s::set(mem_req_s *mem_req, int bid, int rid, int cid)
   m_appl_id   = mem_req->m_appl_id;
   m_req       = mem_req;
   m_size      = mem_req->m_size;
-  m_timestamp = m_simBase->m_simulation_cycle;
   m_priority  = dram_controller_c::dram_req_priority[mem_req->m_type];
 
   switch (mem_req->m_type) {
@@ -398,6 +397,7 @@ void dram_controller_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, 
 
   // set drb_entry
   new_entry->set(mem_req, bid, rid, cid); 
+  new_entry->m_timestamp = m_cycle;
 
   // insert new drb entry to drb 
   m_buffer[bid].push_back(new_entry);
@@ -459,7 +459,7 @@ void dram_controller_c::print_req(void)
 {
   FILE* fp = fopen("bug_detect_dram.out", "w");
 
-  fprintf(fp, "Current cycle:%llu\n", m_simBase->m_simulation_cycle);
+  fprintf(fp, "Current cycle:%llu\n", m_cycle);
   fprintf(fp, "Total req:%d\n", m_total_req);
   fprintf(fp, "\n");
   fprintf(fp, "Data bus\n");
@@ -486,7 +486,7 @@ void dram_controller_c::print_req(void)
     for (auto I = m_buffer[ii].begin(), E  = m_buffer[ii].end(); I != E; ++I) {
       fprintf(fp, "req_id:%-10d state:%-15s time:%lld delta:%lld\n", 
           (*I)->m_req->m_id, dram_state[(*I)->m_state], (*I)->m_timestamp, 
-          CYCLE - (*I)->m_timestamp);
+          m_cycle - (*I)->m_timestamp);
     }
   }
 
@@ -516,7 +516,7 @@ void dram_controller_c::bank_schedule_complete(void)
     if (m_current_list[ii] == NULL)
       continue;
 
-    if (m_data_ready[ii] <= m_simBase->m_simulation_cycle) {
+    if (m_data_ready[ii] <= m_cycle) {
       ASSERT(m_current_list[ii]->m_state == DRAM_DATA_WAIT);
 
       // find same address entries
@@ -539,7 +539,7 @@ void dram_controller_c::bank_schedule_complete(void)
                   mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
             }
             temp_list.push_back((*I));
-            m_num_completed_in_last_cycle = m_simBase->m_simulation_cycle;
+            m_num_completed_in_last_cycle = m_cycle;
           }
         }
 
@@ -556,7 +556,7 @@ void dram_controller_c::bank_schedule_complete(void)
 
       
       STAT_EVENT(DRAM_AVG_LATENCY_BASE);
-      STAT_EVENT_N(DRAM_AVG_LATENCY, CYCLE - m_current_list[ii]->m_timestamp);
+      STAT_EVENT_N(DRAM_AVG_LATENCY, m_cycle - m_current_list[ii]->m_timestamp);
 
       on_complete(m_current_list[ii]);
       // wb request will be retired immediately
@@ -722,25 +722,24 @@ void dram_controller_c::bank_schedule_new(void)
 
       m_current_list[ii] = entry;
       m_current_list[ii]->m_state = DRAM_CMD;
-      m_current_list[ii]->m_scheduled = m_simBase->m_simulation_cycle;
+      m_current_list[ii]->m_scheduled = m_cycle;
 
       m_buffer[ii].remove(entry);
 
       m_bank_ready[ii]     = ULLONG_MAX;
-      m_bank_timestamp[ii] = m_simBase->m_simulation_cycle;
+      m_bank_timestamp[ii] = m_cycle;
 
       POWER_EVENT(POWER_MC_R);
 
       DEBUG("bank[%d] req:%d has been selected\n", ii, m_current_list[ii]->m_req->m_id);
     }
     // previous command is done. ready for next sequence of command.
-    else if (m_bank_ready[ii] <= m_simBase->m_simulation_cycle && 
-        m_current_list[ii]->m_state == DRAM_CMD_WAIT) {
+    else if (m_bank_ready[ii] <= m_cycle && m_current_list[ii]->m_state == DRAM_CMD_WAIT) {
       ASSERT(m_current_list[ii]->m_state == DRAM_CMD_WAIT || 
           m_current_list[ii]->m_state == DRAM_DATA);
       m_bank_ready[ii] = ULLONG_MAX;
       m_current_list[ii]->m_state = DRAM_CMD;
-      m_bank_timestamp[ii] = m_simBase->m_simulation_cycle;
+      m_bank_timestamp[ii] = m_cycle;
     }
   }
 }
@@ -829,7 +828,7 @@ void dram_controller_c::channel_schedule_data(void)
       for (int jj = ii * m_num_bank_per_channel; jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
         if (m_current_list[jj] != NULL && 
             m_current_list[jj]->m_state == DRAM_DATA &&
-            m_data_avail[jj] <= m_simBase->m_simulation_cycle) {
+            m_data_avail[jj] <= m_cycle) {
           found = true;
           break;
         }
@@ -847,7 +846,7 @@ void dram_controller_c::channel_schedule_data(void)
       for (int jj = ii * m_num_bank_per_channel; jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
         if (m_current_list[jj] != NULL && 
             m_current_list[jj]->m_state == DRAM_DATA &&
-            m_data_avail[jj] <= m_simBase->m_simulation_cycle &&
+            m_data_avail[jj] <= m_cycle &&
             m_bank_timestamp[jj] < oldest) {
           oldest = m_bank_timestamp[jj];
           bank = jj;
@@ -874,7 +873,7 @@ void dram_controller_c::channel_schedule_data(void)
 // check data bus availability.
 bool dram_controller_c::avail_data_bus(int channel_id)
 {
-  if (m_dbus_ready[channel_id] <= m_simBase->m_simulation_cycle)
+  if (m_dbus_ready[channel_id] <= m_cycle)
     return true;
 
   return false;

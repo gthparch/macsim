@@ -358,24 +358,24 @@ void retire_c::update_stats(process_s* process)
       core->get_core_type() == "ptx") {
     if ((process->m_repeat+1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
-      STAT_EVENT_N(CYC_COUNT_PTX, m_simBase->m_simulation_cycle);
+      STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
       report("application " << process->m_process_id << " terminated " 
           << "(" << process->m_applications[process->m_current_vector_index-1] 
-          << "," << process->m_repeat << ") at " << m_simBase->m_simulation_cycle);
+          << "," << process->m_repeat << ") at " << CYCLE);
     }
   } 
   else {
     if (process->m_repeat == 0) {
       if (core->get_core_type() == "ptx") {
-        STAT_EVENT_N(CYC_COUNT_PTX, m_simBase->m_simulation_cycle);
+        STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
       }
       else {
-        STAT_EVENT_N(CYC_COUNT_X86, m_simBase->m_simulation_cycle);
+        STAT_EVENT_N(CYC_COUNT_X86, CYCLE);
       }
       --m_simBase->m_process_count_without_repeat;
       report("----- application " << process->m_process_id << " terminated (" 
           << process->m_applications[process->m_current_vector_index-1] 
-          << "," << process->m_repeat << ") at " << m_simBase->m_simulation_cycle);
+          << "," << process->m_repeat << ") at " << CYCLE);
     }
   }
 }

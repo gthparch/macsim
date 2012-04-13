@@ -290,6 +290,9 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   else {
     m_shared_memory = NULL;
   }
+
+  // clock cycle
+  m_cycle = 0;
 }
 
 
@@ -397,6 +400,8 @@ void core_c::run_a_cycle(void)
 
   // frontend stage
   m_frontend->run_a_cycle();
+
+  ++m_cycle;
 }
 
 

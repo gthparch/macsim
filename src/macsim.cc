@@ -108,7 +108,10 @@ macsim_c::macsim_c()
 		m_core_started[ii]   = false;
 	}
 
-	m_simulation_cycle = 1;
+  m_termination_check[0] = false;
+  m_termination_check[1] = false;
+
+	m_simulation_cycle = 0;
 	m_core0_inst_count = 0;
 }
 
@@ -717,6 +720,12 @@ void macsim_c::initialize(int argc, char** argv)
 // =======================================
 void macsim_c::init_clock_domain(void)
 {
+  report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
+  report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz");
+  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz");
+  report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz");
+  report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz");
+
   m_clock_internal = 0;
   float domain_f[5];
   domain_f[0] = *KNOB(KNOB_CLOCK_CPU);
@@ -775,8 +784,14 @@ int macsim_c::run_a_cycle()
   // 1. no active threads in the system
   // 2. repetition has been done (in case of multiple applications simulation)
   // 3. no core has been executed in the last cycle;
-  if (m_num_active_threads == 0 || m_repeat_done || m_num_running_core == 0)  {
+  if (m_termination_check[0] && m_termination_check[1] && 
+      (m_num_active_threads == 0 || m_repeat_done || m_num_running_core == 0))  {
     return 0; //simulation finished
+  }
+
+  if (m_termination_check[0] && m_termination_check[1]) {
+    m_termination_check[0] = false;
+    m_termination_check[1] = false;
   }
 
   int pivot = m_core_cycle[0]+1;
@@ -824,7 +839,6 @@ int macsim_c::run_a_cycle()
     else if (core_type != "PTX" && m_clock_internal % m_clock_divisor[CLOCK_CPU] != 0) {
       continue;
     }
-
 
     // increment core cycle
     core->inc_core_cycle_count();
@@ -889,6 +903,16 @@ int macsim_c::run_a_cycle()
   // increase simulation cycle
   m_simulation_cycle++;
   STAT_EVENT(CYC_COUNT_TOT);
+    
+  if (m_clock_internal % m_clock_divisor[CLOCK_GPU] == 0) {
+    STAT_EVENT(CYCLE_CPU);
+    m_termination_check[1] = true;
+  }
+
+  if (m_clock_internal % m_clock_divisor[CLOCK_CPU] == 0) {
+    STAT_EVENT(CYCLE_GPU);
+    m_termination_check[0] = true;
+  }
 
   m_clock_internal = (m_clock_internal + 1) % m_clock_lcm;
 

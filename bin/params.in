@@ -1,24 +1,23 @@
 
 # Simulation Configuration
-num_sim_cores 10 
-num_sim_small_cores 6
+num_sim_cores 8
+num_sim_small_cores 4
 num_sim_medium_cores 0
 num_sim_large_cores 4
 core_type ptx
 large_core_type x86
-cpu_frequency 3 
-gpu_frequency 1.5
 sim_cycle_count 0 
 max_insts 200000000
 heartbeat_interval 1000000
 forward_progress_limit 500000
 
-# frequency
-clock_cpu 4
-clock_gpu 4
-clock_l3  4
-clock_noc 4
-clock_mc  1 
+
+# Clock
+clock_cpu 3
+clock_gpu 1.5
+clock_l3  1
+clock_noc 1
+clock_mc  1.6 
 
 
 # Common Core Configuration
@@ -107,9 +106,7 @@ enable_pref_small_core 0
 
 # DRAM
 dram_num_mc 2
-dram_frequency 1.603
 dram_bus_width 8
-dram_ddr_factor 2
 dram_column 11
 dram_activate 25
 dram_precharge 10

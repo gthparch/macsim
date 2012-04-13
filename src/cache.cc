@@ -210,7 +210,7 @@ void cache_c::update_cache_on_access(Addr line_addr, int set, int appl_id)
 
 void cache_c::update_line_on_hit(cache_entry_c* line, int set, int appl_id)
 {
-  line->m_last_access_time = m_simBase->m_simulation_cycle;
+  line->m_last_access_time = CYCLE;
 }
 
 
@@ -312,7 +312,7 @@ void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr
   ins_line->m_tag              = tag;
   ins_line->m_base             = (addr & ~m_offset_mask);
   ins_line->m_access_counter   = 0;
-  ins_line->m_last_access_time = m_simBase->m_simulation_cycle;
+  ins_line->m_last_access_time = CYCLE;
   ins_line->m_pref             = false;
   ins_line->m_skip             = skip;
 
@@ -476,7 +476,7 @@ Counter cache_c::find_min_lru(int set)
   }
 
   if (lru_time == MAX_INT) {
-    lru_time = m_simBase->m_simulation_cycle;
+    lru_time = CYCLE;
   }
   return lru_time;
 }

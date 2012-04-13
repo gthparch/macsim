@@ -213,6 +213,7 @@ class macsim_c
     int m_clock_lcm; /**< main clock period */
     int m_clock_divisor[5]; /**< clock divisor */
     int m_clock_internal; /**< internal macsim clock */
+    bool m_termination_check[2];
 
     // bug detector
 		bug_detector_c *m_bug_detector; /**< bug detector */

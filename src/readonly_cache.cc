@@ -200,7 +200,7 @@ bool readonly_cache_c::cache_fill_line(mem_req_s *req)
     uop_c* uop = req->m_uop;
 
     DEBUG("uop:%lld done\n", uop->m_uop_num);
-    uop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+    uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
 
     if (uop->m_mem_type == MEM_LD_CM) {
@@ -223,7 +223,7 @@ bool readonly_cache_c::cache_fill_line(mem_req_s *req)
           core->get_frontend()->set_load_ready(puop->m_thread_id, puop->m_uop_num);
         }
 
-        puop->m_done_cycle = m_simBase->m_simulation_cycle + 1;
+        puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;;
         puop->m_state = OS_SCHEDULED;
       }
     } // uop->m_parent_uop

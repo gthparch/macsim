@@ -210,7 +210,7 @@ void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
   entry  = &index_table[region_idx];
   stride = lineIndex - index_table[region_idx].last_index;
   index_table[region_idx].last_index = lineIndex;
-  region_table[region_idx].last_access = m_simBase->m_simulation_cycle;
+  region_table[region_idx].last_access = CYCLE;
 
   // not trained yet
   if (!entry->trained) {
@@ -376,7 +376,7 @@ void pref_stride_c::create_newentry (int idx, Addr line_addr, Addr region_tag)
 {
   region_table[idx].tag             = region_tag;
   region_table[idx].valid           = true;
-  region_table[idx].last_access     = m_simBase->m_simulation_cycle;    
+  region_table[idx].last_access     = CYCLE;    
   index_table[idx].trained          = false;
   index_table[idx].num_states       = 1;
   index_table[idx].curr_state       = 0; // 0 or 1

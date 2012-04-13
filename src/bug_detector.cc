@@ -109,7 +109,7 @@ void bug_detector_c::allocate(uop_c *uop)
   int core_id = uop->m_core_id;
 
   ASSERT(m_uop_table[core_id]->find(uop) == m_uop_table[core_id]->end());
-  (*m_uop_table[core_id])[uop] = m_simBase->m_simulation_cycle;
+  (*m_uop_table[core_id])[uop] = CYCLE;
 }
 
 
@@ -123,7 +123,7 @@ void bug_detector_c::deallocate(uop_c *uop)
 
   ASSERT(m_uop_table[core_id]->find(uop) != m_uop_table[core_id]->end());
 
-  int latency = m_simBase->m_simulation_cycle - (*m_uop_table[core_id])[uop];
+  int latency = CYCLE - (*m_uop_table[core_id])[uop];
   m_latency_sum[core_id] += latency;
   ++m_latency_count[core_id];
 
@@ -151,7 +151,7 @@ void bug_detector_c::print(int core_id, int thread_id)
     if (m_latency_count[ii] > 0)
       average_latency = m_latency_sum[ii] / m_latency_count[ii];
 
-    out << "Current cycle:" << m_simBase->m_simulation_cycle << "\n";
+    out << "Current cycle:" << CYCLE << "\n";
     out << "Core id:" << core_id << "\n";
     out << "Last terminated thread:" << thread_id << "\n";
 
@@ -181,7 +181,7 @@ void bug_detector_c::print(int core_id, int thread_id)
     temp_list1.sort(sort_uop);
 
     for (auto I = temp_list1.begin(), E = temp_list1.end(); I != E; ++I) {
-      if (m_simBase->m_simulation_cycle - (*m_uop_table[ii])[(*I)] < average_latency * 5)
+      if (CYCLE - (*m_uop_table[ii])[(*I)] < average_latency * 5)
         continue;
 
       uop_c *uop = (*I);
@@ -191,7 +191,7 @@ void bug_detector_c::print(int core_id, int thread_id)
         << setw(10) << left << uop->m_uop_num
         << setw(10) << left << uop->m_thread_id
         << setw(15) << left << (*m_uop_table[ii])[(*I)]
-        << setw(15) << left << m_simBase->m_simulation_cycle - (*m_uop_table[ii])[(*I)]
+        << setw(15) << left << CYCLE - (*m_uop_table[ii])[(*I)]
         << setw(25) << left << uop_c::g_uop_state_name[uop->m_state] 
         << setw(25) << left << trace_read_c::g_tr_opcode_names[uop->m_opcode] 
         << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type]

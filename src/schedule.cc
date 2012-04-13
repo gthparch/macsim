@@ -159,12 +159,12 @@ bool schedule_c::check_srcs(int entry)
       // Source is not ready. 
       // Hence we update the last_dep_exec field of this uop and return. 
       if (!cur_uop->m_last_dep_exec || (*(cur_uop->m_last_dep_exec) < src_uop->m_done_cycle)) {
-        DEBUG("*cur_uop->last_dep_exec:%lld src_uop->uop_num:%lld src_uop->done_cycle:%lld \n", 
-            cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec): 0, 
-            src_uop? src_uop->m_uop_num: 0, src_uop? src_uop->m_done_cycle: 1);
-
         cur_uop->m_last_dep_exec = &(src_uop->m_done_cycle);
       }
+      DEBUG("*cur_uop->last_dep_exec:%lld src_uop->uop_num:%lld src_uop->done_cycle:%lld \n", 
+          cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec): 0, 
+          src_uop? src_uop->m_uop_num: 0, src_uop? src_uop->m_done_cycle: 1);
+
       ready = false;
       return ready;
     }

@@ -315,6 +315,9 @@ class dcu_c
     // interconnection
     ManifoldProcessor* m_terminal; /**< terminal to the NoC router */
     router_c* m_router; /**< router */
+
+    // clock
+    Counter m_cycle; /**< clock cycle */
 };
 
 
@@ -521,7 +524,9 @@ class memory_c
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
     unordered_map<Addr, bool> m_td_pending_req; /**< pending requests in tag directory */
-};
+
+    Counter m_cycle; /**< clock cycle */
+}; 
 
 
 #define NEW_MEMORY_CLASS(x) \

@@ -680,7 +680,7 @@ bool process_manager_c::terminate_process(process_s* process)
   else {
     delta = static_cast<int>(CYCLE - m_appl_cyccount_info[process->m_orig_pid]);
   }
-  m_appl_cyccount_info[process->m_orig_pid] = m_simBase->m_simulation_cycle;
+  m_appl_cyccount_info[process->m_orig_pid] = CYCLE;
 
 
   STAT_EVENT_N(APPL_CYC_COUNT0 + process->m_orig_pid, delta);

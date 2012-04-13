@@ -93,7 +93,7 @@ bool noc_c::insert(int src, int dst, int msg, mem_req_s* req)
   new_entry->m_dst = dst;
   new_entry->m_msg = msg;
   new_entry->m_req = req;
-  new_entry->m_rdy = m_simBase->m_simulation_cycle + 10; 
+  new_entry->m_rdy = CYCLE + 10; 
 
   return true;
 }
@@ -106,7 +106,7 @@ void noc_c::run_a_cycle()
   memory_c* memory = m_simBase->m_memory;
 
   for (auto itr = m_cpu_entry_up->begin(); itr != m_cpu_entry_up->end(); ++itr) {
-    if ((*itr)->m_rdy <= m_simBase->m_simulation_cycle) {
+    if ((*itr)->m_rdy <= CYCLE) {
       done_list.push_back((*itr));
     }
     else
@@ -124,7 +124,7 @@ void noc_c::run_a_cycle()
   
   if (!*m_simBase->m_knobs->KNOB_HETERO_NOC_USE_SAME_QUEUE) {
     for (auto itr = m_gpu_entry_up->begin(); itr != m_gpu_entry_up->end(); ++itr) {
-      if ((*itr)->m_rdy <= m_simBase->m_simulation_cycle) {
+      if ((*itr)->m_rdy <= CYCLE) {
         done_list.push_back((*itr));
       }
       else
@@ -143,7 +143,7 @@ void noc_c::run_a_cycle()
 
 
   for (auto itr = m_cpu_entry_down->begin(); itr != m_cpu_entry_down->end(); ++itr) {
-    if ((*itr)->m_rdy <= m_simBase->m_simulation_cycle) {
+    if ((*itr)->m_rdy <= CYCLE) {
       done_list.push_back((*itr));
     }
     else
@@ -161,7 +161,7 @@ void noc_c::run_a_cycle()
   
   if (!*m_simBase->m_knobs->KNOB_HETERO_NOC_USE_SAME_QUEUE) {
     for (auto itr = m_gpu_entry_down->begin(); itr != m_gpu_entry_down->end(); ++itr) {
-      if ((*itr)->m_rdy <= m_simBase->m_simulation_cycle) {
+      if ((*itr)->m_rdy <= CYCLE) {
         done_list.push_back((*itr));
       }
       else
