@@ -1,0 +1,10 @@
+#!/usr/bin/python
+
+#########################################################################################
+# Author      : Jaekyu Lee (jq.lee17@gmail.com)
+# Description : Scons for trace reader
+#########################################################################################
+
+
+SConscript('SConscript')
+Clean('.', 'all_knobs.cc')
