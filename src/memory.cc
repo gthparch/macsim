@@ -1367,6 +1367,9 @@ bool dcu_c::done(mem_req_s* req)
   Addr line_addr;
   Addr repl_line_addr;
 
+  if (m_wb_queue->full())
+    return false;
+
 
   if (m_disable) {
     // do nothing
