@@ -464,13 +464,13 @@ int dcu_c::access(uop_c* uop)
   if (*m_simBase->m_knobs->KNOB_DCACHE_INFINITE_PORT || m_disable == true) {
     // do nothing
   }
-  else if (IsStore(type) && !m_port[bank]->get_write_port(m_cycle)) { 
+  else if (IsStore(type) && !m_port[bank]->get_write_port(m_cycle - 1)) { 
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank + 64;
     return 0;
   }
-  else if (IsLoad(type) && !m_port[bank]->get_read_port(m_cycle)) {
+  else if (IsLoad(type) && !m_port[bank]->get_read_port(m_cycle - 1)) {
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank;

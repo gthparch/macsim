@@ -720,12 +720,6 @@ void macsim_c::initialize(int argc, char** argv)
 // =======================================
 void macsim_c::init_clock_domain(void)
 {
-  report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
-  report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz");
-  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz");
-  report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz");
-  report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz");
-
   m_clock_internal = 0;
   float domain_f[5];
   domain_f[0] = *KNOB(KNOB_CLOCK_CPU);
@@ -767,6 +761,14 @@ void macsim_c::init_clock_domain(void)
 
   for (int ii = 0; ii < 5; ++ii)
     m_clock_divisor[ii] = m_clock_lcm / domain_i[ii];
+
+  report("Clock LCM           : " << m_clock_lcm);
+  report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz " << m_clock_divisor[0]);
+  report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz " << m_clock_divisor[1]);
+  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz " << m_clock_divisor[2]);
+  report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz " << m_clock_divisor[3]);
+  report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz " << m_clock_divisor[4]);
+
 }
 
 #define CLOCK_CPU 0
