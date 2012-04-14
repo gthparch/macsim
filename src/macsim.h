@@ -146,10 +146,12 @@ class macsim_c
      */
 		void deallocate_memory(void);
 
+#ifdef POWER_EI
     /**
      * Compute power consumption
      */
 		void compute_power(void);
+#endif
 
     /**
      * Finialize simulation
@@ -259,11 +261,14 @@ class macsim_c
     // cache partitioning
     cache_partition_framework_c* m_PCL; /**< cache partitioning framework */
 
+
+#ifdef POWER_EI
 		// power stats
 		ei_power_c* m_ei_power; /**< energy introspector */
 		double avg_power; /**< average power */
 		double total_energy; /**< total energy consumption */
 		int total_packets; /**< number of packets */
+#endif
 
 	private:
 		macsim_c* m_simBase; /**< self-reference for macro usage */

@@ -20,6 +20,7 @@ def parse_arg():
   parser.add_option("-p", "--gprof", action="store_true", dest="gprof", default=False, help="gprof build")
   parser.add_option("-c", "--clean", action="store_true", dest="clean", default=False, help="clean")
   parser.add_option("--dramsim", action="store_true", dest="dramsim", default=False, help="DRAMSim2")
+  parser.add_option("--power", action="store_true", dest="power", default=False, help="EI Power")
 
   return parser
 
@@ -41,12 +42,38 @@ def main():
       cmd += 'debug=1 '
     elif options.gprof:
       cmd += 'gprof=1 '
+    
+    # DRAMSim2
+    if options.dramsim:
+      cmd += 'dram=1 '
+
+    # EI power
+    if options.power:
+      cmd += 'power=1 '
 
     cmd += '-j %s ' % options.thread
+
 
   ## run scons command (in the top level)
   os.chdir('../')
   os.system(cmd)
+  
+  
+  ## Create a symbolic link
+  if not options.clean:
+    if options.debug:
+      build_dir = '.dbg_build'
+    elif options.gprof:
+      build_dir = '.gpf_build'
+    else:
+      build_dir = '.opt_build'
+
+    if os.path.exists('%s/macsim' % build_dir):
+      os.chdir('bin')
+
+      if os.path.exists('macsim'):
+        os.system('rm -f macsim')
+      os.system('ln -s ../%s/macsim' % build_dir)
 
 
 if __name__ == '__main__':

@@ -1067,7 +1067,12 @@ void dcu_c::process_fill_queue()
   int count = 0;
 
   for (auto I = m_fill_queue->m_entry.begin(), E = m_fill_queue->m_entry.end(); I != E; ++I) {
-    if (count == 4) break;
+    if (count == 4) 
+      break;
+    
+    // if wb-queue is full, fill request cannot be made
+    if (m_wb_queue->full())
+      break;
 
     mem_req_s* req = (*I);
 

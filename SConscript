@@ -59,6 +59,7 @@ else:
   env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s %s -DNO_DEBUG' % (warn_flags, header_dirs, compile_flags)
 
 env['LINKFLAGS'] = '-lz -lpthread'
+env['CPPDEFINES'] = []
 
 
 
@@ -97,7 +98,11 @@ IRIS_srcs = [
   'src/manifold/models/iris/iris_srcs/components/simpleRouter.cc'
 ]
 
-env.Library('iris', IRIS_kernel_srcs + IRIS_srcs)
+
+if flags['power'] == '1':
+  env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI'])
+else:
+  env.Library('iris', IRIS_kernel_srcs + IRIS_srcs)
 
 
 #########################################################################################
@@ -122,6 +127,7 @@ ORION_srcs = [
   'src/orion/SIM_time.c'
 ]
 
+
 env.Library('orion', ORION_srcs, CPPFLAGS='')
 
 
@@ -140,7 +146,9 @@ EI_srcs = [
   'src/energy_introspector/SENSORLIB_RNG.cc'
 ]
 
-env.Library('ei', EI_srcs)
+
+if flags['power'] == '1':
+  env.Library('ei', EI_srcs)
 
 
 #########################################################################################
@@ -173,12 +181,71 @@ if flags['dram'] == '1':
 #########################################################################################
 # MACSIM
 #########################################################################################
-macsim_src = Glob('src/*.cc')
-libraries = ['iris', 'orion', 'ei', static_libcpp]
+macsim_src = [
+  'src/all_knobs.cc',
+  'src/all_stats.cc',
+  'src/allocate.cc',
+  'src/allocate_smc.cc',
+  'src/bp.cc',
+  'src/bp_gshare.cc',
+  'src/bp_targ.cc',
+  'src/bug_detector.cc',
+  'src/cache.cc',
+  'src/core.cc',
+  'src/dram.cc',
+  'src/exec.cc',
+  'src/factory_class.cc',
+  'src/fetch_factory.cc',
+  'src/frontend.cc',
+  'src/knob.cc',
+  'src/macsim.cc',
+  'src/main.cc',
+  'src/map.cc',
+  'src/memory.cc',
+  'src/memreq_info.cc',
+  'src/noc.cc',
+  'src/port.cc',
+  'src/pref.cc',
+  'src/pref_common.cc',
+  'src/pref_factory.cc',
+  'src/pref_stride.cc',
+  'src/process_manager.cc',
+  'src/readonly_cache.cc',
+  'src/retire.cc',
+  'src/rob.cc',
+  'src/rob_smc.cc',
+  'src/router.cc',
+  'src/schedule.cc',
+  'src/schedule_io.cc',
+  'src/schedule_ooo.cc',
+  'src/schedule_smc.cc',
+  'src/statistics.cc',
+  'src/sw_managed_cache.cc',
+  'src/trace_read.cc',
+  'src/uop.cc',
+  'src/utils.cc',
+]
+
+
+if flags['power'] == '1':
+  macsim_src.append('src/ei_power.cc')
+
+
+#########################################################################################
+# Libraries
+#########################################################################################
+libraries = ['iris', 'orion', static_libcpp]
+
+
+if flags['power'] == '1':
+  libraries.append('ei')
+  env['CPPDEFINES'].append('POWER_EI')
+
 if flags['dram'] == '1':
   libraries.append('dramsim')
-  env.Append(CPPDEFINES=['DRAMSIM'])
+  env['CPPDEFINES'].append('DRAMSIM')
   env['CPPFLAGS'] += ' -I src/DRAMSim2'
+
 
 env.Program(
     'macsim',
@@ -186,17 +253,6 @@ env.Program(
     LIBS=libraries, 
     LIBPATH=['.', '/usr/lib', '/usr/local/lib']
 )
-
-
-## create a symbolic link
-if not GetOption('clean') and os.path.exists('macsim'):
-  os.system('pwd')
-  binary = '%s/macsim' % os.getcwd()
-  os.chdir('../bin')
-
-  if os.path.exists('macsim'):
-    os.system('rm -f macsim')
-  os.system('ln -s %s' % binary)
 
 
 #########################################################################################

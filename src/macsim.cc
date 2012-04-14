@@ -61,13 +61,16 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "noc.h"
 #include "factory_class.h"
 #include "dram.h"
-#include "ei_power.h"
 #include "router.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
 #include "statistics.h"
 
+
+#ifdef POWER_EI
+#include "ei_power.h"
+#endif
 
 
 using namespace std;
@@ -486,10 +489,12 @@ void macsim_c::init_network(void)
     m_iris_network->connect_interface_routers();
     m_iris_network->connect_routers();
 
+#ifdef POWER_EI
     //initialize power stats
     avg_power     = 0;
     total_energy  = 0;
     total_packets = 0;
+#endif
   }
 
 
@@ -521,6 +526,7 @@ void macsim_c::init_sim(void)
 }
 
 
+#ifdef POWER_EI
 // =======================================
 // =======================================
 void macsim_c::compute_power(void)
@@ -531,6 +537,7 @@ void macsim_c::compute_power(void)
 	
 	delete m_ei_power;
 }
+#endif
 
 
 // =======================================
@@ -615,19 +622,23 @@ void macsim_c::fini_sim(void)
        m_end_sim.tv_usec - m_begin_sim.tv_usec)/1000000.0);
   STAT_EVENT_N(EXE_TIME, second);
 
+#ifdef POWER_EI
   // compute power if enable_energy_introspector is enabled
   if (*KNOB(KNOB_ENABLE_ENERGY_INTROSPECTOR)) {
     compute_power();
   }
+#endif
 
   if (*KNOB(KNOB_ENABLE_IRIS)) {
     for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
       //        m_iris_network->routers[i]->print_stats();
       m_iris_network->routers[ii]->power_stats();
     }
+#ifdef POWER_EI
     cout << "Average Network power: " << avg_power << "W\n"
       << "Total Network Energy: " << total_energy << "J\n"
       << "Total packets " << total_packets << "\n";
+#endif
   }
   
 }

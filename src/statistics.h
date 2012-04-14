@@ -1122,35 +1122,37 @@ class ProcessorStatistics
 #define STAT_CORE_EVENT(coreID, Event)                                  \
   m_simBase->m_ProcessorStats->core(coreID)[Event - PER_CORE_STATS_ENUM_FIRST]++;
 
-#define POWER_CORE_EVENT(coreID, Event) STAT_CORE_EVENT(coreID, Event)
 
 #define STAT_CORE_EVENT_M(coreID, Event)                                \
   m_simBase->m_ProcessorStats->core(coreID)[Event - PER_CORE_STATS_ENUM_FIRST]--;
 
-#define POWER_CORE_EVENT_M(coreID, Event) STAT_CORE_EVENT_M(coreID, Event)
 
 #define STAT_CORE_EVENT_N(coreID, Event, delta)                         \
   m_simBase->m_ProcessorStats->core(coreID)[Event  - PER_CORE_STATS_ENUM_FIRST]+=delta;
-
-#define POWER_CORE_EVENT_N(coreID, Event, delta) STAT_CORE_EVENT_N(coreID, Event, delta)
 
 
 // increment a stat
 #define STAT_EVENT(ID)                                                   \
   (*m_simBase->m_ProcessorStats)[ID]++
 
-#define POWER_EVENT(ID) STAT_EVENT(ID)
 
 // decrement a stat
 #define STAT_EVENT_M(ID)                                                 \
   (*m_simBase->m_ProcessorStats)[ID]--
 
-#define POWER_EVENT_M(ID) STAT_EVENT_M(ID)
 
 // increat a stat with delta value
 #define STAT_EVENT_N(ID, delta)                                          \
   (*m_simBase->m_ProcessorStats)[ID] += delta
 
+
+
+// POWER EVENT
+#define POWER_CORE_EVENT(coreID, Event) STAT_CORE_EVENT(coreID, Event)
+#define POWER_CORE_EVENT_M(coreID, Event) STAT_CORE_EVENT_M(coreID, Event)
+#define POWER_CORE_EVENT_N(coreID, Event, delta) STAT_CORE_EVENT_N(coreID, Event, delta)
+#define POWER_EVENT(ID) STAT_EVENT(ID)
+#define POWER_EVENT_M(ID) STAT_EVENT_M(ID)
 #define POWER_EVENT_N(ID, delta) STAT_EVENT_N(ID, delta)
 
 
