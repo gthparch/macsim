@@ -66,7 +66,7 @@ elif flags['gprof'] == '1':
 else:
   env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s %s -DNO_DEBUG' % (warn_flags, header_dirs, compile_flags)
 
-env['LINKFLAGS'] = '-lz -lpthread'
+env['LINKFLAGS'] = '--static -lpthread'
 env['CPPDEFINES'] = []
 
 
@@ -74,7 +74,7 @@ env['CPPDEFINES'] = []
 #########################################################################################
 # libstdc++ library static linking
 #########################################################################################
-static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
+#static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
 
 
 #########################################################################################
@@ -242,7 +242,7 @@ if flags['power'] == '1':
 #########################################################################################
 # Libraries
 #########################################################################################
-libraries = ['iris', 'orion', static_libcpp]
+libraries = ['z', 'iris', 'orion']
 
 
 if flags['power'] == '1':
@@ -259,7 +259,7 @@ env.Program(
     'macsim',
     macsim_src, 
     LIBS=libraries, 
-    #LIBPATH=['.', '/usr/lib', '/usr/local/lib']
+    LIBPATH=['.', '/usr/lib', '/usr/local/lib']
 )
 
 
