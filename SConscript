@@ -47,7 +47,15 @@ warn_flags = [
 ]
 warn_flags = ' '.join(warn_flags)
 
-env = Environment()
+use_vars = set([ 'AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
+use_env = {}
+
+for key,val in os.environ.iteritems():
+  if key in use_vars:
+    use_env[key] = val
+
+env = Environment(ENV=use_env)
+
 ## Opt
 if flags['debug'] == '1':
   env['CPPFLAGS'] = '-g -std=c++0x %s %s %s' % (warn_flags, header_dirs, compile_flags)
@@ -251,7 +259,7 @@ env.Program(
     'macsim',
     macsim_src, 
     LIBS=libraries, 
-    LIBPATH=['.', '/usr/lib', '/usr/local/lib']
+    #LIBPATH=['.', '/usr/lib', '/usr/local/lib']
 )
 
 
