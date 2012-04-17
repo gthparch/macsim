@@ -40,6 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <unordered_map>
+#include <sstream>
 
 #include "global_defs.h"
 #include "global_types.h"
@@ -54,6 +55,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "manifold/models/iris/iris_srcs/topology/ring.h"
 #include "manifold/models/iris/iris_srcs/topology/torus.h"
 #include "manifold/models/iris/iris_srcs/topology/mesh.h"
+#include "manifold/models/iris/iris_srcs/topology/spinalMesh.h"
 #include "manifold/kernel/include/kernel/manifold.h"
 #include "manifold/kernel/include/kernel/component.h"
 #include "manifold/models/iris/iris_srcs/components/ninterface.h"
@@ -247,6 +249,7 @@ class macsim_c
 
 		// interconnect
     router_wrapper_c* m_router; /**< NOC routers */
+		stringstream network_trace;
 
     // IRIS
 		vector<ManifoldProcessor*> m_macsim_terminals; /**< manifold terminals */

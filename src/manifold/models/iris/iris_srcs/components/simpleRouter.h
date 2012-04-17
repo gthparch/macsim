@@ -164,6 +164,8 @@ class SimpleRouter: public IrisRouter
         
         // stats
         uint64_t stat_last_packet_out_cycle;
+        std::vector<short> nodeAF;
+        std::map<int, int>nodeLatency;      //only use positive latency 
 
 	macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 }; /* -----  end of class SimpleRouter  ----- */

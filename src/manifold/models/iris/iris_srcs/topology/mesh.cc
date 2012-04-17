@@ -159,8 +159,8 @@ Mesh::connect_interface_terminal()
         m_simBase->m_macsim_terminals.at(i)->ni = static_cast<manifold::kernel::Component*>(interfaces.at(mapping[i]));
         interfaces.at(mapping[i])->terminal = static_cast<manifold::kernel::Component*>(m_simBase->m_macsim_terminals.at(i));
         
-        m_simBase->m_macsim_terminals.at(mapping[i])->node_id = i;
-        m_simBase->m_memory->m_iris_node_id[i] = mapping[i];
+        m_simBase->m_macsim_terminals.at(mapping[i])->node_id = i;  //iris node id
+        m_simBase->m_memory->m_iris_node_id[i] = mapping[i];        //iris node id
     }
     
     return;

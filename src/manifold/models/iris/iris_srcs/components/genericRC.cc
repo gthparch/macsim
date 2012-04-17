@@ -14,7 +14,7 @@ GenericRC::GenericRC()
 
 void GenericRC::init()
 {
-    if( rc_method == XY_ROUTING )
+    if( rc_method == XY_ROUTING || rc_method == XY_ROUTING_HETERO)
     {
         grid_xloc.resize(no_nodes);
         grid_yloc.resize(no_nodes);
@@ -54,6 +54,56 @@ GenericRC::route_x_y(uint dest)
     }
 
     return oport;
+}
+
+//want spinal routers to be flexible: prefer y traversal, but can use x if adjacent router is also spinal
+//FIXME only does X then Y for now, as GPU nodes only have lateral links - consider using MECS eventually?
+void
+GenericRC::route_x_y_hetero( HeadFlit* hf )
+
+{
+    if ( hf->req->m_id == 458 )
+		{
+			cout << "node id " << node_id << "\n";
+            cout << "routing: \n";
+		}
+    uint dest = hf->dst_node;
+    uint myx=-1, destx=-1, myy =-1, desty=-1;
+    myx = grid_xloc[node_id];
+    myy = grid_yloc[node_id];
+    destx = grid_xloc[ dest ];
+    desty = grid_yloc[ dest ];
+    if ( myx == destx && myy == desty )
+        possible_out_ports.push_back(0);
+    else if ( myx < 3 || myx > 4 )//case is gpu
+    {
+        if( destx < myx )
+            possible_out_ports.push_back(1);
+        else
+            possible_out_ports.push_back(2);
+        
+    } //case is mc/l3
+    else if ( myy !=  desty )   
+    {
+        if( desty < myy )
+        {
+            possible_out_ports.push_back(3);
+//            possible_out_vcs.push_back(5);     //alternative to 3
+        }
+        else
+        {
+            possible_out_ports.push_back(4);
+//            possible_out_vcs.push_back(6);
+        }
+    }else
+    {
+        if( destx < myx )
+            possible_out_ports.push_back(1);
+        else
+            possible_out_ports.push_back(2);
+    }
+
+    return;
 }
 
 void
@@ -366,6 +416,14 @@ GenericRC::push (Flit* f, uint ch )
             addresses [ch].out_port = route_x_y(header->dst_node );
             addresses[ch].possible_out_vcs.push_back(0);
             addresses [ch].possible_out_ports.push_back(route_x_y(header->dst_node));
+
+        }
+        if( rc_method == XY_ROUTING_HETERO)
+        {
+            route_x_y_hetero(header);
+            addresses [ch].out_port = possible_out_ports.at(0);
+            addresses[ch].possible_out_vcs.push_back(0);
+            addresses [ch].possible_out_ports.push_back(possible_out_ports.at(0));
 
         }
         if( rc_method == TORUS_ROUTING)

@@ -392,8 +392,23 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   else if (params["topology"] == "mesh" || params["topology"] == "torus") {
     params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
     params["no_ports"]  = "5"; // check for torus
-    // params["rc_method"] = KNOB(KNOB_IRIS_RC_METHOD)->getValue();
-    params["mapping"]  = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+    params["rc_method"] = "XY_ROUTING_HETERO";
+    params["mapping"]  = "0,1,2,5,6,7,8,9,10,13,14,15,16,17,18,21,22,23,24,25,26,29,30,31,32,33,34,37,38,39,40,41,42,45,46,47,48,49,50,53,54,55,56,57,58,61,62,63,11,12,19,20,27,28,35,36,43,44,51,52,3,4,59,60,";                                                             
+    //original spinal order "0,1,2,48,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,3,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66";
+
+//"0,1,2,60,61,3,4,5,6,7,8,48,49,9,10,11,12,13,14,50,51,15,16,17,18,19,20,52,53,21,22,23,24,25,26,54,55,27,28,29,30,31,32,56,57,33,34,35,36,37,38,58,59,39,40,41,42,43,44,62,63,45,46,47";
+    //"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+  }//else if (params["topology"] == "spinalMesh") 
+  
+  //FIXME - always uses spinalMesh for testing
+  if (0)
+  {
+    params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
+    params["no_ports"]  = "5"; // 4 for north/south, 2 for west/east, 1 for interface
+    params["mapping"]  = "0,1,2,60,61,3,4,5,6,7,8,48,49,9,10,11,12,13,14,50,51,15,16,17,18,19,20,52,53,21,22,23,24,25,26,54,55,27,28,29,30,31,32,56,57,33,34,35,36,37,38,58,59,39,40,41,42,43,44,62,63,45,46,47";
+    //"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66";
+    cout << "reading mesh topology in init iris config" << endl;
+    params["rc_method"] = "XY_ROUTING_HETERO"; //doesn't work in param file, might need to use quotes
   }
   params["no_vcs"]         = KNOB(KNOB_IRIS_NUM_VC)->getValue();
   params["credits"]        = KNOB(KNOB_IRIS_CREDIT)->getValue();
@@ -408,7 +423,7 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
   ToString(s, m_macsim_terminals.size());
   params["no_nodes"] = s;
           
-          
+  report("Routing method: " << params["rc_method"] << "\n");       
 #if FIXME
   //if (! key.compare("-iris:self_assign_dest_id"))
    //           params.insert(pair<string,string>("self_assign_dest_id",value));
@@ -447,6 +462,8 @@ void macsim_c::init_network(void)
     m_simBase->no_nodes = m_macsim_terminals.size();
     report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
 
+#define MAPI i //((Mesh*)m_iris_network)->mapping[i]
+
     for (int i=0; i<m_macsim_terminals.size(); i++) {
       //create component id
       manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
@@ -465,16 +482,16 @@ void macsim_c::init_network(void)
       manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
 
       //push back
-      m_iris_network->terminals.push_back(m_macsim_terminals[i]);
-      m_iris_network->terminal_ids.push_back(m_macsim_terminals[i]->GetComponentId());
+      m_iris_network->terminals.push_back(m_macsim_terminals[MAPI]);
+      m_iris_network->terminal_ids.push_back(m_macsim_terminals[MAPI]->GetComponentId());
       m_iris_network->interfaces.push_back(interface);
       m_iris_network->interface_ids.push_back(interface_id);
       m_iris_network->routers.push_back(rr);
       m_iris_network->router_ids.push_back(router_id);
     
       //init
-      m_macsim_terminals[i]->parse_config(m_iris_params);
-      m_macsim_terminals[i]->init();
+      m_macsim_terminals[MAPI]->parse_config(m_iris_params);
+      m_macsim_terminals[MAPI]->init();
       interface->parse_config(m_iris_params);
       interface->init();
       rr->parse_config(m_iris_params);
@@ -630,6 +647,41 @@ void macsim_c::fini_sim(void)
 #endif
 
   if (*KNOB(KNOB_ENABLE_IRIS)) {
+    ofstream irisTraceFile;
+    string logName = "iris_log_mesh_stall";
+
+    irisTraceFile.open(logName.c_str());
+    if (irisTraceFile.is_open())
+    {
+        cout << "printing to file " << logName << endl;
+        
+        //mapping info
+        irisTraceFile << ":Topology mapping:" << endl;
+        
+        char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+        for(int i=0; i<m_macsim_terminals.size(); i++)
+        {
+            int node_id = ((Mesh*)m_iris_network)->mapping[i];
+            int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
+            
+            irisTraceFile << message_class_type[type] << "," 
+                << m_macsim_terminals[node_id]->ptx << "," << node_id << ",";
+        }
+        irisTraceFile << endl;
+        
+        //summary info
+        irisTraceFile << ":Per Node Summary: node id, total packets out, total flits in, total flits out, cycles: ib, sa, vca, st, average buffer size, average packet latency, average flit latency,  " << endl;
+        for(int i=0; i<m_iris_network->routers.size(); i++)
+        {
+            irisTraceFile << m_iris_network->routers[i]->print_csv_stats();
+        }
+        
+        //detailed, router/packet state vs time info
+        irisTraceFile << ":Detail info: clock cycle, req ID, mem state, msg type, current node, dst node, component (R=Router), input buffer port0.vc0, port0,vc1, port1,vc0, etc..." << endl;
+        irisTraceFile << m_simBase->network_trace.str();
+    }
+    irisTraceFile.close();
+   
     for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
       //        m_iris_network->routers[i]->print_stats();
       m_iris_network->routers[ii]->power_stats();
@@ -679,7 +731,7 @@ void macsim_c::initialize(int argc, char** argv)
   m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
 
   init_per_core_stats(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES, m_simBase);
-
+  cout << "number of cores" << *m_simBase->m_knobs->KNOB_NUM_SIM_CORES << "\n";
 
   // register wrapper functions
   register_functions();

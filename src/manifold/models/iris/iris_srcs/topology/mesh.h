@@ -91,7 +91,7 @@ class Mesh : public Topology
             vector<uint> &split(const string &s, char delim, vector<uint> &elems);
             vector<uint> split(const std::string &s, char delim);
     
-    private:
+    public:
         uint ports;
         uint vcs;
         uint credits;

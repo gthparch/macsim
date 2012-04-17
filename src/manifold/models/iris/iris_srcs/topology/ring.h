@@ -74,6 +74,7 @@ class Ring : public Topology
         void set_router_outports( uint n);
 
         uint no_nodes;
+        vector<uint> mapping;
         
     protected:
             vector<uint> &split(const string &s, char delim, vector<uint> &elems);
@@ -85,7 +86,6 @@ class Ring : public Topology
         uint credits;
         uint buffer_size;
         uint links;
-        vector<uint> mapping;
 	
 	macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

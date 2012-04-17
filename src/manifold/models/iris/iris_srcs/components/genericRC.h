@@ -54,6 +54,7 @@ class GenericRC
         std::string name;
         uint vcs;
         uint route_x_y( uint addr );
+        void route_x_y_hetero(  HeadFlit* hf );
         void route_twonode( HeadFlit* hf );
         void route_torus( HeadFlit* hf );
         void route_ring( HeadFlit* hf );
