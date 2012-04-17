@@ -47,7 +47,9 @@ warn_flags = [
 ]
 warn_flags = ' '.join(warn_flags)
 
-use_vars = set([ 'AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
+
+## Environment
+use_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
 use_env = {}
 
 for key,val in os.environ.iteritems():
@@ -55,6 +57,7 @@ for key,val in os.environ.iteritems():
     use_env[key] = val
 
 env = Environment(ENV=use_env)
+
 
 ## Opt
 if flags['debug'] == '1':
@@ -66,15 +69,8 @@ elif flags['gprof'] == '1':
 else:
   env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s %s -DNO_DEBUG' % (warn_flags, header_dirs, compile_flags)
 
-env['LINKFLAGS'] = '--static -lpthread'
 env['CPPDEFINES'] = []
-
-
-
-#########################################################################################
-# libstdc++ library static linking
-#########################################################################################
-#static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
+env['LINKFLAGS'] = ['--static']
 
 
 #########################################################################################
@@ -181,8 +177,6 @@ DRAMSIM2_srcs = [
 
 
 if flags['dram'] == '1':
-  if not os.path.exists('src/DRAMSim2'):
-    os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
   env.Library('dramsim', DRAMSIM2_srcs, CPPDEFINES=['NO_STORAGE', 'DEBUG_BUILD', 'LOG_OUTPUT'])
 
 
@@ -247,6 +241,7 @@ libraries = ['z', 'iris', 'orion']
 
 if flags['power'] == '1':
   libraries.append('ei')
+  libraries.append('pthread')
   env['CPPDEFINES'].append('POWER_EI')
 
 if flags['dram'] == '1':

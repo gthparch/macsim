@@ -34,7 +34,7 @@ env['LINKFLAGS'] = '-lz'
 #########################################################################################
 # libstdc++ library static linking
 #########################################################################################
-static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
+#static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
 
 #########################################################################################
 # Script
@@ -56,7 +56,7 @@ reader_srcs = [
 env.Program(
     'trace_reader',
     reader_srcs,
-    LIBS=[static_libcpp],
+#    LIBS=[static_libcpp],
     LIBPATH=['.', '/usr/lib', '/usr/local/lib']
 )
 

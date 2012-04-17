@@ -1,19 +1,30 @@
-* How to patch
-  All patches are based on 'svn diff'
-  Please patch Macsim using this command
-  -> patch -p0 -i xxx.patch
+== How to build MacSim ==
+
+=== Requirement ===
+
+  SCons
+
+  * How to get SCons
+    Ubuntu --> apt-get install scons
 
 
-* How to build Macsim
-  To build Macsim, autotool (xxx or higher) is required.
+=== Build steps ===
 
-  aclocal
-  automake --add-missing
-  autoconf
-  ./configure
-  make
+  ./build.py
 
-  or aclocal && automake --add-missing && autoconf && ./configure && make
 
-  or ./autogen.sh
+=== Build options ===
+
+  -j (--thread) : specify number of threads for parallel build
+  -d : debug build
+  -p : gprof build
+  -c : clean
+  --dramsim : using DRAMSim2
+  --power : using EnergyIntrospector for power model
+
+
+=== Build outcome ===
+
+  bin/macsim
+
 
