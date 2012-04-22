@@ -8,6 +8,7 @@
 
 import os
 import sys
+import ConfigParser
 
 
 ## Check c++0x support
@@ -51,15 +52,26 @@ def pre_compile_check():
 pre_compile_check()
 
 
-## parse argument
+## Configuration
 flags = {}
-flags['debug'] = ARGUMENTS.get('debug', 0)
-flags['gprof'] = ARGUMENTS.get('gprof', 0)
-flags['dram']  = ARGUMENTS.get('dram', 0)
-flags['power'] = ARGUMENTS.get('power', 0)
-flags['iris']  = ARGUMENTS.get('iris', 0)
 
 
+## Configuration from file
+Config = ConfigParser.ConfigParser()
+Config.read('macsim.config')
+flags['dram']  = Config.get('Library', 'dram', '0')
+flags['power'] = Config.get('Library', 'power', '0')
+flags['iris']  = Config.get('Library', 'iris', '0')
+flags['debug'] = Config.get('Build', 'debug', '0')
+flags['gprof'] = Config.get('Build', 'gprof', '0')
+
+
+## Configuration from commandline
+flags['debug'] = ARGUMENTS.get('debug', flags['debug'])
+flags['gprof'] = ARGUMENTS.get('gprof', flags['gprof'])
+
+
+## Checkout DRAMSim2 copy
 if flags['dram'] == '1':
   if not os.path.exists('src/DRAMSim2'):
     os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
