@@ -288,7 +288,9 @@ class dram_controller_c
     int m_column_latency; /**< column access latency */
 
     // interconnection
+#ifdef IRIS
     ManifoldProcessor* m_terminal; /**< connects to Iris interface->router */
+#endif
     router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
 

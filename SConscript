@@ -18,31 +18,13 @@ Import('flags')
 # FLAGS
 #########################################################################################
 
-## include directories
-header_dirs = [
-  '-I src/manifold/kernel/include/kernel',
-  '-I src/manifold/kernel/include',
-  '-I src/manifold/models/iris/interfaces',
-  '-I src',
-  '-I src/orion'
-]
-header_dirs = ' '.join(header_dirs)
-
-
-# 
-compile_flags = [
-  '-DNO_MPI',
-  '-DLONG_COUNTERS'
-]
-compile_flags = ' '.join(compile_flags)
-
 
 ## compiler warning flags
 warn_flags = [
   '-Werror',
-  '-Wunused-function',
-  '-Wreturn-type',
-  '-Wpointer-arith',
+#  '-Wunused-function',
+#  '-Wreturn-type',
+#  '-Wpointer-arith',
   '-Wno-write-strings'
 ]
 warn_flags = ' '.join(warn_flags)
@@ -59,18 +41,22 @@ for key,val in os.environ.iteritems():
 env = Environment(ENV=use_env)
 
 
-## Opt
-if flags['debug'] == '1':
-  env['CPPFLAGS'] = '-g -std=c++0x %s %s %s' % (warn_flags, header_dirs, compile_flags)
-## Gprof
-elif flags['gprof'] == '1':
-  env['CPPFLAGS'] = '-pg -std=c++0x %s %s %s -DNO_DEBUG' % (warn_flags, header_dirs, compile_flags)
-## Debug
-else:
-  env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s %s -DNO_DEBUG' % (warn_flags, header_dirs, compile_flags)
+env['CPPPATH']    = ['#src']
+env['CPPDEFINES'] = ['NO_MPI', 'LONG_COUNTERS']
+env['LINKFLAGS']  = ['--static']
 
-env['CPPDEFINES'] = []
-env['LINKFLAGS'] = ['--static']
+
+## DEBUG build
+if flags['debug'] == '1':
+  env['CPPFLAGS'] = '-g -std=c++0x %s' % warn_flags
+## GPROF build
+elif flags['gprof'] == '1':
+  env['CPPFLAGS'] = '-pg -std=c++0x %s' % warn_flags
+  env['CPPDEFINES'].append('NO_DEBUG')
+## OPT build
+else:
+  env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s' % warn_flags
+  env['CPPDEFINES'].append('NO_DEBUG')
 
 
 #########################################################################################
@@ -103,10 +89,11 @@ IRIS_srcs = [
 ]
 
 
-if flags['power'] == '1':
-  env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI'])
-else:
-  env.Library('iris', IRIS_kernel_srcs + IRIS_srcs)
+if flags['iris'] == '1':
+  if flags['power'] == '1':
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI', 'IRIS'])
+  else:
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['IRIS'])
 
 
 #########################################################################################
@@ -132,7 +119,8 @@ ORION_srcs = [
 ]
 
 
-env.Library('orion', ORION_srcs, CPPFLAGS='')
+if flags['iris'] == '1':
+  env.Library('orion', ORION_srcs, CPPFLAGS='')
 
 
 #########################################################################################
@@ -236,7 +224,7 @@ if flags['power'] == '1':
 #########################################################################################
 # Libraries
 #########################################################################################
-libraries = ['z', 'iris', 'orion']
+libraries = ['z']
 
 
 if flags['power'] == '1':
@@ -247,7 +235,16 @@ if flags['power'] == '1':
 if flags['dram'] == '1':
   libraries.append('dramsim')
   env['CPPDEFINES'].append('DRAMSIM')
-  env['CPPFLAGS'] += ' -I src/DRAMSim2'
+  env['CPPPATH'] += ['#src/DRAMSim2']
+
+if flags['iris'] == '1':
+  libraries.append('iris')
+  libraries.append('orion')
+  env['CPPDEFINES'].append('IRIS')
+  env['CPPPATH'] += ['#src/manifold/kernel/include/kernel']
+  env['CPPPATH'] += ['#src/manifold/kernel/include']
+  env['CPPPATH'] += ['#src/manifold/models/iris/interfaces']
+  env['CPPPATH'] += ['#src/orion']
 
 
 env.Program(

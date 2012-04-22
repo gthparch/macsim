@@ -366,6 +366,7 @@ void macsim_c::init_cores(int num_max_core)
 }
 
 
+#ifdef IRIS
 // =======================================
 // initialize IRIS parameters (with config file, preferrably)
 // =======================================
@@ -433,6 +434,7 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
               params.insert(pair<string,string>("memory_latency",value));
 #endif
 }
+#endif
 
 
 // =======================================
@@ -441,83 +443,82 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
 // =======================================
 void macsim_c::init_network(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    init_iris_config(m_iris_params);
+#ifdef IRIS
+  init_iris_config(m_iris_params);
 
-    map<std::string, std::string>:: iterator it;
+  map<std::string, std::string>:: iterator it;
 
-    it = m_iris_params.find("topology");
-    if ((it->second).compare("ring") == 0) {
-      m_iris_network = new Ring(m_simBase);
-    } 
-    else if ((it->second).compare("mesh") == 0) {
-      m_iris_network = new Mesh(m_simBase);
-    } 
-    else if ((it->second).compare("torus") == 0) {
-      m_iris_network = new Torus(m_simBase);
-    } 
+  it = m_iris_params.find("topology");
+  if ((it->second).compare("ring") == 0) {
+    m_iris_network = new Ring(m_simBase);
+  } 
+  else if ((it->second).compare("mesh") == 0) {
+    m_iris_network = new Mesh(m_simBase);
+  } 
+  else if ((it->second).compare("torus") == 0) {
+    m_iris_network = new Torus(m_simBase);
+  } 
 
-    //initialize iris network
-    m_iris_network->parse_config(m_iris_params);
-    m_simBase->no_nodes = m_macsim_terminals.size();
-    report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
+  //initialize iris network
+  m_iris_network->parse_config(m_iris_params);
+  m_simBase->no_nodes = m_macsim_terminals.size();
+  report("number of macsim terminals: " << m_macsim_terminals.size() << "\n");
 
 #define MAPI i //((Mesh*)m_iris_network)->mapping[i]
 
-    for (int i=0; i<m_macsim_terminals.size(); i++) {
-      //create component id
-      manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
-      manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
+  for (int i=0; i<m_macsim_terminals.size(); i++) {
+    //create component id
+    manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
+    manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
 
-      //create component
-      NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
-      SimpleRouter* rr =manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
+    //create component
+    NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
+    SimpleRouter* rr =manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
 
-      //set node id
-      interface->node_id = i;
-      rr->node_id = i;
+    //set node id
+    interface->node_id = i;
+    rr->node_id = i;
 
-      //register clock
-      manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
-      manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
+    //register clock
+    manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
+    manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
 
-      //push back
-      m_iris_network->terminals.push_back(m_macsim_terminals[MAPI]);
-      m_iris_network->terminal_ids.push_back(m_macsim_terminals[MAPI]->GetComponentId());
-      m_iris_network->interfaces.push_back(interface);
-      m_iris_network->interface_ids.push_back(interface_id);
-      m_iris_network->routers.push_back(rr);
-      m_iris_network->router_ids.push_back(router_id);
-    
-      //init
-      m_macsim_terminals[MAPI]->parse_config(m_iris_params);
-      m_macsim_terminals[MAPI]->init();
-      interface->parse_config(m_iris_params);
-      interface->init();
-      rr->parse_config(m_iris_params);
-      rr->init();
-    }
+    //push back
+    m_iris_network->terminals.push_back(m_macsim_terminals[MAPI]);
+    m_iris_network->terminal_ids.push_back(m_macsim_terminals[MAPI]->GetComponentId());
+    m_iris_network->interfaces.push_back(interface);
+    m_iris_network->interface_ids.push_back(interface_id);
+    m_iris_network->routers.push_back(rr);
+    m_iris_network->router_ids.push_back(router_id);
 
-    //initialize router outports
-    for (int i = 0; i < m_macsim_terminals.size(); i++)
-      m_iris_network->set_router_outports(i);
-
-    m_iris_network->connect_interface_terminal();
-    m_iris_network->connect_interface_routers();
-    m_iris_network->connect_routers();
-
-#ifdef POWER_EI
-    //initialize power stats
-    avg_power     = 0;
-    total_energy  = 0;
-    total_packets = 0;
-#endif
+    //init
+    m_macsim_terminals[MAPI]->parse_config(m_iris_params);
+    m_macsim_terminals[MAPI]->init();
+    interface->parse_config(m_iris_params);
+    interface->init();
+    rr->parse_config(m_iris_params);
+    rr->init();
   }
 
+  //initialize router outports
+  for (int i = 0; i < m_macsim_terminals.size(); i++)
+    m_iris_network->set_router_outports(i);
 
+  m_iris_network->connect_interface_terminal();
+  m_iris_network->connect_interface_routers();
+  m_iris_network->connect_routers();
+
+#ifdef POWER_EI
+  //initialize power stats
+  avg_power     = 0;
+  total_energy  = 0;
+  total_packets = 0;
+#endif
+#else
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     m_router->init();
   }
+#endif
 }
 
 
@@ -646,53 +647,53 @@ void macsim_c::fini_sim(void)
   }
 #endif
 
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    ofstream irisTraceFile;
-    string logName = "iris_log_mesh_stall";
 
-    irisTraceFile.open(logName.c_str());
-    if (irisTraceFile.is_open())
+#ifdef IRIS
+  ofstream irisTraceFile;
+  string logName = "iris_log_mesh_stall";
+
+  irisTraceFile.open(logName.c_str());
+  if (irisTraceFile.is_open())
+  {
+    cout << "printing to file " << logName << endl;
+
+    //mapping info
+    irisTraceFile << ":Topology mapping:" << endl;
+
+    char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+    for(int i=0; i<m_macsim_terminals.size(); i++)
     {
-        cout << "printing to file " << logName << endl;
-        
-        //mapping info
-        irisTraceFile << ":Topology mapping:" << endl;
-        
-        char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
-        for(int i=0; i<m_macsim_terminals.size(); i++)
-        {
-            int node_id = ((Mesh*)m_iris_network)->mapping[i];
-            int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
-            
-            irisTraceFile << message_class_type[type] << "," 
-                << m_macsim_terminals[node_id]->ptx << "," << node_id << ",";
-        }
-        irisTraceFile << endl;
-        
-        //summary info
-        irisTraceFile << ":Per Node Summary: node id, total packets out, total flits in, total flits out, cycles: ib, sa, vca, st, average buffer size, average packet latency, average flit latency,  " << endl;
-        for(int i=0; i<m_iris_network->routers.size(); i++)
-        {
-            irisTraceFile << m_iris_network->routers[i]->print_csv_stats();
-        }
-        
-        //detailed, router/packet state vs time info
-        irisTraceFile << ":Detail info: clock cycle, req ID, mem state, msg type, current node, dst node, component (R=Router), input buffer port0.vc0, port0,vc1, port1,vc0, etc..." << endl;
-        irisTraceFile << m_simBase->network_trace.str();
+      int node_id = ((Mesh*)m_iris_network)->mapping[i];
+      int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
+
+      irisTraceFile << message_class_type[type] << "," 
+        << m_macsim_terminals[node_id]->ptx << "," << node_id << ",";
     }
-    irisTraceFile.close();
-   
-    for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
-      //        m_iris_network->routers[i]->print_stats();
-      m_iris_network->routers[ii]->power_stats();
+    irisTraceFile << endl;
+
+    //summary info
+    irisTraceFile << ":Per Node Summary: node id, total packets out, total flits in, total flits out, cycles: ib, sa, vca, st, average buffer size, average packet latency, average flit latency,  " << endl;
+    for(int i=0; i<m_iris_network->routers.size(); i++)
+    {
+      irisTraceFile << m_iris_network->routers[i]->print_csv_stats();
     }
-#ifdef POWER_EI
-    cout << "Average Network power: " << avg_power << "W\n"
-      << "Total Network Energy: " << total_energy << "J\n"
-      << "Total packets " << total_packets << "\n";
-#endif
+
+    //detailed, router/packet state vs time info
+    irisTraceFile << ":Detail info: clock cycle, req ID, mem state, msg type, current node, dst node, component (R=Router), input buffer port0.vc0, port0,vc1, port1,vc0, etc..." << endl;
+    irisTraceFile << m_simBase->network_trace.str();
   }
-  
+  irisTraceFile.close();
+
+  for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
+    //        m_iris_network->routers[i]->print_stats();
+    m_iris_network->routers[ii]->power_stats();
+  }
+#ifdef POWER_EI
+  cout << "Average Network power: " << avg_power << "W\n"
+    << "Total Network Energy: " << total_energy << "J\n"
+    << "Total packets " << total_packets << "\n";
+#endif
+#endif
 }
 
 
@@ -739,8 +740,9 @@ void macsim_c::initialize(int argc, char** argv)
   // initialize simulation
   init_sim();
 
-  if (*KNOB(KNOB_ENABLE_IRIS))
-    master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
+#ifdef IRIS
+  master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
+#endif
 
   // init memory
   init_memory();
@@ -752,18 +754,18 @@ void macsim_c::initialize(int argc, char** argv)
   init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
 
 
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    REPORT("Initializing sim IRIS\n");
-    manifold::kernel::Manifold::Init(0, NULL);
+#ifdef IRIS
+  REPORT("Initializing sim IRIS\n");
+  manifold::kernel::Manifold::Init(0, NULL);
 
-    // initialize interconnect network
-    init_network();
-  }
-
+  // initialize interconnect network
+  init_network();
+#else
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     report("Initializing new noc\n");
     init_network();
   }
+#endif
 
   // initialize clocks
   init_clock_domain();
@@ -865,17 +867,18 @@ int macsim_c::run_a_cycle()
 
   // interconnection
   if (m_clock_internal % m_clock_divisor[CLOCK_NOC] == 0) {
-    if (*KNOB(KNOB_ENABLE_IRIS)) {
-      manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
-      manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
-    }
-    else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#ifdef IRIS
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
+#else
+    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
       m_router->run_a_cycle();
     }
     else {
       // run interconnection network
       m_noc->run_a_cycle();
     }
+#endif
   }
 
   // run memory system

@@ -312,8 +312,12 @@ class dcu_c
     memory_c* m_memory; /**< pointer to the memory system */
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 
-    // interconnection
+#ifdef IRIS
+    // IRIS
     ManifoldProcessor* m_terminal; /**< terminal to the NoC router */
+#endif
+
+    // interconnection
     router_c* m_router; /**< router */
 
     // clock

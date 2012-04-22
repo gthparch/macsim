@@ -49,11 +49,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 #include "statistics.h"
 
+#ifdef IRIS
 #include "manifold/kernel/include/kernel/common-defs.h"
 #include "manifold/kernel/include/kernel/component-decl.h"
 #include "manifold/kernel/include/kernel/clock.h"
 #include "manifold/kernel/include/kernel/manifold.h"
 #include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
+#endif
 
 #ifdef DRAMSIM
 #include "DRAMSim.h"
@@ -624,27 +626,29 @@ void dram_controller_c::send_packet(void)
       req->m_msg_type = NOC_FILL;
       req->m_msg_src = m_noc_id;
 
-      if (*KNOB(KNOB_ENABLE_IRIS)) {
-        req->m_msg_src = m_terminal->node_id;
-        req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
-      }
-      else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#ifdef IRIS
+      req->m_msg_src = m_terminal->node_id;
+      req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
+#else
+      if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
         req->m_msg_src = m_router->get_id();
         req->m_msg_dst = m_simBase->m_memory->get_dst_router_id(MEM_L3, req->m_cache_id[MEM_L3]);
       }
+#endif
       assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
       bool insert_packet = false;
-      if (*KNOB(KNOB_ENABLE_IRIS)) {
-        insert_packet = m_terminal->send_packet(req);
-      }
-      else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#ifdef IRIS
+      insert_packet = m_terminal->send_packet(req);
+#else
+      if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
         insert_packet = m_router->inject_packet(req);
       }
       else {
         int dst_id = m_simBase->m_memory->get_dst_id(MEM_L3, req->m_cache_id[MEM_L3]);
         insert_packet = m_simBase->m_noc->insert(m_noc_id, dst_id, NOC_FILL, req);
       }
+#endif
 
       if (!insert_packet) {
         DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
@@ -653,10 +657,15 @@ void dram_controller_c::send_packet(void)
       }
 
       temp_list.push_back(req);
-      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) &&
-          (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))) {
+#ifdef IRIS
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) { 
         m_simBase->m_bug_detector->allocate_noc(req);
       }
+#else
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && *KNOB(KNOB_ENABLE_NEW_NOC)) {
+        m_simBase->m_bug_detector->allocate_noc(req);
+      }
+#endif
     }
   }
 
@@ -668,26 +677,28 @@ void dram_controller_c::send_packet(void)
 
 void dram_controller_c::receive_packet(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
+#ifndef IRIS
+  if (*KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
+#endif
 
   // check router queue every cycle
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    if (!m_terminal->receive_queue.empty()) {
-      mem_req_s* req = m_terminal->receive_queue.front();
+#ifdef IRIS
+  if (!m_terminal->receive_queue.empty()) {
+    mem_req_s* req = m_terminal->receive_queue.front();
 #ifndef DRAMSIM // MacSim module
-      if (insert_new_req(req)) {
+    if (insert_new_req(req)) {
 #else
-      if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
-        m_pending_request->push_back(req);
+    if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
+      m_pending_request->push_back(req);
 #endif
-        m_terminal->receive_queue.pop();
-        if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-          m_simBase->m_bug_detector->deallocate_noc(req);
-        }
+      m_terminal->receive_queue.pop();
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+        m_simBase->m_bug_detector->deallocate_noc(req);
       }
     }
   }
+#else // #ifndef IRIS
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     mem_req_s* req = m_router->receive_req();
     if (!req)
@@ -704,6 +715,7 @@ void dram_controller_c::receive_packet(void)
       }
     }
   }
+#endif // ifdef IRIS
 }
 
 
@@ -908,26 +920,28 @@ Counter dram_controller_c::acquire_data_bus(int channel_id, int req_size, bool g
 // create the network interface
 void dram_controller_c::create_network_interface(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
+#ifndef IRIS
+  if (*KNOB(KNOB_ENABLE_NEW_NOC) == false)
     return ;
+#endif
 
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    manifold::kernel::CompId_t processor_id = 
-      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
-    m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
-    manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
-        &ManifoldProcessor::tock);
+#ifdef IRIS
+  manifold::kernel::CompId_t processor_id = 
+    manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
+  m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
+  manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
+      &ManifoldProcessor::tock);
 
-    m_terminal->mclass = MC_RESP; //PROC_REQ;//
-    m_simBase->m_macsim_terminals.push_back(m_terminal);
+  m_terminal->mclass = MC_RESP; //PROC_REQ;//
+  m_simBase->m_macsim_terminals.push_back(m_terminal);
 
-    m_noc_id = static_cast<int>(processor_id);
-  }
-
+  m_noc_id = static_cast<int>(processor_id);
+#else
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     m_router = m_simBase->create_router(MC_ROUTER);
     m_noc_id = m_router->get_id(); 
   }
+#endif
 }
 
 void dram_controller_c::on_insert(mem_req_s* req, int bid, int rid, int cid)

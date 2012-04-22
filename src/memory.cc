@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <iostream>
+#include <cmath>
 
 #include "assert_macros.h"
 #include "cache.h"
@@ -57,11 +58,19 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 #include "statistics.h"
 
+#ifdef IRIS
 #include "manifold/kernel/include/kernel/common-defs.h"
 #include "manifold/kernel/include/kernel/component-decl.h"
 #include "manifold/kernel/include/kernel/clock.h"
 #include "manifold/kernel/include/kernel/manifold.h"
 #include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
+#else
+#define PROC_REQ 1
+#define L1_REQ 2
+#define L2_REQ 3
+#define L3_REQ 4
+#define MC_RESP 5
+#endif
 
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args)
@@ -892,11 +901,13 @@ void dcu_c::receive_packet(void)
 
   mem_req_s* req = NULL;
   
-  if (*KNOB(KNOB_ENABLE_IRIS)) 
-    req = m_terminal->check_queue();
-  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#ifdef IRIS
+  req = m_terminal->check_queue();
+#else
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     req = m_router->receive_req();
   }
+#endif
 
   if (req != NULL) {
     req->m_state = MEM_NOC_DONE;
@@ -935,41 +946,43 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 {
   req->m_msg_type = msg_type;
 
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    req->m_msg_src = m_terminal->node_id;
-    req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
-    //if node type is mc and destination is a proc, then mclass should be reply type
-    if (m_terminal->mclass == L3_REQ) {
-      if ( dir == 1)                      //to MC
-        req->m_noc_type = PROC_REQ;
-      else                                //to proc
-        req->m_noc_type = MC_RESP;
-    } 
-    else {
-      req->m_noc_type = m_terminal->mclass;
-    }
+#ifdef IRIS
+  req->m_msg_src = m_terminal->node_id;
+  req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
+  //if node type is mc and destination is a proc, then mclass should be reply type
+  if (m_terminal->mclass == L3_REQ) {
+    if ( dir == 1)                      //to MC
+      req->m_noc_type = PROC_REQ;
+    else                                //to proc
+      req->m_noc_type = MC_RESP;
+  } 
+  else {
+    req->m_noc_type = m_terminal->mclass;
   }
-  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#else
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     req->m_msg_src = m_router->get_id();
     req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
   }
   else {
     req->m_msg_src = m_noc_id;
   }
+#endif
   assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
   int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
 
   bool packet_insert = false;
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    packet_insert = m_terminal->send_packet(req);
-  }
-  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+#ifdef IRIS
+  packet_insert = m_terminal->send_packet(req);
+#else
+  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     packet_insert = m_router->inject_packet(req);
   }
   else {
     packet_insert = m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req);  
   }
+#endif
 
   if (packet_insert) {
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && 
@@ -1488,20 +1501,19 @@ bool dcu_c::done(mem_req_s* req)
 bool dcu_c::create_network_interface(int mclass)
 {
   if (m_has_router) {
-    if (*KNOB(KNOB_ENABLE_IRIS)) {
-      manifold::kernel::CompId_t processor_id = 
-        manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
-      m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
-      manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
-          &ManifoldProcessor::tock);
+#ifdef IRIS
+    manifold::kernel::CompId_t processor_id = 
+      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
+    m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
+    manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
+        &ManifoldProcessor::tock);
 
-      m_terminal->init();
-      m_terminal->mclass = (message_class)mclass; //PROC_REQ
-      m_simBase->m_macsim_terminals.push_back(m_terminal);
+    m_terminal->init();
+    m_terminal->mclass = (message_class)mclass; //PROC_REQ
+    m_simBase->m_macsim_terminals.push_back(m_terminal);
 
-      m_noc_id = static_cast<int>(processor_id);
-    }
-    
+    m_noc_id = static_cast<int>(processor_id);
+#else
     if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
       int type;
       if (mclass == L3_REQ) {
@@ -1521,7 +1533,7 @@ bool dcu_c::create_network_interface(int mclass)
       m_router = m_simBase->create_router(type);
       m_noc_id = m_router->get_id(); 
     }
-
+#endif
     return true;
   }
   else {

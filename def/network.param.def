@@ -47,7 +47,7 @@ param<IRIS_MEMORY_LATENCY,      iris_memory_latencY,            string, 1>
 param<ENABLE_NEW_NOC, enable_new_noc, bool, true>
 param<NUM_VC, num_vc, int, 4>
 param<NUM_PORT, num_port, int, 3>
-param<LINK_LATENCY, link_latency, int, 2>
+param<LINK_LATENCY, link_latency, int, 1>
 param<LINK_WIDTH, link_width, int, 16>
 
 param<ENABLE_HETEROGENEOUS_LINK, enable_heterogeneous_link, bool, false>

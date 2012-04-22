@@ -57,6 +57,7 @@ flags['debug'] = ARGUMENTS.get('debug', 0)
 flags['gprof'] = ARGUMENTS.get('gprof', 0)
 flags['dram']  = ARGUMENTS.get('dram', 0)
 flags['power'] = ARGUMENTS.get('power', 0)
+flags['iris']  = ARGUMENTS.get('iris', 0)
 
 
 if flags['dram'] == '1':

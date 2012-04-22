@@ -45,6 +45,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_defs.h"
 #include "global_types.h"
 
+
+#ifdef IRIS
 #include "manifold/kernel/include/kernel/clock.h"
 
 #ifndef DONT_INCLUDE_MANIFOLD // to prevent circular link dependencies
@@ -62,10 +64,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "manifold/models/iris/iris_srcs/components/simpleRouter.h"
 #endif
 
+class Topology;
+#endif
+
 
 #define CYCLE m_simBase->m_simulation_cycle
 
-class Topology;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief macsim top-level class
@@ -165,10 +169,12 @@ class macsim_c
      */
     router_c* create_router(int type);
 
+#ifdef IRIS
     /**
      * Initialize iris configuration
      */
 		void init_iris_config(map<string, string> &params);
+#endif
 
 	public:
 		int m_num_active_threads; /**< number of active threads */
@@ -251,6 +257,7 @@ class macsim_c
     router_wrapper_c* m_router; /**< NOC routers */
 		stringstream network_trace;
 
+#ifdef IRIS
     // IRIS
 		vector<ManifoldProcessor*> m_macsim_terminals; /**< manifold terminals */
 		manifold::kernel::Clock* master_clock; /**< manifold clock - has to be global or static */
@@ -260,6 +267,7 @@ class macsim_c
 		uint no_nodes; /**< number of network nodes */
 		int Mytid; /**< tid used by IRIS */
 		FILE* log_file; /**< log file used by IRIS */
+#endif
 
     // cache partitioning
     cache_partition_framework_c* m_PCL; /**< cache partitioning framework */
