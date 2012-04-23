@@ -32,17 +32,15 @@ warn_flags = ' '.join(warn_flags)
 
 ## Environment
 use_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
-use_env = {}
 
+env = Environment()
 for key,val in os.environ.iteritems():
   if key in use_vars:
-    use_env[key] = val
-
-env = Environment(ENV=use_env)
+    env[key] = val
 
 
 env['CPPPATH']    = ['#src']
-env['CPPDEFINES'] = ['NO_MPI', 'LONG_COUNTERS']
+env['CPPDEFINES'] = ['LONG_COUNTERS']
 env['LINKFLAGS']  = ['--static']
 
 
@@ -91,9 +89,9 @@ IRIS_srcs = [
 
 if flags['iris'] == '1':
   if flags['power'] == '1':
-    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI', 'IRIS'])
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI', 'IRIS', 'NO_MPI'])
   else:
-    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['IRIS'])
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['IRIS', 'NO_MPI'])
 
 
 #########################################################################################
