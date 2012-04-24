@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <unordered_map>
 #include <sstream>
+#include <sys/time.h>
 
 #include "global_defs.h"
 #include "global_types.h"

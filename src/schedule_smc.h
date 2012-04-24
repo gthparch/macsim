@@ -92,7 +92,7 @@ class schedule_smc_c : public schedule_c
      *  \param entry - ROB entry of the uop
      *  \return bool - True if no dependency found
      */
-    bool check_srcs(int thread_id, int entry);
+    bool check_srcs_smc(int thread_id, int entry);
 
     /*! \fn bool uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
      *  \brief Function to schedule uops 
@@ -101,7 +101,7 @@ class schedule_smc_c : public schedule_c
      *  \param sched_fail_reason - Reason of uop schedule failure
      *  \return bool - True on success in scheduling
      */
-    bool uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason);
+    bool uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason);
 
   private:
     static const int MAX_GPU_SCHED_SIZE = 128; /**< max sched table size */

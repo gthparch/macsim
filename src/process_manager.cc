@@ -528,7 +528,7 @@ void process_manager_c::setup_process(process_s* process)
     path += "_info.txt";
 
     // read trace information file
-    ifstream trace_lengths_file(path);
+    ifstream trace_lengths_file(path.c_str());
     if (!trace_lengths_file.good())
       ASSERTM(0, "could not open file: %s\n", path.c_str());
 

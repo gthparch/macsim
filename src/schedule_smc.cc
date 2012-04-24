@@ -186,7 +186,7 @@ void schedule_smc_c::advance(int q_index) {
 
 
 // check source registers are ready
-bool schedule_smc_c::check_srcs(int thread_id, int entry)
+bool schedule_smc_c::check_srcs_smc(int thread_id, int entry)
 {
   bool ready = true;
   uop_c *cur_uop = NULL;
@@ -253,7 +253,7 @@ bool schedule_smc_c::check_srcs(int thread_id, int entry)
 // schedule an uop from reorder buffer
 // called by schedule_io_c::run_a_cycle
 // call exec_c::exec function for uop execution
-bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
+bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
 {
   uop_c *cur_uop = NULL;
   rob_c *thread_m_rob = m_gpu_rob->get_thread_rob(thread_id);
@@ -285,7 +285,7 @@ bool schedule_smc_c::uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sch
 
   if (!bogus) {
     // source registers are not ready
-    if (!check_srcs(thread_id, entry)) {
+    if (!check_srcs_smc(thread_id, entry)) {
       *sched_fail_reason = SCHED_FAIL_OPERANDS_NOT_READY;
       DEBUG("core_id:%d thread_id:%d uop_num:%lld operands are not ready \n", 
             m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num); 
@@ -425,7 +425,7 @@ void schedule_smc_c::run_a_cycle(void)
 
     if (entry != -1) {
       // schedule a uop from a thread
-      if (uop_schedule(thread_id, entry, &sched_fail_reason)) {
+      if (uop_schedule_smc(thread_id, entry, &sched_fail_reason)) {
         STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS);
 
         m_schlist_entry[ii] = -1;

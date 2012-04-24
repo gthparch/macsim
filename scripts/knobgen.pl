@@ -191,6 +191,7 @@ sub processLine
 sub writeSource
 {
   print ALLKNOBS_C "#include \"all_knobs.h\"\n\n";
+  print ALLKNOBS_C "#include <string>\n\n";
   
   #constructor
   print ALLKNOBS_C "all_knobs_c::all_knobs_c() {\n";
