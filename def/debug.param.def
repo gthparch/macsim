@@ -45,7 +45,7 @@ param<DEBUG_BP_DIR,              debug_bp_dir,              uns,             0>
 param<DEBUG_BTB,                 debug_btb,                 uns,             0>
 param<DEBUG_MAP_STAGE,           debug_map_stage,           uns,             0> 
 param<DEBUG_PORT,                debug_port,                uns,             0> 
-param<DEBUG_CORE_ID,             debug_core_id,             uns,             0> 
+param<DEBUG_CORE_ID,             debug_core_id,             int,             0> 
 param<DEBUG_SIM_THREAD_SCHEDULE, debug_sim_thread_schedule, uns,             0>
 param<DEBUG_DRAM,                debug_dram,                uns,             0>
 param<DEBUG_PRINT_TRACE,         debug_print_trace,         uns,             0>

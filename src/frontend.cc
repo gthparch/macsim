@@ -644,7 +644,7 @@ inline void frontend_c::send_uop_to_qfe(uop_c *uop)
 // branch prediction
 int frontend_c::predict_bpu(uop_c *uop)
 {
-  uns8 pred_dir;
+  uns8 pred_dir = 0; // initialized to dummy value
   bool mispredicted = false;
   switch (uop->m_cf_type) {
     case CF_BR:

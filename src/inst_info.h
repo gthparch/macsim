@@ -90,9 +90,9 @@ typedef struct table_info_s {
   Mem_Type    m_mem_type; //!< type of memory instruction
   Cf_Type     m_cf_type; //!< type of control flow instruction
   Bar_Type    m_bar_type; //!< type of barrier caused by instruction
-  uns         m_num_dest_regs; //!< number of destination registers written
-  uns         m_num_src_regs; //!< number of source registers read
-  uns         m_mem_size; //!< number of bytes read/written by a memory instruction
+  int         m_num_dest_regs; //!< number of destination registers written
+  int         m_num_src_regs; //!< number of source registers read
+  int         m_mem_size; //!< number of bytes read/written by a memory instruction
 //  char        m_name[256]; //!< Mnemonic of the instruction
   uns8        m_type; //!< the format type code for the instruction (see table)
   uns32       m_mask; /**< mask */

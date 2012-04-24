@@ -361,7 +361,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
 
 
   // Setup file name of process trace
-  int dot_location = appl.find_last_of(".");
+  unsigned int dot_location = appl.find_last_of(".");
   if (dot_location == string::npos)
     ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", appl.c_str());
 
@@ -441,7 +441,7 @@ void process_manager_c::setup_process(process_s* process)
   // trace file name
   string trace_info_file_name = process->m_applications[process->m_current_vector_index++];
 
-  int dot_location = trace_info_file_name.find_last_of(".");
+  unsigned int dot_location = trace_info_file_name.find_last_of(".");
   if (dot_location == string::npos)
     ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", 
         trace_info_file_name.c_str());
@@ -594,7 +594,8 @@ void process_manager_c::setup_process(process_s* process)
   // TODO (jaekyu, 1-30-2009)
   // FIXME
   if (trace_type == "ptx" && *KNOB(KNOB_BLOCKS_TO_SIMULATE)) {
-    if ((*KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block) < thread_count) { 
+    if ((*KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block) < 
+        static_cast<unsigned int>(thread_count)) { 
       uns temp = thread_count;
       thread_count = *KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block;
 
@@ -973,7 +974,7 @@ void process_manager_c::sim_thread_schedule(void)
   thread_trace_info_node_s* trace_to_run;
 
   // assign the fetched thread to that core's active queue
-  for (int core_id = 0; core_id < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++core_id)  {
+  for (int core_id = 0; core_id < *KNOB(KNOB_NUM_SIM_CORES); ++core_id)  {
     core_c* core = m_simBase->m_core_pointers[core_id];
 
     if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 &&

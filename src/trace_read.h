@@ -107,10 +107,10 @@ typedef struct trace_uop_s {
   Mem_Type     m_mem_type;      /**< type of memory instruction */
   Cf_Type      m_cf_type;       /**< type of control flow instruction */ 
   Bar_Type     m_bar_type;      /**< type of barrier caused by instruction */
-  uns          m_num_dest_regs; /**< number of destination registers written */
-  uns          m_num_src_regs;  /**< number of source registers read */
-  uns          m_mem_size;      /**< number of bytes read/written by a memory instruction */
-  uns          m_inst_size;     /**< instruction size */
+  int          m_num_dest_regs; /**< number of destination registers written */
+  int          m_num_src_regs;  /**< number of source registers read */
+  int          m_mem_size;      /**< number of bytes read/written by a memory instruction */
+  int          m_inst_size;     /**< instruction size */
   Addr         m_addr;          /**< pc address */ 
   reg_info_s   m_srcs[MAX_SRCS]; /**< source register information */
   reg_info_s   m_dests[MAX_DESTS]; /**< destination register information */

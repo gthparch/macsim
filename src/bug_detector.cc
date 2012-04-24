@@ -147,7 +147,7 @@ void bug_detector_c::print(int core_id, int thread_id)
 
   ofstream out("bug_detect_uop.out");
   for (int ii = 0; ii < m_num_core; ++ii) {
-    int average_latency = 0;
+    unsigned int average_latency = 0;
     if (m_latency_count[ii] > 0)
       average_latency = m_latency_sum[ii] / m_latency_count[ii];
 

@@ -182,7 +182,7 @@ class macsim_c
 		int m_total_num_application; /**< total number of applications */
 		int m_process_count; /**< number of processes */
 		int m_process_count_without_repeat; /**< number of processes without repeat */
-		int m_all_threads; /**< number of all threads */
+		unsigned int m_all_threads; /**< number of all threads */
 		int m_no_threads_per_block; /**< number of threads per block */
 		int m_total_retired_block; /**< number of retired blocks total */
 		int m_num_running_core; /**< set to any non0 number before simulation start */

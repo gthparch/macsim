@@ -444,7 +444,7 @@ void ProcessorStatistics::setNumCores(unsigned int numCores)
   m_allCoresStats.clear();
 
   // generate enough core power model objects
-  for (int coreId = 0; coreId < numCores; ++coreId) {
+  for (unsigned int coreId = 0; coreId < numCores; ++coreId) {
     CoreStatistics* pCoreModel = m_simBase->m_coreStatsTemplate->clone(coreId, m_simBase);
     m_allCoresStats.push_back(pCoreModel);
   }

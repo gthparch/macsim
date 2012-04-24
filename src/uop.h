@@ -231,7 +231,7 @@ class  uop_info_c
     uns32 m_pred_global_hist;   /**< global branch history 32-bit */
     uns64 m_pred_global_hist_64; /**< global branch history 64-bit */
     int32 m_perceptron_output;  /**< perceptron bp output */
-    uns   m_btb_set;            /**< btb set address */
+    int   m_btb_set;            /**< btb set address */
 };
 
 
@@ -320,8 +320,8 @@ class uop_c
     Counter           m_exec_cycle; /**< execution cycle */
     Counter           m_done_cycle; /**< done cycle */
 
-    uns               m_num_srcs; /**< number of src registers */
-    uns               m_num_dests; /**< number of dest registers */
+    int               m_num_srcs; /**< number of src registers */
+    int               m_num_dests; /**< number of dest registers */
     Addr              m_vaddr; /**< memory address */
     int               m_mem_size; /**< memory access size */
     uns8              m_dir; /**< branch direction */
@@ -349,7 +349,7 @@ class uop_c
     bool              m_isitEOM; /**< last uop of an instruction */
     bool              m_last_uop; /**< last uop of a thread */
     recovery_info_c   m_recovery_info; /**< recovery information */
-    uns               m_srcs_not_rdy_vector; /**< src not ready bit vector */
+    int               m_srcs_not_rdy_vector; /**< src not ready bit vector */
     int               m_num_child_uops; /**< number of children uops */
     int               m_num_child_uops_done; /**< number of done children uops */
     uop_c           **m_child_uops; /**< children uops */

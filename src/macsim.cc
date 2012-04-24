@@ -339,7 +339,7 @@ void macsim_c::init_cores(int num_max_core)
 
 	// medium cores
 	int total_core = num_large_cores;
-	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES; ++ii) { 
+	for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_MEDIUM_CORES); ++ii) { 
 		m_core_pointers[ii + num_large_cores] = new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
 		m_core_pointers[ii + num_large_cores]->pref_init();
 
@@ -352,7 +352,7 @@ void macsim_c::init_cores(int num_max_core)
 
 	// small cores
 	total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
-	for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES; ++ii) { 
+	for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) { 
 		m_core_pointers[ii + num_large_medium_cores] = 
 			new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
 		m_core_pointers[ii + num_large_medium_cores]->pref_init();
@@ -466,7 +466,7 @@ void macsim_c::init_network(void)
 
 #define MAPI i //((Mesh*)m_iris_network)->mapping[i]
 
-  for (int i=0; i<m_macsim_terminals.size(); i++) {
+  for (unsigned int i=0; i<m_macsim_terminals.size(); i++) {
     //create component id
     manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0,m_simBase);
     manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0,m_simBase);
@@ -501,7 +501,7 @@ void macsim_c::init_network(void)
   }
 
   //initialize router outports
-  for (int i = 0; i < m_macsim_terminals.size(); i++)
+  for (unsigned int i = 0; i < m_macsim_terminals.size(); i++)
     m_iris_network->set_router_outports(i);
 
   m_iris_network->connect_interface_terminal();
@@ -660,8 +660,8 @@ void macsim_c::fini_sim(void)
     //mapping info
     irisTraceFile << ":Topology mapping:" << endl;
 
-    char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
-    for(int i=0; i<m_macsim_terminals.size(); i++)
+    const char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+    for(unsigned int i=0; i<m_macsim_terminals.size(); i++)
     {
       int node_id = ((Mesh*)m_iris_network)->mapping[i];
       int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
@@ -673,7 +673,7 @@ void macsim_c::fini_sim(void)
 
     //summary info
     irisTraceFile << ":Per Node Summary: node id, total packets out, total flits in, total flits out, cycles: ib, sa, vca, st, average buffer size, average packet latency, average flit latency,  " << endl;
-    for(int i=0; i<m_iris_network->routers.size(); i++)
+    for(unsigned int i=0; i<m_iris_network->routers.size(); i++)
     {
       irisTraceFile << m_iris_network->routers[i]->print_csv_stats();
     }
@@ -684,7 +684,7 @@ void macsim_c::fini_sim(void)
   }
   irisTraceFile.close();
 
-  for (int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
+  for (unsigned int ii = 0; ii < m_iris_network->routers.size(); ++ii) {
     //        m_iris_network->routers[i]->print_stats();
     m_iris_network->routers[ii]->power_stats();
   }
@@ -751,7 +751,7 @@ void macsim_c::initialize(int argc, char** argv)
   init_output_streams();
 
   // initialize cores
-  init_cores(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES);
+  init_cores(*KNOB(KNOB_NUM_SIM_CORES));
 
 
 #ifdef IRIS
@@ -895,7 +895,7 @@ int macsim_c::run_a_cycle()
 
 
   // core execution loop
-  for (int kk = 0; kk < *m_simBase->m_knobs->KNOB_NUM_SIM_CORES; ++kk) {
+  for (int kk = 0; kk < *KNOB(KNOB_NUM_SIM_CORES); ++kk) {
     // use pivot to randomize core run_cycle pattern 
     int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
 

@@ -80,7 +80,7 @@ typedef struct stride_index_table_entry_struct {
   int     pref_count; /**< prefetch count */
   uns     pref_curr_state; /**< prefetch current state */
   Addr    pref_last_index; /**< prefetch last index */
-  Counter pref_sent; /**< number of prefetch sent */
+  int64_t pref_sent; /**< number of prefetch sent */
 
   /**
    * Constructor

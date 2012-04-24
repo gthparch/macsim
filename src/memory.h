@@ -138,7 +138,7 @@ class queue_c
     list<mem_req_s*> m_entry; /**< queue entries */
 
   private:
-    int m_size; /**< queue size */
+    unsigned int m_size; /**< queue size */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
 };

@@ -70,7 +70,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ## args)
-#define DEBUG_CORE(m_core_id, args...) if(m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) \
+#define DEBUG_CORE(m_core_id, args...) if (m_core_id == *KNOB(KNOB_DEBUG_CORE_ID)) \
 					 { _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ## args); }
 
 #define CLEAR_BIT(val, pos)   (val & ~(0x1ULL << pos))

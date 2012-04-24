@@ -257,7 +257,7 @@ typedef struct process_s {
   vector<int>          m_kernel_block_start_count; /**< block id start count for sub-appl. */
   string               m_current_file_name_base; /**< current sub-appl.'s filename base */
   string               m_kernel_config_name; /**< kernel config file name */
-  int                  m_current_vector_index; /**< current index to the sub-application */
+  unsigned int         m_current_vector_index; /**< current index to the sub-application */
   map<int, bool>       m_block_list; /**< list of block currently running */
   uns64                m_inst_count_tot; /**< total instruction counts */
   int                  m_block_count; /**< total block counts */

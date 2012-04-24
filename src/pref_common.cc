@@ -170,7 +170,7 @@ void hwp_common_c::pref_init(bool ptx)
   }
 
   // initialize each hardware prefetcher 
-  for (int ii = 0; ii < pref_table.size(); ++ii) {
+  for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     pref_table[ii]->init_func(core_id);
   }
 
@@ -238,7 +238,7 @@ void hwp_common_c::pref_done(void)
   if (*m_simBase->m_knobs->KNOB_PREF_ANALYZE_LOAD) {
   }
 
-  for (int ii = 0; ii < pref_table.size(); ++ii) {
+  for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     if (pref_table[ii]->hwp_info->enabled && *m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) {
       fprintf(PREF_ACC_OUT, "Pref: %s\n", pref_table[ii]->name.c_str());
       fprintf(PREF_ACC_OUT, "Buckets       : ");
@@ -269,7 +269,7 @@ void hwp_common_c::pref_l1_miss(int tid, Addr line_addr, Addr load_PC, uop_c *uo
     return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_DL0_MISS_ON) {
-    for (int ii = 0; ii < pref_table.size(); ++ii) {
+    for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
       if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l1_miss) {
         if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
           if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
@@ -294,7 +294,7 @@ void hwp_common_c::pref_l1_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop
     return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_DL0_HIT_ON) {
-    for (int ii = 0; ii < pref_table.size(); ++ii) {
+    for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
       if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l1_hit) {
         if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
           if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
@@ -325,7 +325,7 @@ void hwp_common_c::pref_l1_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 
   m_overall_l1useful++;
     
   if (*m_simBase->m_knobs->KNOB_PREF_DL0_HIT_ON) {
-    for (int ii = 0; ii < pref_table.size(); ++ii) {
+    for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
       if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l1_pref_hit) {
         pref_table[ii]->l1_pref_hit_func(tid, line_addr, load_PC, uop);
       }
@@ -363,7 +363,7 @@ void hwp_common_c::pref_l2_miss(int tid, Addr line_addr, uop_c* uop)
     *pref_polbv_access(line_index) = 0;
   }
 
-  for (int ii = 0; ii < pref_table.size(); ++ii) {
+  for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l2_miss) { 
       if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
         if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
@@ -396,7 +396,7 @@ void hwp_common_c::pref_l2_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop
   if (*m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) 
     pref_acc_useupdate(line_addr);
 
-  for (int ii = 0; ii < pref_table.size(); ++ii) { 
+  for (unsigned int ii = 0; ii < pref_table.size(); ++ii) { 
     if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l2_hit) { 
       if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
         if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
@@ -450,7 +450,7 @@ void hwp_common_c::pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 
     pref_table[prefetcher_id]->hwp_info->curr_useful++;
   }
 
-  for (int ii = 0; ii < pref_table.size(); ++ii) {
+  for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l2_pref_hit) {
       pref_table[ii]->l2_pref_hit_func(tid, line_addr, load_PC, uop);
     }    
@@ -782,7 +782,7 @@ void hwp_common_c::pref_update_queues(void)
         // Port is not available.
         continue;
       }
-      DEBUG_MEM("prefetch L1[%d] port acquired\n", m_l1req_queue[q_index].core_id, bank);
+      DEBUG_MEM("prefetch L1[%d] port bank:%d acquired\n", m_l1req_queue[q_index].core_id, bank);
 
       // Now, access the cache
       // FIXME (jaekyu, 4-26-2011) use right application id
@@ -1414,7 +1414,7 @@ void  hwp_common_c::pref_hybrid_makeselection(int reg_idx)
 
     m_last_update_time = m_simBase->m_simulation_cycle;
     // Default is picked based on best accuracy 
-    for (int ii = 0; ii < pref_table.size() ; ++ii) {	
+    for (unsigned int ii = 0; ii < pref_table.size() ; ++ii) {	
       pref_info_s *hwp_info = pref_table[ii]->hwp_info;
       if (hwp_info->enabled) {
         float acc;
@@ -1447,7 +1447,7 @@ void  hwp_common_c::pref_hybrid_makeselection(int reg_idx)
   best_pref_id = -1;
   mem_accesses = 0;
 
-  for (int jj = 0; jj < pref_table.size(); ++jj) {
+  for (unsigned int jj = 0; jj < pref_table.size(); ++jj) {
     pref_sent[jj] = 0;
     pref_useful[jj] = 0;
   }
@@ -1466,7 +1466,7 @@ void  hwp_common_c::pref_hybrid_makeselection(int reg_idx)
     }
 
 
-    for (int jj = 0; jj < pref_table.size(); ++jj) {
+    for (unsigned int jj = 0; jj < pref_table.size(); ++jj) {
 #if NEED_TO_DEBUG
       if (g_pref_table[jj].hwp_info->enabled && 
           TESTBIT(region_info[reg_idx].status[ii].pref_sent, jj)) {
@@ -1479,7 +1479,7 @@ void  hwp_common_c::pref_hybrid_makeselection(int reg_idx)
   }
 
 
-  for (int jj = 0 ; jj < pref_table.size(); ++jj) {
+  for (unsigned int jj = 0 ; jj < pref_table.size(); ++jj) {
     pref_acc[jj] = 0.0;
     pref_cov[jj] = 0.0;
 
@@ -1517,7 +1517,7 @@ void  hwp_common_c::pref_hybrid_makeselection(int reg_idx)
 void hwp_common_c::pref_acc_useupdate(Addr line_addr)
 {
   Addr line_index = (line_addr>>m_shift_bit);
-  for (int jj = 0 ; jj < pref_table.size(); ++jj) {
+  for (unsigned int jj = 0 ; jj < pref_table.size(); ++jj) {
     pref_info_s *hwp_info = pref_table[jj]->hwp_info;
     if (hwp_info->enabled) {
       for (int ii = 0; ii < hwp_info->track_num; ++ii) {

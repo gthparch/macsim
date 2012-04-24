@@ -100,14 +100,14 @@ param<CPU_FETCH_RATIO,                      cpu_fetch_ratio,                    
 
 param<PTX_EXEC_RATIO,                   ptx_exec_ratio,                     int,         4>
 
-param<NUM_SIM_CORES, 				num_sim_cores, 					uns32, 	80>
+param<NUM_SIM_CORES, 				num_sim_cores, 					int, 	80>
 param<CORE_TYPE, core_type, string, x86>
 param<MEDIUM_CORE_TYPE, medium_core_type, string, x86>
 param<LARGE_CORE_TYPE, large_core_type, string, x86>
 
-param<NUM_SIM_SMALL_CORES,  num_sim_small_cores, 	  uns32, 	KNOB_NUM_SIM_CORES>
-param<NUM_SIM_LARGE_CORES, 	num_sim_large_cores, 		uns32, 	0>
-param<NUM_SIM_MEDIUM_CORES, num_sim_medium_cores, 	uns32, 	0>
+param<NUM_SIM_SMALL_CORES,  num_sim_small_cores, 	  int, 	KNOB_NUM_SIM_CORES>
+param<NUM_SIM_LARGE_CORES, 	num_sim_large_cores, 		int, 	0>
+param<NUM_SIM_MEDIUM_CORES, num_sim_medium_cores, 	int, 	0>
 
 param<MAX_THREADS_PER_CORE,     	  max_threads_per_core,   		int,    3>
 param<MAX_THREADS_PER_MEDIUM_CORE,  max_threads_per_medium_core,   	int,    KNOB_MAX_THREADS_PER_CORE>

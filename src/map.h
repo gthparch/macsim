@@ -123,7 +123,7 @@ class map_c
     /**
      * Set source N not ready
      */
-    void set_not_rdy_bit (uop_c *uop, uns bit); 
+    void set_not_rdy_bit (uop_c *uop, int bit); 
 
     /**
      * Set dependent-source information. An uop will check each source's dependence.
@@ -132,7 +132,7 @@ class map_c
      * @param map_entry map entry corresponding to the register #
      * @param type register dependence (always)
      */
-    void add_src_from_map_entry(uop_c *uop, uns src_num, map_entry_c *map_entry, 
+    void add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_entry, 
         Dep_Type type); 
 
     /**

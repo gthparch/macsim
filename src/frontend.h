@@ -435,7 +435,7 @@ class frontend_c
     Counter       m_cur_core_cycle; /**< current core cycle */
     int           m_fetch_modulo; /**< fetch modulo */
     list<int32_t> m_sync_done; /**< synchronization information */
-    uns           m_fetch_arbiter; /**< fetch arbiter */
+    int           m_fetch_arbiter; /**< fetch arbiter */
     uns16         m_knob_width; /**< width */
     uns16         m_knob_fetch_width; /**< fetch width */
     uns           m_knob_icache_line_size; /**< icache line size */

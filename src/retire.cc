@@ -132,7 +132,7 @@ void retire_c::run_a_cycle()
   core_c *core = m_simBase->m_core_pointers[m_core_id];
     
   vector<uop_c*>* uop_list = NULL;
-  int uop_list_index = 0;
+  unsigned int uop_list_index = 0;
   if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
     // GPU : many retireable uops from multiple threads. Get entire retireable uops
     uop_list = m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);

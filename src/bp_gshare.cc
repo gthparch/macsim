@@ -48,7 +48,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_BP_DIR, ## args) 
 
-#define PHT_INIT_VALUE (0x1 << *m_simBase->m_knobs->KNOB_PHT_CTR_BITS - 1) /* weakly taken */
+#define PHT_INIT_VALUE ((0x1 << *KNOB(KNOB_PHT_CTR_BITS)) - 1) /* weakly taken */
 #define COOK_HIST_BITS(hist,len,untouched) \
   ((uns32)(hist) >> (32 - (len) + (untouched)) << (untouched))
 #define COOK_ADDR_BITS(addr,len,shift) (((uns32)(addr) >> (shift)) & (N_BIT_MASK((len))))
@@ -62,8 +62,8 @@ POSSIBILITY OF SUCH DAMAGE.
 // bp_gshare_c constructor
 bp_gshare_c::bp_gshare_c(macsim_c* simBase) : bp_dir_base_c(simBase)
 {
-  m_pht = (uns8 *)malloc(sizeof(uns8) * (0x1 << *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH));
-  for (int ii = 0; ii < 0x1 << *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH; ++ii) {
+  m_pht = (uns8 *)malloc(sizeof(uns8) * (0x1 << *KNOB(KNOB_BP_HIST_LENGTH)));
+  for (int ii = 0; ii < (0x1 << *KNOB(KNOB_BP_HIST_LENGTH)); ++ii) {
     m_pht[ii] = PHT_INIT_VALUE;
   }
 }
@@ -78,7 +78,7 @@ uns8 bp_gshare_c::pred (uop_c *uop)
   uns32 cooked_addr = COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
   uns32 pht_index   = cooked_hist ^ cooked_addr;
   uns8  pht_entry   = m_pht[pht_index];
-  uns8  pred        = pht_entry >> *m_simBase->m_knobs->KNOB_PHT_CTR_BITS - 1 & 0x1;
+  uns8  pred        = ((pht_entry >> *KNOB(KNOB_PHT_CTR_BITS)) - 1) & 0x1;
   
 
   uop->m_uop_info.m_pred_global_hist = m_global_hist;

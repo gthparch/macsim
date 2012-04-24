@@ -1070,7 +1070,7 @@ class ProcessorStatistics
      * Get a core stat.
      * @param coreID core id
      */
-    inline CoreStatistics& core(int coreID) const
+    inline CoreStatistics& core(unsigned int coreID) const
     {
       // if invalid coreID, default to the last one
       if(coreID >= m_allCoresStats.size())

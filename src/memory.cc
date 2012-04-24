@@ -806,7 +806,7 @@ void dcu_c::process_in_queue()
         ASSERTM(m_level == MEM_L3, "Level:%d\n", m_level);
         DEBUG("L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access hit\n", 
             m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, 
-            mem_req_c::mem_req_type_name[req->m_type], m_level-1);
+            mem_req_c::mem_req_type_name[req->m_type]);
         if (!m_prev[req->m_cache_id[m_level-1]]->fill(req))
           continue;
       }
@@ -819,7 +819,7 @@ void dcu_c::process_in_queue()
         if (!m_out_queue->push(req))
           continue;
         DEBUG("L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n", 
-            m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_level-1);
+            m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUT_FILL;
         req->m_rdy_cycle = m_cycle + 1;
       }
@@ -970,12 +970,12 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 #endif
   assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
 
-  int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
 
   bool packet_insert = false;
 #ifdef IRIS
   packet_insert = m_terminal->send_packet(req);
 #else
+  int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     packet_insert = m_router->inject_packet(req);
   }

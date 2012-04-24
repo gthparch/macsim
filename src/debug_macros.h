@@ -76,11 +76,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define DEBUG_RANGE_COND                                                \
-  ((*KNOB(KNOB_DEBUG_INST_START) && m_simBase->m_core0_inst_count >= *KNOB(KNOB_DEBUG_INST_START)) && \
-   (!*KNOB(KNOB_DEBUG_INST_STOP)  || m_simBase->m_core0_inst_count <= *KNOB(KNOB_DEBUG_INST_STOP)) \
+  (((*KNOB(KNOB_DEBUG_INST_START) && m_simBase->m_core0_inst_count >= *KNOB(KNOB_DEBUG_INST_START)) && \
+   (!*KNOB(KNOB_DEBUG_INST_STOP)  || m_simBase->m_core0_inst_count <= *KNOB(KNOB_DEBUG_INST_STOP))) \
    ||                                                                   \
-   (*KNOB(KNOB_DEBUG_CYCLE_START) && m_simBase->m_simulation_cycle >= *KNOB(KNOB_DEBUG_CYCLE_START)) && \
-   (!*KNOB(KNOB_DEBUG_CYCLE_STOP) || m_simBase->m_simulation_cycle <= *KNOB(KNOB_DEBUG_CYCLE_STOP))) 
+   ((*KNOB(KNOB_DEBUG_CYCLE_START) && m_simBase->m_simulation_cycle >= *KNOB(KNOB_DEBUG_CYCLE_START)) && \
+   (!*KNOB(KNOB_DEBUG_CYCLE_STOP) || m_simBase->m_simulation_cycle <= *KNOB(KNOB_DEBUG_CYCLE_STOP)))) 
  
 
 #ifdef NO_DEBUG

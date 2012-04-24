@@ -123,7 +123,7 @@ map_c::~map_c()
 
 
 // set source N not ready 
-void map_c::set_not_rdy_bit (uop_c *uop, uns bit)
+void map_c::set_not_rdy_bit (uop_c *uop, int bit)
 {
   ASSERT(uop);
   ASSERT(bit < uop->m_num_srcs);
@@ -133,7 +133,7 @@ void map_c::set_not_rdy_bit (uop_c *uop, uns bit)
 
 
 // set dependent-source information
-void map_c::add_src_from_map_entry(uop_c *uop, uns src_num, map_entry_c *map_entry, 
+void map_c::add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_entry, 
     Dep_Type type)
 {
   src_info_c *info = &(uop->m_map_src_info[src_num]); 
@@ -430,7 +430,7 @@ uop_c* map_c::add_store_deps(uop_c * uop)
   // Find byte on whom I am dependent
   else {  
     int ii;
-    int first_byte_op_num = 0;
+    unsigned int first_byte_op_num = 0;
     for (first_byte = -1, ii = 0; ii < BYTES_IN_QUADWORD; ++ii) {
       uop_c * src_uop = mem_map_p->m_uop[ii];
 

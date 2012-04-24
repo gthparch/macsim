@@ -140,6 +140,8 @@ void schedule_smc_c::advance(int q_index) {
       case UOP_FCMOV:
         STAT_CORE_EVENT(m_core_id, POWER_FP_RENAME_R);
         break;
+      default:
+        break;
     } 
 
     ALLOCQ_Type allocq = (*m_rob)[allocq_entry.m_rob_entry]->m_allocq_num;

@@ -14,7 +14,8 @@ AM_CPPFLAGS = \
   -I$(srcdir)/src/manifold/kernel/include/kernel \
 	-I$(srcdir)/src/orion \
   -std=c++0x \
-	-DUSING_SST
+	-DUSING_SST 
+
 
 SUBDIRS = scripts
 
@@ -79,62 +80,7 @@ src/allocate_interface.h                                               \
 src/exec_interface.h                                                   \
 src/frontend_interface.h                                               \
 src/retire_interface.h                                                 \
-src/schedule_interface.h                                               \
-                                                                       \
-src/manifold/kernel/src/clock.cc                                       \
-src/manifold/kernel/src/component.cc                                   \
-src/manifold/kernel/src/link.cc                                        \
-src/manifold/kernel/src/manifold.cc                                    \
-src/manifold/kernel/src/messenger.cc                                   \
-                                                                       \
-src/manifold/kernel/src/kernel/include/kernel/clock.h                  \
-src/manifold/kernel/src/kernel/include/kernel/common-defs.h            \
-src/manifold/kernel/src/kernel/include/kernel/component-decl.h         \
-src/manifold/kernel/src/kernel/include/kernel/component.h              \
-src/manifold/kernel/src/kernel/include/kernel/link-decl.h              \
-src/manifold/kernel/src/kernel/include/kernel/link.h                   \
-src/manifold/kernel/src/kernel/include/kernel/manifold-decl.h          \
-src/manifold/kernel/src/kernel/include/kernel/manifold.h               \
-src/manifold/kernel/src/kernel/include/kernel/message.h                \
-src/manifold/kernel/src/kernel/include/kernel/messenger.h              \
-                                                                       \
-src/manifold/models/iris/interfaces/genericHeader.h                    \
-src/manifold/models/iris/interfaces/irisInterface.h                    \
-src/manifold/models/iris/interfaces/irisRouter.h                       \
-src/manifold/models/iris/interfaces/irisTerminal.h                     \
-src/manifold/models/iris/interfaces/MersenneTwister.h                  \
-src/manifold/models/iris/interfaces/topology.h                         \
-                                                                       \
-src/manifold/models/iris/iris_srcs/components/genericBuffer.cc         \
-src/manifold/models/iris/iris_srcs/components/genericBuffer.h          \
-src/manifold/models/iris/iris_srcs/components/genericRC.cc             \
-src/manifold/models/iris/iris_srcs/components/genericRC.h              \
-src/manifold/models/iris/iris_srcs/components/genericSwitchArbiter.cc  \
-src/manifold/models/iris/iris_srcs/components/genericSwitchArbiter.h   \
-src/manifold/models/iris/iris_srcs/components/genericVcAllocator.cc    \
-src/manifold/models/iris/iris_srcs/components/genericVcAllocator.h     \
-src/manifold/models/iris/iris_srcs/components/manifoldProcessor.cc     \
-src/manifold/models/iris/iris_srcs/components/manifoldProcessor.h      \
-src/manifold/models/iris/iris_srcs/components/ninterface.cc            \
-src/manifold/models/iris/iris_srcs/components/ninterface.h             \
-src/manifold/models/iris/iris_srcs/components/simpleRouter.cc          \
-src/manifold/models/iris/iris_srcs/components/simpleRouter.h           \
-                                                                       \
-src/manifold/models/iris/iris_srcs/data_types/flit.cc                  \
-src/manifold/models/iris/iris_srcs/data_types/flit.h                   \
-src/manifold/models/iris/iris_srcs/data_types/linkData.cc              \
-src/manifold/models/iris/iris_srcs/data_types/linkData.h               \
-src/manifold/models/iris/iris_srcs/data_types/networkPacket.cc         \
-src/manifold/models/iris/iris_srcs/data_types/networkPacket.h          \
-                                                                       \
-src/manifold/models/iris/iris_srcs/topology/ring.cc                    \
-src/manifold/models/iris/iris_srcs/topology/ring.h                     \
-src/manifold/models/iris/iris_srcs/topology/twoNode.cc                 \
-src/manifold/models/iris/iris_srcs/topology/twoNode.h                  \
-src/manifold/models/iris/iris_srcs/topology/util.cc                    \
-                                                                       \
-src/orion/SIM_router.c                                                 \
-src/orion/SIM_router.h                                                 
+src/schedule_interface.h                                               
 
 
 EXTRA_DIST = 
