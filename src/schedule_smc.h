@@ -86,7 +86,7 @@ class schedule_smc_c : public schedule_c
      */
     void advance(int ALLOCQ_index);
 
-    /*! \fn bool check_srcs(int thread_id, int entry)
+    /*! \fn bool check_srcs_smc(int thread_id, int entry)
      *  \brief Function to check if the sources of an uop are ready
      *  \param thread_id - Thread id
      *  \param entry - ROB entry of the uop
@@ -94,7 +94,7 @@ class schedule_smc_c : public schedule_c
      */
     bool check_srcs_smc(int thread_id, int entry);
 
-    /*! \fn bool uop_schedule(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
+    /*! \fn bool uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason)
      *  \brief Function to schedule uops 
      *  \param thread_id - Thread id
      *  \param entry - ROB entry of the uop

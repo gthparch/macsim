@@ -50,6 +50,9 @@ param<NUM_PORT, num_port, int, 3>
 param<LINK_LATENCY, link_latency, int, 1>
 param<LINK_WIDTH, link_width, int, 16>
 
+param<NOC_DIMENSION, noc_dimension, int, 1>
+param<NOC_TOPOLOGY, noc_topology, string, ring>
+
 param<ENABLE_HETEROGENEOUS_LINK, enable_heterogeneous_link, bool, false>
 param<NUM_SWITCH, num_switch, int, 1>
 param<NUM_SWITCH_CPU, num_switch_cpu, int, 1>

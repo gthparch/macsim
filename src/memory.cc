@@ -1678,61 +1678,79 @@ void memory_c::init(void)
     ++total_num_router;
   }
 
+
+  // NEW NOC Model
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 0) { // GPU_FRIENDLY
-      for (int ii = 0; ii < m_num_core; ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-      }
-      for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
-      }
-      for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
-      }
-    }
-    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1) { // CPU_FRIENDLY
+    if (*KNOB(KNOB_NOC_DIMENSION) == 2) {
       for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = *KNOB(KNOB_NUM_SIM_SMALL_CORES) + ii;
-      } 
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii;
-      }
-      for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
-      }
-      for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
-      }
-    }
-    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 2) { // MIXED
-      int count = 0;
-      for (int ii = 0; ii < m_num_core; ++ii) {
         (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-        count++;
-      }
-      for (int ii = 0; ii < m_num_mc/2; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + ii;
-        count++;
-      }
-      for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = count++;
       } 
-      for (int ii = m_num_mc/2; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = count++;
-      }
-    }
-    else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 3) { // INTERLEAVE
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = ii*2;
-      } 
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii*2 + 1;
-      }
       for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+        (*m_dst_map)[MEM_L3 * 100 + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii;
       }
       for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+        (*m_dst_map)[MEM_MC * 100 + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + ii;
+      }
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + m_num_mc + ii;
+      }
+    }
+    else if (*KNOB(KNOB_NOC_DIMENSION) == 1) {
+      if (*KNOB(KNOB_ROUTER_PLACEMENT) == 0) { // GPU_FRIENDLY
+        for (int ii = 0; ii < m_num_core; ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+        }
+        for (int ii = 0; ii < m_num_l3; ++ii) {
+          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+        }
+        for (int ii = 0; ii < m_num_mc; ++ii) {
+          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+        }
+      }
+      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1) { // CPU_FRIENDLY
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + ii] = *KNOB(KNOB_NUM_SIM_SMALL_CORES) + ii;
+        } 
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii;
+        }
+        for (int ii = 0; ii < m_num_l3; ++ii) {
+          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+        }
+        for (int ii = 0; ii < m_num_mc; ++ii) {
+          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+        }
+      }
+      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 2) { // MIXED
+        int count = 0;
+        for (int ii = 0; ii < m_num_core; ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+          count++;
+        }
+        for (int ii = 0; ii < m_num_mc/2; ++ii) {
+          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + ii;
+          count++;
+        }
+        for (int ii = 0; ii < m_num_l3; ++ii) {
+          (*m_dst_map)[MEM_L3 * 100 + ii] = count++;
+        } 
+        for (int ii = m_num_mc/2; ii < m_num_mc; ++ii) {
+          (*m_dst_map)[MEM_MC * 100 + ii] = count++;
+        }
+      }
+      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 3) { // INTERLEAVE
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + ii] = ii*2;
+        } 
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii*2 + 1;
+        }
+        for (int ii = 0; ii < m_num_l3; ++ii) {
+          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
+        }
+        for (int ii = 0; ii < m_num_mc; ++ii) {
+          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
+        }
       }
     }
   }

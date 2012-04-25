@@ -394,8 +394,14 @@ class memory_c
      */
     void run_a_cycle(void);
 
+    /**
+     * Tick a cycle for L1/L2 (core, private) caches
+     */
     void run_a_cycle_core(int);
 
+    /**
+     * Tick a cycle for L3 cache
+     */
     void run_a_cycle_uncore();
 
     /**

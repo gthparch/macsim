@@ -224,7 +224,7 @@ class macsim_c
     int m_clock_lcm; /**< main clock period */
     int m_clock_divisor[5]; /**< clock divisor */
     int m_clock_internal; /**< internal macsim clock */
-    bool m_termination_check[2];
+    bool m_termination_check[2]; /**< termination checking logic */
 
     // bug detector
 		bug_detector_c *m_bug_detector; /**< bug detector */
@@ -256,7 +256,6 @@ class macsim_c
 
 		// interconnect
     router_wrapper_c* m_router; /**< NOC routers */
-		stringstream network_trace;
 
 #ifdef IRIS
     // IRIS
@@ -268,6 +267,7 @@ class macsim_c
 		uint no_nodes; /**< number of network nodes */
 		int Mytid; /**< tid used by IRIS */
 		FILE* log_file; /**< log file used by IRIS */
+		stringstream network_trace; /**< network trace */
 #endif
 
     // cache partitioning

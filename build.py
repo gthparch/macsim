@@ -42,8 +42,7 @@ def build_test():
     for jj in range(0, len(build_libs)+1):
       for opt in itertools.combinations(build_libs, jj):
         cmd = 'scons -j 4 %s %s' % (build_option[ii], ' '.join(opt))
-        redir = ''
-        #redir = '> /dev/null 2>&1'
+        redir = '> /dev/null 2>&1'
 
         if os.path.exists('%s/macsim' % build_dir[ii]):
           os.system('rm -f %s/macsim' % build_dir[ii])
