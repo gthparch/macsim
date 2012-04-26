@@ -904,7 +904,7 @@ int macsim_c::run_a_cycle()
     if (core_type == "ptx" && m_clock_internal % m_clock_divisor[CLOCK_GPU] != 0) {
       continue;
     }
-    else if (core_type != "PTX" && m_clock_internal % m_clock_divisor[CLOCK_CPU] != 0) {
+    else if (core_type != "ptx" && m_clock_internal % m_clock_divisor[CLOCK_CPU] != 0) {
       continue;
     }
 
