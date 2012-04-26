@@ -90,32 +90,32 @@ using namespace std;
 // =======================================
 macsim_c::macsim_c()
 {
-	m_simBase = this;
-	
-	m_num_active_threads             = 0; 
-	m_num_waiting_dispatched_threads = 0;
-	m_total_num_application          = 0;
-	m_process_count                  = 0; 
-	m_process_count_without_repeat   = 0;
-	m_all_threads                    = 0;
-	m_no_threads_per_block           = 0;
-	m_total_retired_block            = 0;
-	m_end_simulation                 = false;
-	m_repeat_done                    = false;
-  m_gpu_paused                     = true;
+    m_simBase = this;
+    
+    m_num_active_threads             = 0; 
+    m_num_waiting_dispatched_threads = 0;
+    m_total_num_application          = 0;
+    m_process_count                  = 0; 
+    m_process_count_without_repeat   = 0;
+    m_all_threads                    = 0;
+    m_no_threads_per_block           = 0;
+    m_total_retired_block            = 0;
+    m_end_simulation                 = false;
+    m_repeat_done                    = false;
+    m_gpu_paused                     = true;
 
-	for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {	
-		m_core_cycle[ii]     = 0;
-		m_core_end_trace[ii] = false;
-		m_sim_end[ii]        = false;
-		m_core_started[ii]   = false;
-	}
+    for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {    
+        m_core_cycle[ii]     = 0;
+        m_core_end_trace[ii] = false;
+        m_sim_end[ii]        = false;
+        m_core_started[ii]   = false;
+    }
 
-  m_termination_check[0] = false;
-  m_termination_check[1] = false;
+    m_termination_check[0] = false;
+    m_termination_check[1] = false;
 
-	m_simulation_cycle = 0;
-	m_core0_inst_count = 0;
+    m_simulation_cycle = 0;
+    m_core0_inst_count = 0;
 }
 
 
@@ -132,42 +132,42 @@ macsim_c::~macsim_c()
 // =======================================
 void macsim_c::init_knobs(int argc, char** argv)
 {
-	report("initialize knobs");
+    report("initialize knobs");
 
-	// Create the knob managing class
-	m_knobsContainer = new KnobsContainer();
+    // Create the knob managing class
+    m_knobsContainer = new KnobsContainer();
 
-	// Get a reference to the actual knobs for this component instance
-	m_knobs = m_knobsContainer->getAllKnobs();
+    // Get a reference to the actual knobs for this component instance
+    m_knobs = m_knobsContainer->getAllKnobs();
 
 #ifdef USING_SST
-	string  paramPath(argv[0]);
-	string  tracePath(argv[1]);
-	string outputPath(argv[2]);
-	
-	//Apply specified params.in file
-	m_knobsContainer->applyParamFile(paramPath);
-	
-	//Specify trace_file_list and update the knob
-	m_knobsContainer->updateKnob("trace_name_file", tracePath);
+    string  paramPath(argv[0]);
+    string  tracePath(argv[1]);
+    string outputPath(argv[2]);
+    
+    //Apply specified params.in file
+    m_knobsContainer->applyParamFile(paramPath);
+    
+    //Specify trace_file_list and update the knob
+    m_knobsContainer->updateKnob("trace_name_file", tracePath);
 
-	//Specify output path for statistics
-	m_knobsContainer->updateKnob("out", outputPath);
+    //Specify output path for statistics
+    m_knobsContainer->updateKnob("out", outputPath);
 
-	//save the states of all knobs to a file
-	m_knobsContainer->saveToFile(outputPath + "/params.out");
+    //save the states of all knobs to a file
+    m_knobsContainer->saveToFile(outputPath + "/params.out");
 
 #else
-	// apply values from parameters file
-	m_knobsContainer->applyParamFile("params.in");
+    // apply values from parameters file
+    m_knobsContainer->applyParamFile("params.in");
 
-	// apply the supplied command line switches
-	char* pInvalidArgument = NULL;
-	if(!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
-	}
+    // apply the supplied command line switches
+    char* pInvalidArgument = NULL;
+    if(!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
+    }
 
-	// save the states of all knobs to a file
-	m_knobsContainer->saveToFile("params.out");
+    // save the states of all knobs to a file
+    m_knobsContainer->saveToFile("params.out");
 #endif
 }
 
@@ -177,21 +177,21 @@ void macsim_c::init_knobs(int argc, char** argv)
 // =======================================
 void macsim_c::register_functions(void)
 {
-	mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
-	mem_factory_c::get()->register_class("l3_decoupled_network", default_mem); 
-	mem_factory_c::get()->register_class("l2_coupled_local", default_mem); 
-	mem_factory_c::get()->register_class("no_cache", default_mem);
-	mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
-	mem_factory_c::get()->register_class("l2_decoupled_local", default_mem);
-	
-	dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
-	dram_factory_c::get()->register_class("FCFS", fcfs_controller);
-	
-	fetch_factory_c::get()->register_class("rr", fetch_factory);
-	pref_factory_c::get()->register_class(pref_factory);
-	bp_factory_c::get()->register_class("gshare", default_bp); 
+    mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
+    mem_factory_c::get()->register_class("l3_decoupled_network", default_mem); 
+    mem_factory_c::get()->register_class("l2_coupled_local", default_mem); 
+    mem_factory_c::get()->register_class("no_cache", default_mem);
+    mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
+    mem_factory_c::get()->register_class("l2_decoupled_local", default_mem);
+    
+    dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
+    dram_factory_c::get()->register_class("FCFS", fcfs_controller);
+    
+    fetch_factory_c::get()->register_class("rr", fetch_factory);
+    pref_factory_c::get()->register_class(pref_factory);
+    bp_factory_c::get()->register_class("gshare", default_bp); 
 
-  llc_factory_c::get()->register_class("default", default_llc);
+    llc_factory_c::get()->register_class("default", default_llc);
 }
 
 
@@ -200,30 +200,30 @@ void macsim_c::register_functions(void)
 // =======================================
 void macsim_c::init_memory(void)
 {
-	// pool allocation
-	m_thread_pool           = new pool_c<thread_s>(10, "thread_pool"); 
-	m_section_pool          = new pool_c<section_info_s>(100, "section_pool"); 
-	m_mem_map_entry_pool    = new pool_c<mem_map_entry_c>(200, "mem_map_pool");
-	m_heartbeat_pool        = new pool_c<heartbeat_s>(10, "heartbeat_pool");
-	m_bp_recovery_info_pool = new pool_c<bp_recovery_info_c>(10, "bp_recovery_info_pool");
-	m_trace_node_pool       = new pool_c<thread_trace_info_node_s>(10, "thread_node_pool");
-	m_uop_pool              = new pool_c<uop_c>(1000, "uop_pool");
+  // pool allocation
+  m_thread_pool           = new pool_c<thread_s>(10, "thread_pool"); 
+  m_section_pool          = new pool_c<section_info_s>(100, "section_pool"); 
+  m_mem_map_entry_pool    = new pool_c<mem_map_entry_c>(200, "mem_map_pool");
+  m_heartbeat_pool        = new pool_c<heartbeat_s>(10, "heartbeat_pool");
+  m_bp_recovery_info_pool = new pool_c<bp_recovery_info_c>(10, "bp_recovery_info_pool");
+  m_trace_node_pool       = new pool_c<thread_trace_info_node_s>(10, "thread_node_pool");
+  m_uop_pool              = new pool_c<uop_c>(1000, "uop_pool");
 
-	m_block_id_mapper = new multi_key_map_c;
-	m_process_manager = new process_manager_c(m_simBase);
-	m_trace_reader = new trace_read_c(m_simBase);
+  m_block_id_mapper = new multi_key_map_c;
+  m_process_manager = new process_manager_c(m_simBase);
+  m_trace_reader = new trace_read_c(m_simBase);
 
-	// block schedule info
-	block_schedule_info_s* block_schedule_info = new block_schedule_info_s;
-	m_block_schedule_info[0] = block_schedule_info;
+  // block schedule info
+  block_schedule_info_s* block_schedule_info = new block_schedule_info_s;
+  m_block_schedule_info[0] = block_schedule_info;
 
-	// dummy invalid uop
-	m_invalid_uop = new uop_c(m_simBase);
-	m_invalid_uop->init();
+  // dummy invalid uop
+  m_invalid_uop = new uop_c(m_simBase);
+  m_invalid_uop->init();
 
-	// main memory
+  // main memory
   string memory_type = m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue();
-	m_memory = mem_factory_c::get()->allocate(memory_type, m_simBase);
+  m_memory = mem_factory_c::get()->allocate(memory_type, m_simBase);
 
   // dram controller
   m_dram_controller = new dram_controller_c*[m_num_mc];
@@ -237,7 +237,7 @@ void macsim_c::init_memory(void)
   }
 
 
-	// interconnection network
+    // interconnection network
   if (*KNOB(KNOB_ENABLE_NEW_NOC))
     m_router = new router_wrapper_c(m_simBase);
 
@@ -246,11 +246,11 @@ void macsim_c::init_memory(void)
   else
     m_noc = new noc_c(m_simBase);
 
-	// bug detector
-	if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-		printf("enabling bug detector\n");
-		m_bug_detector = new bug_detector_c(m_simBase);
-	}
+    // bug detector
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+        printf("enabling bug detector\n");
+        m_bug_detector = new bug_detector_c(m_simBase);
+    }
     
   m_PCL = new cache_partition_framework_c(m_simBase);
 }
@@ -261,49 +261,49 @@ void macsim_c::init_memory(void)
 // =======================================
 void macsim_c::init_output_streams()
 {
-	string stderr_file = *m_simBase->m_knobs->KNOB_STDERR_FILE;
-	string stdout_file = *m_simBase->m_knobs->KNOB_STDOUT_FILE;
-	string status_file = *m_simBase->m_knobs->KNOB_STDOUT_FILE;
+    string stderr_file = *m_simBase->m_knobs->KNOB_STDERR_FILE;
+    string stdout_file = *m_simBase->m_knobs->KNOB_STDOUT_FILE;
+    string status_file = *m_simBase->m_knobs->KNOB_STDOUT_FILE;
 
-	if (strcmp(stderr_file.c_str(), "NULL")) {
-		g_mystderr = file_tag_fopen(stderr_file.c_str(), "w", m_simBase);
+    if (strcmp(stderr_file.c_str(), "NULL")) {
+        g_mystderr = file_tag_fopen(stderr_file.c_str(), "w", m_simBase);
 
-		if (!g_mystderr) {
-			fprintf(stderr, "\n");
-			fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-				unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
-			fprintf(stderr, "%s '%s'\n", "mystderr", stderr_file.c_str());
-			breakpoint(__FILE__, __LINE__);
-			exit(15);
-		}
-	}
+        if (!g_mystderr) {
+            fprintf(stderr, "\n");
+            fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
+                unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+            fprintf(stderr, "%s '%s'\n", "mystderr", stderr_file.c_str());
+            breakpoint(__FILE__, __LINE__);
+            exit(15);
+        }
+    }
 
-	if (strcmp(stdout_file.c_str(), "NULL")){
-		g_mystdout = file_tag_fopen(stdout_file.c_str(), "w", m_simBase);
+    if (strcmp(stdout_file.c_str(), "NULL")){
+        g_mystdout = file_tag_fopen(stdout_file.c_str(), "w", m_simBase);
 
-		if (!g_mystdout) {
-			fprintf(stderr, "\n");
-			fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-				unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+        if (!g_mystdout) {
+            fprintf(stderr, "\n");
+            fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
+                unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
 
-			fprintf(stderr, "%s '%s'\n", "mystdout", stdout_file.c_str()); 
-			breakpoint(__FILE__, __LINE__);
-			exit(15);
-		}
-	}
+            fprintf(stderr, "%s '%s'\n", "mystdout", stdout_file.c_str()); 
+            breakpoint(__FILE__, __LINE__);
+            exit(15);
+        }
+    }
 
-	if (!strcmp(status_file.c_str(), "NULL")) {
-		g_mystatus = fopen(status_file.c_str(), "a"); 
+    if (!strcmp(status_file.c_str(), "NULL")) {
+        g_mystatus = fopen(status_file.c_str(), "a"); 
 
-		if (!g_mystatus) {
-			fprintf(stderr, "\n");
-			fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-				unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
-			fprintf(stderr, "%s '%s'\n", "mystatus", status_file.c_str());
-			breakpoint(__FILE__, __LINE__);
-			exit(15);
-		}
-	}
+        if (!g_mystatus) {
+            fprintf(stderr, "\n");
+            fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
+                unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+            fprintf(stderr, "%s '%s'\n", "mystatus", status_file.c_str());
+            breakpoint(__FILE__, __LINE__);
+            exit(15);
+        }
+    }
 }
 
 
@@ -312,57 +312,60 @@ void macsim_c::init_output_streams()
 // =======================================
 void macsim_c::init_cores(int num_max_core)
 {
-	int num_large_cores        = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
-	int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
+    int num_large_cores        = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+    int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
-	report("initialize cores (" << num_large_cores << "/" 
-			<< (num_large_medium_cores - num_large_cores) << "/" 
+    report("initialize cores (" << num_large_cores << "/" 
+            << (num_large_medium_cores - num_large_cores) << "/" 
       << *KNOB(KNOB_NUM_SIM_SMALL_CORES) <<")");
 
-	ASSERT(num_max_core == (*KNOB(KNOB_NUM_SIM_SMALL_CORES) + \
+    ASSERT(num_max_core == (*KNOB(KNOB_NUM_SIM_SMALL_CORES) + \
         *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) + *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
 
 
-	// based on the core type, add cores into type-specific core pools
-	
-	// large coresno_mcs
-	for (int ii = 0; ii < num_large_cores; ++ii) { 
-		m_core_pointers[ii] = new core_c(ii, m_simBase, UNIT_LARGE);
-		m_core_pointers[ii]->pref_init();
+    // based on the core type, add cores into type-specific core pools
+    
+    // large coresno_mcs
+    for (int ii = 0; ii < num_large_cores; ++ii) { 
+        m_core_pointers[ii] = new core_c(ii, m_simBase, UNIT_LARGE);
+        m_core_pointers[ii]->init();
+        m_core_pointers[ii]->pref_init();
 
-		// insert to the core type pool
-		if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx")
-			m_ptx_core_pool.push(ii);
-		else
-			m_x86_core_pool.push(ii);
-	}
+        // insert to the core type pool
+        if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx")
+            m_ptx_core_pool.push(ii);
+        else
+            m_x86_core_pool.push(ii);
+    }
 
-	// medium cores
-	int total_core = num_large_cores;
-	for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_MEDIUM_CORES); ++ii) { 
-		m_core_pointers[ii + num_large_cores] = new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
-		m_core_pointers[ii + num_large_cores]->pref_init();
+    // medium cores
+    int total_core = num_large_cores;
+    for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_MEDIUM_CORES); ++ii) { 
+        m_core_pointers[ii + num_large_cores] = new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
+        m_core_pointers[ii + num_large_cores]->init();
+        m_core_pointers[ii + num_large_cores]->pref_init();
 
-		// insert to the core type pool
-		if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx")
-			m_ptx_core_pool.push(ii + total_core);
-		else
-			m_x86_core_pool.push(ii + total_core);
-	}
+        // insert to the core type pool
+        if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx")
+            m_ptx_core_pool.push(ii + total_core);
+        else
+            m_x86_core_pool.push(ii + total_core);
+    }
 
-	// small cores
-	total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
-	for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) { 
-		m_core_pointers[ii + num_large_medium_cores] = 
-			new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
-		m_core_pointers[ii + num_large_medium_cores]->pref_init();
+    // small cores
+    total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
+    for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) { 
+        m_core_pointers[ii + num_large_medium_cores] = 
+            new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
+        m_core_pointers[ii + num_large_medium_cores]->init();
+        m_core_pointers[ii + num_large_medium_cores]->pref_init();
 
-		// insert to the core type pool
-		if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx")
-			m_ptx_core_pool.push(ii + total_core);
-		else
-			m_x86_core_pool.push(ii + total_core);
-	}
+        // insert to the core type pool
+        if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx")
+            m_ptx_core_pool.push(ii + total_core);
+        else
+            m_x86_core_pool.push(ii + total_core);
+    }
 }
 
 
@@ -549,11 +552,11 @@ void macsim_c::init_sim(void)
 // =======================================
 void macsim_c::compute_power(void)
 {
-	m_ei_power = new ei_power_c(m_simBase);
-	m_ei_power->ei_config_gen_top();	// to make config file for EI
-	m_ei_power->ei_main();
-	
-	delete m_ei_power;
+    m_ei_power = new ei_power_c(m_simBase);
+    m_ei_power->ei_config_gen_top();    // to make config file for EI
+    m_ei_power->ei_main();
+    
+    delete m_ei_power;
 }
 #endif
 
@@ -859,17 +862,17 @@ int macsim_c::run_a_cycle()
   if (m_termination_check[0] && m_termination_check[1]) {
     m_termination_check[0] = false;
     m_termination_check[1] = false;
+    m_num_running_core = 0;
   }
 
   int pivot = m_core_cycle[0]+1;
-  m_num_running_core = 0;
 
 
   // interconnection
   if (m_clock_internal % m_clock_divisor[CLOCK_NOC] == 0) {
 #ifdef IRIS
-    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS
-    manifold::kernel::Manifold::Run((double) m_simulation_cycle);		//IRIS for half tick?
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS
+    manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS for half tick?
 #else
     if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
       m_router->run_a_cycle();
@@ -912,7 +915,7 @@ int macsim_c::run_a_cycle()
     core->inc_core_cycle_count();
     m_core_cycle[ii]++;
 
-    // core ended or not started	
+    // core ended or not started    
     if (m_sim_end[ii] || !m_core_started[ii]) {
       continue;
     }
@@ -972,14 +975,14 @@ int macsim_c::run_a_cycle()
   m_simulation_cycle++;
   STAT_EVENT(CYC_COUNT_TOT);
     
-  if (m_clock_internal % m_clock_divisor[CLOCK_GPU] == 0) {
+  if (m_clock_internal % m_clock_divisor[CLOCK_CPU] == 0) {
     STAT_EVENT(CYCLE_CPU);
-    m_termination_check[1] = true;
+    m_termination_check[0] = true;
   }
 
-  if (m_clock_internal % m_clock_divisor[CLOCK_CPU] == 0) {
+  if (m_clock_internal % m_clock_divisor[CLOCK_GPU] == 0) {
     STAT_EVENT(CYCLE_GPU);
-    m_termination_check[0] = true;
+    m_termination_check[1] = true;
   }
 
   m_clock_internal = (m_clock_internal + 1) % m_clock_lcm;
