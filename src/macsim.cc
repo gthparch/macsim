@@ -226,8 +226,8 @@ void macsim_c::init_memory(void)
   m_memory = mem_factory_c::get()->allocate(memory_type, m_simBase);
 
   // dram controller
-  m_dram_controller = new dram_controller_c*[m_num_mc];
   m_num_mc = m_simBase->m_knobs->KNOB_DRAM_NUM_MC->getValue();
+  m_dram_controller = new dram_controller_c*[m_num_mc];
   int num_noc_node = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES
     + *m_simBase->m_knobs->KNOB_NUM_L3;
   for (int ii = 0; ii < m_num_mc; ++ii) {
