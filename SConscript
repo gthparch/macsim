@@ -40,7 +40,7 @@ for key,val in os.environ.iteritems():
 
 
 env['CPPPATH']    = ['#src']
-env['CPPDEFINES'] = ['LONG_COUNTERS']
+env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
 env['LINKFLAGS']  = ['--static']
 
 
@@ -89,9 +89,9 @@ IRIS_srcs = [
 
 if flags['iris'] == '1':
   if flags['power'] == '1':
-    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['POWER_EI', 'IRIS', 'NO_MPI'])
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=env['CPPDEFINES'] + ['POWER_EI', 'IRIS'])
   else:
-    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=['IRIS', 'NO_MPI'])
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=env['CPPDEFINES'] + ['IRIS'])
 
 
 #########################################################################################
