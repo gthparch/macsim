@@ -31,13 +31,14 @@ warn_flags = ' '.join(warn_flags)
 
 
 ## Environment
-use_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
+custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
+custom_env  = {}
 
-env = Environment()
 for key,val in os.environ.iteritems():
-  if key in use_vars:
-    env[key] = val
+  if key in custom_vars:
+    custom_env[key] = val
 
+env = Environment(ENV=custom_env)
 
 env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']

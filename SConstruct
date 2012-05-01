@@ -40,9 +40,15 @@ def CheckCPP0x():
 
 ## Check c++0x support
 def pre_compile_check():
-  conf = Configure(Environment(), custom_tests = {
-    'CheckCPP0x' : CheckCPP0x()
-  })
+  ## Environment
+  custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
+  custom_env = {}
+
+  for key,val in os.environ.iteritems():
+    if key in custom_vars:
+      custom_env[key] = val
+
+  conf = Configure(Environment(ENV=custom_env), custom_tests = {'CheckCPP0x' : CheckCPP0x()})
 
   if not conf.CheckCPP0x():
     print('Error: Your compiler does not support c++0x. Exit now...')
