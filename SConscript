@@ -52,6 +52,7 @@ if flags['debug'] == '1':
 elif flags['gprof'] == '1':
   env['CPPFLAGS'] = '-pg -std=c++0x %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
+  env['LINKFLAGS'].append('-pg')
 ## OPT build
 else:
   env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s' % warn_flags
