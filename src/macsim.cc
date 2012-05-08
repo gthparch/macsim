@@ -391,7 +391,7 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
         sstr << ',';
     }
     sstr >> params["mapping"];
-
+    params["rc_method"] = "RING_ROUTING";
   }
   else if (params["topology"] == "mesh" || params["topology"] == "torus") {
     params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
@@ -666,7 +666,7 @@ void macsim_c::fini_sim(void)
     const char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
     for(unsigned int i=0; i<m_macsim_terminals.size(); i++)
     {
-      int node_id = ((Mesh*)m_iris_network)->mapping[i];
+      int node_id = ((Ring*)m_iris_network)->mapping[i];
       int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
 
       irisTraceFile << message_class_type[type] << "," 

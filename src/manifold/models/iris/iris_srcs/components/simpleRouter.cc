@@ -15,7 +15,7 @@ extern "C" {
 #include "SIM_link.h"
 }
 
-#define NETVIS 1
+#define NETVIS 0
 bool printFlag = false;
 
 
@@ -239,17 +239,6 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
 
                     //for csv stats collection/visualization
 #if NETVIS
-//char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
-
-//int type = m_simBase->m_macsim_terminals.at(macsim_node_id)->mclass;
-		//if ( ((HeadFlit*)data->f)->req->m_id == 0 && node_id==11)
-		//{
-		//	cout << "node id " << node_id << "\n";
-		//	printFlag = true;
-		//}
-  
-  //track latency of each packet
-  //insert packet if new (from interface)
   if( inport == 0 )
   {
     int m_id = ((HeadFlit*)data->f)->req->m_id;
@@ -260,13 +249,13 @@ SimpleRouter::handle_link_arrival( int port, LinkData* data )
   }
   
   //track flit_id of tail flit
-//                    cout << manifold::kernel::Manifold::NowTicks() << ",p," 
-//                        << ((HeadFlit*)data->f)->req->m_id << "," 
-//                        << ((HeadFlit*)data->f)->req->m_ptx << ","
-//                        << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
-//                        << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
-//                        << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
-//                        << endl;
+                    cout << manifold::kernel::Manifold::NowTicks() << ",p," 
+                        << ((HeadFlit*)data->f)->req->m_id << "," 
+                        << ((HeadFlit*)data->f)->req->m_ptx << ","
+                        << mem_state_copy[((HeadFlit*)data->f)->req->m_state] << ","
+                        << mem_req_noc_type_name[((HeadFlit*)data->f)->req->m_msg_type] << ","
+                        << node_id << "," << ((HeadFlit*)data->f)->dst_node << ","
+                        << endl;
          /*           
 		    cout << manifold::kernel::Manifold::NowTicks() << ",b," << node_id << ","; 
                     for(uint i=0; i<ports; i++)
@@ -505,11 +494,12 @@ SimpleRouter::do_switch_traversal()
                 /*! \brief Send a credit back and update buffer state for the
                  * downstream router buffer */
                 downstream_credits[op][oc]--;
-//NETVIS  //out going flit
+#if NETVIS  //out going flit
   if(nodeAF.size() <= manifold::kernel::Manifold::NowTicks() / 10)
     nodeAF.push_back(0);
   ++nodeAF[ manifold::kernel::Manifold::NowTicks() / 10 ];
-  
+
+#endif
 //                if (numFlits[ip]-- < MAX_NUM_FLITS)
                 {
                     LinkData* ldc = new LinkData();
