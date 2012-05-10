@@ -1680,19 +1680,33 @@ void memory_c::init(void)
 
 
   // NEW NOC Model
+  // TODO (jaekyu, 5-9-2012)
+  // improve mapping mechanism
   if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
     if (*KNOB(KNOB_NOC_DIMENSION) == 2) {
+      int l3_start_index = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
       for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
         (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
       } 
+
+      if (*KNOB(KNOB_NUM_SIM_LARGE_CORES) == 0) {
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+        }
+        l3_start_index = *KNOB(KNOB_NUM_SIM_SMALL_CORES); 
+      }
+
       for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii;
+        (*m_dst_map)[MEM_L3 * 100 + ii] = l3_start_index + ii;
       }
       for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + ii;
+        (*m_dst_map)[MEM_MC * 100 + ii] = l3_start_index + m_num_l3 + ii;
       }
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + m_num_mc + ii;
+      
+      if (*KNOB(KNOB_NUM_SIM_LARGE_CORES) != 0) {
+        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
+          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + m_num_mc + ii;
+        }
       }
     }
     else if (*KNOB(KNOB_NOC_DIMENSION) == 1) {
@@ -2013,7 +2027,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
   else if (level == MEM_MC) {
     ASSERTM(msg == NOC_NEW || msg == NOC_FILL, "msg:%d", msg);
     result = m_simBase->m_dram_controller[id]->insert_new_req(req);
-    assert(0); // jaekyu (2-15-2012) this will be completely removed
+//    assert(0); // jaekyu (2-15-2012) this will be completely removed
     if (result) {
       DEBUG("MC[%d] new_req:%d addr:%s type:%s\n", 
           id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);

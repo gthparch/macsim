@@ -24,7 +24,7 @@ def parse_arg():
   parser.add_option("-t", "--test", action="store_true", dest="test", default=False, help="clean")
   parser.add_option("--dramsim", action="store_true", dest="dramsim", default=False, help="DRAMSim2")
   parser.add_option("--power", action="store_true", dest="power", default=False, help="EI Power")
-  parser.add_option("--iris", action="store_true", dest="iris", default=False, help="EI Power")
+  parser.add_option("--iris", action="store_true", dest="iris", default=False, help="IRIS")
 
   return parser
 

@@ -75,6 +75,9 @@ flags['gprof'] = Config.get('Build', 'gprof', '0')
 ## Configuration from commandline
 flags['debug'] = ARGUMENTS.get('debug', flags['debug'])
 flags['gprof'] = ARGUMENTS.get('gprof', flags['gprof'])
+flags['power'] = ARGUMENTS.get('power', flags['power'])
+flags['iris']  = ARGUMENTS.get('iris', flags['iris'])
+flags['dram']  = ARGUMENTS.get('dram', flags['dram'])
 
 
 ## Checkout DRAMSim2 copy

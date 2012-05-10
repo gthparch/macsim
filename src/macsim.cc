@@ -447,6 +447,7 @@ void macsim_c::init_iris_config(map<string, string> &params)  //passed g_iris_pa
 void macsim_c::init_network(void)
 {
 #ifdef IRIS
+  assert(*KNOB(KNOB_ENABLE_IRIS) == true && *KNOB(KNOB_ENABLE_NEW_NOC) == false);
   init_iris_config(m_iris_params);
 
   map<std::string, std::string>:: iterator it;
