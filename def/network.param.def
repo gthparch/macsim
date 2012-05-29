@@ -89,3 +89,7 @@ param<ROUTER_PLACEMENT, router_placement, int, 0>
 
 param<CORE_ENABLE_BEGIN, core_enable_begin, int, 0>
 param<CORE_ENABLE_END, core_enable_end, int, 0>
+
+
+param<IDEAL_NOC, ideal_noc, bool, false>
+param<IDEAL_NOC_LATENCY, ideal_noc_latency, int, 2>
