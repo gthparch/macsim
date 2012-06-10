@@ -1116,8 +1116,6 @@ int main(int argc, char *argv[])
   INS_AddInstrumentFunction(Instruction, 0);
   control.CheckKnobs(Handler, 0);
 
-  cout << "ASDF " << g_enable_instrument << "\n";
-
   PIN_AddDetachFunction(Detach, 0);
   PIN_AddFiniFunction(Fini, 0);
   PIN_StartProgram();
