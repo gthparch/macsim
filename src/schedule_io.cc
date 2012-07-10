@@ -111,6 +111,8 @@ void schedule_io_c::run_a_cycle(void)
  
       STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS);  
 
+      m_first_schlist_ptr = (m_first_schlist_ptr + 1) % MAX_SCHED_SIZE;
+
       // increment scheduled uop counter
       ++count;
 
