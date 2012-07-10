@@ -124,9 +124,9 @@ void allocate_c::run_a_cycle(void)
     int req_fp_reg  = 0;        // require fp register
     int q_type      = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
 
-    if (uop->m_uop_type == UOP_LD) // load queue
+    if (uop->m_mem_type == MEM_LD) // load queue
       req_lb = 1;
-    else if (uop->m_uop_type == UOP_ST) // store queue
+    else if (uop->m_mem_type == MEM_ST) // store queue
       req_sb = 1;
     else if (uop->m_uop_type == UOP_IADD || // integer register
         uop->m_uop_type == UOP_IMUL || 
