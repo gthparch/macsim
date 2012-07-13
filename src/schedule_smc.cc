@@ -401,12 +401,7 @@ void schedule_smc_c::run_a_cycle(void)
   // can schedule instructions from different threads. We enforce threads selected by
   // each warp scheduler should be different. 
   int count = 0;
-  int num_schedulers = *KNOB(KNOB_NUM_WARP_SCHEDULER);
-  int round_count;
-  int inst_per_sched = 1;
-  for (int sched_id = 0; sched_id < num_schedulers; ++sched_id) {
-    round_count = 0;
-  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) {
+  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) { 
     // -------------------------------------
     // Schedule stops when
     // 1) no uops in the scheduler (m_num_in_sched and first == last)
