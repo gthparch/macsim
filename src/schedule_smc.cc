@@ -123,10 +123,7 @@ void schedule_smc_c::advance(int q_index) {
     uop_c *cur_uop = (uop_c *) (*m_rob)[allocq_entry.m_rob_entry];
     
     POWER_CORE_EVENT(m_core_id, POWER_INST_QUEUE_R);
-    POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
     POWER_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_R);
-    POWER_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_R);
-    POWER_CORE_EVENT(m_core_id, POWER_FREELIST_R);
 
     switch (cur_uop->m_uop_type){
       case UOP_FMEM:
@@ -264,9 +261,6 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE*
 
   *sched_fail_reason = SCHED_SUCCESS;
   
-  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
-  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
-  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
     
   DEBUG("uop_schedule core_id:%d thread_id:%d uop_num:%lld inst_num:%lld "
       "uop.va:%s allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
@@ -341,6 +335,9 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE*
   STAT_CORE_EVENT_N(m_core_id, CORE_DISPATCH_WAIT, 
       m_cur_core_cycle - cur_uop->m_alloc_cycle);
 
+  POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
+  POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
+  POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
   // Decrement dispatch m_count for the current thread
   --m_simBase->m_core_pointers[m_core_id]->m_ops_to_be_dispatched[cur_uop->m_thread_id];
@@ -404,7 +401,12 @@ void schedule_smc_c::run_a_cycle(void)
   // can schedule instructions from different threads. We enforce threads selected by
   // each warp scheduler should be different. 
   int count = 0;
-  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) { 
+  int num_schedulers = *KNOB(KNOB_NUM_WARP_SCHEDULER);
+  int round_count;
+  int inst_per_sched = 1;
+  for (int sched_id = 0; sched_id < num_schedulers; ++sched_id) {
+    round_count = 0;
+  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) {
     // -------------------------------------
     // Schedule stops when
     // 1) no uops in the scheduler (m_num_in_sched and first == last)
