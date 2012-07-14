@@ -113,8 +113,6 @@ void smc_allocate_c::run_a_cycle(void)
         unsstr64(uop->m_uop_num));
     ASSERT(uop);
     
-    POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_R);
-
     // check resource requirement
     int req_rob     = 1;        // required rob entries
     int req_sb      = 0;        // required store buffer entries
@@ -202,15 +200,12 @@ void smc_allocate_c::run_a_cycle(void)
     POWER_CORE_EVENT(m_core_id, POWER_INST_QUEUE_W);
     POWER_CORE_EVENT(m_core_id, POWER_INST_COMMIT_SEL_LOGIC_W);
     POWER_CORE_EVENT(m_core_id, POWER_UOP_QUEUE_W);	  
-    POWER_CORE_EVENT(m_core_id, POWER_REG_RENAMING_TABLE_W);
-    POWER_CORE_EVENT(m_core_id, POWER_FREELIST_W);
 
     // insert an uop into reorder buffer
     uop->m_allocq_num = gpu_alloc_q_type;
     uop->m_state      = OS_ALLOCATE;
     thread_rob->push(uop);
 
-    POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
     
     // dequeue from frontend queue
     m_frontend_q->dequeue();

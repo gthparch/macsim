@@ -200,6 +200,9 @@ void frontend_c::run_a_cycle(void)
   if (!m_fe_running || !m_fetching_thread_num) 
     return; 
 
+	// Block_States table is accessed EVERY cycle, so should be before the code that fetches every FETCH_RATIO cycle
+  POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_R);
+  POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_W);
 
   // fetch every KNOB_FETCH_RATIO cycle
   // CPU : every cycle
@@ -276,8 +279,6 @@ void frontend_c::run_a_cycle(void)
   // TONAGESH
   // nagesh - comments for BAR are incomplete...
   if (m_knob_ptx_sim) {
-  	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_R);
-  	POWER_CORE_EVENT(m_core_id, POWER_BLOCK_STATES_W);
 
     // handling of BAR instruction in PTX - can/should this be moved?
     // do we have any blocks for which all warps have reached (retired)
@@ -377,7 +378,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     } 
     // instruction cache hit
     else {
-      POWER_CORE_EVENT(m_core_id, POWER_ICACHE_R);
+      POWER_CORE_EVENT(m_core_id, POWER_ICACHE_R);	// FIXME Jieun Apr-9-2012 should be moved to somewhere else, this is not a right place. currently ICACHE_R = #insts, but it should be 1/4
 
       // -------------------------------------
       // fetch instructions

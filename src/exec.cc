@@ -239,8 +239,6 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
           // shared memory access
           uop_latency = core->get_shared_memory()->load(uop);
-          POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R);
-          POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R_TAG);
           if (uop_latency != 0) {
             uop->m_mem_start_cycle = m_cur_core_cycle;
           }
@@ -327,8 +325,6 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
           // -------------------------------------
           if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
             latency = core->get_shared_memory()->load(uop->m_child_uops[next_set_bit]);
-            POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R);
-            POWER_CORE_EVENT(m_core_id, POWER_SHARED_MEM_R_TAG);
             if (latency != 0) {
               uop->m_mem_start_cycle = m_cur_core_cycle;
             }
@@ -456,8 +452,6 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
       case UOP_FCF:
       case UOP_FCVT:
       case UOP_FADD:
-      case UOP_FMUL:
-      case UOP_FDIV:
       case UOP_FCMP:
       case UOP_FBIT:
       case UOP_FCMOV:
@@ -468,7 +462,16 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         POWER_CORE_EVENT(m_core_id, POWER_FP_REGFILE_R);
         POWER_CORE_EVENT(m_core_id, POWER_FP_REGFILE_R);
         POWER_CORE_EVENT(m_core_id, POWER_FP_REGFILE_W);
-
+        break;
+      case UOP_FDIV:
+      case UOP_FMUL:
+        //POWER_CORE_EVENT(m_core_id, POWER_EX_SFU_R);	// FDIV and FMUL do not necessarily mean SFU functions
+        POWER_CORE_EVENT(m_core_id, POWER_EX_FPU_R);
+        POWER_CORE_EVENT(m_core_id, POWER_FP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_FP_REGISTER_R);
+        POWER_CORE_EVENT(m_core_id, POWER_FP_REGISTER_W);
+        POWER_CORE_EVENT(m_core_id, POWER_FP_REGFILE_R);
+        POWER_CORE_EVENT(m_core_id, POWER_FP_REGFILE_W);
         break;
 
       case UOP_IMUL:
@@ -595,6 +598,8 @@ void exec_c::update_memory_stats(uop_c* uop)
     case MEM_LD_SM:
     case MEM_ST_SM:
       STAT_EVENT(SHARED_MEM_ACCESS);
+            POWER_CORE_EVENT(uop->m_core_id, POWER_SHARED_MEM_R);	// FIXME Jieun Mar-14-2012
+            POWER_CORE_EVENT(uop->m_core_id, POWER_SHARED_MEM_R_TAG);	// FIXME Jieun Mar-14-2012
       break;
 
     case MEM_LD_CM:

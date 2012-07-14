@@ -1856,6 +1856,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
     POWER_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_W); 
   }
   STAT_EVENT(TOTAL_MEMORY);
+	POWER_EVENT(POWER_MC_R);
 
   Counter priority = g_mem_priority[type];
 
