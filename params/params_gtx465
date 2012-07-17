@@ -73,7 +73,6 @@ dram_scheduling_policy FRFCFS
 infinite_port 0
 pref_train_inst_once 0
 pref_framework_on 1
-pref_ghb_on 0
 enable_pref_small_core 0
 
 
