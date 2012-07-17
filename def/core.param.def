@@ -132,7 +132,9 @@ param<GPU_SCHED, gpu_sched, bool, false>
 param<GPU_USE_SINGLE_ALLOCQ_TYPE, gpu_use_single_iaq_type, bool, true>
 param<GPU_SHARE_ALLOCQS_BETWEEN_THREADS, gpu_share_iaqs_between_threads, bool, true>
 param<MAX_WARP_PER_SM, max_warp_per_sm, int, 48>
-param<SP_PER_SM, sp_per_sm, int, 8>
+param<SP_PER_SM, sp_per_sm, int, 32>
+param<SFU_PER_SM, sfu_per_sm, int, 4>
+param<LDST_PER_SM, ldst_per_sm, int, 16>
 
 
 param<32_64_ISA, 32_64_isa, int, 32>
@@ -176,6 +178,7 @@ param<EI_DECODE_WIDTH, ei_decode_width, int, KNOB_LARGE_WIDTH>
 param<EI_ISSUE_WIDTH, ei_issue_width, int, KNOB_LARGE_WIDTH> 
 param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH> 
 param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
+param<IS_FERMI, is_fermi, bool, 1> 
 
 
 
