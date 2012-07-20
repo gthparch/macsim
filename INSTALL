@@ -21,6 +21,7 @@
   -c : clean
   --dramsim : using DRAMSim2
   --power : using EnergyIntrospector for power model
+                  (Please note that power model is currently available to only internal developers.)
 
 
 === Build outcome ===
