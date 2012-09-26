@@ -217,3 +217,11 @@ param<LOAD_BUF_SIZE, load_buf_size, int, 16>
 param<STORE_BUF_SIZE, store_buf_size, int, 12>
 
 param<USE_INCOMING_TID_CID_FOR_WB, use_incoming_tid_cid_for_wb, bool, false>
+
+/* L3 and DRAM interleaving */
+param<DEFAULT_INTERLEAVING, default_interleaving, bool, true>
+param<NEW_INTERLEAVING_SAME_GRANULARITY, new_interleaving_same_granularity, bool, false>
+param<NEW_INTERLEAVING_DIFF_GRANULARITY, new_interleaving_diff_granularity, bool, false>
+
+
+

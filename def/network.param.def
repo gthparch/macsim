@@ -93,3 +93,5 @@ param<CORE_ENABLE_END, core_enable_end, int, 0>
 
 param<IDEAL_NOC, ideal_noc, bool, false>
 param<IDEAL_NOC_LATENCY, ideal_noc_latency, int, 2>
+
+param<USE_ZERO_LATENCY_NOC, use_zero_latency_noc, bool, false>
