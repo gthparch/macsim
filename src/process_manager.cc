@@ -622,6 +622,19 @@ void process_manager_c::setup_process(process_s* process)
 
   // Insert the main thread to the pool
   create_thread_node(process, 0, true);
+
+#ifdef GPU_VALIDATION
+  if (process->m_ptx) {
+    for (int tid = 1; tid < thread_count; ++tid) {
+      if (process->m_thread_start_info[tid].m_inst_count == 0) {
+        create_thread_node(process, process->m_no_of_threads_created++, false);
+      }
+      else {
+        break;
+      }
+    }
+  }
+#endif
 }
 
 
@@ -890,7 +903,7 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
 
   // if there are remaining threads, schedule it
   if (m_simBase->m_num_waiting_dispatched_threads) 
-    sim_thread_schedule(); 
+    sim_thread_schedule(false); 
 
   return 0;
 }
@@ -969,7 +982,7 @@ thread_trace_info_node_s *process_manager_c::fetch_block(int block_id)
 // schedule a thread
 // assigns a new thread/block to a core if the number of live threads/blocks
 // on the core are fewer than the maximum allowed
-void process_manager_c::sim_thread_schedule(void)
+void process_manager_c::sim_thread_schedule(bool initial)
 {
   thread_trace_info_node_s* trace_to_run;
 
@@ -1021,7 +1034,7 @@ void process_manager_c::sim_thread_schedule(void)
         int prev_fetching_block_id = core->m_fetching_block_id;
 
         // get block id
-        int block_id = sim_schedule_thread_block(core_id); 
+        int block_id = sim_schedule_thread_block(core_id, initial); 
 
         // no thread to schedule
         if (block_id == -1) 
@@ -1076,7 +1089,7 @@ void process_manager_c::sim_thread_schedule(void)
 
           // try to schedule other threads in the same block
           prev_fetching_block_id = core->m_fetching_block_id;
-          block_id = sim_schedule_thread_block(core_id);
+          block_id = sim_schedule_thread_block(core_id, initial);
           if (block_id == -1) 
             break;
 
@@ -1094,7 +1107,7 @@ void process_manager_c::sim_thread_schedule(void)
 // assignment of warps from a block doesn't happen in one go, it is done one 
 // warp at a time, hence this function is called once for each warp. however, 
 // all warps of a block get assigned in the same cycle (TODO: make it 1 call)
-int process_manager_c::sim_schedule_thread_block(int core_id) 
+int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) 
 {
   core_c* core          = m_simBase->m_core_pointers[core_id];
   int new_block_id      = -1; 
@@ -1135,6 +1148,21 @@ int process_manager_c::sim_schedule_thread_block(int core_id)
   for (auto I = process->m_block_list.begin(), E = process->m_block_list.end(); I != E; ++I) {
     int block_id = (*I).first;
 
+    if (initial && !*m_simBase->m_knobs->KNOB_ASSIGN_BLOCKS_GREEDILY_INITIALLY) {
+      int min_core_id;
+      if (*m_simBase->m_knobs->KNOB_MAX_NUM_CORE_PER_APPL == 0) {
+        min_core_id = 0;
+      }
+      else 
+      {
+        min_core_id = process->m_core_list.begin()->first;
+      }
+      int num_core_per_appl = process->m_core_list.size();
+
+      if ((block_id  - m_simBase->m_block_id_mapper->find(process->m_process_id, process->m_kernel_block_start_count[process->m_current_vector_index - 1])) % num_core_per_appl != (core_id - min_core_id)) {
+        continue;
+      }
+    }
     // this block was not fetched yet and has traces to schedule
     if (!(m_simBase->m_block_schedule_info[block_id]->m_start_to_fetch) && 
         m_simBase->m_block_schedule_info[block_id]->m_trace_exist) {

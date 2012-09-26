@@ -330,7 +330,7 @@ bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thr
           // create non-main threads here
           m_simBase->m_process_manager->create_thread_node(process, process->m_no_of_threads_created++, 
               false);
-          m_simBase->m_process_manager->sim_thread_schedule();
+          m_simBase->m_process_manager->sim_thread_schedule(false);
         }
       }
 
@@ -1148,6 +1148,20 @@ inst_info_s* trace_read_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s
       // the last uop
       if (ii == (num_uop - 1) && trace_uop[num_uop-1]->m_mem_type == NOT_MEM) {
         /* last uop's info */
+#ifdef GPU_VALIDATION
+        if ((pi->m_opcode == XED_CATEGORY_SEMAPHORE) ||
+            (pi->m_opcode == XED_CATEGORY_IO) ||
+            (pi->m_opcode == XED_CATEGORY_INTERRUPT) ||
+            (pi->m_opcode == XED_CATEGORY_SYSTEM) ||
+            (pi->m_opcode == XED_CATEGORY_SYSCALL) ||
+            (pi->m_opcode == XED_CATEGORY_SYSRET) ||
+            (pi->m_opcode == GPU_BAR)) {
+          // only the last instruction will have bar type
+          trace_uop[(num_uop-1)]->m_bar_type = BAR_FETCH;
+          trace_uop[(num_uop-1)]->m_cf_type  = CF_ICO;
+        }
+      }
+#else
         if ((pi->m_opcode == XED_CATEGORY_SEMAPHORE) ||
             (pi->m_opcode == XED_CATEGORY_IO) ||
             (pi->m_opcode == XED_CATEGORY_INTERRUPT) ||
@@ -1159,6 +1173,7 @@ inst_info_s* trace_read_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s
           trace_uop[(num_uop-1)]->m_cf_type  = CF_ICO;
         }
       }
+#endif
 
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
@@ -1410,6 +1425,10 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
     DEBUG("trace_read nm core_id:%d thread_id:%d pc:%s opcode:%d inst_count:%lu\n",
         core_id, sim_thread_id, hexstr64s(trace_info.m_instruction_addr), 
         static_cast<int>(trace_info.m_opcode), thread_trace_info->m_temp_inst_count);
+
+#ifdef GPU_VALIDATION
+    ASSERTM(trace_info.m_opcode > PREFETCH_T2 && trace_info.m_opcode < TR_OPCODE_LAST, "opcode is %d\n", trace_info.m_opcode);
+#endif
 
 
     ///
@@ -2015,6 +2034,177 @@ void trace_read_c::init_pin_convert(void)
   m_int_uop_table[TR_MEM_LD_TM]             = UOP_IADD;
   m_int_uop_table[TR_MEM_LD_PM]             = UOP_IADD;
   m_int_uop_table[GPU_EN]                   = UOP_IADD;
+  m_int_uop_table[LD_CM_CA]             		= UOP_IADD;
+  m_int_uop_table[LD_CM_CG]             		= UOP_IADD;
+  m_int_uop_table[LD_CM_CS]             		= UOP_IADD;
+  m_int_uop_table[LD_CM_LU]             		= UOP_IADD;
+  m_int_uop_table[LD_CM_CU]             		= UOP_IADD;
+  m_int_uop_table[LD_GM_CA]             		= UOP_IADD;
+  m_int_uop_table[LD_GM_CG]             		= UOP_IADD;
+  m_int_uop_table[LD_GM_CS]             		= UOP_IADD;
+  m_int_uop_table[LD_GM_LU]             		= UOP_IADD;
+  m_int_uop_table[LD_GM_CU]             		= UOP_IADD;
+  m_int_uop_table[LD_LM_CA]             		= UOP_IADD;
+  m_int_uop_table[LD_LM_CG]             		= UOP_IADD;
+  m_int_uop_table[LD_LM_CS]             		= UOP_IADD;
+  m_int_uop_table[LD_LM_LU]             		= UOP_IADD;
+  m_int_uop_table[LD_LM_CU]             		= UOP_IADD;
+  m_int_uop_table[LD_PM_CA]             		= UOP_IADD;
+  m_int_uop_table[LD_PM_CG]             		= UOP_IADD;
+  m_int_uop_table[LD_PM_CS]             		= UOP_IADD;
+  m_int_uop_table[LD_PM_LU]             		= UOP_IADD;
+  m_int_uop_table[LD_PM_CU]             		= UOP_IADD;
+  m_int_uop_table[LD_SM_CA]             		= UOP_IADD;
+  m_int_uop_table[LD_SM_CG]             		= UOP_IADD;
+  m_int_uop_table[LD_SM_CS]             		= UOP_IADD;
+  m_int_uop_table[LD_SM_LU]             		= UOP_IADD;
+  m_int_uop_table[LD_SM_CU]             		= UOP_IADD;
+  m_int_uop_table[LDU_GM]             		  = UOP_IADD;
+  m_int_uop_table[ST_GM_WB]             		= UOP_IADD;
+  m_int_uop_table[ST_GM_CG]             		= UOP_IADD;
+  m_int_uop_table[ST_GM_CS]             		= UOP_IADD;
+  m_int_uop_table[ST_GM_WT]             		= UOP_IADD;
+  m_int_uop_table[ST_LM_WB]             		= UOP_IADD;
+  m_int_uop_table[ST_LM_CG]             		= UOP_IADD;
+  m_int_uop_table[ST_LM_CS]             		= UOP_IADD;
+  m_int_uop_table[ST_LM_WT]             		= UOP_IADD;
+  m_int_uop_table[ST_SM_WB]             		= UOP_IADD;
+  m_int_uop_table[ST_SM_CG]             		= UOP_IADD;
+  m_int_uop_table[ST_SM_CS]             		= UOP_IADD;
+  m_int_uop_table[ST_SM_WT]             		= UOP_IADD;
+  m_int_uop_table[PREF_GM_L1]               = UOP_IADD;
+  m_int_uop_table[PREF_GM_L2]             	= UOP_IADD;
+  m_int_uop_table[PREF_LM_L1]             	= UOP_IADD;
+  m_int_uop_table[PREF_LM_L2]             	= UOP_IADD;
+  m_int_uop_table[PREF_UNIFORM]             = UOP_IADD;
+  m_int_uop_table[GPU_ABS]               		= UOP_GPU_ABS;
+  m_int_uop_table[GPU_ABS64]             		= UOP_GPU_ABS64;
+  m_int_uop_table[GPU_ADD]               		= UOP_GPU_ADD; 
+  m_int_uop_table[GPU_ADD64]             		= UOP_GPU_ADD64; 
+	m_int_uop_table[GPU_ADDC]             		= UOP_GPU_ADDC;
+	m_int_uop_table[GPU_AND]               		= UOP_GPU_AND;
+	m_int_uop_table[GPU_AND64]             		= UOP_GPU_AND64;
+	m_int_uop_table[GPU_ATOM]             		= UOP_GPU_ATOM;
+	m_int_uop_table[GPU_ATOM64]            		= UOP_GPU_ATOM64;
+	m_int_uop_table[GPU_BAR]               		= UOP_GPU_BAR;
+	m_int_uop_table[GPU_BFE]               		= UOP_GPU_BFE;
+	m_int_uop_table[GPU_BFE64]             		= UOP_GPU_BFE64;
+	m_int_uop_table[GPU_BFI]             	  	= UOP_GPU_BFI;
+	m_int_uop_table[GPU_BFI64]             		= UOP_GPU_BFI64;
+	m_int_uop_table[GPU_BFIND]             		= UOP_GPU_BFIND;
+	m_int_uop_table[GPU_BFIND64]            	= UOP_GPU_BFIND64;
+	m_int_uop_table[GPU_BRA]             	  	= UOP_GPU_BRA;
+	m_int_uop_table[GPU_BREV]             		= UOP_GPU_BREV;
+	m_int_uop_table[GPU_BREV64]             	= UOP_GPU_BREV64;
+	m_int_uop_table[GPU_BRKPT]             		= UOP_GPU_BRKPT;
+	m_int_uop_table[GPU_CALL]             		= UOP_GPU_CALL;
+	m_int_uop_table[GPU_CLZ]             	  	= UOP_GPU_CLZ;
+	m_int_uop_table[GPU_CLZ64]             		= UOP_GPU_CLZ64;
+	m_int_uop_table[GPU_CNOT]             		= UOP_GPU_CNOT;
+	m_int_uop_table[GPU_CNOT64]             	= UOP_GPU_CNOT64;
+	m_int_uop_table[GPU_COPYSIGN]           	= UOP_GPU_COPYSIGN;
+	m_int_uop_table[GPU_COPYSIGN64]         	= UOP_GPU_COPYSIGN64;
+	m_int_uop_table[GPU_COS]             	  	= UOP_GPU_COS;
+	m_int_uop_table[GPU_CVT]             	  	= UOP_GPU_CVT;
+	m_int_uop_table[GPU_CVT64]             		= UOP_GPU_CVT64;
+	m_int_uop_table[GPU_CVTA]             		= UOP_GPU_CVTA;
+	m_int_uop_table[GPU_CVTA64]            		= UOP_GPU_CVTA64;
+	m_int_uop_table[GPU_DIV]             	  	= UOP_GPU_DIV;
+	m_int_uop_table[GPU_DIV64]             		= UOP_GPU_DIV64;
+	m_int_uop_table[GPU_EX2]             	  	= UOP_GPU_EX2;
+	m_int_uop_table[GPU_EXIT]             		= UOP_GPU_EXIT;
+	m_int_uop_table[GPU_FMA]             	  	= UOP_GPU_FMA;
+	m_int_uop_table[GPU_FMA64]             		= UOP_GPU_FMA64;
+	m_int_uop_table[GPU_ISSPACEP]           	= UOP_GPU_ISSPACEP;
+	m_int_uop_table[GPU_LD]             		  = UOP_GPU_LD;
+	m_int_uop_table[GPU_LD64]             		= UOP_GPU_LD64;
+	m_int_uop_table[GPU_LDU]             		  = UOP_GPU_LDU;
+	m_int_uop_table[GPU_LDU64]             		= UOP_GPU_LDU64;
+	m_int_uop_table[GPU_LG2]               		= UOP_GPU_LG2;
+	m_int_uop_table[GPU_MAD24]             		= UOP_GPU_MAD24;
+	m_int_uop_table[GPU_MAD]             	  	= UOP_GPU_MAD;
+	m_int_uop_table[GPU_MAD64]             		= UOP_GPU_MAD64;
+	m_int_uop_table[GPU_MAX]             	  	= UOP_GPU_MAX;
+	m_int_uop_table[GPU_MAX64]             		= UOP_GPU_MAX64;
+	m_int_uop_table[GPU_MEMBAR]             	= UOP_GPU_MEMBAR;
+	m_int_uop_table[GPU_MIN]             		  = UOP_GPU_MIN;
+	m_int_uop_table[GPU_MIN64]             		= UOP_GPU_MIN64;
+	m_int_uop_table[GPU_MOV]             	  	= UOP_GPU_MOV;
+	m_int_uop_table[GPU_MOV64]             		= UOP_GPU_MOV64;
+	m_int_uop_table[GPU_MUL24]             		= UOP_GPU_MUL24;
+	m_int_uop_table[GPU_MUL]             		  = UOP_GPU_MUL;
+	m_int_uop_table[GPU_MUL64]             		= UOP_GPU_MUL64;
+	m_int_uop_table[GPU_NEG]             		  = UOP_GPU_NEG;
+	m_int_uop_table[GPU_NEG64]             		= UOP_GPU_NEG64;
+	m_int_uop_table[GPU_NOT]             		  = UOP_GPU_NOT;
+	m_int_uop_table[GPU_NOT64]             		= UOP_GPU_NOT64;
+	m_int_uop_table[GPU_OR]             	  	= UOP_GPU_OR;
+	m_int_uop_table[GPU_OR64]             		= UOP_GPU_OR64;
+	m_int_uop_table[GPU_PMEVENT]            	= UOP_GPU_PMEVENT;
+	m_int_uop_table[GPU_POPC]             		= UOP_GPU_POPC;
+	m_int_uop_table[GPU_POPC64]             	= UOP_GPU_POPC64;
+	m_int_uop_table[GPU_PREFETCH]           	= UOP_GPU_PREFETCH;
+	m_int_uop_table[GPU_PREFETCHU]          	= UOP_GPU_PREFETCHU;
+	m_int_uop_table[GPU_PRMT]             		= UOP_GPU_PRMT;
+	m_int_uop_table[GPU_RCP]             	  	= UOP_GPU_RCP;
+	m_int_uop_table[GPU_RCP64]             		= UOP_GPU_RCP64;
+	m_int_uop_table[GPU_RED]             	  	= UOP_GPU_RED;
+	m_int_uop_table[GPU_RED64]             		= UOP_GPU_RED64;
+	m_int_uop_table[GPU_REM]             	  	= UOP_GPU_REM;
+	m_int_uop_table[GPU_REM64]             		= UOP_GPU_REM64;
+	m_int_uop_table[GPU_RET]             	  	= UOP_GPU_RET;
+	m_int_uop_table[GPU_RSQRT]             		= UOP_GPU_RSQRT;
+	m_int_uop_table[GPU_RSQRT64]            	= UOP_GPU_RSQRT64;
+	m_int_uop_table[GPU_SAD]             	  	= UOP_GPU_SAD;
+	m_int_uop_table[GPU_SAD64]             		= UOP_GPU_SAD64;
+	m_int_uop_table[GPU_SELP]             		= UOP_GPU_SELP;
+	m_int_uop_table[GPU_SELP64]             	= UOP_GPU_SELP64;
+	m_int_uop_table[GPU_SET]             	  	= UOP_GPU_SET;
+	m_int_uop_table[GPU_SET64]             		= UOP_GPU_SET64;
+	m_int_uop_table[GPU_SETP]             		= UOP_GPU_SETP;
+	m_int_uop_table[GPU_SETP64]             	= UOP_GPU_SETP64;
+	m_int_uop_table[GPU_SHL]             	  	= UOP_GPU_SHL;
+	m_int_uop_table[GPU_SHL64]             		= UOP_GPU_SHL64;
+	m_int_uop_table[GPU_SHR]             		  = UOP_GPU_SHR;
+	m_int_uop_table[GPU_SHR64]             		= UOP_GPU_SHR64;
+	m_int_uop_table[GPU_SIN]             	  	= UOP_GPU_SIN;
+	m_int_uop_table[GPU_SLCT]             		= UOP_GPU_SLCT;
+	m_int_uop_table[GPU_SLCT64]            		= UOP_GPU_SLCT64;
+	m_int_uop_table[GPU_SQRT]             		= UOP_GPU_SQRT;
+	m_int_uop_table[GPU_SQRT64]            		= UOP_GPU_SQRT64;
+	m_int_uop_table[GPU_ST]             	  	= UOP_GPU_ST;
+	m_int_uop_table[GPU_ST64]             		= UOP_GPU_ST64;
+	m_int_uop_table[GPU_SUB]             		  = UOP_GPU_SUB;
+	m_int_uop_table[GPU_SUB64]             		= UOP_GPU_SUB64;
+	m_int_uop_table[GPU_SUBC]             		= UOP_GPU_SUBC;
+	m_int_uop_table[GPU_SULD]             		= UOP_GPU_SULD;
+	m_int_uop_table[GPU_SULD64]             	= UOP_GPU_SULD64;
+	m_int_uop_table[GPU_SURED]             		= UOP_GPU_SURED;
+	m_int_uop_table[GPU_SURED64]            	= UOP_GPU_SURED64;
+	m_int_uop_table[GPU_SUST]             		= UOP_GPU_SUST;
+	m_int_uop_table[GPU_SUST64]             	= UOP_GPU_SUST64;
+	m_int_uop_table[GPU_SUQ]             		  = UOP_GPU_SUQ;
+  m_int_uop_table[GPU_TESTP]             		= UOP_GPU_TESTP;
+  m_int_uop_table[GPU_TESTP64]            	= UOP_GPU_TESTP64;
+  m_int_uop_table[GPU_TEX]             		  = UOP_GPU_TEX;
+  m_int_uop_table[GPU_TLD4]             		= UOP_GPU_TLD4;
+  m_int_uop_table[GPU_TXQ]             		  = UOP_GPU_TXQ;
+  m_int_uop_table[GPU_TRAP]             		= UOP_GPU_TRAP;
+  m_int_uop_table[GPU_VABSDIFF]             = UOP_GPU_VABSDIFF;
+  m_int_uop_table[GPU_VADD]             		= UOP_GPU_VADD;
+  m_int_uop_table[GPU_VMAD]             		= UOP_GPU_VMAD;
+  m_int_uop_table[GPU_VMAX]             		= UOP_GPU_VMAX;
+  m_int_uop_table[GPU_VMIN]             		= UOP_GPU_VMIN;
+  m_int_uop_table[GPU_VSET]             		= UOP_GPU_VSET;
+  m_int_uop_table[GPU_VSHL]             		= UOP_GPU_VSHL;
+  m_int_uop_table[GPU_VSHR]             		= UOP_GPU_VSHR;
+  m_int_uop_table[GPU_VSUB]             		= UOP_GPU_VSUB;
+  m_int_uop_table[GPU_VOTE]             		= UOP_GPU_VOTE;
+  m_int_uop_table[GPU_XOR]             		  = UOP_GPU_XOR;
+  m_int_uop_table[GPU_XOR64]             		= UOP_GPU_XOR64;
+  m_int_uop_table[GPU_RECONVERGE]           = UOP_GPU_RECONVERGE;
+  m_int_uop_table[GPU_PHI]             		  = UOP_GPU_PHI;
+
 
   m_fp_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
   m_fp_uop_table[XED_CATEGORY_3DNOW]       = UOP_FADD;
@@ -2081,6 +2271,176 @@ void trace_read_c::init_pin_convert(void)
   m_fp_uop_table[TR_MEM_LD_TM]             = UOP_FADD;
   m_fp_uop_table[TR_MEM_LD_PM]             = UOP_FADD;
   m_fp_uop_table[GPU_EN]                   = UOP_FADD;
+  m_fp_uop_table[LD_CM_CA]             		 = UOP_FADD;
+  m_fp_uop_table[LD_CM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[LD_CM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[LD_CM_LU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_CM_CU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_GM_CA]             		 = UOP_FADD;
+  m_fp_uop_table[LD_GM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[LD_GM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[LD_GM_LU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_GM_CU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_LM_CA]             		 = UOP_FADD;
+  m_fp_uop_table[LD_LM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[LD_LM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[LD_LM_LU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_LM_CU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_PM_CA]             		 = UOP_FADD;
+  m_fp_uop_table[LD_PM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[LD_PM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[LD_PM_LU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_PM_CU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_SM_CA]             		 = UOP_FADD;
+  m_fp_uop_table[LD_SM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[LD_SM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[LD_SM_LU]             		 = UOP_FADD;
+  m_fp_uop_table[LD_SM_CU]             		 = UOP_FADD;
+  m_fp_uop_table[LDU_GM]             		   = UOP_FADD;
+  m_fp_uop_table[ST_GM_WB]             		 = UOP_FADD;
+  m_fp_uop_table[ST_GM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[ST_GM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[ST_GM_WT]             		 = UOP_FADD;
+  m_fp_uop_table[ST_LM_WB]             		 = UOP_FADD;
+  m_fp_uop_table[ST_LM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[ST_LM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[ST_LM_WT]             		 = UOP_FADD;
+  m_fp_uop_table[ST_SM_WB]             		 = UOP_FADD;
+  m_fp_uop_table[ST_SM_CG]             		 = UOP_FADD;
+  m_fp_uop_table[ST_SM_CS]             		 = UOP_FADD;
+  m_fp_uop_table[ST_SM_WT]             		 = UOP_FADD;
+  m_fp_uop_table[PREF_GM_L1]               = UOP_FADD;
+  m_fp_uop_table[PREF_GM_L2]             	 = UOP_FADD;
+  m_fp_uop_table[PREF_LM_L1]             	 = UOP_FADD;
+  m_fp_uop_table[PREF_LM_L2]             	 = UOP_FADD;
+  m_fp_uop_table[PREF_UNIFORM]             = UOP_FADD;
+  m_fp_uop_table[GPU_ABS]                  = UOP_GPU_FABS;
+  m_fp_uop_table[GPU_ABS64]              	 = UOP_GPU_FABS64;
+  m_fp_uop_table[GPU_ADD]                	 = UOP_GPU_FADD; 
+  m_fp_uop_table[GPU_ADD64]              	 = UOP_GPU_FADD64; 
+	m_fp_uop_table[GPU_ADDC]              	 = UOP_GPU_FADDC;
+	m_fp_uop_table[GPU_AND]                	 = UOP_GPU_FAND;
+	m_fp_uop_table[GPU_AND64]              	 = UOP_GPU_FAND64;
+	m_fp_uop_table[GPU_ATOM]              	 = UOP_GPU_FATOM;
+	m_fp_uop_table[GPU_ATOM64]             	 = UOP_GPU_FATOM64;
+	m_fp_uop_table[GPU_BAR]                	 = UOP_GPU_FBAR;
+	m_fp_uop_table[GPU_BFE]               	 = UOP_GPU_FBFE;
+	m_fp_uop_table[GPU_BFE64]             	 = UOP_GPU_FBFE64;
+	m_fp_uop_table[GPU_BFI]             	   = UOP_GPU_FBFI;
+	m_fp_uop_table[GPU_BFI64]             	 = UOP_GPU_FBFI64;
+	m_fp_uop_table[GPU_BFIND]             	 = UOP_GPU_FBFIND;
+	m_fp_uop_table[GPU_BFIND64]            	 = UOP_GPU_FBFIND64;
+	m_fp_uop_table[GPU_BRA]             	   = UOP_GPU_FBRA;
+	m_fp_uop_table[GPU_BREV]             		 = UOP_GPU_FBREV;
+	m_fp_uop_table[GPU_BREV64]             	 = UOP_GPU_FBREV64;
+	m_fp_uop_table[GPU_BRKPT]             	 = UOP_GPU_FBRKPT;
+	m_fp_uop_table[GPU_CALL]             		 = UOP_GPU_FCALL;
+	m_fp_uop_table[GPU_CLZ]             	   = UOP_GPU_FCLZ;
+	m_fp_uop_table[GPU_CLZ64]             	 = UOP_GPU_FCLZ64;
+	m_fp_uop_table[GPU_CNOT]             		 = UOP_GPU_FCNOT;
+	m_fp_uop_table[GPU_CNOT64]             	 = UOP_GPU_FCNOT64;
+	m_fp_uop_table[GPU_COPYSIGN]           	 = UOP_GPU_FCOPYSIGN;
+	m_fp_uop_table[GPU_COPYSIGN64]         	 = UOP_GPU_FCOPYSIGN64;
+	m_fp_uop_table[GPU_COS]             	   = UOP_GPU_FCOS;
+	m_fp_uop_table[GPU_CVT]             	   = UOP_GPU_FCVT;
+	m_fp_uop_table[GPU_CVT64]             	 = UOP_GPU_FCVT64;
+	m_fp_uop_table[GPU_CVTA]             		 = UOP_GPU_FCVTA;
+	m_fp_uop_table[GPU_CVTA64]            	 = UOP_GPU_FCVTA64;
+	m_fp_uop_table[GPU_DIV]             	   = UOP_GPU_FDIV;
+	m_fp_uop_table[GPU_DIV64]             	 = UOP_GPU_FDIV64;
+	m_fp_uop_table[GPU_EX2]             	   = UOP_GPU_FEX2;
+	m_fp_uop_table[GPU_EXIT]             		 = UOP_GPU_FEXIT;
+	m_fp_uop_table[GPU_FMA]             	   = UOP_GPU_FFMA;
+	m_fp_uop_table[GPU_FMA64]             	 = UOP_GPU_FFMA64;
+	m_fp_uop_table[GPU_ISSPACEP]           	 = UOP_GPU_FISSPACEP;
+	m_fp_uop_table[GPU_LD]             		   = UOP_GPU_FLD;
+	m_fp_uop_table[GPU_LD64]             		 = UOP_GPU_FLD64;
+	m_fp_uop_table[GPU_LDU]             		 = UOP_GPU_FLDU;
+	m_fp_uop_table[GPU_LDU64]             	 = UOP_GPU_FLDU64;
+	m_fp_uop_table[GPU_LG2]               	 = UOP_GPU_FLG2;
+	m_fp_uop_table[GPU_MAD24]             	 = UOP_GPU_FMAD24;
+	m_fp_uop_table[GPU_MAD]             	   = UOP_GPU_FMAD;
+	m_fp_uop_table[GPU_MAD64]             	 = UOP_GPU_FMAD64;
+	m_fp_uop_table[GPU_MAX]             	   = UOP_GPU_FMAX;
+	m_fp_uop_table[GPU_MAX64]             	 = UOP_GPU_FMAX64;
+	m_fp_uop_table[GPU_MEMBAR]             	 = UOP_GPU_FMEMBAR;
+	m_fp_uop_table[GPU_MIN]             		 = UOP_GPU_FMIN;
+	m_fp_uop_table[GPU_MIN64]             	 = UOP_GPU_FMIN64;
+	m_fp_uop_table[GPU_MOV]             	   = UOP_GPU_FMOV;
+	m_fp_uop_table[GPU_MOV64]             	 = UOP_GPU_FMOV64;
+	m_fp_uop_table[GPU_MUL24]             	 = UOP_GPU_FMUL24;
+	m_fp_uop_table[GPU_MUL]             		 = UOP_GPU_FMUL;
+	m_fp_uop_table[GPU_MUL64]             	 = UOP_GPU_FMUL64;
+	m_fp_uop_table[GPU_NEG]             		 = UOP_GPU_FNEG;
+	m_fp_uop_table[GPU_NEG64]             	 = UOP_GPU_FNEG64;
+	m_fp_uop_table[GPU_NOT]             		 = UOP_GPU_FNOT;
+	m_fp_uop_table[GPU_NOT64]             	 = UOP_GPU_FNOT64;
+	m_fp_uop_table[GPU_OR]             	  	 = UOP_GPU_FOR;
+	m_fp_uop_table[GPU_OR64]             		 = UOP_GPU_FOR64;
+	m_fp_uop_table[GPU_PMEVENT]            	 = UOP_GPU_FPMEVENT;
+	m_fp_uop_table[GPU_POPC]             		 = UOP_GPU_FPOPC;
+	m_fp_uop_table[GPU_POPC64]             	 = UOP_GPU_FPOPC64;
+	m_fp_uop_table[GPU_PREFETCH]           	 = UOP_GPU_FPREFETCH;
+	m_fp_uop_table[GPU_PREFETCHU]          	 = UOP_GPU_FPREFETCHU;
+	m_fp_uop_table[GPU_PRMT]             		 = UOP_GPU_FPRMT;
+	m_fp_uop_table[GPU_RCP]             	   = UOP_GPU_FRCP;
+	m_fp_uop_table[GPU_RCP64]             	 = UOP_GPU_FRCP64;
+	m_fp_uop_table[GPU_RED]             	   = UOP_GPU_FRED;
+	m_fp_uop_table[GPU_RED64]             	 = UOP_GPU_FRED64;
+	m_fp_uop_table[GPU_REM]             	   = UOP_GPU_FREM;
+	m_fp_uop_table[GPU_REM64]             	 = UOP_GPU_FREM64;
+	m_fp_uop_table[GPU_RET]             	   = UOP_GPU_FRET;
+	m_fp_uop_table[GPU_RSQRT]             	 = UOP_GPU_FRSQRT;
+	m_fp_uop_table[GPU_RSQRT64]            	 = UOP_GPU_FRSQRT64;
+	m_fp_uop_table[GPU_SAD]             	   = UOP_GPU_FSAD;
+	m_fp_uop_table[GPU_SAD64]             	 = UOP_GPU_FSAD64;
+	m_fp_uop_table[GPU_SELP]             		 = UOP_GPU_FSELP;
+	m_fp_uop_table[GPU_SELP64]             	 = UOP_GPU_FSELP64;
+	m_fp_uop_table[GPU_SET]             	   = UOP_GPU_FSET;
+	m_fp_uop_table[GPU_SET64]             	 = UOP_GPU_FSET64;
+	m_fp_uop_table[GPU_SETP]             		 = UOP_GPU_FSETP;
+	m_fp_uop_table[GPU_SETP64]             	 = UOP_GPU_FSETP64;
+	m_fp_uop_table[GPU_SHL]             	   = UOP_GPU_FSHL;
+	m_fp_uop_table[GPU_SHL64]             	 = UOP_GPU_FSHL64;
+	m_fp_uop_table[GPU_SHR]             		 = UOP_GPU_FSHR;
+	m_fp_uop_table[GPU_SHR64]             	 = UOP_GPU_FSHR64;
+	m_fp_uop_table[GPU_SIN]             	   = UOP_GPU_FSIN;
+	m_fp_uop_table[GPU_SLCT]             		 = UOP_GPU_FSLCT;
+	m_fp_uop_table[GPU_SLCT64]            	 = UOP_GPU_FSLCT64;
+	m_fp_uop_table[GPU_SQRT]             		 = UOP_GPU_FSQRT;
+	m_fp_uop_table[GPU_SQRT64]            	 = UOP_GPU_FSQRT64;
+	m_fp_uop_table[GPU_ST]             	  	 = UOP_GPU_FST;
+	m_fp_uop_table[GPU_ST64]             		 = UOP_GPU_FST64;
+	m_fp_uop_table[GPU_SUB]             		 = UOP_GPU_FSUB;
+	m_fp_uop_table[GPU_SUB64]             	 = UOP_GPU_FSUB64;
+	m_fp_uop_table[GPU_SUBC]             		 = UOP_GPU_FSUBC;
+	m_fp_uop_table[GPU_SULD]             		 = UOP_GPU_FSULD;
+	m_fp_uop_table[GPU_SULD64]             	 = UOP_GPU_FSULD64;
+	m_fp_uop_table[GPU_SURED]             	 = UOP_GPU_FSURED;
+	m_fp_uop_table[GPU_SURED64]            	 = UOP_GPU_FSURED64;
+	m_fp_uop_table[GPU_SUST]             		 = UOP_GPU_FSUST;
+	m_fp_uop_table[GPU_SUST64]             	 = UOP_GPU_FSUST64;
+	m_fp_uop_table[GPU_SUQ]             		 = UOP_GPU_FSUQ;
+  m_fp_uop_table[GPU_TESTP]             	 = UOP_GPU_FTESTP;
+  m_fp_uop_table[GPU_TESTP64]            	 = UOP_GPU_FTESTP64;
+  m_fp_uop_table[GPU_TEX]             		 = UOP_GPU_FTEX;
+  m_fp_uop_table[GPU_TLD4]             		 = UOP_GPU_FTLD4;
+  m_fp_uop_table[GPU_TXQ]             		 = UOP_GPU_FTXQ;
+  m_fp_uop_table[GPU_TRAP]             		 = UOP_GPU_FTRAP;
+  m_fp_uop_table[GPU_VABSDIFF]             = UOP_GPU_FVABSDIFF;
+  m_fp_uop_table[GPU_VADD]             		 = UOP_GPU_FVADD;
+  m_fp_uop_table[GPU_VMAD]             		 = UOP_GPU_FVMAD;
+  m_fp_uop_table[GPU_VMAX]             		 = UOP_GPU_FVMAX;
+  m_fp_uop_table[GPU_VMIN]             		 = UOP_GPU_FVMIN;
+  m_fp_uop_table[GPU_VSET]             		 = UOP_GPU_FVSET;
+  m_fp_uop_table[GPU_VSHL]             		 = UOP_GPU_FVSHL;
+  m_fp_uop_table[GPU_VSHR]             		 = UOP_GPU_FVSHR;
+  m_fp_uop_table[GPU_VSUB]             		 = UOP_GPU_FVSUB;
+  m_fp_uop_table[GPU_VOTE]             		 = UOP_GPU_FVOTE;
+  m_fp_uop_table[GPU_XOR]             		 = UOP_GPU_FXOR;
+  m_fp_uop_table[GPU_XOR64]             	 = UOP_GPU_FXOR64;
+  m_fp_uop_table[GPU_RECONVERGE]           = UOP_GPU_FRECONVERGE;
+  m_fp_uop_table[GPU_PHI]             		 = UOP_GPU_FPHI;
 }
 
 

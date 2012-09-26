@@ -57,7 +57,7 @@ bp_targ_c::bp_targ_c(uns core_id_arg, macsim_c* simBase)
   btb = new cache_c("btb", simBase->m_knobs->KNOB_BTB_ENTRIES->getValue() * 4, 
       simBase->m_knobs->KNOB_BTB_ASSOC->getValue(), 4, sizeof(Addr), 
       simBase->m_knobs->KNOB_BTB_BANK_NUM->getValue(), false, core_id_arg, CACHE_BTB,
-      false, simBase); 
+      false, 1, 0, simBase); 
 		    
   m_core_id = core_id_arg; 
   m_simBase = simBase; 

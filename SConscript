@@ -58,6 +58,9 @@ else:
   env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
 
+if flags['val'] == '1':
+  env['CPPDEFINES'].append('GPU_VALIDATION')
+
 
 #########################################################################################
 # IRIS

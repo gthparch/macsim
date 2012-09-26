@@ -528,6 +528,7 @@ class memory_c
     int m_noc_id_base[MEM_LAST]; /**< noc id base per level */
     Counter m_stop_prefetch; /**< when set, no prefetches will be inserted */
     int m_l3_interleave_factor; /**< mask bit for L3 id */
+    int m_dram_interleave_factor; /**< mask bit for dram id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
     map<int, int>* m_dst_map; /**< destination id mapping function */
 

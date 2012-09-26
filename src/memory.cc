@@ -202,9 +202,27 @@ cache_c *default_llc(macsim_c* m_simBase)
 {
   string llc_type = KNOB(KNOB_LLC_TYPE)->getValue();
   assert(llc_type == "default");
+
+  int num_tiles;
+  int interleaving;
+
+  if (*KNOB(KNOB_DEFAULT_INTERLEAVING)) {
+    num_tiles = 1;
+    interleaving = 0;
+  }
+  else {
+    num_tiles = *KNOB(KNOB_NUM_L3);
+    if (*KNOB(KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY)) {
+      interleaving = *m_simBase->m_knobs->KNOB_L3_LINE_SIZE;
+    }
+    else if (*KNOB(KNOB_NEW_INTERLEAVING_SAME_GRANULARITY)) {
+      interleaving = *m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE;
+    }
+  }
+
   cache_c* llc = new cache_c("llc_default", *KNOB(KNOB_L3_NUM_SET), *KNOB(KNOB_L3_ASSOC),
       *KNOB(KNOB_L3_LINE_SIZE), sizeof(dcache_data_s), *KNOB(KNOB_L3_NUM_BANK),
-      false, 0, CACHE_DL1, false, m_simBase);
+      false, 0, CACHE_DL1, false, num_tiles, interleaving, m_simBase);
   return llc;
 }
 
@@ -369,7 +387,7 @@ void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coup
     }
     else {
       m_cache = new cache_c("dcache", m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), 
-          m_banks, false, m_id, CACHE_DL1, m_level == MEM_L3 ? true : false, m_simBase);
+          m_banks, false, m_id, CACHE_DL1, m_level == MEM_L3 ? true : false, 1, 0, m_simBase);
     }
 
     // allocate port
@@ -900,40 +918,47 @@ void dcu_c::receive_packet(void)
     
 
   mem_req_s* req = NULL;
-  
+
+  string topology = KNOB(KNOB_NOC_TOPOLOGY)->getValue();
+  int num_rounds = 1;
+  if (topology == "simple_noc") num_rounds = 2;
+
+  for (int ii = 0; ii < num_rounds; ++ii) {
+
 #ifdef IRIS
-  req = m_terminal->check_queue();
+    req = m_terminal->check_queue();
 #else
-  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    req = m_router->receive_req();
-  }
+    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+      req = m_router->receive_req(ii);
+    }
 #endif
 
-  if (req != NULL) {
-    req->m_state = MEM_NOC_DONE;
-    bool insert_done = false;
-    if (req->m_msg_type == NOC_FILL) {
-      insert_done = fill(req);
-    }
-    else if (req->m_msg_type == NOC_NEW) {
-      insert_done = insert(req);
-    }
-    else {
-      assert(0);
-    }
-
-    if (insert_done) {
-      if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-        m_router->pop_req();
+    if (req != NULL) {
+      req->m_state = MEM_NOC_DONE;
+      bool insert_done = false;
+      if (req->m_msg_type == NOC_FILL) {
+        insert_done = fill(req);
       }
-    
-      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-        m_simBase->m_bug_detector->deallocate_noc(req);
+      else if (req->m_msg_type == NOC_NEW) {
+        insert_done = insert(req);
       }
-    }
-    else {
-      if (*KNOB(KNOB_ENABLE_IRIS))
+      else {
         assert(0);
+      }
+
+      if (insert_done) {
+        if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
+          m_router->pop_req(ii);
+        }
+
+        if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+          m_simBase->m_bug_detector->deallocate_noc(req);
+        }
+      }
+      else {
+        if (*KNOB(KNOB_ENABLE_IRIS))
+          assert(0);
+      }
     }
   }
 }
@@ -1618,8 +1643,26 @@ memory_c::memory_c(macsim_c* simBase)
   // misc
   m_stop_prefetch = 0;
 
-  m_l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
-  m_l3_interleave_factor = static_cast<int>(pow(2, m_l3_interleave_factor));
+  if (*m_simBase->m_knobs->KNOB_DEFAULT_INTERLEAVING) {
+    m_l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
+    m_l3_interleave_factor = static_cast<int>(pow(2, m_l3_interleave_factor));
+
+    m_dram_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
+    m_dram_interleave_factor = static_cast<int>(pow(2, m_dram_interleave_factor));
+  }
+  // diff granularity for L3 and DRAM
+  else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY) {
+    m_l3_interleave_factor = *m_simBase->m_knobs->KNOB_L3_LINE_SIZE;
+    m_dram_interleave_factor = *m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE;
+  }
+  // same granularity for L3 and DRAM - if #l3 == #mc, then each l3 slice sends request to only one mc
+  else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_SAME_GRANULARITY) {
+    m_l3_interleave_factor = *m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE;
+    m_dram_interleave_factor = *m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE;
+  }
+  else {
+    assert(0);
+  }
     
   // destination router map
   m_dst_map = new map<int, int>;
@@ -1766,6 +1809,31 @@ void memory_c::init(void)
           (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
         }
       }
+    }
+    else if (*KNOB(KNOB_NOC_DIMENSION) == 0) {
+
+      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+      }
+      int count = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+
+      for (int ii = count; ii < (count + *KNOB(KNOB_NUM_SIM_SMALL_CORES)); ++ii) {
+        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
+      }
+      count += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
+
+      for (int ii = 0; ii < m_num_l3; ++ii) {
+        (*m_dst_map)[MEM_L3 * 100 + ii] = (count + ii);
+      }
+      count += m_num_l3;
+
+      for (int ii = 0; ii < m_num_mc; ++ii) {
+        (*m_dst_map)[MEM_MC * 100 + ii] = (count + ii);
+      }
+
+    }
+    else {
+      assert(0);
     }
   }
 }
@@ -1940,6 +2008,7 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int si
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
   req->m_in                     = m_cycle;
+  req->m_core_in                = m_simBase->m_core_cycle[core_id];
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -1972,6 +2041,7 @@ void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
   req->m_in                     = m_cycle;
+  req->m_core_in                = m_simBase->m_core_cycle[core_id];
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -2237,13 +2307,15 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
   req->m_done_func              = NULL;
   req->m_uop                    = NULL;
   req->m_in                     = m_cycle;
+  req->m_core_in                = m_simBase->m_core_cycle[data->m_core_id];
   req->m_dirty                  = true;
   req->m_done                   = false;
 
-  req->m_cache_id[MEM_L1] = data->m_core_id;
-  req->m_cache_id[MEM_L2] = data->m_core_id;
-  req->m_cache_id[MEM_L3] = BANK(addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
+  set_cache_id(req);
+  //req->m_cache_id[MEM_L1] = data->m_core_id;
+  //req->m_cache_id[MEM_L2] = data->m_core_id;
+  //req->m_cache_id[MEM_L3] = BANK(addr, m_num_l3, m_l3_interleave_factor);
+  //req->m_cache_id[MEM_MC] = BANK(addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
 
   return req;
 } 
@@ -2539,8 +2611,24 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
 {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
-  req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  //req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
+  //req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+
+  if (m_num_l3 & (m_num_l3 - 1) == 0) {
+    req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
+  }
+  else {
+    req->m_cache_id[MEM_L3] = (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3;
+    //cout << "addr " << hex << req->m_addr << " l3 tile " << dec << (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3 << "\n";
+  }
+
+  if (m_num_mc & (m_num_mc - 1) == 0) {
+    req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, m_dram_interleave_factor);
+  }
+  else {
+    req->m_cache_id[MEM_MC] = (req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc;
+    //cout << "addr " << hex << req->m_addr << " mc " << dec << ((req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc) << "\n";
+  }
 }
 
 

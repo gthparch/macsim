@@ -103,6 +103,13 @@ class schedule_smc_c : public schedule_c
      */
     bool uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE* sched_fail_reason);
 
+    /*! \fn bool is_sfu_inst(uop_c *uop)
+     *  \brief Function to check if instruction uses SFU
+     *  \param uop - Instruction to be checked
+     *  \return bool - True if instruction uses SFU
+     */
+    bool is_sfu_inst(uop_c *uop);
+
   private:
     static const int MAX_GPU_SCHED_SIZE = 128; /**< max sched table size */
 
@@ -115,6 +122,11 @@ class schedule_smc_c : public schedule_c
     int m_first_schlist; /**< current index in schedule list */
     int m_last_schlist; /**< last index in schedule list */
     int m_schlist_size; /**< schedule list size */
+    map<int, int> m_processed_threads; /**<to track threads which have already been examined by the scheduler */
+    Counter *m_dispatch_busy_cycle; /**<model the variable throughputs of different instructions */
+    Counter m_sfu_dispatch_busy_cycle; /**<track when a SFU instruction can be dispatched */
+    int m_dispatch_latency[NUM_UOP_TYPES]; /**<dispatch latency of different instructions */
+    int m_next_sched_id; /**<id of warp scheduler for which instructions will be scheduled next */
 
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
    

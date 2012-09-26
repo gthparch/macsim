@@ -249,6 +249,8 @@ typedef struct process_s {
   unsigned int         m_no_of_threads; /**< number of total threads */
   unsigned int         m_no_of_threads_created; /**< number of threads created */
   unsigned int         m_no_of_threads_terminated; /**< number of terminated threads */
+  // m_core_list should remain a map, don't change it to unordered map, it is used 
+  // for RR assignment of blocks to cores
   map<int, bool>       m_core_list; /**< list of cores that this process is executed */
   queue<int>          *m_core_pool; /**< core pool pointer */
   bool                 m_ptx; /**< GPU application */
@@ -328,15 +330,17 @@ class process_manager_c
 
     /**
      * Schedule a new thread
+     * @param initial - set true for initial assignment to cores (PTX)
      */
-    void sim_thread_schedule(void);
+    void sim_thread_schedule(bool initial);
 
   private:
     /**
      * GPU simulation : schedule a thread from a block
      * @param core_id - core to schedule a new thread
+     * @param initial -  set true for initial assignment to cores (PTX)
      */
-    int sim_schedule_thread_block(int core_id);
+    int sim_schedule_thread_block(int core_id, bool initial);
     
     /**
      * Insert a new thread to the scheduler

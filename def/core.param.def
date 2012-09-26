@@ -99,6 +99,8 @@ param<GPU_SCHEDULE_RATIO,                   schedule_ratio,                     
 param<CPU_FETCH_RATIO,                      cpu_fetch_ratio,                            int,    1> 
 
 param<PTX_EXEC_RATIO,                   ptx_exec_ratio,                     int,         4>
+param<PTX_INST_LATENCY,                 ptx_inst_latency,                   int,         20>
+param<PTX_DISPATCH_LATENCY_FACTOR,      ptx_dispatch_latency_factor,        int,         2>
 
 param<NUM_SIM_CORES, 				num_sim_cores, 					int, 	80>
 param<CORE_TYPE, core_type, string, x86>

@@ -141,6 +141,7 @@ void smc_allocate_c::run_a_cycle(void)
       gpu_alloc_q_type = gen_ALLOCQ;
     }
     else {
+      assert(0);
       int q_type = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
       
       // multiple Alloc queues

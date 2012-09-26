@@ -70,6 +70,7 @@ flags['power'] = Config.get('Library', 'power', '0')
 flags['iris']  = Config.get('Library', 'iris', '0')
 flags['debug'] = Config.get('Build', 'debug', '0')
 flags['gprof'] = Config.get('Build', 'gprof', '0')
+flags['val']   = Config.get('Build_Extra', 'val', '0')
 
 
 ## Configuration from commandline
@@ -78,6 +79,7 @@ flags['gprof'] = ARGUMENTS.get('gprof', flags['gprof'])
 flags['power'] = ARGUMENTS.get('power', flags['power'])
 flags['iris']  = ARGUMENTS.get('iris', flags['iris'])
 flags['dram']  = ARGUMENTS.get('dram', flags['dram'])
+flags['val']   = ARGUMENTS.get('val', flags['val'])
 
 
 ## Checkout DRAMSim2 copy

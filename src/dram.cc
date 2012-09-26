@@ -233,11 +233,31 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 
   
   // address parsing
-  m_cid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
-  m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
-  m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
-  m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-  m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
+  if (*m_simBase->m_knobs->KNOB_DEFAULT_INTERLEAVING) {
+    m_cid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
+    m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
+    m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
+    m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
+  }
+  else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY || 
+      *m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_SAME_GRANULARITY) {
+    m_cid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
+
+    int mcid_shift;
+    int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
+    if (num_mc & (num_mc - 1) == 0) {
+      mcid_shift = log2_int(num_mc);
+      m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + mcid_shift;
+    }
+    else {
+      m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
+    }
+
+    m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
+    m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_L3) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + 5;
+  }
 
   m_cycle = 0;
 
@@ -248,6 +268,11 @@ dram_controller_c::dram_controller_c(macsim_c* simBase)
 
   // output buffer
   m_output_buffer = new list<mem_req_s*>;
+  if (*KNOB(KNOB_DRAM_ADDITIONAL_LATENCY)) {
+    m_tmp_output_buffer = new list<mem_req_s*>;
+  } else {
+    m_tmp_output_buffer = NULL;
+  }
 
 #ifdef DRAMSIM
   m_pending_request = new list<mem_req_s*>;
@@ -276,7 +301,12 @@ void dram_controller_c::read_callback(unsigned id, uint64_t address, uint64_t cl
     ++I;
 
     if (req->m_addr == address) {
-      m_output_buffer->push_back(req);
+      if (m_tmp_output_buffer) {
+        req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+        m_tmp_output_buffer->push_back(req);
+      } else {
+        m_output_buffer->push_back(req);
+      }
       m_pending_request->remove(req);
     }
   }
@@ -293,7 +323,12 @@ void dram_controller_c::write_callback(unsigned id, uint64_t address, uint64_t c
     ++I;
 
     if (req->m_addr == address) {
-      m_output_buffer->push_back(req);
+      if (m_tmp_output_buffer) {
+        req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+        m_tmp_output_buffer->push_back(req);
+      } else {
+        m_output_buffer->push_back(req);
+      }
       m_pending_request->remove(req);
     }
   }
@@ -313,6 +348,7 @@ dram_controller_c::~dram_controller_c()
   delete[] m_bank_ready;
   delete[] m_bank_timestamp;
   delete m_output_buffer;
+  delete m_tmp_output_buffer;
 #ifdef DRAMSIM
   delete m_pending_request;
   delete dramsim_instance;
@@ -333,10 +369,27 @@ bool dram_controller_c::insert_new_req(mem_req_s* mem_req)
 {
   // address parsing
   Addr addr = mem_req->m_addr;
-  int bid_xor = (addr >> m_bid_xor_shift) & m_bid_mask; 
-  int cid = addr & m_cid_mask;	addr = addr >> m_bid_shift;
-  int bid = addr & m_bid_mask; addr = addr >> m_rid_shift;
-  int rid = addr;
+  int bid_xor;
+  int cid;
+  int bid;
+  int rid;
+
+  int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
+  if (num_mc & (num_mc - 1) == 0) {
+    bid_xor = (addr >> m_bid_xor_shift) & m_bid_mask; 
+    cid = addr & m_cid_mask; addr = addr >> m_bid_shift;
+    bid = addr & m_bid_mask; addr = addr >> m_rid_shift;
+    rid = addr;
+  }
+  else {
+    bid_xor = (addr >> m_bid_xor_shift) & m_bid_mask; 
+    cid = addr & m_cid_mask; 
+    addr = (addr >> m_bid_shift) / num_mc;
+
+    bid = addr & m_bid_mask; 
+    addr = addr >> m_rid_shift;
+    rid = addr;
+  }
 
   ASSERTM(rid >= 0, "addr:%s cid:%d bid:%d rid:%d type:%s\n",    \
           hexstr64s(addr), cid, bid, rid,                        \
@@ -415,6 +468,9 @@ void dram_controller_c::run_a_cycle()
   dramsim_instance->update();
 #endif
   send_packet();
+  if (m_tmp_output_buffer) {
+    delay_packet();
+  }
 #ifndef DRAMSIM
   channel_schedule();
   bank_schedule();
@@ -534,7 +590,12 @@ void dram_controller_c::bank_schedule_complete(void)
               m_simBase->m_memory->free_req((*I)->m_req->m_core_id, (*I)->m_req);
             }
             else {
-              m_output_buffer->push_back((*I)->m_req);
+              if (m_tmp_output_buffer) {
+                (*I)->m_req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+                m_tmp_output_buffer->push_back((*I)->m_req);
+              } else {
+                m_output_buffer->push_back((*I)->m_req);
+              }
               (*I)->m_req->m_state = MEM_DRAM_DONE;
               DEBUG("MC[%d] merged_req:%d addr:%s typs:%s done\n", \
                   m_id, (*I)->m_req->m_id, hexstr64s((*I)->m_req->m_addr), \
@@ -572,7 +633,12 @@ void dram_controller_c::bank_schedule_complete(void)
       }
       // otherwise, send back to interconnection network
       else {
-        m_output_buffer->push_back(m_current_list[ii]->m_req);
+        if (m_tmp_output_buffer) {
+          m_current_list[ii]->m_req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+          m_tmp_output_buffer->push_back(m_current_list[ii]->m_req);
+        } else {
+          m_output_buffer->push_back(m_current_list[ii]->m_req);
+        }
         m_current_list[ii]->m_req->m_state = MEM_DRAM_DONE;
         DEBUG("MC[%d] req:%d addr:%s type:%s bank:%d done\n", 
             m_id, m_current_list[ii]->m_req->m_id, \
@@ -590,6 +656,23 @@ void dram_controller_c::bank_schedule_complete(void)
   }
 }
 
+void dram_controller_c::delay_packet()
+{
+  vector<mem_req_s*> temp_list;
+  for (auto itr = m_tmp_output_buffer->begin(), end = m_tmp_output_buffer->end(); itr != end; ++itr) {
+    mem_req_s* req = *itr;
+    if (req->m_rdy_cycle <= m_cycle) {
+      temp_list.push_back(req);
+      m_output_buffer->push_back(req);
+    } else {
+      break;
+    }
+  }
+
+  for (auto itr = temp_list.begin(), end = temp_list.end(); itr != end; ++itr) {
+    m_tmp_output_buffer->remove((*itr));
+  }
+}
 
 void dram_controller_c::send_packet(void)
 {
@@ -700,7 +783,7 @@ void dram_controller_c::receive_packet(void)
   }
 #else // #ifndef IRIS
   else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    mem_req_s* req = m_router->receive_req();
+    mem_req_s* req = m_router->receive_req(0);
     if (!req)
       return ;
 #ifndef DRAMSIM
@@ -709,7 +792,7 @@ void dram_controller_c::receive_packet(void)
     if (dramsim_instance->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
       m_pending_request->push_back(req);
 #endif
-      m_router->pop_req();
+      m_router->pop_req(0);
       if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
         m_simBase->m_bug_detector->deallocate_noc(req);
       }

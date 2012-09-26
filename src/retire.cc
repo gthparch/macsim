@@ -202,6 +202,9 @@ void retire_c::run_a_cycle()
       STAT_EVENT(INST_COUNT_TOT);
     }
 
+    STAT_CORE_EVENT(cur_uop->m_core_id, UOP_COUNT);
+    STAT_EVENT(UOP_COUNT_TOT);
+
 
     // GPU : barrier
     if (m_knob_ptx_sim && cur_uop->m_bar_type == BAR_FETCH) {
@@ -245,11 +248,11 @@ void retire_c::run_a_cycle()
           }
 
           // schedule new threads
-          m_simBase->m_process_manager->sim_thread_schedule();
+          m_simBase->m_process_manager->sim_thread_schedule(true);
         }
 
         // schedule new threads
-        m_simBase->m_process_manager->sim_thread_schedule();
+        m_simBase->m_process_manager->sim_thread_schedule(false);
       }
     } // terminate_thread
 

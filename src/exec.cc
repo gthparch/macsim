@@ -97,7 +97,11 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_x86[] = {
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 #define DEFUOP(A, B) {A, # A, B},
+#ifdef GPU_VALIDATION
+#include "../def/uoplatency_ptx580.def"
+#else
 #include "../def/uoplatency_ptx.def"
+#endif
 };
 
 
@@ -113,7 +117,11 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
 
   // latency binding
   if (m_ptx_sim) {
+#ifdef GPU_VALIDATION
+    int factor             = *KNOB(KNOB_PTX_INST_LATENCY);
+#else
     int factor             = *KNOB(KNOB_PTX_EXEC_RATIO);
+#endif
     int latency_array_size = (sizeof uop_latencybinding_init_ptx /
         sizeof (uop_latencybinding_init_ptx[0]));
 

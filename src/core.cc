@@ -167,7 +167,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
 
   // instruction cache
   m_icache = new cache_c("icache", icache_size, icache_assoc, icache_line_size, 
-      sizeof(icache_data_c), icache_banks, icache_bypass, c_id, CACHE_IL1, false, m_simBase);
+      sizeof(icache_data_c), icache_banks, icache_bypass, c_id, CACHE_IL1, false, 1, 0, m_simBase);
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer
@@ -429,7 +429,7 @@ void core_c::advance_queues(void)
 void core_c::final_heartbeat(int thread_id) 
 {
   // schedule a new thread
-  m_simBase->m_process_manager->sim_thread_schedule(); 
+  m_simBase->m_process_manager->sim_thread_schedule(false); 
 
   // check done
   m_heartbeat[thread_id]->m_check_done = true; 

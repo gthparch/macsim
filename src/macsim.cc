@@ -576,7 +576,7 @@ void macsim_c::open_traces(string trace_list)
     string line;
     tracefile >> line;
     m_process_manager->create_process(line);
-    m_process_manager->sim_thread_schedule();
+    m_process_manager->sim_thread_schedule(true);
   }
 }
 

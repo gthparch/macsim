@@ -57,7 +57,7 @@ sw_managed_cache_c::sw_managed_cache_c(string name, int c_id, uns32 c_size, uns8
   int num_set = c_size / c_assoc / c_line_size;
   // allocate cache
   m_cache = new cache_c(name, num_set, c_assoc, c_line_size, c_data_size, 
-      m_num_banks, by_pass, m_core_id, c_type, false, m_simBase);
+      m_num_banks, by_pass, m_core_id, c_type, false, 1, 0, m_simBase);
 
   // allocate port
   m_ports = new port_c* [m_num_banks];

@@ -235,6 +235,11 @@ class dram_controller_c
     void send_packet(void);
 
     /**
+     * delay the sending of a packet
+     */
+    void delay_packet(void);
+
+    /**
      * Receive a packet from the NoC
      */
     void receive_packet(void);
@@ -293,6 +298,7 @@ class dram_controller_c
 #endif
     router_c* m_router; /**< router */
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
+    list<mem_req_s*>* m_tmp_output_buffer; /**< buffer to simulate any additional dram latency */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

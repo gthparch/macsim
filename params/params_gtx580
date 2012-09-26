@@ -1,0 +1,120 @@
+
+this_is_experimental_and_should_not_be_used_simulation_will_fail_because_of_this_fake_entry_in_params.in_thank_you 0
+# Simulation Configuration
+num_sim_cores 16
+num_sim_small_cores 16
+core_type ptx
+max_threads_per_core 80
+num_sim_medium_cores 0
+num_sim_large_cores 0
+
+
+# Clock
+# from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
+clock_cpu 1.2
+clock_gpu 1.6
+clock_l3  1.6
+clock_noc 1.6
+clock_mc  2.1
+
+
+# Small Core Configuration
+fetch_wdith 2
+width 1
+fetch_latency 5
+alloc_latency 5
+rob_size 1024
+schedule ooo
+isched_rate 4 
+msched_rate 2 
+fsched_rate 2 
+bp_hist_length 14
+max_block_per_core 4
+fetch_policy rr
+mt_no_fetch_br 1
+fetch_only_load_ready 0 
+schedule_ratio 2
+fetch_ratio 2
+gpu_sched 1
+icache_num_set 8
+
+
+# Memory
+memory_type l2_decoupled_network
+perfect_dcache 0
+enable_cache_coherence 0
+dram_merge_requests 1
+mem_ooo_stores 0
+ptx_common_cache 0
+const_cache_size 8192
+texture_cache_size 8192
+shared_mem_size 16384
+shared_mem_banks 32
+shared_mem_cycles 2
+shared_mem_ports 1
+byte_level_access 0
+
+l1_small_line_size 128
+
+# L3 Cache
+num_l3 6
+l3_num_set 128
+l3_line_size 128
+l3_assoc 8
+l3_num_bank 4
+l3_latency 10 
+
+
+# DRAM
+dram_num_mc 6
+dram_bus_width 8
+dram_column 11
+dram_activate 25
+dram_precharge 10
+dram_num_banks 16
+dram_num_channel 1
+dram_rowbuffer_size 2048
+dram_scheduling_policy FRFCFS
+
+
+
+infinite_port 0
+pref_train_inst_once 0
+pref_framework_on 1
+pref_ghb_on 0
+enable_pref_small_core 0
+
+
+
+bug_detector_enable 1
+
+sim_cycle_count 0
+max_insts 200000000
+heartbeat_interval 1000000
+forward_progress_limit 50000
+blocks_to_simulate 0
+ptx_exec_ratio 2
+num_warp_scheduler 2
+
+
+noc_topology simple_noc
+noc_dimension 0
+link_width 32
+
+# DEBUG
+debug_core_id 0
+debug_cycle_start 1
+debug_cycle_stop 0
+debug_front_stage 0
+debug_alloc_stage 0
+debug_schedule_stage 0
+debug_exec_stage 0
+debug_dcu_stage 0
+debug_retire_stage 0
+debug_map_stage 0
+debug_mem  0
+debug_trace_read 0
+debug_sim_thread_schedule 0
+debug_cache_lib 0
+debug_bp_dir 0
+

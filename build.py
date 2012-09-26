@@ -22,6 +22,7 @@ def parse_arg():
   parser.add_option("-p", "--gprof", action="store_true", dest="gprof", default=False, help="gprof build")
   parser.add_option("-c", "--clean", action="store_true", dest="clean", default=False, help="clean")
   parser.add_option("-t", "--test", action="store_true", dest="test", default=False, help="clean")
+  parser.add_option("-v", "--val", action="store_true", dest="val", default=False, help="build version used for gpu validation")
   parser.add_option("--dramsim", action="store_true", dest="dramsim", default=False, help="DRAMSim2")
   parser.add_option("--power", action="store_true", dest="power", default=False, help="EI Power")
   parser.add_option("--iris", action="store_true", dest="iris", default=False, help="IRIS")
@@ -75,6 +76,9 @@ def main():
     cmd += 'debug=1 '
   elif options.gprof:
     cmd += 'gprof=1 '
+
+  if options.val:
+    cmd += 'val=1 '
 
   ## External libraries (dramsim, ei, iris)
   # DRAMSim2

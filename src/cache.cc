@@ -80,7 +80,7 @@ cache_set_c::~cache_set_c()
 // cache_c constructor
 cache_c::cache_c(string name, int num_set, int assoc, int line_size, 
     int data_size, int bank_num, bool cache_by_pass, int core_id, Cache_Type cache_type_info,
-    bool enable_partition, macsim_c* simBase) 
+    bool enable_partition, int num_tiles, int interleave_factor, macsim_c* simBase) 
 {
   m_simBase = simBase;
 
@@ -93,6 +93,8 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
   m_num_sets   = num_set;
   m_line_size  = line_size;
   m_cache_type = cache_type_info; 
+  m_num_tiles   = (num_tiles > 0) ? num_tiles : 1;
+  m_interleave_factor = interleave_factor;
 
   // Setting some fields to make indexing quick
   m_set_bits    = log2_int(num_set);
@@ -101,6 +103,22 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
   m_tag_mask    = ~m_set_mask;  /* use after shifting */
   m_offset_mask = N_BIT_MASK(m_shift_bits); /* use before shifting */
   m_bank_num    = bank_num; 
+  if ((m_num_tiles & (m_num_tiles - 1)) == 0) {
+    m_tile_bits = log2_int(m_num_tiles);
+  }
+  else {
+    m_tile_bits = 0;
+  }
+  /*
+  if (m_tile_bits) {
+    m_interleave_bits = log2_int(m_interleave_factor);
+  }
+  else {
+    m_interleave_bits = 0;
+  }
+  */
+  m_interleave_bits = log2_int(m_interleave_factor);
+  m_interleave_mask = N_BIT_MASK(m_interleave_bits);
 
   // Allocating memory for all the sets (pointers to line arrays)
   m_core_id = core_id; 
@@ -153,8 +171,25 @@ cache_c::~cache_c()
 // parse tag address and set index from an address
 void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) 
 {
-  *tag = addr >> m_shift_bits & m_tag_mask;
-  *set = addr >> m_shift_bits & m_set_mask;
+  if (m_num_tiles == 1) {
+    *tag = addr >> m_shift_bits & m_tag_mask;
+    *set = addr >> m_shift_bits & m_set_mask;
+  }
+  else {
+    Addr mod_addr;
+    if (m_tile_bits) {
+      // 1 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of two
+      mod_addr = ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) | (addr & m_interleave_mask);
+    }
+    else {
+      // 2
+      // this works even when m_num_tiles = 1
+      mod_addr = (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) | (addr & m_interleave_mask);
+    }
+    *tag = mod_addr >> m_shift_bits & m_tag_mask;
+    *set = mod_addr >> m_shift_bits & m_set_mask;
+    //cout << hex << addr << " mod addr " << mod_addr << " imask " << m_interleave_mask << " addr & imask " << (addr & m_interleave_mask) << " other part short " << ((addr >> m_interleave_bits) / m_num_tiles)  << " other part " << (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) << " num tiles " << dec << m_num_tiles << " tile bits " << m_tile_bits << " tile " << dec << ((m_num_tiles > 1) ? ((addr >> m_interleave_bits) % m_num_tiles) : 0) <<  " tag mask " << hex << m_tag_mask << " tag " << *tag << " set mask " << m_set_mask << " set " << *set << dec << "\n";
+  }
 }
 
 
@@ -459,8 +494,23 @@ void cache_c::invalidate_cache(void)
 
 // get bank id from an address
 int cache_c::get_bank_num(Addr addr) 
-{ 
-  return addr >> m_shift_bits & N_BIT_MASK(log2_int(m_bank_num)); 
+{
+  if (m_num_tiles == 1) {
+    return addr >> m_shift_bits & N_BIT_MASK(log2_int(m_bank_num)); 
+  }
+  else {
+    Addr mod_addr;
+    if (m_tile_bits) {
+      // 1 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of two
+      mod_addr = ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) | (addr & m_interleave_mask);
+    }
+    else {
+      // 2 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of two
+      // this works even when m_num_tiles = 1
+      mod_addr = (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) | (addr & m_interleave_mask);
+    }
+    return mod_addr >> m_shift_bits & N_BIT_MASK(log2_int(m_bank_num)); 
+  }
 }
 
 

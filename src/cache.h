@@ -133,12 +133,14 @@ class cache_c
      *  \param core_id - Core id
      *  \param cache_type_info - Cache Type
      *  \param enable_partition - Enable cache partitioning
+     *  \param num_tiles - number of cache tiles
+     *  \param interleave factor - interleaving factor across tiles
      *  \param simBase - Pointer to base simulation class for perf/stat counters
      *  \return void (Called with new operator)
      */
     cache_c(string name, int num_set, int assoc, int line_size, int data_size, int bank_num, 
         bool cache_by_pass, int core_id, Cache_Type cache_type_info, bool enable_partition,
-        macsim_c* simBase); 
+        int num_tiles, int interleave_factor, macsim_c* simBase); 
 
     virtual ~cache_c();
 
@@ -320,6 +322,11 @@ class cache_c
     int     m_num_gpu_line;      /**< number of gpu cache lines */ 
     Counter m_insert_count;      /**< total cache line insertion */
     bool    m_enable_partition;  /**< Enable cache partition */
+    int     m_num_tiles;         /**< number of tiles */
+    int     m_tile_bits;         /**< number of bits taken by tile id */
+    int     m_interleave_factor; /**< granularity of interleaving across tiles */
+    int     m_interleave_bits;   /**< number of bits taken by interleaving factor */
+    Addr    m_interleave_mask;   /**< interleave factor mask */
     
     cache_set_c** m_set;       /**< cache data structure */
 

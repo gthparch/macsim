@@ -136,6 +136,7 @@ param<DRAM_PRECHARGE, dram_precharge, uns, 6>
 param<DRAM_ACTIVATE, dram_activate, uns, 6>
 param<DRAM_NUM_MC, dram_num_mc, int, 1>
 param<DRAM_INTERLEAVE_FACTOR, dram_interleave_factor, int, 128>
+param<DRAM_ADDITIONAL_LATENCY, dram_additional_latency, int, 0>
 
 
 /* Memory */

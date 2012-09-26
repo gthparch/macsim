@@ -165,6 +165,7 @@ frontend_c::frontend_c(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase)
   m_ready_thread_available = false;
   m_fetch_arbiter          = 0;
   m_mem_access_thread_num  = 0;
+  m_last_fetch_tid_failed  = false;
 
   FRONTEND_CONFIG();
     
@@ -272,6 +273,11 @@ void frontend_c::run_a_cycle(void)
         default:
           ASSERTM(0, "Unknown frontend mode\n");
       }
+    }
+    else {
+#ifdef GPU_VALIDATION
+      m_last_fetch_tid_failed =  true;
+#endif
     }
   }
 
@@ -758,7 +764,12 @@ int frontend_c::fetch_rr(void)
     fetch_id = m_fetch_arbiter % m_unique_scheduled_thread_num;
 
     // update arbiter for next fetching
-    m_fetch_arbiter = (m_fetch_arbiter + 1) % m_unique_scheduled_thread_num;
+    if (!m_last_fetch_tid_failed) {
+      m_fetch_arbiter = (m_fetch_arbiter + 1) % m_unique_scheduled_thread_num;
+    } else {
+      m_last_fetch_tid_failed = false;
+    }
+
 
     // when fetch id goes back to 0, fast-forward until last terminated thread
     if (m_fetch_arbiter < m_last_terminated_tid) 

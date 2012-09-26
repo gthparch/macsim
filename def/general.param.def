@@ -46,6 +46,7 @@ param<MAX_INSTS1, max_insts1, uns64, 10000000000>
 param<ENABLE_CONDITIONAL_EXECUTION, enable_conditional_execution, bool, false>
 param<TEMPERATURE, temperature, int, 320>
 
+param<ASSIGN_BLOCKS_GREEDILY_INITIALLY, assign_blocks_greedily_initially, bool, false>
 
 param<CLOCK_CPU, clock_cpu, float, 4.0> 
 param<CLOCK_GPU, clock_gpu, float, 1.5> 

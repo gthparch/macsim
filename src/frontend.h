@@ -450,6 +450,8 @@ class frontend_c
     macsim_c*     m_simBase; /**< macsim base class for simulation globals */
     
     int (frontend_c::*MT_fetch_scheduler)(void); /**< current fetch scheduler */
+
+    bool          m_last_fetch_tid_failed;
     
     // FIXME : implement itlb
     // tlb_c            *m_itlb;

@@ -160,6 +160,7 @@ typedef struct mem_req_s {
   int           m_cache_id[MEM_LAST]; /**< each level cache id */
   uop_c*        m_uop;          /**< uop that generates this request */
   Counter       m_in;           /**< request inserted cycle */
+  Counter       m_core_in;      /**< request inserted cycle */
   bool          m_dirty;        /**< wb request? */
   bool          m_done;         /**< request done flag */
   mem_req_s*    m_merged_req;   /**< merged request */

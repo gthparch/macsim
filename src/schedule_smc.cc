@@ -66,6 +66,18 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
+struct Uop_Dispatch_Latency
+{
+  Uop_Type uop_type_s;
+  string m_name;
+  int m_latency;
+};
+
+static Uop_Dispatch_Latency uop_dispatch_latency_ptx [] = {
+#define DEFUOP(A, B) {A, #A, B},
+#include "../def/uopdispatchlatency_ptx580.def"
+};
+
 // schedule_smc_c constructor
 schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_allocq,
     smc_rob_c* gpu_rob, exec_c* exec, Unit_Type unit_type, frontend_c* frontend, 
@@ -95,6 +107,17 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_a
   m_schlist_tid     = new int[m_schlist_size];
   m_first_schlist   = 0;
   m_last_schlist    = 0;
+  m_dispatch_busy_cycle = new Counter[*KNOB(KNOB_NUM_WARP_SCHEDULER)];
+  fill_n(m_dispatch_busy_cycle, m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER->getValue(), 0);
+  m_sfu_dispatch_busy_cycle = 0;
+
+  int factor = *KNOB(KNOB_PTX_DISPATCH_LATENCY_FACTOR);
+  int latency_array_size = (sizeof(uop_dispatch_latency_ptx) / sizeof(uop_dispatch_latency_ptx[0]));
+  for (int i = 0; i < latency_array_size; ++i) {
+    m_dispatch_latency[uop_dispatch_latency_ptx[i].uop_type_s] = 
+    factor * uop_dispatch_latency_ptx[i].m_latency;
+  }
+  m_next_sched_id = 0;
 }
 
 
@@ -376,7 +399,146 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE*
   return true;
 }
 
+#ifdef GPU_VALIDATION
+// main execution routine
+// In every cycle, schedule uops from rob
+void schedule_smc_c::run_a_cycle(void) 
+{
+  // check if the scheduler is running
+  if (!is_running()) {
+    return;
+  }
 
+  m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
+
+  // GPU : schedule every N cycles (G80:4, Fermi:2)
+  m_schedule_modulo = (m_schedule_modulo + 1) % *KNOB(KNOB_GPU_SCHEDULE_RATIO);
+  if (m_schedule_modulo) 
+    return;
+
+  // clear execution port
+  m_exec->clear_ports(); 
+
+
+  // GPU : recent GPUs have dual warp schedulers. In each schedule cycle, each warp scheduler
+  // can schedule instructions from different threads. We enforce threads selected by
+  // each warp scheduler should be different. 
+  int count = 0;
+  int num_schedulers = *KNOB(KNOB_NUM_WARP_SCHEDULER);
+  int round_count;
+  int inst_per_sched = 1;
+  for (int sched_id = m_next_sched_id, sched_count = 0; sched_count < num_schedulers; sched_id = (sched_id + 1) % num_schedulers, ++sched_count) {
+    if (m_dispatch_busy_cycle[sched_id] > m_cur_core_cycle) {
+      continue;
+    }
+    round_count = 0;
+  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) {
+    // -------------------------------------
+    // Schedule stops when
+    // 1) no uops in the scheduler (m_num_in_sched and first == last)
+    // 2) # warp scheduler
+    // 3) FIXME add width condition
+    // -------------------------------------
+    if (!m_num_in_sched || 
+        m_first_schlist == m_last_schlist) 
+      break;
+
+    SCHED_FAIL_TYPE sched_fail_reason;
+
+    int thread_id = m_schlist_tid[ii];
+    int entry     = m_schlist_entry[ii];
+    bool sfu_inst;
+
+    if (thread_id != -1 && (thread_id % num_schedulers) != sched_id) {
+      continue;
+    }
+
+    bool uop_scheduled = false;
+
+    if (entry != -1) {
+      if (m_processed_threads.find(thread_id) != m_processed_threads.end()) {
+        continue;
+      }
+
+      m_processed_threads[thread_id] = 1;
+
+      {
+        rob_c *thread_m_rob = m_gpu_rob->get_thread_rob(thread_id);
+        uop_c *cur_uop = (*thread_m_rob)[entry];
+
+        sfu_inst = is_sfu_inst(cur_uop);
+        if (sfu_inst && m_sfu_dispatch_busy_cycle > m_cur_core_cycle) {
+          continue;
+        }
+      }
+
+      //cout << m_cur_core_cycle << " trying " << setw(3) << thread_id << "\n";
+
+      // schedule a uop from a thread
+      if (uop_schedule_smc(thread_id, entry, &sched_fail_reason)) {
+        STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS);
+
+        m_schlist_entry[ii] = -1;
+        m_schlist_tid[ii] = -1;
+        if (ii == m_first_schlist) {
+          m_first_schlist = (m_first_schlist + 1) % m_schlist_size;
+        }
+
+        uop_scheduled = true;
+        ++count;
+
+        {
+          rob_c *thread_m_rob = m_gpu_rob->get_thread_rob(thread_id);
+          uop_c *cur_uop = (*thread_m_rob)[entry];
+          /*
+          cout << m_cur_core_cycle << " " 
+               << sched_id << " " 
+               << thread_id << " " 
+               << sfu_inst << " " 
+               << m_dispatch_latency[cur_uop->m_uop_type] << "\n";
+          */
+
+          if (sfu_inst) {
+            m_sfu_dispatch_busy_cycle = m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
+          }
+          else {
+            m_dispatch_busy_cycle[sched_id] = m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
+          }
+
+        }
+        ++round_count;
+        if (round_count == inst_per_sched) {
+          break;
+        }
+      }
+      else {
+        STAT_CORE_EVENT(m_core_id, 
+            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 2));
+      }
+    }
+    else if (ii == m_first_schlist) {
+      m_first_schlist = (m_first_schlist + 1) % m_schlist_size;
+    }
+  }
+  }
+
+
+  m_next_sched_id = (m_next_sched_id + 1) % num_schedulers;
+  // no uop is scheduled in this cycle
+  if (count == 0) {
+    STAT_CORE_EVENT(m_core_id, NUM_NO_SCHED_CYCLE);
+    STAT_EVENT(AVG_CORE_IDLE_CYCLE);
+  }
+
+  m_processed_threads.clear();
+
+
+  // advance entries from alloc queue to schedule queue 
+  for (int ii = 0; ii < max_ALLOCQ; ++ii) {
+    advance(ii);
+  }
+}
+#else
 // main execution routine
 // In every cycle, schedule uops from rob
 void schedule_smc_c::run_a_cycle(void) 
@@ -456,6 +618,20 @@ void schedule_smc_c::run_a_cycle(void)
   for (int ii = 0; ii < max_ALLOCQ; ++ii) {
     advance(ii);
   }
+}
+#endif
+
+bool schedule_smc_c::is_sfu_inst(uop_c *uop) {
+  if (uop->m_uop_type == UOP_GPU_FCOS ||
+      uop->m_uop_type == UOP_GPU_FEX2 || 
+      uop->m_uop_type == UOP_GPU_FLG2 ||
+      uop->m_uop_type == UOP_GPU_FRCP || 
+      uop->m_uop_type == UOP_GPU_FRSQRT ||
+      uop->m_uop_type == UOP_GPU_FSIN ||
+      uop->m_uop_type == UOP_GPU_FSQRT) {
+    return true;
+  }
+  return false;
 }
 
 
