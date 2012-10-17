@@ -6,6 +6,7 @@
 #########################################################################################
 
 import os
+import glob
 
 
 #########################################################################################
@@ -149,22 +150,7 @@ if flags['power'] == '1':
 #########################################################################################
 # DRAMSIM2
 #########################################################################################
-DRAMSIM2_srcs = [
-  'src/DRAMSim2/Transaction.cpp',
-  'src/DRAMSim2/AddressMapping.cpp',
-  'src/DRAMSim2/Bank.cpp',
-  'src/DRAMSim2/BankState.cpp',
-  'src/DRAMSim2/BusPacket.cpp',
-  'src/DRAMSim2/CommandQueue.cpp',
-  'src/DRAMSim2/IniReader.cpp',
-  'src/DRAMSim2/MemoryController.cpp',
-  'src/DRAMSim2/MemorySystem.cpp',
-  'src/DRAMSim2/MultiChannelMemorySystem.cpp',
-  'src/DRAMSim2/Rank.cpp',
-  'src/DRAMSim2/SimulatorObject.cpp',
-  'src/DRAMSim2/TraceBasedSim.cpp',
-  'src/DRAMSim2/Transaction.cpp'
-]
+DRAMSIM2_srcs = glob.glob('src/DRAMSim2/*.cpp')
 
 
 if flags['dram'] == '1':
