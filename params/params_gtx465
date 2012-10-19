@@ -46,7 +46,7 @@ ptx_common_cache 0
 const_cache_size 8192
 texture_cache_size 8192
 shared_mem_size 16384
-byte_level_access 1
+byte_level_access 0
 
 
 # L3 Cache
