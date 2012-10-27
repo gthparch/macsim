@@ -44,6 +44,7 @@ env = Environment(ENV=custom_env)
 env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
 env['LINKFLAGS']  = ['--static']
+# env['CXX']        = ['icpc']
 
 
 ## DEBUG build

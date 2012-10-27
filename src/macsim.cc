@@ -736,7 +736,7 @@ void macsim_c::initialize(int argc, char** argv)
   m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
 
   init_per_core_stats(*m_simBase->m_knobs->KNOB_NUM_SIM_CORES, m_simBase);
-  cout << "number of cores" << *m_simBase->m_knobs->KNOB_NUM_SIM_CORES << "\n";
+  cout << "number of cores : " << *m_simBase->m_knobs->KNOB_NUM_SIM_CORES << "\n";
 
   // register wrapper functions
   register_functions();
@@ -748,14 +748,14 @@ void macsim_c::initialize(int argc, char** argv)
   master_clock = new manifold::kernel::Clock(1); //clock has to be global or static
 #endif
 
+  // initialize cores
+  init_cores(*KNOB(KNOB_NUM_SIM_CORES));
+
   // init memory
   init_memory();
 
   // initialize some of my output streams to the standards */
   init_output_streams();
-
-  // initialize cores
-  init_cores(*KNOB(KNOB_NUM_SIM_CORES));
 
 
 #ifdef IRIS

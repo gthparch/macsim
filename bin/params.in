@@ -1,9 +1,9 @@
 
 # Simulation Configuration
-num_sim_cores 8
-num_sim_small_cores 4
+num_sim_cores 1
+num_sim_small_cores 0
 num_sim_medium_cores 0
-num_sim_large_cores 4
+num_sim_large_cores 1
 core_type ptx
 large_core_type x86
 sim_cycle_count 0 
