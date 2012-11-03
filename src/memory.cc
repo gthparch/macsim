@@ -597,6 +597,7 @@ int dcu_c::access(uop_c* uop)
       case MEM_SWPREF_T0:
       case MEM_SWPREF_T1:
       case MEM_SWPREF_T2:
+      case MEM_PF:
         req_type = MRT_DPRF; break;
       default:
         ASSERTM(0, "type:%d\n", type);
