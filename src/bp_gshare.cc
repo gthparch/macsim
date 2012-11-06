@@ -78,7 +78,7 @@ uns8 bp_gshare_c::pred (uop_c *uop)
   uns32 cooked_addr = COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
   uns32 pht_index   = cooked_hist ^ cooked_addr;
   uns8  pht_entry   = m_pht[pht_index];
-  uns8  pred        = ((pht_entry >> *KNOB(KNOB_PHT_CTR_BITS)) - 1) & 0x1;
+  uns8  pred        = ((pht_entry >> (*KNOB(KNOB_PHT_CTR_BITS)) - 1)) & 0x1;
   
 
   uop->m_uop_info.m_pred_global_hist = m_global_hist;
@@ -86,9 +86,9 @@ uns8 bp_gshare_c::pred (uop_c *uop)
   uop->m_recovery_info.m_global_hist = this->m_global_hist | uop->m_dir << 31; 
   m_global_hist |= pred << 31;
 
-  DEBUG("Predicting core:%d thread_id:%d uop_num:%s addr:%s  index:%d  pred:%d  dir:%d\n", 
+  DEBUG("Predicting core:%d thread_id:%d uop_num:%s addr:%s  index:%d  ent:%u pred:%d  dir:%d\n", 
         uop->m_core_id, uop->m_thread_id, unsstr64(uop->m_uop_num), hexstr64s(addr), 
-        pht_index, pred, uop->m_dir);
+        pht_index, pht_entry, pred, uop->m_dir);
 
   return pred;
 }
@@ -104,8 +104,8 @@ void bp_gshare_c::update (uop_c *uop)
   uns32 pht_index   = cooked_hist ^ cooked_addr;
   uns8  pht_entry   = m_pht[pht_index];
 
-  DEBUG("Writing gshare PHT for  op_num:%s  index:%d  dir:%d max value is :%lld \n", 
-      unsstr64(uop->m_uop_num), pht_index, uop->m_dir, 
+  DEBUG("Writing gshare PHT for  op_num:%s  index:%d  dir:%d ent:%u max value is :%lld \n", 
+      unsstr64(uop->m_uop_num), pht_index, uop->m_dir, m_pht[pht_index],  
       N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
 
 
@@ -117,7 +117,7 @@ void bp_gshare_c::update (uop_c *uop)
   }
 
 
-  DEBUG("Updating addr:%s  pht:%u  ent:%u  dir:%d\n", 
+  DEBUG("Updating addr:%s  index:%u  ent:%u  dir:%d\n", 
         hexstr64s(addr), pht_index, m_pht[pht_index], uop->m_dir);
 }
 
