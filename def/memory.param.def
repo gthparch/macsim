@@ -223,5 +223,4 @@ param<DEFAULT_INTERLEAVING, default_interleaving, bool, true>
 param<NEW_INTERLEAVING_SAME_GRANULARITY, new_interleaving_same_granularity, bool, false>
 param<NEW_INTERLEAVING_DIFF_GRANULARITY, new_interleaving_diff_granularity, bool, false>
 
-
-
+param<USE_NEW_COALESCING, use_new_coalescing, bool, false>
