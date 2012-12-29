@@ -834,8 +834,8 @@ void hwp_common_c::pref_update_queues(void)
           result = true;
         }
         else {
-          result  = m_simBase->m_memory->new_mem_req(MRT_DPRF, m_l2req_queue[q_index].line_addr, 64, 1, \
-              NULL, NULL, 0, &info, pref_core_id, m_l2req_queue[q_index].thread_id, \
+          result  = m_simBase->m_memory->new_mem_req(MRT_DPRF, m_l2req_queue[q_index].line_addr, 64, \
+              false, false, 1, NULL, NULL, 0, &info, pref_core_id, m_l2req_queue[q_index].thread_id, \
               knob_ptx_sim); 
         }
 

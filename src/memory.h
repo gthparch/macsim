@@ -210,6 +210,11 @@ class dcu_c
     bool done(mem_req_s* req);
 
     /**
+     * Function for write ack
+     */
+    bool write_done(mem_req_s* req);
+
+    /**
      * Insert a request to in_queue (NEW REQ)
      */
     bool insert(mem_req_s* req);
@@ -346,6 +351,8 @@ class memory_c
      * @param type - memory request type
      * @param addr - memory request address
      * @param size - memory request size
+     * @param cache_hit - was request a hit in L1?
+     * @param with_data - does request include data as well?
      * @param delay - delay
      * @param uop - request generating uop
      * @param done_func - done function
@@ -357,9 +364,9 @@ class memory_c
      * @return false, if mshr full or l2 queue full
      * @return true, otherwise
      */
-    bool new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uop_c* uop, 
-        function<bool (mem_req_s*)> done_func, Counter unique_num, pref_req_info_s* pref_info, 
-        int core_id, int thread_id, bool ptx);
+    bool new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hit, bool with_data, 
+        uns delay, uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, 
+        pref_req_info_s* pref_info, int core_id, int thread_id, bool ptx);
 
     /**
      * Access first-level cache from execution stage
@@ -410,6 +417,11 @@ class memory_c
     void free_req(int core_id, mem_req_s* req);
 
     /**
+     * Deallocate completed write request
+     */
+    void free_write_req(mem_req_s* req);
+
+    /**
      * Receive a message from NoC
      */
     bool receive(int src, int dst, int msg, mem_req_s* req);
@@ -433,6 +445,11 @@ class memory_c
      * Cache line fill function
      */
     bool done(mem_req_s* req);
+    
+    /**
+     * Function for write ack
+     */
+    bool write_done(mem_req_s* req);
     
     /**
      * Access L1 data cache
@@ -481,8 +498,8 @@ class memory_c
     /**
      * Initialize a new request
      */
-    void init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, int delay, \
-        uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, \
+    void init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, bool with_data, \
+        int delay, uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, \
         Counter priority, int core_id, int thread_id, bool ptx);
 
     /**
@@ -537,6 +554,7 @@ class memory_c
     unordered_map<Addr, bool> m_td_pending_req; /**< pending requests in tag directory */
 
     Counter m_cycle; /**< clock cycle */
+    pool_c<mem_req_s> *m_mem_req_pool; /**< pool for write requests in ptx simulations */
 }; 
 
 

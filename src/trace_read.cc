@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <iostream>
+#include <set>
 
 #include "assert_macros.h"
 #include "trace_read.h"
@@ -1774,8 +1775,19 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
       bool last_inst         = false;
       int num_inst_to_unread = 0;
 
+      static set<Addr> seen_block_addr;
+      if (*m_simBase->m_knobs->KNOB_USE_NEW_COALESCING) seen_block_addr.clear();
       do {
         for (int i = 0; i < num_mem_req; ++i) {
+
+          if (*m_simBase->m_knobs->KNOB_USE_NEW_COALESCING) {
+            auto itr = seen_block_addr.find(cache_line_addr + i * cache_line_size);
+            auto end = seen_block_addr.end();
+
+            if (itr != end) continue;
+            seen_block_addr.insert(cache_line_addr + i * cache_line_size);
+          }
+
           child_mem_uop = core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
           child_mem_uop->allocate();
           ASSERT(child_mem_uop); 
@@ -1829,7 +1841,12 @@ bool trace_read_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_
 
           uop->m_num_child_uops      = mem_req_count;
           uop->m_num_child_uops_done = 0;
-          uop->m_pending_child_uops  = N_BIT_MASK(uop->m_num_child_uops);
+          if (uop->m_num_child_uops != 64) {
+            uop->m_pending_child_uops  = N_BIT_MASK(uop->m_num_child_uops);
+          }
+          else {
+            uop->m_pending_child_uops  = N_BIT_MASK_64;
+          }
           uop->m_vaddr               = 0;
           uop->m_mem_size            = 0;
 

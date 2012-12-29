@@ -163,6 +163,13 @@ bool dcache_fill_line_wrapper(mem_req_s* req)
 }
 
 
+bool dcache_write_ack_wrapper(mem_req_s* req)
+{
+  assert(req->m_done_func && req->m_simBase->m_memory->write_done(req));
+  return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -413,12 +420,10 @@ bool dcu_c::full(void)
 }
 
 
-// get cache line address.
-// FIXME (jaekyu, 3-7-2012)
-// replace 63 with the cache line size
 Addr dcu_c::base_addr(Addr addr)
 {
-  return (addr & ~63);
+  //nbl - taking advantage of 2's complement representation
+  return (addr & -m_line_size); 
 }
 
 
@@ -491,7 +496,7 @@ int dcu_c::access(uop_c* uop)
   if (*m_simBase->m_knobs->KNOB_DCACHE_INFINITE_PORT || m_disable == true) {
     // do nothing
   }
-  else if (IsStore(type) && !m_port[bank]->get_write_port(m_cycle - 1)) { 
+  else if (IsStore(type) && !m_port[bank]->get_write_port(m_cycle - 1)) {
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank + 64;
@@ -561,7 +566,40 @@ int dcu_c::access(uop_c* uop)
     if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
     }
 
-    return m_latency;
+    if (this->m_ptx_sim && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+        && type == MEM_ST) {
+      //evict global data on write hit in L1
+      m_cache->invalidate_cache_line(vaddr);
+
+      int req_size;
+      Addr req_addr;
+      if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+        req_size = uop->m_mem_size;
+        req_addr = vaddr;
+      }
+      else {
+        req_size = m_line_size;
+        req_addr = line_addr;
+      }
+
+      Mem_Req_Type req_type = MRT_DSTORE;
+
+      function<bool (mem_req_s*)> done_func = dcache_write_ack_wrapper;
+
+      int result = m_simBase->m_memory->new_mem_req(req_type, req_addr, req_size, cache_hit, 
+                      true, m_latency, uop, done_func, uop->m_unique_num, NULL, m_id, 
+                      uop->m_thread_id, m_ptx_sim);
+
+      if (!result) {
+        uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
+        return 0;
+      }
+
+      return -1;
+    }
+    else {
+      return m_latency;
+    }
   }
   // -------------------------------------
   // DCACHE miss
@@ -630,11 +668,19 @@ int dcu_c::access(uop_c* uop)
     // -------------------------------------
     // Generate a new memory request (MSHR access)
     // -------------------------------------
-    function<bool (mem_req_s*)> done_func = dcache_fill_line_wrapper;
+    function<bool (mem_req_s*)> done_func = NULL;
+    if (this->m_ptx_sim && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+        && (type == MEM_ST || type == MEM_ST_LM)) {
+      done_func = dcache_write_ack_wrapper;
+    }
+    else {
+      done_func = dcache_fill_line_wrapper;
+    }
+
     int result;
-    result = m_simBase->m_memory->new_mem_req(
-        req_type, req_addr, req_size, m_latency, uop, done_func, uop->m_unique_num, NULL, m_id, 
-        uop->m_thread_id, m_ptx_sim);
+    result = m_simBase->m_memory->new_mem_req(req_type, req_addr, req_size, cache_hit, 
+        (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func, 
+        uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
 
     // -------------------------------------
     // MSHR full
@@ -900,10 +946,18 @@ void dcu_c::process_in_queue()
   for (auto I = done_list.begin(), E = done_list.end(); I != E; ++I) {
     m_in_queue->pop((*I));
     if ((*I)->m_done == true) {
+      mem_req_s *req = *I;
       DEBUG("L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n", 
-          m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
-          m_cycle - (*I)->m_in);
-      m_simBase->m_memory->free_req((*I)->m_core_id, (*I));
+          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], \
+          m_cycle - req->m_in);
+
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_type == MRT_DSTORE) {
+        m_simBase->m_memory->free_write_req(req);
+      }
+      else {
+        m_simBase->m_memory->free_req(req->m_core_id, req);
+      }
     }
   }
 
@@ -937,10 +991,10 @@ void dcu_c::receive_packet(void)
     if (req != NULL) {
       req->m_state = MEM_NOC_DONE;
       bool insert_done = false;
-      if (req->m_msg_type == NOC_FILL) {
+      if (req->m_msg_type == NOC_FILL || req->m_msg_type == NOC_ACK) {
         insert_done = fill(req);
       }
-      else if (req->m_msg_type == NOC_NEW) {
+      else if (req->m_msg_type == NOC_NEW || req->m_msg_type == NOC_NEW_WITH_DATA) {
         insert_done = insert(req);
       }
       else {
@@ -1047,7 +1101,16 @@ void dcu_c::process_out_queue()
     // NEW request : send to lower level
     // -------------------------------------
     if (req->m_state == MEM_OUTQUEUE_NEW) {
-      if (!send_packet(req, NOC_NEW, 1))
+      int msg_type;
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+          && req->m_with_data && m_level != MEM_L3) {
+        //can change if to req->m_type == MRT_DSTORE
+        msg_type = NOC_NEW_WITH_DATA;
+      }
+      else {
+        msg_type = NOC_NEW;
+      }
+      if (!send_packet(req, msg_type, 1))
         continue;
       DEBUG("L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s (new)\n", 
           m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, 
@@ -1059,7 +1122,17 @@ void dcu_c::process_out_queue()
     // FILL request : send to upward
     // -------------------------------------
     else if (req->m_state == MEM_OUT_FILL) {
-      if (!send_packet(req, NOC_FILL, -1))
+      int msg_type;
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+          && req->m_with_data && m_level == MEM_L3) {
+        //can change if to req->m_type == MRT_DSTORE
+        msg_type = NOC_ACK;
+      }
+      else {
+        msg_type = NOC_FILL;
+      }
+
+      if (!send_packet(req, msg_type, -1))
         continue;
       DEBUG("L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", 
           m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, 
@@ -1115,6 +1188,15 @@ void dcu_c::process_fill_queue()
 
     mem_req_s* req = (*I);
 
+    if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f 
+        && m_level == MEM_L1 && req->m_type == MRT_DSTORE) {
+        ASSERTM(m_done && req->m_done_func && req->m_done_func(req), "done function failed\n");
+        req->m_done = true;
+        done_list.push_back(req);
+        ++count;
+        continue;
+    }
+
     if (m_level != MEM_L3) {
       POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
     }
@@ -1140,7 +1222,7 @@ void dcu_c::process_fill_queue()
       // -------------------------------------
       // MEM_FILL_NEW : just inserted to the fill queue
       // -------------------------------------
-      case MEM_FILL_NEW: { 
+      case MEM_FILL_NEW: {
         Addr line_addr, victim_line_addr;
         dcache_data_s* line = NULL;
         bool cache_hit = true;
@@ -1323,10 +1405,18 @@ void dcu_c::process_fill_queue()
   for (auto I = done_list.begin(), E = done_list.end(); I != E; ++I) {
     m_fill_queue->pop((*I));
     if ((*I)->m_done == true) {
+      mem_req_s *req = *I;
       DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
-          m_level, m_id, (*I)->m_id, mem_req_c::mem_req_type_name[(*I)->m_type], \
-          m_cycle - (*I)->m_in);
-      m_memory->free_req((*I)->m_core_id, (*I));
+          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], \
+          m_cycle - req->m_in);
+
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_type == MRT_DSTORE) {
+        m_simBase->m_memory->free_write_req(req);
+      }
+      else {
+        m_memory->free_req(req->m_core_id, req);
+      }
     }
   }
 
@@ -1521,6 +1611,40 @@ bool dcu_c::done(mem_req_s* req)
 }
 
 
+bool dcu_c::write_done(mem_req_s* req)
+{
+  uop_c* uop = req->m_uop;
+  uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+  uop->m_state = OS_SCHEDULED;
+  if (m_ptx_sim) {
+    if (uop->m_parent_uop) {
+      uop_c* puop = uop->m_parent_uop;
+      ++puop->m_num_child_uops_done;
+      if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
+        if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+          m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
+              puop->m_thread_id, puop->m_uop_num);
+        }
+
+        puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+        puop->m_state = OS_SCHEDULED;
+      }
+    } // uop->m_parent_uop
+    else {
+      if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+        m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
+            uop->m_thread_id, uop->m_uop_num);
+      }
+    }
+  }
+
+  STAT_CORE_EVENT(uop->m_core_id, NUM_WRITE_ACKS);
+  STAT_EVENT(TOTAL_WRITE_ACKS);
+
+  return true;
+}
+
+
 // =======================================
 // create the network interface
 // =======================================
@@ -1600,6 +1724,8 @@ memory_c::memory_c(macsim_c* simBase)
       m_mshr_free_list[ii].push_back(entry);
     }
   }
+
+  m_mem_req_pool = new pool_c<mem_req_s>;
 
   int num_large_core = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
   int num_medium_core = *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
@@ -1842,9 +1968,9 @@ void memory_c::init(void)
 
 // generate a new memory request
 // called from 1) data cache, 2) instruction cache, and 3) prefetcher
-bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uop_c* uop, \
-    function<bool (mem_req_s*)> done_func, Counter unique_num, pref_req_info_s* pref_info, \
-    int core_id, int thread_id, bool ptx)
+bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hit, bool with_data, \
+    uns delay, uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, \
+    pref_req_info_s* pref_info, int core_id, int thread_id, bool ptx)
 {
   DEBUG("MSHR[%d] new_req type:%s (%d)\n", 
       core_id, mem_req_c::mem_req_type_name[type], (int)m_mshr[core_id].size());
@@ -1858,11 +1984,28 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   if (type == MRT_IFETCH) { 
     POWER_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_R_TAG); 
   }
-  else { 
-    POWER_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG); 
+  else {
+    // cache hit will be true only for writes to global memory 
+    // (write-evict for global memory in L1)
+    if (!cache_hit) {
+      POWER_CORE_EVENT(core_id, POWER_DCACHE_MISS_BUF_R_TAG); 
+    }
   }
 
-  if (matching_req) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+      && type == MRT_DSTORE)
+  {
+    STAT_CORE_EVENT(core_id, NUM_WRITES);
+    STAT_EVENT(TOTAL_WRITES);
+  }
+
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+      && matching_req && type == MRT_DSTORE) {
+    // nbl: TBD dec-20-2012
+    // store matching a load, we cannot have a load matching 
+    // a store because stores are not allocated mshrs
+  }
+  else if (matching_req) {
     ASSERT(type != MRT_WB);
     // redundant hardware prefetch request
     if (type == MRT_DPRF) {
@@ -1897,25 +2040,33 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
 
 
   // allocate an entry
-  mem_req_s* new_req = allocate_new_entry(core_id);
-
-  // mshr full
-  if (new_req == NULL) {
-    m_stop_prefetch = m_cycle + 500;
-    flush_prefetch(core_id);
-    if (type == MRT_DPRF)
-      return true;
-
+  mem_req_s* new_req = NULL;
+  
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
+      && type == MRT_DSTORE) {
+    new_req = m_mem_req_pool->acquire_entry(m_simBase);
+  }
+  else {
     new_req = allocate_new_entry(core_id);
 
+    // mshr full
     if (new_req == NULL) {
-      STAT_EVENT(MSHR_FULL);
-      return false;
+      m_stop_prefetch = m_cycle + 500;
+      flush_prefetch(core_id);
+      if (type == MRT_DPRF)
+        return true;
+
+      new_req = allocate_new_entry(core_id);
+
+      if (new_req == NULL) {
+        STAT_EVENT(MSHR_FULL);
+        return false;
+      }
     }
   }
 
 
-  if (type == MRT_IFETCH) { 
+  if (type == MRT_IFETCH) {
     POWER_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_W); 
   }
   else if (type == MRT_DSTORE) {
@@ -1930,11 +2081,17 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, uns delay, uo
   Counter priority = g_mem_priority[type];
 
   // init new request
-  init_new_req(new_req, type, addr, size, delay, uop, done_func, unique_num, priority, \
-      core_id, thread_id, ptx);
+  init_new_req(new_req, type, addr, size, with_data, delay, uop, done_func, unique_num, \
+      priority, core_id, thread_id, ptx);
 
   // merge to existing request
-  if (matching_req) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f 
+      && matching_req && type == MRT_DSTORE) {
+    //nbl: TBD - dec-20-2012
+    // store matching a load, we cannot have a load matching 
+    // a store because stores are not allocated mshrs
+  }
+  else if (matching_req) {
     STAT_EVENT(TOTAL_MEMORY_MERGE);
     DEBUG("req:%d addr:%llx has matching entry req:%d addr:%llx type:%s\n", 
         new_req->m_id, new_req->m_addr, matching_req->m_id, matching_req->m_addr, \
@@ -1988,8 +2145,8 @@ mem_req_s* memory_c::search_req(int core_id, Addr addr, int size)
 
 // initialize a new request
 void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, \
-    int delay, uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, \
-    Counter priority, int core_id, int thread_id, bool ptx)
+    bool with_data, int delay, uop_c* uop, function<bool (mem_req_s*)> done_func, \
+    Counter unique_num, Counter priority, int core_id, int thread_id, bool ptx)
 {
   req->m_id                     = m_unique_id++;
   req->m_appl_id                = m_simBase->m_core_pointers[core_id]->get_appl_id(thread_id);
@@ -2001,6 +2158,7 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int si
   req->m_priority               = priority;
   req->m_addr                   = addr;
   req->m_size                   = size;
+  req->m_with_data              = with_data;
   req->m_rdy_cycle              = m_cycle + delay;
   req->m_pc                     = uop ? uop->m_pc : 0;
   req->m_prefetcher_id          = 0;
@@ -2081,7 +2239,7 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
     ASSERT(0);
   }
   else if (level == MEM_L2) {
-    ASSERTM(msg == NOC_FILL, "msg:%d\n", msg);
+    ASSERTM(msg == NOC_FILL || msg == NOC_ACK, "msg:%d\n", msg);
     result = m_l2_cache[id]->fill(req);
     if (result) {
       DEBUG("L2[%d] fill_req:%d type:%s from L3\n", 
@@ -2092,12 +2250,15 @@ bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
     if (msg == NOC_FILL) {
       result = m_l3_cache[id]->fill(req);
     }
-    else if (msg == NOC_NEW) {
+    else if (msg == NOC_NEW || msg == NOC_NEW_WITH_DATA) {
       result = m_l3_cache[id]->insert(req);
+    }
+    else {
+      ASSERTM(0, "msg is %d\n", msg);
     }
   }
   else if (level == MEM_MC) {
-    ASSERTM(msg == NOC_NEW || msg == NOC_FILL, "msg:%d", msg);
+    ASSERTM(msg == NOC_NEW || msg == NOC_NEW_WITH_DATA || msg == NOC_FILL, "msg:%d", msg);
     result = m_simBase->m_dram_controller[id]->insert_new_req(req);
 //    assert(0); // jaekyu (2-15-2012) this will be completely removed
     if (result) {
@@ -2142,6 +2303,14 @@ void memory_c::free_req(int core_id, mem_req_s* req)
   }
 }
 
+void memory_c::free_write_req(mem_req_s* req)
+{
+  STAT_EVENT(AVG_MEMORY_LATENCY_BASE);
+  STAT_EVENT_N(AVG_MEMORY_LATENCY, m_cycle - req->m_in);
+
+  m_mem_req_pool->release_entry(req);
+}
+
 
 // get number of available mshr entries
 int memory_c::get_num_avail_entry(int core_id)
@@ -2157,12 +2326,10 @@ int memory_c::access(uop_c* uop)
 }
 
 
-// get base line address
-// FIXME (jaekyu, 3-7-2012)
-// replace 63 with the cache line size
 Addr memory_c::base_addr(int core_id, Addr addr)
 {
-  return (addr & ~63); 
+  //nbl - taking advantage of 2's complement representation
+  return (addr & -line_size(core_id)); 
 }
 
 
@@ -2225,6 +2392,12 @@ bool memory_c::done(mem_req_s* req)
 {
   return m_l1_cache[req->m_cache_id[MEM_L1]]->done(req);
 }
+
+bool memory_c::write_done(mem_req_s* req)
+{
+  return m_l1_cache[req->m_cache_id[MEM_L1]]->write_done(req);
+}
+
 
 
 // get cache bank id

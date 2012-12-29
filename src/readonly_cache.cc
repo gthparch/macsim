@@ -130,7 +130,7 @@ int readonly_cache_c::load(uop_c *uop)
 
     // generate a new request
     int req_status = m_simBase->m_memory->new_mem_req(req_type, line_addr, uop->m_mem_size,
-        m_cache_cycles - 1 + *KNOB(KNOB_EXTRA_LD_LATENCY), uop, 
+        false, false, m_cache_cycles - 1 + *KNOB(KNOB_EXTRA_LD_LATENCY), uop, 
         readonly_cache_fill_line_wrapper, uop->m_unique_num, NULL, m_core_id, 
         uop->m_thread_id, 1);
 

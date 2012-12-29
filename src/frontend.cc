@@ -565,7 +565,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
 
     // send a new icache miss memory request
     int result = m_simBase->m_memory->new_mem_req(MRT_IFETCH, line_addr, 
-        m_knob_icache_line_size, 0, NULL, icache_fill_line_wrapper, 
+        m_knob_icache_line_size, false, false, 0, NULL, icache_fill_line_wrapper, 
         m_core->get_unique_uop_num(), NULL, m_core_id, tid, m_knob_ptx_sim);
 
     // mshr full

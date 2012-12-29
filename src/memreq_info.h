@@ -68,7 +68,9 @@ enum MEMORY_TYPE {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 enum NOC_TYPE {
   NOC_FILL,
+  NOC_ACK,
   NOC_NEW,
+  NOC_NEW_WITH_DATA,
   NOC_LAST,
   MAX_NOC_STATE,
 };
@@ -148,6 +150,7 @@ typedef struct mem_req_s {
   int           m_block_id;     /**< GPU block id */
   Mem_Req_State m_state;        /**< memory request state */   
   Mem_Req_Type  m_type;         /**< request type */
+  bool          m_with_data;    /**< set to true for global and local mem writes */
   Counter       m_priority;     /**< priority */
   Addr          m_addr;         /**< request address */ 
   uns           m_size;         /**< request size */
