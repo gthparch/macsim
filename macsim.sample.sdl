@@ -9,7 +9,7 @@
 <sst>
   <component name=gpu0 type=macsimComponent.macsimComponent rank=0 >
     <params>
-      <paramPath>./params/unit-test.params.in</paramPath>
+      <paramPath>./sst-unit-test/params.in</paramPath>
       <tracePath>./bin/trace_file_list</tracePath>
       <outputPath>./bin/results/</outputPath>
       <clock>1.4Ghz</clock>
