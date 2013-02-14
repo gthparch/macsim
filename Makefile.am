@@ -73,7 +73,6 @@ src/sw_managed_cache.cc      src/sw_managed_cache.h                    \
 src/trace_read.cc            src/trace_read.h                          \
 src/uop.cc                   src/uop.h                                 \
 src/utils.cc                 src/utils.h                               \
-src/ei_power.cc              src/ei_power.h                            \
 src/router.cc                src/router.h                              \
                                                                        \
 src/allocate_interface.h                                               \
@@ -86,3 +85,4 @@ src/schedule_interface.h
 EXTRA_DIST = 
 
 libmacsimComponent_la_LDFLAGS = -module -avoid-version
+libmacsimComponent_la_LIBADD = -lz

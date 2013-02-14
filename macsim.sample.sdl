@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<sdl version="2.0"/>
+
+<config>
+  stopAtCycle=1000s
+  partitioner=self
+</config>
+
+<sst>
+  <component name=gpu0 type=macsimComponent.macsimComponent rank=0 >
+    <params>
+      <paramPath>./params/unit-test.params.in</paramPath>
+      <tracePath>./bin/trace_file_list</tracePath>
+      <outputPath>./bin/results/</outputPath>
+      <clock>1.4Ghz</clock>
+    </params>
+  </component>
+</sst>
