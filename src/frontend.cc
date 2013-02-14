@@ -335,7 +335,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
 
   // First time : set up traces for current thread 
   if (fetch_data->m_first_time) {
-    m_simBase->m_trace_reader->setup_trace(m_core_id, tid);
+    m_simBase->m_trace_reader->setup_trace(m_core_id, tid, m_knob_ptx_sim);
     fetch_data->m_first_time = false;
 
     ++m_core->m_inst_fetched[tid]; /*! initial increase */
@@ -400,7 +400,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
 
 
         // read an uop from the traces 
-        if (!m_simBase->m_trace_reader->get_uops_from_traces(m_core_id, new_uop, tid)) {
+        if (!m_simBase->m_trace_reader->get_uops_from_traces(m_core_id, new_uop, tid, m_knob_ptx_sim)) {
           // couldn't get an uop
           DEBUG("not success\n");
           m_uop_pool->release_entry(new_uop->free());

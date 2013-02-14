@@ -218,7 +218,7 @@ class macsim_c
     dram_controller_c** m_dram_controller; /**< dram controller */
     int m_num_mc; /**< number of memory controllers */
 		noc_c* m_noc; /**<  interconnection network */
-		trace_read_c* m_trace_reader; /**< trace reader */
+		trace_reader_wrapper_c* m_trace_reader; /**< trace reader */
 
     // clock handling
     int m_clock_lcm; /**< main clock period */

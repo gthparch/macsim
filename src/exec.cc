@@ -100,7 +100,7 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 #ifdef GPU_VALIDATION
 #include "../def/uoplatency_ptx580.def"
 #else
-#include "../def/uoplatency_ptx.def"
+#include "../def/uoplatency_ptx580.def"
 #endif
 };
 
@@ -508,7 +508,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   // set scheduling cycle
   uop->m_sched_cycle = m_cur_core_cycle;
 
-  ASSERT(uop_latency != 0);
+  ASSERTM(uop_latency != 0, "type=%d uop_type:%d\n", type, uop_type);
 
   // set uop done cycle
   if (uop_latency > 0) {

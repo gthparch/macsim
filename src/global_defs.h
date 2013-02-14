@@ -112,6 +112,7 @@ class pref_sw_throttle_c;
 class noc_c;
 class ManifoldProcessor;
 class trace_read_c;
+class trace_reader_wrapper_c;
 class KnobsContainer;
 class ProcessorStatistics;
 class CoreStatistics;
@@ -165,7 +166,7 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 // Global definitions
 
 
-#define MAX_TR_OPCODE_NAME 70
+#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define MAX_PUP 256 
 //per core
 #define MAX_NUM_THREADS 3000

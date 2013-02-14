@@ -204,6 +204,8 @@ macsim_src = [
   'src/trace_read.cc',
   'src/uop.cc',
   'src/utils.cc',
+  'src/trace_read_cpu.cc',
+  'src/trace_read_gpu.cc',
 ]
 
 

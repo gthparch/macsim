@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : trace_read.h 
- * Author       : Hyesoon Kim
+ * Author       : HPArch Research Group
  * Date         : 
  * SVN          : $Id: dram.h 912 2009-11-20 19:09:21Z kacear $
  * Description  : Trace handling class
@@ -48,12 +48,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define MAX_TR_REG 300 // REG_LAST = 298
-#define MAX_TR_OPCODE_NAME 70
+//#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define REP_MOV_MEM_SIZE_MAX 4
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
 #define TRACE_SIZE (sizeof(trace_info_s) - sizeof(uint32_t))
+#define CPU_TRACE_SIZE TRACE_SIZE
+#define GPU_TRACE_SIZE TRACE_SIZE
+#define MAX_TR_OPCODE GPU_OPCODE_LAST
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,12 +144,7 @@ typedef enum TR_TEMP_TEMP_ENUM_ {
 } TR_TEMP_TEMP_ENUM;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief enumerator for supported opcodes
-///
-/// IMPORTANT : please modify inst.stat.def if you modify this enumerator
-///////////////////////////////////////////////////////////////////////////////////////////////
-typedef enum TR_OPCODE_ENUM_ {
+typedef enum CPU_OPCODE_ENUM_ {
   XED_CATEGORY_INVALID,
   XED_CATEGORY_3DNOW,
   XED_CATEGORY_AES,
@@ -199,62 +197,13 @@ typedef enum TR_OPCODE_ENUM_ {
   PREFETCH_T0,
   PREFETCH_T1,
   PREFETCH_T2,
-  TR_MEM_LD_LM,
-  TR_MEM_LD_SM,
-  TR_MEM_LD_GM,
-  TR_MEM_ST_LM,
-  TR_MEM_ST_SM,
-  TR_MEM_ST_GM,
-  TR_DATA_XFER_LM,
-  TR_DATA_XFER_SM,
-  TR_DATA_XFER_GM,
-  TR_MEM_LD_CM,
-  TR_MEM_LD_TM,
-  TR_MEM_LD_PM,
   GPU_EN,
-  LD_CM_CA,
-  LD_CM_CG,
-  LD_CM_CS,
-  LD_CM_LU,
-  LD_CM_CU,
-  LD_GM_CA,
-  LD_GM_CG,
-  LD_GM_CS,
-  LD_GM_LU,
-  LD_GM_CU,
-  LD_LM_CA,
-  LD_LM_CG,
-  LD_LM_CS,
-  LD_LM_LU,
-  LD_LM_CU,
-  LD_PM_CA,
-  LD_PM_CG,
-  LD_PM_CS,
-  LD_PM_LU,
-  LD_PM_CU,
-  LD_SM_CA,
-  LD_SM_CG,
-  LD_SM_CS,
-  LD_SM_LU,
-  LD_SM_CU,
-  LDU_GM,
-  ST_GM_WB,
-  ST_GM_CG,
-  ST_GM_CS,
-  ST_GM_WT,
-  ST_LM_WB,
-  ST_LM_CG,
-  ST_LM_CS,
-  ST_LM_WT,
-  ST_SM_WB,
-  ST_SM_CG,
-  ST_SM_CS,
-  ST_SM_WT,
-  PREF_GM_L1,
-  PREF_GM_L2,
-  PREF_LM_L1,
-  PREF_LM_L2,
-  PREF_UNIFORM,
+  CPU_OPCODE_LAST,
+} CPU_OPCODE_ENUM;
+
+
+typedef enum GPU_OPCODE_ {
+  GPU_INVALID,
   GPU_ABS,
   GPU_ABS64,
   GPU_ADD, 
@@ -382,8 +331,23 @@ typedef enum TR_OPCODE_ENUM_ {
   GPU_XOR64,
   GPU_RECONVERGE,
   GPU_PHI,
-  TR_OPCODE_LAST,
-} TR_OPCODE_ENUM;
+
+  GPU_MEM_LD_GM,
+  GPU_MEM_LD_LM,
+  GPU_MEM_LD_SM,
+  GPU_MEM_LD_CM,
+  GPU_MEM_LD_TM,
+  GPU_MEM_LD_PM,
+  GPU_MEM_LDU_GM,
+  GPU_MEM_ST_GM,
+  GPU_MEM_ST_LM,
+  GPU_MEM_ST_SM,
+  GPU_DATA_XFER_GM,
+  GPU_DATA_XFER_LM,
+  GPU_DATA_XFER_SM,
+
+  GPU_OPCODE_LAST,
+} GPU_OPCODE_ENUM;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,7 +380,7 @@ class trace_read_c
     /**
      * Constructor
      */
-    trace_read_c(macsim_c* simBase);
+    trace_read_c(macsim_c* simBase, ofstream* dprint_output);
 
     /**
      * Destructor
@@ -430,14 +394,14 @@ class trace_read_c
      * @param uop - uop object to hold instruction information
      * @param sim_thread_id thread id
      */
-    bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id);
+    virtual bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id) = 0;
 
     /**
      * GPU simulation : Read trace ahead to read synchronization information
      * @param trace_info - trace information
      * @see process_manager_c::sim_thread_schedule
      */
-    void pre_read_trace(thread_s* trace_info);
+    virtual void pre_read_trace(thread_s* trace_info) = 0;
 
     /**
      * This function is called once for each thread/warp when the thread/warp is started.
@@ -454,11 +418,11 @@ class trace_read_c
     static const char *g_optype_names[37]; /**< opcode type string */
     static const char *g_mem_type_names[20]; /**< memeory request type string */
 
-  private:
+  protected:
       /**
        * Initialize the mapping between trace opcode and uop type
        */
-    void init_pin_convert();
+    virtual void init_pin_convert() = 0;
 
     /**
      * Function to decode an instruction from the trace file into a sequence of uops
@@ -467,8 +431,8 @@ class trace_read_c
      * @param core_id - core id
      * @param sim_thread_id - thread id  
      */
-    inst_info_s* convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
-        int core_id, int sim_thread_id);
+    virtual inst_info_s* convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
+        int core_id, int sim_thread_id) = 0;
 
     /**
      * Convert MacSim trace to instruction information (hash table)
@@ -492,8 +456,8 @@ class trace_read_c
      * @param rep_offset - repetition offet
      * @param core_id - core id
      */
-    void convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
-        Addr rep_offset, int core_id);
+    virtual void convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
+        Addr rep_offset, int core_id) = 0;
 
     /**
      * Dump out instruction information to the file. At most 50000 instructions will be printed
@@ -501,7 +465,7 @@ class trace_read_c
      * @param core_id - core id
      * @param thread_id - thread id
      */
-    void dprint_inst(trace_info_s *t_info, int core_id, int thread_id);
+    virtual void dprint_inst(trace_info_s *t_info, int core_id, int thread_id) = 0;
 
     /**
      * @param core_id - core id
@@ -519,7 +483,7 @@ class trace_read_c
      * @param num_inst - number of instructions to rewind
      * @see peek_trace
      */
-    bool ungetch_trace(int core_id, int sim_thread_id, int num_inst);
+    virtual bool ungetch_trace(int core_id, int sim_thread_id, int num_inst) = 0;
 
     /**
      * In case of GPU simulation, from our design, each uncoalcesd accesses will be one 
@@ -531,18 +495,45 @@ class trace_read_c
      * @param inst_read - indicate instruction read successful
      * @see get_uops_from_traces
      */
-    bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read);
+    virtual bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read) = 0;
 
-  private:
+  protected:
     static const int k_trace_buffer_size = 1000; /**< maximum buffer size */
-    int m_int_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping table (int) */
-    int m_fp_uop_table[TR_OPCODE_LAST]; /**< opcode to uop type mapping tabpe (fp) */
+    int m_int_uop_table[MAX_TR_OPCODE]; /**< opcode to uop type mapping table (int) */
+    int m_fp_uop_table[MAX_TR_OPCODE]; /**< opcode to uop type mapping tabpe (fp) */
 
-    uint32_t  dprint_count; /**< dumped instruction count */
-    ofstream* dprint_output; /**< dump output file stream */
+    uint32_t  m_dprint_count; /**< dumped instruction count */
+    ofstream* m_dprint_output; /**< dump output file stream */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+    int m_trace_size;
+};
+
+
+class trace_reader_wrapper_c {
+  public:
+    trace_reader_wrapper_c(macsim_c* simBase);
+    ~trace_reader_wrapper_c();
+    
+    void setup_trace(int core_id, int sim_thread_id, bool gpu_sim);
+    bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id, bool gpu_sim);
+    void pre_read_trace(thread_s* trace_info);
+
+  private:
+    trace_reader_wrapper_c();
+
+  private:
+    macsim_c* m_simBase;
+    trace_read_c* m_cpu_decoder;
+    trace_read_c* m_gpu_decoder;
+    
+    ofstream* m_dprint_output; /**< dump output file stream */
 
 };
+
+
+
+
+
 
 #endif // TRACE_READ_H_INCLUDED

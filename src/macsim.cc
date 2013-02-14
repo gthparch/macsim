@@ -211,7 +211,7 @@ void macsim_c::init_memory(void)
 
   m_block_id_mapper = new multi_key_map_c;
   m_process_manager = new process_manager_c(m_simBase);
-  m_trace_reader = new trace_read_c(m_simBase);
+  m_trace_reader = new trace_reader_wrapper_c(m_simBase);
 
   // block schedule info
   block_schedule_info_s* block_schedule_info = new block_schedule_info_s;
