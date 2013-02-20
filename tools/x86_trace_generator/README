@@ -33,6 +33,14 @@ Note
          3) g_tr_opcode_names
      
 
+Known Problems
+
+  1. pin-2.10-41150-gcc.3.4.6-ia32_intel64-linux/pin: line 52: pin-2.10-41150-gcc.3.4.6-ia32_intel64-linux/ia32/bin/pinbin: No such file or directory 
+ 
+     This happens due to missing ia32 libraries. Please install ia32-libs.   
+     
+     => apt-get install ia32-libs
+
 Changes
 
   1. November 2011 

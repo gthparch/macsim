@@ -60,58 +60,9 @@ void extract_register(void)
 
 void extract_category(void)
 {
+  int num_opcodes = XED_CATEGORY_LAST + 10;
   cout << "\n";
-  cout << "string tr_opcode_names[60] = {\n";
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
-    cout << "  \"" << CATEGORY_StringShort(ii) << "\",\n";
-  }
-  cout << "};\n";
-}
-
-
-void extract_opcode(void)
-{
-  for (int ii = 0; ii < XED_ICLASS_LAST; ++ii) {
-    if (OPCODE_StringShort(ii).find("NOP") != string::npos)
-      cout << OPCODE_StringShort(ii) << "\n";
-  }
-}
-
-
-void macsim_opcode_enum(void)
-{
-  cout << "typedef enum TR_OPCODE_ENUM_ {\n";
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
-    cout << "  XED_CATEGORY_" << CATEGORY_StringShort(ii) << ",\n";
-  }
-  cout << "  TR_MUL,\n"; 
-  cout << "  TR_DIV,\n";
-  cout << "  TR_FMUL,\n";
-  cout << "  TR_FDIV,\n";
-  cout << "  TR_NOP,\n";
-  cout << "  PREFETCH_NTA,\n";
-  cout << "  PREFETCH_T0,\n";
-  cout << "  PREFETCH_T1,\n";
-  cout << "  PREFETCH_T2,\n";
-  cout << "  TR_MEM_LD_LM,\n";
-  cout << "  TR_MEM_LD_SM,\n";
-  cout << "  TR_MEM_LD_GM,\n";
-  cout << "  TR_MEM_ST_LM,\n";
-  cout << "  TR_MEM_ST_SM,\n";
-  cout << "  TR_MEM_ST_GM,\n";
-  cout << "  TR_DATA_XFER_LM,\n";
-  cout << "  TR_DATA_XFER_SM,\n";
-  cout << "  TR_DATA_XFER_GM,\n";
-  cout << "  TR_MEM_LD_CM,\n";
-  cout << "  TR_MEM_LD_TM,\n";
-  cout << "  TR_MEM_LD_PM,\n";
-  cout << "} TR_OPCODE_ENUM;\n";
-}
-
-
-void macsim_opcode(void)
-{
-  cout << "const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {\n";
+  cout << "string tr_opcode_names[" << num_opcodes << "] = {\n";
   for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
     cout << "  \"" << CATEGORY_StringShort(ii) << "\",\n";
   }
@@ -124,18 +75,58 @@ void macsim_opcode(void)
   cout << "  \"PREFETCH_T0\",\n";
   cout << "  \"PREFETCH_T1\",\n";
   cout << "  \"PREFETCH_T2\",\n";
-  cout << "  \"TR_MEM_LD_LM\",\n";
-  cout << "  \"TR_MEM_LD_SM\",\n";
-  cout << "  \"TR_MEM_LD_GM\",\n";
-  cout << "  \"TR_MEM_ST_LM\",\n";
-  cout << "  \"TR_MEM_ST_SM\",\n";
-  cout << "  \"TR_MEM_ST_GM\",\n";
-  cout << "  \"TR_DATA_XFER_LM\",\n";
-  cout << "  \"TR_DATA_XFER_SM\",\n";
-  cout << "  \"TR_DATA_XFER_GM\",\n";
-  cout << "  \"TR_MEM_LD_CM\",\n";
-  cout << "  \"TR_MEM_LD_TM\",\n";
-  cout << "  \"TR_MEM_LD_PM\",\n";
+  cout << "  \"GPU_EN\",\n";
+  cout << "};\n";
+}
+
+
+void extract_opcode(void)
+{
+  for (int ii = 0; ii < XED_ICLASS_LAST; ++ii) {
+//    if (OPCODE_StringShort(ii).find("NOP") != string::npos)
+    cout << OPCODE_StringShort(ii) << "\n";
+  }
+}
+
+
+void macsim_opcode_enum(void)
+{
+  cout << "typedef enum CPU_OPCODE_ENUM_ {\n";
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+    cout << "  XED_CATEGORY_" << CATEGORY_StringShort(ii) << ",\n";
+  }
+  cout << "  TR_MUL,\n"; 
+  cout << "  TR_DIV,\n";
+  cout << "  TR_FMUL,\n";
+  cout << "  TR_FDIV,\n";
+  cout << "  TR_NOP,\n";
+  cout << "  PREFETCH_NTA,\n";
+  cout << "  PREFETCH_T0,\n";
+  cout << "  PREFETCH_T1,\n";
+  cout << "  PREFETCH_T2,\n";
+  cout << "  GPU_EN,\n";
+  cout << "  CPU_OPCODE_LAST,\n";
+  cout << "} CPU_OPCODE_ENUM;\n";
+}
+
+
+void macsim_opcode(void)
+{
+  cout << "const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {\n";
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+    cout << "  \"" << CATEGORY_StringShort(ii) << "\",\n";
+  }
+  cout << "  \"TR_MUL\",\n"; 
+  cout << "  \"TR_DIV\",\n";
+  cout << "  \"TR_FMUL\",\n";
+  cout << "  \"TR_FDIV\",\n";
+  cout << "  \"TR_NOP\",\n";
+  cout << "  \"PREFETCH_NTA\",\n";
+  cout << "  \"PREFETCH_T0\",\n";
+  cout << "  \"PREFETCH_T1\",\n";
+  cout << "  \"PREFETCH_T2\",\n";
+  cout << "  \"GPU_EN\",\n";
+  cout << "  \"CPU_OPCODE_LAST\",\n";
   cout << "};\n";
 }
 
@@ -222,10 +213,10 @@ void initialize_sim(void)
 {
 //  extract_register();
 //  extract_category();
-//  extract_opcode();
+//  extract_opcode(); // useless
 //  macsim_opcode();
 //  macsim_opcode_enum();
-//  macsim_reg();
+  macsim_reg();
 //  macsim_pin_convert();
 }
 

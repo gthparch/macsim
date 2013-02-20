@@ -1,0 +1,29 @@
+Note: This is for the Macsim developers in HPArch Research Group.
+      This document describes how to update x86_trace_generator 
+      when Intel's XED has been updated.
+
+Mostly, we can get updated information my running a pintool, xed_extractor by
+  pin -t ./obj-intel64/xed_extractor.so -- bin args...
+
+In particular, you have to change code in void initialize_sim(void) in xed_extractor.cpp.
+
+1. replace CPU_OPCODE_ENUM_ in macsim (trace_read.h)
+
+  => macsim_opcode_enum() 
+
+2. replace g_tr_opcode_names in macsim (trace_read_cpu.cc)
+
+  => macsim_opcode()
+
+3. replace const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] in macsim (trace_read_cpu.cc)
+
+  => macsim_reg()
+
+4. modify void cpu_decoder_c::init_pin_convert(void) in macsim (trace_read_cpu.cc)
+
+  1) remove lines for deleted opcodes
+  2) add lines for newly added opcodes
+
+5. replace string tr_opcode_names[66] = { in trace_generator (trace_generator.h)
+
+  => extract_category()

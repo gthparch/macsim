@@ -102,9 +102,9 @@ string findLineByPC(addr_t pc)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // Memory Instruction Data type
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 struct inst_t {
   addr_t pc;
@@ -133,7 +133,7 @@ THREADID main_thread_id;
 Thread_info thread_info[MAX_THREADS];
 //UINT64 inst_count = 0;
 UINT64 detach_inst = 0;
-bool print_inst=false;
+bool print_inst = false;
 UINT32 thread_count = 0;
 UINT32 ThreadArrivalCount = 0;
 unsigned int g_inst_print_count[MAX_THREADS];
@@ -146,24 +146,22 @@ bool g_enable_instrument = false;
 /////////////////////////////////////////////////////////////////////////////////////////
 // knob variables (Knob_xxx_yyy)
 /////////////////////////////////////////////////////////////////////////////////////////
-KNOB<string> Knob_trace_name        (KNOB_MODE_WRITEONCE, "pintool", "tracename", "trace",  "trace output filename");
-KNOB<bool>   Knob_print_inst        (KNOB_MODE_WRITEONCE, "pintool", "print_inst", "0", "dumping trace in the stdout" );
-KNOB<UINT64> Knob_detach_inst       (KNOB_MODE_WRITEONCE, "pintool", "detach", "0", "detach pintool after n instructions");
-KNOB<UINT64> Knob_max_length        (KNOB_MODE_WRITEONCE, "pintool", "max_length", "0", "Stop instrumentation after max_length instructions");
-KNOB<bool>   Knob_inst_dump         (KNOB_MODE_WRITEONCE, "pintool", "dump", "1", "Dump t_info to the file");
-KNOB<UINT32> Knob_dump_max          (KNOB_MODE_WRITEONCE, "pintool", "dump_max", "50000",    "");
-KNOB<string> Knob_dump_file         (KNOB_MODE_WRITEONCE, "pintool", "dump_file", "dump.txt", "");
-KNOB<UINT32> Knob_num_thread        (KNOB_MODE_WRITEONCE, "pintool", "thread", "1", "Total number of threads to gather information");
-KNOB<UINT32> Knob_instrument_option (KNOB_MODE_WRITEONCE, "pintool", "option", "0", "Instrumentation Option"); // 0:INS 1:RTN-RTN 2:RTN
-KNOB<string> Knob_compiler          (KNOB_MODE_WRITEONCE, "pintool", "compiler", "gcc", "Which compiler was used?");
-KNOB<string> Knob_pl                (KNOB_MODE_WRITEONCE, "pintool", "pl", "normal", "Programming Language");
-KNOB<string> Knob_function1         (KNOB_MODE_WRITEONCE, "pintool", "func1", "", "Function to instrument");
-KNOB<string> Knob_function2         (KNOB_MODE_WRITEONCE, "pintool", "func2", "", "Function to instrument");
-KNOB<UINT64> Knob_skip              (KNOB_MODE_WRITEONCE, "pintool", "skipinst", "0", "Instructions to skip");
-KNOB<UINT64> Knob_max               (KNOB_MODE_WRITEONCE, "pintool", "max", "0", "Max number of instruction to collect");
-KNOB<UINT64> Knob_rtn_min           (KNOB_MODE_WRITEONCE, "pintool", "rmin", "0", "Max number of function calls to collect data");
-KNOB<UINT64> Knob_rtn_max           (KNOB_MODE_WRITEONCE, "pintool", "rmax", "0", "Max number of function calls to collect data");
+#define Knob(type, name, var, init, desc) \
+  KNOB<type> name (KNOB_MODE_WRITEONCE, "pintool", var, init, desc);
 
+Knob(string, Knob_trace_name, "tracename", "trace", "trace output filename");
+Knob(bool, Knob_print_inst, "print_inst", "0", "dumping trace in the stdout");
+Knob(UINT64, Knob_detach_inst, "detach", "0", "detach pintool after n instructions");
+Knob(bool, Knob_inst_dump, "dump", "1", "Dump t_info to the file");
+Knob(UINT32, Knob_dump_max, "dump_max", "50000", "");
+Knob(string, Knob_dump_file, "dump_file", "dump.txt", "");
+Knob(UINT32, Knob_num_thread, "thread", "1", "Total number of threads to gather information");
+Knob(string, Knob_compiler, "compiler", "gcc", "Which compiler was used?");
+Knob(string, Knob_pl, "pl", "normal", "Programming Language");
+Knob(UINT64, Knob_skip, "skipinst", "0", "Instructions to skip");
+Knob(UINT64, Knob_max, "max", "0", "Max number of instruction to collect");
+Knob(UINT64, Knob_rtn_min, "rmin", "0", "Max number of function calls to collect data");
+Knob(UINT64, Knob_rtn_max, "rmax", "0", "Max number of function calls to collect data");
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,13 +172,11 @@ void Initialize(void);
 void sanity_check(void);
 
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Handler(CONTROL_EVENT ev, void * v, CONTEXT * ctxt, void * ip, THREADID tid)
 {
-  
   switch (ev) {
     case CONTROL_START: {
       cerr << "-> Trace Generation Starts at icount " << g_inst_count[tid] << endl;
@@ -586,16 +582,19 @@ void instrument(INS ins)
   }
 
 
+#if 0
   // ----------------------------------------
   // SSE, AVX (Vector) instruction
   // ----------------------------------------
   if (INS_Category(ins) == XED_CATEGORY_AVX ||
+      INS_Category(ins) == XED_CATEGORY_AVX2 ||
       INS_Category(ins) == XED_CATEGORY_FCMOV ||
       INS_Category(ins) == XED_CATEGORY_X87_ALU || 
       INS_Category(ins) == XED_CATEGORY_MMX ||
       INS_Category(ins) == XED_CATEGORY_SSE) {
     info->is_fp = 1;
   }
+#endif
   
 
   // ----------------------------------------
@@ -787,7 +786,6 @@ void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
     return ;
 
   struct Trace_info* trace_info = NULL;
-  int my_index;
 
   trace_info = new Trace_info;
   if (trace_info == NULL) {
@@ -824,7 +822,7 @@ void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
     if (thread_count == 0)
       main_thread_id = threadid;
 
-    my_index = thread_count++;
+    thread_count++;
     ReleaseLock(&g_lock);
     trace_info_array[threadid] = trace_info;
 
@@ -1030,11 +1028,11 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
   (*file) << "t_info->mem_read_size: " << hex << (uint32_t) t_info->mem_read_size << endl;
   (*file) << "t_info->mem_write_size: " << hex << (uint32_t) t_info->mem_write_size << endl;
   (*file) << "t_info->is_fp: " << (uint32_t) t_info->is_fp << endl;
-  (*file) << "t_info->ld_vaddr1: " << hex << (uint32_t) t_info->ld_vaddr1 << endl;
-  (*file) << "t_info->ld_vaddr2: " << hex << (uint32_t) t_info->ld_vaddr2 << endl;
-  (*file) << "t_info->st_vaddr: " << hex << (uint32_t) t_info->st_vaddr << endl;
-  (*file) << "t_info->instruction_addr: " << hex << (uint32_t) t_info->instruction_addr << endl;
-  (*file) << "t_info->branch_target: " << hex << (uint32_t) t_info->branch_target << endl;
+  (*file) << "t_info->ld_vaddr1: " << hex << (uint64_t) t_info->ld_vaddr1 << endl;
+  (*file) << "t_info->ld_vaddr2: " << hex << (uint64_t) t_info->ld_vaddr2 << endl;
+  (*file) << "t_info->st_vaddr: " << hex << (uint64_t) t_info->st_vaddr << endl;
+  (*file) << "t_info->instruction_addr: " << hex << (uint64_t) t_info->instruction_addr << endl;
+  (*file) << "t_info->branch_target: " << hex << (uint64_t) t_info->branch_target << endl;
   (*file) << "t_info->actually_taken: " << hex << (uint32_t) t_info->actually_taken << endl;
   (*file) << "t_info->write_flg: " << hex << (uint32_t) t_info->write_flg << endl;
   (*file) << "*** end of the data strcture *** " << endl << endl;
@@ -1078,11 +1076,11 @@ void dprint_inst(ADDRINT iaddr, string *disassemble_info, THREADID threadid)
   cout << "t_info->mem_read_size: " << hex << (uint32_t) t_info->mem_read_size << endl;
   cout << "t_info->mem_write_size: " << hex << (uint32_t) t_info->mem_write_size << endl;
   cout << "t_info->is_fp: " << (uint32_t) t_info->is_fp << endl;
-  cout << "t_info->ld_vaddr1: " << hex << (uint32_t) t_info->ld_vaddr1 << endl;
-  cout << "t_info->ld_vaddr2: " << hex << (uint32_t) t_info->ld_vaddr2 << endl;
-  cout << "t_info->st_vaddr: " << hex << (uint32_t) t_info->st_vaddr << endl;
-  cout << "t_info->instruction_addr: " << hex << (uint32_t) t_info->instruction_addr << endl;
-  cout << "t_info->branch_target: " << hex << (uint32_t) t_info->branch_target << endl;
+  cout << "t_info->ld_vaddr1: " << hex << (uint64_t) t_info->ld_vaddr1 << endl;
+  cout << "t_info->ld_vaddr2: " << hex << (uint64_t) t_info->ld_vaddr2 << endl;
+  cout << "t_info->st_vaddr: " << hex << (uint64_t) t_info->st_vaddr << endl;
+  cout << "t_info->instruction_addr: " << hex << (uint64_t) t_info->instruction_addr << endl;
+  cout << "t_info->branch_target: " << hex << (uint64_t) t_info->branch_target << endl;
   cout << "t_info->actually_taken: " << hex << (uint32_t) t_info->actually_taken << endl;
   cout << "t_info->write_flg: " << hex << (uint32_t) t_info->write_flg << endl;
   cout << "*** end of the data strcture *** " << endl;
