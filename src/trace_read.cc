@@ -549,8 +549,13 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "3DNOW",
   "AES",
   "AVX",
+  "AVX2",
+  "AVX2GATHER",
+  "BDW",
   "BINARY",
   "BITBYTE",
+  "BMI1",
+  "BMI2",
   "BROADCAST",
   "CALL",
   "CMOV",
@@ -560,10 +565,12 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "DECIMAL",
   "FCMOV",
   "FLAGOP",
+  "FMA4",
   "INTERRUPT",
   "IO",
   "IOSTRINGOP",
   "LOGICAL",
+  "LZCNT",
   "MISC",
   "MMX",
   "NOP",
@@ -571,6 +578,9 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "POP",
   "PREFETCH",
   "PUSH",
+  "RDRAND",
+  "RDSEED",
+  "RDWRFSGS",
   "RET",
   "ROTATE",
   "SEGOP",
@@ -582,10 +592,13 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "SYSCALL",
   "SYSRET",
   "SYSTEM",
+  "TBM",
   "UNCOND_BR",
+  "VFMA",
   "VTX",
   "WIDENOP",
   "X87_ALU",
+  "XOP",
   "XSAVE",
   "XSAVEOPT",
   "TR_MUL",
@@ -597,20 +610,9 @@ const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "PREFETCH_T0",
   "PREFETCH_T1",
   "PREFETCH_T2",
-  "TR_MEM_LD_LM",
-  "TR_MEM_LD_SM",
-  "TR_MEM_LD_GM",
-  "TR_MEM_ST_LM",
-  "TR_MEM_ST_SM",
-  "TR_MEM_ST_GM",
-  "TR_DATA_XFER_LM",
-  "TR_DATA_XFER_SM",
-  "TR_DATA_XFER_GM",
-  "TR_MEM_LD_CM",
-  "TR_MEM_LD_TM",
-  "TR_MEM_LD_PM",
-	"GPU_EN"
+  "GPU_EN",
 };
+
 
 
 
@@ -690,6 +692,8 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c* simBase)
 
 trace_reader_wrapper_c::trace_reader_wrapper_c()
 {
+  m_dprint_output->close();
+  delete m_dprint_output;
 }
 
 
@@ -702,9 +706,9 @@ trace_reader_wrapper_c::~trace_reader_wrapper_c()
 void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id, bool gpu_sim)
 {
   if (gpu_sim)
-    m_cpu_decoder->setup_trace(core_id, sim_thread_id);
-  else
     m_gpu_decoder->setup_trace(core_id, sim_thread_id);
+  else
+    m_cpu_decoder->setup_trace(core_id, sim_thread_id);
 }
     
 bool trace_reader_wrapper_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id, 

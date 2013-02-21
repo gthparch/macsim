@@ -1036,8 +1036,13 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_3DNOW]       = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_AES]         = UOP_IMUL;
   m_int_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
+  m_int_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
+  m_int_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
+  m_int_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
   m_int_uop_table[XED_CATEGORY_BINARY]      = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
+  m_int_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
+  m_int_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
   m_int_uop_table[XED_CATEGORY_BROADCAST]   = UOP_IADD; // tocheck
   m_int_uop_table[XED_CATEGORY_CALL]        = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
@@ -1047,10 +1052,12 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_DECIMAL]     = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_FLAGOP]      = UOP_IADD;
+  m_int_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
   m_int_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_IO]          = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_IMUL;
   m_int_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
+  m_int_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
   m_int_uop_table[XED_CATEGORY_MISC]        = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
@@ -1058,6 +1065,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_POP]         = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_PREFETCH]    = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_PUSH]        = UOP_IADD;
+  m_int_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
+  m_int_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
+  m_int_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
   m_int_uop_table[XED_CATEGORY_RET]         = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
   m_int_uop_table[XED_CATEGORY_SEGOP]       = UOP_IADD;
@@ -1069,7 +1079,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_SYSCALL]     = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_SYSRET]      = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_SYSTEM]      = UOP_IADD;
+  m_int_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
   m_int_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_IADD;
+  m_int_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
   m_int_uop_table[XED_CATEGORY_VTX]         = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
   m_int_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
@@ -1090,8 +1102,13 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_3DNOW]       = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_AES]         = UOP_FMUL;
   m_fp_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
+  m_fp_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
+  m_fp_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
   m_fp_uop_table[XED_CATEGORY_BINARY]      = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
+  m_fp_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
+  m_fp_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
   m_fp_uop_table[XED_CATEGORY_BROADCAST]   = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_CALL]        = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
@@ -1101,10 +1118,12 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_DECIMAL]     = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_FLAGOP]      = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
   m_fp_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_IO]          = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_FMUL;
   m_fp_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
+  m_fp_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
   m_fp_uop_table[XED_CATEGORY_MISC]        = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
@@ -1112,6 +1131,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_POP]         = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_PREFETCH]    = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_PUSH]        = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
+  m_fp_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
+  m_fp_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
   m_fp_uop_table[XED_CATEGORY_RET]         = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
   m_fp_uop_table[XED_CATEGORY_SEGOP]       = UOP_FADD;
@@ -1123,7 +1145,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_SYSCALL]     = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_SYSRET]      = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_SYSTEM]      = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
   m_fp_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
   m_fp_uop_table[XED_CATEGORY_VTX]         = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
   m_fp_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
@@ -1251,6 +1275,7 @@ const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "emm6",
   "emm7",
   "mxt",
+  "x87", // new
   "xmm0",
   "xmm1",
   "xmm2",
@@ -1324,10 +1349,10 @@ const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "st5",
   "st6",
   "st7",
-  "x87",
   "r_status_flags",
   "rdf",
 };
+
 
 
 const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
@@ -1335,8 +1360,13 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "3DNOW",
   "AES",
   "AVX",
+  "AVX2",
+  "AVX2GATHER",
+  "BDW",
   "BINARY",
   "BITBYTE",
+  "BMI1",
+  "BMI2",
   "BROADCAST",
   "CALL",
   "CMOV",
@@ -1346,10 +1376,12 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "DECIMAL",
   "FCMOV",
   "FLAGOP",
+  "FMA4",
   "INTERRUPT",
   "IO",
   "IOSTRINGOP",
   "LOGICAL",
+  "LZCNT",
   "MISC",
   "MMX",
   "NOP",
@@ -1357,6 +1389,9 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "POP",
   "PREFETCH",
   "PUSH",
+  "RDRAND",
+  "RDSEED",
+  "RDWRFSGS",
   "RET",
   "ROTATE",
   "SEGOP",
@@ -1368,10 +1403,13 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "SYSCALL",
   "SYSRET",
   "SYSTEM",
+  "TBM",
   "UNCOND_BR",
+  "VFMA",
   "VTX",
   "WIDENOP",
   "X87_ALU",
+  "XOP",
   "XSAVE",
   "XSAVEOPT",
   "TR_MUL",
@@ -1383,9 +1421,8 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "PREFETCH_T0",
   "PREFETCH_T1",
   "PREFETCH_T2",
-	"GPU_EN"
+  "GPU_EN",
 };
-
 
 
 const char* cpu_decoder_c::g_tr_cf_names[10] = {
