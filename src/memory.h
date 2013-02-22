@@ -317,14 +317,6 @@ class dcu_c
     memory_c* m_memory; /**< pointer to the memory system */
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 
-#ifdef IRIS
-    // IRIS
-    ManifoldProcessor* m_terminal; /**< terminal to the NoC router */
-#endif
-
-    // interconnection
-    router_c* m_router; /**< router */
-
     // clock
     Counter m_cycle; /**< clock cycle */
 };
@@ -539,6 +531,8 @@ class memory_c
     list<mem_req_s*>* m_mshr; /**< mshr entry per L1 cache */
     list<mem_req_s*>* m_mshr_free_list; /**< mshr entry free list */
     int m_num_core; /**< number of cores */
+    int m_num_cpu;
+    int m_num_gpu;
     int m_num_l3; /**< number of l3 caches */
     int m_num_mc; /**< number of memory controllers */
     int m_noc_index_base[MEM_LAST]; /**< component id of each memory hierarchy */
@@ -547,7 +541,6 @@ class memory_c
     int m_l3_interleave_factor; /**< mask bit for L3 id */
     int m_dram_interleave_factor; /**< mask bit for dram id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
-    map<int, int>* m_dst_map; /**< destination id mapping function */
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */

@@ -58,10 +58,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "bug_detector.h"
 #include "fetch_factory.h"
 #include "pref_factory.h"
-#include "noc.h"
+#include "network.h"
+#include "network_ring.h"
+#include "network_mesh.h"
 #include "factory_class.h"
 #include "dram.h"
-#include "router.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
@@ -90,32 +91,32 @@ using namespace std;
 // =======================================
 macsim_c::macsim_c()
 {
-    m_simBase = this;
-    
-    m_num_active_threads             = 0; 
-    m_num_waiting_dispatched_threads = 0;
-    m_total_num_application          = 0;
-    m_process_count                  = 0; 
-    m_process_count_without_repeat   = 0;
-    m_all_threads                    = 0;
-    m_no_threads_per_block           = 0;
-    m_total_retired_block            = 0;
-    m_end_simulation                 = false;
-    m_repeat_done                    = false;
-    m_gpu_paused                     = true;
+  m_simBase = this;
 
-    for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {    
-        m_core_cycle[ii]     = 0;
-        m_core_end_trace[ii] = false;
-        m_sim_end[ii]        = false;
-        m_core_started[ii]   = false;
-    }
+  m_num_active_threads             = 0; 
+  m_num_waiting_dispatched_threads = 0;
+  m_total_num_application          = 0;
+  m_process_count                  = 0; 
+  m_process_count_without_repeat   = 0;
+  m_all_threads                    = 0;
+  m_no_threads_per_block           = 0;
+  m_total_retired_block            = 0;
+  m_end_simulation                 = false;
+  m_repeat_done                    = false;
+  m_gpu_paused                     = true;
 
-    m_termination_check[0] = false;
-    m_termination_check[1] = false;
+  for (int ii = 0; ii < MAX_NUM_CORES; ++ii) {    
+    m_core_cycle[ii]     = 0;
+    m_core_end_trace[ii] = false;
+    m_sim_end[ii]        = false;
+    m_core_started[ii]   = false;
+  }
 
-    m_simulation_cycle = 0;
-    m_core0_inst_count = 0;
+  m_termination_check[0] = false;
+  m_termination_check[1] = false;
+
+  m_simulation_cycle = 0;
+  m_core0_inst_count = 0;
 }
 
 
@@ -132,42 +133,42 @@ macsim_c::~macsim_c()
 // =======================================
 void macsim_c::init_knobs(int argc, char** argv)
 {
-    report("initialize knobs");
+  report("initialize knobs");
 
-    // Create the knob managing class
-    m_knobsContainer = new KnobsContainer();
+  // Create the knob managing class
+  m_knobsContainer = new KnobsContainer();
 
-    // Get a reference to the actual knobs for this component instance
-    m_knobs = m_knobsContainer->getAllKnobs();
+  // Get a reference to the actual knobs for this component instance
+  m_knobs = m_knobsContainer->getAllKnobs();
 
 #ifdef USING_SST
-    string  paramPath(argv[0]);
-    string  tracePath(argv[1]);
-    string outputPath(argv[2]);
-    
-    //Apply specified params.in file
-    m_knobsContainer->applyParamFile(paramPath);
-    
-    //Specify trace_file_list and update the knob
-    m_knobsContainer->updateKnob("trace_name_file", tracePath);
+  string  paramPath(argv[0]);
+  string  tracePath(argv[1]);
+  string outputPath(argv[2]);
 
-    //Specify output path for statistics
-    m_knobsContainer->updateKnob("out", outputPath);
+  //Apply specified params.in file
+  m_knobsContainer->applyParamFile(paramPath);
 
-    //save the states of all knobs to a file
-    m_knobsContainer->saveToFile(outputPath + "/params.out");
+  //Specify trace_file_list and update the knob
+  m_knobsContainer->updateKnob("trace_name_file", tracePath);
+
+  //Specify output path for statistics
+  m_knobsContainer->updateKnob("out", outputPath);
+
+  //save the states of all knobs to a file
+  m_knobsContainer->saveToFile(outputPath + "/params.out");
 
 #else
-    // apply values from parameters file
-    m_knobsContainer->applyParamFile("params.in");
+  // apply values from parameters file
+  m_knobsContainer->applyParamFile("params.in");
 
-    // apply the supplied command line switches
-    char* pInvalidArgument = NULL;
-    if(!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
-    }
+  // apply the supplied command line switches
+  char* pInvalidArgument = NULL;
+  if(!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
+  }
 
-    // save the states of all knobs to a file
-    m_knobsContainer->saveToFile("params.out");
+  // save the states of all knobs to a file
+  m_knobsContainer->saveToFile("params.out");
 #endif
 }
 
@@ -177,21 +178,24 @@ void macsim_c::init_knobs(int argc, char** argv)
 // =======================================
 void macsim_c::register_functions(void)
 {
-    mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
-    mem_factory_c::get()->register_class("l3_decoupled_network", default_mem); 
-    mem_factory_c::get()->register_class("l2_coupled_local", default_mem); 
-    mem_factory_c::get()->register_class("no_cache", default_mem);
-    mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
-    mem_factory_c::get()->register_class("l2_decoupled_local", default_mem);
-    
-    dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
-    dram_factory_c::get()->register_class("FCFS", fcfs_controller);
-    
-    fetch_factory_c::get()->register_class("rr", fetch_factory);
-    pref_factory_c::get()->register_class(pref_factory);
-    bp_factory_c::get()->register_class("gshare", default_bp); 
+  mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
+  mem_factory_c::get()->register_class("l3_decoupled_network", default_mem); 
+  mem_factory_c::get()->register_class("l2_coupled_local", default_mem); 
+  mem_factory_c::get()->register_class("no_cache", default_mem);
+  mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
+  mem_factory_c::get()->register_class("l2_decoupled_local", default_mem);
 
-    llc_factory_c::get()->register_class("default", default_llc);
+  dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
+  dram_factory_c::get()->register_class("FCFS", fcfs_controller);
+
+  fetch_factory_c::get()->register_class("rr", fetch_factory);
+  pref_factory_c::get()->register_class(pref_factory);
+  bp_factory_c::get()->register_class("gshare", default_bp); 
+
+  llc_factory_c::get()->register_class("default", default_llc);
+
+  network_factory_c::get()->register_class("ring", default_network);
+  network_factory_c::get()->register_class("mesh", default_network);
 }
 
 
@@ -220,6 +224,10 @@ void macsim_c::init_memory(void)
   // dummy invalid uop
   m_invalid_uop = new uop_c(m_simBase);
   m_invalid_uop->init();
+  
+  // interconnection network
+  string network_type = KNOB(KNOB_NOC_TOPOLOGY)->getValue();
+  m_network = network_factory_c::get()->allocate(network_type, m_simBase);
 
   // main memory
   string memory_type = m_simBase->m_knobs->KNOB_MEMORY_TYPE->getValue();
@@ -227,32 +235,23 @@ void macsim_c::init_memory(void)
 
   // dram controller
   m_num_mc = m_simBase->m_knobs->KNOB_DRAM_NUM_MC->getValue();
-  m_dram_controller = new dram_controller_c*[m_num_mc];
+  m_dram_controller = new dram_c*[m_num_mc];
   int num_noc_node = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES
     + *m_simBase->m_knobs->KNOB_NUM_L3;
   for (int ii = 0; ii < m_num_mc; ++ii) {
     m_dram_controller[ii] = dram_factory_c::get()->allocate(
         m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
-    m_dram_controller[ii]->init(ii, num_noc_node + ii);
+    m_dram_controller[ii]->init(ii);
   }
 
+  // initialize memory
+  m_memory->init();
 
-    // interconnection network
-  if (*KNOB(KNOB_ENABLE_NEW_NOC))
-    m_router = new router_wrapper_c(m_simBase);
-
-  if (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))
-    m_memory->init();
-  else
-    m_noc = new noc_c(m_simBase);
-
-    // bug detector
-    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
-        printf("enabling bug detector\n");
-        m_bug_detector = new bug_detector_c(m_simBase);
-    }
-    
-  m_PCL = new cache_partition_framework_c(m_simBase);
+  // bug detector
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
+    printf("enabling bug detector\n");
+    m_bug_detector = new bug_detector_c(m_simBase);
+  }
 }
 
 
@@ -518,10 +517,6 @@ void macsim_c::init_network(void)
   total_energy  = 0;
   total_packets = 0;
 #endif
-#else
-  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    m_router->init();
-  }
 #endif
 }
 
@@ -596,12 +591,7 @@ void macsim_c::deallocate_memory(void)
   delete m_uop_pool;
   delete m_invalid_uop;
   delete m_memory;
-
-  if (*KNOB(KNOB_ENABLE_IRIS) == false)
-    delete m_noc;
-
-  if (*KNOB(KNOB_ENABLE_NEW_NOC))
-    delete m_router;
+  delete m_network;
 
   if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
     delete m_bug_detector;
@@ -875,13 +865,7 @@ int macsim_c::run_a_cycle()
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS for half tick?
 #else
-    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-      m_router->run_a_cycle();
-    }
-    else {
-      // run interconnection network
-      m_noc->run_a_cycle();
-    }
+    m_network->run_a_cycle();
 #endif
   }
 
@@ -989,15 +973,6 @@ int macsim_c::run_a_cycle()
   m_clock_internal = (m_clock_internal + 1) % m_clock_lcm;
 
   return 1; //simulation not finished
-}
-
-
-// =======================================
-// Create a router
-// =======================================
-router_c* macsim_c::create_router(int type)
-{
-  return m_router->create_router(type);
 }
 
 

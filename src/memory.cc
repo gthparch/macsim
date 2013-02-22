@@ -46,31 +46,22 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "dram.h"
 #include "frontend.h"
 #include "memory.h"
-#include "noc.h"
+#include "network.h"
 #include "port.h"
 #include "uop.h"
 #include "factory_class.h"
 #include "bug_detector.h"
-#include "router.h"
 
 #include "config.h"
 
 #include "all_knobs.h"
 #include "statistics.h"
 
-#ifdef IRIS
-#include "manifold/kernel/include/kernel/common-defs.h"
-#include "manifold/kernel/include/kernel/component-decl.h"
-#include "manifold/kernel/include/kernel/clock.h"
-#include "manifold/kernel/include/kernel/manifold.h"
-#include "manifold/models/iris/iris_srcs/components/manifoldProcessor.h"
-#else
 #define PROC_REQ 1
 #define L1_REQ 2
 #define L2_REQ 3
 #define L3_REQ 4
 #define MC_RESP 5
-#endif
 
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args)
@@ -979,14 +970,7 @@ void dcu_c::receive_packet(void)
   if (topology == "simple_noc") num_rounds = 2;
 
   for (int ii = 0; ii < num_rounds; ++ii) {
-
-#ifdef IRIS
-    req = m_terminal->check_queue();
-#else
-    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-      req = m_router->receive_req(ii);
-    }
-#endif
+    req = NETWORK->receive(m_level, m_id);
 
     if (req != NULL) {
       req->m_state = MEM_NOC_DONE;
@@ -1002,9 +986,7 @@ void dcu_c::receive_packet(void)
       }
 
       if (insert_done) {
-        if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-          m_router->pop_req(ii);
-        }
+        NETWORK->receive_pop(m_level, m_id);
 
         if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
           m_simBase->m_bug_detector->deallocate_noc(req);
@@ -1026,43 +1008,8 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir)
 {
   req->m_msg_type = msg_type;
 
-#ifdef IRIS
-  req->m_msg_src = m_terminal->node_id;
-  req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
-  //if node type is mc and destination is a proc, then mclass should be reply type
-  if (m_terminal->mclass == L3_REQ) {
-    if ( dir == 1)                      //to MC
-      req->m_noc_type = PROC_REQ;
-    else                                //to proc
-      req->m_noc_type = MC_RESP;
-  } 
-  else {
-    req->m_noc_type = m_terminal->mclass;
-  }
-#else
-  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    req->m_msg_src = m_router->get_id();
-    req->m_msg_dst = m_memory->get_dst_router_id(m_level+dir, req->m_cache_id[m_level+dir]);
-  }
-  else {
-    req->m_msg_src = m_noc_id;
-  }
-#endif
-  assert(req->m_msg_src != -1 && req->m_msg_dst != -1);
-
-
   bool packet_insert = false;
-#ifdef IRIS
-  packet_insert = m_terminal->send_packet(req);
-#else
-  int dst = m_memory->get_dst_id(m_level+dir, req->m_cache_id[m_level+dir]);
-  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    packet_insert = m_router->inject_packet(req);
-  }
-  else {
-    packet_insert = m_simBase->m_noc->insert(m_noc_id, dst, msg_type, req);  
-  }
-#endif
+  packet_insert = NETWORK->send(req, m_level, m_id, m_level+dir, req->m_cache_id[m_level+dir]);
 
   if (packet_insert) {
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && 
@@ -1645,54 +1592,6 @@ bool dcu_c::write_done(mem_req_s* req)
 }
 
 
-// =======================================
-// create the network interface
-// =======================================
-bool dcu_c::create_network_interface(int mclass)
-{
-  if (m_has_router) {
-#ifdef IRIS
-    manifold::kernel::CompId_t processor_id = 
-      manifold::kernel::Component::Create<ManifoldProcessor>(0, m_simBase);
-    m_terminal = manifold::kernel::Component::GetComponent<ManifoldProcessor>(processor_id);
-    manifold::kernel::Clock::Register<ManifoldProcessor>(m_terminal, &ManifoldProcessor::tick, 
-        &ManifoldProcessor::tock);
-
-    m_terminal->init();
-    m_terminal->mclass = (message_class)mclass; //PROC_REQ
-    m_simBase->m_macsim_terminals.push_back(m_terminal);
-
-    m_noc_id = static_cast<int>(processor_id);
-#else
-    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-      int type;
-      if (mclass == L3_REQ) {
-        type = L3_ROUTER;
-      }
-      else if (mclass == PROC_REQ) {
-        if (m_ptx_sim) {
-          type = GPU_ROUTER;
-        }
-        else {
-          type = CPU_ROUTER;
-        }
-      }
-      else {
-        type = MC_ROUTER;
-      }
-      m_router = m_simBase->create_router(type);
-      m_noc_id = m_router->get_id(); 
-    }
-#endif
-    return true;
-  }
-  else {
-    m_noc_id = -1;
-    return false;
-  }
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1711,6 +1610,22 @@ memory_c::memory_c(macsim_c* simBase)
   m_num_core = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
   m_num_l3   = *m_simBase->m_knobs->KNOB_NUM_L3;
   m_num_mc   = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
+
+
+  if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
+    m_num_gpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+  else
+    m_num_cpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+  
+  if (KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx")
+    m_num_gpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
+  else
+    m_num_cpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
+  
+  if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx")
+    m_num_gpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
+  else
+    m_num_cpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
 
   //  ASSERT(m_num_core == m_num_l3);
 
@@ -1790,9 +1705,6 @@ memory_c::memory_c(macsim_c* simBase)
   else {
     assert(0);
   }
-    
-  // destination router map
-  m_dst_map = new map<int, int>;
 }
 
 
@@ -1820,149 +1732,6 @@ memory_c::~memory_c()
 // =======================================
 void memory_c::init(void)
 {
-  if (*KNOB(KNOB_ENABLE_IRIS) == false && *KNOB(KNOB_ENABLE_NEW_NOC) == false)
-    return;
-
-  int total_num_router = 0;
-  m_noc_id_base[MEM_L1] = 0;
-  for (int ii = 0; ii < m_num_core; ++ii) { 
-    if (m_l1_cache[ii]->create_network_interface(PROC_REQ))
-      ++total_num_router;
-  }
-
-  m_noc_id_base[MEM_L2] = total_num_router;
-  for (int ii = 0; ii < m_num_core; ++ii) {
-    if (m_l2_cache[ii]->create_network_interface(PROC_REQ))     //represents GPU
-      ++total_num_router;
-  }
-
-  m_noc_id_base[MEM_L3] = total_num_router;
-  for (int ii = 0; ii < m_num_l3; ++ii) {
-    if (m_l3_cache[ii]->create_network_interface(L3_REQ))       //represents L2 cache
-      ++total_num_router;
-  }
-
-  m_noc_id_base[MEM_MC] = total_num_router;
-  for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_simBase->m_dram_controller[ii]->create_network_interface();
-    ++total_num_router;
-  }
-
-
-  // NEW NOC Model
-  // TODO (jaekyu, 5-9-2012)
-  // improve mapping mechanism
-  if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    if (*KNOB(KNOB_NOC_DIMENSION) == 2) {
-      int l3_start_index = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-      } 
-
-      if (*KNOB(KNOB_NUM_SIM_LARGE_CORES) == 0) {
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-        }
-        l3_start_index = *KNOB(KNOB_NUM_SIM_SMALL_CORES); 
-      }
-
-      for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = l3_start_index + ii;
-      }
-      for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = l3_start_index + m_num_l3 + ii;
-      }
-      
-      if (*KNOB(KNOB_NUM_SIM_LARGE_CORES) != 0) {
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + m_num_l3 + m_num_mc + ii;
-        }
-      }
-    }
-    else if (*KNOB(KNOB_NOC_DIMENSION) == 1) {
-      if (*KNOB(KNOB_ROUTER_PLACEMENT) == 0) { // GPU_FRIENDLY
-        for (int ii = 0; ii < m_num_core; ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-        }
-        for (int ii = 0; ii < m_num_l3; ++ii) {
-          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
-        }
-        for (int ii = 0; ii < m_num_mc; ++ii) {
-          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
-        }
-      }
-      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1) { // CPU_FRIENDLY
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + ii] = *KNOB(KNOB_NUM_SIM_SMALL_CORES) + ii;
-        } 
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii;
-        }
-        for (int ii = 0; ii < m_num_l3; ++ii) {
-          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
-        }
-        for (int ii = 0; ii < m_num_mc; ++ii) {
-          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
-        }
-      }
-      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 2) { // MIXED
-        int count = 0;
-        for (int ii = 0; ii < m_num_core; ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-          count++;
-        }
-        for (int ii = 0; ii < m_num_mc/2; ++ii) {
-          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + ii;
-          count++;
-        }
-        for (int ii = 0; ii < m_num_l3; ++ii) {
-          (*m_dst_map)[MEM_L3 * 100 + ii] = count++;
-        } 
-        for (int ii = m_num_mc/2; ii < m_num_mc; ++ii) {
-          (*m_dst_map)[MEM_MC * 100 + ii] = count++;
-        }
-      }
-      else if (*KNOB(KNOB_ROUTER_PLACEMENT) == 3) { // INTERLEAVE
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + ii] = ii*2;
-        } 
-        for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-          (*m_dst_map)[MEM_L2 * 100 + *KNOB(KNOB_NUM_SIM_LARGE_CORES) + ii] = ii*2 + 1;
-        }
-        for (int ii = 0; ii < m_num_l3; ++ii) {
-          (*m_dst_map)[MEM_L3 * 100 + ii] = m_num_core + ii;
-        }
-        for (int ii = 0; ii < m_num_mc; ++ii) {
-          (*m_dst_map)[MEM_MC * 100 + ii] = m_num_core + m_num_l3 + ii;
-        }
-      }
-    }
-    else if (*KNOB(KNOB_NOC_DIMENSION) == 0) {
-
-      for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_LARGE_CORES); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-      }
-      int count = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
-
-      for (int ii = count; ii < (count + *KNOB(KNOB_NUM_SIM_SMALL_CORES)); ++ii) {
-        (*m_dst_map)[MEM_L2 * 100 + ii] = ii;
-      }
-      count += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
-
-      for (int ii = 0; ii < m_num_l3; ++ii) {
-        (*m_dst_map)[MEM_L3 * 100 + ii] = (count + ii);
-      }
-      count += m_num_l3;
-
-      for (int ii = 0; ii < m_num_mc; ++ii) {
-        (*m_dst_map)[MEM_MC * 100 + ii] = (count + ii);
-      }
-
-    }
-    else {
-      assert(0);
-    }
-  }
 }
 
 
@@ -2211,7 +1980,7 @@ void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size
 }
 
 
-// set each cache-level id
+// set each cache-level id : L1,L2: private to core, L3: shared by cores
 void memory_c::set_cache_id(mem_req_s* req)
 {
   req->m_cache_id[MEM_L1] = req->m_core_id;
@@ -2220,61 +1989,6 @@ void memory_c::set_cache_id(mem_req_s* req)
   req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
 }
 
-
-// receive a message from interconnection
-// based on the destination id, call appropiriate component (L1, L2, L3, Memory Controller)
-bool memory_c::receive(int src, int dst, int msg, mem_req_s* req)
-{
-  bool result = false;
-  int level;
-  int id;
-  int src_level;
-  int src_id;
-
-  get_level_id(dst, &level, &id);
-  get_level_id(src, &src_level, &src_id);
-
-  req->m_rdy_cycle = m_cycle + 1;
-  if (level == MEM_L1) {
-    ASSERT(0);
-  }
-  else if (level == MEM_L2) {
-    ASSERTM(msg == NOC_FILL || msg == NOC_ACK, "msg:%d\n", msg);
-    result = m_l2_cache[id]->fill(req);
-    if (result) {
-      DEBUG("L2[%d] fill_req:%d type:%s from L3\n", 
-          id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
-    }
-  }
-  else if (level == MEM_L3) {
-    if (msg == NOC_FILL) {
-      result = m_l3_cache[id]->fill(req);
-    }
-    else if (msg == NOC_NEW || msg == NOC_NEW_WITH_DATA) {
-      result = m_l3_cache[id]->insert(req);
-    }
-    else {
-      ASSERTM(0, "msg is %d\n", msg);
-    }
-  }
-  else if (level == MEM_MC) {
-    ASSERTM(msg == NOC_NEW || msg == NOC_NEW_WITH_DATA || msg == NOC_FILL, "msg:%d", msg);
-    result = m_simBase->m_dram_controller[id]->insert_new_req(req);
-//    assert(0); // jaekyu (2-15-2012) this will be completely removed
-    if (result) {
-      DEBUG("MC[%d] new_req:%d addr:%s type:%s\n", 
-          id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);
-    }
-    else {
-      if (req->m_type == MRT_DPRF) {
-        free_req(req->m_core_id, req);
-        result = true;
-      }
-    }
-  }
-
-  return result;
-}
 
 
 // deallocate a memory request
@@ -2344,46 +2058,6 @@ int memory_c::line_size(int core_id)
 int memory_c::get_dst_id(int level, int id)
 {
   return m_noc_index_base[level] + id;
-}
-
-
-// =======================================
-// Get destination router ID
-// =======================================
-int memory_c::get_dst_router_id(int level, int id)
-{
-  if (*KNOB(KNOB_ENABLE_IRIS)) {
-    return m_iris_node_id[m_noc_id_base[level] + id];
-  }
-  else if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-    return (*m_dst_map)[level * 100 + id];
-//    return m_noc_id_base[level] + id;
-  }
-  else {
-    return m_noc_id_base[level] + id;
-  }
-}
-
-
-// from network id, get cache level and cache id
-void memory_c::get_level_id(int noc_id, int* level, int* id)
-{
-  if (m_noc_index_base[MEM_L2] > noc_id) {
-    *level = MEM_L1;
-    *id = noc_id - m_noc_index_base[MEM_L1];
-  }
-  else if (m_noc_index_base[MEM_L3] > noc_id) {
-    *level = MEM_L2;
-    *id = noc_id - m_noc_index_base[MEM_L2];
-  }
-  else if (m_noc_index_base[MEM_MC] > noc_id) {
-    *level = MEM_L3;
-    *id = noc_id - m_noc_index_base[MEM_L3];
-  }
-  else {
-    *level = MEM_MC;
-    *id = noc_id - m_noc_index_base[MEM_MC];
-  }
 }
 
 
@@ -2544,8 +2218,6 @@ void memory_c::flush_prefetch(int core_id)
 }
 
 
-
-
 void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache)
 {
   int state = I_STATE;
@@ -2663,12 +2335,14 @@ void memory_c::handle_coherence()
 l3_coupled_network_c::l3_coupled_network_c(macsim_c* simBase) : memory_c(simBase)
 {
   ASSERT(m_num_core == m_num_l3);
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true, false, false);
     m_l2_cache[ii]->init(ii, ii, true,  true,  true, false, true);
     m_l3_cache[ii]->init(-1, ii, false, true,  false,false, true);
   }
+
+  NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_mc);
 }
 
 
@@ -2682,7 +2356,7 @@ l3_coupled_network_c::~l3_coupled_network_c()
 
 l3_decoupled_network_c::l3_decoupled_network_c(macsim_c* simBase) : memory_c(simBase)
 {
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true,  false, false);
     m_l2_cache[ii]->init(-1, ii, true,  true,  false, false, true);
@@ -2691,6 +2365,8 @@ l3_decoupled_network_c::l3_decoupled_network_c(macsim_c* simBase) : memory_c(sim
   for (int ii = 0; ii < m_num_l3; ++ii) {
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
+  
+  NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_mc);
 }
 
 
@@ -2702,15 +2378,19 @@ l3_decoupled_network_c::~l3_decoupled_network_c()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
+// FIXME
 l2_coupled_local_c::l2_coupled_local_c(macsim_c* simBase) : memory_c(simBase)
 {
   ASSERT(m_num_core == m_num_l3);
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
-    m_l1_cache[ii]->init(ii, -1, false, false, true,  false, true);
+    m_l1_cache[ii]->init(ii, -1, false, false, true,  false, false);
     m_l2_cache[ii]->init(ii, ii, true,  true,  true,  false, true);
     m_l3_cache[ii]->init(-1, ii, false, true,  false, true,  true);
   }
+  
+  NETWORK->init(0, 0, m_num_l3, m_num_mc);
+
 }
 
 
@@ -2734,13 +2414,14 @@ void l2_coupled_local_c::set_cache_id(mem_req_s* req)
 no_cache_c::no_cache_c(macsim_c* simBase) : memory_c(simBase)
 {
   ASSERT(m_num_core == m_num_l3);
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
-    //                   next_id, next,  prev_id, prev,  done,  cup,   cdown, disable
     m_l1_cache[ii]->init(ii, -1, false, false, true,  true, false);
-    m_l2_cache[ii]->init(ii, ii, true,  true,  true,  true, true);
+    m_l2_cache[ii]->init(ii, ii, true,  true,  true,  true, false);
     m_l3_cache[ii]->init(-1, ii, false, true,  false, true, true);
   }
+
+  NETWORK->init(0, 0, m_num_l3, m_num_mc);
 }
 
 
@@ -2763,16 +2444,18 @@ void no_cache_c::set_cache_id(mem_req_s* req)
 
 l2_decoupled_network_c::l2_decoupled_network_c(macsim_c* simBase) : memory_c(simBase)
 {
-  // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true,  false, false);
     m_l2_cache[ii]->init(-1, ii, true,  true,  false, true,  true);
   }
 
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_l3; ++ii) { 
-    // next_id, next, prev_id, prev, done, coupled_up, doupled_down, disable
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
+  
+  NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_mc);
 }
 
 
@@ -2785,15 +2468,12 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
 {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
-  //req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  //req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 
   if (m_num_l3 & (m_num_l3 - 1) == 0) {
     req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   }
   else {
     req->m_cache_id[MEM_L3] = (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3;
-    //cout << "addr " << hex << req->m_addr << " l3 tile " << dec << (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3 << "\n";
   }
 
   if (m_num_mc & (m_num_mc - 1) == 0) {
@@ -2801,7 +2481,6 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
   }
   else {
     req->m_cache_id[MEM_MC] = (req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc;
-    //cout << "addr " << hex << req->m_addr << " mc " << dec << ((req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc) << "\n";
   }
 }
 
@@ -2811,14 +2490,14 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
 
 l2_decoupled_local_c::l2_decoupled_local_c(macsim_c* simBase) : memory_c(simBase)
 {
-  // next_id, prev_id, done, coupled_up, coupled_down, disable, has_router
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, !HAS_DONE_FUNC, !ULINK,  DLINK,  ENABLE, !HAS_ROUTER);
     m_l2_cache[ii]->init(-1, ii,  HAS_DONE_FUNC,  ULINK, !DLINK, !ENABLE, !HAS_ROUTER);
   }
 
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_l3; ++ii) { 
-    // next_id, prev_id, done, coupled_up, coupled_down, disable, has_router
     m_l3_cache[ii]->init(-1, -1, !HAS_DONE_FUNC, !ULINK, !DLINK, ENABLE, HAS_ROUTER);
   }
 }

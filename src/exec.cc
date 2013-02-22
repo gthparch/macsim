@@ -270,7 +270,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
             else {
 #endif
-              uop_latency = m_simBase->m_memory->access(uop);
+              uop_latency = MEMORY->access(uop);
 #if PORT_FIXME
               if (uop_latency == 0) {
                 if (uop->m_dcache_bank_id >= 128)
@@ -353,7 +353,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
             else {
 #endif
-              latency = m_simBase->m_memory->access(uop->m_child_uops[next_set_bit]);
+              latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
 #if PORT_FIXME
               if (latency == 0) {
                 if (m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] < 128)

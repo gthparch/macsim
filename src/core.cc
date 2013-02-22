@@ -89,7 +89,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "fetch_factory.h"
 #include "readonly_cache.h"
 #include "sw_managed_cache.h"
-#include "router.h"
+#include "network.h"
 #include "dram.h"
 
 #include "config.h"
@@ -564,7 +564,7 @@ void core_c::check_forward_progress()
 
     // print all dram requests
     for (int ii = 0; ii < *KNOB(KNOB_DRAM_NUM_MC); ++ii) {
-      m_simBase->m_dram_controller[ii]->print_req();
+      DRAM_CTRL[ii]->print_req();
     }
 
     // print all remaining uop states
@@ -572,9 +572,7 @@ void core_c::check_forward_progress()
       m_simBase->m_bug_detector->print(m_core_id, m_last_terminated_tid);
     }
 
-    if (*KNOB(KNOB_ENABLE_NEW_NOC)) {
-      m_simBase->m_router->print();
-    }
+    m_simBase->m_network->print();
 
     ASSERTM(m_core_cycle_count - m_last_forward_progress <= *KNOB(KNOB_FORWARD_PROGRESS_LIMIT),
         "core_id:%d core_cycle_count:%s last_forward_progress:%s last_tid:%d "

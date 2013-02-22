@@ -414,8 +414,6 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     process->m_core_pool = &m_simBase->m_x86_core_pool;
   }
 
-  m_simBase->m_PCL->set_appl_type(process->m_orig_pid, process->m_ptx);
-
   // now we set up a new process to execute it
   setup_process(process);
 

@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : macsim.h
- * Author       : Jaekyu Lee
+ * Author       : HPArch Research Group
  * Date         : 3/25/2011
  * SVN          : $Id: main.cc 911 2009-11-20 19:08:10Z kacear $:
  * Description  : MacSim Wrapper Class
@@ -70,6 +70,9 @@ class Topology;
 
 
 #define CYCLE m_simBase->m_simulation_cycle
+#define NETWORK m_simBase->m_network
+#define DRAM_CTRL m_simBase->m_dram_controller
+#define MEMORY m_simBase->m_memory
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +168,6 @@ class macsim_c
      */
 		void fini_sim(void);
 
-    /**
-     * Create routers
-     */
-    router_c* create_router(int type);
-
 #ifdef IRIS
     /**
      * Initialize iris configuration
@@ -215,9 +213,8 @@ class macsim_c
 
 		core_c *m_core_pointers[MAX_NUM_CORES]; /**< core pointers */
 		memory_c* m_memory; /**< main memory */
-    dram_controller_c** m_dram_controller; /**< dram controller */
+    dram_c** m_dram_controller; /**< dram controller */
     int m_num_mc; /**< number of memory controllers */
-		noc_c* m_noc; /**<  interconnection network */
 		trace_reader_wrapper_c* m_trace_reader; /**< trace reader */
 
     // clock handling
@@ -255,7 +252,7 @@ class macsim_c
 		struct timeval m_end_sim; /**< simulation termination time */
 
 		// interconnect
-    router_wrapper_c* m_router; /**< NOC routers */
+    network_c* m_network;
 
 #ifdef IRIS
     // IRIS
@@ -269,10 +266,6 @@ class macsim_c
 		FILE* log_file; /**< log file used by IRIS */
 		stringstream network_trace; /**< network trace */
 #endif
-
-    // cache partitioning
-    cache_partition_framework_c* m_PCL; /**< cache partitioning framework */
-
 
 #ifdef POWER_EI
 		// power stats

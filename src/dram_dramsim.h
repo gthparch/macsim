@@ -28,62 +28,92 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : factory_class.h
- * Author       : Jaekyu Lee
- * Date         : 1/27/2011 
- * SVN          : $Id: frontend.h 915 2009-11-20 19:13:07Z kacear $:
- * Description  : factory class
+ * File         : dram_dramsim.h 
+ * Author       : HPArch Research Group
+ * Date         : 2/18/2013
+ * SVN          : $Id: dram.h 867 2009-11-05 02:28:12Z kacear $:
+ * Description  : DRAMSim2 interface
  *********************************************************************************************/
 
 
-#include "factory_class.h"
-#include "assert_macros.h"
+#ifndef DRAM_DRAMSIM_H
+#define DRAM_DRAMSIM_H
+
+
+#ifdef DRAMSIM
+#include <list>
+
+
+#include "dram.h"
+#include "memreq_info.h"
+#include "network.h"
+
+
+namespace DRAMSim {
+  class MultiChannelMemorySystem;
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// Few factory classes share exactly same structure. However, since all these factories have
-/// singleton pattern, they need separate classes. In this file, define common codes, and 
-/// replace with name and type
+/// \brief MC - DRAMSim2 interface
 ///////////////////////////////////////////////////////////////////////////////////////////////
+class dram_dramsim_c : public dram_c
+{
+  public:
+    /**
+     * Constructor
+     */
+    dram_dramsim_c(macsim_c* simBase);
 
-#define FACTORY_IMPLEMENTATION(name, type) \
-  name* name::instance = NULL; \
-  \
-  name::name() \
-  { \
-  } \
-  \
-  name::~name() \
-  { \
-  } \
-  \
-  void name::register_class(string policy, function<type (macsim_c*)> func) \
-  { \
-    m_func_table[policy] = func; \
-  } \
-  \
-  type name::allocate(string policy, macsim_c* m_simBase) \
-  { \
-    ASSERT(!m_func_table.empty()); \
-    ASSERTM(m_func_table.find(policy) != m_func_table.end(), "policy:%s\n", \
-        policy.c_str()); \
-    \
-    type new_object = m_func_table[policy](m_simBase); \
-    ASSERT(new_object); \
-    return new_object; \
-  } \
-  name* name::get() \
-  { \
-    if (name::instance == NULL) \
-      name::instance = new name; \
-    \
-    return name::instance; \
-  } \
+    /**
+     * Destructor
+     */
+    ~dram_dramsim_c();
 
-// declare implementations
-FACTORY_IMPLEMENTATION(dram_factory_c, dram_c*);
-FACTORY_IMPLEMENTATION(bp_factory_c, bp_dir_base_c*);
-FACTORY_IMPLEMENTATION(mem_factory_c, memory_c*);
-FACTORY_IMPLEMENTATION(llc_factory_c, cache_c*);
-FACTORY_IMPLEMENTATION(network_factory_c, network_c*);
+    /**
+     * Print all requests in DRB
+     */
+    void print_req(void);
 
+    /**
+     * Initialize MC
+     */
+    void init(int id);
+
+    /**
+     * Tick a cycle
+     */
+    void run_a_cycle(void);
+
+  private:
+    dram_dramsim_c(); // do not implement
+
+    /**
+     * DRAMSim2 read callback function
+     */
+    void read_callback(unsigned, uint64_t, uint64_t);
+
+    /**
+     * DRAMSim2 write callback function
+     */
+    void write_callback(unsigned, uint64_t, uint64_t);
+
+    /**
+     * Send a packet to NOC
+     */
+    void send(void);
+
+    /**
+     * Receive a packet from NOC
+     */
+    void receive(void);
+
+  private:
+    list<mem_req_s*>* m_output_buffer; /**< output buffer */
+    list<mem_req_s*>* m_pending_request; /**< pending request */
+    DRAMSim::MultiChannelMemorySystem* m_dramsim; /**< dramsim2 instance */
+};
+#endif
+
+
+#endif
