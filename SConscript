@@ -151,7 +151,24 @@ if flags['power'] == '1':
 #########################################################################################
 # DRAMSIM2
 #########################################################################################
-DRAMSIM2_srcs = glob.glob('src/DRAMSim2/*.cpp')
+DRAMSIM2_srcs = [
+  'src/DRAMSim2/AddressMapping.cpp',
+  'src/DRAMSim2/BankState.cpp',
+  'src/DRAMSim2/ClockDomain.cpp',
+  'src/DRAMSim2/IniReader.cpp',
+  'src/DRAMSim2/MemorySystem.cpp',
+  'src/DRAMSim2/Rank.cpp',
+  'src/DRAMSim2/TraceBasedSim.cpp',
+  'src/DRAMSim2/Bank.cpp',
+  'src/DRAMSim2/BusPacket.cpp',
+  'src/DRAMSim2/CommandQueue.cpp',
+  'src/DRAMSim2/MemoryController.cpp',
+  'src/DRAMSim2/MultiChannelMemorySystem.cpp',
+  'src/DRAMSim2/SimulatorObject.cpp',
+  'src/DRAMSim2/Transaction.cpp',
+]
+#"""
+
 
 
 if flags['dram'] == '1':
@@ -173,6 +190,8 @@ macsim_src = [
   'src/cache.cc',
   'src/core.cc',
   'src/dram.cc',
+  'src/dram_ctrl.cc',
+  'src/dram_dramsim.cc',
   'src/exec.cc',
   'src/factory_class.cc',
   'src/fetch_factory.cc',
@@ -183,7 +202,6 @@ macsim_src = [
   'src/map.cc',
   'src/memory.cc',
   'src/memreq_info.cc',
-  'src/noc.cc',
   'src/port.cc',
   'src/pref.cc',
   'src/pref_common.cc',
@@ -194,7 +212,6 @@ macsim_src = [
   'src/retire.cc',
   'src/rob.cc',
   'src/rob_smc.cc',
-  'src/router.cc',
   'src/schedule.cc',
   'src/schedule_io.cc',
   'src/schedule_ooo.cc',
@@ -204,6 +221,9 @@ macsim_src = [
   'src/trace_read.cc',
   'src/uop.cc',
   'src/utils.cc',
+  'src/network.cc',
+  'src/network_ring.cc',
+  'src/network_mesh.cc',
   'src/trace_read_cpu.cc',
   'src/trace_read_gpu.cc',
 ]
