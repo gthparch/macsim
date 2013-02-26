@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "sw_managed_cache.h"
 #include "memory.h"
 #include "inst_info.h"
+#include "page_mapping.h"
 
 #include "all_knobs.h"
 
@@ -79,6 +80,20 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
 
   // map opcode type to uop type 
   init_pin_convert();
+
+  // physical page mapping
+  m_enable_physical_mapping = *KNOB(KNOB_ENABLE_PHYSICAL_MAPPING);
+
+  if (m_enable_physical_mapping)
+  {
+    std::string policy = simBase->m_knobs->KNOB_PAGE_MAPPING_POLICY->getValue();
+    if (policy == "FCFS")
+      m_page_mapper = new FCFSPageMapper(simBase, *KNOB(KNOB_PAGE_SIZE));
+    else if (policy == "REGION_FCFS")
+      m_page_mapper = new RegionBasedFCFSPageMapper(simBase, *KNOB(KNOB_PAGE_SIZE), *KNOB(KNOB_REGION_SIZE));
+    else
+      assert(0);
+  }
 }
 
 
@@ -87,6 +102,7 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
  */
 cpu_decoder_c::~cpu_decoder_c()
 {
+  delete m_page_mapper;
 }
 
 
@@ -948,6 +964,11 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     uop->m_vaddr = trace_uop->m_va + m_simBase->m_memory->base_addr(core_id,
         (unsigned long)UINT_MAX * 
         (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
+
+    // virtual-to-physical translation 
+    // physical page is allocated at this point for the time being
+    if (m_enable_physical_mapping)
+      uop->m_vaddr = m_page_mapper->translate(uop->m_vaddr);
   }
 
 

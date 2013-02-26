@@ -226,6 +226,7 @@ macsim_src = [
   'src/network_mesh.cc',
   'src/trace_read_cpu.cc',
   'src/trace_read_gpu.cc',
+  'src/page_mapping.cc',
 ]
 
 

@@ -200,13 +200,6 @@ param<HETERO_NOC_USE_SAME_QUEUE, hetero_noc_use_same_queue, bool, true>
 param<HETERO_MEM_PRIORITY_CPU, hetero_mem_priority_cpu, bool, false>
 param<HETERO_MEM_PRIORITY_GPU, hetero_mem_priority_gpu, bool, false>
 
-
-
-
-
-
-
-
 param<CACHE_USE_PSEUDO_LRU, cache_use_pseudo_lru, bool, false>
 
 
@@ -224,3 +217,11 @@ param<NEW_INTERLEAVING_SAME_GRANULARITY, new_interleaving_same_granularity, bool
 param<NEW_INTERLEAVING_DIFF_GRANULARITY, new_interleaving_diff_granularity, bool, false>
 
 param<USE_NEW_COALESCING, use_new_coalescing, bool, false>
+
+
+/* Page Mapping */
+param<ENABLE_PHYSICAL_MAPPING, enable_physical_mapping, bool, false>
+param<PAGE_SIZE, page_size, int, 4096>
+param<REGION_SIZE, page_size, int, 1048576>
+/* FCFS or REGION_FCFS */
+param<PAGE_MAPPING_POLICY, page_mapping_policy, string, REGION_FCFS> 

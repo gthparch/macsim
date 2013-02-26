@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "uop.h"
 #include "inst_info.h"
 #include "trace_read.h"
+#include "page_mapping.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +144,9 @@ class cpu_decoder_c : public trace_read_c
     bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read);
 
   private:
+    // page mapping support
+    bool m_enable_physical_mapping;     //!< use physical mapping 
+    PageMapper* m_page_mapper;          //!< page mapper
 };
 
 #endif // TRACE_READ_CPU_H_INCLUDED
