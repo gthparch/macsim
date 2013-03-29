@@ -69,9 +69,9 @@ typedef struct drb_entry_s {
   int         m_id;             /**< drb entry id */
   int         m_state;          /**< state */
   Addr        m_addr;           /**< request address */
-  int         m_bid;            /**< bank id */
-  int         m_rid;            /**< row id */
-  int         m_cid;            /**< column id */
+  uint64_t    m_bid;            /**< bank id */
+  uint64_t    m_rid;            /**< row id */
+  uint64_t    m_cid;            /**< column id */
   int         m_core_id;        /**< core id */
   int         m_thread_id;      /**< thread id */
   int         m_appl_id;        /**< application id */
@@ -94,7 +94,7 @@ typedef struct drb_entry_s {
   /**
    * set a new entry
    */
-  void set(mem_req_s* req, int bid, int rid, int cid);
+  void set(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid);
 
   /**
    * reset the entry
@@ -134,7 +134,7 @@ class dram_ctrl_c : public dram_c
     /**
      * Insert a new request to dram request buffer (DRB).
      */
-    void insert_req_in_drb(mem_req_s* req, int bid, int rid, int cid);
+    void insert_req_in_drb(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid);
 
     /**
      * Tick a cycle.
@@ -229,7 +229,7 @@ class dram_ctrl_c : public dram_c
     /**
      * Function to do any book-keeping that might be needed by scheduling policies
      */
-    virtual void on_insert(mem_req_s* req, int bid, int rid, int cid);
+    virtual void on_insert(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid);
 
     /**
      * Function to do any book-keeping that might be needed by scheduling policies
@@ -245,7 +245,7 @@ class dram_ctrl_c : public dram_c
     list<drb_entry_s*> *m_buffer; /**< Dram request buffer (DRB) */
     list<drb_entry_s*> *m_buffer_free_list; /**< DRB free list */
     drb_entry_s** m_current_list; /**< Currently servicing request in each DRB */
-    int* m_current_rid; /**< Current open row id */
+    uint64_t* m_current_rid; /**< Current open row id */
     Counter* m_bank_ready; /**< bank ready cycle */
     Counter* m_data_ready; /**< data ready cycle */
     Counter* m_data_avail; /**< data avail cycle */
@@ -256,11 +256,11 @@ class dram_ctrl_c : public dram_c
     int m_num_bank; /**< number of dram banks */
     int m_num_channel; /**< number of dram channels */
     int m_num_bank_per_channel;  /**< number of banks per channel */
-    uns m_cid_mask; /**< column id mask */
-    uns m_bid_mask; /**< bank id mask */
-    uns m_bid_shift; /**< bank id shift */
-    uns m_rid_shift; /**< row id shift */
-    uns m_bid_xor_shift; /**< bank id xor factor */
+    uint64_t m_cid_mask; /**< column id mask */
+    uint64_t m_bid_mask; /**< bank id mask */
+    uint64_t m_bid_shift; /**< bank id shift */
+    uint64_t m_rid_shift; /**< row id shift */
+    uint64_t m_bid_xor_shift; /**< bank id xor factor */
 
     int m_num_completed_in_last_cycle; /**< number of requests completed in last cycle */
     int m_starvation_cycle; /**< number of cycles without completed requests*/

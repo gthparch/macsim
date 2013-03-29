@@ -977,7 +977,8 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     int temp_num_req = (uop->m_mem_size + *KNOB(KNOB_MAX_TRANSACTION_SIZE) - 1) / 
       *KNOB(KNOB_MAX_TRANSACTION_SIZE);
 
-    ASSERTM(temp_num_req > 0, "size:%d max:%d num:%d type:%d num:%d\n", uop->m_mem_size, 
+    ASSERTM(temp_num_req > 0, "pc:%llx vaddr:%llx opcode:%d size:%d max:%d num:%d type:%d num:%d\n", 
+        uop->m_pc, uop->m_vaddr, uop->m_opcode, uop->m_mem_size, 
         (int)*KNOB(KNOB_MAX_TRANSACTION_SIZE), temp_num_req, uop->m_mem_type, 
         trace_uop->m_info->m_trace_info.m_num_uop);
   }

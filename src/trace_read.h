@@ -53,7 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
-#define TRACE_SIZE (sizeof(trace_info_s) - sizeof(uint32_t))
+#define TRACE_SIZE (sizeof(trace_info_s) - sizeof(uint64_t))
 #define CPU_TRACE_SIZE TRACE_SIZE
 #define GPU_TRACE_SIZE TRACE_SIZE
 #define MAX_TR_OPCODE GPU_OPCODE_LAST
@@ -80,16 +80,16 @@ typedef struct trace_info_s {
   uint8_t  m_num_ld;            /**< number of load operations */
   uint8_t  m_size;              /**< instruction size */
   // dynamic information
-  uint32_t m_ld_vaddr1;         /**< load address 1 */
-  uint32_t m_ld_vaddr2;         /**< load address 2 */
-  uint32_t m_st_vaddr;          /**< store address */
-  uint32_t m_instruction_addr;  /**< pc address */
-  uint32_t m_branch_target;     /**< branch target address */
+  uint64_t m_ld_vaddr1;         /**< load address 1 */
+  uint64_t m_ld_vaddr2;         /**< load address 2 */
+  uint64_t m_st_vaddr;          /**< store address */
+  uint64_t m_instruction_addr;  /**< pc address */
+  uint64_t m_branch_target;     /**< branch target address */
   uint8_t  m_mem_read_size;     /**< memory read size */
   uint8_t  m_mem_write_size;    /**< memory write size */
   bool     m_rep_dir;           /**< repetition direction */
   bool     m_actually_taken;    /**< branch actually taken */
-  uint32_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_s;
 
 

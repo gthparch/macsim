@@ -141,7 +141,7 @@ void drb_entry_s::reset()
 
 
 // set a drb entry.
-void drb_entry_s::set(mem_req_s *mem_req, int bid, int rid, int cid)
+void drb_entry_s::set(mem_req_s *mem_req, uint64_t bid, uint64_t rid, uint64_t cid)
 {
   m_id        = m_unique_id++;
   m_addr      = mem_req->m_addr;
@@ -185,7 +185,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
   m_buffer           = new list<drb_entry_s*>[m_num_bank];
   m_buffer_free_list = new list<drb_entry_s*>[m_num_bank];
   m_current_list     = new drb_entry_s*[m_num_bank];
-  m_current_rid      = new int[m_num_bank];
+  m_current_rid      = new uint64_t[m_num_bank];
   m_data_ready       = new Counter[m_num_bank];
   m_data_avail       = new Counter[m_num_bank];
   m_bank_ready       = new Counter[m_num_bank];
@@ -201,7 +201,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
     m_data_avail[ii]     = ULLONG_MAX;
     m_bank_ready[ii]     = ULLONG_MAX;
     m_bank_timestamp[ii] = 0;
-    m_current_rid[ii]    = -1;
+    m_current_rid[ii]    = ULLONG_MAX;
     m_current_list[ii]   = NULL;
   }
 
@@ -288,10 +288,10 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
 {
   // address parsing
   Addr addr = mem_req->m_addr;
-  int bid_xor;
-  int cid;
-  int bid;
-  int rid;
+  uint64_t bid_xor;
+  uint64_t cid;
+  uint64_t bid;
+  uint64_t rid;
 
   int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
   if (num_mc & (num_mc - 1) == 0) {
@@ -310,7 +310,7 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
     rid = addr;
   }
 
-  ASSERTM(rid >= 0, "addr:%s cid:%d bid:%d rid:%d type:%s\n",    \
+  ASSERTM(rid >= 0, "addr:%s cid:%lu bid:%lu rid:%lu type:%s\n",    \
           hexstr64s(addr), cid, bid, rid,                        \
           mem_req_c::mem_req_type_name[mem_req->m_type]);
   
@@ -364,7 +364,7 @@ void dram_ctrl_c::flush_prefetch(int bid)
 
 
 // insert a new request to dram request buffer (DRB)
-void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, int bid, int rid, int cid)
+void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, uint64_t bid, uint64_t rid, uint64_t cid)
 {
   drb_entry_s* new_entry = m_buffer_free_list[bid].front();
   m_buffer_free_list[bid].pop_front();
@@ -737,7 +737,7 @@ void dram_ctrl_c::channel_schedule_cmd(void)
       ASSERT(m_current_list[bank]->m_state == DRAM_CMD);
       m_current_list[bank]->m_req->m_state = MEM_DRAM_CMD;
       // activate
-      if (m_current_rid[bank] == -1) {
+      if (m_current_rid[bank] == ULLONG_MAX) {
         m_current_rid[bank] = m_current_list[bank]->m_rid;
         m_bank_ready[bank]  = m_cycle + m_activate_latency; 
         m_data_avail[bank]   = ULLONG_MAX;
@@ -755,7 +755,7 @@ void dram_ctrl_c::channel_schedule_cmd(void)
       }
       // precharge
       else {
-        m_current_rid[bank] = -1;
+        m_current_rid[bank] = ULLONG_MAX;
         m_bank_ready[bank]  = m_cycle + m_precharge_latency;
         m_data_avail[bank]   = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_CMD_WAIT;
@@ -854,7 +854,7 @@ Counter dram_ctrl_c::acquire_data_bus(int channel_id, int req_size, bool gpu_req
 }
 
 
-void dram_ctrl_c::on_insert(mem_req_s* req, int bid, int rid, int cid)
+void dram_ctrl_c::on_insert(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid)
 {
   // empty
 }
