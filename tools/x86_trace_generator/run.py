@@ -17,6 +17,7 @@ tracegen = os.getcwd() + '/obj-intel64/trace_generator.so'
 Parse argument
   -t : number of thread in an application (defautl 1)
   -n : number of instructions to generate (default 0 - until end)
+  -s : number of instructions to skip the beginning of a binary (default 0 - nothing to skip)
   -c : cmd including binary
 """
 def process_options(args):
@@ -26,6 +27,7 @@ def process_options(args):
   parsed_args = {}
   parsed_args['-t'] = '1'
   parsed_args['-n'] = '0'
+  parsed_args['-s'] = '0'
   parsed_args['-c'] = ''
 
 
@@ -57,7 +59,7 @@ def main():
     sys.exit(0)
 
 
-  os.system('%s -t %s -thread %s -max %s -- %s' % (pin, tracegen, args['-t'], args['-n'], args['-c']))
+  os.system('%s -t %s -thread %s -max %s -skip %s -- %s' % (pin, tracegen, args['-t'], args['-n'], args['-s'], args['-c']))
 
 
 if __name__ == '__main__':
