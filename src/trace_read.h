@@ -53,9 +53,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
-#define TRACE_SIZE (sizeof(trace_info_s) - sizeof(uint64_t))
-#define CPU_TRACE_SIZE TRACE_SIZE
-#define GPU_TRACE_SIZE TRACE_SIZE
+#define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
+#define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
 #define MAX_TR_OPCODE GPU_OPCODE_LAST
 
 
@@ -66,7 +65,13 @@ POSSIBILITY OF SUCH DAMAGE.
 /// instead of keeping two separate structures, just using TRACE_SIZE, which is defined above,
 /// read/write required size only.
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
 typedef struct trace_info_s {
+  trace_info_s();
+  virtual ~trace_info_s();
+} trace_info_s;
+
+typedef struct trace_info_cpu_s {
   uint8_t  m_num_read_regs;     /**< num read registers */
   uint8_t  m_num_dest_regs;     /**< num dest registers */
   uint8_t  m_src[MAX_SRC_NUM];  /**< src register id */
@@ -90,7 +95,75 @@ typedef struct trace_info_s {
   bool     m_rep_dir;           /**< repetition direction */
   bool     m_actually_taken;    /**< branch actually taken */
   uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
-} trace_info_s;
+} trace_info_cpu_s;
+
+// identical to structure in trace generator
+typedef struct trace_info_gpu_small_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint8_t m_src[MAX_SRC_NUM];
+  uint8_t m_dst[MAX_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space; //for loads, stores, atomic, prefetch(?)
+    uint8_t m_level; //for membar
+  };
+  uint8_t m_cache_level; //for prefetch?
+  uint8_t m_cache_operator; //for loads, stores, atomic, prefetch(?)
+} trace_info_gpu_small_s;
+
+
+// trace_info_gpu_small_s + next_inst_addr
+typedef struct trace_info_gpu_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint8_t m_src[MAX_SRC_NUM];
+  uint8_t m_dst[MAX_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space; //for loads, stores, atomic, prefetch(?)
+    uint8_t m_level; //for membar
+  };
+  uint8_t m_cache_level; //for prefetch?
+  uint8_t m_cache_operator; //for loads, stores, atomic, prefetch(?)
+  uint64_t m_next_inst_addr; // next pc address, not present in raw trace format
+} trace_info_gpu_s;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,8 +289,9 @@ typedef enum CPU_OPCODE_ENUM_ {
 
 
 
+// identical to enum in PTX trace generator
 typedef enum GPU_OPCODE_ {
-  GPU_INVALID,
+  GPU_INVALID = 0,
   GPU_ABS,
   GPU_ABS64,
   GPU_ADD, 
@@ -225,9 +299,13 @@ typedef enum GPU_OPCODE_ {
 	GPU_ADDC,
 	GPU_AND,
 	GPU_AND64,
-	GPU_ATOM,
-	GPU_ATOM64,
-	GPU_BAR,
+	GPU_ATOM_GM,
+	GPU_ATOM_SM,
+	GPU_ATOM64_GM,
+	GPU_ATOM64_SM,
+	GPU_BAR_ARRIVE,
+  GPU_BAR_SYNC,
+  GPU_BAR_RED,
 	GPU_BFE,
 	GPU_BFE64,
 	GPU_BFI,
@@ -267,7 +345,9 @@ typedef enum GPU_OPCODE_ {
 	GPU_MAD64,
 	GPU_MAX,
 	GPU_MAX64,
-	GPU_MEMBAR,
+	GPU_MEMBAR_CTA,
+	GPU_MEMBAR_GL,
+	GPU_MEMBAR_SYS,
 	GPU_MIN,
 	GPU_MIN64,
 	GPU_MOV,
@@ -289,8 +369,10 @@ typedef enum GPU_OPCODE_ {
 	GPU_PRMT,
 	GPU_RCP,
 	GPU_RCP64,
-	GPU_RED,
-	GPU_RED64,
+	GPU_RED_GM,
+	GPU_RED_SM,
+	GPU_RED64_GM,
+	GPU_RED64_SM,
 	GPU_REM,
 	GPU_REM64,
 	GPU_RET,
@@ -345,7 +427,6 @@ typedef enum GPU_OPCODE_ {
   GPU_XOR64,
   GPU_RECONVERGE,
   GPU_PHI,
-
   GPU_MEM_LD_GM,
   GPU_MEM_LD_LM,
   GPU_MEM_LD_SM,
@@ -359,9 +440,111 @@ typedef enum GPU_OPCODE_ {
   GPU_DATA_XFER_GM,
   GPU_DATA_XFER_LM,
   GPU_DATA_XFER_SM,
-
-  GPU_OPCODE_LAST,
+  GPU_OPCODE_LAST
 } GPU_OPCODE_ENUM;
+
+
+typedef enum GPU_ADDRESS_SPACE_ENUM_ {
+  GPU_ADDR_SP_INVALID = 0,
+  GPU_ADDR_SP_CONST,
+  GPU_ADDR_SP_GLOBAL,
+  GPU_ADDR_SP_LOCAL,
+  GPU_ADDR_SP_PARAM,
+  GPU_ADDR_SP_SHARED,
+  GPU_ADDR_SP_TEXTURE,
+  GPU_ADDR_SP_GENERIC,
+  GPU_ADDR_SP_LAST
+} GPU_ADDRESS_SPACE_ENUM;
+
+
+typedef enum GPU_CACHE_OP_ENUM_ {
+  GPU_CACHE_OP_INVALID = 0,
+  GPU_CACHE_OP_CA,
+  GPU_CACHE_OP_CV,
+  GPU_CACHE_OP_CG,
+  GPU_CACHE_OP_CS,
+  GPU_CACHE_OP_WB,
+  GPU_CACHE_OP_WT,
+  GPU_CACHE_OP_LAST
+} GPU_CACHE_OP_ENUM;
+
+
+typedef enum GPU_CACHE_LEVEL_ENUM_ {
+  GPU_CACHE_INVALID = 0,
+  GPU_CACHE_L1,
+  GPU_CACHE_L2,
+  GPU_CACHE_LAST
+} GPU_CACHE_LEVEL_ENUM;
+
+typedef enum GPU_FENCE_LEVEL_ENUM_ {
+  GPU_FENCE_INVALID = 0,
+  GPU_FENCE_CTA,
+  GPU_FENCE_GL,
+  GPU_FENCE_SYS,
+  GPU_FENCE_LAST
+} GPU_FENCE_LEVEL_ENUM;
+
+// in trace generator, special registers are assigned values starting from 200
+// matches order in ocelot/ir/interface/PTXOperand.h
+typedef enum GPU_SPECIAL_REGISTER_ENUM_ {
+  GPU_SP_REG_INVALID = 0,
+  GPU_SP_REG_TID = 200,
+  GPU_SP_REG_NTID,
+  GPU_SP_REG_LANEID,
+  GPU_SP_REG_WARPID,
+  GPU_SP_REG_NWARPID,
+  GPU_SP_REG_WARPSIZE,
+  GPU_SP_REG_CTAID,
+  GPU_SP_REG_NCTAID,
+  GPU_SP_REG_SMID,
+  GPU_SP_REG_NSMID,
+  GPU_SP_REG_GRIDID,
+  GPU_SP_REG_CLOCK,
+  GPU_SP_REG_CLOCK64,
+  GPU_SP_REG_LANEMASK_EQ,
+  GPU_SP_REG_LANEMASK_LE,
+  GPU_SP_REG_LANEMASK_LT,
+  GPU_SP_REG_LANEMASK_GE,
+  GPU_SP_REG_LANEMASK_GT,
+  GPU_SP_REG_PM0,
+  GPU_SP_REG_PM1,
+  GPU_SP_REG_PM2,
+  GPU_SP_REG_PM3,
+  GPU_SP_REG_ENVREG0,
+  GPU_SP_REG_ENVREG1,
+  GPU_SP_REG_ENVREG2,
+  GPU_SP_REG_ENVREG3,
+  GPU_SP_REG_ENVREG4,
+  GPU_SP_REG_ENVREG5,
+  GPU_SP_REG_ENVREG6,
+  GPU_SP_REG_ENVREG7,
+  GPU_SP_REG_ENVREG8,
+  GPU_SP_REG_ENVREG9,
+  GPU_SP_REG_ENVREG10,
+  GPU_SP_REG_ENVREG11,
+  GPU_SP_REG_ENVREG12,
+  GPU_SP_REG_ENVREG13,
+  GPU_SP_REG_ENVREG14,
+  GPU_SP_REG_ENVREG15,
+  GPU_SP_REG_ENVREG16,
+  GPU_SP_REG_ENVREG17,
+  GPU_SP_REG_ENVREG18,
+  GPU_SP_REG_ENVREG19,
+  GPU_SP_REG_ENVREG20,
+  GPU_SP_REG_ENVREG21,
+  GPU_SP_REG_ENVREG22,
+  GPU_SP_REG_ENVREG23,
+  GPU_SP_REG_ENVREG24,
+  GPU_SP_REG_ENVREG25,
+  GPU_SP_REG_ENVREG26,
+  GPU_SP_REG_ENVREG27,
+  GPU_SP_REG_ENVREG28,
+  GPU_SP_REG_ENVREG29,
+  GPU_SP_REG_ENVREG30,
+  GPU_SP_REG_ENVREG31,
+  SPECIALREGISTER_INVALID
+} GPU_SPECIAL_REGISTER_ENUM;
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,7 +582,7 @@ class trace_read_c
     /**
      * Destructor
      */
-    ~trace_read_c();
+    virtual ~trace_read_c();
 
     /**
      * Get an uop from trace
@@ -445,7 +628,7 @@ class trace_read_c
      * @param core_id - core id
      * @param sim_thread_id - thread id  
      */
-    virtual inst_info_s* convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
+    virtual inst_info_s* convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, 
         int core_id, int sim_thread_id) = 0;
 
     /**
@@ -470,7 +653,7 @@ class trace_read_c
      * @param rep_offset - repetition offet
      * @param core_id - core id
      */
-    virtual void convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
+    virtual void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, 
         Addr rep_offset, int core_id) = 0;
 
     /**
@@ -479,7 +662,7 @@ class trace_read_c
      * @param core_id - core id
      * @param thread_id - thread id
      */
-    virtual void dprint_inst(trace_info_s *t_info, int core_id, int thread_id) = 0;
+    virtual void dprint_inst(void  *t_info, int core_id, int thread_id) = 0;
 
     /**
      * @param core_id - core id
@@ -488,7 +671,7 @@ class trace_read_c
      * @param inst_read - set true if instruction read successful
      * @see get_uops_from_traces
      */
-    bool read_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read);
+    bool read_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read);
 
     /**
      * After peeking trace, in case of failture, we need to rewind trace file.
@@ -509,7 +692,7 @@ class trace_read_c
      * @param inst_read - indicate instruction read successful
      * @see get_uops_from_traces
      */
-    virtual bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read) = 0;
+    virtual bool peek_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read) = 0;
 
   protected:
     static const int k_trace_buffer_size = 1000; /**< maximum buffer size */

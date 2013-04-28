@@ -135,8 +135,6 @@ typedef struct Hash_Table_struct Hash_Table;
 typedef struct l2_data_s l2_data_s;
 typedef struct pref_req_info_s pref_req_info_s;
 typedef struct trace_uop_s trace_uop_s;
-typedef struct trace_info_s trace_info_s;
-typedef struct trace_info_small_s trace_info_small_s;
 typedef struct TraceBuffer_ TraceBuffer;
 typedef struct mt_scheduler_s mt_scheduler_s;
 typedef struct reconv_data_s recove_data_s;
@@ -166,7 +164,12 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 // Global definitions
 
 
-#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
+#define MAX_TR_OPCODE_NAME  GPU_OPCODE_LAST
+#define MAX_GPU_ADDR_SPACE  GPU_ADDR_SP_LAST
+#define MAX_GPU_CACHE_OP    GPU_CACHE_OP_LAST
+#define MAX_GPU_CACHE_LEVEL GPU_CACHE_LAST
+#define MAX_GPU_FENCE_LEVEL GPU_FENCE_LAST
+
 #define MAX_PUP 256 
 //per core
 #define MAX_NUM_THREADS 3000

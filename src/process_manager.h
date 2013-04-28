@@ -202,8 +202,8 @@ typedef struct thread_s {
   int                  m_buffer_index_max; /**< maximum buffer index */
   bool                 m_buffer_exhausted; /**< read all traces from the buffer */
   frontend_s*          m_fetch_data; /**< frontend fetch data */ 
-  trace_info_s*        m_prev_trace_info; /**< prev instruction trace info */
-  trace_info_s*        m_next_trace_info; /**< next instruction trace info */
+  void*                m_prev_trace_info; /**< prev instruction trace info */
+  void*                m_next_trace_info; /**< next instruction trace info */
   bool                 m_thread_init; /**< thread initialized */
   uint64_t             m_temp_inst_count; /**< temp instruction count */
   uint64_t             m_temp_uop_count; /**< temp uop count */

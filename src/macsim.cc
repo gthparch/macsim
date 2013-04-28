@@ -117,6 +117,7 @@ macsim_c::macsim_c()
 
   m_simulation_cycle = 0;
   m_core0_inst_count = 0;
+
 }
 
 

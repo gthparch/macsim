@@ -74,6 +74,13 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
+trace_info_s::trace_info_s() { }
+trace_info_s::~trace_info_s() { }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
 reg_info_s::reg_info_s()
 {
   m_reg  = 0;
@@ -158,7 +165,6 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id)
   }
 }
 
-
 /**
  * @param core_id - core id
  * @param trace_info - trace information
@@ -166,7 +172,7 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id)
  * @param inst_read - set true if instruction read successful
  * @see get_uops_from_traces
  */
-bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, 
+bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, 
     bool *inst_read)
 {
   core_c* core = m_simBase->m_core_pointers[core_id];
@@ -272,7 +278,6 @@ bool trace_read_c::read_trace(int core_id, trace_info_s *trace_info, int sim_thr
 
   return 1;
 }
-
 
 /**
  * Convert instruction information (from hash table) to trace uop

@@ -85,6 +85,10 @@ class gpu_decoder_c : public trace_read_c
     static const char* g_tr_cf_names[10]; /**< cf type string */
     static const char *g_optype_names[37]; /**< opcode type string */
     static const char *g_mem_type_names[20]; /**< memeory request type string */
+    static const char *g_addr_space_names[MAX_GPU_ADDR_SPACE]; /**<gpu address space names */
+    static const char *g_cache_op_names[MAX_GPU_CACHE_OP]; /**<gpu cache operator names */
+    static const char *g_cache_level_names[MAX_GPU_CACHE_LEVEL]; /**<gpu cache level names for prefetch insts. */
+    static const char *g_fence_level_names[MAX_GPU_FENCE_LEVEL]; /**<gpu memory fence levels */
 
   private:
       /**
@@ -99,7 +103,7 @@ class gpu_decoder_c : public trace_read_c
      * @param core_id - core id
      * @param sim_thread_id - thread id  
      */
-    inst_info_s* convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
+    inst_info_s* convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, 
         int core_id, int sim_thread_id);
 
     /**
@@ -110,7 +114,7 @@ class gpu_decoder_c : public trace_read_c
      * @param rep_offset - repetition offet
      * @param core_id - core id
      */
-    void convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
+    void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, 
         Addr rep_offset, int core_id);
 
     /**
@@ -119,7 +123,7 @@ class gpu_decoder_c : public trace_read_c
      * @param core_id - core id
      * @param thread_id - thread id
      */
-    void dprint_inst(trace_info_s *t_info, int core_id, int thread_id);
+    void dprint_inst(void *t_info, int core_id, int thread_id);
 
     /**
      * After peeking trace, in case of failture, we need to rewind trace file.
@@ -140,7 +144,7 @@ class gpu_decoder_c : public trace_read_c
      * @param inst_read - indicate instruction read successful
      * @see get_uops_from_traces
      */
-    bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read);
+    bool peek_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read);
 
   private:
 };

@@ -275,9 +275,7 @@ void frontend_c::run_a_cycle(void)
       }
     }
     else {
-#ifdef GPU_VALIDATION
-      m_last_fetch_tid_failed =  true;
-#endif
+      m_last_fetch_tid_failed = true;
     }
   }
 
@@ -344,8 +342,15 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     }
 
     // set up initial fetch address
-    fetch_data->m_MT_scheduler.m_next_fetch_addr = 
-      m_core->get_trace_info(tid)->m_prev_trace_info->m_instruction_addr;
+    thread_s *thread = m_core->get_trace_info(tid);
+    if (thread->m_ptx) {
+      trace_info_gpu_s *prev_trace_info = static_cast<trace_info_gpu_s *>(thread->m_prev_trace_info);
+      fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_inst_addr;
+    }
+    else {
+      trace_info_cpu_s *prev_trace_info = static_cast<trace_info_cpu_s *>(thread->m_prev_trace_info);
+      fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_instruction_addr;
+    }
   }
 
 
@@ -370,7 +375,6 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     fetch_addr = fetch_data->m_MT_scheduler.m_next_fetch_addr;
     fetch_addr = fetch_addr + m_icache->base_cache_line((unsigned long)UINT_MAX *
         (m_core->get_trace_info(tid)->m_process->m_process_id) * 10ul);
-
 
     // -------------------------------------
     // instruction cache access

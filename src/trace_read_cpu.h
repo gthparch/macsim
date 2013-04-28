@@ -100,7 +100,7 @@ class cpu_decoder_c : public trace_read_c
      * @param core_id - core id
      * @param sim_thread_id - thread id  
      */
-    inst_info_s* convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
+    inst_info_s* convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, 
         int core_id, int sim_thread_id);
 
     /**
@@ -111,7 +111,7 @@ class cpu_decoder_c : public trace_read_c
      * @param rep_offset - repetition offet
      * @param core_id - core id
      */
-    void convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
+    void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, 
         Addr rep_offset, int core_id);
 
     /**
@@ -120,7 +120,7 @@ class cpu_decoder_c : public trace_read_c
      * @param core_id - core id
      * @param thread_id - thread id
      */
-    void dprint_inst(trace_info_s *t_info, int core_id, int thread_id);
+    void dprint_inst(void *t_info, int core_id, int thread_id);
 
     /**
      * After peeking trace, in case of failture, we need to rewind trace file.
@@ -141,7 +141,7 @@ class cpu_decoder_c : public trace_read_c
      * @param inst_read - indicate instruction read successful
      * @see get_uops_from_traces
      */
-    bool peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, bool *inst_read);
+    bool peek_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read);
 
   private:
     // page mapping support

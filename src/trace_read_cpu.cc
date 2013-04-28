@@ -105,7 +105,6 @@ cpu_decoder_c::~cpu_decoder_c()
   delete m_page_mapper;
 }
 
-
 /**
  * In case of GPU simulation, from our design, each uncoalcesd accesses will be one 
  * trace instruction. To make these accesses in one instruction, we need to read trace
@@ -116,7 +115,7 @@ cpu_decoder_c::~cpu_decoder_c()
  * @param inst_read - indicate instruction read successful
  * @see get_uops_from_traces
  */
-bool cpu_decoder_c::peek_trace(int core_id, trace_info_s *trace_info, int sim_thread_id, 
+bool cpu_decoder_c::peek_trace(int core_id, void *trace_info, int sim_thread_id, 
     bool *inst_read)
 {
   assert(0);
@@ -146,10 +145,12 @@ bool cpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id, int num_inst)
  * @param core_id - core id
  * @param thread_id - thread id
  */
-void cpu_decoder_c::dprint_inst(trace_info_s *t_info, int core_id, int thread_id) 
+void cpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) 
 {
   if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE))
     return ;
+
+  trace_info_cpu_s *t_info = static_cast<trace_info_cpu_s *>(trace_info);
  
   *m_dprint_output << "*** begin of the data strcture *** " << endl;
   *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
@@ -210,9 +211,10 @@ void cpu_decoder_c::pre_read_trace(thread_s* trace_info)
  * @param rep_offset - repetition offet
  * @param core_id - core id
  */
-void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_uop_s *trace_uop, 
+void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_uop_s *trace_uop, 
     Addr rep_offset, int core_id)
 {
+  trace_info_cpu_s *pi = static_cast<trace_info_cpu_s *>(trace_info);
   core_c* core    = m_simBase->m_core_pointers[core_id];
   trace_uop->m_va = 0;
 
@@ -262,9 +264,10 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, trace_info_s *pi, trace_u
  * @param core_id - core id
  * @param sim_thread_id - thread id  
  */
-inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(trace_info_s *pi, trace_uop_s **trace_uop, 
+inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_s **trace_uop, 
     int core_id, int sim_thread_id)
 {
+  trace_info_cpu_s *pi = static_cast<trace_info_cpu_s *>(trace_info);
   core_c* core = m_simBase->m_core_pointers[core_id];
 
   // simulator maintains a cache of decoded instructions (uop) for each process, 
@@ -820,7 +823,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   if (core->m_fetch_ended[sim_thread_id]) 
     return false;
 
-  trace_info_s trace_info;
+  trace_info_cpu_s trace_info;
   bool read_success = true;
   thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -849,15 +852,15 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
 
     // Copy current instruction to data structure
-    memcpy(&trace_info, thread_trace_info->m_prev_trace_info, sizeof(trace_info_s));
+    memcpy(&trace_info, thread_trace_info->m_prev_trace_info, sizeof(trace_info_cpu_s));
 
     // Set next pc address
-    trace_info.m_instruction_next_addr = 
-      thread_trace_info->m_next_trace_info->m_instruction_addr;
+    trace_info_cpu_s *next_trace_info = static_cast<trace_info_cpu_s *>(thread_trace_info->m_next_trace_info);
+    trace_info.m_instruction_next_addr = next_trace_info->m_instruction_addr;
 
     // Copy next instruction to current instruction field
     memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, 
-        sizeof(trace_info_s));
+        sizeof(trace_info_cpu_s));
 
     DEBUG("trace_read nm core_id:%d thread_id:%d pc:%s opcode:%d inst_count:%lu\n",
         core_id, sim_thread_id, hexstr64s(trace_info.m_instruction_addr), 

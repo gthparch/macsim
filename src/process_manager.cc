@@ -158,9 +158,10 @@ thread_s::thread_s(macsim_c* simBase)
 {
   m_simBase         = simBase;
   m_fetch_data      = new frontend_s; 
-  m_buffer          = new char[1000 * TRACE_SIZE];
-  m_prev_trace_info = new trace_info_s;
-  m_next_trace_info = new trace_info_s;
+  int buf_ele_size  = (CPU_TRACE_SIZE > GPU_TRACE_SIZE) ? CPU_TRACE_SIZE : GPU_TRACE_SIZE;
+  m_buffer          = new char[1000 * buf_ele_size];
+  m_prev_trace_info = NULL;
+  m_next_trace_info = NULL;
 
   for (int ii = 0; ii < MAX_PUP; ++ii) {
     m_trace_uop_array[ii] = new trace_uop_s;
@@ -379,9 +380,12 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
   // Read the first line of trace configuration file
   // Get (#thread, type)
   int thread_count;
+  int trace_ver = -1;
+  if (!(trace_config_file >> trace_ver) || trace_ver != 11) {
+    ASSERTM(0, "this version of the simulator supports only version 1.1 of the GPU traces\n");
+  }
   if (!(trace_config_file >> thread_count >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", appl.c_str());
-
 
   // To support new trace version : each kernel has own configuration and some applications
   // may have multiple kernels
@@ -408,6 +412,17 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
   if (trace_type == "ptx" || trace_type == "newptx") {
     process->m_ptx = true;
     process->m_core_pool = &m_simBase->m_ptx_core_pool;
+
+    // most basic check to ensure that offsets of members in structure that we
+    // use for reading traces (which contains one extra field compared to the
+    // structure used when generating traces) match with the structure used when
+    // generating traces 
+    if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
+      assert(sizeof(trace_info_gpu_s) == (sizeof(trace_info_gpu_small_s) + sizeof(uint64_t)));
+    }
+    else {
+      assert(sizeof(trace_info_gpu_s) == (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
+    }
   }
   else {
     process->m_ptx = false;
@@ -459,6 +474,7 @@ void process_manager_c::setup_process(process_s* process)
   // -------------------------------------------
   // TRACE_CONFIG Format
   // -------------------------------------------
+  // Trace version
   // #Threads | Trace Type | (Optional Fields)
   // 1st Thread ID    | #Instructions
   // 2nd Thread ID    | #Instructions
@@ -469,6 +485,12 @@ void process_manager_c::setup_process(process_s* process)
   // X86 Traces : (#Threads | x86)
   // GPU Traces (OLD) : (#Warps | ptx)
   // GPU Traces (NEW) : (#Warps | newptx | #MaxBlocks per Core)
+
+  int trace_ver = -1;
+  if (!(trace_config_file >> trace_ver) || trace_ver != 11) {
+    ASSERTM(0, "this version of the simulator supports only version 1.1 of the GPU traces\n");
+  }
+
   int thread_count;
   string trace_type;
   if (!(trace_config_file >> thread_count >> trace_type)) 
@@ -621,7 +643,6 @@ void process_manager_c::setup_process(process_s* process)
   // Insert the main thread to the pool
   create_thread_node(process, 0, true);
 
-#ifdef GPU_VALIDATION
   if (process->m_ptx) {
     for (int tid = 1; tid < thread_count; ++tid) {
       if (process->m_thread_start_info[tid].m_inst_count == 0) {
@@ -632,7 +653,6 @@ void process_manager_c::setup_process(process_s* process)
       }
     }
   }
-#endif
 }
 
 
@@ -720,6 +740,16 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
 {
   thread_s* trace_info = m_simBase->m_thread_pool->acquire_entry(m_simBase);
   process->m_thread_trace_info[tid] = trace_info;
+
+  //TODO - nbl (apr-17-2013): use pools
+  if (process->m_ptx) {
+    trace_info->m_prev_trace_info = new trace_info_gpu_s;
+    trace_info->m_next_trace_info = new trace_info_gpu_s;
+  }
+  else {
+    trace_info->m_prev_trace_info = new trace_info_cpu_s;
+    trace_info->m_next_trace_info = new trace_info_cpu_s;
+  }
   thread_start_info_s* start_info = &process->m_thread_start_info[tid];
 
   int block_id = start_info->m_thread_id >> BLOCK_ID_SHIFT;
@@ -895,6 +925,20 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
   // cloase trace file
   gzclose(trace_info->m_trace_file); 
 
+  // TODO - nbl (apr-17-2013): use pools
+  if (trace_info->m_process->m_ptx) {
+    trace_info_gpu_s *temp = static_cast<trace_info_gpu_s*>(trace_info->m_prev_trace_info);
+    delete temp;
+    temp = static_cast<trace_info_gpu_s*>(trace_info->m_next_trace_info);
+    delete temp;
+  }
+  else {
+    trace_info_cpu_s *temp = static_cast<trace_info_cpu_s*>(trace_info->m_prev_trace_info);
+    delete temp;
+    temp = static_cast<trace_info_cpu_s*>(trace_info->m_next_trace_info);
+    delete temp;
+  }
+
   // release thread_trace_info to the pool
   m_simBase->m_thread_pool->release_entry(trace_info);
 
@@ -1061,7 +1105,7 @@ void process_manager_c::sim_thread_schedule(bool initial)
           core->create_trace_info(unique_scheduled_thread_num, trace_to_run->m_trace_info_ptr); 
 
 
-          m_simBase->m_trace_reader->pre_read_trace(trace_to_run->m_trace_info_ptr);
+          //m_simBase->m_trace_reader->pre_read_trace(trace_to_run->m_trace_info_ptr);
           
           // set flag for the simulation
           m_simBase->m_core_end_trace[core_id] = false;

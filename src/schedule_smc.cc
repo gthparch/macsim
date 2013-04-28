@@ -399,7 +399,7 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE*
   return true;
 }
 
-#ifdef GPU_VALIDATION
+#if 1
 // main execution routine
 // In every cycle, schedule uops from rob
 void schedule_smc_c::run_a_cycle(void) 
