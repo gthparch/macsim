@@ -167,6 +167,13 @@ class router_c
     virtual void insert_packet(flit_c* flit, int ip, int ivc);
     virtual void insert_credit(credit_c*);
     virtual router_c* get_router(int dir);
+
+    // these functions are currently used by only network_simple_c
+    virtual void reset(void);
+    virtual int* get_num_packet_inserted(void);
+
+    void set_router_map(vector<router_c*>& router_map);
+    void insert_packet(mem_req_s* req);
     
     /**
      * VCA (Virtual Channel Allocation) stage
@@ -286,6 +293,8 @@ class router_c
 
     // credit-based flow control
     list<credit_c*>* m_pending_credit; /**< pending credit to model latency */
+
+    vector<router_c*> m_router_map; /**< link to other routers */
 
     // clock
     Counter m_cycle; /**< router clock */

@@ -39,6 +39,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "network.h"
 #include "network_ring.h"
 #include "network_mesh.h"
+#include "network_simple.h"
+
 #include "memreq_info.h"
 #include "debug_macros.h"
 #include "all_knobs.h"
@@ -114,6 +116,8 @@ network_c* default_network(macsim_c* m_simBase)
     new_network = new network_ring_c(m_simBase);
   else if (policy == "mesh")
     new_network = new network_mesh_c(m_simBase);
+  else if (policy == "simple_noc")
+    new_network = new network_simple_c(m_simBase);
   else
     assert(0);
 
@@ -728,6 +732,12 @@ void router_c::insert_packet(flit_c* flit, int port, int vc)
 }
 
 
+void router_c::insert_packet(mem_req_s* req)
+{
+  m_req_buffer->push(req);
+}
+
+
 void router_c::insert_credit(credit_c* credit)
 {
   m_pending_credit->push_back(credit);
@@ -799,4 +809,16 @@ router_c* router_c::get_router(int dir)
   return m_link[dir];
 }
 
+void router_c::set_router_map(vector<router_c*>& router_map)
+{
+  m_router_map = router_map;
+}
 
+void router_c::reset(void)
+{
+}
+
+int* router_c::get_num_packet_inserted(void)
+{
+  return NULL;
+}

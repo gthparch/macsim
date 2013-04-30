@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <stdio.h>
+#include <iostream>
 
 #include "utils.h"
 

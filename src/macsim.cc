@@ -61,6 +61,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "network.h"
 #include "network_ring.h"
 #include "network_mesh.h"
+#include "network_simple.h"
 #include "factory_class.h"
 #include "dram.h"
 
@@ -197,6 +198,7 @@ void macsim_c::register_functions(void)
 
   network_factory_c::get()->register_class("ring", default_network);
   network_factory_c::get()->register_class("mesh", default_network);
+  network_factory_c::get()->register_class("simple_noc", default_network);
 }
 
 
