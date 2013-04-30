@@ -381,8 +381,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
   // Get (#thread, type)
   int thread_count;
   int trace_ver = -1;
-  if (!(trace_config_file >> trace_ver) || trace_ver != 11) {
-    ASSERTM(0, "this version of the simulator supports only version 1.1 of the GPU traces\n");
+  if (!(trace_config_file >> trace_ver) || trace_ver != 13) {
+    ASSERTM(0, "this version of the simulator supports only version 1.3 of the GPU traces\n");
   }
   if (!(trace_config_file >> thread_count >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", appl.c_str());
