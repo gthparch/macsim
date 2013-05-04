@@ -631,11 +631,8 @@ void router_c::stage_lt(void)
 {
   for (int port = 0; port < m_num_port; ++port) {
     if (m_link_avail[port] > m_cycle) 
-#ifdef GPU_VALIDATION
-      continue; //break;
-#else
-      break;
-#endif
+      continue;
+
     Counter oldest_cycle = ULLONG_MAX;
     flit_c* f = NULL;
     int vc = -1;
