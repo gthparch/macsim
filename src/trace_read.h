@@ -53,6 +53,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
+#define MAX_GPU_SRC_NUM 5
+#define MAX_GPU_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
 #define MAX_TR_OPCODE GPU_OPCODE_LAST
@@ -105,8 +107,8 @@ typedef struct trace_info_gpu_small_s {
   uint8_t m_cf_type;
   uint8_t m_num_read_regs;
   uint8_t m_num_dest_regs;
-  uint8_t m_src[MAX_SRC_NUM];
-  uint8_t m_dst[MAX_DST_NUM];
+  uint16_t m_src[MAX_GPU_SRC_NUM];
+  uint16_t m_dst[MAX_GPU_DST_NUM];
   uint8_t m_size;
 
   uint32_t m_active_mask;
@@ -139,8 +141,8 @@ typedef struct trace_info_gpu_s {
   uint8_t m_cf_type;
   uint8_t m_num_read_regs;
   uint8_t m_num_dest_regs;
-  uint8_t m_src[MAX_SRC_NUM];
-  uint8_t m_dst[MAX_DST_NUM];
+  uint16_t m_src[MAX_GPU_SRC_NUM];
+  uint16_t m_dst[MAX_GPU_DST_NUM];
   uint8_t m_size;
 
   uint32_t m_active_mask;
