@@ -338,7 +338,7 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
   ++m_total_req;
   mem_req->m_state = MEM_DRAM_START;
 
-  DEBUG("MC[%d] new_req:%d bid:%d rid:%d cid:%d\n", m_id, mem_req->m_id, bid, rid, cid);
+  DEBUG("MC[%d] new_req:%d bid:%lu rid:%lu cid:%lu\n", m_id, mem_req->m_id, bid, rid, cid);
 
   return true;
 }

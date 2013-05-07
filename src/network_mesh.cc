@@ -106,9 +106,9 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
   m_num_mc  = num_mc;
 
   CREATE_ROUTER(m_num_cpu, CPU_ROUTER, MEM_L2, 0);
-  CREATE_ROUTER(m_num_gpu, GPU_ROUTER, MEM_L2, m_num_cpu);
   CREATE_ROUTER(m_num_l3,  L3_ROUTER, MEM_L3, 0);
   CREATE_ROUTER(m_num_mc,  MC_ROUTER, MEM_MC, 0);
+  CREATE_ROUTER(m_num_gpu, GPU_ROUTER, MEM_L2, m_num_cpu);
   
   int width = sqrt(m_num_router);
   if ((width * width) != m_num_router) {
@@ -137,6 +137,7 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
 
   int count = 0;
 
+  /*
   for (int ii = 0; ii < num_large_core; ++ii) {
     mapping[count++] = ii;
   } 
@@ -148,7 +149,13 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
   }
 
   int start_index = num_large_core + num_small_core;
-  int end_index = start_index + *KNOB(KNOB_NUM_L3) + *KNOB(KNOB_DRAM_NUM_MC); 
+  int end_index = start_index + *KNOB(KNOB_NUM_L3); 
+  for (int ii = start_index; ii < end_index; ++ii) {
+    mapping[count++] = ii;
+  }
+
+  start_index = end_index;
+  end_index += *KNOB(KNOB_DRAM_NUM_MC);
   for (int ii = start_index; ii < end_index; ++ii) {
     mapping[count++] = ii;
   }
@@ -159,8 +166,12 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
     }
   }
 
-  for (int ii = end_index; ii < m_num_router; ++ii)
+  for (int ii = end_index; ii < m_num_router; ++ii) {
     mapping[count++] = ii;
+  }
+  */
+  for (int ii = 0; ii < m_num_router; ++ii)
+    mapping[ii] = ii;
 
   for (int ii = 0; ii < m_num_router; ++ii) {
     if (ii / width > 0)  // north link
@@ -175,7 +186,7 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
     if (ii % width != (width - 1))  // east link
       m_router[mapping[ii]]->set_link(RIGHT, m_router[mapping[ii+1]]);
 
-    m_router[mapping[ii]]->set_id(ii);
+//    m_router[mapping[ii]]->set_id(ii);
   }
 
   m_router[0]->print_link_info();

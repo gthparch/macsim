@@ -142,6 +142,7 @@ bool network_c::send(mem_req_s* req, int src_level, int src_id, int dst_level, i
 
 mem_req_s* network_c::receive(int level, int id)
 {
+//  cout << "in receive " << level << " " << id << " " << m_router_map[level*1000+id] << " " << m_router[m_router_map[level*1000+id]]->get_id() << "\n";
   return m_router[m_router_map[level*1000+id]]->receive_req(0);
 }
 
