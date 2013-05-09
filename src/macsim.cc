@@ -859,7 +859,7 @@ int macsim_c::run_a_cycle()
     m_num_running_core = 0;
   }
 
-  int pivot = m_core_cycle[0]+1;
+  Counter pivot = m_core_cycle[0] + 1;
 
 
   // interconnection
@@ -888,7 +888,7 @@ int macsim_c::run_a_cycle()
   // core execution loop
   for (int kk = 0; kk < *KNOB(KNOB_NUM_SIM_CORES); ++kk) {
     // use pivot to randomize core run_cycle pattern 
-    int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
+    unsigned int ii = (kk+pivot) % *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
 
     core_c *core = m_core_pointers[ii];
     string core_type = core->get_core_type();
