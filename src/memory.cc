@@ -1215,6 +1215,8 @@ void dcu_c::process_fill_queue()
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, 
                   m_ptx_sim, data, m_level);
 
+              wb->m_rdy_cycle = m_cycle + 1;
+
               if (!m_wb_queue->push(wb))
                 ASSERT(0);
 
@@ -1496,6 +1498,9 @@ bool dcu_c::done(mem_req_s* req)
           // new write back request
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, 
               m_ptx_sim, data, m_level);
+
+          wb->m_rdy_cycle = m_cycle + 1;
+
           // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb))
             ASSERT(0);
@@ -1528,7 +1533,8 @@ bool dcu_c::done(mem_req_s* req)
   if (req->m_uop) {
     uop_c* uop = req->m_uop;
 
-    DEBUG("uop:%lld done\n", uop->m_uop_num);
+    DEBUG("req_id:%d uop:%lld done in_cycle:%llu\n", 
+        req->m_id, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
     if (m_ptx_sim) {
@@ -1744,8 +1750,10 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   DEBUG("MSHR[%d] new_req type:%s (%d)\n", 
       core_id, mem_req_c::mem_req_type_name[type], (int)m_mshr[core_id].size());
 
-  if (m_stop_prefetch > m_cycle && type == MRT_DPRF)
+  if (m_stop_prefetch > m_cycle && type == MRT_DPRF) {
+    DEBUG("PREFETCHING blocked\n");
     return true;
+  }
 
   // find a matching request
   mem_req_s* matching_req = search_req(core_id, addr, size);
@@ -1762,8 +1770,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
 
   if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f
-      && type == MRT_DSTORE)
-  {
+      && type == MRT_DSTORE) {
     STAT_CORE_EVENT(core_id, NUM_WRITES);
     STAT_EVENT(TOTAL_WRITES);
   }
@@ -1797,6 +1804,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
 
   // queue full
   if (m_l2_cache[core_id]->full()) {
+    DEBUG("QUEUE FULL\n");
     m_stop_prefetch = m_cycle + 500;
     flush_prefetch(core_id);
     if (m_l2_cache[core_id]->full()) {
@@ -1820,6 +1828,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
 
     // mshr full
     if (new_req == NULL) {
+      DEBUG("MSHR FULL\n");
       m_stop_prefetch = m_cycle + 500;
       flush_prefetch(core_id);
       if (type == MRT_DPRF)
@@ -1935,8 +1944,11 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int si
   req->m_ptx                    = ptx;
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
+  if (type == MRT_DPRF)
+    req->m_uop = NULL;
   req->m_in                     = m_cycle;
   req->m_core_in                = m_simBase->m_core_cycle[core_id];
+  req->m_in_global              = CYCLE;
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -1968,8 +1980,11 @@ void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size
   req->m_ptx                    = ptx;
   req->m_done_func              = done_func;
   req->m_uop                    = uop ? uop : NULL;
+  if (type == MRT_DPRF)
+    req->m_uop = NULL;
   req->m_in                     = m_cycle;
   req->m_core_in                = m_simBase->m_core_cycle[core_id];
+  req->m_in_global              = CYCLE;
   req->m_dirty                  = false;
   req->m_done                   = false;
   req->m_merged_req             = NULL;
@@ -2010,8 +2025,7 @@ void memory_c::free_req(int core_id, mem_req_s* req)
     delete req;
   }
   else {
-    req->m_addr = 0;
-    req->m_id   = -1;
+    req->init();
     m_mshr[core_id].remove(req);
     m_mshr_free_list[core_id].push_back(req);
   }
@@ -2155,6 +2169,7 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* da
   req->m_done_func              = NULL;
   req->m_uop                    = NULL;
   req->m_in                     = m_cycle;
+  req->m_in_global              = CYCLE;
   req->m_core_in                = m_simBase->m_core_cycle[data->m_core_id];
   req->m_dirty                  = true;
   req->m_done                   = false;

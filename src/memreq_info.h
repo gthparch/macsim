@@ -142,6 +142,7 @@ typedef struct mem_req_s {
    * Constructor
    */
   mem_req_s(macsim_c* simBase);
+  void init(void);
 
   int           m_id;           /**< unique request id */                         
   int           m_appl_id;      /**< application id */
@@ -164,6 +165,7 @@ typedef struct mem_req_s {
   uop_c*        m_uop;          /**< uop that generates this request */
   Counter       m_in;           /**< request inserted cycle */
   Counter       m_core_in;      /**< request inserted cycle */
+  Counter       m_in_global;    /**< request inserted global cycle */
   bool          m_dirty;        /**< wb request? */
   bool          m_done;         /**< request done flag */
   mem_req_s*    m_merged_req;   /**< merged request */

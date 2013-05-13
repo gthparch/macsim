@@ -221,6 +221,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
   Mem_Type type = uop->m_mem_type;
 
+
   // -------------------------------------
   // execute memory instructions
   // -------------------------------------
@@ -519,6 +520,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
     br_exec(uop);
   }
 
+  uop->m_exec_cycle = m_cur_core_cycle;
+
   return true;
 }
 
@@ -553,6 +556,7 @@ void exec_c::br_exec(uop_c *uop)
     m_bp_data->m_bp_recovery_cycle[uop->m_thread_id] = 
       m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;
     m_bp_data->m_bp_cause_op[uop->m_thread_id] = 0;
+
 
     STAT_CORE_EVENT(m_core_id, BP_RESOLVED); 
 

@@ -79,6 +79,13 @@ const char* mem_req_c::mem_state[MEM_STATE_MAX] = {
 
 mem_req_s::mem_req_s(macsim_c* simBase)
 {
+  init();
+  m_simBase = simBase;
+}
+
+
+void mem_req_s::init(void)
+{
   m_id             = 0;
   m_appl_id        = 0;
   m_core_id        = 0;
@@ -107,5 +114,6 @@ mem_req_s::mem_req_s(macsim_c* simBase)
   m_msg_dst        = 0;
   m_done_func      = NULL;
   m_bypass         = 0;
-  m_simBase        = simBase;
 }
+
+

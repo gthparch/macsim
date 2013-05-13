@@ -478,14 +478,14 @@ void core_c::thread_heartbeat(int tid, bool final)
     double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
     if (final) {
       fprintf(m_simBase->g_mystdout, "**Core %d Thread %d Finished:   insts:%-10s  "
-          "cycles:%-10s  seconds:%-5s -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
-          m_core_id, tid, unsstr64(m_inst_count), unsstr64(m_core_cycle_count),
+          "cycles:%-10s (%llu)  seconds:%-5s -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
+          m_core_id, tid, unsstr64(m_inst_count), unsstr64(m_core_cycle_count), m_simBase->m_simulation_cycle,
           unsstr64(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
       fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:  Thread:%-6d insts:%-10s  "
-          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
-          m_core_id, tid, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count),
+          "cycles:%-10s (%llu) seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
+          m_core_id, tid, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count), m_simBase->m_simulation_cycle,
           unsstr64(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
       fflush(m_simBase->g_mystdout);
     }
@@ -521,14 +521,14 @@ void core_c::core_heartbeat(bool final)
 
     if (final) {
       fprintf(m_simBase->g_mystdout, "**Core %d Core_Total  Finished:   insts:%-10s  "
-          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
-          m_core_id,  unsstr64(m_inst_count), unsstr64(m_core_cycle_count),
+          "cycles:%-10s (%llu) seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
+          m_core_id,  unsstr64(m_inst_count), unsstr64(m_core_cycle_count), m_simBase->m_simulation_cycle,
           unsstr64(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
       fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:        insts:%-10s  "
-          "cycles:%-10s  seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
-          m_core_id, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count),
+          "cycles:%-10s (%llu) seconds:%-5s -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
+          m_core_id, unsstr64(m_inst_count / 100 * 100), unsstr64(m_core_cycle_count), m_simBase->m_simulation_cycle,
           unsstr64(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
       fflush(m_simBase->g_mystdout);
     }
@@ -575,8 +575,8 @@ void core_c::check_forward_progress()
     m_simBase->m_network->print();
 
     ASSERTM(m_core_cycle_count - m_last_forward_progress <= *KNOB(KNOB_FORWARD_PROGRESS_LIMIT),
-        "core_id:%d core_cycle_count:%s last_forward_progress:%s last_tid:%d "
-        "last_inst_count:%s\n", m_core_id, unsstr64(m_core_cycle_count), 
+        "core_id:%d core_cycle_count:%s (%llu) last_forward_progress:%s last_tid:%d "
+        "last_inst_count:%s\n", m_core_id, unsstr64(m_core_cycle_count), m_simBase->m_simulation_cycle,
         unsstr64(m_last_forward_progress), m_last_terminated_tid, unsstr64(m_last_inst_count));
   }
 }

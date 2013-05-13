@@ -171,7 +171,7 @@ void retire_c::run_a_cycle()
       cur_uop = rob->front();
 
       // uop cannot be retired
-      if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle) {
+      if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle || cur_uop->m_exec_cycle == 0) {
         break;
       }
 
@@ -264,7 +264,6 @@ void retire_c::run_a_cycle()
         "done_cycle:%lld\n",
         m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], 
         cur_uop->m_inst_num, cur_uop->m_uop_num, cur_uop->m_done_cycle);
-
 
     // free uop
     for (int ii = 0; ii < cur_uop->m_num_child_uops; ++ii) {

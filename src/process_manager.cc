@@ -371,21 +371,28 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
   trace_config_file.open(appl.c_str(), ifstream::in);
 
   // open trace configuration file
-  string trace_type;
   if (trace_config_file.fail()) {
     STAT_EVENT(FILE_OPEN_ERROR);
     ASSERTM(0, "filename:%s cannot be opened\n", appl.c_str());
   }
   
   // Read the first line of trace configuration file
-  // Get (#thread, type)
-  int thread_count;
-  int trace_ver = -1;
-  if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
-    ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
-  }
-  if (!(trace_config_file >> thread_count >> trace_type)) 
+  // TYPE
+  string trace_type;
+  if (!(trace_config_file >> trace_type))
     ASSERTM(0, "error reading from file:%s", appl.c_str());
+
+  int trace_ver = -1;
+  if (trace_type != "x86") {
+    if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
+      ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
+    }
+  }
+    
+  int thread_count;
+  if (!(trace_config_file >> thread_count)) {
+    ASSERTM(0, "error reading from file:%s", appl.c_str());
+  }
 
   // To support new trace version : each kernel has own configuration and some applications
   // may have multiple kernels
@@ -485,17 +492,20 @@ void process_manager_c::setup_process(process_s* process)
   // X86 Traces : (#Threads | x86)
   // GPU Traces (OLD) : (#Warps | ptx)
   // GPU Traces (NEW) : (#Warps | newptx | #MaxBlocks per Core)
-
-  int trace_ver = -1;
-  if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
-    ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
-  }
-
-  int thread_count;
+  
   string trace_type;
-  if (!(trace_config_file >> thread_count >> trace_type)) 
+  if (!(trace_config_file >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
+  
+  int trace_ver = -1;
+  if (trace_type != "x86") {
+    if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
+      ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
+    }
+  }
+  
+  // get occupancy
   if (trace_type == "ptx") {
     process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
   }
@@ -507,6 +517,12 @@ void process_manager_c::setup_process(process_s* process)
       process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE_SUPER;
     }
   }
+
+  // get thread count
+  int thread_count;
+  if (!(trace_config_file >> thread_count)) 
+    ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
+
   
   // # thread_count > 0
   if (thread_count <= 0) 
