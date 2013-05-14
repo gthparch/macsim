@@ -38,6 +38,8 @@ src/config.h                                                           \
 src/core.cc                  src/core.h                                \
 src/debug_macros.h                                                     \
 src/dram.cc                  src/dram.h                                \
+src/dram_ctrl.cc             src/dram_ctrl.h                           \
+src/dram_dramsim.cc          src/dram_dramsim.h                        \
 src/exec.cc                  src/exec.h                                \
 src/factory_class.cc         src/factory_class.h                       \
 src/fetch_factory.cc         src/fetch_factory.h                       \
@@ -71,9 +73,14 @@ src/statistics.cc            src/statistics.h                          \
 src/statsEnums.h                                                       \
 src/sw_managed_cache.cc      src/sw_managed_cache.h                    \
 src/trace_read.cc            src/trace_read.h                          \
+src/trace_read_cpu.cc        src/trace_read_cpu.h                      \
+src/trace_read_gpu.cc        src/trace_read_gpu.h                      \
 src/uop.cc                   src/uop.h                                 \
 src/utils.cc                 src/utils.h                               \
-src/router.cc                src/router.h                              \
+src/network.cc               src/network.h                             \
+src/network_ring.cc          src/network_ring.h                        \
+src/network_simple.cc        src/network_simple.h                      \
+src/page_mapping.cc          src/page_mapping.h                        \
                                                                        \
 src/allocate_interface.h                                               \
 src/exec_interface.h                                                   \
