@@ -47,10 +47,12 @@ macsimComponent::macsimComponent(ComponentId_t id, Params_t& params) : Component
 
 macsimComponent::macsimComponent() : Component(-1) {} //for serialization only
 
-int macsimComponent::Setup() {
+void macsimComponent::setup() {
 
 	//Ensure that this component must finish before SST kernel can terminate
-	registerExit();
+	//registerExit();
+  registerAsPrimarComponent();
+  primaryComponentDoNotEndSim();
 
 	printf("Initializing macsim simulation state\n");
 	
@@ -66,15 +68,15 @@ int macsimComponent::Setup() {
 	//cleanup
 	delete argv[0]; delete argv[1]; delete argv[2];
 
-	return 0;
+	//return 0;
 }
 
-int macsimComponent::Finish() {
+void macsimComponent::finish() {
 	printf("Simulation Finished, Finalizing");
 
   macsim->finalize();
 
-	return 0;
+	//return 0;
 }
 
 /*******************************************************

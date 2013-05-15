@@ -12,8 +12,8 @@ class macsimComponent : public SST::Component {
 	
 	public:
 		macsimComponent(SST::ComponentId_t id, SST::Component::Params_t& params);
-		int Setup();
-		int Finish();
+		void setup();
+		void finish();
 		
 	private:
 		macsimComponent();   // for serialization only
