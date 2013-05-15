@@ -1,15 +1,17 @@
 
 # Simulation Configuration
-num_sim_cores 8
-num_sim_small_cores 4
+num_sim_cores 10 
+num_sim_small_cores 6
 num_sim_medium_cores 0
 num_sim_large_cores 4
 core_type ptx
 large_core_type x86
-sim_cycle_count 50000 
+sim_cycle_count 0 
 max_insts 200000000
 heartbeat_interval 1000000
 forward_progress_limit 500000
+
+assign_blocks_greedily_initially 1
 
 
 # Clock
@@ -24,6 +26,10 @@ clock_mc  1.6
 fetch_policy rr
 mt_no_fetch_br 1
 one_cycle_exec 0
+
+# Network
+noc_topology mesh
+noc_dimension 2
 
 
 # Small Core Configuration
