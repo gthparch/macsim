@@ -79,6 +79,7 @@ src/uop.cc                   src/uop.h                                 \
 src/utils.cc                 src/utils.h                               \
 src/network.cc               src/network.h                             \
 src/network_ring.cc          src/network_ring.h                        \
+src/network_mesh.cc          src/network_mesh.h                        \
 src/network_simple.cc        src/network_simple.h                      \
 src/page_mapping.cc          src/page_mapping.h                        \
                                                                        \
