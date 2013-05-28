@@ -281,10 +281,10 @@ void router_c::run_a_cycle(void)
     //  check_starvation();
     process_pending_credit();
     stage_lt();
-    stage_st();
     stage_sa();  
-    stage_vca();
+    stage_st();
     stage_rc();
+    stage_vca();
     local_packet_injection();
   }
 

@@ -219,6 +219,9 @@ class macsim_c
 
     // clock handling
     int m_clock_lcm; /**< main clock period */
+    int m_domain_freq[5];
+    int m_domain_count[5];
+    int m_domain_next[5];
     int m_clock_divisor[5]; /**< clock divisor */
     int m_clock_internal; /**< internal macsim clock */
     bool m_termination_check[2]; /**< termination checking logic */

@@ -414,6 +414,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     process->m_applications.push_back(appl);
     process->m_kernel_block_start_count.push_back(0);
   }
+
+  trace_config_file.close();
     
   // setup core pool
   if (trace_type == "ptx" || trace_type == "newptx") {
@@ -938,8 +940,6 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
     ASSERT(core->m_running_block_num >= 0); 
   }
 
-  // cloase trace file
-  gzclose(trace_info->m_trace_file); 
 
   // TODO - nbl (apr-17-2013): use pools
   if (trace_info->m_process->m_ptx) {

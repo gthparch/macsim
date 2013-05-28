@@ -813,24 +813,22 @@ void macsim_c::init_clock_domain(void)
     }
   }
 
-  int domain_i[5];
-  for (int ii = 0; ii < 5; ++ii)
-    domain_i[ii] = static_cast<int>(domain_f[ii]);
+//  int domain_i[5];
+  for (int ii = 0; ii < 5; ++ii) {
+    m_domain_freq[ii] = static_cast<int>(domain_f[ii]);
+    m_domain_count[ii] = 0;
+    m_domain_next[ii] = 0;
+  }
 
-  m_clock_lcm = get_lcm(domain_i[0], domain_i[1]);
-  for (int ii = 2; ii < 5; ++ii)
-    m_clock_lcm = get_lcm(m_clock_lcm, domain_i[ii]);
 
-  for (int ii = 0; ii < 5; ++ii)
-    m_clock_divisor[ii] = m_clock_lcm / domain_i[ii];
+  m_clock_lcm = 100; /* 10 ns loop */
 
   report("Clock LCM           : " << m_clock_lcm);
-  report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz " << m_clock_divisor[0]);
-  report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz " << m_clock_divisor[1]);
-  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz " << m_clock_divisor[2]);
-  report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz " << m_clock_divisor[3]);
-  report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz " << m_clock_divisor[4]);
-
+  report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
+  report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz");
+  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz");
+  report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz");
+  report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz");
 }
 
 #define CLOCK_CPU 0
@@ -838,6 +836,11 @@ void macsim_c::init_clock_domain(void)
 #define CLOCK_L3  2
 #define CLOCK_NOC 3
 #define CLOCK_MC  4
+
+
+#define GET_NEXT_CYCLE(domain) \
+  ++m_domain_count[domain]; \
+  m_domain_next[domain] = static_cast<int>(1.0*m_clock_lcm*m_domain_count[domain]/m_domain_freq[domain]);
 
 // =======================================
 // Single cycle step of simulation state : returns running status
@@ -863,25 +866,28 @@ int macsim_c::run_a_cycle()
 
 
   // interconnection
-  if (m_clock_internal % m_clock_divisor[CLOCK_NOC] == 0) {
+  if (m_clock_internal == m_domain_next[CLOCK_NOC]) {
 #ifdef IRIS
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS
     manifold::kernel::Manifold::Run((double) m_simulation_cycle);       //IRIS for half tick?
 #else
     m_network->run_a_cycle();
 #endif
+    GET_NEXT_CYCLE(CLOCK_NOC);
   }
 
   // run memory system
-  if (m_clock_internal % m_clock_divisor[CLOCK_L3] == 0) {
+  if (m_clock_internal == m_domain_next[CLOCK_L3]) {
     m_memory->run_a_cycle();
+    GET_NEXT_CYCLE(CLOCK_L3);
   }
   
   // run dram controllers
-  if (m_clock_internal % m_clock_divisor[CLOCK_MC] == 0) {
+  if (m_clock_internal == m_domain_next[CLOCK_MC]) {
     for (int ii = 0; ii < m_num_mc; ++ii) {
       m_dram_controller[ii]->run_a_cycle();
     }
+    GET_NEXT_CYCLE(CLOCK_MC);
   }
 
 
@@ -892,10 +898,10 @@ int macsim_c::run_a_cycle()
 
     core_c *core = m_core_pointers[ii];
     string core_type = core->get_core_type();
-    if (core_type == "ptx" && m_clock_internal % m_clock_divisor[CLOCK_GPU] != 0) {
+    if (core_type == "ptx" && m_clock_internal != m_domain_next[CLOCK_GPU]) {
       continue;
     }
-    else if (core_type != "ptx" && m_clock_internal % m_clock_divisor[CLOCK_CPU] != 0) {
+    else if (core_type != "ptx" && m_clock_internal != m_domain_next[CLOCK_CPU]) {
       continue;
     }
 
@@ -963,17 +969,25 @@ int macsim_c::run_a_cycle()
   m_simulation_cycle++;
   STAT_EVENT(CYC_COUNT_TOT);
     
-  if (m_clock_internal % m_clock_divisor[CLOCK_CPU] == 0) {
+  if (m_clock_internal == m_domain_next[CLOCK_CPU]) {
     STAT_EVENT(CYCLE_CPU);
     m_termination_check[0] = true;
+    GET_NEXT_CYCLE(CLOCK_CPU);
   }
 
-  if (m_clock_internal % m_clock_divisor[CLOCK_GPU] == 0) {
+  if (m_clock_internal == m_domain_next[CLOCK_GPU]) {
     STAT_EVENT(CYCLE_GPU);
     m_termination_check[1] = true;
+    GET_NEXT_CYCLE(CLOCK_GPU);
   }
 
-  m_clock_internal = (m_clock_internal + 1) % m_clock_lcm;
+  if (++m_clock_internal == m_clock_lcm) {
+    m_clock_internal = 0;
+    for (int ii = 0; ii < 5; ++ii) {
+      m_domain_count[ii] = 0;
+      m_domain_next[ii]  = 0;
+    }
+  }
 
   return 1; //simulation not finished
 }
