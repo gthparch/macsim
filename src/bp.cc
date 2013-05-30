@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : bp.cc
- * Author       : Hyesoon Kim 
+ * Author       : HPArch Research Group 
  * Date         : 1/26/2008
  * CVS          : $Id: bp.cc 867 2009-11-05 02:28:12Z kacear $:
  * Description  : branch predictor base class
