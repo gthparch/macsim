@@ -218,8 +218,8 @@ void retire_c::run_a_cycle()
     process_s *process = thread_trace_info->m_process;
     if (cur_uop->m_last_uop || m_insts_retired[cur_uop->m_thread_id] >= *m_simBase->m_knobs->KNOB_MAX_INSTS) {
       core->m_thread_reach_end[cur_uop->m_thread_id] = true;
-      ++core->m_num_thread_reach_end;
       if (!core->m_thread_finished[cur_uop->m_thread_id]) {
+        ++core->m_num_thread_reach_end;
         DEBUG("core_id:%d thread_id:%d terminated\n", m_core_id, cur_uop->m_thread_id);
 
         // terminate thread
