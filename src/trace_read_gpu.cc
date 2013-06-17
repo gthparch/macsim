@@ -1044,7 +1044,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       }
     }
 
-    if (*KNOB(KNOB_COMPUTE_CAPABILITY == 1.3f)) {
+    if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 1.3f) {
       if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
         //cache_line_addr = uop->m_vaddr;
         //cache_line_size = *KNOB(KNOB_MAX_TRANSACTION_SIZE);

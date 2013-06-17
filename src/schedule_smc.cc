@@ -101,7 +101,7 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s>** gpu_a
       break;
   }
 
-  m_schedule_modulo = (*KNOB(KNOB_GPU_SCHEDULE_RATIO - 1)); 
+  m_schedule_modulo = *KNOB(KNOB_GPU_SCHEDULE_RATIO) - 1; 
   m_schlist_size    = MAX_GPU_SCHED_SIZE * knob_num_threads;
   m_schlist_entry   = new int[m_schlist_size];
   m_schlist_tid     = new int[m_schlist_size];
