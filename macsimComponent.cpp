@@ -51,7 +51,7 @@ void macsimComponent::setup() {
 
 	//Ensure that this component must finish before SST kernel can terminate
 	//registerExit();
-  registerAsPrimarComponent();
+  registerAsPrimaryComponent();
   primaryComponentDoNotEndSim();
 
 	printf("Initializing macsim simulation state\n");
