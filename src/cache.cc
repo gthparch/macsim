@@ -311,7 +311,7 @@ cache_entry_c* cache_c::find_replacement_line_from_same_type(int set, int appl_i
     current_type_count = m_set[set]->m_num_cpu_line;
     current_type_max   = *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
   }
-    
+
   int lru_index = -1;
   Counter lru_time = ULLONG_MAX;
   for (int ii = 0; ii < m_assoc; ++ii) {

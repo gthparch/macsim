@@ -72,7 +72,7 @@ class dram_c
     /**
      * Tick a cycle
      */
-    virtual void run_a_cycle(void) = 0;
+    virtual void run_a_cycle(bool) = 0;
 
   protected:
     /**

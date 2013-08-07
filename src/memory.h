@@ -222,7 +222,7 @@ class dcu_c
     /**
      * Tick a cycle
      */
-    void run_a_cycle();
+    void run_a_cycle(bool);
 
     /**
      * Check available buffer space
@@ -391,17 +391,17 @@ class memory_c
     /**
      * Tick a cycle for the memory system
      */
-    void run_a_cycle(void);
+    void run_a_cycle(bool);
 
     /**
      * Tick a cycle for L1/L2 (core, private) caches
      */
-    void run_a_cycle_core(int);
+    void run_a_cycle_core(int, bool);
 
     /**
      * Tick a cycle for L3 cache
      */
-    void run_a_cycle_uncore();
+    void run_a_cycle_uncore(bool);
 
     /**
      * Deallocate completed memory request

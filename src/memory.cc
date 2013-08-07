@@ -739,8 +739,13 @@ bool dcu_c::insert(mem_req_s* req)
 // =======================================
 // cache run_a_cycle
 // =======================================
-void dcu_c::run_a_cycle()
+void dcu_c::run_a_cycle(bool pll_lock)
 {
+  if (pll_lock) {
+    ++m_cycle;
+    return ;
+  }
+
   process_wb_queue();
   process_fill_queue();
   process_out_queue();
@@ -2111,23 +2116,23 @@ dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr *line_addr, \
 
 
 // memory run_a_cycle
-void memory_c::run_a_cycle(void)
+void memory_c::run_a_cycle(bool pll_lock)
 {
-  run_a_cycle_uncore();
+  run_a_cycle_uncore(pll_lock);
   ++m_cycle;
 }
 
-void memory_c::run_a_cycle_core(int core_id)
+void memory_c::run_a_cycle_core(int core_id, bool pll_lock)
 {
-  m_l2_cache[core_id]->run_a_cycle();
-  m_l1_cache[core_id]->run_a_cycle();
+  m_l2_cache[core_id]->run_a_cycle(pll_lock);
+  m_l1_cache[core_id]->run_a_cycle(pll_lock);
 }
 
-void memory_c::run_a_cycle_uncore(void)
+void memory_c::run_a_cycle_uncore(bool pll_lock)
 {
   int index = m_cycle % m_num_l3;
   for (int ii = index; ii < index + m_num_l3; ++ii) {
-    m_l3_cache[ii % m_num_l3]->run_a_cycle();
+    m_l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
   }
 }
 

@@ -270,8 +270,13 @@ void router_c::set_id(int id)
 }
 
 
-void router_c::run_a_cycle(void)
+void router_c::run_a_cycle(bool pll_lock)
 {
+  if (pll_lock) {
+    ++m_cycle;
+    return;
+  }
+
   if (*KNOB(KNOB_IDEAL_NOC)) {
     stage_vca();
     stage_rc();

@@ -381,8 +381,12 @@ void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, uint64_t bid, uint64_t r
 
 
 // tick a cycle
-void dram_ctrl_c::run_a_cycle()
+void dram_ctrl_c::run_a_cycle(bool pll_lock)
 {
+  if (pll_lock) {
+    ++m_cycle;
+    return ;
+  }
   send();
   if (m_tmp_output_buffer) {
     delay_packet();
@@ -599,7 +603,7 @@ void dram_ctrl_c::send(void)
   if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
     max_iter = 2;
 
-    vector<mem_req_s*> temp_list;
+  vector<mem_req_s*> temp_list;
 
   // when virtual channels are partitioned for CPU and GPU requests,
   // we need to check individual buffer entries

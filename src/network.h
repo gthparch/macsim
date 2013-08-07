@@ -161,7 +161,7 @@ class router_c
     virtual void set_link(int dir, router_c* link);
     virtual int get_id(void);
     virtual void set_id(int id);
-    virtual void run_a_cycle(void);
+    virtual void run_a_cycle(bool pll_lock);
     virtual void print_link_info() = 0;
     virtual void print(ofstream& out);
     virtual void insert_packet(flit_c* flit, int ip, int ivc);
@@ -330,7 +330,7 @@ class network_c
 
     virtual void receive_pop(int level, int id);
 
-    virtual void run_a_cycle() = 0;
+    virtual void run_a_cycle(bool pll_lock) = 0;
 
     virtual void print() = 0;
 

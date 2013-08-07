@@ -50,7 +50,7 @@ class router_simple_c : public router_c
     router_simple_c(macsim_c* simBase, int type, int id);
     ~router_simple_c();
 
-    virtual void run_a_cycle(void);
+    virtual void run_a_cycle(bool);
     void process(void);
     virtual void print_link_info(void);
     virtual void stage_rc(void);
@@ -74,7 +74,7 @@ class network_simple_c : public network_c
   public:
     network_simple_c(macsim_c* simBase);
     ~network_simple_c();
-    virtual void run_a_cycle(void);
+    virtual void run_a_cycle(bool);
     virtual void print(void);
     virtual void init(int num_cpu, int num_gpu, int num_l3, int num_mc);
 

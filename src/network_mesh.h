@@ -103,7 +103,7 @@ class network_mesh_c : public network_c
     /**
      * Run a cycle
      */
-    void run_a_cycle(void);
+    void run_a_cycle(bool);
 
     /**
      * Initialize interconnection network

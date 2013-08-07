@@ -78,12 +78,12 @@ network_ring_c::~network_ring_c()
 
 
 // run one cycle for all routers
-void network_ring_c::run_a_cycle(void)
+void network_ring_c::run_a_cycle(bool pll_lock)
 {
   // randomized tick function
   int index = CYCLE % m_num_router;
   for (int ii = index; ii < index + m_num_router; ++ii) {
-    m_router[ii % m_num_router]->run_a_cycle();
+    m_router[ii % m_num_router]->run_a_cycle(pll_lock);
   }
   ++m_cycle;
 }

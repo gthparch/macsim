@@ -127,7 +127,7 @@ class core_c
      *  \brief Function to run a cycle of core_c
      *  \return void
      */
-    void run_a_cycle();
+    void run_a_cycle(bool);
 
     /*! \fn Counter get_cycle_count(void)
      *  \brief Function to return cycle count for the core

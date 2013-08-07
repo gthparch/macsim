@@ -65,7 +65,7 @@ network_simple_c::~network_simple_c()
 }
 
 
-void network_simple_c::run_a_cycle(void)
+void network_simple_c::run_a_cycle(bool pll_lock)
 {
   // reset
   for (int ii = 0; ii < m_num_router; ++ii)
@@ -74,7 +74,7 @@ void network_simple_c::run_a_cycle(void)
   // randomized tick function
   int index = CYCLE % m_num_router;
   for (int ii = index; ii < index + m_num_router; ++ii) {
-    m_router[ii % m_num_router]->run_a_cycle();
+    m_router[ii % m_num_router]->run_a_cycle(pll_lock);
   }
   ++m_cycle;
 }
@@ -142,7 +142,7 @@ void router_simple_c::reset(void)
 }
 
 
-void router_simple_c::run_a_cycle(void)
+void router_simple_c::run_a_cycle(bool pll_lock)
 {
   process();
 }

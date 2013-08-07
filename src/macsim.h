@@ -217,15 +217,6 @@ class macsim_c
     int m_num_mc; /**< number of memory controllers */
 		trace_reader_wrapper_c* m_trace_reader; /**< trace reader */
 
-    // clock handling
-    int m_clock_lcm; /**< main clock period */
-    int m_domain_freq[5];
-    int m_domain_count[5];
-    int m_domain_next[5];
-    int m_clock_divisor[5]; /**< clock divisor */
-    int m_clock_internal; /**< internal macsim clock */
-    bool m_termination_check[2]; /**< termination checking logic */
-
     // bug detector
 		bug_detector_c *m_bug_detector; /**< bug detector */
 
@@ -277,9 +268,27 @@ class macsim_c
 		double total_energy; /**< total energy consumption */
 		int total_packets; /**< number of packets */
 #endif
+    
+  public:
+    // clock handling
+    int m_clock_lcm; /**< main clock period */
+    int *m_domain_freq;
+    int *m_domain_count;
+    int *m_domain_next;
+    int m_clock_internal; /**< internal macsim clock */
+    bool* m_termination_check; /**< termination checking logic */
+    int m_termination_count;
 
 	private:
 		macsim_c* m_simBase; /**< self-reference for macro usage */
+
+    int CLOCK_L3;
+    int CLOCK_NOC;
+    int CLOCK_MC;
+    int CLOCK_CPU;
+    int CLOCK_GPU;
+
+    int m_num_sim_cores;
 };
 
 #endif

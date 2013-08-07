@@ -955,6 +955,8 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
     delete temp;
   }
 
+  gzclose(trace_info->m_trace_file);
+
   // release thread_trace_info to the pool
   m_simBase->m_thread_pool->release_entry(trace_info);
 

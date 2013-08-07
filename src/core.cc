@@ -365,8 +365,13 @@ void core_c::stop(void)
 
 // main execution routine
 // In every cycle, run all pipeline stages
-void core_c::run_a_cycle(void)
+void core_c::run_a_cycle(bool pll_lock)
 {
+  if (pll_lock) {
+    ++m_cycle;
+    return ;
+  }
+
   start();
 
   // to simulate kernel invocation from host code
