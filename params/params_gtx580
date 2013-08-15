@@ -1,5 +1,4 @@
 
-this_is_experimental_and_should_not_be_used_simulation_will_fail_because_of_this_fake_entry_in_params.in_thank_you 0
 # Simulation Configuration
 num_sim_cores 16
 num_sim_small_cores 16
@@ -55,6 +54,12 @@ shared_mem_ports 1
 byte_level_access 0
 
 l1_small_line_size 128
+#48 KB
+l1_small_num_set 64
+l1_small_assoc 6
+#16 KB
+#l1_small_num_set 32
+#l1_small_assoc 4
 
 # L3 Cache
 num_l3 6
