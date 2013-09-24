@@ -31,6 +31,11 @@ def CheckCPP0x():
     }
     '''
     context.Message('Checking for c++0x conformance...')
+
+    ## TryCompile doesn't seems to use env['ENV'], so below is a fix.
+    for key, val in context.env['ENV'].iteritems():
+      context.env[key] = val
+
     context.env.AppendUnique(CXXFLAGS=['-std=c++0x'])
     result = context.TryCompile(cpp0x_test, '.cpp')
     context.Result(result)

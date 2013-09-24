@@ -5,6 +5,7 @@
 # Description : Scons top-level
 #########################################################################################
 
+import sys
 import os
 import glob
 
@@ -32,18 +33,19 @@ warn_flags = ' '.join(warn_flags)
 
 
 ## Environment
+env = Environment()
 custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
-custom_env  = {}
 
 for key,val in os.environ.iteritems():
   if key in custom_vars:
-    custom_env[key] = val
-
-env = Environment(ENV=custom_env)
+    env[key] = val
 
 env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
-env['LINKFLAGS']  = ['--static']
+
+## MAC OS X does not support static linking
+if sys.platform != "darwin":
+  env['LINKFLAGS']  = ['--static']
 # env['CXX']        = ['icpc']
 
 
@@ -265,7 +267,6 @@ env.Program(
     'macsim',
     macsim_src, 
     LIBS=libraries, 
-    LIBPATH=['.', '/usr/lib', '/usr/local/lib']
 )
 
 
