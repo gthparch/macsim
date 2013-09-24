@@ -31,11 +31,6 @@ def CheckCPP0x():
     }
     '''
     context.Message('Checking for c++0x conformance...')
-
-    ## TryCompile doesn't seems to use env['ENV'], so below is a fix.
-    for key, val in context.env['ENV'].iteritems():
-      context.env[key] = val
-
     context.env.AppendUnique(CXXFLAGS=['-std=c++0x'])
     result = context.TryCompile(cpp0x_test, '.cpp')
     context.Result(result)
@@ -46,14 +41,14 @@ def CheckCPP0x():
 ## Check c++0x support
 def pre_compile_check():
   ## Environment
+  env = Environment()
   custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
-  custom_env = {}
 
   for key,val in os.environ.iteritems():
     if key in custom_vars:
-      custom_env[key] = val
+      env[key] = val
 
-  conf = Configure(Environment(ENV=custom_env), custom_tests = {'CheckCPP0x' : CheckCPP0x()})
+  conf = Configure(env, custom_tests = {'CheckCPP0x' : CheckCPP0x()})
 
   if not conf.CheckCPP0x():
     print('Error: Your compiler does not support c++0x. Exit now...')
