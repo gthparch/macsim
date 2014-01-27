@@ -98,8 +98,9 @@ void dram_dramsim_c::init(int id)
 }
 
 
-void dram_dramsim_c::run_a_cycle(void)
+void dram_dramsim_c::run_a_cycle(bool temp)
 {
+  send();
   m_dramsim->update();
   receive();
   ++m_cycle;
@@ -181,6 +182,14 @@ void dram_dramsim_c::send(void)
   for (auto I = temp_list.begin(), E = temp_list.end(); I != E; ++I) {
     m_output_buffer->remove((*I));
   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// wrapper functions to allocate dram controller object
+
+dram_c* dramsim_controller(macsim_c* simBase)
+{
+  return new dram_dramsim_c(simBase);
 }
 
 #endif

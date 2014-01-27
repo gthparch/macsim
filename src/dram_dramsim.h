@@ -83,7 +83,7 @@ class dram_dramsim_c : public dram_c
     /**
      * Tick a cycle
      */
-    void run_a_cycle(void);
+    void run_a_cycle(bool);
 
   private:
     dram_dramsim_c(); // do not implement
