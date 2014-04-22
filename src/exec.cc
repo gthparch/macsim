@@ -262,7 +262,16 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
             else {
 #endif
+
+#ifdef USING_SST
+              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue())
+                uop_latency = access_memhierarchy_cache(uop); 
+              else
+                uop_latency = MEMORY->access(uop);
+#else //USING_SST
               uop_latency = MEMORY->access(uop);
+#endif //USING_SST
+
 #if PORT_FIXME
               if (uop_latency == 0) {
                 if (uop->m_dcache_bank_id >= 128)
@@ -345,7 +354,16 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
             else {
 #endif
+
+#ifdef USING_SST
+              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue())
+                latency = access_memhierarchy_cache(uop->m_child_uops[next_set_bit]); 
+              else
+                latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
+#else //USING_SST
               latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
+#endif //USING_SST
+
 #if PORT_FIXME
               if (latency == 0) {
                 if (m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] < 128)
@@ -624,5 +642,47 @@ void exec_c::update_memory_stats(uop_c* uop)
 void exec_c::run_a_cycle(void)
 {
   fill_n(m_bank_busy, 129, false);
+
+#ifdef USING_SST
+  // Strobing
+  if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
+    for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
+      uop_c* uop = I->first;
+      bool responseArrived = (*(m_simBase->strobeDataRespQ))(I->first);
+      if (responseArrived) {
+        uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+        uop->m_state = OS_SCHEDULED;
+        DEBUG("response to uop_num:%lld has arrived from memHierarchy!\n", uop->m_uop_num);
+        m_uop_buffer.erase(I);
+      }
+    }
+  }
+#endif //USING_SST
 }
 
+#ifdef USING_SST
+int exec_c::access_memhierarchy_cache(uop_c* uop)
+{
+  if (*KNOB(KNOB_PERFECT_DCACHE)) {
+    return 1;
+  }
+
+  // Sending
+  std::map<uop_c*, bool>::iterator i = m_uop_buffer.find(uop);
+  if (m_uop_buffer.end() == i) { // New Request
+    int  block_size = KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
+    Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
+    Addr offset     = uop->m_vaddr % block_size;
+
+    if (offset + uop->m_mem_size > block_size) 
+      uop->m_mem_size = block_size - offset;
+
+    DEBUG("sending memory request (uop_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", uop->m_uop_num, uop->m_vaddr);
+    (*(m_simBase->sendDataReq))(uop);
+    DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
+    m_uop_buffer.insert(std::make_pair(uop, false));
+
+    return -1; // cache miss
+  } 
+}
+#endif //USING_SST

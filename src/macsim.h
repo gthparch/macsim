@@ -289,6 +289,23 @@ class macsim_c
     int CLOCK_GPU;
 
     int m_num_sim_cores;
+
+#ifdef USING_SST
+#include "callback.h"
+  public:
+    CallbackSendInstReq *sendInstReq;
+    CallbackSendDataReq *sendDataReq;
+    CallbackStrobeInstRespQ *strobeInstRespQ;
+    CallbackStrobeDataRespQ *strobeDataRespQ;
+
+    void registerCallback(CallbackSendInstReq*, CallbackSendDataReq*, CallbackStrobeInstRespQ*, CallbackStrobeDataRespQ*);
+
+#ifdef HAVE_LIBDRAMSIM
+    void setMacsimComponent(void *comp); 
+    void *getMacsimComponent(); 
+    void *m_macsimComponent;
+#endif //HAVE_LIBDRAMSIM
+#endif //USING_SST
 };
 
 #endif

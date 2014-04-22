@@ -1031,4 +1031,24 @@ void macsim_c::finalize()
   cout << "Done\n";
 }
 
+#ifdef USING_SST
+void macsim_c::registerCallback(CallbackSendInstReq* sir, CallbackSendDataReq* sdr, CallbackStrobeInstRespQ* sirq, CallbackStrobeDataRespQ* sdrq)
+{
+  sendInstReq = sir;
+  sendDataReq = sdr;
+  strobeInstRespQ = sirq;
+  strobeDataRespQ = sdrq;
+}
 
+#ifdef HAVE_LIBDRAMSIM
+void macsim_c::setMacsimComponent(void *comp) 
+{
+  m_macsimComponent = comp;
+}
+
+void *macsim_c::getMacsimComponent()
+{
+  return m_macsimComponent;
+}
+#endif //HAVE_LIBDRAMSIM
+#endif //USING_SST

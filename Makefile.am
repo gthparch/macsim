@@ -14,7 +14,8 @@ AM_CPPFLAGS = \
   -I$(srcdir)/src/manifold/kernel/include/kernel \
 	-I$(srcdir)/src/orion \
   -std=c++0x \
-	-DUSING_SST 
+	-DUSING_SST \
+	-g
 
 
 SUBDIRS = scripts
@@ -23,6 +24,7 @@ compdir = $(pkglibdir)
 comp_LTLIBRARIES = libmacsimComponent.la
 libmacsimComponent_la_SOURCES =                                        \
 macsimComponent.cpp          macsimComponent.h                         \
+libmacsimComponent.cc                                                  \
                                                                        \
 src/all_knobs.cc             src/all_knobs.h                           \
 src/allocate.cc              src/allocate.h                            \
