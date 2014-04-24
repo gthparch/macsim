@@ -72,11 +72,11 @@ large_core_schedule ooo
 max_threads_per_large_core 1
 icache_large_num_set 64 # 64 KB
 icache_large_assoc 8
-l1_large_num_set 64 # 64 KB L1 Cache
+l1_large_num_set 64 # 32 KB L1 Cache
 l1_large_assoc 8
 l1_large_latency 3
 l1_large_bypass 0
-l2_large_num_set 256 # 256 KB L2 Cache
+l2_large_num_set 256 # 128 KB L2 Cache
 l2_large_assoc 8
 l2_large_latency 8
 l2_large_bypass 0
