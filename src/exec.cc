@@ -650,9 +650,33 @@ void exec_c::run_a_cycle(void)
       uop_c* uop = I->first;
       bool responseArrived = (*(m_simBase->strobeDataRespQ))(I->first);
       if (responseArrived) {
+        if (m_ptx_sim) {
+          if (uop->m_parent_uop) {
+            uop_c* puop = uop->m_parent_uop;
+            ++puop->m_num_child_uops_done;
+            if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
+              if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+                m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
+                    puop->m_thread_id, puop->m_uop_num);
+              }
+
+              puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+              puop->m_state = OS_SCHEDULED;
+            }
+          } // uop->m_parent_uop
+          else {
+            if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+              m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
+                  uop->m_thread_id, uop->m_uop_num);
+            }
+          }
+        }
+
         uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
         uop->m_state = OS_SCHEDULED;
-        DEBUG("response to uop_num:%lld has arrived from memHierarchy!\n", uop->m_uop_num);
+
+        DEBUG("response to m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx has arrived from memHierarchy!\n", 
+            m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
         m_uop_buffer.erase(I);
       }
     }
@@ -677,7 +701,8 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
     if (offset + uop->m_mem_size > block_size) 
       uop->m_mem_size = block_size - offset;
 
-    DEBUG("sending memory request (uop_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", uop->m_uop_num, uop->m_vaddr);
+    DEBUG("sending memory request (m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", 
+        m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
     (*(m_simBase->sendDataReq))(uop);
     DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
     m_uop_buffer.insert(std::make_pair(uop, false));
