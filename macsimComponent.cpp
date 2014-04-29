@@ -138,7 +138,7 @@ bool macsimComponent::ticReceived(Cycle_t)
 ////////////////////////////////////////
 void macsimComponent::sendInstReq(frontend_s* fetch_data, uint64_t fetch_addr, int fetch_size)
 {
-  uint64_t addr = fetch_addr;
+  uint64_t addr = fetch_addr & 0x3FFFFFFF;
   int      size = fetch_size;
 
   SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr, size);
@@ -194,14 +194,14 @@ inline bool isStore(Mem_Type type)
 
 void macsimComponent::sendDataReq(uop_c* uop)
 {
-  uint64_t addr = uop->m_vaddr;
+  uint64_t addr = uop->m_vaddr & 0x3FFFFFFF;
   int size      = uop->m_mem_size;
   Mem_Type type = uop->m_mem_type;
   bool doWrite  = isStore(type);
 
   SimpleMem::Request *req = new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr, size);
   dcache_link->sendRequest(req);
-  MSC_DEBUG("D$ request sent: addr = 0x%lx, %s, size = %d\n", addr, doWrite ? "write" : "read", size);
+  MSC_DEBUG("D$ request sent: addr = 0x%lx (orig addr = 0x%lx), %s, size = %d\n", addr, uop->m_vaddr, doWrite ? "write" : "read", size);
 
   dcache_requests.insert(std::make_pair(req->id, uop));
 }
@@ -224,7 +224,7 @@ void macsimComponent::dcacheHandleEvent(Interfaces::SimpleMem::Request *req)
   if (dcache_requests.end() == i) {
     // No matching request
   } else {
-    MSC_DEBUG("D$ response arrived: addr = 0x%llx, size = %d\n", i->second->m_vaddr, i->second->m_mem_size);
+    MSC_DEBUG("D$ response arrived: addr = 0x%llx (orig addr = 0x%llx), size = %d\n", i->second->m_vaddr & 0x3FFFFFFF, i->second->m_vaddr, i->second->m_mem_size);
     dcache_responses.insert(std::make_pair(i->second, req->id));
     dcache_requests.erase(i);
   }
