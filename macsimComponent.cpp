@@ -18,6 +18,7 @@
 
 #define MSC_DEBUG(fmt, args...) dbg->debug(CALL_INFO,INFO,0,fmt,##args)
 
+using namespace boost;
 using namespace SST;
 using namespace SST::MacSim;
 
@@ -28,7 +29,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   int debugLevel = params.find_integer("debugLevel", 0);
   if (debugLevel < 0 || debugLevel > 8) _abort(macsimComponent, "Debugging level must be betwee 0 and 8. \n");
 
-  std::string prefix = "[" + getName() + "] ";
+  string prefix = "[" + getName() + "] ";
   dbg->init(prefix, debugLevel, 0, (Output::output_location_t)params.find_integer("printLocation", Output::NONE));
   MSC_DEBUG("------- Initializing -------\n");
 
@@ -36,9 +37,12 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   if (params.find("traceFile") == params.end()) _abort(macsimComponent, "Couldn't find trace_file_list file\n");
   if (params.find("outputDir") == params.end()) _abort(macsimComponent, "Couldn't find statistics output directory parameter");
 
-  paramFile = std::string(params["paramFile"]);
-  traceFile = std::string(params["traceFile"]);
-  outputDir = std::string(params["outputDir"]);
+  paramFile = string(params["paramFile"]);
+  traceFile = string(params["traceFile"]);
+  outputDir = string(params["outputDir"]);
+
+  if (params.find("commandLine") != params.end()) 
+    commandLine = string(params["commandLine"]);
 
   icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
   if (!icache_link) _abort(macsimComponent, "Unable to load Module as memory\n");
@@ -68,21 +72,42 @@ void macsimComponent::init(unsigned int phase)
   }
 }
 
+#include <boost/tokenizer.hpp>
+int countTokens(string _commandLine)
+{
+  int count = 0;
+  char_separator<char> sep(" ");
+  tokenizer<char_separator<char>> tokens(_commandLine, sep);
+  for (auto I = tokens.begin(), E = tokens.end(); I != E; I++) count++;
+  return count;
+}
+
 void macsimComponent::setup() 
 {
   MSC_DEBUG("------- Setting up -------\n");
 
-  // Format for initialization protocol
-  char* argv[3];
-  argv[0] = new char[ paramFile.size()+1 ]; strcpy(argv[0], paramFile.c_str());
-  argv[1] = new char[ traceFile.size()+1 ]; strcpy(argv[1], traceFile.c_str());
-  argv[2] = new char[ outputDir.size()+1 ]; strcpy(argv[2], outputDir.c_str());
+  // Build arguments
+  char** argv = new char*[1+3+countTokens(commandLine)];
+
+  int argc = 0;
+  argv[argc] = new char[                  4 ]; strcpy(argv[argc],             "sst"); argc++;
+  argv[argc] = new char[ paramFile.size()+1 ]; strcpy(argv[argc], paramFile.c_str()); argc++;
+  argv[argc] = new char[ traceFile.size()+1 ]; strcpy(argv[argc], traceFile.c_str()); argc++;
+  argv[argc] = new char[ outputDir.size()+1 ]; strcpy(argv[argc], outputDir.c_str()); argc++;
+
+  char_separator<char> sep(" ");
+  tokenizer<char_separator<char>> tokens(commandLine, sep);
+  for (auto I = tokens.begin(), E = tokens.end(); I != E; I++) {
+    string command = *I;
+    argv[argc] = new char[ command.size()+1 ]; strcpy(argv[argc], command.c_str()); argc++;
+  }
 
   // Pass paramaters to simulator if applicable
-  macsim->initialize(0, argv);
+  macsim->initialize(argc, argv);
 
   // Cleanup
-  delete argv[0]; delete argv[1]; delete argv[2];
+  for (int trav = 0; trav < argc; trav++) delete argv[trav];
+  delete argv;
 
   CallbackSendInstReq* sir = 
     new Callback3<macsimComponent, void, frontend_s*, uint64_t, int>(this, &macsimComponent::sendInstReq);
@@ -145,7 +170,7 @@ void macsimComponent::sendInstReq(frontend_s* fetch_data, uint64_t fetch_addr, i
   icache_link->sendRequest(req);
   MSC_DEBUG("I$ request sent: addr = 0x%lx, size = %d\n", addr, size);
 
-  icache_requests.insert(std::make_pair(req->id, fetch_data));
+  icache_requests.insert(make_pair(req->id, fetch_data));
 }
 
 bool macsimComponent::strobeInstRespQ(frontend_s* fetch_data)
@@ -167,7 +192,7 @@ void macsimComponent::icacheHandleEvent(Interfaces::SimpleMem::Request *req)
     // No matching request
   } else {
     MSC_DEBUG("I$ response arrived\n");
-    icache_responses.insert(std::make_pair(i->second, req->id));
+    icache_responses.insert(make_pair(i->second, req->id));
     icache_requests.erase(i);
   }
 
@@ -203,7 +228,7 @@ void macsimComponent::sendDataReq(uop_c* uop)
   dcache_link->sendRequest(req);
   MSC_DEBUG("D$ request sent: addr = 0x%lx (orig addr = 0x%lx), %s, size = %d\n", addr, uop->m_vaddr, doWrite ? "write" : "read", size);
 
-  dcache_requests.insert(std::make_pair(req->id, uop));
+  dcache_requests.insert(make_pair(req->id, uop));
 }
 
 bool macsimComponent::strobeDataRespQ(uop_c* uop)
@@ -225,7 +250,7 @@ void macsimComponent::dcacheHandleEvent(Interfaces::SimpleMem::Request *req)
     // No matching request
   } else {
     MSC_DEBUG("D$ response arrived: addr = 0x%llx (orig addr = 0x%llx), size = %d\n", i->second->m_vaddr & 0x3FFFFFFF, i->second->m_vaddr, i->second->m_mem_size);
-    dcache_responses.insert(std::make_pair(i->second, req->id));
+    dcache_responses.insert(make_pair(i->second, req->id));
     dcache_requests.erase(i);
   }
 

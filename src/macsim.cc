@@ -141,9 +141,10 @@ void macsim_c::init_knobs(int argc, char** argv)
   m_knobs = m_knobsContainer->getAllKnobs();
 
 #ifdef USING_SST
-  string  paramPath(argv[0]);
-  string  tracePath(argv[1]);
-  string outputPath(argv[2]);
+  string         bin(argv[0]);
+  string   paramPath(argv[1]);
+  string   tracePath(argv[2]);
+  string  outputPath(argv[3]);
 
   //Apply specified params.in file
   m_knobsContainer->applyParamFile(paramPath);
@@ -154,6 +155,10 @@ void macsim_c::init_knobs(int argc, char** argv)
   //Specify output path for statistics
   m_knobsContainer->updateKnob("out", outputPath);
 
+  char* pInvalidArgument = NULL;
+  if (!m_knobsContainer->applyComandLineArguments(argc-3, argv+3, &pInvalidArgument)) {
+  }
+
   //save the states of all knobs to a file
   m_knobsContainer->saveToFile(outputPath + "/params.out");
 
@@ -163,7 +168,7 @@ void macsim_c::init_knobs(int argc, char** argv)
 
   // apply the supplied command line switches
   char* pInvalidArgument = NULL;
-  if(!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
+  if (!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
   }
 
   // save the states of all knobs to a file

@@ -314,12 +314,10 @@ void frontend_c::run_a_cycle(void)
     if (m_sync_done.size() > 0) {
       int32_t block_id;
       bool status;
-      uint64_t min;
 
       while (m_sync_done.size() > 0) {
         block_id = m_sync_done.front();
         m_sync_done.pop_front();
-        min = ~0;
 
         for (int tid = m_last_terminated_tid; tid < m_unique_scheduled_thread_num; ++tid) {
           /* this condition is not needed */
@@ -389,7 +387,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
   }
 
 #ifdef USING_SST
-  static Addr last_fetched_addr = 0x0;
+  static unordered_map<int, Addr> last_fetched_addr;
 #endif // USING_SST
 
   // -------------------------------------
@@ -407,12 +405,9 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     // instruction cache access
     // -------------------------------------
 #ifdef USING_SST
-    fetch_addr = fetch_addr & 0x00000000ffffffff;
-
     bool icache_miss;
-    DEBUG("last_fetched_addr=0x%lx, fetch_addr=0x%lx\n", last_fetched_addr, fetch_addr);
     // Access instruction cache only for new cache block
-    if (last_fetched_addr != fetch_addr) {
+    if (last_fetched_addr[tid] != fetch_addr) {
       if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) 
         icache_miss = access_memhierarchy_cache(tid, fetch_addr, fetch_data);
       else 
@@ -432,7 +427,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     // instruction cache hit
     else {
 #ifdef USING_SST 
-      last_fetched_addr = fetch_addr;
+      last_fetched_addr[tid] = fetch_addr;
 #endif // USING_SST
 
       POWER_CORE_EVENT(m_core_id, POWER_ICACHE_R);	// FIXME Jieun Apr-9-2012 should be moved to somewhere else, this is not a right place. currently ICACHE_R = #insts, but it should be 1/4
@@ -983,7 +978,7 @@ bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s*
   if (KNOB(KNOB_PERFECT_ICACHE)->getValue()) {
     cache_miss = CACHE_HIT;
   } else {
-    DEBUG("fetch_data = 0x%lx, fetch_addr = 0x%lx\n", fetch_data, fetch_addr);
+    DEBUG("fetch_data = %p, fetch_addr = 0x%llx\n", fetch_data, fetch_addr);
     // Sending
     std::map<frontend_s*, bool>::iterator i = m_fetch_buffer.find(fetch_data);
     if (m_fetch_buffer.end() == i) { // New Request
@@ -997,7 +992,7 @@ bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s*
       fetch_data->m_fetch_ready_addr = line_addr;  
       cache_miss = CACHE_MISS;
     } else {
-      DEBUG("strobing fetch_data = 0x%llx\n", i->first);
+      DEBUG("strobing fetch_data = %p\n", i->first);
       bool responseArrived = i->second;
       if (responseArrived) {
         DEBUG("response has arrived from memHierarchy! Good to go\n");

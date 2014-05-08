@@ -14,6 +14,7 @@
 
 #include "src/macsim.h"
 
+using namespace std;
 using namespace SST::Interfaces;
 
 namespace SST { namespace MacSim {
@@ -37,9 +38,10 @@ class macsimComponent : public SST::Component
     void icacheHandleEvent(SimpleMem::Request *req);
     void dcacheHandleEvent(SimpleMem::Request *req);
 		
-    std::string paramFile;
-    std::string traceFile;
-    std::string outputDir;
+    string paramFile;
+    string traceFile;
+    string outputDir;
+    string commandLine;
 
     macsim_c* macsim;
     bool simRunning;
@@ -47,10 +49,10 @@ class macsimComponent : public SST::Component
     Interfaces::SimpleMem *icache_link;
     Interfaces::SimpleMem *dcache_link;
 
-    std::map<uint64_t, frontend_s*> icache_requests;
-    std::map<frontend_s*, uint64_t> icache_responses;
-    std::map<uint64_t, uop_c*> dcache_requests;
-    std::map<uop_c*, uint64_t> dcache_responses;
+    map<uint64_t, frontend_s*> icache_requests;
+    map<frontend_s*, uint64_t> icache_responses;
+    map<uint64_t, uop_c*> dcache_requests;
+    map<uop_c*, uint64_t> dcache_responses;
 
     void sendInstReq(frontend_s*, uint64_t, int);
     bool strobeInstRespQ(frontend_s*);
