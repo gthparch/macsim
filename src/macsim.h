@@ -295,10 +295,13 @@ class macsim_c
   public:
     CallbackSendInstReq *sendInstReq;
     CallbackSendDataReq *sendDataReq;
+    CallbackSendCubeReq *sendCubeReq;
     CallbackStrobeInstRespQ *strobeInstRespQ;
     CallbackStrobeDataRespQ *strobeDataRespQ;
+    CallbackStrobeCubeRespQ *strobeCubeRespQ;
 
     void registerCallback(CallbackSendInstReq*, CallbackSendDataReq*, CallbackStrobeInstRespQ*, CallbackStrobeDataRespQ*);
+    void registerCallback(CallbackSendCubeReq*, CallbackStrobeCubeRespQ*);
 
 #ifdef HAVE_LIBDRAMSIM
     void setMacsimComponent(void *comp); 

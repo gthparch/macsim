@@ -117,6 +117,12 @@ class core_c
      */
     string get_core_type(void) { return m_core_type; }
 
+    /*! \fn Unit_type get_unit_type(void)
+     *  \brief Function to return core unit type 
+     *  \return Unit_type - Core unit type: SMALL/MEDIUM/LARGE
+     */
+    Unit_Type get_unit_type(void) { return m_unit_type; }
+
     /*! \fn void pref_init(void)
      *  \brief Hardware prefetcher initializer
      *  \return void

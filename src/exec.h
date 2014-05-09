@@ -211,7 +211,7 @@ class exec_c
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
 #ifdef USING_SST
-    std::map<uop_c*, bool> m_uop_buffer;
+    std::map<uint64_t, uop_c*> m_uop_buffer;
     int access_memhierarchy_cache(uop_c* uop);
 #endif //USING_SST
 };

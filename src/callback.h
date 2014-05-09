@@ -119,6 +119,35 @@ private:
 	const PtrMember  member;
 };
 
+
+
+
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T>
+class CallbackBase4
+{
+public:
+	virtual ~CallbackBase4() = 0;
+	virtual ReturnT operator()(Param1T,Param2T,Param3T,Param4T) = 0;
+};
+
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T> MacSim::CallbackBase4<ReturnT,Param1T,Param2T,Param3T,Param4T>::~CallbackBase4() {}
+
+template <typename ConsumerT, typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T> 
+class Callback4: public CallbackBase4<ReturnT,Param1T,Param2T,Param3T,Param4T>
+{
+private:
+	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T,Param4T);
+
+public:
+	Callback4( ConsumerT* const object, PtrMember member) : object(object), member(member) { }
+	Callback4( const Callback4<ConsumerT,ReturnT,Param1T,Param2T,Param3T,Param4T>& e ) : object(e.object), member(e.member) { }
+	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3, Param4T param4) { return (const_cast<ConsumerT*>(object)->*member) (param1,param2,param3,param4); }
+
+private:
+	ConsumerT* const object;
+	const PtrMember  member;
+};
+
 }}
 
 #endif

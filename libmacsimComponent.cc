@@ -19,6 +19,7 @@ static const ElementInfoParam macsim_params[] = {
     {"traceFile", "", NULL},
     {"outputDir", "", NULL},
     {"commandLine", "", NULL},
+    {"cubeConnected", "", "0"},
     {"clockFreq", "Clock frequency", "1GHz"},
     {"printLocation", "Prints debug statements --0[No debugging], 1[STDOUT], 2[STDERR], 3[FILE]--", "0"},
     {"debugLevel", "Debugging level: 0 to 10", "8"},

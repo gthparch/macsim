@@ -1043,6 +1043,14 @@ void macsim_c::registerCallback(CallbackSendInstReq* sir, CallbackSendDataReq* s
   sendDataReq = sdr;
   strobeInstRespQ = sirq;
   strobeDataRespQ = sdrq;
+
+  sendCubeReq = NULL;
+}
+
+void macsim_c::registerCallback(CallbackSendCubeReq* scr, CallbackStrobeCubeRespQ* scrq)
+{
+  sendCubeReq = scr;
+  strobeCubeRespQ = scrq;
 }
 
 #ifdef HAVE_LIBDRAMSIM

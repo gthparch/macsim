@@ -647,9 +647,18 @@ void exec_c::run_a_cycle(void)
   // Strobing
   if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
     for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
-      uop_c* uop = I->first;
-      bool responseArrived = (*(m_simBase->strobeDataRespQ))(I->first);
+      uint64_t key = I->first;
+      uop_c* uop = I->second;
+
+      bool responseArrived = false;
+      core_c *core = m_simBase->m_core_pointers[m_core_id];
+      if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
+        responseArrived = (*(m_simBase->strobeCubeRespQ))(key);
+      else
+        responseArrived = (*(m_simBase->strobeDataRespQ))(key);
+
       if (responseArrived) {
+        DEBUG("key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
         if (m_ptx_sim) {
           if (uop->m_parent_uop) {
             uop_c* puop = uop->m_parent_uop;
@@ -687,27 +696,38 @@ void exec_c::run_a_cycle(void)
 #ifdef USING_SST
 int exec_c::access_memhierarchy_cache(uop_c* uop)
 {
+  static uint64_t id = 0;
   if (*KNOB(KNOB_PERFECT_DCACHE)) {
     return 1;
   }
 
   // Sending
-  std::map<uop_c*, bool>::iterator i = m_uop_buffer.find(uop);
+  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_vaddr, id++);
+  DEBUG("core_id = %d, thread_id = %d, uop->m_vaddr = 0x%llx, key = 0x%lx\n", 
+      m_core_id, uop->m_thread_id, uop->m_vaddr, key);
+  auto i = m_uop_buffer.find(key);
   if (m_uop_buffer.end() == i) { // New Request
     int  block_size = KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
-    Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
+    //Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
     Addr offset     = uop->m_vaddr % block_size;
 
     if (offset + uop->m_mem_size > block_size) 
       uop->m_mem_size = block_size - offset;
 
-    DEBUG("sending memory request (m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", 
+    DEBUG("sending memory request (core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", 
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
-    (*(m_simBase->sendDataReq))(uop);
-    DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
-    m_uop_buffer.insert(std::make_pair(uop, false));
 
-    return -1; // cache miss
+    core_c *core = m_simBase->m_core_pointers[m_core_id];
+
+    if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
+      (*(m_simBase->sendCubeReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+    else
+      (*(m_simBase->sendDataReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+
+    DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
+    m_uop_buffer.insert(std::make_pair(key, uop));
   } 
+
+  return -1; // cache miss
 }
 #endif //USING_SST

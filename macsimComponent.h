@@ -5,6 +5,8 @@
 #define MACSIMCOMPONENT_DBG 1
 #endif
 
+#include <inttypes.h>
+
 #include <sst/core/event.h>
 #include <sst/core/sst_types.h>
 #include <sst/core/component.h>
@@ -35,8 +37,9 @@ class macsimComponent : public SST::Component
 		void operator=(const macsimComponent&); // do not implement
 
     virtual bool ticReceived(Cycle_t);
-    void icacheHandleEvent(SimpleMem::Request *req);
-    void dcacheHandleEvent(SimpleMem::Request *req);
+    void handleIcacheEvent(SimpleMem::Request *req);
+    void handleDcacheEvent(SimpleMem::Request *req);
+    void handleCubeEvent(SimpleMem::Request *req);
 		
     string paramFile;
     string traceFile;
@@ -45,19 +48,25 @@ class macsimComponent : public SST::Component
 
     macsim_c* macsim;
     bool simRunning;
+    bool cubeConnected;
 
     Interfaces::SimpleMem *icache_link;
     Interfaces::SimpleMem *dcache_link;
+    Interfaces::SimpleMem *cube_link;
 
-    map<uint64_t, frontend_s*> icache_requests;
-    map<frontend_s*, uint64_t> icache_responses;
-    map<uint64_t, uop_c*> dcache_requests;
-    map<uop_c*, uint64_t> dcache_responses;
+    map<uint64_t, uint64_t> icache_requests;
+    map<uint64_t, uint64_t> dcache_requests;
+    map<uint64_t, uint64_t> cube_requests;
+    set<uint64_t> icache_responses;
+    set<uint64_t> dcache_responses;
+    set<uint64_t> cube_responses;
 
-    void sendInstReq(frontend_s*, uint64_t, int);
-    bool strobeInstRespQ(frontend_s*);
-    void sendDataReq(uop_c*);
-    bool strobeDataRespQ(uop_c*);
+    void sendInstReq(uint64_t, uint64_t, int);
+    void sendDataReq(uint64_t, uint64_t, int, int);
+    void sendCubeReq(uint64_t, uint64_t, int, int);
+    bool strobeInstRespQ(uint64_t);
+    bool strobeDataRespQ(uint64_t);
+    bool strobeCubeRespQ(uint64_t);
 
     Output* dbg;
     Cycle_t timestamp;

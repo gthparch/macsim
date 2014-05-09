@@ -457,7 +457,7 @@ class frontend_c
     // tlb_c            *m_itlb;
 
 #ifdef USING_SST
-    std::map<frontend_s*, bool> m_fetch_buffer;
+    std::map<uint64_t, bool> m_fetch_buffer;
     bool access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s* fetch_data);
 #endif //USING_SST
 };

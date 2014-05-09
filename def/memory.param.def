@@ -229,3 +229,4 @@ param<PAGE_MAPPING_POLICY, page_mapping_policy, string, REGION_FCFS>
 
 /* SST */
 param<USE_MEMHIERARCHY, use_memhierarchy, bool, false>
+param<USE_VAULTSIM_LINK, use_vaultsim_link, bool, false>
