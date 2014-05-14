@@ -264,10 +264,14 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 #endif
 
 #ifdef USING_SST
-              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue())
-                uop_latency = access_memhierarchy_cache(uop); 
-              else
+              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
+                if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
+                  uop_latency = MEMORY->access(uop);
+                else
+                  uop_latency = access_memhierarchy_cache(uop); 
+              } else {
                 uop_latency = MEMORY->access(uop);
+              }
 #else //USING_SST
               uop_latency = MEMORY->access(uop);
 #endif //USING_SST
@@ -356,10 +360,14 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 #endif
 
 #ifdef USING_SST
-              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue())
-                latency = access_memhierarchy_cache(uop->m_child_uops[next_set_bit]); 
-              else
+              if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
+                if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
+                  latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
+                else
+                  latency = access_memhierarchy_cache(uop->m_child_uops[next_set_bit]); 
+              } else {
                 latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
+              }
 #else //USING_SST
               latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
 #endif //USING_SST
@@ -646,47 +654,44 @@ void exec_c::run_a_cycle(void)
 #ifdef USING_SST
   // Strobing
   if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
-    for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
-      uint64_t key = I->first;
-      uop_c* uop = I->second;
+    core_c *core = m_simBase->m_core_pointers[m_core_id];
+    if (!(KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))) {
+      for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
+        uint64_t key = I->first;
+        uop_c* uop = I->second;
 
-      bool responseArrived = false;
-      core_c *core = m_simBase->m_core_pointers[m_core_id];
-      if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
-        responseArrived = (*(m_simBase->strobeCubeRespQ))(key);
-      else
-        responseArrived = (*(m_simBase->strobeDataRespQ))(key);
+        bool responseArrived = (*(m_simBase->strobeDataRespQ))(key);
+        if (responseArrived) {
+          DEBUG("key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
+          if (m_ptx_sim) {
+            if (uop->m_parent_uop) {
+              uop_c* puop = uop->m_parent_uop;
+              ++puop->m_num_child_uops_done;
+              if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
+                if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+                  m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
+                      puop->m_thread_id, puop->m_uop_num);
+                }
 
-      if (responseArrived) {
-        DEBUG("key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
-        if (m_ptx_sim) {
-          if (uop->m_parent_uop) {
-            uop_c* puop = uop->m_parent_uop;
-            ++puop->m_num_child_uops_done;
-            if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
-              if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-                m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready( \
-                    puop->m_thread_id, puop->m_uop_num);
+                puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+                puop->m_state = OS_SCHEDULED;
               }
-
-              puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
-              puop->m_state = OS_SCHEDULED;
-            }
-          } // uop->m_parent_uop
-          else {
-            if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-              m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
-                  uop->m_thread_id, uop->m_uop_num);
+            } // uop->m_parent_uop
+            else {
+              if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+                m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready( \
+                    uop->m_thread_id, uop->m_uop_num);
+              }
             }
           }
+
+          uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+          uop->m_state = OS_SCHEDULED;
+
+          DEBUG("response to m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx has arrived from memHierarchy!\n", 
+              m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
+          m_uop_buffer.erase(I);
         }
-
-        uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
-        uop->m_state = OS_SCHEDULED;
-
-        DEBUG("response to m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx has arrived from memHierarchy!\n", 
-            m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
-        m_uop_buffer.erase(I);
       }
     }
   }
@@ -718,11 +723,7 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
     core_c *core = m_simBase->m_core_pointers[m_core_id];
-
-    if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (core->get_unit_type() == UNIT_SMALL))
-      (*(m_simBase->sendCubeReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
-    else
-      (*(m_simBase->sendDataReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+    (*(m_simBase->sendDataReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
 
     DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
     m_uop_buffer.insert(std::make_pair(key, uop));

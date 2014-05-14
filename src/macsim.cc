@@ -191,6 +191,9 @@ void macsim_c::register_functions(void)
 
   dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
   dram_factory_c::get()->register_class("FCFS", fcfs_controller);
+#ifdef USING_SST
+  dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
+#endif
 
   fetch_factory_c::get()->register_class("rr", fetch_factory);
   pref_factory_c::get()->register_class(pref_factory);

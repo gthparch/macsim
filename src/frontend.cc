@@ -265,31 +265,28 @@ void frontend_c::run_a_cycle(void)
 
         #ifdef USING_SST
           if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
-            // Strobing
-            for (auto I = m_fetch_buffer.begin(), E = m_fetch_buffer.end(); I != E; I++) {
-              bool responseArrived = false;
-              if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))
-                responseArrived = (*(m_simBase->strobeCubeRespQ))(I->first);
-              else
-                responseArrived = (*(m_simBase->strobeInstRespQ))(I->first);
-
-              if (responseArrived) {
-                I->second = true;
+            if (!(KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))) {
+              // Strobing
+              for (auto I = m_fetch_buffer.begin(), E = m_fetch_buffer.end(); I != E; I++) {
+                bool responseArrived = = (*(m_simBase->strobeInstRespQ))(I->first);
+                if (responseArrived) {
+                  I->second = true;
+                }
               }
-            }
 
-            uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, fetch_data->m_fetch_ready_addr, 0);
-            auto i = m_fetch_buffer.find(key);
-            if (m_fetch_buffer.end() != i) {
-              bool responseArrived = i->second;
-              if (responseArrived) {
-                // fetching from this thread is unblocked. now it can be fetched
-                fetch_data->m_fetch_ready_addr = 0;
+              uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, fetch_data->m_fetch_ready_addr, 0);
+              auto i = m_fetch_buffer.find(key);
+              if (m_fetch_buffer.end() != i) {
+                bool responseArrived = i->second;
+                if (responseArrived) {
+                  // fetching from this thread is unblocked. now it can be fetched
+                  fetch_data->m_fetch_ready_addr = 0;
+                }
+              } else { // this should not be reached
+                ASSERTM(0, "fetch_data not found\n");
               }
-            } else { // this should not be reached
-              ASSERTM(0, "fetch_data not found\n");
-            }
-          } 
+            } 
+          }
         #endif //USING_SST
 
           if (check_fetch_ready(fetch_thread)) {
@@ -414,10 +411,14 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     bool icache_miss;
     // Access instruction cache only for new cache block
     if (last_fetched_addr[tid] != fetch_addr) {
-      if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) 
-        icache_miss = access_memhierarchy_cache(tid, fetch_addr, fetch_data);
-      else 
+      if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
+        if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))
+          icache_miss = access_icache(tid, fetch_addr, fetch_data);
+        else
+          icache_miss = access_memhierarchy_cache(tid, fetch_addr, fetch_data);
+      } else {
         icache_miss = access_icache(tid, fetch_addr, fetch_data);
+      }
     } else {
       icache_miss = false;
     }
@@ -999,10 +1000,7 @@ bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s*
       DEBUG("sending memory request (fetch_addr = 0x%llx) to memHierarchy\n", fetch_addr);
       int line_size = KNOB(KNOB_ICACHE_LARGE_LINE_SIZE)->getValue();
       Addr line_addr = fetch_addr & ~((uint64_t)line_size-1);
-      if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))
-        (*(m_simBase->sendCubeReq))(key, line_addr, line_size, -1);
-      else
-        (*(m_simBase->sendInstReq))(key, line_addr, line_size);
+      (*(m_simBase->sendInstReq))(key, line_addr, line_size);
 
       DEBUG("fetch_data inserted into buffer. fetch_addr = 0x%llx\n", fetch_addr);
       m_fetch_buffer.insert(std::make_pair(key, false));

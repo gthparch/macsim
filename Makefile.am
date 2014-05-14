@@ -25,6 +25,7 @@ comp_LTLIBRARIES = libmacsimComponent.la
 libmacsimComponent_la_SOURCES =                                        \
 macsimComponent.cpp          macsimComponent.h                         \
 libmacsimComponent.cc                                                  \
+src/dram_sst_vaultsim.cc     src/dram_sst_vaultsim.h                   \
                                                                        \
 src/all_knobs.cc             src/all_knobs.h                           \
 src/allocate.cc              src/allocate.h                            \

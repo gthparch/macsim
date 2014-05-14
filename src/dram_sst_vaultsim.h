@@ -28,80 +28,73 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : dram.h 
+ * File         : dram_sst_vaultsim.h 
  * Author       : HPArch Research Group
- * Date         : 2/18/2013
- * SVN          : $Id: dram.h 867 2009-11-05 02:28:12Z kacear $:
- * Description  : Memory controller
+ * Date         : 05/12/2014
+ * Description  : Memory Controller for SST-VaultSim Component
  *********************************************************************************************/
 
 
-#ifndef DRAM_H
-#define DRAM_H
+#ifndef DRAM_SST_VAULTSIM_H
+#define DRAM_SST_VAULTSIM_H
 
+#include <list>
 
-#include "macsim.h"
-
+#include "dram.h"
+#include "memreq_info.h"
+#include "network.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Memory controller base class
+/// \brief MC - SST-VaultSim interface
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class dram_c
+class dram_sst_vaultsim_c : public dram_c
 {
   public:
     /**
      * Constructor
      */
-    dram_c(macsim_c* simBase);
+    dram_sst_vaultsim_c(macsim_c* simBase);
 
     /**
      * Destructor
      */
-    ~dram_c();
+    ~dram_sst_vaultsim_c();
 
     /**
-     * Print all requests in the DRAM request buffer
+     * Print all requests in DRB
      */
-    virtual void print_req(void) = 0; 
+    void print_req(void);
 
     /**
      * Initialize MC
      */
-    virtual void init(int id) = 0; 
+    void init(int id);
 
     /**
      * Tick a cycle
      */
-    virtual void run_a_cycle(bool) = 0;
+    void run_a_cycle(bool);
 
-  protected:
+  private:
+    dram_sst_vaultsim_c(); // do not implement
+
     /**
      * Send a packet to NOC
      */
-    virtual void send(void) = 0;
+    void send(void);
 
     /**
      * Receive a packet from NOC
      */
-    virtual void receive(void) = 0;
+    void receive(void);
+
+    void read_callback(uint64_t key);
+    void write_callback(uint64_t key);
+    void send_packet(mem_req_s* req);
+    void receive_packet();
 
   private:
-    dram_c(); // do not implement
-
-  protected:
-    macsim_c* m_simBase; /**< simulation base class */
-    Counter m_cycle; /**< dram clock cycle */
-    int m_id; /**< MC id */
+    list<mem_req_s*>* m_output_buffer; /**< output buffer */
+    map<uint64_t, mem_req_s*> m_pending_request;
 };
-
-
-// wrapper function to allocate a dram scheduler
-dram_c* fcfs_controller(macsim_c* simBase);
-dram_c* frfcfs_controller(macsim_c* simBase);
-dram_c* dramsim_controller(macsim_c* simBase);
-#ifdef USING_SST
-dram_c* vaultsim_controller(macsim_c* simBase);
-#endif
-
-
-#endif
+#endif //DRAM_SST_VAULTSIM_H
