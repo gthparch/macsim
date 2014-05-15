@@ -712,9 +712,9 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
       m_core_id, uop->m_thread_id, uop->m_vaddr, key);
   auto i = m_uop_buffer.find(key);
   if (m_uop_buffer.end() == i) { // New Request
-    int  block_size = KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
+    int block_size = KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
     //Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
-    Addr offset     = uop->m_vaddr % block_size;
+    Addr offset = uop->m_vaddr % block_size;
 
     if (offset + uop->m_mem_size > block_size) 
       uop->m_mem_size = block_size - offset;
@@ -722,7 +722,7 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
     DEBUG("sending memory request (core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop->m_vaddr:0x%llx) to memHierarchy\n", 
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
-    core_c *core = m_simBase->m_core_pointers[m_core_id];
+    //core_c *core = m_simBase->m_core_pointers[m_core_id];
     (*(m_simBase->sendDataReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
 
     DEBUG("uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);

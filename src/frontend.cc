@@ -268,7 +268,7 @@ void frontend_c::run_a_cycle(void)
             if (!(KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))) {
               // Strobing
               for (auto I = m_fetch_buffer.begin(), E = m_fetch_buffer.end(); I != E; I++) {
-                bool responseArrived = = (*(m_simBase->strobeInstRespQ))(I->first);
+                bool responseArrived = (*(m_simBase->strobeInstRespQ))(I->first);
                 if (responseArrived) {
                   I->second = true;
                 }
