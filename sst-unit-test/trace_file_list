@@ -1,2 +1,3 @@
 1
+./traces/hotspot/kernel_config.txt
 ./traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt

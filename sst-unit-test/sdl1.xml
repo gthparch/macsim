@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<sdl version="2.0"/>
+<timebase>1ns</timebase>
+
+<variables>
+  <lat> 1ns </lat>
+  <buslat> 10 ns </buslat>
+	<netlat> 2ns </netlat>
+</variables>
+
+<param_include>
+  <macsimParams>
+    <paramFile> params.in </paramFile>
+    <traceFile> trace_file_list </traceFile>
+    <outputDir> results </outputDir>
+    <commandLine> --use_memhierarchy=1 </commandLine>
+    <clockFreq> 1 Ghz </clockFreq>
+    <printLocation> 0 </printLocation>
+    <debugLevel> 8 </debugLevel>
+  </macsimParams>
+
+  <l1IParams>
+    <cache_frequency> 2 Ghz  </cache_frequency>
+    <cache_size> 4 KB </cache_size>
+    <coherence_protocol> MSI </coherence_protocol>
+    <replacement_policy> lru </replacement_policy>
+    <associativity> 8 </associativity>
+    <access_latency_cycles> 5  </access_latency_cycles>
+    <cache_line_size> 64 </cache_line_size>
+    <L1> 1 </L1>
+    <debug> 0 </debug>
+    <debug_level> 8 </debug_level>
+    <statistics> 1 </statistics>
+  </l1IParams>
+
+  <l1DParams>
+    <cache_frequency> 2 Ghz  </cache_frequency>
+    <cache_size> 4 KB </cache_size>
+    <coherence_protocol> MSI </coherence_protocol>
+    <replacement_policy> lru </replacement_policy>
+    <associativity> 8 </associativity>
+    <access_latency_cycles> 5  </access_latency_cycles>
+    <cache_line_size> 64 </cache_line_size>
+    <L1> 1 </L1>
+    <debug> 0 </debug>
+    <debug_level> 8 </debug_level>
+    <statistics> 1 </statistics>
+  </l1DParams>
+
+  <l2Params>
+    <cache_frequency> 2 Ghz  </cache_frequency>
+    <cache_size> 32 KB </cache_size>
+    <coherence_protocol> MSI </coherence_protocol>
+    <replacement_policy> lru </replacement_policy>
+    <associativity> 8 </associativity>
+    <access_latency_cycles> 20  </access_latency_cycles>
+    <directory_at_next_level> 0 </directory_at_next_level>
+    <cache_line_size> 64 </cache_line_size>
+    <debug> 0 </debug>
+    <idle_max> 8092 </idle_max>
+    <debug_level> 8 </debug_level>
+    <statistics> 1 </statistics>
+  </l2Params>
+
+  <busParams>
+    <bus_frequency> 2 Ghz </bus_frequency>
+    <debug> 0 </debug>
+  </busParams>
+
+  <memParams>
+    <coherence_protocol> MSI </coherence_protocol>
+    <access_time> 97 ns </access_time>
+    <rangeStart>  0 </rangeStart>
+    <mem_size> 1024 </mem_size>
+    <clock> 1GHz </clock>
+    <debug> 0 </debug>
+    <statistics> 1 </statistics>
+  </memParams>
+</param_include>
+
+<sst>
+  <component name="c0" type="macsimComponent.macsimComponent">
+    <params include=macsimParams />
+    <link name=c0_icache port=icache_link latency=$lat />
+    <link name=c0_dcache port=dcache_link latency=$lat />
+  </component>
+
+  <component name="c0l1Icache" type="memHierarchy.Cache">
+    <params include=l1IParams />
+    <link name=c0_icache port=high_network_0 latency=$lat />
+    <link name=c0_icache_bus port=low_network_0 latency=$buslat />
+  </component>
+
+  <component name="c0l1Dcache" type="memHierarchy.Cache">
+    <params include=l1DParams />
+    <link name=c0_dcache port=high_network_0 latency=$lat />
+    <link name=c0_dcache_bus port=low_network_0 latency=$buslat />
+  </component>
+
+  <component name="c0bus" type="memHierarchy.Bus">
+    <params include=busParams />
+    <link name=c0_icache_bus port=high_network_0 latency=$buslat />
+    <link name=c0_dcache_bus port=high_network_1 latency=$buslat />
+    <link name=bus_c0l2cache port=low_network_0 latency=$buslat />
+  </component>
+
+  <component name="c0l2cache" type="memHierarchy.Cache">
+    <params include=l2Params>
+      <network_address> 1 </network_address>
+    </params>
+    <link name=bus_c0l2cache port=high_network_0 latency=$lat />
+    <link name=dir0_mem port=low_network_0 latency=$buslat />
+  </component>
+
+  <component name="memory0" type="memHierarchy.MemController">
+    <params include=memParams />
+    <link name=dir0_mem port=direct_link latency=$buslat />
+  </component>
+
+</sst>
+
