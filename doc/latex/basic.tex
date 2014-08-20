@@ -62,12 +62,18 @@ To build \SIM the following are required:
    \Verb+Ubuntu+, \Verb+Redhat (TODO)+
   \item[Compiler] Any compiler that supports the C++0x (or C++11)
     standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (will work on)+
+  \item[SConstruct]
+
+    \Verb+apt-get install scons+
+
+\ignore{
   \item[Autotools] - Autotools (automake, autoconf,
     ...) version 2.65 or higher is required. Autotools can be installed using the commands:
 \begin{Verbatim}
 Ubuntu: apt-get install autotools-dev automake autoconf
 Redhat: todo
 \end{Verbatim}
+}
   \item[Libraries] - The zlib library is required and it can be installed using the command:
 \begin{Verbatim}
 Ubuntu: apt-get install zlib1g-dev
@@ -172,41 +178,20 @@ autotools to generate makefile to build \SIM.
 \subsection{Build}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The GNU Autotools (aclocal, automake, autoconf, ...) are used to build \SIM.
-After checking out a copy of the \SIM source code, the following commands have
-to be executed (These instructions are also available in \Verb+INSTALL+ file
-    included in the \SIM source).
+The SConstruct is used to build \SIM. After checking out a copy of the
+\SIM source code, the following commands have to be executed (These
+instructions are also available in \Verb+INSTALL+ file included in the
+\SIM source). Section~\ref{sec:buildoption} details all available build options.
 
 
 \begin{Verbatim}
-aclocal 
-automake 
---add-missing 
-autoconf 
-./configure 
-make
+./build.py
 \end{Verbatim}
 
 \noindent
-Users can enter all the above commands in one go as shown below:
-
-\begin{Verbatim}
-aclocal && automake --add-missing && autoconf && ./configure && make
-\end{Verbatim}
-
-\noindent Alternatively, users can just run the autogen.sh script file included
-in the \SIM source and then run the \Verb+make+ to build \SIM.
-
-\begin{Verbatim}
-./autogen.sh
-make
-\end{Verbatim}
-
-\noindent
-On a successful build, the binary \bin will be generated in the \Verb+trunk/bin/+
-directory.
-
-
+On a successful build, the binary \bin will be generated in the
+\Verb+trunk/bin/+ directory. Please note that SST-Macsim still uses
+GNU Autotools, so we maintain some related files (\Verb+Makefile.am+).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -217,28 +202,46 @@ Three types of build, each of which uses different compiler flags are
 supported. The build types are:
 
 \begin{itemize}
-  \item opt : default, optimized version (-O3 flag)
-  \item dbg : debug version (-g3 flag)
-  \item gpf : gprof version (-pg flag)
+  \item Optimized version (-O3 flag) - default
+  \item Debug version (-g3 flag)
+  \item Gprof version (-pg flag)
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build Options}
+\label{sec:buildoption}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are several options in \Verb+build.py+.
+
+\begin{itemize}
+  \item -j : specify the number of threads to be used for building \SIM.
+  \item -d : debug version
+  \item -p : gprof version
+  \item -c : cleanup
+  \item -t : build test
+  \item - -dramsim : macsim with DRAMSim2 simulator (DRAM memory) 
+  \item - -iris : macsim with Iris simulator (interconnection)
+  \item - -power : macsim with power module (currently, not supported)
 \end{itemize}
 
 \noindent
-The build type can be specified as an argument to the \textit{make} command.
+We also provide \Verb+macsim.config+ file to set the configuration instead of specifying options with the commandline. The following is the content of the \Verb+macsim.config+ file.
 
 \begin{Verbatim}
-To build the optimized version of the binary
-make [opt] 
+[Build]
+debug: 0
+gprof: 0
 
-To build the debug version of the binary
-make dbg
-
-To build the gprof version of the binary
-make gpf
+[Library]
+dram: 0
+power: 0
+iris: 0
 \end{Verbatim}
 
-
-
-
+\noindent
+Users can change the value to 1 for the corresponding option.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Running \SIM}
