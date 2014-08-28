@@ -56,7 +56,6 @@ src/main.cc                                                            \
 src/map.cc                   src/map.h                                 \
 src/memory.cc                src/memory.h                              \
 src/memreq_info.cc           src/memreq_info.h                         \
-src/noc.cc                   src/noc.h                                 \
 src/port.cc                  src/port.h                                \
 src/pqueue.h                                                           \
 src/pref.cc                  src/pref.h                                \
