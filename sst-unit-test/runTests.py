@@ -30,20 +30,20 @@ def main():
   trace = 'hotspot'
   for test in glob.glob('sdl*.xml'):
     ## Run trace
-    os.system('sst {} > /dev/null'.format(test))
+    os.system('sst {0} > /dev/null'.format(test))
 
     ## Compare against reference results
     sdl_filename = os.path.splitext(os.path.basename(test))[0]
-    golden_dir = '{}/{}/{}'.format(refer_dir, trace, sdl_filename) 
-    result_dir = '{}/results'.format(os.getcwd())
+    golden_dir = '{0}/{1}/{2}'.format(refer_dir, trace, sdl_filename) 
+    result_dir = '{0}/results'.format(os.getcwd())
     #print('golden_dir: {}'.format(golden_dir))
     #print('result_dir: {}'.format(result_dir))
 
     match_fail = False
-    stats = glob.glob('{}/*.stat.out'.format(golden_dir))
+    stats = glob.glob('{0}/*.stat.out'.format(golden_dir))
     for stat in stats:
-      golden_output = '{}/{}'.format(golden_dir, os.path.basename(stat))
-      test_output = '{}/{}'.format(result_dir, os.path.basename(stat))
+      golden_output = '{0}/{1}'.format(golden_dir, os.path.basename(stat))
+      test_output = '{0}/{1}'.format(result_dir, os.path.basename(stat))
 
       if not os.path.exists(test_output):
         match_fail = True
@@ -63,9 +63,9 @@ def main():
         break
   
     if match_fail:
-      print('{} failed'.format(test))
+      print('{0} failed'.format(test))
     else:
-      print('{} success'.format(test))
+      print('{0} success'.format(test))
 
     os.system('rm -f NULL trace_debug.out')
     os.system('rm -rf results')
