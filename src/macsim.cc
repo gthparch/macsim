@@ -605,6 +605,11 @@ void macsim_c::deallocate_memory(void)
   delete m_memory;
   delete m_network;
 
+  for (int ii = 0; ii < m_num_mc; ++ii) {
+    delete m_dram_controller[ii];
+  }
+  delete m_dram_controller;
+
   if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
     delete m_bug_detector;
 

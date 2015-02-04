@@ -57,7 +57,7 @@ class dram_c
     /**
      * Destructor
      */
-    ~dram_c();
+    virtual ~dram_c() = 0;
 
     /**
      * Print all requests in the DRAM request buffer
