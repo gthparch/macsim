@@ -461,11 +461,6 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
           return  FRONTEND_MODE_IFETCH;
         }
 
-        if (((new_uop->m_mem_type == MEM_LD) || (new_uop->m_mem_type == MEM_ST)) && (new_uop->m_vaddr == 0)) { 
-          new_uop->m_mem_type = NOT_MEM; 
-          STAT_EVENT(FORCE_TO_BE_NOT_MEM); 
-        }
-        
         new_uop->m_state = OS_FETCHED; 
         new_uop->m_fetched_cycle = m_core->get_cycle_count();
 
