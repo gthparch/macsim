@@ -1172,15 +1172,18 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial)
   core_c* core          = m_simBase->m_core_pointers[core_id];
   int new_block_id      = -1; 
   int fetching_block_id = core->m_fetching_block_id; 
-  DEBUG("core:%d fetching_block_id:%d total_thread_num:%d dispatched_thread_num:%d "
-      "running_block_num:%d block_retired:%d \n",
-      core_id, fetching_block_id, 
-      (m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num), 
-      (m_simBase->m_block_schedule_info[fetching_block_id]->m_dispatched_thread_num), 
-      core->m_running_block_num, m_simBase->m_block_schedule_info[fetching_block_id]->m_retired);
+  if ((fetching_block_id != -1) && 
+      m_simBase->m_block_schedule_info.find(fetching_block_id) != m_simBase->m_block_schedule_info.end()) {
+    DEBUG("core:%d fetching_block_id:%d total_thread_num:%d dispatched_thread_num:%d "
+        "running_block_num:%d block_retired:%d \n",
+        core_id, fetching_block_id, 
+        (m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num), 
+        (m_simBase->m_block_schedule_info[fetching_block_id]->m_dispatched_thread_num), 
+        core->m_running_block_num, m_simBase->m_block_schedule_info[fetching_block_id]->m_retired);
+  }
 
 
-  // All threads from the currently serveced block should be scheduled before a new block
+  // All threads from the currently serviced block should be scheduled before a new block
   // executes. Check currently fetching block has other threads to schedule
   if ((fetching_block_id != -1) && 
       m_simBase->m_block_schedule_info.find(fetching_block_id) != m_simBase->m_block_schedule_info.end() &&
