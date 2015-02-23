@@ -441,7 +441,7 @@ void hwp_common_c::pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 
     return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON) 
-    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0xllx \t %s\n", 
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n", 
         m_simBase->m_simulation_cycle, line_addr, "UL1_PREFHIT");
 
   if (!*m_simBase->m_knobs->KNOB_PREF_USEREGION_TOCALC_ACC) {

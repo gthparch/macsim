@@ -55,8 +55,6 @@ extern int g_total_gpu_packet;
 network_simple_c::network_simple_c(macsim_c* simBase)
   : network_c(simBase)
 {
-  m_total_packet = 0;
-  m_num_router = 0;
 }
 
 

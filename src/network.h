@@ -308,14 +308,15 @@ class router_c
 class network_c
 {
   public:
-    network_c(macsim_c* simBase)
-      : m_simBase(simBase)
-    {
-    }
+    /**
+     * Constructor
+     */
+    network_c(macsim_c* simBase);
 
-    ~network_c()
-    {
-    }
+    /**
+     * Destructor
+     */
+    virtual ~network_c() = 0;
 
   private:
     network_c();

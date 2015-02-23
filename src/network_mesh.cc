@@ -62,18 +62,11 @@ extern int g_total_gpu_packet;
 network_mesh_c::network_mesh_c(macsim_c* simBase)
   : network_c(simBase)
 {
-  m_total_packet = 0;
-  m_num_router   = 0;
-
-  m_flit_pool   = new pool_c<flit_c>(100, "flit");
-  m_credit_pool = new pool_c<credit_c>(100, "credit");
 }
 
 
 network_mesh_c::~network_mesh_c()
 {
-  delete m_flit_pool;
-  delete m_credit_pool;
 }
 
 

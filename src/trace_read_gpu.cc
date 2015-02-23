@@ -819,7 +819,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, 
         sizeof(trace_info_gpu_s));
 
-    DEBUG("trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%lu\n",
+    DEBUG("trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n",
         core_id, sim_thread_id, trace_info.m_inst_addr, 
         static_cast<int>(trace_info.m_opcode), thread_trace_info->m_temp_inst_count);
 

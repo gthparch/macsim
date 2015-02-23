@@ -126,7 +126,22 @@ network_c* default_network(macsim_c* m_simBase)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
+network_c::network_c(macsim_c* simBase)
+{
+  m_simBase = simBase;
 
+  m_total_packet = 0;
+  m_num_router   = 0;
+
+  m_flit_pool   = new pool_c<flit_c>(100, "flit");
+  m_credit_pool = new pool_c<credit_c>(100, "credit");
+}
+
+network_c::~network_c()
+{
+  delete m_flit_pool;
+  delete m_credit_pool;
+}
 
 bool network_c::send(mem_req_s* req, int src_level, int src_id, int dst_level, int dst_id)
 {
