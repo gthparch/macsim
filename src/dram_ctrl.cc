@@ -230,7 +230,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
 
     int mcid_shift;
     int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
-    if (num_mc & (num_mc - 1) == 0) {
+    if ((num_mc & (num_mc - 1)) == 0) { // if num_mc is a power of 2
       mcid_shift = log2_int(num_mc);
       m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + mcid_shift;
     }
@@ -294,7 +294,7 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
   uint64_t rid;
 
   int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
-  if (num_mc & (num_mc - 1) == 0) {
+  if ((num_mc & (num_mc - 1)) == 0) { // if num_mc is a power of 2
     bid_xor = (addr >> m_bid_xor_shift) & m_bid_mask; 
     cid = addr & m_cid_mask; addr = addr >> m_bid_shift;
     bid = addr & m_bid_mask; addr = addr >> m_rid_shift;

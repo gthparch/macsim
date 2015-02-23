@@ -2486,14 +2486,14 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
 
-  if (m_num_l3 & (m_num_l3 - 1) == 0) {
+  if ((m_num_l3 & (m_num_l3 - 1)) == 0) { // if m_num_l3 is a power of 2
     req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   }
   else {
     req->m_cache_id[MEM_L3] = (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3;
   }
 
-  if (m_num_mc & (m_num_mc - 1) == 0) {
+  if ((m_num_mc & (m_num_mc - 1)) == 0) { // if m_num_l3 is a power of 2
     req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, m_dram_interleave_factor);
   }
   else {
