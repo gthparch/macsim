@@ -181,6 +181,9 @@ param<EI_ISSUE_WIDTH, ei_issue_width, int, KNOB_LARGE_WIDTH>
 param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH> 
 param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
 param<IS_FERMI, is_fermi, bool, 1> 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 0c95d2d2f2b93c529331eb741d8c4fdccdd30c27
