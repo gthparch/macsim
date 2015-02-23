@@ -161,7 +161,7 @@ void pref_stride_c::l2_miss_func(int tid, Addr lineAddr, Addr loadPC, uop_c *uop
 // train stride tables
 void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
 {
-  DEBUG_MEM("core_id:%d addr:%s trained\n", core_id, hexstr64s(lineAddr));
+  DEBUG_MEM("core_id:%d addr:0x%llx trained\n", core_id, lineAddr);
 
   int ii;
   int region_idx = -1;
@@ -344,8 +344,8 @@ void pref_stride_c::train(int tid, Addr lineAddr, Addr loadPC, bool l2_hit)
           if (!hwp_common->pref_addto_l2req_queue(pref_index, hwp_info->id))
             break; // q is full
           entry->pref_count++;
-          DEBUG_MEM("core_id:%d pref_addto_l2req_queue index:%s\n",
-              core_id, hexstr64s(pref_index));
+          DEBUG_MEM("core_id:%d pref_addto_l2req_queue index:0x%llx\n",
+              core_id, pref_index);
 
         }
         entry->pref_last_index = pref_index;

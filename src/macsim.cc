@@ -281,8 +281,8 @@ void macsim_c::init_output_streams()
 
     if (!g_mystderr) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-          unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,
+          m_core0_inst_count, m_simulation_cycle);
       fprintf(stderr, "%s '%s'\n", "mystderr", stderr_file.c_str());
       breakpoint(__FILE__, __LINE__);
       exit(15);
@@ -294,8 +294,8 @@ void macsim_c::init_output_streams()
 
     if (!g_mystdout) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-          unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,
+          m_core0_inst_count, m_simulation_cycle);
 
       fprintf(stderr, "%s '%s'\n", "mystdout", stdout_file.c_str()); 
       breakpoint(__FILE__, __LINE__);
@@ -308,8 +308,8 @@ void macsim_c::init_output_streams()
 
     if (!g_mystatus) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,
-          unsstr64(m_core0_inst_count), unsstr64(m_simulation_cycle));
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,
+          m_core0_inst_count, m_simulation_cycle);
       fprintf(stderr, "%s '%s'\n", "mystatus", status_file.c_str());
       breakpoint(__FILE__, __LINE__);
       exit(15);

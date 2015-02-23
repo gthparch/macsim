@@ -499,8 +499,7 @@ int dcu_c::access(uop_c* uop)
     uop->m_dcache_bank_id = bank;
     return 0;
   }
-  DEBUG("L%d[%d] uop_num:%lld addr:%llu port:%d acquired\n", m_level, m_id, uop->m_uop_num, \
-      line_addr, bank);
+  DEBUG("L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", m_level, m_id, uop->m_uop_num, line_addr, bank);
 
 
   // -------------------------------------
@@ -1232,9 +1231,8 @@ void dcu_c::process_fill_queue()
                 POWER_EVENT( POWER_L3CACHE_WB_BUF_W );
               }
 
-              DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:%s type:%s by req:%d\n", 
-                  m_level, m_id, wb->m_id, hexstr64s(victim_line_addr), \
-                  mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
+              DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:0x%llx type:%s by req:%d\n", 
+                  m_level, m_id, wb->m_id, victim_line_addr, mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
             }
           }
 
@@ -1510,9 +1508,8 @@ bool dcu_c::done(mem_req_s* req)
           if (!m_wb_queue->push(wb))
             ASSERT(0);
 
-          DEBUG("L%d[%d] (done) new_wb_req:%d addr:%s by req:%d type:%s\n", 
-              m_level, m_id, wb->m_id, hexstr64s(repl_line_addr), req->m_id, \
-              mem_req_c::mem_req_type_name[MRT_WB]);
+          DEBUG("L%d[%d] (done) new_wb_req:%d addr:0x%llx by req:%d type:%s\n", 
+              m_level, m_id, wb->m_id, repl_line_addr, req->m_id, mem_req_c::mem_req_type_name[MRT_WB]);
 
           if (m_level != MEM_L3) {
             POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
@@ -1876,7 +1873,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
   else if (matching_req) {
     STAT_EVENT(TOTAL_MEMORY_MERGE);
-    DEBUG("req:%d addr:%llx has matching entry req:%d addr:%llx type:%s\n", 
+    DEBUG("req:%d addr:0x%llx has matching entry req:%d addr:0x%llx type:%s\n", 
         new_req->m_id, new_req->m_addr, matching_req->m_id, matching_req->m_addr, \
         mem_req_c::mem_req_type_name[matching_req->m_type]); 
 

@@ -108,9 +108,8 @@ void smc_allocate_c::run_a_cycle(void)
 
     // fetch an uop from frontend queue
     uop_c *uop = (uop_c *) m_frontend_q->peek(0);
-    DEBUG("core_id:%d thread_id:%d inst_num:%s uop_num:%s is peeked\n", 
-        m_core_id, uop->m_thread_id, unsstr64(uop->m_inst_num),
-        unsstr64(uop->m_uop_num));
+    DEBUG("core_id:%d thread_id:%d inst_num:%llu uop_num:%llu is peeked\n", 
+        m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
     ASSERT(uop);
     
     // check resource requirement
@@ -211,10 +210,10 @@ void smc_allocate_c::run_a_cycle(void)
     // dequeue from frontend queue
     m_frontend_q->dequeue();
 
-    DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%s "
+    DEBUG("cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%llx "
           "gpu_alloc_q:%d mem_type:%d thread_id:%d uop is pushed.\n", 
           m_cur_core_cycle, m_core_id, uop->m_uop_num, uop->m_inst_num, 
-          hexstr64s(uop->m_vaddr), uop->m_allocq_num, uop->m_mem_type, uop->m_thread_id);
+          uop->m_vaddr, uop->m_allocq_num, uop->m_mem_type, uop->m_thread_id);
   }
 }
 

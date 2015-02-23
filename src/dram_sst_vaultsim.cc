@@ -155,8 +155,8 @@ void dram_sst_vaultsim_c::send(void)
     bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
 
     if (!insert_packet) {
-      DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
-          m_id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
+          m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
       break;
     }
 

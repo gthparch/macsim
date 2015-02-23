@@ -75,7 +75,7 @@ void breakpoint (const char file [], const int line)
   ;
 }
 
-
+/* 
 // return string from 64-bit unsigned (with leading zeros)
 const char *hexstr64 (uns64 value)
 {
@@ -130,7 +130,7 @@ const char *intstr64 (int64 value)
 
   return str_buffer[str_buffer_index++];
 }
-
+*/
 
 // get log value
 uns log2_int (uns n)

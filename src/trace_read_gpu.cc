@@ -594,11 +594,10 @@ inst_info_s* gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
       trace_uop[ii]->m_addr = pi->m_inst_addr;
 
-      DEBUG("pi->instruction_addr:0x%s trace_uop[%d]->addr:0x%s num_src_regs:%d "
+      DEBUG("pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx num_src_regs:%d "
           "num_read_regs:%d pi:num_dst_regs:%d uop:num_dst_regs:%d \n",
-          hexstr64s(pi->m_inst_addr), ii, hexstr64s(trace_uop[ii]->m_addr), 
-          trace_uop[ii]->m_num_src_regs, pi->m_num_read_regs, pi->m_num_dest_regs, 
-          trace_uop[ii]->m_num_dest_regs);
+          pi->m_inst_addr, ii, trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs, 
+          pi->m_num_read_regs, pi->m_num_dest_regs, trace_uop[ii]->m_num_dest_regs);
 
       // set source register
       for (jj = 0; jj < trace_uop[ii]->m_num_src_regs; ++jj) {
@@ -673,9 +672,8 @@ inst_info_s* gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
 
-      DEBUG("tuop: pc %s num_src_reg:%d num_dest_reg:%d \n",
-          hexstr64s(trace_uop[ii]->m_addr), trace_uop[ii]->m_num_src_regs, 
-          trace_uop[ii]->m_num_dest_regs);
+      DEBUG("tuop: pc 0x%llx num_src_reg:%d num_dest_reg:%d \n",
+          trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs, trace_uop[ii]->m_num_dest_regs);
       
       trace_uop[ii]->m_info = info;
 
@@ -821,8 +819,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, 
         sizeof(trace_info_gpu_s));
 
-    DEBUG("trace_read nm core_id:%d thread_id:%d pc:%s opcode:%d inst_count:%lu\n",
-        core_id, sim_thread_id, hexstr64s(trace_info.m_inst_addr), 
+    DEBUG("trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%lu\n",
+        core_id, sim_thread_id, trace_info.m_inst_addr, 
         static_cast<int>(trace_info.m_opcode), thread_trace_info->m_temp_inst_count);
 
     ///
@@ -835,7 +833,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     // read a new instruction, so update stats
     if (inst_read) { 
       ++core->m_inst_fetched[sim_thread_id];
-      DEBUG("core_id:%d thread_id:%d inst_num:%lu\n",
+      DEBUG("core_id:%d thread_id:%d inst_num:%llu\n",
           core_id, sim_thread_id, thread_trace_info->m_temp_inst_count + 1);
 
       if (core->m_inst_fetched[sim_thread_id] > core->m_max_inst_fetched) 
@@ -992,10 +990,10 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   // uop number is specific to the core
   uop->m_unique_num = core->inc_and_get_unique_uop_num();
 
-  DEBUG("uop_num:%lld num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d "
-      "pc:0x%s dir:%d \n",
+  DEBUG("uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d "
+      "pc:0x%llx dir:%d \n",
       uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests, 
-      thread_trace_info->m_num_sending_uop, hexstr64s(uop->m_pc), uop->m_dir);
+      thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
 
   // filling the src_info, dest_info
   if (uop->m_num_srcs < MAX_SRCS) {

@@ -124,8 +124,8 @@ int readonly_cache_c::load(uop_c *uop)
 
   // cache miss
   if (line_data == NULL) {
-    DEBUG_MEM("core_id:%d tid:%d addr:%s type:%d [readonly cache miss]\n",
-       uop->m_core_id, uop->m_thread_id, hexstr64s(line_addr), uop->m_mem_type); 
+    DEBUG_MEM("core_id:%d tid:%d addr:0x%llx type:%d [readonly cache miss]\n",
+       uop->m_core_id, uop->m_thread_id, line_addr, uop->m_mem_type); 
     Mem_Req_Type req_type = MRT_DFETCH;
 
     // generate a new request
@@ -143,8 +143,8 @@ int readonly_cache_c::load(uop_c *uop)
   }
   // cache hit
   else {
-    DEBUG_MEM("core_id:%d tid:%d addr:%s type:%d [readonly cache hit]\n",
-       uop->m_core_id, uop->m_thread_id, hexstr64s(line_addr), uop->m_mem_type); 
+    DEBUG_MEM("core_id:%d tid:%d addr:0x%llx type:%d [readonly cache hit]\n",
+       uop->m_core_id, uop->m_thread_id, line_addr, uop->m_mem_type); 
     return m_cache_cycles; 
   }
 }

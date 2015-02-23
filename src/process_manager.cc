@@ -362,7 +362,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
 
 
   // Setup file name of process trace
-  unsigned int dot_location = appl.find_last_of(".");
+  size_t dot_location = appl.find_last_of(".");
   if (dot_location == string::npos)
     ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", appl.c_str());
 
@@ -463,7 +463,7 @@ void process_manager_c::setup_process(process_s* process)
   // trace file name
   string trace_info_file_name = process->m_applications[process->m_current_vector_index++];
 
-  unsigned int dot_location = trace_info_file_name.find_last_of(".");
+  size_t dot_location = trace_info_file_name.find_last_of(".");
   if (dot_location == string::npos)
     ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", 
         trace_info_file_name.c_str());

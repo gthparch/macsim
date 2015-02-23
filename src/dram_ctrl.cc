@@ -310,9 +310,8 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
     rid = addr;
   }
 
-  ASSERTM(rid >= 0, "addr:%s cid:%lu bid:%lu rid:%lu type:%s\n",    \
-          hexstr64s(addr), cid, bid, rid,                        \
-          mem_req_c::mem_req_type_name[mem_req->m_type]);
+  ASSERTM(rid >= 0, "addr:0x%lld cid:%llu bid:%llu rid:%llu type:%s\n",    \
+          addr, cid, bid, rid, mem_req_c::mem_req_type_name[mem_req->m_type]);
   
   // Permutation-based Interleaving
   if (*KNOB(KNOB_DRAM_BANK_XOR_INDEX)) {
@@ -338,7 +337,7 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
   ++m_total_req;
   mem_req->m_state = MEM_DRAM_START;
 
-  DEBUG("MC[%d] new_req:%d bid:%lu rid:%lu cid:%lu\n", m_id, mem_req->m_id, bid, rid, cid);
+  DEBUG("MC[%d] new_req:%d bid:%llu rid:%llu cid:%llu\n", m_id, mem_req->m_id, bid, rid, cid);
 
   return true;
 }
@@ -499,8 +498,8 @@ void dram_ctrl_c::bank_schedule_complete(void)
           if ((*I)->m_addr == m_current_list[ii]->m_addr) {
             on_complete(*I);
             if ((*I)->m_req->m_type == MRT_WB) {
-              DEBUG("MC[%d] merged_req:%d addr:%s type:%s done\n", \
-                  m_id, (*I)->m_req->m_id, hexstr64s((*I)->m_req->m_addr), \
+              DEBUG("MC[%d] merged_req:%d addr:0x%llx type:%s done\n", \
+                  m_id, (*I)->m_req->m_id, (*I)->m_req->m_addr, \
                   mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
               MEMORY->free_req((*I)->m_req->m_core_id, (*I)->m_req);
             }
@@ -512,8 +511,8 @@ void dram_ctrl_c::bank_schedule_complete(void)
                 m_output_buffer->push_back((*I)->m_req);
               }
               (*I)->m_req->m_state = MEM_DRAM_DONE;
-              DEBUG("MC[%d] merged_req:%d addr:%s typs:%s done\n", \
-                  m_id, (*I)->m_req->m_id, hexstr64s((*I)->m_req->m_addr), \
+              DEBUG("MC[%d] merged_req:%d addr:0x%llx typs:%s done\n", \
+                  m_id, (*I)->m_req->m_id, (*I)->m_req->m_addr, \
                   mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
             }
             temp_list.push_back((*I));
@@ -539,9 +538,9 @@ void dram_ctrl_c::bank_schedule_complete(void)
       on_complete(m_current_list[ii]);
       // wb request will be retired immediately
       if (m_current_list[ii]->m_req->m_type == MRT_WB) {
-        DEBUG("MC[%d] req:%d addr:%s type:%s done\n", 
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s done\n", 
             m_id, m_current_list[ii]->m_req->m_id, \
-            hexstr64s(m_current_list[ii]->m_req->m_addr), \
+            m_current_list[ii]->m_req->m_addr, \
             mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type]);
         MEMORY->free_req(m_current_list[ii]->m_req->m_core_id, 
             m_current_list[ii]->m_req);
@@ -555,9 +554,9 @@ void dram_ctrl_c::bank_schedule_complete(void)
           m_output_buffer->push_back(m_current_list[ii]->m_req);
         }
         m_current_list[ii]->m_req->m_state = MEM_DRAM_DONE;
-        DEBUG("MC[%d] req:%d addr:%s type:%s bank:%d done\n", 
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s bank:%d done\n", 
             m_id, m_current_list[ii]->m_req->m_id, \
-            hexstr64s(m_current_list[ii]->m_req->m_addr), \
+            m_current_list[ii]->m_req->m_addr, \
             mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type], ii);
       }
 
@@ -626,8 +625,8 @@ void dram_ctrl_c::send(void)
       bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
 
       if (!insert_packet) {
-        DEBUG("MC[%d] req:%d addr:%s type:%s noc busy\n", 
-            m_id, req->m_id, hexstr64s(req->m_addr), mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
+            m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
         break;
       }
 

@@ -52,8 +52,8 @@ POSSIBILITY OF SUCH DAMAGE.
 // cout statement + file and line information
 #ifndef NO_REPORT
 #define report(x) cout << __FILE__ << ":" << __LINE__ \
-  << ": (I=" << unsstr64(m_simBase->m_core0_inst_count) \
-  << "  C="  << unsstr64(m_simBase->m_simulation_cycle) << "):  " << x << "\n";
+  << ": (I=" << m_simBase->m_core0_inst_count \
+  << "  C="  << m_simBase->m_simulation_cycle << "):  " << x << "\n";
 #else
 #define report(x) {}
 #endif
@@ -62,9 +62,9 @@ POSSIBILITY OF SUCH DAMAGE.
 // printf statement + file and line information
 #define REPORT(args...)                                     \
   do {                                                                  \
-    fprintf(m_simBase->g_mystdout, "%s:%u: (I=%s  C=%s):  ", __FILE__, __LINE__, \
-        unsstr64(m_simBase->m_core0_inst_count), \
-        unsstr64(m_simBase->m_simulation_cycle)); \
+    fprintf(m_simBase->g_mystdout, "%s:%u: (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+        m_simBase->m_core0_inst_count, \
+        m_simBase->m_simulation_cycle); \
     fprintf(GLOBAL_DEBUG_STREAM, ## args);                            \
     fflush(GLOBAL_DEBUG_STREAM);                                      \
   } while (0)
@@ -101,9 +101,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define _DEBUG(debug_flag, args...)                                     \
   do {                                                                  \
     if (debug_flag && DEBUG_RANGE_COND) {                               \
-      fprintf(GLOBAL_DEBUG_STREAM, "%s:%u: " # debug_flag " (I=%s  C=%s):  ", \
-          __FILE__, __LINE__, unsstr64(m_simBase->m_core0_inst_count), \
-          unsstr64(m_simBase->m_simulation_cycle)); \
+      fprintf(GLOBAL_DEBUG_STREAM, "%s:%u: " # debug_flag " (I=%llu  C=%llu):  ", \
+          __FILE__, __LINE__, m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle); \
       fprintf(GLOBAL_DEBUG_STREAM, ## args);                            \
       fflush(GLOBAL_DEBUG_STREAM);                                      \
     }                                                                   \

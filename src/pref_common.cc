@@ -344,8 +344,8 @@ void hwp_common_c::pref_l2_miss(int tid, Addr line_addr, uop_c* uop)
   m_curr_l2_misses++;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON)
-    fprintf(PREF_TRACE_OUT, "%s \t %s \t %s \t %s\n", 
-        hexstr64s(m_simBase->m_simulation_cycle), hexstr64s(load_PC), hexstr64s(line_addr), "UL1_MISS");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x%llx \t 0x%llx \t %s\n", 
+        m_simBase->m_simulation_cycle, load_PC, line_addr, "UL1_MISS");
 
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON)
     pref_update_regioninfo(line_addr, false, true, false, 0, 0);
@@ -387,8 +387,8 @@ void hwp_common_c::pref_l2_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop
     return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON) 
-    fprintf(PREF_TRACE_OUT, "%s \t %s \t %s \t %s\n", 
-        hexstr64s(m_simBase->m_simulation_cycle), hexstr64s(0), hexstr64s(line_addr), "UL1_HIT");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n", 
+        m_simBase->m_simulation_cycle, line_addr, "UL1_HIT");
 
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) 
     pref_update_regioninfo(line_addr, true, false, false, 0, 0);
@@ -441,8 +441,8 @@ void hwp_common_c::pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 
     return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON) 
-    fprintf(PREF_TRACE_OUT, "%s \t %s \t %s \t %s\n", 
-        hexstr64s(m_simBase->m_simulation_cycle), hexstr64s(0), hexstr64s(line_addr), "UL1_PREFHIT");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0xllx \t %s\n", 
+        m_simBase->m_simulation_cycle, line_addr, "UL1_PREFHIT");
 
   if (!*m_simBase->m_knobs->KNOB_PREF_USEREGION_TOCALC_ACC) {
     m_overall_l2useful++;
@@ -840,9 +840,9 @@ void hwp_common_c::pref_update_queues(void)
         }
 
         if (result) {
-          DEBUG_MEM("core_id:%d thread_id:%d addr:%s type:%s [prefetch generated]\n",
+          DEBUG_MEM("core_id:%d thread_id:%d addr:0x%llx type:%s [prefetch generated]\n",
              pref_core_id, m_l2req_queue[q_index].thread_id, \
-             hexstr64s(m_l2req_queue[q_index].line_addr), mem_req_c::mem_req_type_name[MRT_DPRF]);
+             m_l2req_queue[q_index].line_addr, mem_req_c::mem_req_type_name[MRT_DPRF]);
 
           DEBUG("Sent req %llx to l2 Qpos:%d\n", 
               m_l2req_queue[q_index].line_index, m_l2req_queue_send_pos);

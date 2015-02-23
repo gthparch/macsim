@@ -147,10 +147,10 @@ bool schedule_c::check_srcs(int entry)
     }
 
     DEBUG("core_cycle_m_count:%lld m_core_id:%d thread_id:%d uop_num:%lld "
-          "src_uop_num:%lld src_uop->uop_num:%lld src_uop->done_cycle:%lld "
-          "src_uop->uop_num:%s  src_uop_num:%s \n", m_cur_core_cycle,
+          "src_uop_num:%llu src_uop->uop_num:%llu src_uop->done_cycle:%lld "
+          "src_uop->uop_num:%llu  src_uop_num:%llu \n", m_cur_core_cycle,
           m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, src_uop_num, src_uop->m_uop_num, 
-          src_uop->m_done_cycle, unsstr64(src_uop->m_uop_num), unsstr64(src_uop_num));
+          src_uop->m_done_cycle, src_uop->m_uop_num, src_uop_num);
 
 
     // Check if the source uop is ready
@@ -188,10 +188,10 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   *sched_fail_reason = SCHED_SUCCESS;
 
 
-  DEBUG("cycle_m_count:%llu m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld uop.va:%s "
+  DEBUG("cycle_m_count:%llu m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop.va:0x%llx "
       "allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
       m_cur_core_cycle, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num,
-      cur_uop->m_inst_num, hexstr64s(cur_uop->m_vaddr), cur_uop->m_allocq_num,
+      cur_uop->m_inst_num, cur_uop->m_vaddr, cur_uop->m_allocq_num,
       cur_uop->m_mem_type, (cur_uop->m_last_dep_exec? *(cur_uop->m_last_dep_exec) : 0),
       cur_uop->m_done_cycle);
 
@@ -324,10 +324,10 @@ void schedule_c::advance(int q_index)
         break;
     }
 
-    DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%lld "
-        "inst_num:%lld uop.va:%s allocq:%d mem_type:%d \n", m_cur_core_cycle,
+    DEBUG("cycle_m_count:%lld entry:%d m_core_id:%d thread_id:%d uop_num:%llu "
+        "inst_num:%llu uop.va:0x%llx allocq:%d mem_type:%d \n", m_cur_core_cycle,
         entry, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, 
-        hexstr64s(cur_uop->m_vaddr), cur_uop->m_allocq_num, cur_uop->m_mem_type);
+        cur_uop->m_vaddr, cur_uop->m_allocq_num, cur_uop->m_mem_type);
 
     // Take out the corresponding entries queue type 
     // and check if the sched queue of the corresponding type has space. 

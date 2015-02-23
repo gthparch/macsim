@@ -88,10 +88,10 @@ POSSIBILITY OF SUCH DAMAGE.
 // function declarations in utils.h. Please refer to utils.cc for the description
 int get_next_set_bit64(uns64 val, uns pos);
 int get_num_set_bits64(uns64 val);
-const char *hexstr64(uns64 );
-const char *hexstr64s(uns64 );
-const char *unsstr64(uns64 );
-const char *intstr64(int64 );
+//const char *hexstr64(uns64 );
+//const char *hexstr64s(uns64 );
+//const char *unsstr64(uns64 );
+//const char *intstr64(int64 );
 void  breakpoint(const char [], const int);
 // get log value
 uns log2_int (uns n);

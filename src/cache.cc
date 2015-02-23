@@ -402,10 +402,10 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
     *updated_line = 0;
   }
   
-  DEBUG("Replacing (set %u, tag 0x%s, base 0x%s, up:0x%s) in cache '%s' "
-        "core_id:%d with base 0x%s\n",
-        set, hexstr64s(ins_line->m_tag), hexstr64s(ins_line->m_base), 
-        hexstr64s(*updated_line), m_name.c_str(), m_core_id, hexstr64s(*line_addr));
+  DEBUG("Replacing (set %u, tag 0x%llx, base 0x%llx, up:0x%lld) in cache '%s' "
+        "core_id:%d with base 0x%llx\n",
+        set, ins_line->m_tag, ins_line->m_base, 
+        (uint64_t)(*updated_line), m_name.c_str(), m_core_id, (uint64_t)(*line_addr));
   
   // Initialize the other fileds of the cache line
   initialize_cache_line(ins_line, tag, addr, appl_id, gpuline, set, skip);

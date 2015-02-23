@@ -74,8 +74,8 @@ POSSIBILITY OF SUCH DAMAGE.
     if (ENABLE_ASSERTIONS && !(cond)) {								\
       fflush(m_simBase->g_mystdout);									\
       fprintf(m_simBase->g_mystderr, "\n");								\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, "%s\n", #cond);							\
       breakpoint(__FILE__, __LINE__);								\
       WRITE_STATUS("ASSERT");									\
@@ -94,11 +94,11 @@ POSSIBILITY OF SUCH DAMAGE.
     if (ENABLE_ASSERTIONS && !(cond)) {								\
       fflush(m_simBase->g_mystdout);									\
       fprintf(m_simBase->g_mystderr, "\n");								\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, "%s\n", #cond);							\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, ## args);								\
       breakpoint(__FILE__, __LINE__);								\
       WRITE_STATUS("ASSERT");									\
@@ -119,8 +119,8 @@ POSSIBILITY OF SUCH DAMAGE.
     if (!(cond)) {										\
       fflush(m_simBase->g_mystdout);									\
       fprintf(m_simBase->g_mystderr, "\n");								\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, "%s\n", #cond);							\
       breakpoint(__FILE__, __LINE__);								\
       WRITE_STATUS("ASSERT");									\
@@ -137,11 +137,11 @@ POSSIBILITY OF SUCH DAMAGE.
     if (!(cond)) {										\
       fflush(m_simBase->g_mystdout);									\
       fprintf(m_simBase->g_mystderr, "\n");								\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, "%s\n", #cond);							\
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%s  C=%s):  ", __FILE__, __LINE__,	\
-          intstr64(m_simBase->m_core0_inst_count), intstr64(m_simBase->m_simulation_cycle));		\
+      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__,	\
+          m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);		\
       fprintf(m_simBase->g_mystderr, ## args);								\
       breakpoint(__FILE__, __LINE__);								\
       WRITE_STATUS("ASSERT");									\
