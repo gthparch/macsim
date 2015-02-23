@@ -119,6 +119,6 @@ void bp_targ_c::update (uop_c *uop)
   DEBUG("Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
       "btb_line:0x%llx set:%d tag:0x%llx insert_btb:%d\n",
       uop->m_pc, uop->m_target_addr, uop->m_uop_num,
-      m_core_id, uop->m_thread_id, uop->m_cf_type, (btb_line) ? (uint64_t)(*btb_line) : -1, 
+      m_core_id, uop->m_thread_id, uop->m_cf_type, (btb_line) ? (Addr)(*btb_line) : -1, 
       set, tag, insert_btb);
 }

@@ -550,7 +550,7 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
       DEBUG("pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx num_src_regs:%d "
           "num_read_regs:%d pi:num_dst_regs:%d uop:num_dst_regs:%d \n",
-          pi->m_instruction_addr, ii, trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs, 
+          (Addr)(pi->m_instruction_addr), ii, trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs, 
           pi->m_num_read_regs, pi->m_num_dest_regs, trace_uop[ii]->m_num_dest_regs);
 
       // set source register
@@ -861,8 +861,8 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         sizeof(trace_info_cpu_s));
 
     DEBUG("trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n",
-        core_id, sim_thread_id, trace_info.m_instruction_addr, 
-        static_cast<int>(trace_info.m_opcode), thread_trace_info->m_temp_inst_count);
+        core_id, sim_thread_id, (Addr)(trace_info.m_instruction_addr), 
+        static_cast<int>(trace_info.m_opcode), (Counter)(thread_trace_info->m_temp_inst_count));
 
 
     ///
@@ -876,7 +876,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     if (inst_read) { 
       ++core->m_inst_fetched[sim_thread_id];
       DEBUG("core_id:%d thread_id:%d inst_num:%llu\n",
-          core_id, sim_thread_id, thread_trace_info->m_temp_inst_count + 1);
+          core_id, sim_thread_id, (Counter)(thread_trace_info->m_temp_inst_count + 1));
 
       if (core->m_inst_fetched[sim_thread_id] > core->m_max_inst_fetched) 
         core->m_max_inst_fetched = core->m_inst_fetched[sim_thread_id];

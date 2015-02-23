@@ -288,10 +288,10 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
 {
   // address parsing
   Addr addr = mem_req->m_addr;
-  uint64_t bid_xor;
-  uint64_t cid;
-  uint64_t bid;
-  uint64_t rid;
+  Addr bid_xor;
+  Addr cid;
+  Addr bid;
+  Addr rid;
 
   int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
   if ((num_mc & (num_mc - 1)) == 0) { // if num_mc is a power of 2
@@ -310,7 +310,7 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req)
     rid = addr;
   }
 
-  ASSERTM(rid >= 0, "addr:0x%lld cid:%llu bid:%llu rid:%llu type:%s\n",    \
+  ASSERTM(rid >= 0, "addr:0x%llx cid:%llu bid:%llu rid:%llu type:%s\n",    \
           addr, cid, bid, rid, mem_req_c::mem_req_type_name[mem_req->m_type]);
   
   // Permutation-based Interleaving
