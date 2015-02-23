@@ -319,10 +319,7 @@ bool queue_c::full()
   return false;
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 0c95d2d2f2b93c529331eb741d8c4fdccdd30c27
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -340,10 +337,7 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   m_fill_queue = new queue_c(simBase, 1024);
   m_out_queue = new queue_c(simBase, 2048);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 0c95d2d2f2b93c529331eb741d8c4fdccdd30c27
   m_id     = id;
   m_noc_id = noc_id;
   m_type   = type;
@@ -1611,10 +1605,7 @@ bool dcu_c::write_done(mem_req_s* req)
 
 int memory_c::m_unique_id = 0;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 0c95d2d2f2b93c529331eb741d8c4fdccdd30c27
 // =======================================
 // memory_c constructor
 // =======================================
