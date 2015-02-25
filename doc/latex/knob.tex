@@ -1,21 +1,23 @@
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Configuring \SIM}
 \label{sec:knob}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 To control simulation and architectural parameters, knob variables defined 
-in \textit{trunk/def/*.param.def} files are used. The build process automatically 
+in \textit{def/*.param.def} files are used. The build process automatically 
 converts the knob definitions in these files into c++ source that gets included in 
 the compilation of the \SIM binary. Using different parameter values for the knob 
 variables \SIM can be configured to simulate different CPU, GPU and even 
 heterogeneous architectures. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Adding a new knob}
 \label{sec:knob1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A new knob variable can be defined by adding a line in the following format in 
-one of the\textit{param.def} files:
+one of the \textit{param.def} files:
 
 \begin{Verbatim}
 param<{name used in MacSim}, {name used in the command line or params file}, {knob type}, {default value}>
@@ -29,9 +31,10 @@ param<L2_ASSOC, l2_assoc, int, 8>
 \end{Verbatim}
 
 
-\ignore{ However, one restriction is this new variable must be defined in
-\textit{trunk/def} directory and the file name should be \textit{*.param.def}
-to parse variables correctly.  }
+\ignore
+		{ However, one restriction is this new variable must be defined in
+		\textit{trunk/def} directory and the file name should be \textit{*.param.def}
+		to parse variables correctly.  }
 
 Knobs can be pretty much of any type, to support knobs of type other than the
 basic data types users may have to add code to \textit{src/knob.h}. Knobs of
@@ -39,24 +42,26 @@ type string are already supported, this is helpful for specifying policies and
 configurations such as branch predictor type, instruction scheduler type, dram
 scheduling policy and so on as strings instead of integers.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Accessing the value of a knob in \SIM}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In the \SIM code, a knob variable is accessed by prefixing its name (in
 uppercase) with \textit{KNOB\_}.  For example, L2\_ASSOC defined in the example
 in Section~\ref{sec:knob1} can be accessed in \SIM using the name
 KNOB\_L2\_ASSOC.  To access the value of a knob either the \textit{getValue()}
 function or the name of the knob (works because of operator overloading) can be
-used.
+used. (e.g. \textit{*KNOB(KNOB\_L2\_ASSOC)})
 
-\ignore { \subsection{Adding a New String Type Knob} Several knobs especially
-setting policies use {\texttt string} type.  Examples are branch predictor,
-instruction scheduler, dram scheduler, and llc setting. Please see {\texttt
-factory\_class.cc/h} and {\texttt bp.cc}.  }
+\ignore
+		{ \subsection{Adding a New String Type Knob} Several knobs especially
+		setting policies use {\texttt string} type.  Examples are branch predictor,
+		instruction scheduler, dram scheduler, and llc setting. Please see {\texttt
+		factory\_class.cc/h} and {\texttt bp.cc}.  }
 
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Assigning values to knobs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 When defining a knob in one of the \textit{*.param.def} files, a default value
 for the knob has to be specified. If a user does not set the value of a knob
@@ -64,31 +69,28 @@ for a simulation, then the knob assumes its default value. If a user wishes to
 change the value of a knob for a simulation, there are two ways in which the
 user can accomplish this:
 
-
-\ignore { \section{How to apply different value to a knob variables} There are
-two ways of modifying the default value of a knob variable.  }
+\ignore 
+		{ \section{How to apply different value to a knob variables} There are
+		two ways of modifying the default value of a knob variable.  }
 
 \begin{enumerate}
-
-  \item edit params.in - this file is read by the \SIM binary on startup for
-  parameter values.  Sample parameter files with parameter values for different
-  configurations can be found in \textit{trunk/params} directory. Each line in
+\item edit params.in - this file is read by the \SIM binary on startup for
+parameter values.  Sample parameter files with parameter values for different
+configurations can be found in \textit{params/} directory. Each line in
 a parameter file consists of a knob name (in lowercase) followed by the
-parameter value. For example,
-
+parameter value. For example:
 \begin{Verbatim}
 l1_assoc 8
 l2_assoc 16
 \end{Verbatim}
 
 
-  \item specify parameter values from the command line - an user can specify
-  knobs and their values from the command line as shown below.
+\item specify parameter values from the command line - an user can specify
+knobs and their values from the command line as shown below.
 
 \begin{Verbatim}
 ./macsim --l1_assoc=8 --l2_assoc=16
 \end{Verbatim}
-
 \end{enumerate}
 
 For a knob with values specified in the params.in file as well as the command
@@ -103,7 +105,7 @@ specified in the params.in file.
 
 This section shows how different kinds of simulations and simulation
 configurations can be achieved using knobs and parameter values. \SIM can model up
-to three types of cores : SMALL, MEDIUM and LARGE, in a simulation. Equivalent
+to three types of cores, SMALL, MEDIUM and LARGE, in a simulation. Equivalent
 knobs are provided for each core type for configuration purposes. Knobs for
 medium and large cores use \Verb+medium+ and \Verb+large+ in their names, while
 knobs for small cores do not use any such identifiers in their names. For
@@ -118,27 +120,26 @@ rob\_large\_size.
 
 For multiple-application simulations, sometimes, early-terminating applications
 have to be re-executed to model resource contention (cache, on-chip
-    interconnection, and memory controller) until all applications finish. This
+interconnection, and memory controller) until all applications finish. This
 is a common methodology adopted in evaluating multi-program workloads and is
 supported by \SIM also. To enable this feature, the repeate\_trace knob must be
 turned on i.e. set repeat\_trace to 1. This can be done either via params.in
 file or from the command line. 
 
 \ignore
-{
+		{
+		\begin{itemize}
+		  \item Specify the configuration in the command line by
+		  \begin{Verbatim}
+		  ./macsim --repeat_trace=1
+		  \end{Verbatim}
 
-\begin{itemize}
-  \item Specify the configuration in the command line by
-  \begin{Verbatim}
-  ./macsim --repeat_trace=1
-  \end{Verbatim}
-
-  \item Or you can write this in \textit{params.in} file
-  \begin{Verbatim}
-  repeat_trace 1
-  \end{Verbatim}
-\end{itemize}
-}
+		  \item Or you can write this in \textit{params.in} file
+		  \begin{Verbatim}
+		  repeat_trace 1
+		  \end{Verbatim}
+		\end{itemize}
+		}
 
 
 
@@ -151,11 +152,11 @@ file or from the command line.
 \subsubsection{One \cpu Core}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Usually, cores of type large are configured as x86 cores, however, this is not
+Usually, cores of type large are configured as \cpu cores, however, this is not
 mandatory. 
 
 \begin{Verbatim}
-// macsim-top/trunk/params/params_x86
+// params/params_x86
 num_sim_cores 1
 num_sim_small_cores 0
 num_sim_medium_cores 0
@@ -189,12 +190,10 @@ repeat_trace 1
 \SIM also supports the simultaneous multi-threading (SMT) features.
 These parameters are used for the SMT configurations:
 
-\Verb+ max_threads_per_core+, \Verb+max_threads_per_medium_core+, and
+\Verb+ max_threads_per_core+, \Verb+max_threads_per_medium_core+, and 
 \Verb+max_thread_per_large_core+. 
 
-\noindent
-For example,
-
+\noindent For example:
 \begin{Verbatim}
 // 1-core 2-way SMT configuration
 num_sim_cores 1
@@ -214,21 +213,19 @@ repeat_trace 1
 
 By default these parameter values are applied to large cores. 
 
-\begin{Verbatim}
-large_width   2 // pipeline width (the entire pipelines use the same width) 
-large_core_fetch_latency 5 // front-end depth 
-large_core_alloc_latency 5 // decode/allocation depth  
-bp_dir_mech   gshare // this is common to all core types
-bp_hist_length 14 // branch history length 
-isched_large_rate 4  // # of integer instructions that can be executed per cycle 
-msched_large_rate 2  // # of memory instructions that can be executed per cycle 
-fsched_large_rate 2  // # of FP instructions that can be executed per cycle 
-large_core_schedule  io // use in order instruction scheduling, set to "ooo" for out of order scheduling 
-rob_large_size    96  // ROB size
-fetch_policy rr // SMT(MT) thread fetch policy  by default: round-robin, common to all core types 
-\end{Verbatim}
-
-
+\begin{tabular}{l l}
+ \Verb+large_width 2+ & \Verb+// pipeline width (the entire pipelines use the same width)+ \\
+ \Verb+large_core_fetch_latency 5+ & \Verb+// front-end depth+ \\
+ \Verb+large_core_alloc_latency 5+ & \Verb+// decode/allocation depth+ \\
+ \Verb+bp_dir_mech gshare+ & \Verb+// this is common to all core types+ \\
+ \Verb+bp_hist_length 14+ & \Verb+// branch history length+ \\
+ \Verb+isched_large_rate 4 + & \Verb+// # of integer instructions that can be executed per cycle+ \\
+ \Verb+msched_large_rate 2+ & \Verb+// # of memory instructions that can be executed per cycle + \\
+ \Verb+fsched_large_rate 2 + & \Verb+// # of FP instructions that can be executed per cycle+ \\
+ \Verb+large_core_schedule  io + & \Verb+// in order instruction scheduling, set to "ooo" for out of order scheduling + \\
+ \Verb+rob_large_size 96+ & \Verb+// ROB size+ \\
+ \Verb+fetch_policy rr+ & \Verb+// SMT(MT) thread fetch policy  by default: round-robin, common to all core types+
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\gpu Simulations}
@@ -238,75 +235,78 @@ Usually cores of type small are configured as \gpu cores. Several pre-defined
 parameter files for simulating NVIDIA architectures are provided, below is the
 list of GPU parameter files provided with \SIM.
 
-\begin{Verbatim}
-params_8800gt // NVIDIA GeForce 8800GT (G80 architecture)
-params_gtx280 // NVIDIA GeForce GTX280 (GT200 architecture)
-params_gtx465, params_gtx480 // NVIDIA GeForece GTX465, GTX480 (Fermi architecture)
-\end{Verbatim}
+\begin{center}
+ \begin{tabular}{| l | l |}
+  \hline
+  File Name & Description \\ \hline \hline
+  params\_8800gt &  NVIDIA GeForce 8800GT (G80 architecture) \\
+  params\_gtx280 &  NVIDIA GeForce GTX280 (GT200 architecture) \\
+  params\_gtx465, params\_gtx480 & NVIDIA GeForece GTX465, GTX480 (Fermi architecture) \\
+  \hline
+ \end{tabular}
+\end{center}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\gpu with One Application}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{Verbatim}
-// 12-SM simulations
-num_sim_cores 12
-num_sim_small_cores 12
-core_type ptx
-max_threads_per_core 80 // set the max number of warps per SM
-\end{Verbatim}
-
+\noindent Below is some sample configurations:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\gpu with Multiple Applications}
+\subsubsection*{\gpu with One Application}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{Verbatim}
-// 12-SM simulations, 6 SMs for each application
-num_sim_cores 12
-num_sim_small_cores 12
-core_type ptx
-max_threads_per_core 80 // set the max number of warps 
-max_num_core_per_appl 6 // 6 SMs for each application
-repeat_trace 1 // for multi-program workload simulation
-\end{Verbatim}
-
+\begin{tabular}{l l}
+ \Verb+// 12-SM simulations+ & \Verb++ \\
+ \Verb+num_sim_small_cores 12+ & \Verb++ \\
+ \Verb+core_type ptx+ & \Verb++ \\
+ \Verb+max_threads_per_core 80+ & \Verb+// set the max number of warps per SM+
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Setting GPU Core Parameters}
+\subsubsection*{\gpu with Multiple Applications}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{Verbatim}
-schedule_ratio 4 \\ schedule instructions every 4th cycle
-fetch_ratio  4 \\ fetch new instructions every 4th cycle
-gpu_sched   1 \\ use GPU scheduler for GPU cores \todo{this knob should be removed!, it is unnecessary now}
-const_cache_size  1024 \\ 1024B constant cache
-texture_cache_size 1024  \\ 1024B texture cache (currently, each core has a private texture cache)
-shared_mem_size 4096  \\ 4096B shared memory size 
-ptx_exec_ratio  4 \\ factor by which latency values defined in uoplatency_ptx.def must be multiplied for actual PTX instruction latency
-num_warp_scheduler \\ the number of warps to schedule whenever instruction scheduler is run
-\end{Verbatim}
-
-
+\begin{tabular}{l l}
+ \Verb+// 12-SM simulations, 6 SMs for each application+ & \Verb++ \\
+ \Verb+num_sim_cores 12+ & \Verb++ \\
+ \Verb+num_sim_small_cores 12+ & \Verb++ \\
+ \Verb+core_type ptx+ & \Verb++ \\
+ \Verb+max_threads_per_core 80+ & \Verb+// set the max number of warps + \\
+ \Verb+max_num_core_per_appl 6+ & \Verb+// 6 SMs for each application+ \\
+ \Verb+repeat_trace 1+ & \Verb+// for multi-program workload simulation+
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Number of Thread Blocks Per Core}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The Maximum number of thread blocks per core for a kernel is determined by
-several factors: 1) the number of threads in each thread block, 2) the number
-of registers used by each thread, 3) the amount of shared memory required, and
-4) the GPU architecture (the CUDA compute version). The PTX trace generator
-calculates the maximum thread blocks per core based on the values provided by
-Ocelot for these variables (note that the CUDA compute version is set by the
-    user while generating traces) includes it the trace output.  The
+several factors: 
+\begin{enumerate}
+ \item number of threads in each thread block
+ \item number of registers used by each thread
+ \item amount of shared memory required
+ \item GPU architecture (the CUDA compute version)\footnote{note that the CUDA 
+ compute version is set by the user while generating traces}.
+\end{enumerate}
+\noindent The PTX trace generator calculates the maximum thread blocks per core based on the 
+values provided by Ocelot for these variables includes it the trace output. The
 calculation is similar to what is done by the CUDA occupancy calculator. Users
 can override this value for all GPU applications by setting the
 \Verb+max_block_per_core_super+ knob.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\gpu Core Parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+\begin{tabular}{l l}
+ \Verb+schedule_ratio 4+ & \Verb+\\ schedule instructions on every 4 cycle+ \\
+ \Verb+fetch_ratio  4+ & \Verb+\\ fetch new instructions on every 4 cycle+ \\
+ \Verb+gpu_sched 1+ & \Verb+\\ use GPU scheduler for GPU cores+ \\ %\todo{this knob should be removed!, it is unnecessary now}
+ \Verb+const_cache_size  1024+ & \Verb+\\ 1024B constant cache+ \\
+ \Verb+texture_cache_size 1024+ & \Verb+\\ 1024B texture cache (currently, each core has a private texture cache)+ \\
+ \Verb+shared_mem_size 4096+ & \Verb+\\ 4096B shared memory size + \\
+ \Verb+ptx_exec_ratio  4+ & \Verb+\\ factor by which latency values defined in uoplatency_ptx.def+ \\
+ \Verb++			     & \Verb+\\ must be multiplied for actual PTX instruction latency+ \\
+ \Verb+num_warp_scheduler 2+ & \Verb+\\ the number of warps to schedule whenever instruction scheduler is run+
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Heterogeneous Architecture Simulations}
@@ -314,20 +314,24 @@ can override this value for all GPU applications by setting the
 
 For CPU-GPU heterogeneous simulations, an architecture similar to Intel's Sandy
 Bridge~\cite{sandybridge} is modeled. However, the \gpu cores in this model are
-similar to NVIDIA's Fermi~\cite{fermi}. A parameter file for a heterogeneous
-configuration is also provided.
+similar to NVIDIA's Fermi~\cite{fermi} architecture. Two sample parameter files 
+for a heterogeneous configuration is also provided.
 
-\begin{Verbatim}
-params_hetero_1_6 // 1-CPU, 6-GPU cores
-params_hetero_4c_4g // 4-CPU, 4-GPU cores
-\end{Verbatim}
+\begin{center}
+ \begin{tabular}{| l | l |}
+  \hline
+  File Name & Description \\ \hline \hline
+  params\_hetero\_1\_6 &  1-CPU, 6-GPU cores \\
+  params\_hetero\_4c\_4g &  4-CPU, 4-GPU cores \\
+  \hline
+ \end{tabular}
+\end{center}
 
+\noindent Following example shows a simple heterogeneous configuration.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{One CPU application + One GPU application}
+\subsubsection*{One CPU application + One GPU application}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Following example shows a simple heterogeneous configuration.
 
 \begin{Verbatim}
 num_sim_cores 2
@@ -347,7 +351,7 @@ correctly, users still have to setup each core types individually. Please refer
 to sample files for other parameter values.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Multiple CPU applications + Multiple GPU applications}
+\subsubsection*{Multiple CPU applications + Multiple GPU applications}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{Verbatim}
@@ -371,43 +375,36 @@ repeat_trace 1
 
 The cache can be configured using the following knobs:
 
-\begin{Verbatim}
-l{1,2}_{small, medium, large}_num_set // number of sets
-l{1,2}_{small, medium, large}_assoc // associativity
-l{1,2}_{small, medium, large}_line_size // cache line size
-l{1,2}_{small, medium, large}_num_bank // number of banks  
-l{1,2}_{small, medium, large}_latency // cache latency
-l{1,2}_{small, medium, large}_bypass // cache bypass (if set, always miss)
-num_l3 // number of l3 cache tiles
-l3_num_Set // number of l3 cache sets
-l3_assoc // l3 associativity
-l3_line_size // l3 line size
-l3_num_bank // l3 number of banks
-l3_latency // l3 latency
-l{1,2,3}_{read,write}_port // the number of read / write port
-icache_num_set  8 // 4KB I-cache 
-icache_assoc   8 // I cache set associativity 
-\end{Verbatim}
+\begin{tabular}{l l}
+ \\
+ \Verb+l{1,2}_{small, medium, large}_num_set+ & \Verb+// number of sets+ \\
+ \Verb+l{1,2}_{small, medium, large}_assoc+ & \Verb+// associativity+ \\
+ \Verb+l{1,2}_{small, medium, large}_line_size+ & \Verb+// cache line size+ \\
+ \Verb+l{1,2}_{small, medium, large}_num_bank+ & \Verb+// number of banks+ \\
+ \Verb+l{1,2}_{small, medium, large}_latency + & \Verb+// cache latency+ \\
+ \Verb+l{1,2}_{small, medium, large}_bypass + & \Verb+// cache bypass (if set, always miss)+ \\
+ \Verb+num_l3 + & \Verb+// number of l3 cache tiles+ \\
+ \Verb+l3_num_Set + & \Verb+// number of l3 cache sets+ \\
+ \Verb+l3_assoc + & \Verb+// l3 associativity+ \\
+ \Verb+l3_line_size+ & \Verb+// l3 line size+ \\
+ \Verb+l3_num_bank+ & \Verb+// l3 number of banks+ \\
+ \Verb+l3_latency + & \Verb+// l3 latency+ \\
+ \Verb+l{1,2,3}_{read,write}_port + & \Verb+// the number of read / write port+ \\
+ \Verb+icache_num_set 8 + & \Verb+// 4KB I-cache number of set+ \\
+ \Verb+icache_assoc   8 /+ & \Verb+/ I cache set associativity + \\
+ \\
+\end{tabular}
 
-
-The effective cache size can be calculated using Equation~\ref{eq:cachesize}.
-
+\noindent The effective cache size can be calculated using Equation~\ref{eq:cachesize}.
 \begin{equation}
 \label{eq:cachesize}
 cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only, otherwise 1)
 \end{equation}
 
 
-\noindent
+\noindent For instance, the size of a cache with 256 sets, 16 ways per set, 64B per cache lines and 4
+tiles is $256 \times 16 \times 64 \times 4 = 1\textit{MB}$
 
-The size of a cache with 256 sets, 16 ways per set, 64B per cache lines and 4
-tiles is 
-
-\Verb+ 256 * 16 * 64 * 4 = 1 MB +
-%\Verb+\textsf{16 way} $\times$ \textsf{64 B}+ $\times$
-%\Verb+\textsf{4 tiles}+. 
-
-\noindent
 Cache latency is determined by several factors including the
 size, technology, and the number of ports. Cacti~\cite{cacti} can be
 used to model cache latency accurately. The cache line size is set to
@@ -423,22 +420,22 @@ all cache levels must have the same cache line size.
 For configuring the DRAM system including the memory controllers and the DRAM
 itself, the knobs shown below are available. 
 
+\begin{tabular}{l l}
+ \\
+ \Verb+dram_frequency 0.8+ & \Verb+// dram frequency+ \\
+ \Verb+dram_bus_width 4 + & \Verb+// dram bus width+ \\
+ \Verb+dram_column 11+ & \Verb+// column access (CL) latency+ \\
+ \Verb+dram_activate 25 + & \Verb+// row activate (RCD) latency+ \\
+ \Verb+dram_precharge 10+ & \Verb+// precharge (RP) latency+ \\
+ \Verb+dram_num_mc 2 + & \Verb+// number of memory controllers+ \\
+ \Verb+dram_num_banks 8+ & \Verb+// number of banks per controller+ \\
+ \Verb+dram_num_channel 2 + & \Verb+// number of dram channels per controller+ \\
+ \Verb+dram_rowbuffer_size 2048 + & \Verb+// row buffer size+ \\
+ \Verb+dram_scheduling_policy FRFCFS+ & \Verb+// dram scheduling policy+ \\
+ \\
+\end{tabular}
 
-\begin{Verbatim}
-dram_frequency 0.8 // dram frequency
-dram_bus_width 4 // dram bus width
-dram_column 11 // column access (CL) latency
-dram_activate 25 // row activate (RCD) latency
-dram_precharge 10 // precharge (RP) latency
-dram_num_mc 2 // number of memory controllers
-dram_num_banks 8 // number of banks per controller
-dram_num_channel 2 // number of dram channels per controller
-dram_rowbuffer_size 2048 // row buffer size
-dram_scheduling_policy FRFCFS // dram scheduling policy
-\end{Verbatim}
-
-\noindent
-\SIM models three DRAM timing parameters - precharge ($t_{RP}$), activate
+\noindent \SIM models three DRAM timing parameters - precharge ($t_{RP}$), activate
 ($t_{RCD}$), and column access ($t_{CL}$). While DRAM bandwidth is modeled using the
 parameters \Verb+dram_frequency+, \Verb+dram_bus_width+, and
 \Verb+dram_num_channel+. The maximum DRAM bandwidth can be calculated using
@@ -449,29 +446,22 @@ Equation~\ref{eq:bandwidth}.
 max\_bandwidth = dram\_frequency \times dram\_bus\_width \times dram\_num\_mc \times dram\_num\_channel 
 \end{equation}
 
-\noindent
-For example, the maximum bandwidth of a DRAM system with the above parameter
+\noindent For example, the maximum bandwidth of a DRAM system with the above parameter
 values is
 
-\Verb+ 800 MHz (0.8 GHz)} * 4 Bytes+
-  \Verb+* 2 MCs * 2 Channels = 12.8GB/s+.
+\Verb+ 800 MHz (0.8 GHz) * 4 Bytes+
+\Verb+* 2 MCs * 2 Channels = 12.8GB/s+.
  
 
-\noindent
-Currently, \SIM provides multiple DRAM scheduling policies: FCFS
+\noindent Currently, \SIM provides two memory scheduling policies: FCFS 
 (First-Come-First-Serve) and FR-FCFS (First-Ready First-Come-First-Serve).
 
 
 
-
-
-
-
 \ignore{
-\subsubsection{Hardware Prefetching}
-
-We provide stride hardware prefetcher~\cite{iac:spr04}. 
-}
+		\subsubsection{Hardware Prefetching}
+		We provide stride hardware prefetcher~\cite{iac:spr04}. 
+		}
 
 
 

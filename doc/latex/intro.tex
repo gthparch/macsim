@@ -17,13 +17,12 @@ multicore simulations as well as heterogeneous ISA multicore
 simulations.
 
 MacSim is a microarchitecture simulator that simulates detailed
-pipeline (in-order and out-of-order) and a memory system including
-caches, NoC, and memory controllers. It supports, asymmetric multicore
-configurations (small cores + medium cores + big cores) and SMT or MT
-architectures as well.
+pipeline stages (in-order and out-of-order) and the memory system components 
+including caches, NoC, and memory controllers. It supports asymmetric 
+multicore configurations as well as SMT or MT architectures.
 
 Currently interconnection network model (based on IRIS) and power
-model (based on McPat~\cite{mcpat}) are connected. ARM ISA support is
+model (based on McPat~\cite{mcpat}) are implemented. ARM ISA support is
 on-progress. MacSim is also one of the components of SST~\cite{sst} so
 multiple MacSim simulators can run concurrently.
 
@@ -40,14 +39,22 @@ multiple MacSim simulators can run concurrently.
 \renewcommand\descriptionlabel[1]{\textit{\hspace\labelsep{#1}}}
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
-\item[2.03 - May, 2004] Preparation tagging for 2.04 version 
-\item[1.1 - September 26, 2012] Preparation tagging for 1.2 version 
-
-  \Verb+macsim-top/tags/macsim_1.1+ 
-
+\item[2.0.4 - October, 2014] 
+  \Verb+macsim/tags/macsim-2.0.4/+
+\item[2.0.3 - August, 2014] 
+  \Verb+macsim/tags/macsim-2.0.3/+
+\item[2.0.2 - April, 2014] 
+  \Verb+macsim/tags/macsim-2.0.2/+
+\item[2.0 - September, 2013] 
+  \Verb+macsim/tags/macsim-2.0/+
+\item[1.2.1 - April, 2013] 
+  \Verb+macsim/tags/macsim-1.2.1/+
+\item[1.2 - October, 2012] 
+  \Verb+macsim/tags/macsim_1.2+ 
+\item[1.1 - October, 2012] 
+  \Verb+macsim/tags/macsim_1.1+ 
 \item[1.0 - February, 2012] Initial release
-
-  \Verb+macsim-top/tags/macsim_1.0+ 
+  \Verb+macsim/tags/macsim_1.0+ 
 \end{description}
 \endgroup
 

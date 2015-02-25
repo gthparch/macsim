@@ -36,16 +36,16 @@ allocate*.cc/h, rob*.cc/h, map.cc/h                          & Decode and Alloca
 schedule*.cc/h                                               & Schedule stage                     \\ \hline 
 exec.cc/h                                                    & Execution stage                    \\ \hline 
 retire.cc/h                                                  & Retire stage                       \\ \hline       
-port.cc/h, cache.cc/h dram.cc/h, memory*.cc/h, \\ 
-memreq\_info.cc/h, readonly\_cache.cc/h, \\ 
-sw\_managed\_cache.cc/h                                      & Memory system                      \\ \hline 
+port.cc/h, cache.cc/h dram.cc/h, memory*.cc/h, 				 & Memory system 					  \\ 
+memreq\_info.cc/h, readonly\_cache.cc/h, 					 & 									  \\ 
+sw\_managed\_cache.cc/h                                      & 				                      \\ \hline 
 pref*.cc/h                                                   & Prefetchers                        \\ \hline
 trace\_read.cc/h inst\_info.h                                & Reading traces                     \\ \hline
 core.cc/h                                                    & Class representing a core being simulated \\ \hline
 process\_manager.cc/h                                        & Process Manager/thread scheduler   \\ \hline 
 uop.cc/h                                                     & Uop structure and related enums    \\ \hline
-\multirow{2}{*}{macsim.cc/h}                                 & Class containing pointers to the simulated cores, NoC, \\
-                                                               memory system, knobs and other objects \\ \hline
+macsim.cc/h					                                 & Class containing pointers to the simulated cores, NoC, \\
+                                                             & memory system, knobs and other objects \\ \hline
 knob.cc/h                                                    & Classes for supporting knobs       \\ \hline
 statistics.cc/h                                              & Classes for supporting knobs       \\ \hline
 factory\_class.cc/h                                          & Implementation of different factory classes                          \\ \hline

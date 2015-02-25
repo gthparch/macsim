@@ -6,8 +6,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A simple framework for collecting statistics (hereafter referred to as stats)
-  during simulation is provided.  Stats can be either global (includes
-      data from all cores) or per core.
+during simulation is provided.  Stats can be either global (includes
+data from all cores) or per core.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Stat Types}
@@ -17,28 +17,24 @@ The following stat types are supported:
 
 \begin{description}
 
-  \item [COUNT] for counting the number of occurances of an event. Eg. number
-  of cache hits. 
+  \item [COUNT] for counting the number of occurrences of an event. (Eg. number
+  of cache hits)
 
-  \item [RATIO] for calculating the ratio of number of occurances of one event
-  over another. Eg. (number of cache hits / number of cache accesses) i.e.,
-  cache hit ratio.
+  \item [RATIO] for calculating the ratio of number of occurrences of one event
+  over another. (Eg. (number of cache hits / number of cache accesses) i.e.,
+  cache hit ratio )
 
   \item [DIST]  for calculating the proportion of each event in a group of
-  events.  \ignore{for defining a group of related events and calculating the
-    number of occurances of each event in the group as a percent of the sum of
-      the number of occurances of all events in the group.}  Eg. If the user
-      wants to know what percent of L1 data cache accesses (in a 2-level
-          hierarchy) resulted in L1 hits, L2 hits or memory accesses, then the
-      user should define a distribution consisting on three events - L1 hits,
-      L2 hits and L2 misses  - and update the counter for each event correctly. 
+  events. (Eg. If the user wants to know what percent of L1 data cache accesses 
+  (in a 2-level hierarchy) resulted in L1 hits, L2 hits or memory accesses, then the
+  user should define a distribution consisting on three events - L1 hits,
+  L2 hits and L2 misses  - and update the counter for each event separately) 
 
 \end{description}
 
-
-Note that a simulation will output two values for each stat. One is the
-raw value i.e. the number of occurances of the event associated with the
-stat and the other value is the value calculated based on the type
+Note that a simulation will output two values for each stat. First one is the
+raw value i.e. the number of occurrences of the event associated with the
+stat and the second value is the value calculated based on the type
 of the stat.
 
 
@@ -47,50 +43,41 @@ of the stat.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 New stats can be defined by adding DEF\_STAT statements to any of the
-\textit{*.stat.def} files in the \textit{trunk/def/} directory or by creating a
-\textit{.stat.def} file including the definitions in the \textit{trunk/def/}
+\textit{*.stat.def} files in the \textit{def/} directory or by creating a
+\textit{.stat.def} file including the definitions in the same
 directory.  To define a per core statistic specify PER\_CORE at the
-end of each DEF\_STAT statement below.
-
+end of each DEF\_STAT statement. Below is a description and an example of 
+defining stats for different types of stats.
 
 
 \begin{description}
 
 \item[COUNT Stat:] \Verb+ +
-
-\Verb+DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])+
-
-Eg: 
+\par \Verb+DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])+
+\par Eg: 
 \begin{Verbatim}
 DEF_STAT(INST_COUNT_TOT, COUNT, NO_RATIO)
 DEF_STAT(INST_COUNT, COUNT, NO_RATIO, PER_CORE)
 \end{Verbatim}
 
 \item[RATIO Stat:] \Verb+ +
-
-\Verb+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])+
-
-
-In addition to defining the RATIO stat itself, a base stat of type COUNT has to
+\par \Verb+DEF_STAT(STAT_NAME, RATIO, BASE_STAT_NAME [, PER_CORE])+
+\par In addition to defining the RATIO stat itself, a base stat of type COUNT has to
 be defined as well. The value of the base stat is used as the denominator in
 calculating the ratio. 
-
-Eg: 
+\par Eg: 
 \begin{Verbatim}
 DEF_STAT(DISPATCHED_INST, COUNT, NO_RATIO)
 DEF_STAT(DISPATCH_WAIT, RATIO, DISPATCHED_INST)
 \end{Verbatim}
 
 \item[DIST Stat:] \Verb+ +
-
 \begin{Verbatim}
 DEF_STAT(STAT_NAME_START, DIST, NO_RATIO [, PER_CORE])
 DEF_STAT(STAT_NAME, COUNT, NO_RATIO [, PER_CORE])*
 DEF_STAT(STAT_NAME_END, DIST, NO_RATIO [, PER_CORE])
 \end{Verbatim}
-
-The definition of a DIST stat requires at least two stats.
-
+\par The definition of a DIST stat requires at least two stats.
 Eg: 
 \begin{Verbatim}
 DEF_STAT(SCHED_FAILED_REASON_SUCCESS, DIST, NO_RATIO, PER_CORE)
@@ -104,8 +91,7 @@ DEF_STAT(SCHED_FAILED_NO_PORTS, DIST, NO_RATIO, PER_CORE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Updating Stats}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+  
 Macros are provided to update the value of stats. STAT\_EVENT and
 STAT\_EVENT\_M increment and decrement the value of a global stat by 1 and take
 the name of the stat to be updated as their argument.  STAT\_EVENT\_N is used
@@ -115,14 +101,12 @@ STAT\_CORE\_EVENT and STAT\_CORE\_EVENT\_M increment and decrement the value of
 a per core stat by 1. These take core id and the name of the stat to be
 incremented/decremented as their parameters. For example,
 
-\begin{Verbatim}
-STAT_EVENT(INST_COUNT_TOT); // increments global stat INST_COUNT_STAT by 1
-STAT_EVENT_N(INST_COUNT_TOT, 2); // increments global stat INST_COUNT_STAT by 2
-STAT_EVENT_M(INST_COUNT_TOT); // decrements global stat INST_COUNT_STAT by 1
-STAT_CORE_EVENT(0, INST_COUNT); // increments stat INST_COUNT for core 0 by 1
-\end{Verbatim}
-
-
+\begin{tabular}{ll}
+ \Verb+STAT_EVENT(INST_COUNT_TOT);+ & \Verb+// increments global stat INST_COUNT_STAT by 1+ \\
+ \Verb+STAT_EVENT_N(INST_COUNT_TOT, 2); + & \Verb+// increments global stat INST_COUNT_STAT by 2+ \\
+ \Verb+STAT_EVENT_M(INST_COUNT_TOT);+ & \Verb+// decrements global stat INST_COUNT_STAT by 1+ \\
+ \Verb+STAT_CORE_EVENT(0, INST_COUNT); + & \Verb+// increments stat INST_COUNT for core 0 by 1+ 
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Simulation output}
@@ -134,19 +118,20 @@ simulation. As mentioned, for each stat two values are generated, one is the
 raw stat value and other is a value calculated based on the type of the
 stat. For simulations with multiple applications, multiple sets of stat files
 are generated. Each simulated application is assigned an integer id (these ids
-    are assigned according to the order in which the applications appear in the
-    trace\_file\_list), when an application terminates (for the first time,
-      note that applications may be repeated), stat files suffixed with the the
-    id of the application, i.e.  *.stat.out.<appl\_id>, are generated. These
-    stat files contain the value of the stats until that point in the
-    simulation. At the end of the simulation, *.stat.out files are generated as
-    usual.
+are assigned according to the order in which the applications appear in the
+trace\_file\_list), when an application terminates (for the first time,
+note that applications may be repeated), stat files suffixed with the the
+id of the application, i.e.  *.stat.out.<appl\_id>, are generated. These
+stat files contain the value of the stats until that point in the
+simulation. At the end of the simulation, *.stat.out files are generated as
+usual.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Important Stats}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In table \ref{table:stats} some important stats are listed. 
 
 \begin{table}[htb]
 \begin{footnotesize}

@@ -131,6 +131,9 @@ void retire_c::run_a_cycle()
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
   core_c *core = m_simBase->m_core_pointers[m_core_id];
     
+
+  //Ramyad: based on document gpu_sched knob should be removed
+  //gpu_sched 1 use GPU scheduler for GPU cores \todo{this knob should be removed!, it is unnecessary now}
   vector<uop_c*>* uop_list = NULL;
   unsigned int uop_list_index = 0;
   if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
