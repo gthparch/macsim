@@ -73,6 +73,7 @@ class Topology;
 #define NETWORK m_simBase->m_network
 #define DRAM_CTRL m_simBase->m_dram_controller
 #define MEMORY m_simBase->m_memory
+#define DYFR m_simBase->m_dyfr
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +156,34 @@ class macsim_c
      * Deallocate data structure
      */
 		void deallocate_memory(void);
+
+    /**
+     * Change frequency of a core
+     */
+        void change_frequency_core(int id, int freq);
+
+    /**
+     * Change frequency of other units (L3, NoC, MC)
+     * {0:l3, 1:noc, 2:mc}
+     */
+        void change_frequency_uncore(int type, int freq);
+
+    /**
+     * Function to check outstanding requests
+     * to change frequency of units
+     */
+        void apply_new_frequency(void);
+
+    /**
+     * Returns a core's current frequency
+     */
+        int get_current_frequency_core(int core_id);
+
+    /**
+     * Returns a unit current frequency
+     * {0:l3, 1:noc, 2:mc}
+     */
+        int get_current_frequency_uncore(int type);
 
 #ifdef POWER_EI
     /**
@@ -279,8 +308,12 @@ class macsim_c
     bool* m_termination_check; /**< termination checking logic */
     int m_termination_count;
 
+    dyfr_c* m_dyfr; /**< dynamic frequency class> */
+
 	private:
 		macsim_c* m_simBase; /**< self-reference for macro usage */
+
+    int m_num_sim_cores;
 
     int CLOCK_L3;
     int CLOCK_NOC;
@@ -288,7 +321,12 @@ class macsim_c
     int CLOCK_CPU;
     int CLOCK_GPU;
 
-    int m_num_sim_cores;
+    // dynamic frequency
+    queue<Counter> m_freq_ready;
+    queue<int> m_freq_id;
+    queue<int> m_freq;
+
+    int m_pll_lockout; /**< pll time counter to lock on a frequency */
 
 #ifdef USING_SST
 #include "callback.h"

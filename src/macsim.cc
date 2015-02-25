@@ -64,6 +64,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "network_simple.h"
 #include "factory_class.h"
 #include "dram.h"
+#include "dyfr.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
@@ -116,6 +117,7 @@ macsim_c::macsim_c()
   m_simulation_cycle = 0;
   m_core0_inst_count = 0;
 
+  m_pll_lockout = 0;
 }
 
 
@@ -259,6 +261,9 @@ void macsim_c::init_memory(void)
     printf("enabling bug detector\n");
     m_bug_detector = new bug_detector_c(m_simBase);
   }
+
+  //Dynamic Frequency
+  m_dyfr = new dyfr_c(this, m_num_sim_cores);
 
   // ETC
   m_termination_check = new bool[m_num_sim_cores];
@@ -893,8 +898,6 @@ int macsim_c::run_a_cycle()
     return 0; //simulation finished
   }
 
-  bool pll_locked = false;
-
   if (m_termination_count == m_num_sim_cores) {
     m_termination_count = 0;
     fill_n(m_termination_check, m_num_sim_cores, false);
@@ -903,6 +906,23 @@ int macsim_c::run_a_cycle()
 
   Counter pivot = m_core_cycle[0] + 1;
 
+  // Dynamic Frequency
+  // on lock pll is trying to lock on frequency - all units stall
+  bool pll_locked = (m_pll_lockout > 0);
+
+  if (pll_locked) {
+    m_dyfr->reset();
+    --m_pll_lockout;
+    if (m_pll_lockout <= 0) {
+      cout << "PLL_UNLOCKED at " << m_simulation_cycle << "\n"; 
+    }
+  }
+
+  // update dyfr only after 1ms based on sampling period 
+  int dyfr_sample_period = *KNOB(KNOB_DYFR_SAMPLE_PERIOD);
+  if (m_simulation_cycle > 10000000 && m_simulation_cycle % dyfr_sample_period == 0) {
+    m_dyfr->update();
+  }
 
   // interconnection
   if (m_clock_internal == m_domain_next[CLOCK_NOC]) {
@@ -1042,6 +1062,76 @@ void macsim_c::finalize()
   m_ProcessorStats->saveStats();
 
   cout << "Done\n";
+}
+
+// =======================================
+// Change frequency of a core
+// =======================================
+#define LATENCY_APPLY_FREQUENCY 10000 //1us
+
+void macsim_c::change_frequency_core(int id, int freq)
+{
+  m_freq_ready.push(m_simulation_cycle+LATENCY_APPLY_FREQUENCY);
+  m_freq_id.push(id);
+  m_freq.push(freq);
+  //report("ID:" << id << " new frequency:" << freq << " (" << m_simulation_cycle+LATENCY_APPLY_FREQUENCY << ") added");
+
+}
+
+// =======================================
+// Change frequency of other units core
+// 0: l3, 1: noc, 2: mc
+// =======================================
+void macsim_c::change_frequency_uncore(int type, int freq)
+{
+  m_freq_ready.push(m_simulation_cycle + LATENCY_APPLY_FREQUENCY);
+  m_freq_id.push(m_num_sim_cores + type);
+  m_freq.push(freq);
+}
+
+
+// =======================================
+// Function to check outstanding requests
+// to change frequency of units
+// =======================================
+void macsim_c::apply_new_frequency(void)
+{
+  // set up pll_lockout - duration when all units stall
+  if (!m_freq_ready.empty()) {
+    m_pll_lockout = KNOB(KNOB_DYFR_PLL_LOCK)->getValue(); 
+    cout << "PLL_LOCKED at " << m_simulation_cycle << "\n"; 
+  }
+
+  // process the queue and apply frequencies for this simulation cycle
+  while (!m_freq_ready.empty()) {
+    int id = m_freq_id.front();
+    int freq = m_freq.front();
+    report("ID:" << id << " new frequency:" << freq << " (" << m_simulation_cycle << ") enforced " << m_freq_ready.front());
+
+
+    m_freq_ready.pop();
+    m_freq_id.pop();
+    m_freq.pop();
+
+    m_domain_freq[id] = freq;
+  }
+}
+
+// =======================================
+// Returns a core current frequency
+// =======================================
+int macsim_c::get_current_frequency_core(int core_id)
+{
+  return m_domain_freq[core_id];
+}
+
+// =======================================
+// Returns a unit current frequency
+// 0: l3, 1: noc, 2: mc
+// =======================================
+int macsim_c::get_current_frequency_uncore(int type)
+{
+  return m_domain_freq[m_num_sim_cores + type];
 }
 
 #ifdef USING_SST
