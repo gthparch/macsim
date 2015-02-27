@@ -1,88 +1,106 @@
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{The Memory System}
 \label{sec:memory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this section \SIM memory system is explained. First, we describe caches,
+then memory system hierarchy and organization. Next, configuring different
+memory systems are investigated. Finally, DRAM module is explained.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Caches}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Each cache structure consists of the cache storage (tag and data) and multiple
-queues. Figure~\ref{fig:cache} shows the overall structure of a cache in \SIM.
-There are two flows: 1) cache access flow: from a processor or upper level
-cache miss, to access the cache and 2) cache fill flow: in case of a cache
-miss, data is supplied from the lower level cache or DRAM.
+queues. Figure~\ref{fig:cache} shows the overall structure and its queues
+of a cache in \SIM. There are two flows to the cache:
+\begin{enumerate}
+ \item \textbf{Cache access flow}: from a processor or upper level cache
+		\footnote{Due to miss in that level} to access the cache
+ \item \textbf{Cache fill flow}: in case of a cache miss, data is supplied from the 
+		lower level cache or DRAM.
+\end{enumerate}
 Section~\ref{sec:queue} details all queues and Section~\ref{sec:cache-flow}
 lists the flows through the queues and the cache.
 
 \begin{figure*}[htb]
-\centering
-\includegraphics{figs/cache}
-\caption{The cache structure.}
-\label{fig:cache}
+  \centering
+  \includegraphics{figs/cache}
+  \caption{The cache structure.}
+  \label{fig:cache}
 \end{figure*}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Queues}
 \label{sec:queue}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-All cache accesses flow from one queue to another.
+\SIM uses queues to transfer data and command between different cache levels
+and processors. Therefore, all cache accesses flow from one queue to another.
+Below is the list of queues and their description.
 
 \begin{itemize}
-  \item input queue - requests forwarded to this cache due to upper-level cache misses are inserted into this queue.
+  \item \textbf{Input queue}: requests forwarded to the cache due to upper-level 
+		cache misses or processor are inserted into this queue.
 
-  \item output queue - requests that miss in this cache are inserted into the
-  output queue to be forwarded to a lower-level cache . If no lower-level cache
-  is available, then requests are forwarded to DRAM.
+  \item \textbf{Output queue}: requests that miss in the cache are inserted into the
+  output queue to be forwarded to a lower-level cache. If no lower-level cache
+  is available, then requests are forwarded to the memory controller.
 
-  \item write-back queue - \SIM models write-back caches. When a dirty cache
+  \item \textbf{Write-back queue}: \SIM models write-back caches. When a dirty cache
   line is evicted, the line must be written back into the next level cache (or
-      DRAM). All write-back requests are initially inserted into the write-back
-  queue.
+  main memory). All write-back requests are initially inserted into this queue.
 
-  \item fill queue - data returned from the next level cache or DRAM is
-  inserted into the fill queue before updating the cache.
+  \item \textbf{Fill queue}: Data returned from the next level cache or main memory 
+  is inserted into the fill queue before updating the cache to be processed.
 
 %  \item coherence queue - this queue is intended for handling coherence
 %  traffic, but this is currently not modeled
   
 \end{itemize}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Flows}
 \label{sec:cache-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this subsection all possible flows from or to the cache is listed. If the memory or cache
+levels are distributed, \SIM will use routers to send core's request. 
 
 \begin{itemize}
 
-  \item Upper-level cache to input queue : forwarding of upper-level cache misses
+  \item \textbf{Upper-level cache $\rightarrow$ Input queue}: Forwarding of upper-level cache misses
+		to the cache.
 
-  \item Upper-level cache to fill queue : forwarding of upper-level write-back requests
+  \item \textbf{Upper-level cache $\rightarrow$ Fill queue}: Forwarding of upper-level write-back 
+		requests to the cache.
 
-  \item input queue to cache : accessing the cache
+  \item \textbf{Input queue $\rightarrow$ Cache}: Accessing the cache
 
-  \item cache to output queue : cache miss, access lower-level cache
+  \item \textbf{Cache $\rightarrow$ Output queue} : Cache miss, access to lower-level cache
 
-  \item cache to write-back queue : generating write-back requests
+  \item \textbf{Cache $\rightarrow$ Write-back queue}: Generating write-back requests due to
+		eviction of a dirty line
 
-  \item write-back queue to output queue : write-back request, access the
-  lower-level cache
+  \item \textbf{Write-back queue $\rightarrow$ Output queue} : write-back requests to access the
+		lower-level cache when they are processed.
 
-  \item output queue to the router : access the lower-level cache
-  through the on-chip interconnection network
+  \item \textbf{Output queue $\rightarrow$ Router} : access the lower-level cache
+		through the on-chip interconnection network
 
-  \item router to the fill queue : the data from the lower-level cache
-  or DRAM
+  \item \textbf{Router $\rightarrow$ Fill queue} : the data from the lower-level cache
+		or DRAM
 
 \end{itemize}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The Hierarchy}
 \label{sec:memhierarchy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \SIM is very flexible in its support for different memory
 hierarchies. Each level in the cache hierarchy can be configured
 independently of other levels (see Section~\ref{sec:knob:cache}).
 Figure~\ref{fig:memory} shows the base memory hierarchy without DRAM
-memory.
+memory. It is good to note these points about this figure: 
 
 \begin{figure*}[htb]
 \centering
@@ -92,8 +110,9 @@ memory.
 \end{figure*}
 
 
-\begin{itemize} \item There are three levels (L1, L2, and L3) of caches in the
-\SIM , the L2 cache can be disabled if needed by some configurations.
+\begin{itemize} 
+  \item There are three levels (L1, L2, and L3) of caches in the
+	\SIM , the L2 cache can be disabled if needed.
 
   \item All the caches and memory controllers can be connected via an
     on-chip interconnection network (currently, the default topology
@@ -102,12 +121,16 @@ memory.
   \item L1 and L2 caches are always private to each core.
 
   \item The local router within a cache structure is enabled only when
-  necessary.
+	necessary.
 
   \item L3 cache is unified (shared by all cores), but sub banked. In
     other words, address regions are statically partitioned and each
     tile is responsible for sub regions. Each cache tile has multiple
     banks as well.
+   
+  \item Each L3 tile could be coupled with its own L2 to reduce network
+	  traffic. This is controlled by knob \Verb+memory_type   l3_[de]coupled_network+.
+	  For more setting for this knob look at \ref{sec:types_memory}.
 
 \end{itemize}
 
@@ -126,24 +149,29 @@ can flexibly configure 2-level cache hierarchies.
 \label{fig:level2cache}
 \end{figure*}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Configuring the Cache Hierarchy} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The cache hierarchy can be configured by 1) setting the link between different
-cache levels, 2) disabling cache levels and 3) enabling/disabling routers. The
-following code is used in \SIM for cache initialization.
+The cache hierarchy can be configured by:
+\begin{enumerate}
+ \item Setting the links between different cache levels
+ \item Disabling cache levels
+ \item Enabling/Disabling routers
+\end{enumerate}
+Following variables is used in \SIM for cache initialization:
 
-\begin{Verbatim}
-void dcu_c::init(
-  int next_id, // next level cache id
-  int prev_id, // previous level cache id
-  bool done, 
-  bool coupled_up, // direct link with upper level cache
-  bool coupled_down, // direct link with lower level cache
-  bool disable, // disable cache
-  bool has_router // router
-);
-\end{Verbatim}
+\begin{center}
+\begin{tabular}{l | l}
+  Variable Name & Description \\ \hline \hline
+  int next\_id & next level cache id \\
+  int prev\_id & previous level cache id \\ 
+  bool coupled\_up &  direct link with upper level cache \\
+  bool coupled\_down & direct link with lower level cache \\
+  bool disable & disable cache \\
+  bool has\_router & router \\ 
+\end{tabular}
+\end{center}
 
 \begin{description}
   \item[Enabling/disabling router] When \textsf{has\_router} is set to \textit{false},
@@ -174,28 +202,33 @@ void dcu_c::init(
 
 \end{description}
 
-\subsection{Configuring Different Cache Hierarchies with \SIM}
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Different Cache Hierarchies Configurations with \SIM}
+\label{sec:types_memory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The configuration listed below could be used for knob \Verb+memory_type+.
+In the description for each one the code for generating that configuration is
+included.
 \begin{itemize}
-\ignore{
-  \item Intel Core~\cite{core2duo} microarchitecture has two-level of
-  caches. The last-level cache might be tiled, but if the L2 cache
-  tries to access the closest the L3 tile, it does not have to access
-  through the interconnection. All communications will be made through
-  the direct link. However, if the L2 cache accesses the remote L3
-  tile, it goes through the interconnection. Note that the number of
-  cores (L1 and L2 caches) and the number of the L3 tiles must be the
-  same.
+\ignore
+		{
+		\item Intel Core~\cite{core2duo} microarchitecture has two-level of
+		caches. The last-level cache might be tiled, but if the L2 cache
+		tries to access the closest the L3 tile, it does not have to access
+		through the interconnection. All communications will be made through
+		the direct link. However, if the L2 cache accesses the remote L3
+		tile, it goes through the interconnection. Note that the number of
+		cores (L1 and L2 caches) and the number of the L3 tiles must be the
+		same.
 
-  \smallskip
-  \begin{lstlisting}
-  // class l2_coupled_local_c
-  \end{lstlisting}
-  \smallskip
-}
+		\smallskip
+		\begin{lstlisting}
+		// class l2_coupled_local_c
+		\end{lstlisting}
+		\smallskip
+		 }
 
-  \item Intel Nehalem~\cite{nehalem} and Sandy
+\item \textbf{l3\_coupled\_network}: Intel Nehalem~\cite{nehalem} and Sandy
     Bridge~\cite{sandybridge} microarchitectures have three-levels of
     caches. The last-level cache is tiled and to access the closest L3
     tile, a L2 cache does not have to go through the interconnection,
@@ -214,7 +247,7 @@ for (int ii = 0; ii < m_num_core; ++ii) {
 }
 \end{Verbatim}
 
-  \item NVIDIA G80~\cite{g80} architecture does not have
+  \item \textbf{no\_cache}: NVIDIA G80~\cite{g80} architecture does not have
   hardware-managed caches. Thus, all three levels are connected each
   other and disabled. Only the L3 cache has a router to access the DRAM.
 
@@ -228,9 +261,9 @@ for (int ii = 0; ii < m_num_core; ++ii) {
   }
   \end{Verbatim}
 
-  \item NVIDIA Fermi~\cite{fermi} architecture has private L1 caches and a
+  \item \textbf{l2\_decoupled\_network}: NVIDIA Fermi~\cite{fermi} architecture has private L1 caches and a
   unified L2 cache shared by all cores. The L1 and L2 caches are linked. The L2
-  cache is been disabled, but has is router enabled. The L3 is not linked with
+  cache is been disabled, but has its router enabled. The L3 is not linked with
   others (it is connected via the interconnect), but it is enabled and has a
   router.
 
@@ -248,10 +281,10 @@ for (int ii = 0; ii < m_num_core; ++ii) {
   }
   \end{Verbatim}
   
-  \item In a general 2-D Topology (Mesh, Torus), it is assumed that each core
-  has private L1 and L2 caches, but access to the L3 cache must be 
-  through the interconnection network. The L1 and L2 caches are both enabled
-  and linked, but only the L2 cache has a router. The L3 cache is not linked
+  \item \textbf{l3\_decoupled\_network} In a general 2-D Topology (Mesh, Torus), 
+  it is assumed that each core has private L1 and L2 caches, but access to 
+  the L3 cache must be through the interconnection network. The L1 and L2 caches 
+  are both enabled and linked, but only the L2 cache has a router. The L3 cache is not linked
   with other caches and the communication is made through the interconnection
   network.
 
@@ -276,29 +309,28 @@ for (int ii = 0; ii < m_num_core; ++ii) {
 \label{sec:dram}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 \SIM also models detailed memory controllers which consider DRAM
 timing constraints and bandwidth specifications when scheduling
-requests.  Section~\ref{sec:param-dram} describes how to configure
+requests. Section~\ref{sec:param-dram} describes how to configure
 DRAM parameters.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{DRAM Timing Constraints}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We model following three timing constrainsts of DRAM.
+We model following three timing constraints of DRAM.
 
 \vspace{0.2in}
+\begin{center}
 \begin{footnotesize}
-\begin{tabular}{llll}
-Timing               & Knob variable in \SIM      & Symbol    & Description                         \\ \hline
-\Verb+Precharge+     & \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
-\Verb+Activate+      & \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
-\Verb+Column Access+ & \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
+\begin{tabular}{l l l l}
+Timing              & Knob      				 & Symbol    & Description                         \\ \hline \hline
+Precharge     		& \Verb+KNOB_DRAM_PRECHARGE+ & T$_{RP}$  & Row precharge time                  \\
+Activate      		& \Verb+KNOB_DRAM_ACTIVATE+  & T$_{RCD}$ & Row address to column address delay \\
+Column Access 		& \Verb+KNOB_DRAM_COLUMN+    & T$_{CL}$  & CAS latency                         \\
 \end{tabular}
 \end{footnotesize}
-
+\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{DRAM Bandwidth}
@@ -306,47 +338,41 @@ Timing               & Knob variable in \SIM      & Symbol    & Description     
 
 DRAM bandwidth can be modeled using several factors:
 
+\begin{center}
 \vspace{0.2in}
 \begin{footnotesize}
-\begin{tabular}{ll}
-Factor                                       & Knob variable in \SIM      \\ \hline
-\Verb+DRAM Frequency+                        & \Verb+KNOB_DRAM_FREQUENCY+ \\
-\Verb+DRAM Data bus width+                   & \Verb+KNOB_DRAM_BUS_WIDTH+  \\
-\Verb+Number of dram controllers+            & \Verb+KNOB_DRAM_NUM_MC+    \\
-\Verb+Number of dram channels Column Access+ & \Verb+KNOB_DRAM_NUM_CHANNEL+    \\
+\begin{tabular}{l l}
+Factor                                       & Knob 				     \\ \hline \hline
+DRAM Frequency                      		 & \Verb+KNOB_DRAM_FREQUENCY+ \\
+DRAM Data bus width                  	 	 & \Verb+KNOB_DRAM_BUS_WIDTH+  \\
+Number of dram controllers            		 & \Verb+KNOB_DRAM_NUM_MC+    \\
+Number of dram channels Column Access	 	 & \Verb+KNOB_DRAM_NUM_CHANNEL+    \\
 \end{tabular}
 \end{footnotesize}
+\end{center}
 
 \vspace{0.2in}
 \noindent
-, where
-\Verb+Bandwidth = FREQUENCY * BUS_WIDTH * NUM_MC * NUM_CHANNEL+.
-
-\ignore{
-max_bandwidth =dram_f requency×dram_bus_width×dram_num_mc×dram_num_channel
-(2)
-For example, the maximum bandwidth of a DRAM system with the above parameter values is
-800 MHz (0.8 GHz)*4 Bytes*2 MCs*2 Channels = 12.8GB/s.
-Currently, MacSim provides multiple DRAM scheduling policies: FCFS (First-Come-First-Serve) and FR-
-FCFS (First-Ready First-Come-First-Serve).
-}
-
+Where $\textit{Bandwidth} = \textit{Frequency} \times \textit{Bus\_Width} \times 
+	  \textit{Number\_of\_MemoryControllers} \times \textit{Number\_of\_Channels}$.
+	  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Structure of DRAM Controller}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A DRAM controller consists of multiple banks and one or more channels.
 Each bank has its own request buffer and request scheduler. The bank
-scheduler picks a request to service based on the policy.
+scheduler picks a request to service based on the policy. Here are
+some notes:
 
 \begin{itemize}
   \item The bank scheduler picks a request based on the policy (FCFS,
-    FRFCFS, ...) if no request is being served currently.
+    FR-FCFS, ...) if no request is being served currently.
 
   \item The channel scheduler picks a request from command-ready banks
     usually based on the oldest request firs. Based on the command,
     appropriate timing constraint (precharge, activate, or column
-    access) is enforced on the bank.
+    access) is enforced to the bank.
 
   \item Once the column access signal is sent, the data is prepared
   from the DRAM chip (load) or the data is sent to the DRAM chip
