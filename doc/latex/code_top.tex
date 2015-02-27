@@ -1,67 +1,47 @@
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{\SIM Internals}
 \label{sec:codetop}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This chapter briefly discusses some internals of \SIM including data structures
 and their purposes, important functions and components that will help users
-understand \SIM better.
+understand \SIM better. For naming standards in \SIM code see chapter \ref{sec:add_macsim}.
 
-\ignore
-{
-This section provides a brief overview of the organization of the code in
-MacSim. Code in MacSim is organized into many classes, for a descpription of
-the classes please refer to the doxygen documentation.
-
-
-In
-\textit{macsim\_c}, there is an instance of \textit{process\_s} for each
-application being simulated. An application can contain multiple threads each
-represented by a \textit{thread\_s} structure. In case of GPU applications, an
-instance of \textit{thread\_s} represents a warp. 
-
-The threads of an application
-can run on multiple cores each of which is an \textit{core\_c} object. For GPU
-applications, each core represents an SM. Each core has a member variable for
-each stage of the pipeline.  A \textit{core\_c} object also contains objects
-for hardware structures such as ROB, I-cache, Shared Memory, branch predictor
-and so on. Note that some of these components are valid for CPUs only, while
-some others are valid for GPUs only.  According to the speficied memory
-hierarchy, an instance of a class that derives from \textit{memory\_c} is
-created. This object is a member of \textit{macsim\_c} and is accessed by all
-cores in the simulation. The \textit{memory\_c} object includes objects for L1
-D-cache, L2 and L3 caches and also DRAM controllers which are objects of
-classes that derive from \textit{dram\_controller\_c}. 
-
-}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{run\_a\_cycle() function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 All pipeline stages, units such as cache and memory controller, components such
-as memory system and core implement the \textit{run\_a\_cycle()} function which
+as memory system and core implement their own \textit{run\_a\_cycle()} function which
 is called every cycle. Within the \textit{run\_a\_cycle()} function of each
-component is the processing done by the component for every simulation cycle.
-\textit{macsim\_c}, the simulation object, calls \textit{run\_a\_cycle()} for
+component the processing is done by the component for every simulation cycle.
+
+\noindent \textit{macsim\_c}, the main simulation class, calls \textit{run\_a\_cycle()} for
 the memory system, interconnect and cores in the simulation (see
-    \textit{macsim.cc}). Each core in turn calls \textit{run\_a\_cycle()} for
-the individual pipeline stages (see \textit{core.cc}).
+\textit{macsim.cc}). Each core in turn calls \textit{run\_a\_cycle()} for
+their own individual pipeline stages (see \textit{core.cc}).
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Important data structures and classes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Here we list important data structures and classes in \SIM.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{macsim\_c}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For each simulation, an instance of \textit{macsim\_c} is created. This
 instance is responsible for initializing the cores, the memory system, the
 interconnection network and knobs, for registering classes/functions
 implementing various policies with the factory classes and so on. Every cycle,
-             \textit{macsim\_c} ticks all the other simulation components via
-             the \textit{run\_a\_cycle()} function.
+\textit{macsim\_c} ticks all the other simulation components via
+the \textit{run\_a\_cycle()} function.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{core\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Each core being simulated is represented by an object of \textit{core\_c}
 declared in \textit{core.h}. Besides pointers to various pipeline stages and
@@ -69,8 +49,9 @@ hardware units, \textit{core\_c} tracks information such as how many threads
 are assigned to the core, how many instructions have been fetched for each
 thread and so on.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{trace\_read\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 An single instance of \textit{trace\_read\_c} is created at startup and is used
 for reading the traces of all threads/warp in a simulation. To amortize the
@@ -81,28 +62,30 @@ Some of the important functions in \textit{trace\_read\_c} are:
 
 \begin{description}
 
-\item [get\_uops\_from\_traces()] called by front-end stage to fetch uops for a
-thread. If a decoded instruction is available, the next uop from the decoded
-instruction is returned to the front-end, otherwise the next instruction from
-the trace is decoded and the first uop from the decoded instruction is returned
-to the front-end.
+  \item [get\_uops\_from\_traces()] called by front-end stage to fetch uops for a
+	thread. If a decoded instruction is available, the next uop from the decoded
+	instruction is returned to the front-end, otherwise the next instruction from
+	the trace is decoded and the first uop from the decoded instruction is returned
+	to the front-end.
 
-\item [read\_trace()] returns the next instruction from the trace buffer which
-contains a chunk of instructions read from the trace file. If the trace buffer
-is empty, a chunk is read from the trace file and the first instruction is
-returned.
+  \item [read\_trace()] returns the next instruction from the trace buffer which
+	contains a chunk of instructions read from the trace file. If the trace buffer
+	is empty, a chunk is read from the trace file and the first instruction is
+	returned.
 
-\item [convert\_pinuop\_to\_t\_uop()] decodes an instruction from a trace into a
-sequence of \textit{trace\_uop\_s} instances and returns the sequence.
-Instructions being decoded for the first time have their decoded information
-stored in a hashtable so that decoding does not have to be repeated when the
-same instruction is encountered again in the trace.
+  \item [convert\_pinuop\_to\_t\_uop()] decodes an instruction from a trace into a
+	sequence of \textit{trace\_uop\_s} instances and returns the sequence.
+	Instructions being decoded for the first time have their decoded information
+	stored in a hashtable so that decoding does not have to be repeated when the
+	same instruction is encountered again in the trace.
 
 \end{description}
 
 \ignore {\todo{add more if possible}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{map\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 An instance of \textit{map\_c} is created for each core in the simulation. This
 instance tracks data and memory dependences between the uops of a thread for all
@@ -112,24 +95,27 @@ uop becomes ready for execution.
 
 \ignore {\todo{add more if possible}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{uop\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 An instance of \textit{uop\_c} defined in \textit{uop.h} is allocated (from a
-  pool) for each uop and is populated with all the information about the uop.
+pool) for each uop and is populated with all the information about the uop.
 Each uop is assigned a unique number, \textit{m\_unique\_num}, that is unique
 across all uops in a core. Each uop is also assigned a unique number,
-       \textit{m\_uop\_num}, that is unique across a uops of a thread. To
-       identify a uop from a thread of a core, \textit{m\_core\_id},
-       \textit{m\_thread\_id}, \textit{m\_uop\_num} member variables of the uop
-       have to checked. Users can define new member variables to collect/track
-       information as a uop moves through the pipeline. The \textit{uop\_c}
-       object allocated for a uop is returned to the \textit{uop\_c} pool when
-       the uop retires.  Whenever a new member variable is added to
-       \textit{uop\_c} users should make sure that the member variable is
-       initialized to a default value in \textit{uop\_c::init()}.
+\textit{m\_uop\_num}, that is unique across all uops of a thread. To
+identify a uop from a thread of a core, \textit{m\_core\_id},
+\textit{m\_thread\_id}, \textit{m\_uop\_num} member variables of the uop
+have to checked. Users can define new member variables to collect/track
+information as a uop moves through the pipeline. The \textit{uop\_c}
+object allocated for a uop is returned to the \textit{uop\_c} pool when
+the uop retires.  Whenever a new member variable is added to
+\textit{uop\_c} users should make sure that the member variable is
+initialized to a default value in \textit{uop\_c::init()}.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{mem\_req\_s}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For each memory request (L1 data cache miss, and write back requests), a
 instance of \textit{mem\_req\_s} declared in \textit{memreq\_info.h} is
@@ -139,52 +125,59 @@ request completes and data is filled in the cache. Users can define new member
 variables to collect/track information as a memory request moves through the
 memory hierarchy.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{drb\_entry\_s}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For each memory request that reaches the DRAM an instance of
 \textit{drb\_entry\_s} declared in \textit{dram.h} is allocated. This instance
 contains information about the bank, row and column of the DRAM request among
 other details and is deallocated (freed) when the DRAM request is serviced.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{rob\_c/smc\_rob\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textit{rob\_c} declared in \textit{rob.h} and \textit{smc\_rob\_c} declared in
 \textit{rob\_smc.h} are for ROBs in CPUs and GPUs respectively. uops are
 allocated an entry in the ROB in the allocate stage and the allocated entry is
 reclaimed when the uop retires.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{pool\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textit{pool\_c} defined \textit{utils.h} is a utility class meant for creating
 memory pools. Using memory pools reduces the overhead of frequent memory
 allocation and deallocation. In Macsim memory pools are used for uops
 (\textit{uop\_c}), threads/warps (\textit{thread\_s}) and so on.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{pqueue\_c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textit{pqueue\_c} is a utility class for varying the length of the simulated
 pipeline. In MacSim, it is used to vary the length of the fetch (and decode)
-  and allocation stages. At the time of creation of a \textit{pqueue\_c}
-  object, user has to specify the latency of the pqueue in cycles.
-  Objects/values enqueued into the are ready to be dequeued after speficied
-  latency. Besides the object to be enqueued, the enqueue operation takes a
-  priority value as argument as well. Different priority values can be used for
-  objects enqueued in the same cycle to control which object gets dequeued
-  first from the pqueue.
+and allocation stages. At the time of creation of a \textit{pqueue\_c}
+object, user has to specify the latency of the pqueue in cycles.
+Objects/values enqueued into it are ready to be dequeued after specified
+latency. Besides the object to be enqueued, the enqueue operation takes a
+priority value as argument as well. Different priority values can be used for
+objects enqueued in the same cycle to control which object gets dequeued
+first from the pqueue.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Instructions Latencies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Latencies of X86 and PTX uops are defined in \textit{uoplatency\_x86.def} and
-\textit{uoplatency\_ptx.def} files in \textit{trunk/def}. Users must edit these
+\textit{uoplatency\_ptx.def} files in \textit{def/}. Users must edit these
 files to modify the latencies of instructions. Note that for PTX instructions,
-      the value defined in \textit{uoplatency\_ptx.def} is multiplied by the
-      value of the knob \textit{PTX\_EXEC\_RATIO}.
+the value defined in \textit{uoplatency\_ptx.def} is multiplied by the
+value of the knob \textit{PTX\_EXEC\_RATIO}.
 
 
 The process manager which is responsible for assigned threads (thread blocks)
-  to cores and data structures related to it are discussed in
-  Chapter~\ref{sec:process_manager}.
+to cores and data structures related to it are discussed in
+Chapter~\ref{sec:process_manager}.
