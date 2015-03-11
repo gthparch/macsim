@@ -476,92 +476,132 @@ interpret the contents of \Verb+.stat.out+ files.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{SST-Macsim}
+\section{SST-MacSim}
 \label{sec:sst}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-Macsim is a part of the SST simulation framework~\cite{sst} and this section is
-intended for SST users who want to use \SIM for GPU simulations.
+The Structural Simulation Toolkit (SST)~\cite{sst} is a MPI-based 
+simulation framework, on which multiple simulators can communicate 
+and run over multiple nodes. 
+\SIM provides SST component wrappers and this section provides 
+an instruction to use \SIM as a SST component.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Installing SST}
+\subsection{Building SST}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-Instructions for installing SST are provided in the Wiki
-page at the SST Google Code repository~\cite{sst-google} at
-\urlc{http://code.google.com/p/sst-simulator}.
+The instructions for building SST can be found at 
+\urlc{https://www.sst-simulator.org/}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Building \SIM as a SST component}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-Check out a copy of \SIM from SVN in \textit{sst-top/sst/elements} and
-apply the \Verb+macsim-sst.patch+. 
+Checkout \SIM from our SVN or GitHub repository (\urlc{https://github.com/macsimgt/macsim-public}) under \textit{<sst-root>/sst/elements}.
+Make sure to change the name of the directory as \textit{macsimComponent}.
 
 \begin{Verbatim}
-cd sst-top/sst/elements
-svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim
-cd macsim
-patch -p0 -i macsim-sst.patch
+cd <sst-root>/sst/elements
+svn co https://svn.research.cc.gatech.edu/macsim/trunk macsimComponent
 \end{Verbatim}
-
-Then, re-run the SST build procedure.
+Re-build the SST in order for \SIM to be included in the build procedure.
 
 \begin{Verbatim}
-cd sst-top
+cd <sst-root>
 ./autogen.sh
-./configure --prefix=/usr/local --with-boost=/usr/local --with-zoltan=/usr/local --with-parmetis=/usr/local
+./configure --prefix=\$SST_HOME --with-boost=\$BOOST_HOME
+make && make install
 \end{Verbatim}
+Some tips regarding building procedure are as follows.
+\begin{itemize}
+  \item To print debug messages, add \textit{--enable-debug} to the configure command.
+  \item To adjust the optimization level, use \textit{CFLAGS or CXXFLAGS} when configuring. E.g., \textit{CFLAGS=-O0 CXXFLAGS=-O0}
+  \item To exclude a component from SST build procedure, put \textit{.ignore} file in the component directory.
+  \item After the initial build, you can just \textit{make \&\& make install} in the component directory without re-building entire SST.
+\end{itemize}
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Configuring the SST-\SIM component}
+\subsection{Example configuration}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-An example SST sdl configuration file setup for simulating \SIM is shown below:
+An example configuration is as follows.
+Please note that parameters for other components but \SIM are omitted.
+Several sample configurations can be found in <macsim-root>/sst-unit-test/.
 
 \begin{Verbatim}
 <?xml version="1.0"?>
 <sdl version="2.0"/>
+<timebase>1ns</timebase>
 
-<config>
-  stopAtCycle=1000s
-  partitioner=self
-</config>
+<variables>
+  <lat> 1ns </lat>
+  <buslat> 10 ns </buslat>
+</variables>
+
+<param_include>
+  <macsimParams>
+    <paramFile> params.in </paramFile>
+    <traceFile> trace_file_list </traceFile>
+    <outputDir> results </outputDir>
+    <commandLine> --use_memhierarchy=1 </commandLine>
+    <clockFreq> 1 Ghz </clockFreq>
+    <printLocation> 0 </printLocation>
+    <debugLevel> 8 </debugLevel>
+  </macsimParams>
+</param_include>
 
 <sst>
-  <component name=gpu0 type=macsimComponent.macsimComponent rank=0 >
-    <params>
-      <paramPath>./params.in</paramPath>
-      <tracePath>./trace_file_list</tracePath>
-      <outputPath>./results/</outputPath>
-      <clock>1.4Ghz</clock>
-    </params>
+  <component name="c0" type="macsimComponent.macsimComponent">
+    <params include=macsimParams />
+    <link name=c0_icache port=icache_link latency=$lat/>
+    <link name=c0_dcache port=dcache_link latency=$lat/>
+  </component>
+
+  <component name="c0l1Icache" type="memHierarchy.Cache">
+    <params include=l1IParams />
+    <link name=c0_icache port=high_network_0 latency=$lat/>
+    <link name=c0_icache_l2 port=low_network_0 latency=$buslat/>
+  </component>
+
+  <component name="c0l1Dcache" type="memHierarchy.Cache">
+    <params include=l1DParams />
+    <link name=c0_dcache port=high_network_0 latency=$lat/>
+    <link name=c0_dcache_l2 port=low_network_0 latency=$buslat/>
+  </component>
+
+  <component name="c0l2cache" type="memHierarchy.Cache">
+    <params include=l2Params />
+    <link name=c0_icache_l2 port=high_network_0 latency=$lat/>
+    <link name=c0_icache_l2 port=high_network_1 latency=$lat/>
+    <link name=l2_mem port=low_network_0 latency=$buslat/>
+  </component>
+
+  <component name="memory0" type="memHierarchy.MemController">
+    <params include=memParams />
+    <link name=l2_mem port=direct_link latency=$buslat/>
   </component>
 </sst>
 \end{Verbatim}
+Multiple instances of \SIM can be instantiated.
+Each instance can be configured differently using its own params.in file and also run separate traces using its own trace\_file\_list file.
+For instance, one \SIM instance can be configured as X86 processor which runs one of SPEC2006 benchmarks, while the other \SIM instance can be configured as GPU which runs one of CUDA benchmarks. 
 
-In this manner, an SST simulation configuration file can declare multiple
-instances of \SIM as well as define the traces are run on each \SIM instance.
+\subsection{Running a \SIM simulation on top of SST framework}
 
-\subsection{Running a \SIM simulation in SST}
-
-Ensure that SST and \SIM components are compiled and/or installed.  
-Ensure that the paths and contents of both SST configuration sdl file and
-\SIM \textit{params.in} configuration file are correct. Start the SST simulation 
-either standalone or through MPI.
+Ensure that SST and \SIM components are successfully built and installed.  
+Start the SST simulation either standalone or through MPI using the following commands.
 
 \begin{Verbatim}
-sst.x [sdl-file]
+sst [sdl-file]
 \end{Verbatim}
 or
 \begin{Verbatim}
-mpirun -np [x] sst.x [sdl-file]
+mpirun -np [x] sst [sdl-file]
 \end{Verbatim}
 
 
