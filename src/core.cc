@@ -770,6 +770,9 @@ void core_c::create_trace_info(int tid, thread_s* thread)
   ++m_unique_scheduled_thread_num;
   ++m_running_thread_num;
   ++m_fetching_thread_num;
+
+  // to prevent from unnecessary forward progress error for a newely launched cores 
+  m_last_forward_progress = m_core_cycle_count; 
 }
 
 

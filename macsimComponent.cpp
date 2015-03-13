@@ -1,5 +1,7 @@
 #include <sys/time.h>
 
+#include <stdint.h>
+
 #include <sst_config.h>
 #include <sst/core/serialization/element.h>
 #include <sst/core/element.h>
@@ -18,7 +20,6 @@
 
 #define MSC_DEBUG(fmt, args...) dbg->debug(CALL_INFO,INFO,0,fmt,##args)
 
-using namespace boost;
 using namespace SST;
 using namespace SST::MacSim;
 
@@ -87,8 +88,8 @@ void macsimComponent::init(unsigned int phase)
 int countTokens(string _commandLine)
 {
   int count = 0;
-  char_separator<char> sep(" ");
-  tokenizer<char_separator<char>> tokens(_commandLine, sep);
+  boost::char_separator<char> sep(" ");
+  boost::tokenizer<boost::char_separator<char>> tokens(_commandLine, sep);
   for (auto I = tokens.begin(), E = tokens.end(); I != E; I++) count++;
   return count;
 }
@@ -106,8 +107,8 @@ void macsimComponent::setup()
   argv[argc] = new char[ traceFile.size()+1 ]; strcpy(argv[argc], traceFile.c_str()); argc++;
   argv[argc] = new char[ outputDir.size()+1 ]; strcpy(argv[argc], outputDir.c_str()); argc++;
 
-  char_separator<char> sep(" ");
-  tokenizer<char_separator<char>> tokens(commandLine, sep);
+  boost::char_separator<char> sep(" ");
+  boost::tokenizer<boost::char_separator<char>> tokens(commandLine, sep);
   for (auto I = tokens.begin(), E = tokens.end(); I != E; I++) {
     string command = *I;
     argv[argc] = new char[ command.size()+1 ]; strcpy(argv[argc], command.c_str()); argc++;

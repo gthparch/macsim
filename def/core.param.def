@@ -182,5 +182,14 @@ param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH>
 param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
 param<IS_FERMI, is_fermi, bool, 1> 
 
-
-
+param<ENABLE_DYFR, enable_dyfr, bool, 0>
+param<NUM_CPU_APPLICATION, num_cpu_application, int, 1>
+param<DYFR_PLL_LOCK, dyfr_pll_lock, bool, 0> 
+param<DYFR_SAMPLE_PERIOD, dyfr_sample_period, int, 4000000>
+param<DYFR_CPU_BUDGET, dyfr_cpu_budget, int, 30>
+param<DYFR_GPU_BUDGET, dyfr_gpu_budget, int, 30>
+param<DYFR_MEM_BUDGET, dyfr_mem_budget, int, 40>
+param<DYFR_CPU_FREQ_MIN, dyfr_cpu_freq_min, int, 1>
+param<DYFR_CPU_FREQ_MAX, dyfr_cpu_freq_max, int, 4>
+param<DYFR_GPU_FREQ_MIN, dyfr_gpu_freq_min, int, 1>
+param<DYFR_GPU_FREQ_MAX, dyfr_gpu_freq_max, int, 4>

@@ -43,6 +43,7 @@ src/debug_macros.h                                                     \
 src/dram.cc                  src/dram.h                                \
 src/dram_ctrl.cc             src/dram_ctrl.h                           \
 src/dram_dramsim.cc          src/dram_dramsim.h                        \
+src/dyfr.cc									 src/dyfr.h																 \
 src/exec.cc                  src/exec.h                                \
 src/factory_class.cc         src/factory_class.h                       \
 src/fetch_factory.cc         src/fetch_factory.h                       \
