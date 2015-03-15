@@ -95,6 +95,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_RETIRE_STAGE, ## args)
+#define DEBUG_CORE(m_core_id, args...)       \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_RETIRE_STAGE, ## args); \
+  }
 
 
 // retire_c constructor
@@ -223,11 +227,10 @@ void retire_c::run_a_cycle()
       core->m_thread_reach_end[cur_uop->m_thread_id] = true;
       if (!core->m_thread_finished[cur_uop->m_thread_id]) {
         ++core->m_num_thread_reach_end;
-        DEBUG("core_id:%d thread_id:%d terminated\n", m_core_id, cur_uop->m_thread_id);
+        DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d terminated\n", m_core_id, cur_uop->m_thread_id);
 
         // terminate thread
-        m_simBase->m_process_manager->terminate_thread(m_core_id, thread_trace_info, \
-            cur_uop->m_thread_id, cur_uop->m_block_id);
+        m_simBase->m_process_manager->terminate_thread(m_core_id, thread_trace_info, cur_uop->m_thread_id, cur_uop->m_block_id);
 
         // disable current thread's fetch engine
         if (!core->m_fetch_ended[cur_uop->m_thread_id]) {
@@ -263,10 +266,9 @@ void retire_c::run_a_cycle()
     // update number of retired uops
     ++m_uops_retired[cur_uop->m_thread_id];
 
-    DEBUG("core_id:%d thread_id:%d retired_insts:%lld uop->inst_num:%lld uop_num:%lld " 
-        "done_cycle:%lld\n",
-        m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], 
-        cur_uop->m_inst_num, cur_uop->m_uop_num, cur_uop->m_done_cycle);
+    DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d retired_insts:%lld uop->inst_num:%lld uop_num:%lld done_cycle:%lld\n",
+        m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], cur_uop->m_inst_num, cur_uop->m_uop_num, 
+        cur_uop->m_done_cycle);
 
     // free uop
     for (int ii = 0; ii < cur_uop->m_num_child_uops; ++ii) {

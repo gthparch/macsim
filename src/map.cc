@@ -56,6 +56,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MAP_STAGE, ## args)
+#define DEBUG_CORE(m_core_id, args...)       \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MAP_STAGE, ## args); \
+  }
 
 #define MEM_MAP_KEY(va, off_path)(((va >> 3) << 1) | off_path)
 
@@ -143,8 +147,9 @@ void map_c::add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_ent
   ASSERT(map_entry->m_uop);
   ASSERT(type < NUM_DEP_TYPES);
 
-  DEBUG("core_id:%d thread_id:%d Added dep uop_num:%llu inst_num:%llu src_uop_num:%llu src_num:%d\n",
-        uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, map_entry->m_uop_num, src_num);
+  DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Added dep uop_num:%llu inst_num:%llu "
+      "src_uop_num:%llu src_num:%d\n", uop->m_core_id, uop->m_thread_id, uop->m_uop_num, 
+      uop->m_inst_num, map_entry->m_uop_num, src_num);
 
   ASSERTM(src_num < MAX_UOP_SRC_DEPS, "src_num:%d MAX_UOP_SRC_DEPS:%d \n", 
       src_num, MAX_UOP_SRC_DEPS); 
@@ -162,7 +167,7 @@ void map_c::add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_ent
   // set source bit not ready
   set_not_rdy_bit(uop, src_num); 
 
-  DEBUG("core_id:%d thread_id:%d Added dep uop_num:%llu src_uop_num:%llu "
+  DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Added dep uop_num:%llu src_uop_num:%llu "
       "dep inst_num:%llu src_inst_num:%llu src_num:%d dep pc:0x%llx src pc:0x%llx\n", 
       uop->m_core_id, uop->m_thread_id, uop->m_uop_num, map_entry->m_uop_num, uop->m_inst_num, 
       map_entry->m_inst_num, src_num, uop->m_pc, map_entry->m_pc);
@@ -205,9 +210,9 @@ void map_c::add_src_from_uop (uop_c *uop, uop_c *src_uop, Dep_Type type)
   // for memory dependencies, derived_from_prog_input incremented in track_addr
   set_not_rdy_bit(uop, src_num);
 
-  DEBUG("core_id:%d thread_id:%d Added dep uop_num:%llu src_uop_num:%llu src_num:%d dep_type:%d "
-      "pc:0x%llx\n", uop->m_core_id, uop->m_thread_id, uop->m_uop_num, src_uop->m_uop_num, 
-      src_num, type, uop->m_pc);
+  DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Added dep uop_num:%llu "
+      "src_uop_num:%llu src_num:%d dep_type:%d pc:0x%llx\n", uop->m_core_id, 
+      uop->m_thread_id, uop->m_uop_num, src_uop->m_uop_num, src_num, type, uop->m_pc);
 }
 
 
@@ -251,9 +256,10 @@ void map_c::update_map(uop_c *uop)
     ASSERT(ind < NUM_REG_IDS*2); 
     map_entry_c *map_entry = &(map_data->m_reg_map[ind]); 
 
-    DEBUG("core_id:%d thread_id:%d Writing map uop_num:%llu inst_num:%llu off_path:%d id:%d "
-        "flag:%d ind:%d \n", uop->m_core_id, uop->m_thread_id, uop->m_uop_num, 
-        uop->m_inst_num, uop->m_off_path, id, map_data->m_map_flags[id], ind); 
+    DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Writing map uop_num:%llu "
+        "inst_num:%llu off_path:%d id:%d flag:%d ind:%d \n", uop->m_core_id, 
+        uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_off_path, 
+        id, map_data->m_map_flags[id], ind); 
 
     // update dependence information
     map_entry->m_uop          = uop;
@@ -298,10 +304,10 @@ void map_c::read_reg_map (uop_c *uop)
     uns ind = id << 1 | (map_data->m_map_flags[id]); 
     ASSERT(ind < NUM_REG_IDS*2); 
     map_entry_c *map_entry = &(map_data->m_reg_map[ind]); 
-    DEBUG("core_id:%d thread_id:%d Reading map uop_num:%llu inst_num:%llu "
-          "off_path:%d id:%d flag:%d ind:%d ii:%d num_srcs:%d \n",
-          uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
-          uop->m_off_path, id, map_data->m_map_flags[id], ind, ii, uop->m_num_srcs); 
+    DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Reading map uop_num:%llu inst_num:%llu "
+          "off_path:%d id:%d flag:%d ind:%d ii:%d num_srcs:%d \n", uop->m_core_id, uop->m_thread_id, 
+          uop->m_uop_num, uop->m_inst_num, uop->m_off_path, id, map_data->m_map_flags[id], ind, ii, 
+          uop->m_num_srcs); 
 
     add_src_from_map_entry(uop, ii, map_entry, REG_DATA_DEP);
   }
@@ -324,10 +330,9 @@ void map_c::read_store_map(uop_c *uop)
     ASSERT(ind < 2); 
     map_entry_c *map_entry = &(map_data->m_last_store[ind]); 
 
-    DEBUG("core_id:%d thread_id:%d Reading store map uop_num:%llu inst_num:%llu off_path:%d "
-        "flag:%d   ind:%d \n",
-        uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, 
-        uop->m_off_path, map_data->m_last_store_flag, ind); 
+    DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Reading store map uop_num:%llu "
+        "inst_num:%llu off_path:%d flag:%d ind:%d \n", uop->m_core_id, uop->m_thread_id, 
+        uop->m_uop_num, uop->m_inst_num, uop->m_off_path, map_data->m_last_store_flag, ind); 
 
     add_src_from_map_entry(uop, uop->m_num_srcs++, map_entry, MEM_ADDR_DEP); 
   }
@@ -358,10 +363,9 @@ void map_c::update_store_hash (uop_c *uop)
           MEM_MAP_KEY(va, off_path));
     }
 
-    DEBUG("add store_hash core_id:%d thread_id:%d fb:%d USH: (%llu) inst:%llu "
-          "St(%d)[%llx]: %llx + %s => %s\n", 
-          uop->m_core_id, uop->m_thread_id, first_byte, uop->m_uop_num, uop->m_inst_num, 
-          uop->m_mem_size, uop->m_vaddr, old_data, "XXX", "XXX"); 
+    DEBUG_CORE(uop->m_core_id, "add store_hash core_id:%d thread_id:%d fb:%d USH: (%llu) inst:%llu "
+          "St(%d)[%llx]: %llx + %s => %s\n", uop->m_core_id, uop->m_thread_id, first_byte, 
+          uop->m_uop_num, uop->m_inst_num, uop->m_mem_size, uop->m_vaddr, old_data, "XXX", "XXX"); 
   } 
   else { 
     mem_map_p = (map_data->m_oracle_mem_hash)->hash_table_access_create(
@@ -371,8 +375,8 @@ void map_c::update_store_hash (uop_c *uop)
 
   if (new_entry) {
     ASSERT(!*KNOB(KNOB_USE_NEW_ORACLE) || (off_path && !MEM_GEN_OFF_PATH_VALS));
-    DEBUG("core_id:%d thread_id:%d update_store_hash uop:%llu inst:%llu va:0x%llx first_byte:%d\n",
-          uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, va, first_byte); 
+    DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d update_store_hash uop:%llu inst:%llu va:0x%llx "
+        "first_byte:%d\n", uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, va, first_byte); 
 
     mem_map_p->m_store_mask = 0;
   } 
@@ -382,7 +386,7 @@ void map_c::update_store_hash (uop_c *uop)
   ASSERT(first_byte < BYTES_IN_QUADWORD);
 
   mem_map_p->m_uop[first_byte] = uop;
-  DEBUG("core_id:%d thread_id:%d store_mask:0x%x first_byte:%d uop_num:%llu vaddr:0x%llx  \n", 
+  DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d store_mask:0x%x first_byte:%d uop_num:%llu vaddr:0x%llx\n", 
       uop->m_core_id, uop->m_thread_id, mem_map_p->m_store_mask, first_byte, uop->m_uop_num, 
       (mem_map_p->m_uop[first_byte])->m_vaddr); 
 }
@@ -433,7 +437,7 @@ uop_c* map_c::add_store_deps(uop_c * uop)
       if (!BYTE_OVERLAP(src_uop->m_vaddr, src_uop->m_mem_size, va, uop->m_mem_size)) 
         continue;
 
-      DEBUG("src uop_num:%llu va:0x%llx mem_size:%d dest uop uop_num:%llu va:0x%llx mem_size:%d \n", 
+      DEBUG_CORE(src_uop->m_core_id, "src uop_num:%llu va:0x%llx mem_size:%d dest uop uop_num:%llu va:0x%llx mem_size:%d\n", 
           src_uop->m_uop_num, src_uop->m_vaddr, src_uop->m_mem_size, uop->m_uop_num, uop->m_vaddr, uop->m_mem_size); 
 
       if (*m_simBase->m_knobs->KNOB_MEM_OOO_STORES) {
@@ -496,7 +500,7 @@ void map_c::delete_store_hash_entry(uop_c *uop)
 
   xclearbit(mem_map_p->m_store_mask, first_byte);
 
-  DEBUG("clear store_hash first_byte:%d va:0x%llx core_id:%d uop_num:%llu thread_num:%d\n", 
+  DEBUG_CORE(uop->m_core_id, "clear store_hash first_byte:%d va:0x%llx core_id:%d uop_num:%llu thread_num:%d\n", 
         first_byte, uop->m_vaddr, uop->m_core_id, uop->m_uop_num, uop->m_thread_id); 
 
   mem_map_p->m_uop[first_byte] = NULL;

@@ -65,6 +65,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args)
+#define DEBUG_CORE(m_core_id, args...)       \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ## args); \
+  }
+
 
 #define ULINK 1
 #define DLINK 1
@@ -470,7 +475,7 @@ mem_req_s* dcu_c::search_pref_in_queue()
 int dcu_c::access(uop_c* uop)
 {
   ASSERT(m_level == MEM_L1);
-  DEBUG("L%d[%d] uop_num:%lld access\n", m_level, m_id, uop->m_uop_num);
+  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id, uop->m_uop_num);
 
   uop->m_state = OS_DCACHE_BEGIN;
 
@@ -499,8 +504,8 @@ int dcu_c::access(uop_c* uop)
     uop->m_dcache_bank_id = bank;
     return 0;
   }
-  DEBUG("L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", m_level, m_id, uop->m_uop_num, line_addr, bank);
-
+  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", 
+      m_level, m_id, uop->m_uop_num, line_addr, bank);
 
   // -------------------------------------
   // DCACHE access
@@ -539,7 +544,7 @@ int dcu_c::access(uop_c* uop)
       POWER_EVENT(POWER_L3CACHE_R );
     }
     STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
-    DEBUG("L%d[%d] uop_num:%lld cache hit\n", m_level, m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level, m_id, uop->m_uop_num);
     // stat
     uop->m_uop_info.m_dcmiss = false;
 
@@ -596,7 +601,7 @@ int dcu_c::access(uop_c* uop)
   // -------------------------------------
   else { // !cache_hit
     STAT_EVENT(L1_MISS_CPU + this->m_ptx_sim);
-    DEBUG("L%d[%d] uop_num:%lld cache miss\n", m_level, m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level, m_id, uop->m_uop_num);
 
     // -------------------------------------
     // hardware prefetcher training
@@ -700,7 +705,7 @@ bool dcu_c::fill(mem_req_s* req)
     req->m_queue = m_fill_queue;
     req->m_state = MEM_FILL_NEW;
     req->m_rdy_cycle = m_cycle + 1;
-    DEBUG("L%d[%d] (->fill_queue) req:%d type:%s\n", 
+    DEBUG_CORE(req->m_core_id, "L%d[%d] (->fill_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
 
     if (m_level != MEM_L3) {
@@ -713,7 +718,7 @@ bool dcu_c::fill(mem_req_s* req)
   }
 
   if (req->m_type == MRT_WB)
-    DEBUG("L%d[%d] req:%d type:%s fill queue rejected\n", 
+    DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s fill queue rejected\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
 
   return false;
@@ -726,7 +731,7 @@ bool dcu_c::insert(mem_req_s* req)
   if (m_in_queue->push(req)) {
     req->m_queue = m_in_queue;
     req->m_rdy_cycle = m_cycle + m_latency;
-    DEBUG("L%d[%d] (->in_queue) req:%d type:%s\n", 
+    DEBUG_CORE(req->m_core_id, "L%d[%d] (->in_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
     return true;
   }
@@ -853,7 +858,7 @@ void dcu_c::process_in_queue()
       // If done_func is enabled in this level, need to call done_func to fill lower levels
       // -------------------------------------
       else if (m_done) {
-        DEBUG("L%d[%d] (in_queue->done_func()) req:%d type:%s access hit\n", 
+        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->done_func()) req:%d type:%s access hit\n", 
             m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         if (req->m_done_func && !req->m_done_func(req))
           continue;
@@ -864,9 +869,8 @@ void dcu_c::process_in_queue()
       // -------------------------------------
       else if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level-1]) || !m_has_router) {
         ASSERTM(m_level == MEM_L3, "Level:%d\n", m_level);
-        DEBUG("L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access hit\n", 
-            m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, 
-            mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access hit\n", 
+            m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         if (!m_prev[req->m_cache_id[m_level-1]]->fill(req))
           continue;
       }
@@ -878,7 +882,7 @@ void dcu_c::process_in_queue()
       else {
         if (!m_out_queue->push(req))
           continue;
-        DEBUG("L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n", 
+        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n", 
             m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUT_FILL;
         req->m_rdy_cycle = m_cycle + 1;
@@ -912,9 +916,8 @@ void dcu_c::process_in_queue()
         if (!m_next[req->m_cache_id[m_level+1]]->insert(req)) {
           continue;
         }
-        DEBUG("L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access miss\n", 
-            m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, 
-            mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access miss\n", 
+            m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       }
       // -------------------------------------
       // Because there is no direct link to the next level, send a request thru NoC
@@ -923,7 +926,7 @@ void dcu_c::process_in_queue()
         if (!m_out_queue->push(req)) {
           continue;
         }
-        DEBUG("L%d[%d] (in_queue->out_queue) req:%d type:%s access miss\n", 
+        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->out_queue) req:%d type:%s access miss\n", 
             m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUTQUEUE_NEW;
         req->m_rdy_cycle = m_cycle + 1;
@@ -942,9 +945,8 @@ void dcu_c::process_in_queue()
     m_in_queue->pop((*I));
     if ((*I)->m_done == true) {
       mem_req_s *req = *I;
-      DEBUG("L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n", 
-          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], \
-          m_cycle - req->m_in);
+      DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n", 
+          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_cycle - req->m_in);
 
       if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_type == MRT_DSTORE) {
@@ -1063,9 +1065,8 @@ void dcu_c::process_out_queue()
       }
       if (!send_packet(req, msg_type, 1))
         continue;
-      DEBUG("L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s (new)\n", 
-          m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, 
-          mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s (new)\n", 
+          m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     }
@@ -1085,9 +1086,8 @@ void dcu_c::process_out_queue()
 
       if (!send_packet(req, msg_type, -1))
         continue;
-      DEBUG("L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", 
-          m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, 
-          mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", 
+          m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     }
@@ -1097,9 +1097,8 @@ void dcu_c::process_out_queue()
     else if (req->m_state == MEM_OUT_WB) {
       if (!send_packet(req, NOC_FILL, 1))
         continue;
-      DEBUG("L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", 
-          m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, 
-          mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", 
+          m_level, m_id, m_level+1, req->m_cache_id[m_level+1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     }
@@ -1231,7 +1230,7 @@ void dcu_c::process_fill_queue()
                 POWER_EVENT( POWER_L3CACHE_WB_BUF_W );
               }
 
-              DEBUG("L%d[%d] (fill_queue) new_wb_req:%d addr:0x%llx type:%s by req:%d\n", 
+              DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue) new_wb_req:%d addr:0x%llx type:%s by req:%d\n", 
                   m_level, m_id, wb->m_id, victim_line_addr, mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
             }
           }
@@ -1257,12 +1256,12 @@ void dcu_c::process_fill_queue()
             continue;
           }
           req->m_done = true;
-          DEBUG("L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
+          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
               m_level, m_id, cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         }
         else if (req->m_type == MRT_WB) {
           req->m_done = true;
-          DEBUG("L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
+          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
               m_level, m_id, cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         }
         else {
@@ -1274,8 +1273,8 @@ void dcu_c::process_fill_queue()
               req->m_state = MEM_FILL_WAIT_FILL;
               continue;
             }
-            DEBUG("L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s bypass\n",
-                m_level, m_id, m_level-1, req->m_cache_id[m_level-1], cache_hit, req->m_id, \
+            DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s bypass\n",
+                m_level, m_id, m_level-1, req->m_cache_id[m_level-1], cache_hit, req->m_id, 
                 mem_req_c::mem_req_type_name[req->m_type]);
           }
           // COUPLED L3 OR without router: fill upper level cache
@@ -1284,7 +1283,7 @@ void dcu_c::process_fill_queue()
               req->m_state = MEM_FILL_WAIT_FILL;
               continue;
             }
-            DEBUG("L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s filled\n",
+            DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s filled\n",
                 m_level, m_id, m_level-1, req->m_cache_id[m_level-1], cache_hit, req->m_id, \
                 mem_req_c::mem_req_type_name[req->m_type]);
           }
@@ -1295,7 +1294,7 @@ void dcu_c::process_fill_queue()
               continue;
             }
             req->m_state = MEM_OUT_FILL;
-            DEBUG("L%d[%d] (fill_queue->out_queue) hit:%d req:%d type:%s filled\n",
+            DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->out_queue) hit:%d req:%d type:%s filled\n",
                 m_level, m_id, cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
           }
         }
@@ -1327,9 +1326,8 @@ void dcu_c::process_fill_queue()
             req->m_state = MEM_FILL_WAIT_FILL;
             continue;
           }
-          DEBUG("L%d[%d] (fill_queue->L%d[%d]) req:%d type:%s filled\n",
-              m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, \
-              mem_req_c::mem_req_type_name[req->m_type]);
+          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) req:%d type:%s filled\n",
+              m_level, m_id, m_level-1, req->m_cache_id[m_level-1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         }
         // DECOUPLED L3: send to busout queue
         else {
@@ -1338,7 +1336,7 @@ void dcu_c::process_fill_queue()
             continue;
           }
           req->m_state = MEM_OUT_FILL;
-          DEBUG("L%d[%d] (fill_queue->out_queue) req:%d type:%s filled\n",
+          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->out_queue) req:%d type:%s filled\n",
               m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         }
         done_list.push_back(req);
@@ -1358,9 +1356,8 @@ void dcu_c::process_fill_queue()
     m_fill_queue->pop((*I));
     if ((*I)->m_done == true) {
       mem_req_s *req = *I;
-      DEBUG("L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
-          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], \
-          m_cycle - req->m_in);
+      DEBUG_CORE(req->m_core_id, "L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", 
+          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_cycle - req->m_in);
 
       if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_type == MRT_DSTORE) {
@@ -1413,15 +1410,14 @@ void dcu_c::process_wb_queue()
       //if (!m_next->insert(req))
       if (!m_next[m_next_id]->fill(req))
         continue;
-      DEBUG("L%d[%d] req:%d type:%s inserted to L%d[%d]\n", 
-          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_level+1, 
-          req->m_cache_id[m_level+1]);
+      DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s inserted to L%d[%d]\n", m_level, m_id, req->m_id, 
+          mem_req_c::mem_req_type_name[req->m_type], m_level+1, req->m_cache_id[m_level+1]);
     }
     // L3 : send to dram controller
     else {
       if (!m_out_queue->push(req))
         continue;
-      DEBUG("L%d[%d] req:%d type:%s send to busout queue\n", 
+      DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s send to busout queue\n", 
           m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       req->m_state = MEM_OUT_WB;
     }
@@ -1508,7 +1504,7 @@ bool dcu_c::done(mem_req_s* req)
           if (!m_wb_queue->push(wb))
             ASSERT(0);
 
-          DEBUG("L%d[%d] (done) new_wb_req:%d addr:0x%llx by req:%d type:%s\n", 
+          DEBUG_CORE(req->m_core_id, "L%d[%d] (done) new_wb_req:%d addr:0x%llx by req:%d type:%s\n", 
               m_level, m_id, wb->m_id, repl_line_addr, req->m_id, mem_req_c::mem_req_type_name[MRT_WB]);
 
           if (m_level != MEM_L3) {
@@ -1534,9 +1530,7 @@ bool dcu_c::done(mem_req_s* req)
 
   if (req->m_uop) {
     uop_c* uop = req->m_uop;
-
-    DEBUG("req_id:%d uop:%lld done in_cycle:%llu\n", 
-        req->m_id, uop->m_uop_num, req->m_in_global);
+    DEBUG_CORE(req->m_core_id, "req_id:%d uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
     if (m_ptx_sim) {
@@ -1749,11 +1743,11 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
     uns delay, uop_c* uop, function<bool (mem_req_s*)> done_func, Counter unique_num, \
     pref_req_info_s* pref_info, int core_id, int thread_id, bool ptx)
 {
-  DEBUG("MSHR[%d] new_req type:%s (%d)\n", 
+  DEBUG_CORE(core_id, "MSHR[%d] new_req type:%s (%d)\n", 
       core_id, mem_req_c::mem_req_type_name[type], (int)m_mshr[core_id].size());
 
   if (m_stop_prefetch > m_cycle && type == MRT_DPRF) {
-    DEBUG("PREFETCHING blocked\n");
+    DEBUG_CORE(core_id, "PREFETCHING blocked\n");
     return true;
   }
 
@@ -1792,9 +1786,9 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
     }
     else if (matching_req->m_type == MRT_DPRF) {
       // promotion from hardware prefetch to demand
-      DEBUG("req:%d has been promoted type:%s\n", matching_req->m_id, 
+      DEBUG_CORE(core_id, "req:%d has been promoted type:%s\n", matching_req->m_id, 
           mem_req_c::mem_req_type_name[matching_req->m_type]);
-      adjust_req(matching_req, type, addr, size, delay, uop, done_func, unique_num, \
+      adjust_req(matching_req, type, addr, size, delay, uop, done_func, unique_num, 
           g_mem_priority[type], core_id, thread_id, ptx);
       return true;
     }
@@ -1806,7 +1800,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
 
   // queue full
   if (m_l2_cache[core_id]->full()) {
-    DEBUG("QUEUE FULL\n");
+    DEBUG_CORE(core_id, "QUEUE FULL\n");
     m_stop_prefetch = m_cycle + 500;
     flush_prefetch(core_id);
     if (m_l2_cache[core_id]->full()) {
@@ -1830,7 +1824,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
 
     // mshr full
     if (new_req == NULL) {
-      DEBUG("MSHR FULL\n");
+      DEBUG_CORE(core_id, "MSHR FULL\n");
       m_stop_prefetch = m_cycle + 500;
       flush_prefetch(core_id);
       if (type == MRT_DPRF)
@@ -1873,8 +1867,8 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
   else if (matching_req) {
     STAT_EVENT(TOTAL_MEMORY_MERGE);
-    DEBUG("req:%d addr:0x%llx has matching entry req:%d addr:0x%llx type:%s\n", 
-        new_req->m_id, new_req->m_addr, matching_req->m_id, matching_req->m_addr, \
+    DEBUG_CORE(core_id, "req:%d addr:0x%llx has matching entry req:%d addr:0x%llx type:%s\n", 
+        new_req->m_id, new_req->m_addr, matching_req->m_id, matching_req->m_addr, 
         mem_req_c::mem_req_type_name[matching_req->m_type]); 
 
     matching_req->m_merge.push_back(new_req);
@@ -2016,8 +2010,7 @@ void memory_c::free_req(int core_id, mem_req_s* req)
 
   // when there are still merged requests, call done wrapper function
   if (!req->m_merge.empty()) {
-    DEBUG("req:%d has merged req type:%s\n",
-        req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+    DEBUG_CORE(req->m_core_id, "req:%d has merged req type:%s\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
     dcache_fill_line_wrapper(req);
   }
 
@@ -2138,7 +2131,7 @@ mem_req_s* memory_c::evict_prefetch(int core_id)
 {
   mem_req_s* evict = m_l2_cache[core_id]->search_pref_in_queue();
   if (evict != NULL) {
-    DEBUG("pref_req:%d has been evicted.\n", evict->m_id);
+    DEBUG_CORE(core_id, "pref_req:%d has been evicted.\n", evict->m_id);
   }
 
   return evict;
