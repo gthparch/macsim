@@ -216,11 +216,11 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 
 #ifdef USING_SST
 #include "callback.h"
-typedef SST::MacSim::CallbackBase3<void,uint64_t,uint64_t,int> CallbackSendInstReq;
-typedef SST::MacSim::CallbackBase4<void,uint64_t,uint64_t,int,int> CallbackSendDataReq;
+typedef SST::MacSim::CallbackBase4<void,int,uint64_t,uint64_t,int> CallbackSendInstReq;
+typedef SST::MacSim::CallbackBase5<void,int,uint64_t,uint64_t,int,int> CallbackSendDataReq;
 typedef SST::MacSim::CallbackBase4<void,uint64_t,uint64_t,int,int> CallbackSendCubeReq;
-typedef SST::MacSim::CallbackBase1<bool,uint64_t> CallbackStrobeInstRespQ;
-typedef SST::MacSim::CallbackBase1<bool,uint64_t> CallbackStrobeDataRespQ;
+typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeInstRespQ;
+typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeDataRespQ;
 typedef SST::MacSim::CallbackBase1<bool,uint64_t> CallbackStrobeCubeRespQ;
 
 #define UNIQUE_KEY(C,T,A,I) ((A<<19)|((C&0xF)<<15)|(T&0x7FFF)|I)

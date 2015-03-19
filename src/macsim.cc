@@ -1135,7 +1135,11 @@ int macsim_c::get_current_frequency_uncore(int type)
 }
 
 #ifdef USING_SST
-void macsim_c::registerCallback(CallbackSendInstReq* sir, CallbackSendDataReq* sdr, CallbackStrobeInstRespQ* sirq, CallbackStrobeDataRespQ* sdrq)
+void macsim_c::registerCallback(
+    CallbackSendInstReq* sir, 
+    CallbackSendDataReq* sdr, 
+    CallbackStrobeInstRespQ* sirq, 
+    CallbackStrobeDataRespQ* sdrq)
 {
   sendInstReq = sir;
   sendDataReq = sdr;
@@ -1145,21 +1149,11 @@ void macsim_c::registerCallback(CallbackSendInstReq* sir, CallbackSendDataReq* s
   sendCubeReq = NULL;
 }
 
-void macsim_c::registerCallback(CallbackSendCubeReq* scr, CallbackStrobeCubeRespQ* scrq)
+void macsim_c::registerCallback(
+    CallbackSendCubeReq* scr, 
+    CallbackStrobeCubeRespQ* scrq)
 {
   sendCubeReq = scr;
   strobeCubeRespQ = scrq;
 }
-
-#ifdef HAVE_LIBDRAMSIM
-void macsim_c::setMacsimComponent(void *comp) 
-{
-  m_macsimComponent = comp;
-}
-
-void *macsim_c::getMacsimComponent()
-{
-  return m_macsimComponent;
-}
-#endif //HAVE_LIBDRAMSIM
 #endif //USING_SST

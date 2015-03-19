@@ -93,7 +93,7 @@ ofstream* getOutputStream(const string& filename);
 
 class AbstractStat;
 
-AbstractStat& getGLobalStat(long ID, ProcessorStatistics* m_ProcStat);
+AbstractStat& getGlobalStat(long ID, ProcessorStatistics* m_ProcStat);
 AbstractStat& getCoreWideStat(int coreID, long statID, ProcessorStatistics* m_ProcStat);
 
 
@@ -572,7 +572,7 @@ class RATIO_Stat : public AbstractStat
         refName = refStat.getName();
       }
       else {
-        AbstractStat& refStat = getGLobalStat(m_RatioID, m_ProcStat);
+        AbstractStat& refStat = getGlobalStat(m_RatioID, m_ProcStat);
         refValue = refStat.getCount();
         refName = refStat.getName();
       }
@@ -653,7 +653,7 @@ class PERCENT_Stat : public AbstractStat
         refName = refStat.getName();
       }
       else {
-        AbstractStat& refStat = getGLobalStat(m_denominatorID, m_ProcStat);
+        AbstractStat& refStat = getGlobalStat(m_denominatorID, m_ProcStat);
         refValue = refStat.getCount();
         refName = refStat.getName();
       }

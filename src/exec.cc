@@ -655,7 +655,7 @@ void exec_c::run_a_cycle(void)
         uint64_t key = I->first;
         uop_c* uop = I->second;
 
-        bool responseArrived = (*(m_simBase->strobeDataRespQ))(key);
+        bool responseArrived = (*(m_simBase->strobeDataRespQ))(m_core_id, key);
         if (responseArrived) {
           DEBUG("key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
           if (m_ptx_sim) {
@@ -718,7 +718,7 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
     //core_c *core = m_simBase->m_core_pointers[m_core_id];
-    (*(m_simBase->sendDataReq))(key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+    (*(m_simBase->sendDataReq))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
 
     DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
     m_uop_buffer.insert(std::make_pair(key, uop));

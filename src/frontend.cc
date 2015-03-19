@@ -268,7 +268,7 @@ void frontend_c::run_a_cycle(void)
             if (!(KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))) {
               // Strobing
               for (auto I = m_fetch_buffer.begin(), E = m_fetch_buffer.end(); I != E; I++) {
-                bool responseArrived = (*(m_simBase->strobeInstRespQ))(I->first);
+                bool responseArrived = (*(m_simBase->strobeInstRespQ))(m_core_id, I->first);
                 if (responseArrived) {
                   I->second = true;
                 }
@@ -995,7 +995,7 @@ bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s*
       DEBUG_CORE(m_core_id, "sending memory request (fetch_addr = 0x%llx) to memHierarchy\n", fetch_addr);
       int line_size = KNOB(KNOB_ICACHE_LARGE_LINE_SIZE)->getValue();
       Addr line_addr = fetch_addr & ~((uint64_t)line_size-1);
-      (*(m_simBase->sendInstReq))(key, line_addr, line_size);
+      (*(m_simBase->sendInstReq))(m_core_id, key, line_addr, line_size);
 
       DEBUG_CORE(m_core_id, "fetch_data inserted into buffer. fetch_addr = 0x%llx\n", fetch_addr);
       m_fetch_buffer.insert(std::make_pair(key, false));

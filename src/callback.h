@@ -148,6 +148,35 @@ private:
 	const PtrMember  member;
 };
 
+
+
+
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T>
+class CallbackBase5
+{
+public:
+	virtual ~CallbackBase5() = 0;
+	virtual ReturnT operator()(Param1T,Param2T,Param3T,Param4T,Param5T) = 0;
+};
+
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T> MacSim::CallbackBase5<ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T>::~CallbackBase5() {}
+
+template <typename ConsumerT, typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T> 
+class Callback5: public CallbackBase5<ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T>
+{
+private:
+	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T,Param4T,Param5T);
+
+public:
+	Callback5( ConsumerT* const object, PtrMember member) : object(object), member(member) { }
+	Callback5( const Callback5<ConsumerT,ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T>& e ) : object(e.object), member(e.member) { }
+	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3, Param4T param4, Param5T param5) { return (const_cast<ConsumerT*>(object)->*member) (param1,param2,param3,param4,param5); }
+
+private:
+	ConsumerT* const object;
+	const PtrMember  member;
+};
+
 }}
 
 #endif

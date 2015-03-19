@@ -97,7 +97,7 @@ ofstream* getOutputStream(const string& filename, macsim_c* m_simBase)
 
 
 // get global stats
-AbstractStat& getGLobalStat(long statID, ProcessorStatistics* m_ProcStat)
+AbstractStat& getGlobalStat(long statID, ProcessorStatistics* m_ProcStat)
 {
   AbstractStat& pStat = (*m_ProcStat)[statID];
 
@@ -161,7 +161,7 @@ void DIST_Stat::writeTo(ofstream& stream)
       m_total_count += memberStat.getCount();
     }
     else {
-      AbstractStat& memberStat = getGLobalStat(memberID, m_ProcStat);
+      AbstractStat& memberStat = getGlobalStat(memberID, m_ProcStat);
       m_total_count += memberStat.getCount();
     }
     iter++;
@@ -188,7 +188,7 @@ void DIST_Stat::writeTo(ofstream& stream)
       stream << setw(FILED1_LENGTH) << display_name;
     }
     else {
-      AbstractStat& memberStat = getGLobalStat(memberID, m_ProcStat);
+      AbstractStat& memberStat = getGlobalStat(memberID, m_ProcStat);
       count = memberStat.getCount();
       const string& name = memberStat.getName();
 

@@ -15,20 +15,21 @@ static Component* create_macsimComponent(SST::ComponentId_t id, SST::Params& par
 }
 
 static const ElementInfoParam macsim_params[] = {
-    {"paramFile", "", NULL},
-    {"traceFile", "", NULL},
-    {"outputDir", "", NULL},
-    {"commandLine", "", NULL},
-    {"cubeConnected", "", "0"},
-    {"clockFreq", "Clock frequency", "1GHz"},
-    {"printLocation", "Prints debug statements --0[No debugging], 1[STDOUT], 2[STDERR], 3[FILE]--", "0"},
-    {"debugLevel", "Debugging level: 0 to 10", "8"},
+    {"param_file", "", NULL},
+    {"trace_file", "", NULL},
+    {"output_dir", "", NULL},
+    {"command_line", "", NULL},
+    {"cube_connected", "", "0"},
+    {"frequency", "Clock frequency", "1GHz"},
+    {"num_link", "", "1"},
+    {"debug", "Prints debug statements --0[No debugging], 1[STDOUT], 2[STDERR], 3[FILE]--", "0"},
+    {"debug_level", "Debugging level: 0 to 10", "8"},
     {NULL, NULL, NULL}
 };
 
 static const ElementInfoPort macsim_ports[] = {
-    {"icache_link", "", NULL},
-    {"dcache_link", "", NULL},
+    {"core%(core_id)d-icache", "Ports connected to I$", NULL},
+    {"core%(core_id)d-dcache", "Ports connected to D$", NULL},
     {NULL, NULL, NULL}
 };
 

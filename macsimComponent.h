@@ -36,40 +36,45 @@ class macsimComponent : public SST::Component
 		macsimComponent(const macsimComponent&);   // do not implement
 		void operator=(const macsimComponent&); // do not implement
 
+    void configureLinks(SST::Params& params);
+
     virtual bool ticReceived(Cycle_t);
     void handleIcacheEvent(SimpleMem::Request *req);
     void handleDcacheEvent(SimpleMem::Request *req);
     void handleCubeEvent(SimpleMem::Request *req);
 		
-    string paramFile;
-    string traceFile;
-    string outputDir;
-    string commandLine;
+    string m_param_file;
+    string m_trace_file;
+    string m_output_dir;
+    string m_command_line;
 
-    macsim_c* macsim;
-    bool simRunning;
-    bool cubeConnected;
+    macsim_c* m_macsim;
+    bool m_sim_running;
+    bool m_cube_connected;
 
-    Interfaces::SimpleMem *icache_link;
-    Interfaces::SimpleMem *dcache_link;
-    Interfaces::SimpleMem *cube_link;
+    //Interfaces::SimpleMem *icache_link;
+    //Interfaces::SimpleMem *dcache_link;
+    unsigned int m_num_links;
+    std::vector<Interfaces::SimpleMem*> m_icache_links;
+    std::vector<Interfaces::SimpleMem*> m_dcache_links;
+    Interfaces::SimpleMem *m_cube_link;
 
-    map<uint64_t, uint64_t> icache_requests;
-    map<uint64_t, uint64_t> dcache_requests;
-    map<uint64_t, uint64_t> cube_requests;
-    set<uint64_t> icache_responses;
-    set<uint64_t> dcache_responses;
-    set<uint64_t> cube_responses;
+    std::vector<std::map<uint64_t, uint64_t>> m_icache_requests;
+    std::vector<std::map<uint64_t, uint64_t>> m_dcache_requests;
+    std::map<uint64_t, uint64_t> m_cube_requests;
+    std::vector<std::set<uint64_t>> m_icache_responses;
+    std::vector<std::set<uint64_t>> m_dcache_responses;
+    set<uint64_t> m_cube_responses;
 
-    void sendInstReq(uint64_t, uint64_t, int);
-    void sendDataReq(uint64_t, uint64_t, int, int);
-    void sendCubeReq(uint64_t, uint64_t, int, int);
-    bool strobeInstRespQ(uint64_t);
-    bool strobeDataRespQ(uint64_t);
+    void sendInstReq(int,uint64_t,uint64_t,int);
+    void sendDataReq(int,uint64_t,uint64_t,int,int);
+    void sendCubeReq(uint64_t,uint64_t,int,int);
+    bool strobeInstRespQ(int,uint64_t);
+    bool strobeDataRespQ(int,uint64_t);
     bool strobeCubeRespQ(uint64_t);
 
-    Output* dbg;
-    Cycle_t timestamp;
+    Output* m_dbg;
+    Cycle_t m_cycle;
 };
 
 }}

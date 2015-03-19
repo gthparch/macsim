@@ -340,12 +340,6 @@ class macsim_c
 
     void registerCallback(CallbackSendInstReq*, CallbackSendDataReq*, CallbackStrobeInstRespQ*, CallbackStrobeDataRespQ*);
     void registerCallback(CallbackSendCubeReq*, CallbackStrobeCubeRespQ*);
-
-#ifdef HAVE_LIBDRAMSIM
-    void setMacsimComponent(void *comp); 
-    void *getMacsimComponent(); 
-    void *m_macsimComponent;
-#endif //HAVE_LIBDRAMSIM
 #endif //USING_SST
 };
 
