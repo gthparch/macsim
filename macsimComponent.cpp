@@ -74,12 +74,12 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   // When MASTER mode, MacSim begins execution right away.
   // When SLAVE mode, MacSim awaits trigger event to arrive, which will cause MacSim to begin execution of a specified kernel.
   //   Upon completion, MacSim will return an event to another SST component.
-  m_operation_mode = params.find_integer("operation_mode", OperationMode::MASTER);
-  if (m_operation_mode == OperationMode::MASTER) {
+  m_operation_mode = params.find_integer("operation_mode", MASTER);
+  if (m_operation_mode == MASTER) {
     m_triggered = true;
     m_ipc_link = NULL;
     m_macsim->start();
-  } else { // if (m_operation_mode == OperationMode::SLAVE)
+  } else { // if (m_operation_mode == SLAVE)
     m_triggered = false;
     m_ipc_link = configureLink("ipc_link", "1 ns");
     m_macsim->halt();
@@ -204,14 +204,15 @@ bool macsimComponent::ticReceived(Cycle_t)
   ++m_cycle;
 
   if (!m_triggered) { // When SLAVE mode, wait until triggering event arrives.
+    SST::Event* e = NULL;
     if ((e = m_ipc_link->recv())) {
       MacSimEvent *event = dynamic_cast<MacSimEvent*>(e);
-      if (event == NULL) {
+      if (event->getType() == NONE) {
         _abort(macsimComponent::clock, "macsimComponent got bad event from another component\n");
       }
-      MSC_DEBUG("Received an event (%p) of type: %d at cycle %lld\n", event, event->getType(), m_cycle);
-      if (event->getType() == MacSimEventType::START) {
-        MSC_DEBUG("Beginning execution\n")
+      MSC_DEBUG("Received an event (%p) of type: %d at cycle %lu\n", event, event->getType(), m_cycle);
+      if (event->getType() == START) {
+        MSC_DEBUG("Beginning execution\n");
         m_triggered = true;
         m_macsim->start();
       }
@@ -229,9 +230,11 @@ bool macsimComponent::ticReceived(Cycle_t)
 	}
 	// Let SST know that this component is done and could be terminated
 	else {
-    // Send a report event to another SST component upon completion
-    MacSimEvent *event = new MacSimEvent(MacSimEventType::FINISHED);
-    m_ipc_link->send(event);
+    if (m_operation_mode == SLAVE) {
+      // Send a report event to another SST component upon completion
+      MacSimEvent *event = new MacSimEvent(FINISHED);
+      m_ipc_link->send(event);
+    }
 
     primaryComponentOKToEndSim();
 		return true;

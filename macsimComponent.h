@@ -21,8 +21,8 @@ using namespace SST::Interfaces;
 
 namespace SST { namespace MacSim {
 
-enum class DebugLevel { ERROR, WARNING, INFO, L0, L1, L2, L3, L4, L5, L6 }; // debug level
-enum class OperationMode { MASTER, SLAVE }; // mode
+enum DebugLevel { ERROR, WARNING, INFO, L0, L1, L2, L3, L4, L5, L6 }; // debug level
+enum OperationMode { MASTER, SLAVE }; // mode
 
 class macsimComponent : public SST::Component 
 {
@@ -53,9 +53,9 @@ class macsimComponent : public SST::Component
     bool m_sim_running;
     bool m_cube_connected;
 
-    OperationMode m_operation_mode;
+    int m_operation_mode;
     bool m_triggered;
-    SST::Link m_ipc_link;
+    SST::Link *m_ipc_link;
 
     unsigned int m_num_links;
     std::vector<Interfaces::SimpleMem*> m_icache_links;

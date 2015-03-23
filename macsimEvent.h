@@ -3,13 +3,12 @@
 
 namespace SST { namespace MacSim {
 
-enum class MacSimEventType { NULL, START, FINISHED };
+enum MacSimEventType { NONE, START, FINISHED };
 
-class MacSimEvent
-{
+class MacSimEvent : public SST::Event {
 	public:
-    MacSimEvent(MacSimEventType type = MacSimEventType::NULL) : m_type(type);
-    ~MacSimEvent();
+    MacSimEvent(MacSimEventType type = NONE) : SST::Event(), m_type(type) {}
+    ~MacSimEvent() {}
 
     MacSimEventType getType() { return m_type; }
     void setType(MacSimEventType type) { m_type = type; }
