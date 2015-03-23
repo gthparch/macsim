@@ -62,6 +62,12 @@ class macsimComponent : public SST::Component
     std::vector<Interfaces::SimpleMem*> m_dcache_links;
     Interfaces::SimpleMem *m_cube_link;
 
+    // debugging 
+    std::vector<uint64_t> m_icache_request_counters;
+    std::vector<uint64_t> m_icache_response_counters;
+    std::vector<uint64_t> m_dcache_request_counters;
+    std::vector<uint64_t> m_dcache_response_counters;
+
     std::vector<std::map<uint64_t, uint64_t>> m_icache_requests;
     std::vector<std::map<uint64_t, uint64_t>> m_dcache_requests;
     std::map<uint64_t, uint64_t> m_cube_requests;

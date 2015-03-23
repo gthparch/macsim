@@ -112,6 +112,11 @@ void macsimComponent::configureLinks(SST::Params& params)
     m_dcache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_dcache_responses.push_back(std::set<uint64_t>());
   }
+
+  m_icache_request_counters = std::vector<uint64_t>(m_num_links, 0);
+  m_icache_response_counters = std::vector<uint64_t>(m_num_links, 0);
+  m_dcache_request_counters = std::vector<uint64_t>(m_num_links, 0);
+  m_dcache_response_counters = std::vector<uint64_t>(m_num_links, 0);
 }
 
 void macsimComponent::init(unsigned int phase)
@@ -224,6 +229,15 @@ bool macsimComponent::ticReceived(Cycle_t)
 	// Run a cycle of the simulator
 	m_sim_running = m_macsim->run_a_cycle();
 
+  // Debugging 
+  if (m_cycle % 100000 == 0) {
+    for (unsigned int l = 0 ; l < m_num_links; ++l) {
+      MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l, 
+          m_icache_request_counters[l], m_icache_response_counters[l], 
+          m_dcache_request_counters[l], m_dcache_response_counters[l]);
+    }
+  }
+
 	// Still has more cycles to run
 	if (m_sim_running) {
 		return false;
@@ -251,6 +265,7 @@ void macsimComponent::sendInstReq(int core_id, uint64_t key, uint64_t addr, int 
   SimpleMem::Request *req = 
     new SimpleMem::Request(SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
   m_icache_links[core_id]->sendRequest(req);
+  m_icache_request_counters[core_id]++;
   m_icache_requests[core_id].insert(make_pair(req->id, key));
   MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", 
       core_id, addr & 0x3FFFFFFF, addr, size);
@@ -278,6 +293,7 @@ void macsimComponent::handleIcacheEvent(Interfaces::SimpleMem::Request *req)
     } else {
       MSC_DEBUG("I$[%d] response arrived\n", l);
       m_icache_responses[l].insert(i->second);
+      m_icache_response_counters[l]++;
       m_icache_requests[l].erase(i);
       break;
     }
@@ -310,6 +326,7 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
   SimpleMem::Request *req = 
     new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
   m_dcache_links[core_id]->sendRequest(req);
+  m_dcache_request_counters[core_id]++;
   m_dcache_requests[core_id].insert(make_pair(req->id, key));
   MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
       core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
@@ -335,8 +352,9 @@ void macsimComponent::handleDcacheEvent(Interfaces::SimpleMem::Request *req)
       // No matching request
       continue;
     } else {
-      MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %#" PRIx64 "\n", l, req->addr, req->size);
+      MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n", l, req->addr, req->size);
       m_dcache_responses[l].insert(i->second);
+      m_dcache_response_counters[l]++;
       m_dcache_requests[l].erase(i);
       break;
     }
