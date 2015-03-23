@@ -23,6 +23,7 @@ SUBDIRS = scripts
 compdir = $(pkglibdir)
 comp_LTLIBRARIES = libmacsimComponent.la
 libmacsimComponent_la_SOURCES =                                        \
+macsimEvent.h          																								 \
 macsimComponent.cpp          macsimComponent.h                         \
 libmacsimComponent.cc                                                  \
 src/dram_sst_vaultsim.cc     src/dram_sst_vaultsim.h                   \

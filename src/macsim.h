@@ -340,6 +340,12 @@ class macsim_c
 
     void registerCallback(CallbackSendInstReq*, CallbackSendDataReq*, CallbackStrobeInstRespQ*, CallbackStrobeDataRespQ*);
     void registerCallback(CallbackSendCubeReq*, CallbackStrobeCubeRespQ*);
+
+    void start() { m_started = true; }
+    void halt() { m_started = false; }
+
+  private:
+    bool m_started;
 #endif //USING_SST
 };
 

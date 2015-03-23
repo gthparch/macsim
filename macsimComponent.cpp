@@ -16,6 +16,7 @@
 #include "src/uop.h"
 #include "src/frontend.h"
 
+#include "macsimEvent.h"
 #include "macsimComponent.h"
 
 #define MSC_DEBUG(fmt, args...) m_dbg->debug(CALL_INFO,INFO,0,fmt,##args)
@@ -27,9 +28,9 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 {
   m_dbg = new Output();
 
-  int debug_level = params.find_integer("debug_level", 0);
-  if (debug_level < 0 || debug_level > 8) 
-    _abort(macsimComponent, "Debugging level must be betwee 0 and 8. \n");
+  int debug_level = params.find_integer("debug_level", DebugLevel::ERROR);
+  if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6) 
+    _abort(macsimComponent, "Debugging level must be between 0 and 9. \n");
 
   string prefix = "[" + getName() + "] ";
   m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)params.find_integer("debug", Output::NONE));
@@ -52,14 +53,6 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   m_num_links = params.find_integer("num_link", 1);
   configureLinks(params);
 
-  //icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-  //if (!icache_link) _abort(macsimComponent, "Unable to load Module as memory\n");
-  //icache_link->initialize("icache_link", new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleIcacheEvent));
-
-  //dcache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-  //if (!dcache_link) _abort(macsimComponent, "Unable to load Module as memory\n");
-  //dcache_link->initialize("dcache_link", new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleDcacheEvent));
-
   m_cube_connected = params.find_integer("cube_connected", 0);
   if (m_cube_connected) {
     m_cube_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
@@ -69,7 +62,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  string clockFreq = params.find_string("frequency", "1 GHz");  //Hertz
+  string clockFreq = params.find_string("frequency", "1 GHz");
   registerClock(clockFreq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
   registerAsPrimaryComponent();
@@ -77,6 +70,20 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 
   m_macsim = new macsim_c();
   m_sim_running = false;
+
+  // When MASTER mode, MacSim begins execution right away.
+  // When SLAVE mode, MacSim awaits trigger event to arrive, which will cause MacSim to begin execution of a specified kernel.
+  //   Upon completion, MacSim will return an event to another SST component.
+  m_operation_mode = params.find_integer("operation_mode", OperationMode::MASTER);
+  if (m_operation_mode == OperationMode::MASTER) {
+    m_triggered = true;
+    m_ipc_link = NULL;
+    m_macsim->start();
+  } else { // if (m_operation_mode == OperationMode::SLAVE)
+    m_triggered = false;
+    m_ipc_link = configureLink("ipc_link", "1 ns");
+    m_macsim->halt();
+  }
 }
 
 macsimComponent::macsimComponent() : Component(-1) {}  //for serialization only 
@@ -110,8 +117,6 @@ void macsimComponent::configureLinks(SST::Params& params)
 void macsimComponent::init(unsigned int phase)
 {
   if (!phase) {
-    //icache_link->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
-    //dcache_link->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
     for (unsigned int l = 0 ; l < m_num_links; ++l) {
       m_icache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
       m_dcache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
@@ -198,6 +203,23 @@ bool macsimComponent::ticReceived(Cycle_t)
 {
   ++m_cycle;
 
+  if (!m_triggered) { // When SLAVE mode, wait until triggering event arrives.
+    if ((e = m_ipc_link->recv())) {
+      MacSimEvent *event = dynamic_cast<MacSimEvent*>(e);
+      if (event == NULL) {
+        _abort(macsimComponent::clock, "macsimComponent got bad event from another component\n");
+      }
+      MSC_DEBUG("Received an event (%p) of type: %d at cycle %lld\n", event, event->getType(), m_cycle);
+      if (event->getType() == MacSimEventType::START) {
+        MSC_DEBUG("Beginning execution\n")
+        m_triggered = true;
+        m_macsim->start();
+      }
+    } else {
+      return false;
+    }
+  }
+
 	// Run a cycle of the simulator
 	m_sim_running = m_macsim->run_a_cycle();
 
@@ -207,6 +229,10 @@ bool macsimComponent::ticReceived(Cycle_t)
 	}
 	// Let SST know that this component is done and could be terminated
 	else {
+    // Send a report event to another SST component upon completion
+    MacSimEvent *event = new MacSimEvent(MacSimEventType::FINISHED);
+    m_ipc_link->send(event);
+
     primaryComponentOKToEndSim();
 		return true;
 	}

@@ -889,6 +889,11 @@ void macsim_c::init_clock_domain(void)
 // =======================================
 int macsim_c::run_a_cycle() 
 {
+#ifdef USING_SST
+  if (!m_started)
+    return 1; // simulation not started/finished
+#endif //USING_SST
+
   // termination condition check
   // 1. no active threads in the system
   // 2. repetition has been done (in case of multiple applications simulation)

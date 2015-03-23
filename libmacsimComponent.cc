@@ -15,22 +15,24 @@ static Component* create_macsimComponent(SST::ComponentId_t id, SST::Params& par
 }
 
 static const ElementInfoParam macsim_params[] = {
-    {"param_file", "", NULL},
-    {"trace_file", "", NULL},
-    {"output_dir", "", NULL},
-    {"command_line", "", NULL},
-    {"cube_connected", "", "0"},
-    {"frequency", "Clock frequency", "1GHz"},
-    {"num_link", "", "1"},
-    {"debug", "Prints debug statements --0[No debugging], 1[STDOUT], 2[STDERR], 3[FILE]--", "0"},
-    {"debug_level", "Debugging level: 0 to 10", "8"},
-    {NULL, NULL, NULL}
+  {"param_file", "params.in", NULL},
+  {"trace_file", "trace_file_list", NULL},
+  {"output_dir", "output (stats, params.out, etc.) directory", NULL},
+  {"command_line", "specify knobs, if any", NULL},
+  {"cube_connected", "Depricated", "0"},
+  {"operation_mode", "0: Master, 1: Slave", "0"},
+  {"frequency", "clock frequency", "1GHz"},
+  {"num_link", "this should match to the number of cores and/or L1 caches", "1"},
+  {"debug", "0:No debugging, 1:stdout, 2:stderr, 3:file", "0"},
+  {"debug_level", "debugging level: 0 to 9", "8"},
+  {NULL, NULL, NULL}
 };
 
 static const ElementInfoPort macsim_ports[] = {
-    {"core%(core_id)d-icache", "Ports connected to I$", NULL},
-    {"core%(core_id)d-dcache", "Ports connected to D$", NULL},
-    {NULL, NULL, NULL}
+  {"ipc_link", "Port for Inter Processor Communication", NULL},
+  {"core%(core_id)d-icache", "Ports connected to I$", NULL},
+  {"core%(core_id)d-dcache", "Ports connected to D$", NULL},
+  {NULL, NULL, NULL}
 };
 
 static const ElementInfoComponent components[] = {
