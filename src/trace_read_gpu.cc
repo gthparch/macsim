@@ -1305,6 +1305,8 @@ void gpu_decoder_c::init_pin_convert(void)
 	m_int_uop_table[GPU_MAD24]             		= UOP_GPU_MAD24;
 	m_int_uop_table[GPU_MAD]             	  	= UOP_GPU_MAD;
 	m_int_uop_table[GPU_MAD64]             		= UOP_GPU_MAD64;
+	m_int_uop_table[GPU_MADC]             	  	= UOP_GPU_MAD;
+	m_int_uop_table[GPU_MADC64]             		= UOP_GPU_MAD64;
 	m_int_uop_table[GPU_MAX]             	  	= UOP_GPU_MAX;
 	m_int_uop_table[GPU_MAX64]             		= UOP_GPU_MAX64;
 	m_int_uop_table[GPU_MEMBAR_CTA]          	= UOP_GPU_MEMBAR_CTA;
@@ -1348,6 +1350,8 @@ void gpu_decoder_c::init_pin_convert(void)
 	m_int_uop_table[GPU_SET64]             		= UOP_GPU_SET64;
 	m_int_uop_table[GPU_SETP]             		= UOP_GPU_SETP;
 	m_int_uop_table[GPU_SETP64]             	= UOP_GPU_SETP64;
+	m_int_uop_table[GPU_SHFL]             	  = UOP_GPU_SHFL;
+	m_int_uop_table[GPU_SHFL64]             	= UOP_GPU_SHFL64;
 	m_int_uop_table[GPU_SHL]             	  	= UOP_GPU_SHL;
 	m_int_uop_table[GPU_SHL64]             		= UOP_GPU_SHL64;
 	m_int_uop_table[GPU_SHR]             		  = UOP_GPU_SHR;
@@ -1455,6 +1459,8 @@ void gpu_decoder_c::init_pin_convert(void)
 	m_fp_uop_table[GPU_MAD24]             	 = UOP_GPU_FMAD24;
 	m_fp_uop_table[GPU_MAD]             	   = UOP_GPU_FMAD;
 	m_fp_uop_table[GPU_MAD64]             	 = UOP_GPU_FMAD64;
+	m_fp_uop_table[GPU_MADC]             	   = UOP_GPU_FMADC;
+	m_fp_uop_table[GPU_MADC64]             	 = UOP_GPU_FMADC64;
 	m_fp_uop_table[GPU_MAX]             	   = UOP_GPU_FMAX;
 	m_fp_uop_table[GPU_MAX64]             	 = UOP_GPU_FMAX64;
 	m_fp_uop_table[GPU_MEMBAR_CTA]         	 = UOP_GPU_FMEMBAR_CTA;
@@ -1498,6 +1504,8 @@ void gpu_decoder_c::init_pin_convert(void)
 	m_fp_uop_table[GPU_SET64]             	 = UOP_GPU_FSET64;
 	m_fp_uop_table[GPU_SETP]             		 = UOP_GPU_FSETP;
 	m_fp_uop_table[GPU_SETP64]             	 = UOP_GPU_FSETP64;
+	m_fp_uop_table[GPU_SHFL]             	   = UOP_GPU_FSHFL;
+	m_fp_uop_table[GPU_SHFL64]             	 = UOP_GPU_FSHFL64;
 	m_fp_uop_table[GPU_SHL]             	   = UOP_GPU_FSHL;
 	m_fp_uop_table[GPU_SHL64]             	 = UOP_GPU_FSHL64;
 	m_fp_uop_table[GPU_SHR]             		 = UOP_GPU_FSHR;
@@ -1840,6 +1848,8 @@ const char* gpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
 	"GPU_SET64",
 	"GPU_SETP",
 	"GPU_SETP64",
+	"GPU_SHFL",
+	"GPU_SHFL64",
 	"GPU_SHL",
 	"GPU_SHL64",
 	"GPU_SHR",
