@@ -44,6 +44,9 @@ Install CUDA 4.2 (not higher)
                   2. tar xvf Python-2.7.9.tgz && cd Python-2.7.9
                   3. ./configure && make && sudo make install
                   4. sudo rm /usr/bin/python /usr/bin/python2 /usr/bin/python-config and create a link to /usr/local/bin/python2.7 …
+        
+        Notes:  If you exit the terminal you should export PATH and LD_LIBRARY_PATH again and do sudo ldconfig.
+        For trace generation with Ocelot you can check MacSim documentation and Ocelot's as well.
 
 
         References
