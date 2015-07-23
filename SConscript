@@ -51,15 +51,15 @@ if sys.platform != "darwin":
 
 ## DEBUG build
 if flags['debug'] == '1':
-  env['CPPFLAGS'] = '-g -std=c++0x %s' % warn_flags
+  env['CPPFLAGS'] = '-g -std=c++11 %s' % warn_flags
 ## GPROF build
 elif flags['gprof'] == '1':
-  env['CPPFLAGS'] = '-pg -std=c++0x %s' % warn_flags
+  env['CPPFLAGS'] = '-pg -std=c++11 %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
   env['LINKFLAGS'].append('-pg')
 ## OPT build
 else:
-  env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s' % warn_flags
+  env['CPPFLAGS'] = '-O3 -std=c++11 -funroll-loops %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
 
 if flags['val'] == '1':

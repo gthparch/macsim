@@ -406,11 +406,72 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-// Main instrumentation routine
-// Depending on the type of an instruction, call corresponding subroutines.
-// Do not modify this routine!!
-/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Trace Instrumentation
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+UINT64 last_count = -1;
+
+VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
+{
+  THREADID tid = threadMap[PIN_ThreadId()];
+  if (tid == 100000)
+    return ;
+  
+
+  if (!g_enable_instrument)
+    return;
+
+  g_inst_count[tid] += count;
+
+  if (Knob_max.Value() > 0 && g_inst_count[tid] >= Knob_max.Value()) {
+    finish();
+    exit(0);
+  }
+
+  if (g_inst_count[tid] >= last_count + 500000) {
+    cout << g_inst_count[tid] << "\n";
+    last_count = g_inst_count[tid];
+  }
+
+#if 0
+  if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
+    if (g_start_inst_count[tid] == -1) {
+      cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << "\n";
+      g_start_inst_count[tid] = g_inst_count[tid];
+      g_enable_thread_instrument[tid] = true;
+    }
+  } else {
+    g_enable_thread_instrument[tid] = false;
+  } 
+
+
+  if (Knob_max.Value() > 0 && g_start_inst_count[tid] != -1 && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid]) {
+    g_enable_thread_instrument[tid] = false; 
+    cout << "-> Thread " << tid << " reachea at max instrunction count " << g_inst_count[tid] << endl;
+    finish();
+    exit(0);
+  }
+#endif
+}
+
+VOID INST_trace(TRACE trace, VOID *v)
+{
+  for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
+    BBL_InsertCall(bbl, IPOINT_ANYWHERE, AFUNPTR(INST_count), IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_END);
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Instruction  Instrumentation
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+* Main instrumentation routine
+* Depending on the type of an instruction, call corresponding subroutines.
+* Do not modify this routine!!
+*/
 void instrument(INS ins)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
@@ -537,7 +598,7 @@ void instrument(INS ins)
   // set the opcode
   // ----------------------------------------
   if (OPCODE_StringShort(INS_Opcode(ins)).find("NOP") != string::npos) {
-    info->opcode = TR_NOP;	
+    info->opcode = TR_NOP;  
   } 
   // ----------------------------------------
   // opcode : multiply
@@ -699,77 +760,16 @@ void instrument(INS ins)
   }
 }
 
-
-UINT64 last_count = -1;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Instrumentation Site
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
-{
-  THREADID tid = threadMap[PIN_ThreadId()];
-  if (tid == 100000)
-    return ;
-  
-
-  if (!g_enable_instrument)
-    return;
-
-  g_inst_count[tid] += count;
-
-  if (Knob_max.Value() > 0 && g_inst_count[tid] >= Knob_max.Value()) {
-    finish();
-    exit(0);
-  }
-
-  if (g_inst_count[tid] >= last_count + 500000) {
-    cout << g_inst_count[tid] << "\n";
-    last_count = g_inst_count[tid];
-  }
-
-#if 0
-  if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
-    if (g_start_inst_count[tid] == -1) {
-      cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << "\n";
-      g_start_inst_count[tid] = g_inst_count[tid];
-      g_enable_thread_instrument[tid] = true;
-    }
-  } else {
-    g_enable_thread_instrument[tid] = false;
-  } 
-
-
-  if (Knob_max.Value() > 0 && g_start_inst_count[tid] != -1 && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid]) {
-    g_enable_thread_instrument[tid] = false; 
-    cout << "-> Thread " << tid << " reachea at max instrunction count " << g_inst_count[tid] << endl;
-    finish();
-    exit(0);
-  }
-#endif
-}
-
-VOID INST_trace(TRACE trace, VOID *v)
-{
-  for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
-    BBL_InsertCall(bbl, IPOINT_ANYWHERE, AFUNPTR(INST_count), IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_END);
-  }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Instruction - instrumentation
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+* 
+*/
 void Instruction(INS ins, void* v)
 {
   if (!g_enable_instrument)
     return;
 
-
-//  INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)IncrementNumInstruction, IARG_THREAD_ID, IARG_END);
   instrument(ins);
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /// Thread Start Function
@@ -901,12 +901,12 @@ void Fini(INT32 code, void *v)
 }
 
 
+/*
+* Finalization
+* Create configuration file
+* Final print to standard output
+*/
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/// Finalization
-/// Create configuration file
-/// Final print to standard output
-/////////////////////////////////////////////////////////////////////////////////////////
 void finish(void)
 {
   /**< Create configuration file */
@@ -1110,9 +1110,14 @@ int main(int argc, char *argv[])
   PIN_AddThreadStartFunction(ThreadStart, 0);
   PIN_AddThreadFiniFunction(ThreadEnd, 0);
 
-  // instrumentation option
+  // Instrumentation Granularity:
+  // 1. Trace: Counting Basic Blocks instructions to not to 
+  // overflow from total instruction count for each thread
   TRACE_AddInstrumentFunction(INST_trace, 0);
+  // 2. Instruction: Update Inst_info and insert a callback
+  // before every instruction to dprint_inst
   INS_AddInstrumentFunction(Instruction, 0);
+  // 3. Summery of Trace Generation
   control.CheckKnobs(Handler, 0);
 
   PIN_AddDetachFunction(Detach, 0);

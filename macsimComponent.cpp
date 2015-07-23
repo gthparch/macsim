@@ -7,7 +7,6 @@
 #include <sst/core/element.h>
 #include <sst/core/simulation.h>
 #include <sst/core/params.h>
-#include <sst/core/debug.h>
 
 #include <sst/core/interfaces/stringEvent.h>
 #include <sst/core/interfaces/simpleMem.h>
@@ -30,18 +29,18 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 
   int debug_level = params.find_integer("debug_level", DebugLevel::ERROR);
   if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6) 
-    _abort(macsimComponent, "Debugging level must be between 0 and 9. \n");
+    m_dbg->fatal(CALL_INFO, -1, "Debugging level must be between 0 and 9. \n");
 
   string prefix = "[" + getName() + "] ";
   m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)params.find_integer("debug", Output::NONE));
   MSC_DEBUG("------- Initializing -------\n");
 
   if (params.find("param_file") == params.end())
-    _abort(macsimComponent, "Couldn't find params.in file\n");
+    m_dbg->fatal(CALL_INFO, -1, "Couldn't find params.in file\n");
   if (params.find("trace_file") == params.end()) 
-    _abort(macsimComponent, "Couldn't find trace_file_list file\n");
+    m_dbg->fatal(CALL_INFO, -1, "Couldn't find trace_file_list file\n");
   if (params.find("output_dir") == params.end()) 
-    _abort(macsimComponent, "Couldn't find statistics output directory parameter");
+    m_dbg->fatal(CALL_INFO, -1, "Couldn't find statistics output directory parameter");
 
   m_param_file = string(params["param_file"]);
   m_trace_file = string(params["trace_file"]);
@@ -56,7 +55,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   m_cube_connected = params.find_integer("cube_connected", 0);
   if (m_cube_connected) {
     m_cube_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!m_cube_link) _abort(macsimComponent, "Unable to load Module as memory\n");
+    if (!m_cube_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
     m_cube_link->initialize("cube_link", new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleCubeEvent));
   } else {
     m_cube_link = NULL;
@@ -94,9 +93,9 @@ void macsimComponent::configureLinks(SST::Params& params)
   Interfaces::SimpleMem *dcache_link;
   for (unsigned int l = 0 ; l < m_num_links; ++l) {
     icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!icache_link) _abort(macsimComponent, "Unable to load Module as memory\n");
+    if (!icache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
     dcache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!dcache_link) _abort(macsimComponent, "Unable to load Module as memory\n");
+    if (!dcache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
 
     std::ostringstream icache_link_name;
     icache_link_name << "core" << l << "-icache";
@@ -213,7 +212,7 @@ bool macsimComponent::ticReceived(Cycle_t)
     if ((e = m_ipc_link->recv())) {
       MacSimEvent *event = dynamic_cast<MacSimEvent*>(e);
       if (event->getType() == NONE) {
-        _abort(macsimComponent::clock, "macsimComponent got bad event from another component\n");
+        m_dbg->fatal(CALL_INFO, -1, "macsimComponent got bad event from another component\n");
       }
       MSC_DEBUG("Received an event (%p) of type: %d at cycle %lu\n", event, event->getType(), m_cycle);
       if (event->getType() == START) {
@@ -396,7 +395,7 @@ void macsimComponent::handleCubeEvent(Interfaces::SimpleMem::Request *req)
   auto i = m_cube_requests.find(req->id);
   if (m_cube_requests.end() == i) {
     // No matching request
-    _abort(macsimComponent, "Event (%#" PRIx64 ") not found!\n", req->id);
+    m_dbg->fatal(CALL_INFO, -1, "Event (%#" PRIx64 ") not found!\n", req->id);
   } else {
     MSC_DEBUG("Cube response arrived\n");
     m_cube_responses.insert(i->second);
