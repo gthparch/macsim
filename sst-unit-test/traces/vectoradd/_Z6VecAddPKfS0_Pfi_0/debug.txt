@@ -1,0 +1,7953 @@
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_0 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f40
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40000
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40000
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1 + 8]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_1 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 1
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f48
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40008
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40008
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2 + 16]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_2 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 2
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f50
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40010
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40010
+mem_access_size/barrier_id 8
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 8
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3 + 24]
+opcode ld a _Z6VecAddPKfS0_Pfi_param_3 b  c  d 
+*** begin of the data strcture *** 
+opcode 145
+num_read_regs 0
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 3
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1f58
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 40018
+br_taken_mask 0
+mem_addr/reconv_inst_addr 40018
+mem_access_size/barrier_id 4
+addr_space/fence_level 4
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 4
+*** end of the data strcture *** 
+
+cvta.to.global.u64 %r4, %r2
+opcode cvta a  b  c  d 
+*** begin of the data strcture *** 
+opcode 36
+num_read_regs 1
+num_dest_regs 1
+src1 2
+src2 0
+src3 0
+src4 0
+dest1 4
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f60
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+cvta.to.global.u64 %r5, %r1
+opcode cvta a  b  c  d 
+*** begin of the data strcture *** 
+opcode 36
+num_read_regs 1
+num_dest_regs 1
+src1 1
+src2 0
+src3 0
+src4 0
+dest1 5
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f68
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+cvta.to.global.u64 %r6, %r0
+opcode cvta a  b  c  d 
+*** begin of the data strcture *** 
+opcode 36
+num_read_regs 1
+num_dest_regs 1
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 6
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f70
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+mov.u32 %r7, %ctaid.x
+opcode mov a %ctaid.x b  c  d 
+*** begin of the data strcture *** 
+opcode 61
+num_read_regs 1
+num_dest_regs 1
+src1 1557
+src2 0
+src3 0
+src4 0
+dest1 7
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f78
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+mov.u32 %r8, %ntid.x
+opcode mov a %ntid.x b  c  d 
+*** begin of the data strcture *** 
+opcode 61
+num_read_regs 1
+num_dest_regs 1
+src1 1552
+src2 0
+src3 0
+src4 0
+dest1 8
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f80
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+mov.u32 %r9, %tid.x
+opcode mov a %tid.x b  c  d 
+*** begin of the data strcture *** 
+opcode 61
+num_read_regs 1
+num_dest_regs 1
+src1 1551
+src2 0
+src3 0
+src4 0
+dest1 9
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f88
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+mad.lo.s32 %r10, %r7, %r8, %r9
+opcode mad a  b  c  d 
+*** begin of the data strcture *** 
+opcode 50
+num_read_regs 3
+num_dest_regs 1
+src1 7
+src2 8
+src3 9
+src4 0
+dest1 10
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f90
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+setp.lt.s32 %p11, %r10, %r3
+opcode setp a  b  c  d 
+*** begin of the data strcture *** 
+opcode 95
+num_read_regs 2
+num_dest_regs 1
+src1 10
+src2 3
+src3 0
+src4 0
+dest1 11
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1f98
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+@%p11 bra BB_1_4
+opcode bra a  b  c  d BB_1_4
+*** begin of the data strcture *** 
+opcode 21
+num_read_regs 1
+num_dest_regs 0
+src1 11
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 2
+is_load 0
+inst_size 4
+inst_addr 1fa0
+active_mask ffffffff
+br_target_addr 1fb8
+reconv_inst_addr/mem_addr 1fa8
+br_taken_mask ffffffff
+mem_addr/reconv_inst_addr 1fa8
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+mul.wide.s32 %r12, %r10, 4
+opcode mul a  b %r1 c  d 
+*** begin of the data strcture *** 
+opcode 64
+num_read_regs 1
+num_dest_regs 1
+src1 10
+src2 0
+src3 0
+src4 0
+dest1 12
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fb8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+add.s64 %r13, %r6, %r12
+opcode add a  b  c  d 
+*** begin of the data strcture *** 
+opcode 4
+num_read_regs 2
+num_dest_regs 1
+src1 6
+src2 12
+src3 0
+src4 0
+dest1 13
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fc0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+add.s64 %r14, %r5, %r12
+opcode add a  b  c  d 
+*** begin of the data strcture *** 
+opcode 4
+num_read_regs 2
+num_dest_regs 1
+src1 5
+src2 12
+src3 0
+src4 0
+dest1 14
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fc8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c00
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c00
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c04
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c04
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c08
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c08
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c0c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c0c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c10
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c10
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c14
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c14
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c18
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c18
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c1c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c1c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c20
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c20
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c24
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c24
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c28
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c28
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c2c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c2c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c30
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c30
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c34
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c34
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c38
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c38
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c3c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c3c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c40
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c40
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c44
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c44
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c48
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c48
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c4c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c4c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c50
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c50
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c54
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c54
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c58
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c58
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c5c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c5c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c60
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c60
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c64
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c64
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c68
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c68
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c6c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c6c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c70
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c70
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c74
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c74
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c78
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c78
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r15, [%r14]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 14
+src2 0
+src3 0
+src4 0
+dest1 15
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 937c7c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 937c7c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d00
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d00
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d04
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d04
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d08
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d08
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d0c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d0c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d10
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d10
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d14
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d14
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d18
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d18
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d1c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d1c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d20
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d20
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d24
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d24
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d28
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d28
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d2c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d2c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d30
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d30
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d34
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d34
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d38
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d38
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d3c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d3c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d40
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d40
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d44
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d44
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d48
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d48
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d4c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d4c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d50
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d50
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d54
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d54
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d58
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d58
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d5c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d5c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d60
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d60
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d64
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d64
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d68
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d68
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d6c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d6c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d70
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d70
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d74
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d74
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d78
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d78
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+ld.global.f32 %r16, [%r13]
+opcode ld a  b  c  d 
+*** begin of the data strcture *** 
+opcode 140
+num_read_regs 1
+num_dest_regs 1
+src1 13
+src2 0
+src3 0
+src4 0
+dest1 16
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 1
+inst_size 4
+inst_addr 1fd8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 906d7c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 906d7c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 1
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+add.f32 %r17, %r16, %r15
+opcode add a  b  c  d 
+*** begin of the data strcture *** 
+opcode 3
+num_read_regs 2
+num_dest_regs 1
+src1 16
+src2 15
+src3 0
+src4 0
+dest1 17
+dest2 0
+dest3 0
+dest4 0
+is_fp 1
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fe0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+add.s64 %r18, %r4, %r12
+opcode add a  b  c  d 
+*** begin of the data strcture *** 
+opcode 4
+num_read_regs 2
+num_dest_regs 1
+src1 4
+src2 12
+src3 0
+src4 0
+dest1 18
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fe8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a00
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a00
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a04
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a04
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a08
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a08
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a0c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a0c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a10
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a10
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a14
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a14
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a18
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a18
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a1c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a1c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a20
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a20
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a24
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a24
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a28
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a28
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a2c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a2c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a30
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a30
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a34
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a34
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a38
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a38
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a3c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a3c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a40
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a40
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a44
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a44
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a48
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a48
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a4c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a4c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a50
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a50
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a54
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a54
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a58
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a58
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a5c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a5c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a60
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a60
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a64
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a64
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a68
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a68
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a6c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a6c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a70
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a70
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a74
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a74
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a78
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a78
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+st.global.f32 [%r18], %r17
+opcode st a  b  c  d 
+*** begin of the data strcture *** 
+opcode 147
+num_read_regs 2
+num_dest_regs 0
+src1 17
+src2 18
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1ff0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 968a7c
+br_taken_mask 0
+mem_addr/reconv_inst_addr 968a7c
+mem_access_size/barrier_id 4
+addr_space/fence_level 2
+cache_operator 5
+barrier_id/mem_access_size 4
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 2
+*** end of the data strcture *** 
+
+bra.uni BB_1_6
+opcode bra a  b  c  d BB_1_6
+*** begin of the data strcture *** 
+opcode 21
+num_read_regs 0
+num_dest_regs 0
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 2
+is_load 0
+inst_size 4
+inst_addr 1ff8
+active_mask ffffffff
+br_target_addr 1fa8
+reconv_inst_addr/mem_addr 1f40
+br_taken_mask ffffffff
+mem_addr/reconv_inst_addr 1f40
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+reconverge
+opcode reconverge a  b  c  d 
+*** begin of the data strcture *** 
+opcode 138
+num_read_regs 0
+num_dest_regs 0
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 0
+is_load 0
+inst_size 4
+inst_addr 1fa8
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+
+exit
+opcode exit a  b  c  d 
+*** begin of the data strcture *** 
+opcode 40
+num_read_regs 0
+num_dest_regs 0
+src1 0
+src2 0
+src3 0
+src4 0
+dest1 0
+dest2 0
+dest3 0
+dest4 0
+is_fp 0
+cf_type 8
+is_load 0
+inst_size 4
+inst_addr 1fb0
+active_mask ffffffff
+br_target_addr 0
+reconv_inst_addr/mem_addr 0
+br_taken_mask 0
+mem_addr/reconv_inst_addr 0
+mem_access_size/barrier_id 0
+addr_space/fence_level 0
+cache_operator 0
+barrier_id/mem_access_size 0
+num_barrier_threads 0
+cache_level 0
+fence_level/addr_space 0
+*** end of the data strcture *** 
+

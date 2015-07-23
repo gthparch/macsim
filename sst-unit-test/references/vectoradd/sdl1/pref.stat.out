@@ -1,0 +1,104 @@
+####################################################################################################
+Interval
+####################################################################################################
+Cumulative:         Cycles:                  20000     Instructions:                  1200
+PREF_PFPOL                                                      0                             0
+
+PREF_DL0REQ_QUEUE_HIT_BY_DEMAND                                 0                             0
+
+PREF_UL2REQ_QUEUE_HIT_BY_DEMAND                                 0                             0
+
+PREF_DL0REQ_QUEUE_FULL                                          0                             0
+
+PREF_UL2REQ_QUEUE_FULL                                          0                             0
+
+PREF_UL2REQ_SEND_QUEUE_STALL                                    0                             0
+
+PREF_UL2REQ_QUEUE_MATCHED_REQ                                   0                             0
+
+PREF_DL0REQ_QUEUE_MATCHED_REQ                                   0                             0
+
+PREF_UL2REQ_QUEUE_SENTREQ                                       0                             0
+
+PREF_UNUSED_EVICT                                               0                             0
+
+PREF_REGION_SENT                                                0                             0
+
+PREF_REGION_USEFUL                                              0                             0
+
+PREF_REGION_EVICT                                               0                             0
+
+PREF_PHASE_OVERWRITE_PAGE                                       0                             0
+
+PREF_UPDATE_COUNT                                               0                             0
+
+PREF_ACC_1                                                      0                          NaN 
+PREF_ACC_2                                                      0                          NaN 
+PREF_ACC_3                                                      0                          NaN 
+PREF_ACC_4                                                      0                          NaN 
+PREF_ACC_5                                                      0                          NaN 
+PREF_ACC_6                                                      0                          NaN 
+PREF_ACC_7                                                      0                          NaN 
+PREF_ACC_8                                                      0                          NaN 
+PREF_ACC_9                                                      0                          NaN 
+PREF_ACC_10                                                     0                          NaN 
+                                                                0                           100%
+
+PREF_TIMELY_1                                                   0                          NaN 
+PREF_TIMELY_2                                                   0                          NaN 
+PREF_TIMELY_3                                                   0                          NaN 
+PREF_TIMELY_4                                                   0                          NaN 
+PREF_TIMELY_5                                                   0                          NaN 
+PREF_TIMELY_6                                                   0                          NaN 
+PREF_TIMELY_7                                                   0                          NaN 
+PREF_TIMELY_8                                                   0                          NaN 
+PREF_TIMELY_9                                                   0                          NaN 
+PREF_TIMELY_10                                                  0                          NaN 
+                                                                0                           100%
+
+PREF_POL_1                                                      0                          NaN 
+PREF_POL_2                                                      0                          NaN 
+PREF_POL_3                                                      0                          NaN 
+PREF_POL_4                                                      0                          NaN 
+PREF_POL_5                                                      0                          NaN 
+PREF_POL_6                                                      0                          NaN 
+PREF_POL_7                                                      0                          NaN 
+PREF_POL_8                                                      0                          NaN 
+PREF_POL_9                                                      0                          NaN 
+PREF_POL_10                                                     0                          NaN 
+                                                                0                           100%
+
+PREF_ACC1_HT_HP                                                 0                          NaN 
+PREF_ACC1_HT_LP                                                 0                          NaN 
+PREF_ACC1_LT_HP                                                 0                          NaN 
+PREF_ACC1_LT_LP                                                 0                          NaN 
+PREF_ACC2_HT_HP                                                 0                          NaN 
+PREF_ACC2_HT_LP                                                 0                          NaN 
+PREF_ACC2_LT_HP                                                 0                          NaN 
+PREF_ACC2_LT_LP                                                 0                          NaN 
+PREF_ACC3_HT_HP                                                 0                          NaN 
+PREF_ACC3_HT_LP                                                 0                          NaN 
+PREF_ACC3_LT_HP                                                 0                          NaN 
+PREF_ACC3_LT_LP                                                 0                          NaN 
+PREF_ACC4_HT_HP                                                 0                          NaN 
+PREF_ACC4_HT_LP                                                 0                          NaN 
+PREF_ACC4_LT_HP                                                 0                          NaN 
+PREF_ACC4_LT_LP                                                 0                          NaN 
+                                                                0                           100%
+
+PREF_DISTANCE_1                                                 0                          NaN 
+PREF_DISTANCE_2                                                 0                          NaN 
+PREF_DISTANCE_3                                                 0                          NaN 
+PREF_DISTANCE_4                                                 0                          NaN 
+PREF_DISTANCE_5                                                 0                          NaN 
+                                                                0                           100%
+
+PREF_HYBRID_SEL_0                                               0                          NaN 
+PREF_HYBRID_SEL_1                                               0                          NaN 
+PREF_HYBRID_SEL_2                                               0                          NaN 
+PREF_HYBRID_SEL_3                                               0                          NaN 
+PREF_HYBRID_SEL_4                                               0                          NaN 
+PREF_HYBRID_SEL_5                                               0                          NaN 
+PREF_HYBRID_SEL_6                                               0                          NaN 
+                                                                0                           100%
+
