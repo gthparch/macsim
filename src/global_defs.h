@@ -178,7 +178,8 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 // across all the cores
 #define MAX_NUM_TOTAL_BLOCKS 16384
 #define MAX_NUM_CORES 128
-#define NUM_REG_IDS 1024
+// #define NUM_REG_IDS 1024
+#define NUM_REG_IDS 1600 
 #define NUM_INT_REGS 32
 #define MAX_UOP_SRC_DEPS 10 // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009 
 #define MAX_DRAM_BANKS 32

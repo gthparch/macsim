@@ -1,0 +1,73 @@
+/*
+* Ocelot Version : 2.1.0
+*/
+
+.version 3.0
+.target sm_20
+.address_size 64
+/* Module tests/vectorAdd/vectorAdd.cu */
+
+/* Function prototypes */
+.entry _Z6VecAddPKfS0_Pfi (.param  .u64 _Z6VecAddPKfS0_Pfi_param_0, .param  .u64 _Z6VecAddPKfS0_Pfi_param_1, .param  .u64 _Z6VecAddPKfS0_Pfi_param_2, .param  .u32 _Z6VecAddPKfS0_Pfi_param_3);
+
+/* Globals */
+
+/* Textures */
+
+/* Kernels */
+.entry _Z6VecAddPKfS0_Pfi(.param  .u64 _Z6VecAddPKfS0_Pfi_param_0,
+		.param  .u64 _Z6VecAddPKfS0_Pfi_param_1,
+		.param  .u64 _Z6VecAddPKfS0_Pfi_param_2,
+		.param  .u32 _Z6VecAddPKfS0_Pfi_param_3)
+{
+
+	.reg .s64 %r0;
+	.reg .s64 %r1;
+	.reg .s64 %r2;
+	.reg .s32 %r3;
+	.reg .s64 %r4;
+	.reg .s64 %r5;
+	.reg .s64 %r6;
+	.reg .s32 %r7;
+	.reg .s32 %r8;
+	.reg .s32 %r9;
+	.reg .s32 %r10;
+	.reg .pred %p11;
+	.reg .s64 %r12;
+	.reg .s64 %r13;
+	.reg .s64 %r14;
+	.reg .f32 %r15;
+	.reg .f32 %r16;
+	.reg .f32 %r17;
+	.reg .s64 %r18;
+	BB_1_0:
+	BB_1_2:
+		ld.param.u64 %r0, [_Z6VecAddPKfS0_Pfi_param_0]; 
+		ld.param.u64 %r1, [_Z6VecAddPKfS0_Pfi_param_1]; 
+		ld.param.u64 %r2, [_Z6VecAddPKfS0_Pfi_param_2]; 
+		ld.param.u32 %r3, [_Z6VecAddPKfS0_Pfi_param_3]; 
+		cvta.to.global.u64 %r4, %r2; 
+		cvta.to.global.u64 %r5, %r1; 
+		cvta.to.global.u64 %r6, %r0; 
+		mov.u32 %r7, %ctaid.x; 
+		mov.u32 %r8, %ntid.x; 
+		mov.u32 %r9, %tid.x; 
+		mad.lo.s32 %r10, %r7, %r8, %r9; 
+		setp.lt.s32 %p11, %r10, %r3; 
+		@%p11 bra BB_1_4; 
+	BB_1_6:
+		exit; 
+	BB_1_1:
+	BB_1_4:
+		mul.wide.s32 %r12, %r10, 4; 
+		add.s64 %r13, %r6, %r12; 
+		add.s64 %r14, %r5, %r12; 
+		ld.global.f32 %r15, [%r14]; 
+		ld.global.f32 %r16, [%r13]; 
+		add.f32 %r17, %r16, %r15; 
+		add.s64 %r18, %r4, %r12; 
+		st.global.f32 [%r18], %r17; 
+		bra.uni BB_1_6; 
+}
+
+

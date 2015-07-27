@@ -1,0 +1,56 @@
+Prepare a machine that has CUDA-enabled GPU in it, and install Ubuntu 10.04 (or 11.10 would be fine but not higher). 
+     1. sudo apt-get install gcc-4.6 g++-4.6 build-essential
+     2. sudo /etc/init.d/gdm stop && sudo ./devdriver_4.2_linux_64_295.41.run
+     3. sudo ./cudatoolkit_4.2.9_linux_64_ubuntu10.04.run
+     4. ./gpucomputingsdk_4.2.9_linux.run
+     5. sudo /etc/init.d/gdm start
+     6. cd /home/hparch/NVIDIA_GPU_Computing_SDK/C/common && make
+     6. cd /home/hparch/NVIDIA_GPU_Computing_SDK/C && make
+     7. If everything goes well, then you should see Finished building all.
+Install CUDA 4.2 (not higher)
+             1. export PATH=/usr/local/cuda/bin:$PATH
+             2. export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/lib:$LD_LIBRARY_PATH
+        Install Boost Library 1.49 (not higher)
+             1. sudo apt-get install bzip2 libbz2-dev zip unzip python-dev zlib1g-dev
+             2. mkdir -p ~/src && wget http://softlayer.dl.sourceforge.net/project/boost/boost/1.49.0/boost_1_49_0.tar.gz&& tar xzf boost_1_49_0.tar.gz
+             3. ./bootstrap.sh
+             4. ./b2 
+             5. Only if nothing goes wrong, sudo ./b2 install (to default location: /usr/local/lib and /usr/local/include)
+        Install Hydrazine
+             1. cd ~/src && git clone https://github.com/gtcasl/hydrazine.git
+        Install GPUOcelot
+             1. sudo apt-get install scons flex bison freeglut3-dev libglew1.5-dev
+             2. cd ~/src
+             3. git clone https://github.com/gtcasl/gpuocelot.git
+             4. cd gpuocelot/ocelot && rm -rf hydrazine && ln -s /home/hparch/src/hydrazine
+             5. modify SConscript in which change (libboost_filesystem-mt, boost_system-mt) to (libboost_filesystem, boost_system)
+             6. sudo ./build.py —install —no_llvm —thread 4 && sudo ldconfig
+             7. export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+             8. cd /home/hparch/src/gpuocelot/trace-generators
+             9. ln -s /home/hparch/src/hydrazine
+             10. modify SConstruct in which change (libboost_filesystem-mt, boost_system-mt, boost_serialization-mt) to (libboost_filesystem, boost_system, boost_serialization)
+             11. scons
+             12. Only if nothing goes wrong, sudo scons install
+        Regression Tests
+             1. cd /home/hparch/src/gpuocelot/tests/cuda4.1sdk
+             2. comment out line 164 - env.Append(LIBPATH = [os.path.join(env[‘install_path'], 'lib')])
+             3. scons
+             4. If everything goes well, then you should seescons: done building targets.
+             5. execute any application as a test: for instance, .release_build/Transpose
+            
+        Trace Generation
+             Prerequisite (Python 2.7 - gpu_tracegen.py requires Python version higher than 2.7 due to argparse)
+                  1. mkdir ~/src && wget https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz
+                  2. tar xvf Python-2.7.9.tgz && cd Python-2.7.9
+                  3. ./configure && make && sudo make install
+                  4. sudo rm /usr/bin/python /usr/bin/python2 /usr/bin/python-config and create a link to /usr/local/bin/python2.7 …
+        
+        Notes:  If you exit the terminal you should export PATH and LD_LIBRARY_PATH again and do sudo ldconfig.
+        For trace generation with Ocelot you can check MacSim documentation and Ocelot's as well.
+
+
+        References
+        - https://github.com/gtcasl/gpuocelot/wiki/Installation
+        - https://code.google.com/p/gpuocelot/
+        -L/usr/local/cuda/lib64 -L../../lib -L../../common/lib/linux -L../../../shared//lib -lcudart    -L/usr/local/cuda/lib64 -L../../lib -L../../common/lib/linux -L../../../shared//lib -lcudart
+

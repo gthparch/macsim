@@ -384,8 +384,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
 
   int trace_ver = -1;
   if (trace_type != "x86") {
-    if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
-      ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
+    if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
+      ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
   }
     
@@ -502,8 +502,8 @@ void process_manager_c::setup_process(process_s* process)
   
   int trace_ver = -1;
   if (trace_type != "x86") {
-    if (!(trace_config_file >> trace_ver) || trace_ver != 131) {
-      ASSERTM(0, "this version of the simulator supports only version 1.31 of the GPU traces\n");
+    if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
+      ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
   }
   

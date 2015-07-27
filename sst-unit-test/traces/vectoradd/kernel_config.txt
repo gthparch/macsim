@@ -1,0 +1,4 @@
+newptx
+14
+-1
+/usr/local/src/gpuocelot/tests/cuda4.1sdk/.release_build/trace/VectorAdd/_Z6VecAddPKfS0_Pfi_0/Trace.txt

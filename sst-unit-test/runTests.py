@@ -27,7 +27,7 @@ def main():
   #print('trace directory: {}'.format(trace_dir))
   #print('reference directory: {}'.format(refer_dir))
 
-  trace = 'hotspot'
+  trace = 'vectoradd'
   for test in glob.glob('sdl*.xml'):
     ## Run trace
     os.system('sst {0} > /dev/null'.format(test))

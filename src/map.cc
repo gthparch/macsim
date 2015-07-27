@@ -300,7 +300,7 @@ void map_c::read_reg_map (uop_c *uop)
 
   for (int ii = 0; ii < uop->m_num_srcs; ++ii) {
     uns id = uop->m_src_info[ii];
-    ASSERT(id < NUM_REG_IDS); 
+    ASSERTM(id< NUM_REG_IDS, "id:%d \n", id); 
     uns ind = id << 1 | (map_data->m_map_flags[id]); 
     ASSERT(ind < NUM_REG_IDS*2); 
     map_entry_c *map_entry = &(map_data->m_reg_map[ind]); 

@@ -1,0 +1,117 @@
+####################################################################################################
+Interval
+####################################################################################################
+Cumulative:         Cycles:                  20000     Instructions:                  1200
+DCACHE_PREF_HIT                                                 0                             0
+
+STREAM_BUFFER_REQ                                               0                             0
+
+STREAM_TRAIN_CREATE                                             0                             0
+
+PREF_REQ_QUE_FULL                                               0                             0
+
+STREAM_REQ_QUEUE_HIT_BY_DEMAND                                  0                             0
+
+L2HIT_STREAM_PREF_REQ_QUE_FULL                                  0                             0
+
+L2HIT_STREAM_TRAIN_CREATE                                       0                             0
+
+L2HIT_STREAM_BUFFER_REQ                                         0                             0
+
+L2HIT_STREAM_DCACHE_PORT_FULL                                   0                             0
+
+L2HIT_STREAM_PREF_L2_PORT_FULL                                  0                             0
+
+L2HIT_MEM_REQ                                                   0                             0
+
+REMOVE_REDUNDANT_STREAM_STAT                                    0                             0
+
+REPLACE_OLD_STREAM                                              0                             0
+
+REQ_SEND_QUEUE_STALL                                            0                             0
+
+STREAM_ENTER_RA                                                 0                             0
+
+IFETCH_WB_FIRST_SCHEDULE                                        0                          NaN 
+PREFETCH_LAST_SCHEDULE                                          0                          NaN 
+DEMAND_PASS_PREF_SCHEDULE                                       0                          NaN 
+DEMAND_PASS_LOW_OP_SCHEDULE                                     0                          NaN 
+DEMAND_LAST_SCHEDULE                                            0                          NaN 
+                                                                0                           100%
+
+PREF_SEND_TO_MEM_REQ                                            0                          NaN 
+PREF_SEND_TO_MEM_REQ_FAIL                                       0                          NaN 
+                                                                0                           100%
+
+HIT_TRAIN_STREAM                                                0                          NaN 
+MISS_TRAIN_STREAM                                               0                          NaN 
+                                                                0                           100%
+
+MEM_REQ_MISS_HWP_PREF_Q                                         0                          NaN 
+MEM_REQ_MISS_SW_PREF_Q                                          0                          NaN 
+MEM_REQ_MISS_IFETCH_Q                                           0                          NaN 
+MEM_REQ_MISS_DFETCH_Q                                           0                          NaN 
+MEM_REQ_MISS_DSTORE_Q                                           0                          NaN 
+MEM_REQ_MISS_DPRF_Q                                             0                          NaN 
+MEM_REQ_MISS_WB_Q                                               0                          NaN 
+                                                                0                           100%
+
+PREF_HIT_BY_DEMAND_IFETCH                                       0                          NaN 
+PREF_HIT_BY_DEMAND_DFETCH                                       0                          NaN 
+PREF_HIT_BY_DEMAND_DSTORE                                       0                          NaN 
+PREF_HIT_BY_DEMAND_IPREF                                        0                          NaN 
+PREF_HIT_BY_DEMAND_DPRF                                         0                          NaN 
+PREF_HIT_BY_DEMAND_WB                                           0                          NaN 
+PREF_HIT_BY_PREF                                                0                          NaN 
+                                                                0                           100%
+
+PREF_HIT_DEMAND_IFETCH                                          0                          NaN 
+PREF_HIT_DEMAND_DFETCH                                          0                          NaN 
+PREF_HIT_DEMAND_DSTORE                                          0                          NaN 
+PREF_HIT_DEMAND_IPREF                                           0                          NaN 
+PREF_HIT_DEMAND_DPRF                                            0                          NaN 
+PREF_HIT_DEMAND_WB                                              0                          NaN 
+                                                                0                           100%
+
+PREF_L2_FILL                                                    0                          NaN 
+DEMAND_L2_FILL                                                  0                          NaN 
+                                                                0                           100%
+
+L2HIT_HIT_TRAIN_STREAM                                          0                          NaN 
+L2HIT_MISS_TRAIN_STREAM                                         0                          NaN 
+                                                                0                           100%
+
+L2HIT_STREAM_PREF_DCACHE_HIT                                    0                          NaN 
+L2HIT_STREAM_PREF_DCACHE_INSERT                                 0                          NaN 
+L2HIT_STREAM_L2_MISS                                            0                          NaN 
+                                                                0                           100%
+
+L2HIT_TRAIN_HIT_DEMAND                                          0                          NaN 
+L2HIT_TRAIN_MISS_REQ                                            0                          NaN 
+                                                                0                           100%
+
+L2HIT_TRAIN_FILTER_MISS                                         0                          NaN 
+L2HIT_TRAIN_FILTER_HIT                                          0                          NaN 
+                                                                0                           100%
+
+L2HIT_PREF_REQ_DCACHE_HIT                                       0                          NaN 
+L2HIT_PREF_REQ_DCACHE_MISS                                      0                          NaN 
+                                                                0                           100%
+
+L2HIT_L2SEND_Q_FULL                                             0                          NaN 
+L2HIT_L2SEND_Q_ENTER                                            0                          NaN 
+                                                                0                           100%
+
+STREAM_LENGTH_0                                                 0                          NaN 
+STREAM_LENGTH_10                                                0                          NaN 
+STREAM_LENGTH_20                                                0                          NaN 
+STREAM_LENGTH_30                                                0                          NaN 
+STREAM_LENGTH_40                                                0                          NaN 
+STREAM_LENGTH_50                                                0                          NaN 
+STREAM_LENGTH_60                                                0                          NaN 
+STREAM_LENGTH_70                                                0                          NaN 
+STREAM_LENGTH_80                                                0                          NaN 
+STREAM_LENGTH_90                                                0                          NaN 
+STREAM_LENGTH_100_P                                             0                          NaN 
+                                                                0                           100%
+
