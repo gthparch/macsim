@@ -577,49 +577,49 @@ comp_ll0.addParams({
 })
 comp_c0_0 = sst.Component("c0.0", "VaultSimC.VaultSimC")
 comp_c0_0.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """0""",
       "numVaults2" : """3"""
 })
 comp_c0_1 = sst.Component("c0.1", "VaultSimC.VaultSimC")
 comp_c0_1.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """1""",
       "numVaults2" : """3"""
 })
 comp_c0_2 = sst.Component("c0.2", "VaultSimC.VaultSimC")
 comp_c0_2.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """2""",
       "numVaults2" : """3"""
 })
 comp_c0_3 = sst.Component("c0.3", "VaultSimC.VaultSimC")
 comp_c0_3.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """3""",
       "numVaults2" : """3"""
 })
 comp_c0_4 = sst.Component("c0.4", "VaultSimC.VaultSimC")
 comp_c0_4.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """4""",
       "numVaults2" : """3"""
 })
 comp_c0_5 = sst.Component("c0.5", "VaultSimC.VaultSimC")
 comp_c0_5.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """5""",
       "numVaults2" : """3"""
 })
 comp_c0_6 = sst.Component("c0.6", "VaultSimC.VaultSimC")
 comp_c0_6.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """6""",
       "numVaults2" : """3"""
