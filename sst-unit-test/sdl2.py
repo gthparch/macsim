@@ -626,7 +626,7 @@ comp_c0_6.addParams({
 })
 comp_c0_7 = sst.Component("c0.7", "VaultSimC.VaultSimC")
 comp_c0_7.addParams({
-      "debug" : """1""",
+      "debug" : """0""",
       "clock" : """750Mhz""",
       "VaultID" : """7""",
       "numVaults2" : """3"""
