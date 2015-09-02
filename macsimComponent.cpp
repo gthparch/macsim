@@ -319,7 +319,7 @@ inline bool isStore(Mem_Type type)
   }
 }
 
-void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type)
+void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   SimpleMem::Request *req = 

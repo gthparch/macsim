@@ -718,7 +718,8 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
     //core_c *core = m_simBase->m_core_pointers[m_core_id];
-    (*(m_simBase->sendDataReq))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+    (*(m_simBase->sendDataReq))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, 
+                                uop->m_mem_type,(uint8_t)uop->m_hmc_inst);
 
     DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
     m_uop_buffer.insert(std::make_pair(key, uop));

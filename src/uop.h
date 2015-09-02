@@ -480,12 +480,12 @@ typedef enum Dep_Type_enum {
 
 typedef enum HMC_Type_enum
 {
-    HMC_NONE,
-    HMC_CAS_equal_16B,
-    HMC_CAS_zero_16B,
-    HMC_CAS_greater_16B,
-    HMC_CAS_less_16B,
-    HMC_ADD_16B
+    HMC_NONE=0,
+    HMC_CAS_equal_16B=1,
+    HMC_CAS_zero_16B=2,
+    HMC_CAS_greater_16B=3,
+    HMC_CAS_less_16B=4,
+    HMC_ADD_16B=5
 } HMC_Type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
