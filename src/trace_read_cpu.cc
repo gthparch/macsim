@@ -269,7 +269,7 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_u
  * @param sim_thread_id - thread id  
  */
 inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_s **trace_uop, 
-    int core_id, int sim_thread_id, HMC_Type cur_trace_hmc_type)
+    int core_id, int sim_thread_id)
 {
   trace_info_cpu_s *pi = static_cast<trace_info_cpu_s *>(trace_info);
   core_c* core = m_simBase->m_core_pointers[core_id];
@@ -797,14 +797,6 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
-  // mark hmc uops
-  if (cur_trace_hmc_type!=HMC_NONE)
-  {
-      for (unsigned i = 0; i < num_uop; i++) 
-      {
-          trace_uop[i]->m_hmc_inst = cur_trace_hmc_type;
-      }
-  }
   return first_info;
 }
 
@@ -1001,7 +993,16 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
     // So far we have raw instruction format, so we need to MacSim specific trace format
     info = convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array, 
-        core_id, sim_thread_id, cur_trace_hmc_type);
+        core_id, sim_thread_id);
+
+    // mark hmc uops
+    if (cur_trace_hmc_type!=HMC_NONE)
+    {
+      for (unsigned i = 0; i < info->m_trace_info.m_num_uop; i++) 
+      {
+          thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
+      }
+    }
 
     trace_uop = thread_trace_info->m_trace_uop_array[0];
     num_uop   = info->m_trace_info.m_num_uop;
