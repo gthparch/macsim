@@ -803,7 +803,48 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+bool cpu_decoder_c::generate_hmc_inst(const hmc_inst_s & inst_info, 
+                       uint64_t hmc_vaddr,
+                       trace_info_cpu_s & ret_trace_info)
+{
+  if (inst_info.name == "HMC_CAS_equal_16B") 
+  {
+      ret_trace_info.m_opcode = XED_CATEGORY_DATAXFER;
+      ret_trace_info.m_num_read_regs = 1;
+      ret_trace_info.m_num_dest_regs = 1;
+      ret_trace_info.m_src[0] = 19; // "rax"
+      ret_trace_info.m_dst[0] = 19; // "rax"
+      ret_trace_info.m_has_immediate = false;
+      ret_trace_info.m_cf_type = NOT_CF;     
+      ret_trace_info.m_rep_dir = false;
+      ret_trace_info.m_has_st = false;
+      ret_trace_info.m_num_ld = 1;
+      ret_trace_info.m_mem_read_size = 2;
+      ret_trace_info.m_mem_write_size = 0;
+      ret_trace_info.m_is_fp = false;
+      ret_trace_info.m_ld_vaddr1 = hmc_vaddr;
+      ret_trace_info.m_ld_vaddr2 = 0;
+      ret_trace_info.m_instruction_addr = inst_info.caller_pc;
+      ret_trace_info.m_actually_taken = false;
+      ret_trace_info.m_branch_target = 0;
+      ret_trace_info.m_write_flg = false;
 
+  }
+  else if (inst_info.name == "HMC_CAS_zero_16B") 
+  {
+  }
+  else if (inst_info.name == "HMC_CAS_greater_16B") 
+  {
+  }
+  else if (inst_info.name == "HMC_ADD_16B") 
+  {
+  }
+  else 
+  {
+    return false;
+  }
+  return true;
+}
 /**
  * Get an uop from trace
  * Called by frontend.cc
@@ -840,9 +881,59 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     bool inst_read; // indicate new instruction has been read from a trace file
     
     if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
-      // read next instruction
-      read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
-          sim_thread_id, &inst_read);
+      if (!thread_trace_info->has_cached_inst) 
+      {
+        // read next instruction
+        read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
+            sim_thread_id, &inst_read);
+
+        // changed by Lifeng
+        // looking for instructions from HMC functions
+        // replace them with special HMC instructions
+        map<uint64_t, hmc_inst_s> & hmc_info = thread_trace_info->m_process->m_hmc_info;
+        uint64_t inst_addr = (static_cast<trace_info_cpu_s*>
+                           (thread_trace_info->m_next_trace_info))->m_instruction_addr;
+        if (hmc_info.find(inst_addr) != hmc_info.end()) 
+        {
+          
+          hmc_inst_s hmc_inst = hmc_info[inst_addr];
+          
+          trace_info_cpu_s hmc_trace_info;
+          trace_info_cpu_s cur_trace_info;
+          uint64_t hmc_vaddr = 0; // target mem vaddr for HMC inst
+          while (true) 
+          {
+            read_success = read_trace(core_id, (&cur_trace_info), 
+                                      sim_thread_id, &inst_read);
+            if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
+                hmc_vaddr = cur_trace_info.m_ld_vaddr1;
+
+            if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc
+                || read_success == false) 
+              break;
+          }
+          ASSERT(read_success); // should not reach trace end before hmc func ret
+
+          bool ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
+          ASSERT(ret); // fail if cannot find hmc inst info
+          memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
+
+          // cache the inst@ret_pc for later fetch
+          memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
+          thread_trace_info->has_cached_inst = true;
+        }
+      }
+      else
+      {
+        // use cached instruction directly
+        memcpy(thread_trace_info->m_next_trace_info, 
+               &(thread_trace_info->cached_inst),
+               sizeof(trace_info_cpu_s));
+        inst_read = true;
+        read_success = true;
+
+        thread_trace_info->has_cached_inst = false;
+      }
     }
     else {
       inst_read = false;

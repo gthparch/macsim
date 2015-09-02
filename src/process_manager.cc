@@ -471,6 +471,37 @@ void process_manager_c::setup_process(process_s* process)
   // get the base name of current application (without extension)
   process->m_current_file_name_base = trace_info_file_name.substr(0, dot_location);
 
+  // changed by Lifeng
+  // get HMC instruction information
+  ifstream hmc_info_file;
+  string hmc_info = process->m_current_file_name_base + ".HMCinfo";
+  hmc_info_file.open(hmc_info.c_str());
+  // skip the first line (csv header)
+  if (hmc_info_file.good()) 
+  {
+    string line;
+    getline(hmc_info_file, line);
+  }
+  while (hmc_info_file.good()) 
+  {
+    string line;
+    getline(hmc_info_file, line);
+    if (line.empty()) continue;
+
+    uint64_t caller_pc,func_pc,ret_pc,addr_pc;
+    string name;
+    std::stringstream ss(line);
+    ss >> caller_pc >> func_pc >> ret_pc >> addr_pc >> name;
+
+    hmc_inst_s inst;
+    inst.caller_pc = caller_pc;
+    inst.func_pc = func_pc;
+    inst.ret_pc = ret_pc;
+    inst.addr_pc = addr_pc;
+    inst.name = name;
+    process->m_hmc_info[caller_pc] = inst;
+  }
+  hmc_info_file.close();
 
   // open TRACE_CONFIG file
   ifstream trace_config_file;
@@ -815,6 +846,8 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
 
   trace_info->m_fetch_data->init();
 
+  // changed by Lifeng
+  trace_info->has_cached_inst = false;
   return trace_info;
 }
 
