@@ -797,6 +797,14 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
+  // mark hmc uops
+  if (pi->m_hmc_inst!=HMC_NONE)
+  {
+      for (unsigned i = 0; i < num_uop; i++) 
+      {
+          trace_uop[i]->m_hmc_inst = pi->m_hmc_inst;
+      }
+  }
   return first_info;
 }
 
@@ -807,41 +815,51 @@ bool cpu_decoder_c::generate_hmc_inst(const hmc_inst_s & inst_info,
                        uint64_t hmc_vaddr,
                        trace_info_cpu_s & ret_trace_info)
 {
+  // shared inst info
+  ret_trace_info.m_opcode = XED_CATEGORY_DATAXFER;
+  ret_trace_info.m_num_read_regs = 1;
+  ret_trace_info.m_num_dest_regs = 0;
+  ret_trace_info.m_src[0] = 14; // "rbp"
+  ret_trace_info.m_has_immediate = false;
+  ret_trace_info.m_cf_type = NOT_CF;     
+  ret_trace_info.m_rep_dir = false;
+  ret_trace_info.m_has_st = true;
+  ret_trace_info.m_num_ld = 0;
+  ret_trace_info.m_mem_read_size = 0;
+  ret_trace_info.m_mem_write_size = 2;
+  ret_trace_info.m_is_fp = false;
+  ret_trace_info.m_ld_vaddr1 = 0;
+  ret_trace_info.m_ld_vaddr2 = 0;
+  ret_trace_info.m_st_vaddr = hmc_vaddr;
+  ret_trace_info.m_instruction_addr = inst_info.caller_pc;
+  ret_trace_info.m_actually_taken = false;
+  ret_trace_info.m_branch_target = 0;
+  ret_trace_info.m_write_flg = false;
+
   if (inst_info.name == "HMC_CAS_equal_16B") 
   {
-      ret_trace_info.m_opcode = XED_CATEGORY_DATAXFER;
-      ret_trace_info.m_num_read_regs = 1;
-      ret_trace_info.m_num_dest_regs = 1;
-      ret_trace_info.m_src[0] = 19; // "rax"
-      ret_trace_info.m_dst[0] = 19; // "rax"
-      ret_trace_info.m_has_immediate = false;
-      ret_trace_info.m_cf_type = NOT_CF;     
-      ret_trace_info.m_rep_dir = false;
-      ret_trace_info.m_has_st = false;
-      ret_trace_info.m_num_ld = 1;
-      ret_trace_info.m_mem_read_size = 2;
-      ret_trace_info.m_mem_write_size = 0;
-      ret_trace_info.m_is_fp = false;
-      ret_trace_info.m_ld_vaddr1 = hmc_vaddr;
-      ret_trace_info.m_ld_vaddr2 = 0;
-      ret_trace_info.m_instruction_addr = inst_info.caller_pc;
-      ret_trace_info.m_actually_taken = false;
-      ret_trace_info.m_branch_target = 0;
-      ret_trace_info.m_write_flg = false;
-
+      ret_trace_info.m_hmc_inst = HMC_CAS_equal_16B;
   }
   else if (inst_info.name == "HMC_CAS_zero_16B") 
   {
+      ret_trace_info.m_hmc_inst = HMC_CAS_zero_16B;
   }
   else if (inst_info.name == "HMC_CAS_greater_16B") 
   {
+      ret_trace_info.m_hmc_inst = HMC_CAS_greater_16B;
+  }
+  else if (inst_info.name == "HMC_CAS_less_16B") 
+  {
+      ret_trace_info.m_hmc_inst = HMC_CAS_less_16B;
   }
   else if (inst_info.name == "HMC_ADD_16B") 
   {
+      ret_trace_info.m_hmc_inst = HMC_ADD_16B;
   }
   else 
   {
-    return false;
+      ret_trace_info.m_hmc_inst = HMC_NONE;
+      return false;
   }
   return true;
 }
@@ -879,7 +897,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   ///
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
-    
+
     if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
       if (!thread_trace_info->has_cached_inst) 
       {
@@ -905,6 +923,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
           {
             read_success = read_trace(core_id, (&cur_trace_info), 
                                       sim_thread_id, &inst_read);
+            // get target mem addr of hmc inst
             if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
                 hmc_vaddr = cur_trace_info.m_ld_vaddr1;
 
@@ -931,7 +950,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
                sizeof(trace_info_cpu_s));
         inst_read = true;
         read_success = true;
-
         thread_trace_info->has_cached_inst = false;
       }
     }
@@ -978,7 +996,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     // So far we have raw instruction format, so we need to MacSim specific trace format
     info = convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array, 
         core_id, sim_thread_id);
-
 
     trace_uop = thread_trace_info->m_trace_uop_array[0];
     num_uop   = info->m_trace_info.m_num_uop;
@@ -1035,6 +1052,9 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   uop->m_bar_type    = trace_uop->m_bar_type;
   uop->m_npc         = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
+
+  // pass over hmc inst info
+  uop->m_hmc_inst    = trace_uop->m_hmc_inst;
 
   if (uop->m_cf_type) { 
     uop->m_taken_mask      = trace_uop->m_taken_mask;

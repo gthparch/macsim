@@ -478,6 +478,15 @@ typedef enum Dep_Type_enum {
   NUM_DEP_TYPES,
 } Dep_Type;
 
+typedef enum HMC_Type_enum
+{
+    HMC_NONE,
+    HMC_CAS_equal_16B,
+    HMC_CAS_zero_16B,
+    HMC_CAS_greater_16B,
+    HMC_CAS_less_16B,
+    HMC_ADD_16B
+} HMC_Type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Source uop information class
@@ -649,6 +658,9 @@ class uop_c
     bool              m_bypass_llc; /**< bypass last level cache */
     bool              m_skip_llc; /**< skip last level cache */
 
+    // hmc info 
+    // changed by Lifeng
+    HMC_Type m_hmc_inst;
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
