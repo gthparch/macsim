@@ -177,6 +177,30 @@ private:
 	const PtrMember  member;
 };
 
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T, typename Param6T>
+class CallbackBase6
+{
+public:
+	virtual ~CallbackBase6() = 0;
+	virtual ReturnT operator()(Param1T,Param2T,Param3T,Param4T,Param5T,Param6T) = 0;
+};
+template <typename ConsumerT, typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T, typename Param6T> 
+class Callback6: public CallbackBase6<ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T,Param6T>
+{
+private:
+	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T,Param4T,Param5T,Param6T);
+
+public:
+	Callback6( ConsumerT* const object, PtrMember member) : object(object), member(member) { }
+	Callback6( const Callback6<ConsumerT,ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T,Param6T>& e ) : object(e.object), member(e.member) { }
+	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3, Param4T param4, Param5T param5, Param6T param6) { return (const_cast<ConsumerT*>(object)->*member) (param1,param2,param3,param4,param5,param6); }
+
+
+private:
+	ConsumerT* const object;
+	const PtrMember  member;
+};
+
 }}
 
 #endif

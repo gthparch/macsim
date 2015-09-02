@@ -172,7 +172,7 @@ void macsimComponent::setup()
   CallbackSendInstReq* sir = 
     new Callback4<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstReq);
   CallbackSendDataReq* sdr =
-    new Callback5<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
+    new Callback6<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
   CallbackStrobeInstRespQ* sirq = 
     new Callback2<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeInstRespQ);
   CallbackStrobeDataRespQ* sdrq =
