@@ -323,7 +323,7 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
 {
   bool doWrite = isStore((Mem_Type)type);
   SimpleMem::Request *req = 
-    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
+    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size, hmc_type);
   m_dcache_links[core_id]->sendRequest(req);
   m_dcache_request_counters[core_id]++;
   m_dcache_requests[core_id].insert(make_pair(req->id, key));
