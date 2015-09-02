@@ -97,11 +97,6 @@ typedef struct trace_info_cpu_s {
   bool     m_rep_dir;           /**< repetition direction */
   bool     m_actually_taken;    /**< branch actually taken */
   uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
-
-  // changed by Lifeng
-  HMC_Type m_hmc_inst;
-
-  trace_info_cpu_s():m_hmc_inst(HMC_NONE){}
 } trace_info_cpu_s;
 
 // identical to structure in trace generator

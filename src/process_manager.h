@@ -224,8 +224,10 @@ typedef struct thread_s {
   list<section_info_s*> m_mem_for_bar_sections; /**< memory for barrier sections */
 
   // changed by Lifeng
-  trace_info_cpu_s cached_inst;
-  bool has_cached_inst;
+  trace_info_cpu_s  cached_inst;
+  bool              has_cached_inst;
+  HMC_Type          m_prev_hmc_type;
+  HMC_Type          m_next_hmc_type;
 } thread_s;
 
 // changed by Lifeng
