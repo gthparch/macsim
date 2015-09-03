@@ -60,7 +60,7 @@ To build \SIM the following are required:
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
   \item[Operating System] At present only Linux distributions are supported. \SIM has been tested on:
-   \Verb+Ubuntu+, \Verb+Redhat (TODO)+
+   \Verb+Ubuntu+, \Verb+MacOS+, \Verb+Redhat (TODO)+
   \item[Compiler] Any compiler that supports the C++0x (or C++11)
     standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (will work on)+
   \item[SConstruct]
@@ -505,6 +505,7 @@ Make sure to change the name of the directory as \textit{macsimComponent}.
 \begin{Verbatim}
 cd <sst-root>/sst/elements
 svn co https://svn.research.cc.gatech.edu/macsim/trunk macsimComponent
+--username readonly 
 \end{Verbatim}
 Re-build the SST in order for \SIM to be included in the build procedure.
 
@@ -531,7 +532,10 @@ Some tips regarding building procedure are as follows.
 
 An example configuration is as follows.
 Please note that parameters for other components but \SIM are omitted.
-Several sample configurations can be found in <macsim-root>/sst-unit-test/.
+Several sample configurations can be found in
+<macsim-root>/sst-unit-test/.
+Example files are sdl[1|2].py sdl[1|2].xml . runTest.py test the test
+traces. 
 
 \begin{Verbatim}
 <?xml version="1.0"?>
@@ -539,8 +543,8 @@ Several sample configurations can be found in <macsim-root>/sst-unit-test/.
 <timebase>1ns</timebase>
 
 <variables>
-  <lat> 1ns </lat>
-  <buslat> 10 ns </buslat>
+  <lat> 1ps </lat>
+  <buslat> 10 ps </buslat>
 </variables>
 
 <param_include>
