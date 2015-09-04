@@ -184,6 +184,9 @@ public:
 	virtual ~CallbackBase6() = 0;
 	virtual ReturnT operator()(Param1T,Param2T,Param3T,Param4T,Param5T,Param6T) = 0;
 };
+template <typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T, typename Param6T> MacSim::CallbackBase6<ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T,Param6T>::~CallbackBase6() {}
+
+
 template <typename ConsumerT, typename ReturnT, typename Param1T, typename Param2T, typename Param3T, typename Param4T, typename Param5T, typename Param6T> 
 class Callback6: public CallbackBase6<ReturnT,Param1T,Param2T,Param3T,Param4T,Param5T,Param6T>
 {
