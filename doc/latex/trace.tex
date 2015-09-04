@@ -31,7 +31,7 @@ this procedure.
 binary instrumentation tool. Documentation regarding Pin can be found at
 \urlc{http://www.pintool.org}. After installing Pin\footnote{Note that our
 trace generator may not be backward/forward compatible with different Pin
-versions. Currently, Pin 41150 revision (Jun 07, 2011) must be used.}, the x86
+versions. Currently, pin 2.12 (version number 56759  )  must be used.}, the x86
 trace generator module has to be built. The command for doing so is:
 
 
@@ -105,15 +105,18 @@ framework for heterogeneous systems.
 \subsection{Installing Ocelot}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Ocelot can be installed using the Ubuntu package provided at the Google Code
-page for Ocelot, or the source can be downloaded, built and installed. 
-Below is the sequence of commands to executed to build and install
-from the source. First, checkout a copy of Ocelot from its SVN repository.
+Currently Ocelot can be download from github. Ocelot supports up to
+CUDA 4.2 so higher CUDA versions need to be compiled with 4.2. 
 
 \begin{Verbatim}
-svn checkout http://gpuocelot.googlecode.com/svn/trunk/gpuocelot
+ git clone https://github.com/gtcasl/gpuocelot.git
 \end{Verbatim}
 
+A simple guide of compiling Ocelot to generate traces is provided 
+at macsim/tools/ocelot_install_guide.txt. 
+More detailed information is available at Ocelot's homepage. 
+
+\ignore{
 Then build Ocelot and the trace generator libraries.
 
 \begin{Verbatim}
@@ -125,6 +128,7 @@ make; sudo make install
 All libraries will be installed in the system library path directory
 (\Verb+/usr/local/lib+). More detailed instructions for installing
 Ocelot are available at Ocelot's Google Code project page.
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -567,3 +571,4 @@ bool      &   m\_mul\_mem\_uops      & multiple memory transactions \\ \hline
 		format for each instruction and the description of each field, respectively.
 		}
 
+ 
