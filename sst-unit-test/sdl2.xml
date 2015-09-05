@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdl version="2.0"/>
-<timebase>1ns</timebase>
+<timebase>1ps</timebase>
 
 <variables>
   <lat> 1ns </lat>
@@ -15,6 +15,7 @@
     <output_dir> results </output_dir>
     <num_link> 16 </num_link>
     <command_line> --use_memhierarchy=1 </command_line>
+    <mem_size> 4*1024*1024*1024 </mem_size>
     <frequency> 4 Ghz </frequency>
     <debug> 0 </debug>
     <debug_level> 8 </debug_level>
@@ -33,7 +34,7 @@
     <mshr_latency_cycles> 0 </mshr_latency_cycles>
     <debug> 0 </debug>
     <debug_level> 8 </debug_level>
-    <statistics> 1 </statistics>
+    <statistics> 0 </statistics>
   </l1IParams>
 
   <l1DParams>

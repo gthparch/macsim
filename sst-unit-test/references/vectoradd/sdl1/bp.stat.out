@@ -6,10 +6,10 @@ BP_REDIRECT_RESOLVED_CORE_0                                     0               
 
 PERFECT_TARGET_PRED_CORE_0                                      0                             0
 
-BP_ON_PATH_CORRECT_CORE_0                                     246                           100%
+BP_ON_PATH_CORRECT_CORE_0                                     192                           100%
 BP_ON_PATH_MISPREDICT_CORE_0                                    0                             0%
 BP_ON_PATH_MISFETCH_CORE_0                                      0                             0%
-                                                              246                           100%
+                                                              192                           100%
 
 BP_OFF_PATH_CORRECT_CORE_0                                      0                          NaN 
 BP_OFF_PATH_MISPREDICT_CORE_0                                   0                          NaN 
@@ -204,10 +204,10 @@ BP_REDIRECT_RESOLVED_CORE_11                                    0               
 
 PERFECT_TARGET_PRED_CORE_11                                     0                             0
 
-BP_ON_PATH_CORRECT_CORE_11                                    192                           100%
+BP_ON_PATH_CORRECT_CORE_11                                    246                           100%
 BP_ON_PATH_MISPREDICT_CORE_11                                   0                             0%
 BP_ON_PATH_MISFETCH_CORE_11                                     0                             0%
-                                                              192                           100%
+                                                              246                           100%
 
 BP_OFF_PATH_CORRECT_CORE_11                                     0                          NaN 
 BP_OFF_PATH_MISPREDICT_CORE_11                                  0                          NaN 

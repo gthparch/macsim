@@ -30,7 +30,7 @@ DRAM_CHANNEL6_BANDWIDTH_SATURATED                               0               
 
 DRAM_CHANNEL7_BANDWIDTH_SATURATED                               0                             0
 
-DRAM_CHANNEL0_DBUS_IDLE                                     32652                         32652
+DRAM_CHANNEL0_DBUS_IDLE                                     30780                         30780
 
 DRAM_CHANNEL1_DBUS_IDLE                                         0                             0
 

@@ -10,11 +10,11 @@ num_sim_large_cores 0
 
 # Clock
 # from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
-clock_cpu 1.2
+clock_cpu 3.2
 clock_gpu 1.6
 clock_l3  1.6
 clock_noc 1.6
-clock_mc  2.1
+clock_mc  0.8
 
 
 # Small Core Configuration

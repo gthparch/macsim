@@ -75,8 +75,8 @@ OP_CAT_GPU_EN_CORE_0                                            0               
 OP_CAT_GPU_INVALID_CORE_0                                       0                             0%
 OP_CAT_GPU_ABS_CORE_0                                           0                             0%
 OP_CAT_GPU_ABS64_CORE_0                                         0                             0%
-OP_CAT_GPU_ADD_CORE_0                                         123                        4.2487%
-OP_CAT_GPU_ADD64_CORE_0                                       369                       12.7461%
+OP_CAT_GPU_ADD_CORE_0                                          96                       4.34783%
+OP_CAT_GPU_ADD64_CORE_0                                       288                       13.0435%
 OP_CAT_GPU_ADDC_CORE_0                                          0                             0%
 OP_CAT_GPU_AND_CORE_0                                           0                             0%
 OP_CAT_GPU_AND64_CORE_0                                         0                             0%
@@ -93,7 +93,7 @@ OP_CAT_GPU_BFI_CORE_0                                           0               
 OP_CAT_GPU_BFI64_CORE_0                                         0                             0%
 OP_CAT_GPU_BFIND_CORE_0                                         0                             0%
 OP_CAT_GPU_BFIND64_CORE_0                                       0                             0%
-OP_CAT_GPU_BRA_CORE_0                                         246                       8.49741%
+OP_CAT_GPU_BRA_CORE_0                                         192                       8.69565%
 OP_CAT_GPU_BREV_CORE_0                                          0                             0%
 OP_CAT_GPU_BREV64_CORE_0                                        0                             0%
 OP_CAT_GPU_BRKPT_CORE_0                                         0                             0%
@@ -108,7 +108,7 @@ OP_CAT_GPU_COS_CORE_0                                           0               
 OP_CAT_GPU_CVT_CORE_0                                           0                             0%
 OP_CAT_GPU_CVT64_CORE_0                                         0                             0%
 OP_CAT_GPU_CVTA_CORE_0                                          0                             0%
-OP_CAT_GPU_CVTA64_CORE_0                                      384                       13.2642%
+OP_CAT_GPU_CVTA64_CORE_0                                      288                       13.0435%
 OP_CAT_GPU_DIV_CORE_0                                           0                             0%
 OP_CAT_GPU_DIV64_CORE_0                                         0                             0%
 OP_CAT_GPU_EX2_CORE_0                                           0                             0%
@@ -122,7 +122,7 @@ OP_CAT_GPU_LDU_CORE_0                                           0               
 OP_CAT_GPU_LDU64_CORE_0                                         0                             0%
 OP_CAT_GPU_LG2_CORE_0                                           0                             0%
 OP_CAT_GPU_MAD24_CORE_0                                         0                             0%
-OP_CAT_GPU_MAD_CORE_0                                         128                       4.42142%
+OP_CAT_GPU_MAD_CORE_0                                          96                       4.34783%
 OP_CAT_GPU_MAD64_CORE_0                                         0                             0%
 OP_CAT_GPU_MADC_CORE_0                                          0                             0%
 OP_CAT_GPU_MADC64_CORE_0                                        0                             0%
@@ -133,10 +133,10 @@ OP_CAT_GPU_MEMBAR_GL_CORE_0                                     0               
 OP_CAT_GPU_MEMBAR_SYS_CORE_0                                    0                             0%
 OP_CAT_GPU_MIN_CORE_0                                           0                             0%
 OP_CAT_GPU_MIN64_CORE_0                                         0                             0%
-OP_CAT_GPU_MOV_CORE_0                                         384                       13.2642%
+OP_CAT_GPU_MOV_CORE_0                                         288                       13.0435%
 OP_CAT_GPU_MOV64_CORE_0                                         0                             0%
 OP_CAT_GPU_MUL24_CORE_0                                         0                             0%
-OP_CAT_GPU_MUL_CORE_0                                         123                        4.2487%
+OP_CAT_GPU_MUL_CORE_0                                          96                       4.34783%
 OP_CAT_GPU_MUL64_CORE_0                                         0                             0%
 OP_CAT_GPU_NEG_CORE_0                                           0                             0%
 OP_CAT_GPU_NEG64_CORE_0                                         0                             0%
@@ -167,7 +167,7 @@ OP_CAT_GPU_SELP_CORE_0                                          0               
 OP_CAT_GPU_SELP64_CORE_0                                        0                             0%
 OP_CAT_GPU_SET_CORE_0                                           0                             0%
 OP_CAT_GPU_SET64_CORE_0                                         0                             0%
-OP_CAT_GPU_SETP_CORE_0                                        128                       4.42142%
+OP_CAT_GPU_SETP_CORE_0                                         96                       4.34783%
 OP_CAT_GPU_SETP64_CORE_0                                        0                             0%
 OP_CAT_GPU_SHFL_CORE_0                                          0                             0%
 OP_CAT_GPU_SHFL64_CORE_0                                        0                             0%
@@ -210,22 +210,22 @@ OP_CAT_GPU_VSUB_CORE_0                                          0               
 OP_CAT_GPU_VOTE_CORE_0                                          0                             0%
 OP_CAT_GPU_XOR_CORE_0                                           0                             0%
 OP_CAT_GPU_XOR64_CORE_0                                         0                             0%
-OP_CAT_GPU_RECONVERGE_CORE_0                                  129                       4.45596%
+OP_CAT_GPU_RECONVERGE_CORE_0                                   96                       4.34783%
 OP_CAT_GPU_PHI_CORE_0                                           0                             0%
-OP_CAT_GPU_MEM_LD_GM_CORE_0                                   246                       8.49741%
+OP_CAT_GPU_MEM_LD_GM_CORE_0                                   192                       8.69565%
 OP_CAT_GPU_MEM_LD_LM_CORE_0                                     0                             0%
 OP_CAT_GPU_MEM_LD_SM_CORE_0                                     0                             0%
 OP_CAT_GPU_MEM_LD_CM_CORE_0                                     0                             0%
 OP_CAT_GPU_MEM_LD_TM_CORE_0                                     0                             0%
-OP_CAT_GPU_MEM_LD_PM_CORE_0                                   512                       17.6857%
+OP_CAT_GPU_MEM_LD_PM_CORE_0                                   384                       17.3913%
 OP_CAT_GPU_MEM_LDU_GM_CORE_0                                    0                             0%
-OP_CAT_GPU_MEM_ST_GM_CORE_0                                   123                        4.2487%
+OP_CAT_GPU_MEM_ST_GM_CORE_0                                    96                       4.34783%
 OP_CAT_GPU_MEM_ST_LM_CORE_0                                     0                             0%
 OP_CAT_GPU_MEM_ST_SM_CORE_0                                     0                             0%
 OP_CAT_GPU_DATA_XFER_GM_CORE_0                                  0                             0%
 OP_CAT_GPU_DATA_XFER_LM_CORE_0                                  0                             0%
 OP_CAT_GPU_DATA_XFER_SM_CORE_0                                  0                             0%
-                                                             2895                           100%
+                                                             2208                           100%
 
 FP_OPS_CORE_1                                                   0                             0
 
@@ -2528,8 +2528,8 @@ OP_CAT_GPU_EN_CORE_11                                           0               
 OP_CAT_GPU_INVALID_CORE_11                                      0                             0%
 OP_CAT_GPU_ABS_CORE_11                                          0                             0%
 OP_CAT_GPU_ABS64_CORE_11                                        0                             0%
-OP_CAT_GPU_ADD_CORE_11                                         96                       4.34783%
-OP_CAT_GPU_ADD64_CORE_11                                      288                       13.0435%
+OP_CAT_GPU_ADD_CORE_11                                        123                        4.2487%
+OP_CAT_GPU_ADD64_CORE_11                                      369                       12.7461%
 OP_CAT_GPU_ADDC_CORE_11                                         0                             0%
 OP_CAT_GPU_AND_CORE_11                                          0                             0%
 OP_CAT_GPU_AND64_CORE_11                                        0                             0%
@@ -2546,7 +2546,7 @@ OP_CAT_GPU_BFI_CORE_11                                          0               
 OP_CAT_GPU_BFI64_CORE_11                                        0                             0%
 OP_CAT_GPU_BFIND_CORE_11                                        0                             0%
 OP_CAT_GPU_BFIND64_CORE_11                                      0                             0%
-OP_CAT_GPU_BRA_CORE_11                                        192                       8.69565%
+OP_CAT_GPU_BRA_CORE_11                                        246                       8.49741%
 OP_CAT_GPU_BREV_CORE_11                                         0                             0%
 OP_CAT_GPU_BREV64_CORE_11                                       0                             0%
 OP_CAT_GPU_BRKPT_CORE_11                                        0                             0%
@@ -2561,7 +2561,7 @@ OP_CAT_GPU_COS_CORE_11                                          0               
 OP_CAT_GPU_CVT_CORE_11                                          0                             0%
 OP_CAT_GPU_CVT64_CORE_11                                        0                             0%
 OP_CAT_GPU_CVTA_CORE_11                                         0                             0%
-OP_CAT_GPU_CVTA64_CORE_11                                     288                       13.0435%
+OP_CAT_GPU_CVTA64_CORE_11                                     384                       13.2642%
 OP_CAT_GPU_DIV_CORE_11                                          0                             0%
 OP_CAT_GPU_DIV64_CORE_11                                        0                             0%
 OP_CAT_GPU_EX2_CORE_11                                          0                             0%
@@ -2575,7 +2575,7 @@ OP_CAT_GPU_LDU_CORE_11                                          0               
 OP_CAT_GPU_LDU64_CORE_11                                        0                             0%
 OP_CAT_GPU_LG2_CORE_11                                          0                             0%
 OP_CAT_GPU_MAD24_CORE_11                                        0                             0%
-OP_CAT_GPU_MAD_CORE_11                                         96                       4.34783%
+OP_CAT_GPU_MAD_CORE_11                                        128                       4.42142%
 OP_CAT_GPU_MAD64_CORE_11                                        0                             0%
 OP_CAT_GPU_MADC_CORE_11                                         0                             0%
 OP_CAT_GPU_MADC64_CORE_11                                       0                             0%
@@ -2586,10 +2586,10 @@ OP_CAT_GPU_MEMBAR_GL_CORE_11                                    0               
 OP_CAT_GPU_MEMBAR_SYS_CORE_11                                   0                             0%
 OP_CAT_GPU_MIN_CORE_11                                          0                             0%
 OP_CAT_GPU_MIN64_CORE_11                                        0                             0%
-OP_CAT_GPU_MOV_CORE_11                                        288                       13.0435%
+OP_CAT_GPU_MOV_CORE_11                                        384                       13.2642%
 OP_CAT_GPU_MOV64_CORE_11                                        0                             0%
 OP_CAT_GPU_MUL24_CORE_11                                        0                             0%
-OP_CAT_GPU_MUL_CORE_11                                         96                       4.34783%
+OP_CAT_GPU_MUL_CORE_11                                        123                        4.2487%
 OP_CAT_GPU_MUL64_CORE_11                                        0                             0%
 OP_CAT_GPU_NEG_CORE_11                                          0                             0%
 OP_CAT_GPU_NEG64_CORE_11                                        0                             0%
@@ -2620,7 +2620,7 @@ OP_CAT_GPU_SELP_CORE_11                                         0               
 OP_CAT_GPU_SELP64_CORE_11                                       0                             0%
 OP_CAT_GPU_SET_CORE_11                                          0                             0%
 OP_CAT_GPU_SET64_CORE_11                                        0                             0%
-OP_CAT_GPU_SETP_CORE_11                                        96                       4.34783%
+OP_CAT_GPU_SETP_CORE_11                                       128                       4.42142%
 OP_CAT_GPU_SETP64_CORE_11                                       0                             0%
 OP_CAT_GPU_SHFL_CORE_11                                         0                             0%
 OP_CAT_GPU_SHFL64_CORE_11                                       0                             0%
@@ -2663,22 +2663,22 @@ OP_CAT_GPU_VSUB_CORE_11                                         0               
 OP_CAT_GPU_VOTE_CORE_11                                         0                             0%
 OP_CAT_GPU_XOR_CORE_11                                          0                             0%
 OP_CAT_GPU_XOR64_CORE_11                                        0                             0%
-OP_CAT_GPU_RECONVERGE_CORE_11                                  96                       4.34783%
+OP_CAT_GPU_RECONVERGE_CORE_11                                 129                       4.45596%
 OP_CAT_GPU_PHI_CORE_11                                          0                             0%
-OP_CAT_GPU_MEM_LD_GM_CORE_11                                  192                       8.69565%
+OP_CAT_GPU_MEM_LD_GM_CORE_11                                  246                       8.49741%
 OP_CAT_GPU_MEM_LD_LM_CORE_11                                    0                             0%
 OP_CAT_GPU_MEM_LD_SM_CORE_11                                    0                             0%
 OP_CAT_GPU_MEM_LD_CM_CORE_11                                    0                             0%
 OP_CAT_GPU_MEM_LD_TM_CORE_11                                    0                             0%
-OP_CAT_GPU_MEM_LD_PM_CORE_11                                  384                       17.3913%
+OP_CAT_GPU_MEM_LD_PM_CORE_11                                  512                       17.6857%
 OP_CAT_GPU_MEM_LDU_GM_CORE_11                                   0                             0%
-OP_CAT_GPU_MEM_ST_GM_CORE_11                                   96                       4.34783%
+OP_CAT_GPU_MEM_ST_GM_CORE_11                                  123                        4.2487%
 OP_CAT_GPU_MEM_ST_LM_CORE_11                                    0                             0%
 OP_CAT_GPU_MEM_ST_SM_CORE_11                                    0                             0%
 OP_CAT_GPU_DATA_XFER_GM_CORE_11                                 0                             0%
 OP_CAT_GPU_DATA_XFER_LM_CORE_11                                 0                             0%
 OP_CAT_GPU_DATA_XFER_SM_CORE_11                                 0                             0%
-                                                             2208                           100%
+                                                             2895                           100%
 
 FP_OPS_CORE_12                                                  0                             0
 
