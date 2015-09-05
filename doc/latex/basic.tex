@@ -60,7 +60,7 @@ To build \SIM the following are required:
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
   \item[Operating System] At present only Linux distributions are supported. \SIM has been tested on:
-   \Verb+Ubuntu+, \Verb+MacOS+, \Verb+Redhat (TODO)+
+   \Verb+Ubuntu+, \Verb+MacOS(10.10.5)+, \Verb+Redhat (TODO)+
   \item[Compiler] Any compiler that supports the C++0x (or C++11)
     standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (will work on)+
   \item[SConstruct]
@@ -227,9 +227,11 @@ There are several options in \Verb+build.py+.
   \item -p : gprof version
   \item -c : cleanup
   \item -t : build test
-  \item - -dramsim : macsim with DRAMSim2 simulator (DRAM memory) 
-  \item - -iris : macsim with Iris simulator (interconnection)
-  \item - -power : macsim with power module (currently, not supported)
+  \item - -dramsim : macsim with DRAMSim2 simulator (DRAM memory)
+    (this option is deprecated)
+  \item - -iris : macsim with Iris simulator (interconnection)  (this option is deprecated)
+ 
+  \item - -power : macsim with power module (currently, not supported) 
 \end{itemize}
 
 \noindent
@@ -552,7 +554,7 @@ traces.
     <paramFile> params.in </paramFile>
     <traceFile> trace_file_list </traceFile>
     <outputDir> results </outputDir>
-    <commandLine> --use_memhierarchy=1 </commandLine>
+     <commandLine> --use_memhierarchy=1 </commandLine>
     <clockFreq> 1 Ghz </clockFreq>
     <printLocation> 0 </printLocation>
     <debugLevel> 8 </debugLevel>
@@ -608,6 +610,21 @@ or
 mpirun -np [x] sst [sdl-file]
 \end{Verbatim}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using  SST's Memory Module}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When \SIM is executed as a SST component, it can use other SST
+components. MemHierarchy  is one of them.  MemHierarchy supports MESI
+cache coherence and it also connects with other network modules such
+as merlin. VaultSim models HMC memory model.  Please refer to SST homepage for supported other modules. 
+In order to use MemHierarchy,  the command line use assert {\texttt use\_memhierarchy} as shown in {\texttt sdl1.py} example in sst-unit-test
+directory.  
+
+The code that is guarded with  {\texttt \#ifdef USING\_SST}  include call
+back functions to communicate with macsim.  Caches and DRAMS/3D memory
+modules are modeled inside SST. 
 
 \ignore
 	  {
