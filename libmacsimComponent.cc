@@ -22,6 +22,7 @@ static const ElementInfoParam macsim_params[] = {
   {"cube_connected", "Depricated", "0"},
   {"operation_mode", "0: Master, 1: Slave", "0"},
   {"frequency", "clock frequency", "1GHz"},
+  {"mem_size", "memory size in bytes. E.g., 1073741824 (=1024*1024*1024) for 1GB", "1073741824"},
   {"num_link", "this should match to the number of cores and/or L1 caches", "1"},
   {"debug", "0:No debugging, 1:stdout, 2:stderr, 3:file", "0"},
   {"debug_level", "debugging level: 0 to 9", "8"},

@@ -867,8 +867,7 @@ void macsim_c::init_clock_domain(void)
     m_domain_next[ii+m_num_sim_cores]  = 0;
   }
 
-
-  m_clock_lcm = 100; /* 10 ns loop */
+  m_clock_lcm = lcm(lcm(m_domain_freq[0], m_domain_freq[1]), m_domain_freq[2]);
 
   report("Clock LCM           : " << m_clock_lcm);
   report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
