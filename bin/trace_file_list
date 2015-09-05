@@ -1,3 +1,2 @@
 1
-/trace/ptx_feb13/cuda4_2/BlackScholes/kernel_config.txt
-/trace/x86/spec2006/trace_simpoint/gcc/pin_traces/gcc.1.txt
+../sst-unit-test/traces/vectoradd/kernel_config.txt
