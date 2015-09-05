@@ -246,7 +246,6 @@ void macsim_c::init_memory(void)
   // dram controller
   m_num_mc = m_simBase->m_knobs->KNOB_DRAM_NUM_MC->getValue();
   m_dram_controller = new dram_c*[m_num_mc];
-  int num_noc_node = m_num_sim_cores + *KNOB(KNOB_NUM_L3);
   for (int ii = 0; ii < m_num_mc; ++ii) {
     m_dram_controller[ii] = dram_factory_c::get()->allocate(
         m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
@@ -867,7 +866,10 @@ void macsim_c::init_clock_domain(void)
     m_domain_next[ii+m_num_sim_cores]  = 0;
   }
 
-  m_clock_lcm = lcm(lcm(m_domain_freq[0], m_domain_freq[1]), m_domain_freq[2]);
+  m_clock_lcm = m_domain_freq[0];
+  for (int i = 1; i < 3 + m_num_sim_cores; i++) {
+    m_clock_lcm = lcm(m_clock_lcm, m_domain_freq[i]);
+  }
 
   report("Clock LCM           : " << m_clock_lcm);
   report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
