@@ -127,7 +127,7 @@ Trace_info* trace_info_array[MAX_THREADS];
 map<ADDRINT, Inst_info*> g_inst_storage[MAX_THREADS];
 PIN_LOCK g_lock;
 UINT64 g_inst_count[MAX_THREADS]={0};
-INT64 g_start_inst_count[MAX_THREADS] = {-1};
+INT64 g_start_inst_count[MAX_THREADS] = {0};
 map<THREADID, THREADID> threadMap;
 THREADID main_thread_id;
 Thread_info thread_info[MAX_THREADS];
@@ -141,7 +141,6 @@ unsigned int func_count = 0;
 CONTROL control;
 bool g_enable_thread_instrument[MAX_THREADS];
 bool g_enable_instrument = false;
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // knob variables (Knob_xxx_yyy)
@@ -162,6 +161,31 @@ Knob(UINT64, Knob_skip, "skipinst", "0", "Instructions to skip");
 Knob(UINT64, Knob_max, "max", "0", "Max number of instruction to collect");
 Knob(UINT64, Knob_rtn_min, "rmin", "0", "Max number of function calls to collect data");
 Knob(UINT64, Knob_rtn_max, "rmax", "0", "Max number of function calls to collect data");
+
+//Added by Lifeng
+// knob variables and global variable 
+//   for identifying benchmark annotations
+bool manual_simpoint = false;
+bool sim_begin[MAX_THREADS]={false};
+bool sim_end[MAX_THREADS]={false};
+bool thread_flushed[MAX_THREADS]={false};
+Knob(bool, Knob_manual_simpoint, "manual", "0", "start/stop trace generation at manually added SIM_BEGIN()/SIM_END function call");
+ 
+// variables for HMC 2.0 atomic instruction simulations
+// should be disabled in normal cases
+typedef struct hmc_info_t
+{
+    string name;
+    ADDRINT caller_pc;
+    ADDRINT func_pc;
+    ADDRINT ret_pc;
+    ADDRINT addr_pc;
+}hmc_info_t;
+ADDRINT last_call_pc = 0;
+ADDRINT curr_caller_pc = 0;
+ADDRINT hmc_target_addr = 0;
+std::map<ADDRINT, hmc_info_t> HMC_caller_map;
+Knob(bool, Knob_enable_hmc, "hmc", "0", "enable HMC info collection");
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,6 +295,7 @@ void get_ld_ea(ADDRINT addr, UINT32 mem_read_size,
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info* trace_info = trace_info_array[tid];
+  if (trace_info==NULL) return;
   trace_info->vaddr1        = addr;
   trace_info->mem_read_size = mem_read_size;
   trace_info->eflags        = eflag_value;
@@ -291,6 +316,7 @@ void get_ld_ea2(ADDRINT addr1, ADDRINT addr2, UINT32 mem_read_size,
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info* trace_info = trace_info_array[tid];
+  if (trace_info==NULL) return;
   trace_info->vaddr1        = addr1;
   trace_info->vaddr2        = addr2;
   trace_info->mem_read_size = mem_read_size;
@@ -312,7 +338,7 @@ void get_st_ea(ADDRINT addr, UINT32 mem_st_size,
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info* trace_info = trace_info_array[tid];
-
+  if (trace_info==NULL) return;
   trace_info->st_vaddr       = addr;
   trace_info->mem_write_size = mem_st_size;
   trace_info->eflags         = eflag_value;
@@ -328,7 +354,7 @@ void get_target(ADDRINT target, bool taken, THREADID threadid)
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info* trace_info = trace_info_array[tid];
-
+  if (trace_info==NULL) return;
   trace_info->target         = target;
   trace_info->actually_taken = taken;
 }
@@ -345,6 +371,8 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
 
   Trace_info* trace_info = trace_info_array[tid];
   Inst_info* static_inst = g_inst_storage[tid][iaddr];
+
+  if (trace_info==NULL) return;
 
   //can get rid of this memcpy by directly copying to buffer..
   memcpy(&trace_info->inst_info, static_inst, sizeof(Inst_info)); 
@@ -368,6 +396,17 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
   trace_info->mem_read_size  = 0;
   trace_info->mem_write_size = 0;
   trace_info->eflags         = 0;
+
+  //changed by Lifeng
+  // update hmc inst info
+  if (Knob_enable_hmc.Value()!=0
+          && tid==0 && hmc_target_addr!=0
+          && t_info->ld_vaddr1==hmc_target_addr)
+  {
+      HMC_caller_map[curr_caller_pc].addr_pc = (uint64_t)(t_info->instruction_addr);
+      hmc_target_addr = 0;
+  }
+
 
   memcpy(trace_info->trace_buf + trace_info->bytes_accumulated, t_info, sizeof(Inst_info));
   trace_info->bytes_accumulated += sizeof(Inst_info);
@@ -410,7 +449,7 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
 // Trace Instrumentation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-UINT64 last_count = -1;
+UINT64 last_count[MAX_THREADS] = {0};
 
 VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
 {
@@ -422,18 +461,86 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
   if (!g_enable_instrument)
     return;
 
+  
   g_inst_count[tid] += count;
 
+  /*
   if (Knob_max.Value() > 0 && g_inst_count[tid] >= Knob_max.Value()) {
+    ReleaseLock(&g_lock);
     finish();
     exit(0);
   }
+  */
 
-  if (g_inst_count[tid] >= last_count + 500000) {
-    cout << g_inst_count[tid] << "\n";
-    last_count = g_inst_count[tid];
+  // Added by Lifeng
+  if (Knob_max.Value() > 0 && g_enable_thread_instrument[tid] == true
+         && sim_end[tid] == false
+         && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid])
+  {
+      sim_end[tid]=true;
+  }
+  if (tid==0 && sim_end[tid]==true
+          && g_enable_thread_instrument[tid]==true)
+  {
+      // make sure all threads have reached the end point
+      bool stop=true;
+      for (unsigned t=0;t<thread_count;t++)
+      {
+        if (sim_end[t]==false) stop=false; 
+      }
+      // if so, prepare to quit
+      if (stop)
+      {
+        cout<<"intrumentation finish..."<<endl;  
+        for (unsigned t=0;t<thread_count;t++)
+        {
+            if (g_enable_thread_instrument[t])
+            {
+                g_enable_thread_instrument[t] = false;
+            }
+        }
+      }
+  }
+  if (sim_end[tid]==true && g_enable_thread_instrument[tid]==false)
+  {
+      thread_flushed[tid] = true;
+      thread_end();
+  }
+  if (tid==0 && sim_end[tid]==true && thread_flushed[tid]==true)
+  {
+      bool stop=true;
+      for (unsigned t=0;t<thread_count;t++)
+      {
+        if (thread_flushed[t]==false) stop=false; 
+      }
+      if (stop)
+      {
+        finish();
+        exit(0);
+      }
+  }
+    
+  GetLock(&g_lock, tid+1);
+
+  if (g_inst_count[tid] >= last_count[tid] + 5000000) {
+    cout << tid << ": " << g_inst_count[tid] << endl;
+    last_count[tid] = g_inst_count[tid];
   }
 
+  ReleaseLock(&g_lock);
+
+  // Added by Lifeng
+  if (manual_simpoint == true && g_enable_thread_instrument[tid] == false
+          && sim_begin[tid] == true && sim_end[tid]==false)
+  {
+    if (g_inst_count[tid] >= Knob_skip.Value() + g_start_inst_count[tid])
+    {  
+        cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << endl;
+        g_start_inst_count[tid] = g_inst_count[tid];
+        g_enable_thread_instrument[tid] = true;
+  
+    }
+  }
 #if 0
   if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
     if (g_start_inst_count[tid] == -1) {
@@ -760,6 +867,15 @@ void instrument(INS ins)
   }
 }
 
+VOID InstHMC(ADDRINT pc)
+{
+    if (!Knob_enable_hmc.Value()) return;
+    THREADID tid = threadMap[PIN_ThreadId()];
+    if (tid != 0) return;
+
+    last_call_pc = pc;
+}
+
 /*
 * 
 */
@@ -768,6 +884,11 @@ void Instruction(INS ins, void* v)
   if (!g_enable_instrument)
     return;
 
+  // Added by Lifeng
+  if (Knob_enable_hmc.Value() && INS_IsProcedureCall(ins)
+          && !INS_IsRet(ins) && !INS_IsInterrupt(ins))
+    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)InstHMC, IARG_INST_PTR, IARG_END);
+     
   instrument(ins);
 }
 
@@ -871,6 +992,7 @@ void thread_end(THREADID threadid)
 
   Trace_info* trace_info = NULL;
   trace_info = trace_info_array[threadid];
+  if (trace_info==NULL) return;
 
   /**< dump out instructions that are not written yet when a thread is terminated */
   if (trace_info->bytes_accumulated > 0) {
@@ -888,6 +1010,10 @@ void thread_end(THREADID threadid)
 
   /**< delete thread trace info */
   delete trace_info;
+  trace_info_array[threadid] = NULL;
+
+  sim_end[threadid]=true;
+  thread_flushed[threadid]=true;
 }
 
 
@@ -896,7 +1022,7 @@ void thread_end(THREADID threadid)
 /// Fini function : instrumentation
 /////////////////////////////////////////////////////////////////////////////////////////
 void Fini(INT32 code, void *v)
-{
+{  
   finish();
 }
 
@@ -909,6 +1035,25 @@ void Fini(INT32 code, void *v)
 
 void finish(void)
 {
+    if (Knob_enable_hmc.Value())
+    {
+        string fn = Knob_trace_name.Value() + ".HMCinfo";
+        ofstream ofs;
+
+        ofs.open(fn.c_str());
+        ofs<<"CallerPtr FuncPtr RetPC AddrPC Name"<<endl;
+        map<ADDRINT, hmc_info_t>::iterator iter;
+        for (iter=HMC_caller_map.begin();iter!=HMC_caller_map.end();iter++)
+        {
+            ofs<<iter->second.caller_pc<<" ";
+            ofs<<iter->second.func_pc<<" ";
+            ofs<<iter->second.ret_pc<<" ";
+            ofs<<iter->second.addr_pc<<" ";
+            ofs<<iter->second.name<<endl;
+        }
+        ofs.close();
+    }
+   
   /**< Create configuration file */
   string config_file_name = Knob_trace_name.Value() + ".txt";
   ofstream configFile;
@@ -925,7 +1070,8 @@ void finish(void)
 
   /**< Final print to standard output */
   for (unsigned ii = 0; ii < thread_count; ++ii) {
-    cout << "-> tid " << thread_info[ii].thread_id << " inst count " << g_inst_count[ii] 
+    cout << "-> tid " << thread_info[ii].thread_id << " inst count " << g_inst_count[ii]
+      << "  instrumented inst# "<< g_inst_count[ii] - g_start_inst_count[ii]
       << " (from " << thread_info[ii].inst_count << ")\n";
   }
   cout << "-> Final icount: " << g_inst_count[0] << endl;
@@ -938,9 +1084,16 @@ void finish(void)
 /////////////////////////////////////////////////////////////////////////////////////////
 void initialize(void)
 {
+  // Added by Lifeng
+  // Enable manual simpoint
+  if (Knob_manual_simpoint.Value())
+      manual_simpoint = true;
+
   // Enable Analysis Routine
   for (int ii = 0; ii < MAX_THREADS; ++ii) {
-    g_enable_thread_instrument[ii] = true;
+    // changed by Lifeng
+    // thread instrument is disabled at the beginning if manual simpoint is set.
+    g_enable_thread_instrument[ii] = manual_simpoint ? false : true;
     g_inst_print_count[ii] = 0;
   }
 
@@ -1087,6 +1240,110 @@ void dprint_inst(ADDRINT iaddr, string *disassemble_info, THREADID threadid)
   cout << "*** end of the data strcture *** " << endl;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+/// manual simpoint
+/////////////////////////////////////////////////////////////////////////////////////////
+// Added by Lifeng
+// start trace generation at SIM_BEGIN() function call
+
+VOID RtnBegin(ADDRINT ret)
+{
+    if (ret==0) return;
+
+    // enable corresponding thread's instrumentation
+    THREADID tid = threadMap[PIN_ThreadId()];
+    cout<<"Thread "<<tid<<" sim begin"<<endl;
+    sim_begin[tid] = true;
+}
+VOID RtnEnd(ADDRINT arg)
+{
+    if (arg==0) return;
+    
+    // enable corresponding thread's instrumentation
+    THREADID tid = threadMap[PIN_ThreadId()];
+    if (g_enable_thread_instrument[tid]==false) return;
+    if (sim_end[tid]) return;
+
+    cout<<"Thread "<<tid<<" sim end"<<endl;
+    sim_end[tid]=true;
+}
+
+string HMC_Inst[]=
+{
+"HMC_CAS_greater_16B",
+"HMC_CAS_less_16B",
+"HMC_CAS_equal_16B",
+"HMC_CAS_zero_16B",
+"HMC_ADD_16B",
+""//last element must be empty
+};
+
+
+
+VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
+{
+    THREADID tid = threadMap[PIN_ThreadId()];
+    ADDRINT pc = last_call_pc;
+    if (tid != 0) return;
+    if (pc == 0) return;
+
+    if (HMC_caller_map.find(pc)!=HMC_caller_map.end())
+        return;
+
+    hmc_info_t tmp;
+    tmp.name = name;
+    tmp.caller_pc = pc;
+    tmp.func_pc = func;
+    tmp.ret_pc = ret;
+    tmp.addr_pc = 0;
+
+    HMC_caller_map[pc] = tmp;
+    hmc_target_addr = target_addr;
+    curr_caller_pc = pc;
+}
+VOID Image(IMG img, VOID *v)
+{
+    RTN rtn = RTN_FindByName(img, "SIM_BEGIN");
+    if (RTN_Valid(rtn))
+    {
+        RTN_Open(rtn);
+        RTN_InsertCall(rtn, IPOINT_AFTER, (AFUNPTR)RtnBegin,
+                        IARG_FUNCRET_EXITPOINT_VALUE, IARG_END);
+        RTN_Close(rtn);
+    }
+    RTN rtn2 = RTN_FindByName(img, "SIM_END");
+    if (RTN_Valid(rtn2))
+    {
+        RTN_Open(rtn2);
+        RTN_InsertCall(rtn2, IPOINT_BEFORE, (AFUNPTR)RtnEnd,
+                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+        RTN_Close(rtn2);
+    }
+
+    // HMC atomic functions
+    if (!Knob_enable_hmc.Value()) return;
+
+    RTN hmc_rtn;
+    unsigned i=0;
+    while (!HMC_Inst[i].empty())
+    {
+        string name = HMC_Inst[i]; i++;
+        hmc_rtn = RTN_FindByName(img, name.c_str());
+        if (RTN_Valid(hmc_rtn))
+        {
+            RTN_Open(hmc_rtn);
+            RTN_InsertCall(hmc_rtn, IPOINT_BEFORE, (AFUNPTR)RtnHMC,
+                    IARG_ADDRINT, name.c_str(),
+                    IARG_ADDRINT, RTN_Funptr(hmc_rtn),
+                    IARG_RETURN_IP, 
+                    IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
+                    IARG_END);
+            RTN_Close(hmc_rtn);
+        }
+
+    }
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /// main function
@@ -1109,6 +1366,9 @@ int main(int argc, char *argv[])
 
   PIN_AddThreadStartFunction(ThreadStart, 0);
   PIN_AddThreadFiniFunction(ThreadEnd, 0);
+
+  // Added by Lifeng
+  IMG_AddInstrumentFunction(Image, 0);
 
   // Instrumentation Granularity:
   // 1. Trace: Counting Basic Blocks instructions to not to 
