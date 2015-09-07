@@ -905,7 +905,8 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         map<uint64_t, hmc_inst_s> & hmc_info = thread_trace_info->m_process->m_hmc_info;
         uint64_t inst_addr = (static_cast<trace_info_cpu_s*>
                            (thread_trace_info->m_next_trace_info))->m_instruction_addr;
-        if (hmc_info.find(inst_addr) != hmc_info.end()) 
+        if (true==*KNOB(KNOB_ENABLE_HMC_INST) &&
+                hmc_info.find(inst_addr) != hmc_info.end()) 
         {
           
           hmc_inst_s hmc_inst = hmc_info[inst_addr];
