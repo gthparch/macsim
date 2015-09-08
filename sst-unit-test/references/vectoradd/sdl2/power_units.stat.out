@@ -24,27 +24,27 @@ POWER_MC_R                                                      0               
 
 POWER_MC_W                                                      0                             0
 
-POWER_BLOCK_STATES_R_CORE_0                                  5903                          5903
+POWER_BLOCK_STATES_R_CORE_0                                   835                           835
 
-POWER_BLOCK_STATES_W_CORE_0                                  5903                          5903
+POWER_BLOCK_STATES_W_CORE_0                                   835                           835
 
-POWER_FETCH_QUEUE_R_CORE_0                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_0                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_0                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_0                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_0                                    3354                          3354
+POWER_INST_QUEUE_R_CORE_0                                     340                           340
 
-POWER_INST_QUEUE_W_CORE_0                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_0                                     184                           184
 
-POWER_BR_PRED_R_CORE_0                                        192                           192
+POWER_BR_PRED_R_CORE_0                                         16                            16
 
-POWER_BR_PRED_W_CORE_0                                        192                           192
+POWER_BR_PRED_W_CORE_0                                         16                            16
 
 POWER_RAS_R_CORE_0                                              0                             0
 
 POWER_RAS_W_CORE_0                                              0                             0
 
-POWER_ICACHE_R_CORE_0                                        2208                          2208
+POWER_ICACHE_R_CORE_0                                         184                           184
 
 POWER_ICACHE_W_CORE_0                                           0                             0
 
@@ -62,7 +62,7 @@ POWER_ICACHE_TOT_ACC_CORE_0                                     0               
 
 POWER_ICACHE_CONF_CORE_0                                        0                             0
 
-POWER_INST_DECODER_R_CORE_0                                  2208                          2208
+POWER_INST_DECODER_R_CORE_0                                   184                           184
 
 POWER_INST_DECODER_W_CORE_0                                     0                             0
 
@@ -70,41 +70,41 @@ POWER_MICRO_OP_SEQ_R_CORE_0                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_0                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_0                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_0                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_0                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_0                                     3354                          3354
+POWER_UOP_QUEUE_R_CORE_0                                      340                           340
 
-POWER_UOP_QUEUE_W_CORE_0                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_0                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_0                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_0                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_0                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_0                                184                           184
 
 POWER_FREELIST_R_CORE_0                                         0                             0
 
 POWER_FREELIST_W_CORE_0                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_0                           3820                          3820
+POWER_RESERVATION_STATION_R_CORE_0                            210                           210
 
-POWER_RESERVATION_STATION_W_CORE_0                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_0                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_0                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_0                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_0                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_0                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_0                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_0                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_0                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_0                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_0                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_0                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_0                                    184                           184
 
-POWER_EX_ALU_R_CORE_0                                        1536                          1536
+POWER_EX_ALU_R_CORE_0                                         128                           128
 
 POWER_EX_FPU_R_CORE_0                                           0                             0
 
@@ -118,7 +118,7 @@ POWER_REORDER_BUF_W_CORE_0                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_0                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_0                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_0                          184                           184
 
 POWER_FP_RENAME_R_CORE_0                                        0                             0
 
@@ -148,25 +148,25 @@ POWER_DATA_TLB_R_TAG_CORE_0                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_0                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_0                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_0                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_0                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_0                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_0                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_0                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_0                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_0                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_0                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_0                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_0                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_0                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_0                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_0                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_0                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_0                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_0                                 0                             0
 
@@ -176,11 +176,11 @@ POWER_FLAG_REGISTER_R_CORE_0                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_0                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_0                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_0                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_0                                        0                             0
 
-POWER_PIPELINE_CORE_0                                        2208                          2208
+POWER_PIPELINE_CORE_0                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_0                                  0                             0
 
@@ -246,35 +246,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_0                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_0                                0                             0
 
-POWER_SHARED_MEM_R_CORE_0                                     384                           384
+POWER_SHARED_MEM_R_CORE_0                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_0                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_0                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_0                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_0                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_1                                  8877                          8877
+POWER_BLOCK_STATES_R_CORE_1                                   993                           993
 
-POWER_BLOCK_STATES_W_CORE_1                                  8877                          8877
+POWER_BLOCK_STATES_W_CORE_1                                   993                           993
 
-POWER_FETCH_QUEUE_R_CORE_1                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_1                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_1                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_1                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_1                                    3884                          3884
+POWER_INST_QUEUE_R_CORE_1                                     306                           306
 
-POWER_INST_QUEUE_W_CORE_1                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_1                                     184                           184
 
-POWER_BR_PRED_R_CORE_1                                        192                           192
+POWER_BR_PRED_R_CORE_1                                         16                            16
 
-POWER_BR_PRED_W_CORE_1                                        192                           192
+POWER_BR_PRED_W_CORE_1                                         16                            16
 
 POWER_RAS_R_CORE_1                                              0                             0
 
 POWER_RAS_W_CORE_1                                              0                             0
 
-POWER_ICACHE_R_CORE_1                                        2208                          2208
+POWER_ICACHE_R_CORE_1                                         184                           184
 
 POWER_ICACHE_W_CORE_1                                           0                             0
 
@@ -292,7 +292,7 @@ POWER_ICACHE_TOT_ACC_CORE_1                                     0               
 
 POWER_ICACHE_CONF_CORE_1                                        0                             0
 
-POWER_INST_DECODER_R_CORE_1                                  2208                          2208
+POWER_INST_DECODER_R_CORE_1                                   184                           184
 
 POWER_INST_DECODER_W_CORE_1                                     0                             0
 
@@ -300,41 +300,41 @@ POWER_MICRO_OP_SEQ_R_CORE_1                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_1                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_1                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_1                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_1                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_1                                     3884                          3884
+POWER_UOP_QUEUE_R_CORE_1                                      306                           306
 
-POWER_UOP_QUEUE_W_CORE_1                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_1                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_1                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_1                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_1                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_1                                184                           184
 
 POWER_FREELIST_R_CORE_1                                         0                             0
 
 POWER_FREELIST_W_CORE_1                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_1                           3272                          3272
+POWER_RESERVATION_STATION_R_CORE_1                            207                           207
 
-POWER_RESERVATION_STATION_W_CORE_1                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_1                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_1                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_1                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_1                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_1                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_1                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_1                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_1                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_1                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_1                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_1                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_1                                    184                           184
 
-POWER_EX_ALU_R_CORE_1                                        1536                          1536
+POWER_EX_ALU_R_CORE_1                                         128                           128
 
 POWER_EX_FPU_R_CORE_1                                           0                             0
 
@@ -348,7 +348,7 @@ POWER_REORDER_BUF_W_CORE_1                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_1                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_1                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_1                          184                           184
 
 POWER_FP_RENAME_R_CORE_1                                        0                             0
 
@@ -378,25 +378,25 @@ POWER_DATA_TLB_R_TAG_CORE_1                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_1                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_1                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_1                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_1                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_1                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_1                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_1                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_1                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_1                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_1                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_1                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_1                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_1                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_1                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_1                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_1                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_1                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_1                                 0                             0
 
@@ -406,11 +406,11 @@ POWER_FLAG_REGISTER_R_CORE_1                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_1                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_1                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_1                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_1                                        0                             0
 
-POWER_PIPELINE_CORE_1                                        2208                          2208
+POWER_PIPELINE_CORE_1                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_1                                  0                             0
 
@@ -476,35 +476,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_1                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_1                                0                             0
 
-POWER_SHARED_MEM_R_CORE_1                                     384                           384
+POWER_SHARED_MEM_R_CORE_1                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_1                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_1                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_1                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_1                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_2                                  6045                          6045
+POWER_BLOCK_STATES_R_CORE_2                                   945                           945
 
-POWER_BLOCK_STATES_W_CORE_2                                  6045                          6045
+POWER_BLOCK_STATES_W_CORE_2                                   945                           945
 
-POWER_FETCH_QUEUE_R_CORE_2                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_2                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_2                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_2                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_2                                    4270                          4270
+POWER_INST_QUEUE_R_CORE_2                                     350                           350
 
-POWER_INST_QUEUE_W_CORE_2                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_2                                     184                           184
 
-POWER_BR_PRED_R_CORE_2                                        192                           192
+POWER_BR_PRED_R_CORE_2                                         16                            16
 
-POWER_BR_PRED_W_CORE_2                                        192                           192
+POWER_BR_PRED_W_CORE_2                                         16                            16
 
 POWER_RAS_R_CORE_2                                              0                             0
 
 POWER_RAS_W_CORE_2                                              0                             0
 
-POWER_ICACHE_R_CORE_2                                        2208                          2208
+POWER_ICACHE_R_CORE_2                                         184                           184
 
 POWER_ICACHE_W_CORE_2                                           0                             0
 
@@ -522,7 +522,7 @@ POWER_ICACHE_TOT_ACC_CORE_2                                     0               
 
 POWER_ICACHE_CONF_CORE_2                                        0                             0
 
-POWER_INST_DECODER_R_CORE_2                                  2208                          2208
+POWER_INST_DECODER_R_CORE_2                                   184                           184
 
 POWER_INST_DECODER_W_CORE_2                                     0                             0
 
@@ -530,41 +530,41 @@ POWER_MICRO_OP_SEQ_R_CORE_2                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_2                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_2                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_2                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_2                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_2                                     4270                          4270
+POWER_UOP_QUEUE_R_CORE_2                                      350                           350
 
-POWER_UOP_QUEUE_W_CORE_2                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_2                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_2                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_2                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_2                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_2                                184                           184
 
 POWER_FREELIST_R_CORE_2                                         0                             0
 
 POWER_FREELIST_W_CORE_2                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_2                           3348                          3348
+POWER_RESERVATION_STATION_R_CORE_2                            210                           210
 
-POWER_RESERVATION_STATION_W_CORE_2                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_2                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_2                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_2                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_2                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_2                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_2                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_2                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_2                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_2                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_2                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_2                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_2                                    184                           184
 
-POWER_EX_ALU_R_CORE_2                                        1536                          1536
+POWER_EX_ALU_R_CORE_2                                         128                           128
 
 POWER_EX_FPU_R_CORE_2                                           0                             0
 
@@ -578,7 +578,7 @@ POWER_REORDER_BUF_W_CORE_2                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_2                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_2                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_2                          184                           184
 
 POWER_FP_RENAME_R_CORE_2                                        0                             0
 
@@ -608,25 +608,25 @@ POWER_DATA_TLB_R_TAG_CORE_2                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_2                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_2                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_2                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_2                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_2                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_2                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_2                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_2                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_2                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_2                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_2                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_2                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_2                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_2                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_2                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_2                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_2                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_2                                 0                             0
 
@@ -636,11 +636,11 @@ POWER_FLAG_REGISTER_R_CORE_2                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_2                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_2                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_2                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_2                                        0                             0
 
-POWER_PIPELINE_CORE_2                                        2208                          2208
+POWER_PIPELINE_CORE_2                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_2                                  0                             0
 
@@ -706,35 +706,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_2                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_2                                0                             0
 
-POWER_SHARED_MEM_R_CORE_2                                     384                           384
+POWER_SHARED_MEM_R_CORE_2                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_2                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_2                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_2                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_2                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_3                                  6061                          6061
+POWER_BLOCK_STATES_R_CORE_3                                   909                           909
 
-POWER_BLOCK_STATES_W_CORE_3                                  6061                          6061
+POWER_BLOCK_STATES_W_CORE_3                                   909                           909
 
-POWER_FETCH_QUEUE_R_CORE_3                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_3                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_3                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_3                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_3                                    3890                          3890
+POWER_INST_QUEUE_R_CORE_3                                     351                           351
 
-POWER_INST_QUEUE_W_CORE_3                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_3                                     184                           184
 
-POWER_BR_PRED_R_CORE_3                                        192                           192
+POWER_BR_PRED_R_CORE_3                                         16                            16
 
-POWER_BR_PRED_W_CORE_3                                        192                           192
+POWER_BR_PRED_W_CORE_3                                         16                            16
 
 POWER_RAS_R_CORE_3                                              0                             0
 
 POWER_RAS_W_CORE_3                                              0                             0
 
-POWER_ICACHE_R_CORE_3                                        2208                          2208
+POWER_ICACHE_R_CORE_3                                         184                           184
 
 POWER_ICACHE_W_CORE_3                                           0                             0
 
@@ -752,7 +752,7 @@ POWER_ICACHE_TOT_ACC_CORE_3                                     0               
 
 POWER_ICACHE_CONF_CORE_3                                        0                             0
 
-POWER_INST_DECODER_R_CORE_3                                  2208                          2208
+POWER_INST_DECODER_R_CORE_3                                   184                           184
 
 POWER_INST_DECODER_W_CORE_3                                     0                             0
 
@@ -760,41 +760,41 @@ POWER_MICRO_OP_SEQ_R_CORE_3                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_3                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_3                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_3                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_3                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_3                                     3890                          3890
+POWER_UOP_QUEUE_R_CORE_3                                      351                           351
 
-POWER_UOP_QUEUE_W_CORE_3                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_3                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_3                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_3                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_3                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_3                                184                           184
 
 POWER_FREELIST_R_CORE_3                                         0                             0
 
 POWER_FREELIST_W_CORE_3                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_3                           3573                          3573
+POWER_RESERVATION_STATION_R_CORE_3                            210                           210
 
-POWER_RESERVATION_STATION_W_CORE_3                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_3                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_3                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_3                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_3                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_3                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_3                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_3                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_3                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_3                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_3                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_3                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_3                                    184                           184
 
-POWER_EX_ALU_R_CORE_3                                        1536                          1536
+POWER_EX_ALU_R_CORE_3                                         128                           128
 
 POWER_EX_FPU_R_CORE_3                                           0                             0
 
@@ -808,7 +808,7 @@ POWER_REORDER_BUF_W_CORE_3                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_3                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_3                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_3                          184                           184
 
 POWER_FP_RENAME_R_CORE_3                                        0                             0
 
@@ -838,25 +838,25 @@ POWER_DATA_TLB_R_TAG_CORE_3                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_3                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_3                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_3                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_3                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_3                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_3                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_3                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_3                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_3                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_3                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_3                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_3                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_3                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_3                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_3                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_3                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_3                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_3                                 0                             0
 
@@ -866,11 +866,11 @@ POWER_FLAG_REGISTER_R_CORE_3                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_3                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_3                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_3                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_3                                        0                             0
 
-POWER_PIPELINE_CORE_3                                        2208                          2208
+POWER_PIPELINE_CORE_3                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_3                                  0                             0
 
@@ -936,35 +936,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_3                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_3                                0                             0
 
-POWER_SHARED_MEM_R_CORE_3                                     384                           384
+POWER_SHARED_MEM_R_CORE_3                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_3                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_3                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_3                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_3                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_4                                  6059                          6059
+POWER_BLOCK_STATES_R_CORE_4                                   905                           905
 
-POWER_BLOCK_STATES_W_CORE_4                                  6059                          6059
+POWER_BLOCK_STATES_W_CORE_4                                   905                           905
 
-POWER_FETCH_QUEUE_R_CORE_4                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_4                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_4                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_4                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_4                                    3433                          3433
+POWER_INST_QUEUE_R_CORE_4                                     351                           351
 
-POWER_INST_QUEUE_W_CORE_4                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_4                                     184                           184
 
-POWER_BR_PRED_R_CORE_4                                        192                           192
+POWER_BR_PRED_R_CORE_4                                         16                            16
 
-POWER_BR_PRED_W_CORE_4                                        192                           192
+POWER_BR_PRED_W_CORE_4                                         16                            16
 
 POWER_RAS_R_CORE_4                                              0                             0
 
 POWER_RAS_W_CORE_4                                              0                             0
 
-POWER_ICACHE_R_CORE_4                                        2208                          2208
+POWER_ICACHE_R_CORE_4                                         184                           184
 
 POWER_ICACHE_W_CORE_4                                           0                             0
 
@@ -982,7 +982,7 @@ POWER_ICACHE_TOT_ACC_CORE_4                                     0               
 
 POWER_ICACHE_CONF_CORE_4                                        0                             0
 
-POWER_INST_DECODER_R_CORE_4                                  2208                          2208
+POWER_INST_DECODER_R_CORE_4                                   184                           184
 
 POWER_INST_DECODER_W_CORE_4                                     0                             0
 
@@ -990,41 +990,41 @@ POWER_MICRO_OP_SEQ_R_CORE_4                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_4                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_4                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_4                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_4                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_4                                     3433                          3433
+POWER_UOP_QUEUE_R_CORE_4                                      351                           351
 
-POWER_UOP_QUEUE_W_CORE_4                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_4                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_4                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_4                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_4                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_4                                184                           184
 
 POWER_FREELIST_R_CORE_4                                         0                             0
 
 POWER_FREELIST_W_CORE_4                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_4                           3721                          3721
+POWER_RESERVATION_STATION_R_CORE_4                            206                           206
 
-POWER_RESERVATION_STATION_W_CORE_4                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_4                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_4                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_4                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_4                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_4                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_4                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_4                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_4                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_4                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_4                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_4                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_4                                    184                           184
 
-POWER_EX_ALU_R_CORE_4                                        1536                          1536
+POWER_EX_ALU_R_CORE_4                                         128                           128
 
 POWER_EX_FPU_R_CORE_4                                           0                             0
 
@@ -1038,7 +1038,7 @@ POWER_REORDER_BUF_W_CORE_4                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_4                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_4                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_4                          184                           184
 
 POWER_FP_RENAME_R_CORE_4                                        0                             0
 
@@ -1068,25 +1068,25 @@ POWER_DATA_TLB_R_TAG_CORE_4                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_4                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_4                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_4                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_4                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_4                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_4                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_4                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_4                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_4                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_4                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_4                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_4                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_4                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_4                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_4                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_4                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_4                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_4                                 0                             0
 
@@ -1096,11 +1096,11 @@ POWER_FLAG_REGISTER_R_CORE_4                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_4                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_4                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_4                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_4                                        0                             0
 
-POWER_PIPELINE_CORE_4                                        2208                          2208
+POWER_PIPELINE_CORE_4                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_4                                  0                             0
 
@@ -1166,35 +1166,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_4                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_4                                0                             0
 
-POWER_SHARED_MEM_R_CORE_4                                     384                           384
+POWER_SHARED_MEM_R_CORE_4                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_4                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_4                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_4                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_4                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_5                                  6059                          6059
+POWER_BLOCK_STATES_R_CORE_5                                   905                           905
 
-POWER_BLOCK_STATES_W_CORE_5                                  6059                          6059
+POWER_BLOCK_STATES_W_CORE_5                                   905                           905
 
-POWER_FETCH_QUEUE_R_CORE_5                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_5                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_5                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_5                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_5                                    3799                          3799
+POWER_INST_QUEUE_R_CORE_5                                     351                           351
 
-POWER_INST_QUEUE_W_CORE_5                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_5                                     184                           184
 
-POWER_BR_PRED_R_CORE_5                                        192                           192
+POWER_BR_PRED_R_CORE_5                                         16                            16
 
-POWER_BR_PRED_W_CORE_5                                        192                           192
+POWER_BR_PRED_W_CORE_5                                         16                            16
 
 POWER_RAS_R_CORE_5                                              0                             0
 
 POWER_RAS_W_CORE_5                                              0                             0
 
-POWER_ICACHE_R_CORE_5                                        2208                          2208
+POWER_ICACHE_R_CORE_5                                         184                           184
 
 POWER_ICACHE_W_CORE_5                                           0                             0
 
@@ -1212,7 +1212,7 @@ POWER_ICACHE_TOT_ACC_CORE_5                                     0               
 
 POWER_ICACHE_CONF_CORE_5                                        0                             0
 
-POWER_INST_DECODER_R_CORE_5                                  2208                          2208
+POWER_INST_DECODER_R_CORE_5                                   184                           184
 
 POWER_INST_DECODER_W_CORE_5                                     0                             0
 
@@ -1220,41 +1220,41 @@ POWER_MICRO_OP_SEQ_R_CORE_5                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_5                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_5                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_5                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_5                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_5                                     3799                          3799
+POWER_UOP_QUEUE_R_CORE_5                                      351                           351
 
-POWER_UOP_QUEUE_W_CORE_5                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_5                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_5                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_5                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_5                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_5                                184                           184
 
 POWER_FREELIST_R_CORE_5                                         0                             0
 
 POWER_FREELIST_W_CORE_5                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_5                           3725                          3725
+POWER_RESERVATION_STATION_R_CORE_5                            206                           206
 
-POWER_RESERVATION_STATION_W_CORE_5                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_5                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_5                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_5                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_5                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_5                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_5                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_5                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_5                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_5                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_5                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_5                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_5                                    184                           184
 
-POWER_EX_ALU_R_CORE_5                                        1536                          1536
+POWER_EX_ALU_R_CORE_5                                         128                           128
 
 POWER_EX_FPU_R_CORE_5                                           0                             0
 
@@ -1268,7 +1268,7 @@ POWER_REORDER_BUF_W_CORE_5                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_5                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_5                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_5                          184                           184
 
 POWER_FP_RENAME_R_CORE_5                                        0                             0
 
@@ -1298,25 +1298,25 @@ POWER_DATA_TLB_R_TAG_CORE_5                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_5                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_5                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_5                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_5                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_5                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_5                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_5                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_5                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_5                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_5                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_5                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_5                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_5                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_5                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_5                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_5                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_5                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_5                                 0                             0
 
@@ -1326,11 +1326,11 @@ POWER_FLAG_REGISTER_R_CORE_5                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_5                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_5                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_5                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_5                                        0                             0
 
-POWER_PIPELINE_CORE_5                                        2208                          2208
+POWER_PIPELINE_CORE_5                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_5                                  0                             0
 
@@ -1396,35 +1396,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_5                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_5                                0                             0
 
-POWER_SHARED_MEM_R_CORE_5                                     384                           384
+POWER_SHARED_MEM_R_CORE_5                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_5                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_5                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_5                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_5                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_6                                  6059                          6059
+POWER_BLOCK_STATES_R_CORE_6                                   905                           905
 
-POWER_BLOCK_STATES_W_CORE_6                                  6059                          6059
+POWER_BLOCK_STATES_W_CORE_6                                   905                           905
 
-POWER_FETCH_QUEUE_R_CORE_6                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_6                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_6                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_6                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_6                                    3443                          3443
+POWER_INST_QUEUE_R_CORE_6                                     351                           351
 
-POWER_INST_QUEUE_W_CORE_6                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_6                                     184                           184
 
-POWER_BR_PRED_R_CORE_6                                        192                           192
+POWER_BR_PRED_R_CORE_6                                         16                            16
 
-POWER_BR_PRED_W_CORE_6                                        192                           192
+POWER_BR_PRED_W_CORE_6                                         16                            16
 
 POWER_RAS_R_CORE_6                                              0                             0
 
 POWER_RAS_W_CORE_6                                              0                             0
 
-POWER_ICACHE_R_CORE_6                                        2208                          2208
+POWER_ICACHE_R_CORE_6                                         184                           184
 
 POWER_ICACHE_W_CORE_6                                           0                             0
 
@@ -1442,7 +1442,7 @@ POWER_ICACHE_TOT_ACC_CORE_6                                     0               
 
 POWER_ICACHE_CONF_CORE_6                                        0                             0
 
-POWER_INST_DECODER_R_CORE_6                                  2208                          2208
+POWER_INST_DECODER_R_CORE_6                                   184                           184
 
 POWER_INST_DECODER_W_CORE_6                                     0                             0
 
@@ -1450,41 +1450,41 @@ POWER_MICRO_OP_SEQ_R_CORE_6                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_6                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_6                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_6                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_6                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_6                                     3443                          3443
+POWER_UOP_QUEUE_R_CORE_6                                      351                           351
 
-POWER_UOP_QUEUE_W_CORE_6                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_6                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_6                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_6                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_6                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_6                                184                           184
 
 POWER_FREELIST_R_CORE_6                                         0                             0
 
 POWER_FREELIST_W_CORE_6                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_6                           3761                          3761
+POWER_RESERVATION_STATION_R_CORE_6                            206                           206
 
-POWER_RESERVATION_STATION_W_CORE_6                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_6                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_6                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_6                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_6                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_6                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_6                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_6                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_6                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_6                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_6                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_6                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_6                                    184                           184
 
-POWER_EX_ALU_R_CORE_6                                        1536                          1536
+POWER_EX_ALU_R_CORE_6                                         128                           128
 
 POWER_EX_FPU_R_CORE_6                                           0                             0
 
@@ -1498,7 +1498,7 @@ POWER_REORDER_BUF_W_CORE_6                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_6                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_6                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_6                          184                           184
 
 POWER_FP_RENAME_R_CORE_6                                        0                             0
 
@@ -1528,25 +1528,25 @@ POWER_DATA_TLB_R_TAG_CORE_6                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_6                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_6                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_6                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_6                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_6                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_6                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_6                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_6                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_6                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_6                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_6                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_6                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_6                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_6                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_6                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_6                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_6                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_6                                 0                             0
 
@@ -1556,11 +1556,11 @@ POWER_FLAG_REGISTER_R_CORE_6                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_6                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_6                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_6                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_6                                        0                             0
 
-POWER_PIPELINE_CORE_6                                        2208                          2208
+POWER_PIPELINE_CORE_6                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_6                                  0                             0
 
@@ -1626,35 +1626,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_6                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_6                                0                             0
 
-POWER_SHARED_MEM_R_CORE_6                                     384                           384
+POWER_SHARED_MEM_R_CORE_6                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_6                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_6                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_6                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_6                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_7                                  8849                          8849
+POWER_BLOCK_STATES_R_CORE_7                                   905                           905
 
-POWER_BLOCK_STATES_W_CORE_7                                  8849                          8849
+POWER_BLOCK_STATES_W_CORE_7                                   905                           905
 
-POWER_FETCH_QUEUE_R_CORE_7                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_7                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_7                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_7                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_7                                    4261                          4261
+POWER_INST_QUEUE_R_CORE_7                                     352                           352
 
-POWER_INST_QUEUE_W_CORE_7                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_7                                     184                           184
 
-POWER_BR_PRED_R_CORE_7                                        192                           192
+POWER_BR_PRED_R_CORE_7                                         16                            16
 
-POWER_BR_PRED_W_CORE_7                                        192                           192
+POWER_BR_PRED_W_CORE_7                                         16                            16
 
 POWER_RAS_R_CORE_7                                              0                             0
 
 POWER_RAS_W_CORE_7                                              0                             0
 
-POWER_ICACHE_R_CORE_7                                        2208                          2208
+POWER_ICACHE_R_CORE_7                                         184                           184
 
 POWER_ICACHE_W_CORE_7                                           0                             0
 
@@ -1672,7 +1672,7 @@ POWER_ICACHE_TOT_ACC_CORE_7                                     0               
 
 POWER_ICACHE_CONF_CORE_7                                        0                             0
 
-POWER_INST_DECODER_R_CORE_7                                  2208                          2208
+POWER_INST_DECODER_R_CORE_7                                   184                           184
 
 POWER_INST_DECODER_W_CORE_7                                     0                             0
 
@@ -1680,41 +1680,41 @@ POWER_MICRO_OP_SEQ_R_CORE_7                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_7                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_7                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_7                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_7                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_7                                     4261                          4261
+POWER_UOP_QUEUE_R_CORE_7                                      352                           352
 
-POWER_UOP_QUEUE_W_CORE_7                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_7                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_7                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_7                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_7                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_7                                184                           184
 
 POWER_FREELIST_R_CORE_7                                         0                             0
 
 POWER_FREELIST_W_CORE_7                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_7                           3544                          3544
+POWER_RESERVATION_STATION_R_CORE_7                            206                           206
 
-POWER_RESERVATION_STATION_W_CORE_7                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_7                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_7                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_7                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_7                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_7                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_7                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_7                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_7                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_7                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_7                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_7                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_7                                    184                           184
 
-POWER_EX_ALU_R_CORE_7                                        1536                          1536
+POWER_EX_ALU_R_CORE_7                                         128                           128
 
 POWER_EX_FPU_R_CORE_7                                           0                             0
 
@@ -1728,7 +1728,7 @@ POWER_REORDER_BUF_W_CORE_7                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_7                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_7                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_7                          184                           184
 
 POWER_FP_RENAME_R_CORE_7                                        0                             0
 
@@ -1758,25 +1758,25 @@ POWER_DATA_TLB_R_TAG_CORE_7                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_7                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_7                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_7                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_7                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_7                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_7                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_7                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_7                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_7                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_7                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_7                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_7                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_7                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_7                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_7                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_7                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_7                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_7                                 0                             0
 
@@ -1786,11 +1786,11 @@ POWER_FLAG_REGISTER_R_CORE_7                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_7                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_7                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_7                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_7                                        0                             0
 
-POWER_PIPELINE_CORE_7                                        2208                          2208
+POWER_PIPELINE_CORE_7                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_7                                  0                             0
 
@@ -1856,35 +1856,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_7                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_7                                0                             0
 
-POWER_SHARED_MEM_R_CORE_7                                     384                           384
+POWER_SHARED_MEM_R_CORE_7                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_7                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_7                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_7                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_7                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_8                                  6057                          6057
+POWER_BLOCK_STATES_R_CORE_8                                   907                           907
 
-POWER_BLOCK_STATES_W_CORE_8                                  6057                          6057
+POWER_BLOCK_STATES_W_CORE_8                                   907                           907
 
-POWER_FETCH_QUEUE_R_CORE_8                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_8                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_8                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_8                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_8                                    4046                          4046
+POWER_INST_QUEUE_R_CORE_8                                     352                           352
 
-POWER_INST_QUEUE_W_CORE_8                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_8                                     184                           184
 
-POWER_BR_PRED_R_CORE_8                                        192                           192
+POWER_BR_PRED_R_CORE_8                                         16                            16
 
-POWER_BR_PRED_W_CORE_8                                        192                           192
+POWER_BR_PRED_W_CORE_8                                         16                            16
 
 POWER_RAS_R_CORE_8                                              0                             0
 
 POWER_RAS_W_CORE_8                                              0                             0
 
-POWER_ICACHE_R_CORE_8                                        2208                          2208
+POWER_ICACHE_R_CORE_8                                         184                           184
 
 POWER_ICACHE_W_CORE_8                                           0                             0
 
@@ -1902,7 +1902,7 @@ POWER_ICACHE_TOT_ACC_CORE_8                                     0               
 
 POWER_ICACHE_CONF_CORE_8                                        0                             0
 
-POWER_INST_DECODER_R_CORE_8                                  2208                          2208
+POWER_INST_DECODER_R_CORE_8                                   184                           184
 
 POWER_INST_DECODER_W_CORE_8                                     0                             0
 
@@ -1910,41 +1910,41 @@ POWER_MICRO_OP_SEQ_R_CORE_8                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_8                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_8                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_8                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_8                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_8                                     4046                          4046
+POWER_UOP_QUEUE_R_CORE_8                                      352                           352
 
-POWER_UOP_QUEUE_W_CORE_8                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_8                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_8                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_8                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_8                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_8                                184                           184
 
 POWER_FREELIST_R_CORE_8                                         0                             0
 
 POWER_FREELIST_W_CORE_8                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_8                           3790                          3790
+POWER_RESERVATION_STATION_R_CORE_8                            210                           210
 
-POWER_RESERVATION_STATION_W_CORE_8                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_8                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_8                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_8                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_8                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_8                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_8                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_8                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_8                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_8                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_8                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_8                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_8                                    184                           184
 
-POWER_EX_ALU_R_CORE_8                                        1536                          1536
+POWER_EX_ALU_R_CORE_8                                         128                           128
 
 POWER_EX_FPU_R_CORE_8                                           0                             0
 
@@ -1958,7 +1958,7 @@ POWER_REORDER_BUF_W_CORE_8                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_8                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_8                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_8                          184                           184
 
 POWER_FP_RENAME_R_CORE_8                                        0                             0
 
@@ -1988,25 +1988,25 @@ POWER_DATA_TLB_R_TAG_CORE_8                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_8                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_8                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_8                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_8                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_8                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_8                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_8                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_8                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_8                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_8                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_8                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_8                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_8                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_8                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_8                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_8                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_8                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_8                                 0                             0
 
@@ -2016,11 +2016,11 @@ POWER_FLAG_REGISTER_R_CORE_8                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_8                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_8                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_8                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_8                                        0                             0
 
-POWER_PIPELINE_CORE_8                                        2208                          2208
+POWER_PIPELINE_CORE_8                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_8                                  0                             0
 
@@ -2086,35 +2086,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_8                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_8                                0                             0
 
-POWER_SHARED_MEM_R_CORE_8                                     384                           384
+POWER_SHARED_MEM_R_CORE_8                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_8                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_8                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_8                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_8                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_9                                  6057                          6057
+POWER_BLOCK_STATES_R_CORE_9                                   907                           907
 
-POWER_BLOCK_STATES_W_CORE_9                                  6057                          6057
+POWER_BLOCK_STATES_W_CORE_9                                   907                           907
 
-POWER_FETCH_QUEUE_R_CORE_9                                   2208                          2208
+POWER_FETCH_QUEUE_R_CORE_9                                    184                           184
 
-POWER_FETCH_QUEUE_W_CORE_9                                   2208                          2208
+POWER_FETCH_QUEUE_W_CORE_9                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_9                                    3446                          3446
+POWER_INST_QUEUE_R_CORE_9                                     352                           352
 
-POWER_INST_QUEUE_W_CORE_9                                    2208                          2208
+POWER_INST_QUEUE_W_CORE_9                                     184                           184
 
-POWER_BR_PRED_R_CORE_9                                        192                           192
+POWER_BR_PRED_R_CORE_9                                         16                            16
 
-POWER_BR_PRED_W_CORE_9                                        192                           192
+POWER_BR_PRED_W_CORE_9                                         16                            16
 
 POWER_RAS_R_CORE_9                                              0                             0
 
 POWER_RAS_W_CORE_9                                              0                             0
 
-POWER_ICACHE_R_CORE_9                                        2208                          2208
+POWER_ICACHE_R_CORE_9                                         184                           184
 
 POWER_ICACHE_W_CORE_9                                           0                             0
 
@@ -2132,7 +2132,7 @@ POWER_ICACHE_TOT_ACC_CORE_9                                     0               
 
 POWER_ICACHE_CONF_CORE_9                                        0                             0
 
-POWER_INST_DECODER_R_CORE_9                                  2208                          2208
+POWER_INST_DECODER_R_CORE_9                                   184                           184
 
 POWER_INST_DECODER_W_CORE_9                                     0                             0
 
@@ -2140,41 +2140,41 @@ POWER_MICRO_OP_SEQ_R_CORE_9                                     0               
 
 POWER_MICRO_OP_SEQ_W_CORE_9                                     0                             0
 
-POWER_OPERAND_DECODER_R_CORE_9                               2208                          2208
+POWER_OPERAND_DECODER_R_CORE_9                                184                           184
 
 POWER_OPERAND_DECODER_W_CORE_9                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_9                                     3446                          3446
+POWER_UOP_QUEUE_R_CORE_9                                      352                           352
 
-POWER_UOP_QUEUE_W_CORE_9                                     2208                          2208
+POWER_UOP_QUEUE_W_CORE_9                                      184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_9                               0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_9                               0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_9                               2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_9                                184                           184
 
 POWER_FREELIST_R_CORE_9                                         0                             0
 
 POWER_FREELIST_W_CORE_9                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_9                           3716                          3716
+POWER_RESERVATION_STATION_R_CORE_9                            210                           210
 
-POWER_RESERVATION_STATION_W_CORE_9                           2208                          2208
+POWER_RESERVATION_STATION_W_CORE_9                            184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_9                       2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_9                        184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_9                          0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_9                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_9                           184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_9                          2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_9                           184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_9                                   2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_9                                    184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_9                                   2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_9                                    184                           184
 
-POWER_EX_ALU_R_CORE_9                                        1536                          1536
+POWER_EX_ALU_R_CORE_9                                         128                           128
 
 POWER_EX_FPU_R_CORE_9                                           0                             0
 
@@ -2188,7 +2188,7 @@ POWER_REORDER_BUF_W_CORE_9                                      0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_9                            0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_9                         2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_9                          184                           184
 
 POWER_FP_RENAME_R_CORE_9                                        0                             0
 
@@ -2218,25 +2218,25 @@ POWER_DATA_TLB_R_TAG_CORE_9                                     0               
 
 POWER_DATA_TLB_W_TAG_CORE_9                                     0                             0
 
-POWER_INT_REGFILE_R_CORE_9                                   3744                          3744
+POWER_INT_REGFILE_R_CORE_9                                    312                           312
 
-POWER_INT_REGFILE_W_CORE_9                                   2208                          2208
+POWER_INT_REGFILE_W_CORE_9                                    184                           184
 
 POWER_FP_REGFILE_R_CORE_9                                       0                             0
 
 POWER_FP_REGFILE_W_CORE_9                                       0                             0
 
-POWER_GP_REGISTER_R_CORE_9                                   3744                          3744
+POWER_GP_REGISTER_R_CORE_9                                    312                           312
 
-POWER_GP_REGISTER_W_CORE_9                                   2208                          2208
+POWER_GP_REGISTER_W_CORE_9                                    184                           184
 
 POWER_FP_REGISTER_R_CORE_9                                      0                             0
 
 POWER_FP_REGISTER_W_CORE_9                                      0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_9                               672                           672
+POWER_SEGMENT_REGISTER_R_CORE_9                                56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_9                               672                           672
+POWER_SEGMENT_REGISTER_W_CORE_9                                56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_9                                 0                             0
 
@@ -2246,11 +2246,11 @@ POWER_FLAG_REGISTER_R_CORE_9                                    0               
 
 POWER_FLAG_REGISTER_W_CORE_9                                    0                             0
 
-POWER_EXEC_BYPASS_CORE_9                                     2208                          2208
+POWER_EXEC_BYPASS_CORE_9                                      184                           184
 
 POWER_LOAD_BYPASS_CORE_9                                        0                             0
 
-POWER_PIPELINE_CORE_9                                        2208                          2208
+POWER_PIPELINE_CORE_9                                         184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_9                                  0                             0
 
@@ -2316,35 +2316,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_9                                0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_9                                0                             0
 
-POWER_SHARED_MEM_R_CORE_9                                     384                           384
+POWER_SHARED_MEM_R_CORE_9                                      32                            32
 
 POWER_SHARED_MEM_W_CORE_9                                       0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_9                                 384                           384
+POWER_SHARED_MEM_R_TAG_CORE_9                                  32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_9                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_10                                 8843                          8843
+POWER_BLOCK_STATES_R_CORE_10                                  907                           907
 
-POWER_BLOCK_STATES_W_CORE_10                                 8843                          8843
+POWER_BLOCK_STATES_W_CORE_10                                  907                           907
 
-POWER_FETCH_QUEUE_R_CORE_10                                  2208                          2208
+POWER_FETCH_QUEUE_R_CORE_10                                   184                           184
 
-POWER_FETCH_QUEUE_W_CORE_10                                  2208                          2208
+POWER_FETCH_QUEUE_W_CORE_10                                   184                           184
 
-POWER_INST_QUEUE_R_CORE_10                                   3882                          3882
+POWER_INST_QUEUE_R_CORE_10                                    352                           352
 
-POWER_INST_QUEUE_W_CORE_10                                   2208                          2208
+POWER_INST_QUEUE_W_CORE_10                                    184                           184
 
-POWER_BR_PRED_R_CORE_10                                       192                           192
+POWER_BR_PRED_R_CORE_10                                        16                            16
 
-POWER_BR_PRED_W_CORE_10                                       192                           192
+POWER_BR_PRED_W_CORE_10                                        16                            16
 
 POWER_RAS_R_CORE_10                                             0                             0
 
 POWER_RAS_W_CORE_10                                             0                             0
 
-POWER_ICACHE_R_CORE_10                                       2208                          2208
+POWER_ICACHE_R_CORE_10                                        184                           184
 
 POWER_ICACHE_W_CORE_10                                          0                             0
 
@@ -2362,7 +2362,7 @@ POWER_ICACHE_TOT_ACC_CORE_10                                    0               
 
 POWER_ICACHE_CONF_CORE_10                                       0                             0
 
-POWER_INST_DECODER_R_CORE_10                                 2208                          2208
+POWER_INST_DECODER_R_CORE_10                                  184                           184
 
 POWER_INST_DECODER_W_CORE_10                                    0                             0
 
@@ -2370,41 +2370,41 @@ POWER_MICRO_OP_SEQ_R_CORE_10                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_10                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_10                              2208                          2208
+POWER_OPERAND_DECODER_R_CORE_10                               184                           184
 
 POWER_OPERAND_DECODER_W_CORE_10                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_10                                    3882                          3882
+POWER_UOP_QUEUE_R_CORE_10                                     352                           352
 
-POWER_UOP_QUEUE_W_CORE_10                                    2208                          2208
+POWER_UOP_QUEUE_W_CORE_10                                     184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_10                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_10                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_10                              2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_10                               184                           184
 
 POWER_FREELIST_R_CORE_10                                        0                             0
 
 POWER_FREELIST_W_CORE_10                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_10                          3736                          3736
+POWER_RESERVATION_STATION_R_CORE_10                           210                           210
 
-POWER_RESERVATION_STATION_W_CORE_10                          2208                          2208
+POWER_RESERVATION_STATION_W_CORE_10                           184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_10                      2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_10                       184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_10                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_10                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_10                          184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_10                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_10                          184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_10                                  2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_10                                   184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_10                                  2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_10                                   184                           184
 
-POWER_EX_ALU_R_CORE_10                                       1536                          1536
+POWER_EX_ALU_R_CORE_10                                        128                           128
 
 POWER_EX_FPU_R_CORE_10                                          0                             0
 
@@ -2418,7 +2418,7 @@ POWER_REORDER_BUF_W_CORE_10                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_10                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_10                        2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_10                         184                           184
 
 POWER_FP_RENAME_R_CORE_10                                       0                             0
 
@@ -2448,25 +2448,25 @@ POWER_DATA_TLB_R_TAG_CORE_10                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_10                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_10                                  3744                          3744
+POWER_INT_REGFILE_R_CORE_10                                   312                           312
 
-POWER_INT_REGFILE_W_CORE_10                                  2208                          2208
+POWER_INT_REGFILE_W_CORE_10                                   184                           184
 
 POWER_FP_REGFILE_R_CORE_10                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_10                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_10                                  3744                          3744
+POWER_GP_REGISTER_R_CORE_10                                   312                           312
 
-POWER_GP_REGISTER_W_CORE_10                                  2208                          2208
+POWER_GP_REGISTER_W_CORE_10                                   184                           184
 
 POWER_FP_REGISTER_R_CORE_10                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_10                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_10                              672                           672
+POWER_SEGMENT_REGISTER_R_CORE_10                               56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_10                              672                           672
+POWER_SEGMENT_REGISTER_W_CORE_10                               56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_10                                0                             0
 
@@ -2476,11 +2476,11 @@ POWER_FLAG_REGISTER_R_CORE_10                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_10                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_10                                    2208                          2208
+POWER_EXEC_BYPASS_CORE_10                                     184                           184
 
 POWER_LOAD_BYPASS_CORE_10                                       0                             0
 
-POWER_PIPELINE_CORE_10                                       2208                          2208
+POWER_PIPELINE_CORE_10                                        184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_10                                 0                             0
 
@@ -2546,35 +2546,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_10                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_10                               0                             0
 
-POWER_SHARED_MEM_R_CORE_10                                    384                           384
+POWER_SHARED_MEM_R_CORE_10                                     32                            32
 
 POWER_SHARED_MEM_W_CORE_10                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_10                                384                           384
+POWER_SHARED_MEM_R_TAG_CORE_10                                 32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_10                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_11                                10917                         10917
+POWER_BLOCK_STATES_R_CORE_11                                  907                           907
 
-POWER_BLOCK_STATES_W_CORE_11                                10917                         10917
+POWER_BLOCK_STATES_W_CORE_11                                  907                           907
 
-POWER_FETCH_QUEUE_R_CORE_11                                  2576                          2576
+POWER_FETCH_QUEUE_R_CORE_11                                   184                           184
 
-POWER_FETCH_QUEUE_W_CORE_11                                  2576                          2576
+POWER_FETCH_QUEUE_W_CORE_11                                   184                           184
 
-POWER_INST_QUEUE_R_CORE_11                                   3882                          3882
+POWER_INST_QUEUE_R_CORE_11                                    353                           353
 
-POWER_INST_QUEUE_W_CORE_11                                   2576                          2576
+POWER_INST_QUEUE_W_CORE_11                                    184                           184
 
-POWER_BR_PRED_R_CORE_11                                       224                           224
+POWER_BR_PRED_R_CORE_11                                        16                            16
 
-POWER_BR_PRED_W_CORE_11                                       224                           224
+POWER_BR_PRED_W_CORE_11                                        16                            16
 
 POWER_RAS_R_CORE_11                                             0                             0
 
 POWER_RAS_W_CORE_11                                             0                             0
 
-POWER_ICACHE_R_CORE_11                                       2576                          2576
+POWER_ICACHE_R_CORE_11                                        184                           184
 
 POWER_ICACHE_W_CORE_11                                          0                             0
 
@@ -2592,7 +2592,7 @@ POWER_ICACHE_TOT_ACC_CORE_11                                    0               
 
 POWER_ICACHE_CONF_CORE_11                                       0                             0
 
-POWER_INST_DECODER_R_CORE_11                                 2576                          2576
+POWER_INST_DECODER_R_CORE_11                                  184                           184
 
 POWER_INST_DECODER_W_CORE_11                                    0                             0
 
@@ -2600,41 +2600,41 @@ POWER_MICRO_OP_SEQ_R_CORE_11                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_11                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_11                              2576                          2576
+POWER_OPERAND_DECODER_R_CORE_11                               184                           184
 
 POWER_OPERAND_DECODER_W_CORE_11                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_11                                    3882                          3882
+POWER_UOP_QUEUE_R_CORE_11                                     353                           353
 
-POWER_UOP_QUEUE_W_CORE_11                                    2576                          2576
+POWER_UOP_QUEUE_W_CORE_11                                     184                           184
 
 POWER_REG_RENAMING_TABLE_R_CORE_11                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_11                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_11                              2576                          2576
+POWER_DEP_CHECK_LOGIC_R_CORE_11                               184                           184
 
 POWER_FREELIST_R_CORE_11                                        0                             0
 
 POWER_FREELIST_W_CORE_11                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_11                          3811                          3811
+POWER_RESERVATION_STATION_R_CORE_11                           210                           210
 
-POWER_RESERVATION_STATION_W_CORE_11                          2576                          2576
+POWER_RESERVATION_STATION_W_CORE_11                           184                           184
 
-POWER_RESERVATION_STATION_R_TAG_CORE_11                      2576                          2576
+POWER_RESERVATION_STATION_R_TAG_CORE_11                       184                           184
 
 POWER_RESERVATION_STATION_W_TAG_CORE_11                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_11                         2576                          2576
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_11                          184                           184
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_11                         2576                          2576
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_11                          184                           184
 
-POWER_PAYLOAD_RAM_R_CORE_11                                  2576                          2576
+POWER_PAYLOAD_RAM_R_CORE_11                                   184                           184
 
-POWER_PAYLOAD_RAM_W_CORE_11                                  2576                          2576
+POWER_PAYLOAD_RAM_W_CORE_11                                   184                           184
 
-POWER_EX_ALU_R_CORE_11                                       1792                          1792
+POWER_EX_ALU_R_CORE_11                                        128                           128
 
 POWER_EX_FPU_R_CORE_11                                          0                             0
 
@@ -2648,7 +2648,7 @@ POWER_REORDER_BUF_W_CORE_11                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_11                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_11                        2576                          2576
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_11                         184                           184
 
 POWER_FP_RENAME_R_CORE_11                                       0                             0
 
@@ -2678,25 +2678,25 @@ POWER_DATA_TLB_R_TAG_CORE_11                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_11                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_11                                  4368                          4368
+POWER_INT_REGFILE_R_CORE_11                                   312                           312
 
-POWER_INT_REGFILE_W_CORE_11                                  2576                          2576
+POWER_INT_REGFILE_W_CORE_11                                   184                           184
 
 POWER_FP_REGFILE_R_CORE_11                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_11                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_11                                  4368                          4368
+POWER_GP_REGISTER_R_CORE_11                                   312                           312
 
-POWER_GP_REGISTER_W_CORE_11                                  2576                          2576
+POWER_GP_REGISTER_W_CORE_11                                   184                           184
 
 POWER_FP_REGISTER_R_CORE_11                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_11                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_11                              784                           784
+POWER_SEGMENT_REGISTER_R_CORE_11                               56                            56
 
-POWER_SEGMENT_REGISTER_W_CORE_11                              784                           784
+POWER_SEGMENT_REGISTER_W_CORE_11                               56                            56
 
 POWER_CONTROL_REGISTER_R_CORE_11                                0                             0
 
@@ -2706,11 +2706,11 @@ POWER_FLAG_REGISTER_R_CORE_11                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_11                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_11                                    2576                          2576
+POWER_EXEC_BYPASS_CORE_11                                     184                           184
 
 POWER_LOAD_BYPASS_CORE_11                                       0                             0
 
-POWER_PIPELINE_CORE_11                                       2576                          2576
+POWER_PIPELINE_CORE_11                                        184                           184
 
 POWER_DCACHE_MISS_BUF_R_CORE_11                                 0                             0
 
@@ -2776,35 +2776,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_11                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_11                               0                             0
 
-POWER_SHARED_MEM_R_CORE_11                                    448                           448
+POWER_SHARED_MEM_R_CORE_11                                     32                            32
 
 POWER_SHARED_MEM_W_CORE_11                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_11                                448                           448
+POWER_SHARED_MEM_R_TAG_CORE_11                                 32                            32
 
 POWER_SHARED_MEM_W_TAG_CORE_11                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_12                                11157                         11157
+POWER_BLOCK_STATES_R_CORE_12                                    0                             0
 
-POWER_BLOCK_STATES_W_CORE_12                                11157                         11157
+POWER_BLOCK_STATES_W_CORE_12                                    0                             0
 
-POWER_FETCH_QUEUE_R_CORE_12                                  2527                          2527
+POWER_FETCH_QUEUE_R_CORE_12                                     0                             0
 
-POWER_FETCH_QUEUE_W_CORE_12                                  2527                          2527
+POWER_FETCH_QUEUE_W_CORE_12                                     0                             0
 
-POWER_INST_QUEUE_R_CORE_12                                   3957                          3957
+POWER_INST_QUEUE_R_CORE_12                                      0                             0
 
-POWER_INST_QUEUE_W_CORE_12                                   2527                          2527
+POWER_INST_QUEUE_W_CORE_12                                      0                             0
 
-POWER_BR_PRED_R_CORE_12                                       214                           214
+POWER_BR_PRED_R_CORE_12                                         0                             0
 
-POWER_BR_PRED_W_CORE_12                                       214                           214
+POWER_BR_PRED_W_CORE_12                                         0                             0
 
 POWER_RAS_R_CORE_12                                             0                             0
 
 POWER_RAS_W_CORE_12                                             0                             0
 
-POWER_ICACHE_R_CORE_12                                       2527                          2527
+POWER_ICACHE_R_CORE_12                                          0                             0
 
 POWER_ICACHE_W_CORE_12                                          0                             0
 
@@ -2822,7 +2822,7 @@ POWER_ICACHE_TOT_ACC_CORE_12                                    0               
 
 POWER_ICACHE_CONF_CORE_12                                       0                             0
 
-POWER_INST_DECODER_R_CORE_12                                 2527                          2527
+POWER_INST_DECODER_R_CORE_12                                    0                             0
 
 POWER_INST_DECODER_W_CORE_12                                    0                             0
 
@@ -2830,41 +2830,41 @@ POWER_MICRO_OP_SEQ_R_CORE_12                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_12                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_12                              2527                          2527
+POWER_OPERAND_DECODER_R_CORE_12                                 0                             0
 
 POWER_OPERAND_DECODER_W_CORE_12                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_12                                    3957                          3957
+POWER_UOP_QUEUE_R_CORE_12                                       0                             0
 
-POWER_UOP_QUEUE_W_CORE_12                                    2527                          2527
+POWER_UOP_QUEUE_W_CORE_12                                       0                             0
 
 POWER_REG_RENAMING_TABLE_R_CORE_12                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_12                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_12                              2527                          2527
+POWER_DEP_CHECK_LOGIC_R_CORE_12                                 0                             0
 
 POWER_FREELIST_R_CORE_12                                        0                             0
 
 POWER_FREELIST_W_CORE_12                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_12                          3958                          3958
+POWER_RESERVATION_STATION_R_CORE_12                             0                             0
 
-POWER_RESERVATION_STATION_W_CORE_12                          2527                          2527
+POWER_RESERVATION_STATION_W_CORE_12                             0                             0
 
-POWER_RESERVATION_STATION_R_TAG_CORE_12                      2527                          2527
+POWER_RESERVATION_STATION_R_TAG_CORE_12                         0                             0
 
 POWER_RESERVATION_STATION_W_TAG_CORE_12                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_12                         2527                          2527
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_12                            0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_12                         2527                          2527
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_12                            0                             0
 
-POWER_PAYLOAD_RAM_R_CORE_12                                  2527                          2527
+POWER_PAYLOAD_RAM_R_CORE_12                                     0                             0
 
-POWER_PAYLOAD_RAM_W_CORE_12                                  2527                          2527
+POWER_PAYLOAD_RAM_W_CORE_12                                     0                             0
 
-POWER_EX_ALU_R_CORE_12                                       1758                          1758
+POWER_EX_ALU_R_CORE_12                                          0                             0
 
 POWER_EX_FPU_R_CORE_12                                          0                             0
 
@@ -2878,7 +2878,7 @@ POWER_REORDER_BUF_W_CORE_12                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_12                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_12                        2527                          2527
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_12                           0                             0
 
 POWER_FP_RENAME_R_CORE_12                                       0                             0
 
@@ -2908,25 +2908,25 @@ POWER_DATA_TLB_R_TAG_CORE_12                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_12                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_12                                  4285                          4285
+POWER_INT_REGFILE_R_CORE_12                                     0                             0
 
-POWER_INT_REGFILE_W_CORE_12                                  2527                          2527
+POWER_INT_REGFILE_W_CORE_12                                     0                             0
 
 POWER_FP_REGFILE_R_CORE_12                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_12                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_12                                  4285                          4285
+POWER_GP_REGISTER_R_CORE_12                                     0                             0
 
-POWER_GP_REGISTER_W_CORE_12                                  2527                          2527
+POWER_GP_REGISTER_W_CORE_12                                     0                             0
 
 POWER_FP_REGISTER_R_CORE_12                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_12                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_12                              769                           769
+POWER_SEGMENT_REGISTER_R_CORE_12                                0                             0
 
-POWER_SEGMENT_REGISTER_W_CORE_12                              769                           769
+POWER_SEGMENT_REGISTER_W_CORE_12                                0                             0
 
 POWER_CONTROL_REGISTER_R_CORE_12                                0                             0
 
@@ -2936,11 +2936,11 @@ POWER_FLAG_REGISTER_R_CORE_12                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_12                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_12                                    2527                          2527
+POWER_EXEC_BYPASS_CORE_12                                       0                             0
 
 POWER_LOAD_BYPASS_CORE_12                                       0                             0
 
-POWER_PIPELINE_CORE_12                                       2527                          2527
+POWER_PIPELINE_CORE_12                                          0                             0
 
 POWER_DCACHE_MISS_BUF_R_CORE_12                                 0                             0
 
@@ -3006,35 +3006,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_12                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_12                               0                             0
 
-POWER_SHARED_MEM_R_CORE_12                                    448                           448
+POWER_SHARED_MEM_R_CORE_12                                      0                             0
 
 POWER_SHARED_MEM_W_CORE_12                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_12                                448                           448
+POWER_SHARED_MEM_R_TAG_CORE_12                                  0                             0
 
 POWER_SHARED_MEM_W_TAG_CORE_12                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_13                                 6055                          6055
+POWER_BLOCK_STATES_R_CORE_13                                    0                             0
 
-POWER_BLOCK_STATES_W_CORE_13                                 6055                          6055
+POWER_BLOCK_STATES_W_CORE_13                                    0                             0
 
-POWER_FETCH_QUEUE_R_CORE_13                                  2208                          2208
+POWER_FETCH_QUEUE_R_CORE_13                                     0                             0
 
-POWER_FETCH_QUEUE_W_CORE_13                                  2208                          2208
+POWER_FETCH_QUEUE_W_CORE_13                                     0                             0
 
-POWER_INST_QUEUE_R_CORE_13                                   3447                          3447
+POWER_INST_QUEUE_R_CORE_13                                      0                             0
 
-POWER_INST_QUEUE_W_CORE_13                                   2208                          2208
+POWER_INST_QUEUE_W_CORE_13                                      0                             0
 
-POWER_BR_PRED_R_CORE_13                                       192                           192
+POWER_BR_PRED_R_CORE_13                                         0                             0
 
-POWER_BR_PRED_W_CORE_13                                       192                           192
+POWER_BR_PRED_W_CORE_13                                         0                             0
 
 POWER_RAS_R_CORE_13                                             0                             0
 
 POWER_RAS_W_CORE_13                                             0                             0
 
-POWER_ICACHE_R_CORE_13                                       2208                          2208
+POWER_ICACHE_R_CORE_13                                          0                             0
 
 POWER_ICACHE_W_CORE_13                                          0                             0
 
@@ -3052,7 +3052,7 @@ POWER_ICACHE_TOT_ACC_CORE_13                                    0               
 
 POWER_ICACHE_CONF_CORE_13                                       0                             0
 
-POWER_INST_DECODER_R_CORE_13                                 2208                          2208
+POWER_INST_DECODER_R_CORE_13                                    0                             0
 
 POWER_INST_DECODER_W_CORE_13                                    0                             0
 
@@ -3060,41 +3060,41 @@ POWER_MICRO_OP_SEQ_R_CORE_13                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_13                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_13                              2208                          2208
+POWER_OPERAND_DECODER_R_CORE_13                                 0                             0
 
 POWER_OPERAND_DECODER_W_CORE_13                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_13                                    3447                          3447
+POWER_UOP_QUEUE_R_CORE_13                                       0                             0
 
-POWER_UOP_QUEUE_W_CORE_13                                    2208                          2208
+POWER_UOP_QUEUE_W_CORE_13                                       0                             0
 
 POWER_REG_RENAMING_TABLE_R_CORE_13                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_13                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_13                              2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_13                                 0                             0
 
 POWER_FREELIST_R_CORE_13                                        0                             0
 
 POWER_FREELIST_W_CORE_13                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_13                          3731                          3731
+POWER_RESERVATION_STATION_R_CORE_13                             0                             0
 
-POWER_RESERVATION_STATION_W_CORE_13                          2208                          2208
+POWER_RESERVATION_STATION_W_CORE_13                             0                             0
 
-POWER_RESERVATION_STATION_R_TAG_CORE_13                      2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_13                         0                             0
 
 POWER_RESERVATION_STATION_W_TAG_CORE_13                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_13                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_13                            0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_13                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_13                            0                             0
 
-POWER_PAYLOAD_RAM_R_CORE_13                                  2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_13                                     0                             0
 
-POWER_PAYLOAD_RAM_W_CORE_13                                  2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_13                                     0                             0
 
-POWER_EX_ALU_R_CORE_13                                       1536                          1536
+POWER_EX_ALU_R_CORE_13                                          0                             0
 
 POWER_EX_FPU_R_CORE_13                                          0                             0
 
@@ -3108,7 +3108,7 @@ POWER_REORDER_BUF_W_CORE_13                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_13                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_13                        2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_13                           0                             0
 
 POWER_FP_RENAME_R_CORE_13                                       0                             0
 
@@ -3138,25 +3138,25 @@ POWER_DATA_TLB_R_TAG_CORE_13                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_13                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_13                                  3744                          3744
+POWER_INT_REGFILE_R_CORE_13                                     0                             0
 
-POWER_INT_REGFILE_W_CORE_13                                  2208                          2208
+POWER_INT_REGFILE_W_CORE_13                                     0                             0
 
 POWER_FP_REGFILE_R_CORE_13                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_13                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_13                                  3744                          3744
+POWER_GP_REGISTER_R_CORE_13                                     0                             0
 
-POWER_GP_REGISTER_W_CORE_13                                  2208                          2208
+POWER_GP_REGISTER_W_CORE_13                                     0                             0
 
 POWER_FP_REGISTER_R_CORE_13                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_13                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_13                              672                           672
+POWER_SEGMENT_REGISTER_R_CORE_13                                0                             0
 
-POWER_SEGMENT_REGISTER_W_CORE_13                              672                           672
+POWER_SEGMENT_REGISTER_W_CORE_13                                0                             0
 
 POWER_CONTROL_REGISTER_R_CORE_13                                0                             0
 
@@ -3166,11 +3166,11 @@ POWER_FLAG_REGISTER_R_CORE_13                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_13                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_13                                    2208                          2208
+POWER_EXEC_BYPASS_CORE_13                                       0                             0
 
 POWER_LOAD_BYPASS_CORE_13                                       0                             0
 
-POWER_PIPELINE_CORE_13                                       2208                          2208
+POWER_PIPELINE_CORE_13                                          0                             0
 
 POWER_DCACHE_MISS_BUF_R_CORE_13                                 0                             0
 
@@ -3236,35 +3236,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_13                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_13                               0                             0
 
-POWER_SHARED_MEM_R_CORE_13                                    384                           384
+POWER_SHARED_MEM_R_CORE_13                                      0                             0
 
 POWER_SHARED_MEM_W_CORE_13                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_13                                384                           384
+POWER_SHARED_MEM_R_TAG_CORE_13                                  0                             0
 
 POWER_SHARED_MEM_W_TAG_CORE_13                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_14                                 8873                          8873
+POWER_BLOCK_STATES_R_CORE_14                                    0                             0
 
-POWER_BLOCK_STATES_W_CORE_14                                 8873                          8873
+POWER_BLOCK_STATES_W_CORE_14                                    0                             0
 
-POWER_FETCH_QUEUE_R_CORE_14                                  2208                          2208
+POWER_FETCH_QUEUE_R_CORE_14                                     0                             0
 
-POWER_FETCH_QUEUE_W_CORE_14                                  2208                          2208
+POWER_FETCH_QUEUE_W_CORE_14                                     0                             0
 
-POWER_INST_QUEUE_R_CORE_14                                   3804                          3804
+POWER_INST_QUEUE_R_CORE_14                                      0                             0
 
-POWER_INST_QUEUE_W_CORE_14                                   2208                          2208
+POWER_INST_QUEUE_W_CORE_14                                      0                             0
 
-POWER_BR_PRED_R_CORE_14                                       192                           192
+POWER_BR_PRED_R_CORE_14                                         0                             0
 
-POWER_BR_PRED_W_CORE_14                                       192                           192
+POWER_BR_PRED_W_CORE_14                                         0                             0
 
 POWER_RAS_R_CORE_14                                             0                             0
 
 POWER_RAS_W_CORE_14                                             0                             0
 
-POWER_ICACHE_R_CORE_14                                       2208                          2208
+POWER_ICACHE_R_CORE_14                                          0                             0
 
 POWER_ICACHE_W_CORE_14                                          0                             0
 
@@ -3282,7 +3282,7 @@ POWER_ICACHE_TOT_ACC_CORE_14                                    0               
 
 POWER_ICACHE_CONF_CORE_14                                       0                             0
 
-POWER_INST_DECODER_R_CORE_14                                 2208                          2208
+POWER_INST_DECODER_R_CORE_14                                    0                             0
 
 POWER_INST_DECODER_W_CORE_14                                    0                             0
 
@@ -3290,41 +3290,41 @@ POWER_MICRO_OP_SEQ_R_CORE_14                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_14                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_14                              2208                          2208
+POWER_OPERAND_DECODER_R_CORE_14                                 0                             0
 
 POWER_OPERAND_DECODER_W_CORE_14                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_14                                    3804                          3804
+POWER_UOP_QUEUE_R_CORE_14                                       0                             0
 
-POWER_UOP_QUEUE_W_CORE_14                                    2208                          2208
+POWER_UOP_QUEUE_W_CORE_14                                       0                             0
 
 POWER_REG_RENAMING_TABLE_R_CORE_14                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_14                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_14                              2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_14                                 0                             0
 
 POWER_FREELIST_R_CORE_14                                        0                             0
 
 POWER_FREELIST_W_CORE_14                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_14                          3313                          3313
+POWER_RESERVATION_STATION_R_CORE_14                             0                             0
 
-POWER_RESERVATION_STATION_W_CORE_14                          2208                          2208
+POWER_RESERVATION_STATION_W_CORE_14                             0                             0
 
-POWER_RESERVATION_STATION_R_TAG_CORE_14                      2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_14                         0                             0
 
 POWER_RESERVATION_STATION_W_TAG_CORE_14                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_14                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_14                            0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_14                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_14                            0                             0
 
-POWER_PAYLOAD_RAM_R_CORE_14                                  2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_14                                     0                             0
 
-POWER_PAYLOAD_RAM_W_CORE_14                                  2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_14                                     0                             0
 
-POWER_EX_ALU_R_CORE_14                                       1536                          1536
+POWER_EX_ALU_R_CORE_14                                          0                             0
 
 POWER_EX_FPU_R_CORE_14                                          0                             0
 
@@ -3338,7 +3338,7 @@ POWER_REORDER_BUF_W_CORE_14                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_14                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_14                        2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_14                           0                             0
 
 POWER_FP_RENAME_R_CORE_14                                       0                             0
 
@@ -3368,25 +3368,25 @@ POWER_DATA_TLB_R_TAG_CORE_14                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_14                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_14                                  3744                          3744
+POWER_INT_REGFILE_R_CORE_14                                     0                             0
 
-POWER_INT_REGFILE_W_CORE_14                                  2208                          2208
+POWER_INT_REGFILE_W_CORE_14                                     0                             0
 
 POWER_FP_REGFILE_R_CORE_14                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_14                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_14                                  3744                          3744
+POWER_GP_REGISTER_R_CORE_14                                     0                             0
 
-POWER_GP_REGISTER_W_CORE_14                                  2208                          2208
+POWER_GP_REGISTER_W_CORE_14                                     0                             0
 
 POWER_FP_REGISTER_R_CORE_14                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_14                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_14                              672                           672
+POWER_SEGMENT_REGISTER_R_CORE_14                                0                             0
 
-POWER_SEGMENT_REGISTER_W_CORE_14                              672                           672
+POWER_SEGMENT_REGISTER_W_CORE_14                                0                             0
 
 POWER_CONTROL_REGISTER_R_CORE_14                                0                             0
 
@@ -3396,11 +3396,11 @@ POWER_FLAG_REGISTER_R_CORE_14                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_14                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_14                                    2208                          2208
+POWER_EXEC_BYPASS_CORE_14                                       0                             0
 
 POWER_LOAD_BYPASS_CORE_14                                       0                             0
 
-POWER_PIPELINE_CORE_14                                       2208                          2208
+POWER_PIPELINE_CORE_14                                          0                             0
 
 POWER_DCACHE_MISS_BUF_R_CORE_14                                 0                             0
 
@@ -3466,35 +3466,35 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_14                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_14                               0                             0
 
-POWER_SHARED_MEM_R_CORE_14                                    384                           384
+POWER_SHARED_MEM_R_CORE_14                                      0                             0
 
 POWER_SHARED_MEM_W_CORE_14                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_14                                384                           384
+POWER_SHARED_MEM_R_TAG_CORE_14                                  0                             0
 
 POWER_SHARED_MEM_W_TAG_CORE_14                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_15                                 6055                          6055
+POWER_BLOCK_STATES_R_CORE_15                                    0                             0
 
-POWER_BLOCK_STATES_W_CORE_15                                 6055                          6055
+POWER_BLOCK_STATES_W_CORE_15                                    0                             0
 
-POWER_FETCH_QUEUE_R_CORE_15                                  2208                          2208
+POWER_FETCH_QUEUE_R_CORE_15                                     0                             0
 
-POWER_FETCH_QUEUE_W_CORE_15                                  2208                          2208
+POWER_FETCH_QUEUE_W_CORE_15                                     0                             0
 
-POWER_INST_QUEUE_R_CORE_15                                   3719                          3719
+POWER_INST_QUEUE_R_CORE_15                                      0                             0
 
-POWER_INST_QUEUE_W_CORE_15                                   2208                          2208
+POWER_INST_QUEUE_W_CORE_15                                      0                             0
 
-POWER_BR_PRED_R_CORE_15                                       192                           192
+POWER_BR_PRED_R_CORE_15                                         0                             0
 
-POWER_BR_PRED_W_CORE_15                                       192                           192
+POWER_BR_PRED_W_CORE_15                                         0                             0
 
 POWER_RAS_R_CORE_15                                             0                             0
 
 POWER_RAS_W_CORE_15                                             0                             0
 
-POWER_ICACHE_R_CORE_15                                       2208                          2208
+POWER_ICACHE_R_CORE_15                                          0                             0
 
 POWER_ICACHE_W_CORE_15                                          0                             0
 
@@ -3512,7 +3512,7 @@ POWER_ICACHE_TOT_ACC_CORE_15                                    0               
 
 POWER_ICACHE_CONF_CORE_15                                       0                             0
 
-POWER_INST_DECODER_R_CORE_15                                 2208                          2208
+POWER_INST_DECODER_R_CORE_15                                    0                             0
 
 POWER_INST_DECODER_W_CORE_15                                    0                             0
 
@@ -3520,41 +3520,41 @@ POWER_MICRO_OP_SEQ_R_CORE_15                                    0               
 
 POWER_MICRO_OP_SEQ_W_CORE_15                                    0                             0
 
-POWER_OPERAND_DECODER_R_CORE_15                              2208                          2208
+POWER_OPERAND_DECODER_R_CORE_15                                 0                             0
 
 POWER_OPERAND_DECODER_W_CORE_15                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_15                                    3719                          3719
+POWER_UOP_QUEUE_R_CORE_15                                       0                             0
 
-POWER_UOP_QUEUE_W_CORE_15                                    2208                          2208
+POWER_UOP_QUEUE_W_CORE_15                                       0                             0
 
 POWER_REG_RENAMING_TABLE_R_CORE_15                              0                             0
 
 POWER_REG_RENAMING_TABLE_W_CORE_15                              0                             0
 
-POWER_DEP_CHECK_LOGIC_R_CORE_15                              2208                          2208
+POWER_DEP_CHECK_LOGIC_R_CORE_15                                 0                             0
 
 POWER_FREELIST_R_CORE_15                                        0                             0
 
 POWER_FREELIST_W_CORE_15                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_15                          3726                          3726
+POWER_RESERVATION_STATION_R_CORE_15                             0                             0
 
-POWER_RESERVATION_STATION_W_CORE_15                          2208                          2208
+POWER_RESERVATION_STATION_W_CORE_15                             0                             0
 
-POWER_RESERVATION_STATION_R_TAG_CORE_15                      2208                          2208
+POWER_RESERVATION_STATION_R_TAG_CORE_15                         0                             0
 
 POWER_RESERVATION_STATION_W_TAG_CORE_15                         0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_R_CORE_15                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_R_CORE_15                            0                             0
 
-POWER_INST_ISSUE_SEL_LOGIC_W_CORE_15                         2208                          2208
+POWER_INST_ISSUE_SEL_LOGIC_W_CORE_15                            0                             0
 
-POWER_PAYLOAD_RAM_R_CORE_15                                  2208                          2208
+POWER_PAYLOAD_RAM_R_CORE_15                                     0                             0
 
-POWER_PAYLOAD_RAM_W_CORE_15                                  2208                          2208
+POWER_PAYLOAD_RAM_W_CORE_15                                     0                             0
 
-POWER_EX_ALU_R_CORE_15                                       1536                          1536
+POWER_EX_ALU_R_CORE_15                                          0                             0
 
 POWER_EX_FPU_R_CORE_15                                          0                             0
 
@@ -3568,7 +3568,7 @@ POWER_REORDER_BUF_W_CORE_15                                     0               
 
 POWER_INST_COMMIT_SEL_LOGIC_R_CORE_15                           0                             0
 
-POWER_INST_COMMIT_SEL_LOGIC_W_CORE_15                        2208                          2208
+POWER_INST_COMMIT_SEL_LOGIC_W_CORE_15                           0                             0
 
 POWER_FP_RENAME_R_CORE_15                                       0                             0
 
@@ -3598,25 +3598,25 @@ POWER_DATA_TLB_R_TAG_CORE_15                                    0               
 
 POWER_DATA_TLB_W_TAG_CORE_15                                    0                             0
 
-POWER_INT_REGFILE_R_CORE_15                                  3744                          3744
+POWER_INT_REGFILE_R_CORE_15                                     0                             0
 
-POWER_INT_REGFILE_W_CORE_15                                  2208                          2208
+POWER_INT_REGFILE_W_CORE_15                                     0                             0
 
 POWER_FP_REGFILE_R_CORE_15                                      0                             0
 
 POWER_FP_REGFILE_W_CORE_15                                      0                             0
 
-POWER_GP_REGISTER_R_CORE_15                                  3744                          3744
+POWER_GP_REGISTER_R_CORE_15                                     0                             0
 
-POWER_GP_REGISTER_W_CORE_15                                  2208                          2208
+POWER_GP_REGISTER_W_CORE_15                                     0                             0
 
 POWER_FP_REGISTER_R_CORE_15                                     0                             0
 
 POWER_FP_REGISTER_W_CORE_15                                     0                             0
 
-POWER_SEGMENT_REGISTER_R_CORE_15                              672                           672
+POWER_SEGMENT_REGISTER_R_CORE_15                                0                             0
 
-POWER_SEGMENT_REGISTER_W_CORE_15                              672                           672
+POWER_SEGMENT_REGISTER_W_CORE_15                                0                             0
 
 POWER_CONTROL_REGISTER_R_CORE_15                                0                             0
 
@@ -3626,11 +3626,11 @@ POWER_FLAG_REGISTER_R_CORE_15                                   0               
 
 POWER_FLAG_REGISTER_W_CORE_15                                   0                             0
 
-POWER_EXEC_BYPASS_CORE_15                                    2208                          2208
+POWER_EXEC_BYPASS_CORE_15                                       0                             0
 
 POWER_LOAD_BYPASS_CORE_15                                       0                             0
 
-POWER_PIPELINE_CORE_15                                       2208                          2208
+POWER_PIPELINE_CORE_15                                          0                             0
 
 POWER_DCACHE_MISS_BUF_R_CORE_15                                 0                             0
 
@@ -3696,11 +3696,11 @@ POWER_TEXTURE_CACHE_R_TAG_CORE_15                               0               
 
 POWER_TEXTURE_CACHE_W_TAG_CORE_15                               0                             0
 
-POWER_SHARED_MEM_R_CORE_15                                    384                           384
+POWER_SHARED_MEM_R_CORE_15                                      0                             0
 
 POWER_SHARED_MEM_W_CORE_15                                      0                             0
 
-POWER_SHARED_MEM_R_TAG_CORE_15                                384                           384
+POWER_SHARED_MEM_R_TAG_CORE_15                                  0                             0
 
 POWER_SHARED_MEM_W_TAG_CORE_15                                  0                             0
 
