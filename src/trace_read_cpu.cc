@@ -936,6 +936,8 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
           // cache the inst@ret_pc for later fetch
           memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
           thread_trace_info->has_cached_inst = true;
+
+          STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
         }
       }
       else
@@ -997,12 +999,9 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         core_id, sim_thread_id);
 
     // mark hmc uops
-    if (cur_trace_hmc_type!=HMC_NONE)
+    for (unsigned i = 0; i < info->m_trace_info.m_num_uop; i++) 
     {
-      for (unsigned i = 0; i < info->m_trace_info.m_num_uop; i++) 
-      {
-          thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
-      }
+        thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
     }
 
     trace_uop = thread_trace_info->m_trace_uop_array[0];
@@ -1063,7 +1062,10 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
   // pass over hmc inst info
   uop->m_hmc_inst    = trace_uop->m_hmc_inst;
-
+  if (uop->m_hmc_inst != HMC_NONE)
+  {
+      STAT_CORE_EVENT(core_id, HMC_UOP_COUNT);
+  }
   if (uop->m_cf_type) { 
     uop->m_taken_mask      = trace_uop->m_taken_mask;
     uop->m_reconverge_addr = trace_uop->m_reconverge_addr;
