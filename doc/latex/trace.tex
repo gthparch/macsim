@@ -310,10 +310,10 @@ thread id and start instruction number. For each thread, there is a
 Trace\_<thread\_id>.raw file which contains the dynamic instruction
 trace for the thread. Finally, start instruction number indicates when
 each thread should be started in terms of the number of instructions
-simulated for the main thread of the application. In a PTX kernel
+simulated for the main thread of the application. In a PTX kernel,
 since all warps are ready for execution at the launch of the kernel,
 the start instruction number for all threads is zero. On the other
-hand, for a x86 application, the start instruction is non-zero for all
+hand, for an x86 application, the start instruction is non-zero for all
 threads except thread 0, which is the main (or parent) thread in the
 application. This is because in most multi-threaded CPU applications,
 main thread (thread id 0) spawns children threads.
