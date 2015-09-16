@@ -15,6 +15,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/src/orion \
   -std=c++0x \
 	-DUSING_SST \
+	-DUSE_HMC \
 	-g
 
 
@@ -91,7 +92,8 @@ src/allocate_interface.h                                               \
 src/exec_interface.h                                                   \
 src/frontend_interface.h                                               \
 src/retire_interface.h                                                 \
-src/schedule_interface.h                                               
+src/schedule_interface.h                                              \
+src/hmc_process.cc 			 src/hmc_process.h
 
 
 EXTRA_DIST = 

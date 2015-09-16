@@ -182,4 +182,3 @@ param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH>
 param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
 param<IS_FERMI, is_fermi, bool, 1>
 
-param<ENABLE_HMC_INST, enable_hmc_inst, bool, 0>

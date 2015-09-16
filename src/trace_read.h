@@ -209,7 +209,7 @@ typedef struct trace_uop_s {
 
   // HMC simulation
   // changed by Lifeng
-  HMC_Type m_hmc_inst;
+  HMC_Type m_hmc_inst;  /**<  hmc type of cur uop */
 } trace_uop_s; 
 
 

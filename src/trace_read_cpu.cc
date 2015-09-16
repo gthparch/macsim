@@ -803,57 +803,7 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-HMC_Type cpu_decoder_c::generate_hmc_inst(const hmc_inst_s & inst_info, 
-                       uint64_t hmc_vaddr,
-                       trace_info_cpu_s & ret_trace_info)
-{
-  // shared inst info
-  ret_trace_info.m_opcode = XED_CATEGORY_DATAXFER;
-  ret_trace_info.m_num_read_regs = 1;
-  ret_trace_info.m_num_dest_regs = 0;
-  ret_trace_info.m_src[0] = 14; // "rbp"
-  ret_trace_info.m_has_immediate = false;
-  ret_trace_info.m_cf_type = NOT_CF;     
-  ret_trace_info.m_rep_dir = false;
-  ret_trace_info.m_has_st = true;
-  ret_trace_info.m_num_ld = 0;
-  ret_trace_info.m_mem_read_size = 0;
-  ret_trace_info.m_mem_write_size = 2;
-  ret_trace_info.m_is_fp = false;
-  ret_trace_info.m_ld_vaddr1 = 0;
-  ret_trace_info.m_ld_vaddr2 = 0;
-  ret_trace_info.m_st_vaddr = hmc_vaddr;
-  ret_trace_info.m_instruction_addr = inst_info.caller_pc;
-  ret_trace_info.m_actually_taken = false;
-  ret_trace_info.m_branch_target = 0;
-  ret_trace_info.m_write_flg = false;
 
-  if (inst_info.name == "HMC_CAS_equal_16B") 
-  {
-      return HMC_CAS_equal_16B;
-  }
-  else if (inst_info.name == "HMC_CAS_zero_16B") 
-  {
-      return HMC_CAS_zero_16B;
-  }
-  else if (inst_info.name == "HMC_CAS_greater_16B") 
-  {
-      return HMC_CAS_greater_16B;
-  }
-  else if (inst_info.name == "HMC_CAS_less_16B") 
-  {
-      return HMC_CAS_less_16B;
-  }
-  else if (inst_info.name == "HMC_ADD_16B") 
-  {
-      return HMC_ADD_16B;
-  }
-  else 
-  {
-      return HMC_NONE;
-  }
-  return HMC_NONE;
-}
 /**
  * Get an uop from trace
  * Called by frontend.cc
@@ -863,6 +813,12 @@ HMC_Type cpu_decoder_c::generate_hmc_inst(const hmc_inst_s & inst_info,
  */
 bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id)
 {
+  // use an alternative uop fetch function, if hmc is enabled  
+  if (*KNOB(KNOB_ENABLE_HMC_INST))
+  {
+    return hmc_function_c::get_uops_from_traces_with_hmc_inst(this, core_id, uop, sim_thread_id);
+  }
+
   ASSERT(uop);
 
   trace_uop_s *trace_uop;
@@ -875,8 +831,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     return false;
 
   trace_info_cpu_s trace_info;
-  HMC_Type cur_trace_hmc_type = HMC_NONE;
-
   bool read_success = true;
   thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -890,67 +844,11 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   ///
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
-
+    
     if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
-      if (!thread_trace_info->has_cached_inst) 
-      {
-        // read next instruction
-        read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
-            sim_thread_id, &inst_read);
-        thread_trace_info->m_next_hmc_type = HMC_NONE;
-
-        // changed by Lifeng
-        // looking for instructions from HMC functions
-        // replace them with special HMC instructions
-        map<uint64_t, hmc_inst_s> & hmc_info = thread_trace_info->m_process->m_hmc_info;
-        uint64_t inst_addr = (static_cast<trace_info_cpu_s*>
-                           (thread_trace_info->m_next_trace_info))->m_instruction_addr;
-        if (true==*KNOB(KNOB_ENABLE_HMC_INST) &&
-                hmc_info.find(inst_addr) != hmc_info.end()) 
-        {
-          
-          hmc_inst_s hmc_inst = hmc_info[inst_addr];
-          
-          trace_info_cpu_s hmc_trace_info;
-          trace_info_cpu_s cur_trace_info;
-          uint64_t hmc_vaddr = 0; // target mem vaddr for HMC inst
-          while (true) 
-          {
-            read_success = read_trace(core_id, (&cur_trace_info), 
-                                      sim_thread_id, &inst_read);
-            // get target mem addr of hmc inst
-            if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
-                hmc_vaddr = cur_trace_info.m_ld_vaddr1;
-
-            if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc
-                || read_success == false) 
-              break;
-          }
-          ASSERT(read_success); // should not reach trace end before hmc func ret
-
-          HMC_Type ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
-          ASSERT(ret != HMC_NONE); // fail if cannot find hmc inst info
-          memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
-          thread_trace_info->m_next_hmc_type = ret;
-
-          // cache the inst@ret_pc for later fetch
-          memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
-          thread_trace_info->has_cached_inst = true;
-
-          STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
-        }
-      }
-      else
-      {
-        // use cached instruction directly
-        memcpy(thread_trace_info->m_next_trace_info, 
-               &(thread_trace_info->cached_inst),
-               sizeof(trace_info_cpu_s));
-        inst_read = true;
-        read_success = true;
-        thread_trace_info->has_cached_inst = false;
-        thread_trace_info->m_next_hmc_type = HMC_NONE;
-      }
+      // read next instruction
+      read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
+          sim_thread_id, &inst_read);
     }
     else {
       inst_read = false;
@@ -962,7 +860,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
     // Copy current instruction to data structure
     memcpy(&trace_info, thread_trace_info->m_prev_trace_info, sizeof(trace_info_cpu_s));
-    cur_trace_hmc_type = thread_trace_info->m_prev_hmc_type;
 
     // Set next pc address
     trace_info_cpu_s *next_trace_info = static_cast<trace_info_cpu_s *>(thread_trace_info->m_next_trace_info);
@@ -971,7 +868,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     // Copy next instruction to current instruction field
     memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, 
         sizeof(trace_info_cpu_s));
-    thread_trace_info->m_prev_hmc_type = thread_trace_info->m_next_hmc_type;
 
     DEBUG_CORE(core_id, "trace_read core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n", core_id, sim_thread_id, 
         (Addr)(trace_info.m_instruction_addr), static_cast<int>(trace_info.m_opcode), (Counter)(thread_trace_info->m_temp_inst_count));
@@ -998,11 +894,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     info = convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array, 
         core_id, sim_thread_id);
 
-    // mark hmc uops
-    for (unsigned i = 0; i < info->m_trace_info.m_num_uop; i++) 
-    {
-        thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
-    }
 
     trace_uop = thread_trace_info->m_trace_uop_array[0];
     num_uop   = info->m_trace_info.m_num_uop;
@@ -1060,12 +951,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   uop->m_npc         = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
 
-  // pass over hmc inst info
-  uop->m_hmc_inst    = trace_uop->m_hmc_inst;
-  if (uop->m_hmc_inst != HMC_NONE)
-  {
-      STAT_CORE_EVENT(core_id, HMC_UOP_COUNT);
-  }
   if (uop->m_cf_type) { 
     uop->m_taken_mask      = trace_uop->m_taken_mask;
     uop->m_reconverge_addr = trace_uop->m_reconverge_addr;
