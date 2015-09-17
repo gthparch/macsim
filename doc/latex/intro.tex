@@ -21,9 +21,13 @@ pipeline stages (in-order and out-of-order) and the memory system components
 including caches, NoC, and memory controllers. It supports asymmetric 
 multicore configurations as well as SMT or MT architectures.
 
-Currently interconnection network model (based on IRIS) and power
-model (based on McPat~\cite{mcpat}) are implemented. ARM ISA support is
-on-progress. MacSim is also one of the components of SST~\cite{sst} so
+%Currently interconnection network model (based on IRIS) and power
+%model (based on McPat~\cite{mcpat}) are implemented. 
+
+ARM ISA support is on-progress. To get the ARM traces for macsim,
+please contact hyesoon@cc.gatech.edu. 
+
+MacSim is also one of the components of SST~\cite{sst} so
 multiple MacSim simulators can run concurrently.
 
 
@@ -39,6 +43,12 @@ multiple MacSim simulators can run concurrently.
 \renewcommand\descriptionlabel[1]{\textit{\hspace\labelsep{#1}}}
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
+\item[2.2.0-  September 2015] 
+  \Verb+macsim/tags/macsim-2.2.0/+
+\item[2.1.1 - May 2015] 
+  \Verb+macsim/tags/macsim-2.1.1/+
+\item[2.1.0 - May 2015] 
+  \Verb+macsim/tags/macsim-2.1.0/+
 \item[2.0.4 - October, 2014] 
   \Verb+macsim/tags/macsim-2.0.4/+
 \item[2.0.3 - August, 2014] 
@@ -59,6 +69,24 @@ multiple MacSim simulators can run concurrently.
 \endgroup
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Macsim Code Contributors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The MacSim code is mainly developed at the HpArch research group. The
+main source code contributors are as follows: Hyesoon Kim, Jaekyu Lee,  Nagesh B. Lakshminarayana, Jaewoong Sim,
+Jieun Lim, Tri Pho, Hyojong Kim, Ramyad Hadidi.  This list keeps 
+increasing as we add more features. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Macsim  Mailing List}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Please join macsim-dev@googlegroups.com for macsim mailing list. 
+Internal developers use macsim-dev-hparch@googlegroups.com. If you
+have  questions about joining the mailing list, please send email to hyesoon@cc.gatech.edu 
+
+
+
 
 
 
@@ -74,4 +102,5 @@ multiple MacSim simulators can run concurrently.
 
 
 % LocalWords:  Macsim MacSim NVIDIA PTX multicore RISC uops microarchitecture
-% LocalWords:  NoC SMT McPat
+% LocalWords:  NoC SMT McPat architecreus sandybridge begingroup renewcommand
+% LocalWords:  descriptionlabel textit hspace labelsep cs firmlist endgroup

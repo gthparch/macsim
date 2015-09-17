@@ -49,7 +49,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   if (params.find("command_line") != params.end()) 
     m_command_line = string(params["command_line"]);
 
-  m_num_links = params.find_integer("num_link", 1);
+  m_num_link = params.find_integer("num_link", 1);
   configureLinks(params);
 
   m_cube_connected = params.find_integer("cube_connected", 0);
@@ -61,8 +61,11 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  string clockFreq = params.find_string("frequency", "1 GHz");
-  registerClock(clockFreq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+  string clock_freq = params.find_string("frequency", "1GHz");
+  registerClock(clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+
+  m_mem_size = params.find_integer("mem_size", 1*1024*1024*1024);
+  MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
 
   registerAsPrimaryComponent();
   primaryComponentDoNotEndSim();
@@ -91,7 +94,7 @@ void macsimComponent::configureLinks(SST::Params& params)
 {
   Interfaces::SimpleMem *icache_link;
   Interfaces::SimpleMem *dcache_link;
-  for (unsigned int l = 0 ; l < m_num_links; ++l) {
+  for (unsigned int l = 0 ; l < m_num_link; ++l) {
     icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
     if (!icache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
     dcache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
@@ -112,16 +115,16 @@ void macsimComponent::configureLinks(SST::Params& params)
     m_dcache_responses.push_back(std::set<uint64_t>());
   }
 
-  m_icache_request_counters = std::vector<uint64_t>(m_num_links, 0);
-  m_icache_response_counters = std::vector<uint64_t>(m_num_links, 0);
-  m_dcache_request_counters = std::vector<uint64_t>(m_num_links, 0);
-  m_dcache_response_counters = std::vector<uint64_t>(m_num_links, 0);
+  m_icache_request_counters = std::vector<uint64_t>(m_num_link, 0);
+  m_icache_response_counters = std::vector<uint64_t>(m_num_link, 0);
+  m_dcache_request_counters = std::vector<uint64_t>(m_num_link, 0);
+  m_dcache_response_counters = std::vector<uint64_t>(m_num_link, 0);
 }
 
 void macsimComponent::init(unsigned int phase)
 {
   if (!phase) {
-    for (unsigned int l = 0 ; l < m_num_links; ++l) {
+    for (unsigned int l = 0 ; l < m_num_link; ++l) {
       m_icache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
       m_dcache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
     }
@@ -230,7 +233,7 @@ bool macsimComponent::ticReceived(Cycle_t)
 
   // Debugging 
   if (m_cycle % 100000 == 0) {
-    for (unsigned int l = 0 ; l < m_num_links; ++l) {
+    for (unsigned int l = 0 ; l < m_num_link; ++l) {
       MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l, 
           m_icache_request_counters[l], m_icache_response_counters[l], 
           m_dcache_request_counters[l], m_dcache_response_counters[l]);
@@ -262,7 +265,7 @@ bool macsimComponent::ticReceived(Cycle_t)
 void macsimComponent::sendInstReq(int core_id, uint64_t key, uint64_t addr, int size)
 {
   SimpleMem::Request *req = 
-    new SimpleMem::Request(SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
+    new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
   m_icache_links[core_id]->sendRequest(req);
   m_icache_request_counters[core_id]++;
   m_icache_requests[core_id].insert(make_pair(req->id, key));
@@ -284,7 +287,7 @@ bool macsimComponent::strobeInstRespQ(int core_id, uint64_t key)
 // incoming events are scanned and deleted
 void macsimComponent::handleIcacheEvent(Interfaces::SimpleMem::Request *req)
 {
-  for (unsigned int l = 0; l < m_num_links; ++l) {
+  for (unsigned int l = 0; l < m_num_link; ++l) {
     auto i = m_icache_requests[l].find(req->id);
     if (m_icache_requests[l].end() == i) {
       // No matching request
@@ -323,7 +326,7 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
 {
   bool doWrite = isStore((Mem_Type)type);
   SimpleMem::Request *req = 
-    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
+    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size);
   m_dcache_links[core_id]->sendRequest(req);
   m_dcache_request_counters[core_id]++;
   m_dcache_requests[core_id].insert(make_pair(req->id, key));
@@ -359,7 +362,7 @@ bool macsimComponent::strobeDataRespQ(int core_id, uint64_t key)
 // incoming events are scanned and deleted
 void macsimComponent::handleDcacheEvent(Interfaces::SimpleMem::Request *req)
 {
-  for (unsigned int l = 0; l < m_num_links; ++l) {
+  for (unsigned int l = 0; l < m_num_link; ++l) {
     auto i = m_dcache_requests[l].find(req->id);
     if (m_dcache_requests[l].end() == i) {
       // No matching request

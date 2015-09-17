@@ -4,25 +4,25 @@ Interval
 Cumulative:         Cycles:                  20000     Instructions:                  1200
 DISPATCHED_INST                                             36015                         36015
 
-DISPATCH_WAIT                                             1762879                       48.9485
+DISPATCH_WAIT                                             2184626                       60.6588
 
-NUM_NO_FETCH_CYCLES                                             3                             3
+NUM_NO_FETCH_CYCLES                                             2                             2
 
-AVG_CORE_IDLE_CYCLE                                          5696                          5696
+AVG_CORE_IDLE_CYCLE                                         58653                         58653
 
-NUM_SAMPLES_CORE_0                                           3033                          3033
+NUM_SAMPLES_CORE_0                                           8674                          8674
 
-NUM_ACTIVE_BLOCKS_CORE_0                                    17997                       5.93373
+NUM_ACTIVE_BLOCKS_CORE_0                                    52038                       5.99931
 
-NUM_ACTIVE_THREADS_CORE_0                                  143271                       47.2374
+NUM_ACTIVE_THREADS_CORE_0                                  416304                       47.9945
 
 NUM_SCHED_IDLE_CYCLE_CORE_0                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_0                                     301                           301
+NUM_NO_SCHED_CYCLE_CORE_0                                    3129                          3129
 
 CORE_DISPATCHED_INST_CORE_0                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_0                                  117402                       53.1712
+CORE_DISPATCH_WAIT_CORE_0                                  102572                       46.4547
 
 CORE_CYCLES_CORE_0                                              0                             0
 
@@ -40,24 +40,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_0                                   0               
 
 CORE_RETIRE_DELTA_CORE_0                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_0                           3797                       69.2757%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_0                       1684                       30.7243%
+SCHED_FAILED_REASON_SUCCESS_CORE_0                           3820                       80.4888%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_0                        926                       19.5112%
 SCHED_FAILED_NO_PORTS_CORE_0                                    0                             0%
-                                                             5481                           100%
+                                                             4746                           100%
 
-NUM_SAMPLES_CORE_1                                           3118                          3118
+NUM_SAMPLES_CORE_1                                          10503                         10503
 
-NUM_ACTIVE_BLOCKS_CORE_1                                    18389                       5.89769
+NUM_ACTIVE_BLOCKS_CORE_1                                    50905                       4.84671
 
-NUM_ACTIVE_THREADS_CORE_1                                  146437                        46.965
+NUM_ACTIVE_THREADS_CORE_1                                  385192                       36.6745
 
 NUM_SCHED_IDLE_CYCLE_CORE_1                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_1                                     355                           355
+NUM_NO_SCHED_CYCLE_CORE_1                                    4042                          4042
 
 CORE_DISPATCHED_INST_CORE_1                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_1                                  119542                       54.1404
+CORE_DISPATCH_WAIT_CORE_1                                  129688                       58.7355
 
 CORE_CYCLES_CORE_1                                              0                             0
 
@@ -75,24 +75,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_1                                   0               
 
 CORE_RETIRE_DELTA_CORE_1                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_1                           3805                       66.8013%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_1                       1891                       33.1987%
+SCHED_FAILED_REASON_SUCCESS_CORE_1                           3272                       44.5655%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_1                       4070                       55.4345%
 SCHED_FAILED_NO_PORTS_CORE_1                                    0                             0%
-                                                             5696                           100%
+                                                             7342                           100%
 
-NUM_SAMPLES_CORE_2                                           3100                          3100
+NUM_SAMPLES_CORE_2                                          10835                         10835
 
-NUM_ACTIVE_BLOCKS_CORE_2                                    18327                       5.91194
+NUM_ACTIVE_BLOCKS_CORE_2                                    51037                       4.71038
 
-NUM_ACTIVE_THREADS_CORE_2                                  145939                       47.0771
+NUM_ACTIVE_THREADS_CORE_2                                  388200                       35.8283
 
 NUM_SCHED_IDLE_CYCLE_CORE_2                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_2                                     334                           334
+NUM_NO_SCHED_CYCLE_CORE_2                                    4201                          4201
 
 CORE_DISPATCHED_INST_CORE_2                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_2                                  118859                       53.8311
+CORE_DISPATCH_WAIT_CORE_2                                  184808                       83.6993
 
 CORE_CYCLES_CORE_2                                              0                             0
 
@@ -110,24 +110,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_2                                   0               
 
 CORE_RETIRE_DELTA_CORE_2                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_2                           3811                       65.9913%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_2                       1964                       34.0087%
+SCHED_FAILED_REASON_SUCCESS_CORE_2                           3348                       39.9284%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_2                       5037                       60.0716%
 SCHED_FAILED_NO_PORTS_CORE_2                                    0                             0%
-                                                             5775                           100%
+                                                             8385                           100%
 
-NUM_SAMPLES_CORE_3                                           3105                          3105
+NUM_SAMPLES_CORE_3                                          10005                         10005
 
-NUM_ACTIVE_BLOCKS_CORE_3                                    18345                       5.90821
+NUM_ACTIVE_BLOCKS_CORE_3                                    45231                       4.52084
 
-NUM_ACTIVE_THREADS_CORE_3                                  146123                       47.0605
+NUM_ACTIVE_THREADS_CORE_3                                  342418                       34.2247
 
 NUM_SCHED_IDLE_CYCLE_CORE_3                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_3                                     343                           343
+NUM_NO_SCHED_CYCLE_CORE_3                                    3811                          3811
 
 CORE_DISPATCHED_INST_CORE_3                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_3                                  119420                       54.0851
+CORE_DISPATCH_WAIT_CORE_3                                  153156                       69.3641
 
 CORE_CYCLES_CORE_3                                              0                             0
 
@@ -145,24 +145,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_3                                   0               
 
 CORE_RETIRE_DELTA_CORE_3                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_3                           3819                       66.0612%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_3                       1962                       33.9388%
+SCHED_FAILED_REASON_SUCCESS_CORE_3                           3573                       56.0559%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_3                       2801                       43.9441%
 SCHED_FAILED_NO_PORTS_CORE_3                                    0                             0%
-                                                             5781                           100%
+                                                             6374                           100%
 
-NUM_SAMPLES_CORE_4                                           3108                          3108
+NUM_SAMPLES_CORE_4                                           7678                          7678
 
-NUM_ACTIVE_BLOCKS_CORE_4                                    18350                       5.90412
+NUM_ACTIVE_BLOCKS_CORE_4                                    46062                       5.99922
 
-NUM_ACTIVE_THREADS_CORE_4                                  146036                       46.9871
+NUM_ACTIVE_THREADS_CORE_4                                  342440                       44.6002
 
 NUM_SCHED_IDLE_CYCLE_CORE_4                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_4                                     344                           344
+NUM_NO_SCHED_CYCLE_CORE_4                                    2638                          2638
 
 CORE_DISPATCHED_INST_CORE_4                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_4                                  119420                       54.0851
+CORE_DISPATCH_WAIT_CORE_4                                  111536                       50.5145
 
 CORE_CYCLES_CORE_4                                              0                             0
 
@@ -180,24 +180,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_4                                   0               
 
 CORE_RETIRE_DELTA_CORE_4                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_4                           3819                       66.0612%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_4                       1962                       33.9388%
+SCHED_FAILED_REASON_SUCCESS_CORE_4                           3721                       82.4324%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_4                        793                       17.5676%
 SCHED_FAILED_NO_PORTS_CORE_4                                    0                             0%
-                                                             5781                           100%
+                                                             4514                           100%
 
-NUM_SAMPLES_CORE_5                                           3135                          3135
+NUM_SAMPLES_CORE_5                                           9673                          9673
 
-NUM_ACTIVE_BLOCKS_CORE_5                                    18348                       5.85263
+NUM_ACTIVE_BLOCKS_CORE_5                                    52354                       5.41238
 
-NUM_ACTIVE_THREADS_CORE_5                                  145895                       46.5375
+NUM_ACTIVE_THREADS_CORE_5                                  394188                       40.7514
 
 NUM_SCHED_IDLE_CYCLE_CORE_5                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_5                                     323                           323
+NUM_NO_SCHED_CYCLE_CORE_5                                    3634                          3634
 
 CORE_DISPATCHED_INST_CORE_5                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_5                                  104278                       47.2274
+CORE_DISPATCH_WAIT_CORE_5                                  147526                       66.8143
 
 CORE_CYCLES_CORE_5                                              0                             0
 
@@ -215,24 +215,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_5                                   0               
 
 CORE_RETIRE_DELTA_CORE_5                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_5                           3485                       59.9106%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_5                       2332                       40.0894%
+SCHED_FAILED_REASON_SUCCESS_CORE_5                           3725                       35.1481%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_5                       6873                       64.8519%
 SCHED_FAILED_NO_PORTS_CORE_5                                    0                             0%
-                                                             5817                           100%
+                                                            10598                           100%
 
-NUM_SAMPLES_CORE_6                                           3127                          3127
+NUM_SAMPLES_CORE_6                                           8342                          8342
 
-NUM_ACTIVE_BLOCKS_CORE_6                                    18407                       5.88647
+NUM_ACTIVE_BLOCKS_CORE_6                                    50046                       5.99928
 
-NUM_ACTIVE_THREADS_CORE_6                                  146498                       46.8494
+NUM_ACTIVE_THREADS_CORE_6                                  377530                       45.2565
 
 NUM_SCHED_IDLE_CYCLE_CORE_6                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_6                                     348                           348
+NUM_NO_SCHED_CYCLE_CORE_6                                    2930                          2930
 
 CORE_DISPATCHED_INST_CORE_6                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_6                                  119143                       53.9597
+CORE_DISPATCH_WAIT_CORE_6                                  112436                       50.9221
 
 CORE_CYCLES_CORE_6                                              0                             0
 
@@ -250,30 +250,30 @@ CORE_NUM_RETIRE_CYCLES_CORE_6                                   0               
 
 CORE_RETIRE_DELTA_CORE_6                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_6                           3811                       65.9913%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_6                       1964                       34.0087%
+SCHED_FAILED_REASON_SUCCESS_CORE_6                           3761                       80.5698%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_6                        907                       19.4302%
 SCHED_FAILED_NO_PORTS_CORE_6                                    0                             0%
-                                                             5775                           100%
+                                                             4668                           100%
 
-NUM_SAMPLES_CORE_7                                           3632                          3632
+NUM_SAMPLES_CORE_7                                          10669                         10669
 
-NUM_ACTIVE_BLOCKS_CORE_7                                    19088                       5.25551
+NUM_ACTIVE_BLOCKS_CORE_7                                    51019                       4.78199
 
-NUM_ACTIVE_THREADS_CORE_7                                  150835                       41.5295
+NUM_ACTIVE_THREADS_CORE_7                                  369862                        34.667
 
 NUM_SCHED_IDLE_CYCLE_CORE_7                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_7                                     458                           458
+NUM_NO_SCHED_CYCLE_CORE_7                                    4105                          4105
 
-CORE_DISPATCHED_INST_CORE_7                                  2392                          2392
+CORE_DISPATCHED_INST_CORE_7                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_7                                  113667                       47.5196
+CORE_DISPATCH_WAIT_CORE_7                                  176833                       80.0874
 
 CORE_CYCLES_CORE_7                                              0                             0
 
 CORE_SCHED_THREADS_CORE_7                                       0                           NaN
 
-CORE_NUM_NO_FETCH_CYCLES_CORE_7                                 1                             1
+CORE_NUM_NO_FETCH_CYCLES_CORE_7                                 0                             0
 
 CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS_CORE_7                   0                             0
 
@@ -285,30 +285,30 @@ CORE_NUM_RETIRE_CYCLES_CORE_7                                   0               
 
 CORE_RETIRE_DELTA_CORE_7                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_7                           3634                         54.54%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_7                       3029                         45.46%
+SCHED_FAILED_REASON_SUCCESS_CORE_7                           3544                        43.209%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_7                       4658                        56.791%
 SCHED_FAILED_NO_PORTS_CORE_7                                    0                             0%
-                                                             6663                           100%
+                                                             8202                           100%
 
-NUM_SAMPLES_CORE_8                                           3528                          3528
+NUM_SAMPLES_CORE_8                                          10171                         10171
 
-NUM_ACTIVE_BLOCKS_CORE_8                                    18984                       5.38095
+NUM_ACTIVE_BLOCKS_CORE_8                                    55298                       5.43683
 
-NUM_ACTIVE_THREADS_CORE_8                                  150809                       42.7463
+NUM_ACTIVE_THREADS_CORE_8                                  432770                       42.5494
 
 NUM_SCHED_IDLE_CYCLE_CORE_8                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_8                                     409                           409
+NUM_NO_SCHED_CYCLE_CORE_8                                    3847                          3847
 
-CORE_DISPATCHED_INST_CORE_8                                  2392                          2392
+CORE_DISPATCHED_INST_CORE_8                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_8                                  112897                       47.1977
+CORE_DISPATCH_WAIT_CORE_8                                  171903                       77.8546
 
 CORE_CYCLES_CORE_8                                              0                             0
 
 CORE_SCHED_THREADS_CORE_8                                       0                           NaN
 
-CORE_NUM_NO_FETCH_CYCLES_CORE_8                                 1                             1
+CORE_NUM_NO_FETCH_CYCLES_CORE_8                                 0                             0
 
 CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS_CORE_8                   0                             0
 
@@ -320,24 +320,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_8                                   0               
 
 CORE_RETIRE_DELTA_CORE_8                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_8                           3634                       54.9109%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_8                       2984                       45.0891%
+SCHED_FAILED_REASON_SUCCESS_CORE_8                           3790                       26.2939%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_8                      10624                       73.7061%
 SCHED_FAILED_NO_PORTS_CORE_8                                    0                             0%
-                                                             6618                           100%
+                                                            14414                           100%
 
-NUM_SAMPLES_CORE_9                                           3523                          3523
+NUM_SAMPLES_CORE_9                                           8176                          8176
 
-NUM_ACTIVE_BLOCKS_CORE_9                                    18970                       5.38462
+NUM_ACTIVE_BLOCKS_CORE_9                                    49050                       5.99927
 
-NUM_ACTIVE_THREADS_CORE_9                                  150825                       42.8115
+NUM_ACTIVE_THREADS_CORE_9                                  384992                       47.0881
 
 NUM_SCHED_IDLE_CYCLE_CORE_9                                     0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_9                                     409                           409
+NUM_NO_SCHED_CYCLE_CORE_9                                    2894                          2894
 
-CORE_DISPATCHED_INST_CORE_9                                  2392                          2392
+CORE_DISPATCHED_INST_CORE_9                                  2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_9                                  112894                       47.1965
+CORE_DISPATCH_WAIT_CORE_9                                  113298                       51.3125
 
 CORE_CYCLES_CORE_9                                              0                             0
 
@@ -355,30 +355,30 @@ CORE_NUM_RETIRE_CYCLES_CORE_9                                   0               
 
 CORE_RETIRE_DELTA_CORE_9                                        0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_9                           3638                       54.5019%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_9                       3037                       45.4981%
+SCHED_FAILED_REASON_SUCCESS_CORE_9                           3716                       80.2072%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_9                        917                       19.7928%
 SCHED_FAILED_NO_PORTS_CORE_9                                    0                             0%
-                                                             6675                           100%
+                                                             4633                           100%
 
-NUM_SAMPLES_CORE_10                                          3487                          3487
+NUM_SAMPLES_CORE_10                                          9839                          9839
 
-NUM_ACTIVE_BLOCKS_CORE_10                                   18943                       5.43246
+NUM_ACTIVE_BLOCKS_CORE_10                                   53348                        5.4221
 
-NUM_ACTIVE_THREADS_CORE_10                                 149272                       42.8081
+NUM_ACTIVE_THREADS_CORE_10                                 421064                       42.7954
 
 NUM_SCHED_IDLE_CYCLE_CORE_10                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_10                                    418                           418
+NUM_NO_SCHED_CYCLE_CORE_10                                   3707                          3707
 
-CORE_DISPATCHED_INST_CORE_10                                 2343                          2343
+CORE_DISPATCHED_INST_CORE_10                                 2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_10                                 107602                       45.9249
+CORE_DISPATCH_WAIT_CORE_10                                 156015                        70.659
 
 CORE_CYCLES_CORE_10                                             0                             0
 
 CORE_SCHED_THREADS_CORE_10                                      0                           NaN
 
-CORE_NUM_NO_FETCH_CYCLES_CORE_10                                1                             1
+CORE_NUM_NO_FETCH_CYCLES_CORE_10                                0                             0
 
 CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS_CORE_10                   0                             0
 
@@ -390,30 +390,30 @@ CORE_NUM_RETIRE_CYCLES_CORE_10                                  0               
 
 CORE_RETIRE_DELTA_CORE_10                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_10                          3585                       57.1406%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_10                      2689                       42.8594%
+SCHED_FAILED_REASON_SUCCESS_CORE_10                          3736                       31.1749%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_10                      8248                       68.8251%
 SCHED_FAILED_NO_PORTS_CORE_10                                   0                             0%
-                                                             6274                           100%
+                                                            11984                           100%
 
-NUM_SAMPLES_CORE_11                                          3135                          3135
+NUM_SAMPLES_CORE_11                                         11868                         11868
 
-NUM_ACTIVE_BLOCKS_CORE_11                                   18434                       5.88006
+NUM_ACTIVE_BLOCKS_CORE_11                                   52223                       4.40032
 
-NUM_ACTIVE_THREADS_CORE_11                                 146520                       46.7368
+NUM_ACTIVE_THREADS_CORE_11                                 402258                       33.8943
 
 NUM_SCHED_IDLE_CYCLE_CORE_11                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_11                                    328                           328
+NUM_NO_SCHED_CYCLE_CORE_11                                   4561                          4561
 
-CORE_DISPATCHED_INST_CORE_11                                 2208                          2208
+CORE_DISPATCHED_INST_CORE_11                                 2576                          2576
 
-CORE_DISPATCH_WAIT_CORE_11                                  99486                       45.0571
+CORE_DISPATCH_WAIT_CORE_11                                 113288                       43.9783
 
 CORE_CYCLES_CORE_11                                             0                             0
 
 CORE_SCHED_THREADS_CORE_11                                      0                           NaN
 
-CORE_NUM_NO_FETCH_CYCLES_CORE_11                                0                             0
+CORE_NUM_NO_FETCH_CYCLES_CORE_11                                1                             1
 
 CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS_CORE_11                   0                             0
 
@@ -425,30 +425,30 @@ CORE_NUM_RETIRE_CYCLES_CORE_11                                  0               
 
 CORE_RETIRE_DELTA_CORE_11                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_11                          3426                        59.958%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_11                      2288                        40.042%
+SCHED_FAILED_REASON_SUCCESS_CORE_11                          3811                       56.7029%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_11                      2910                       43.2971%
 SCHED_FAILED_NO_PORTS_CORE_11                                   0                             0%
-                                                             5714                           100%
+                                                             6721                           100%
 
-NUM_SAMPLES_CORE_12                                          3135                          3135
+NUM_SAMPLES_CORE_12                                         12022                         12022
 
-NUM_ACTIVE_BLOCKS_CORE_12                                   18441                        5.8823
+NUM_ACTIVE_BLOCKS_CORE_12                                   59698                       4.96573
 
-NUM_ACTIVE_THREADS_CORE_12                                 146697                       46.7933
+NUM_ACTIVE_THREADS_CORE_12                                 435400                       36.2169
 
 NUM_SCHED_IDLE_CYCLE_CORE_12                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_12                                    329                           329
+NUM_NO_SCHED_CYCLE_CORE_12                                   4601                          4601
 
-CORE_DISPATCHED_INST_CORE_12                                 2208                          2208
+CORE_DISPATCHED_INST_CORE_12                                 2527                          2527
 
-CORE_DISPATCH_WAIT_CORE_12                                  99504                       45.0652
+CORE_DISPATCH_WAIT_CORE_12                                 131223                       51.9284
 
 CORE_CYCLES_CORE_12                                             0                             0
 
 CORE_SCHED_THREADS_CORE_12                                      0                           NaN
 
-CORE_NUM_NO_FETCH_CYCLES_CORE_12                                0                             0
+CORE_NUM_NO_FETCH_CYCLES_CORE_12                                1                             1
 
 CORE_NUM_NO_FETCH_CYCLES_WITH_READY_THREADS_CORE_12                   0                             0
 
@@ -460,24 +460,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_12                                  0               
 
 CORE_RETIRE_DELTA_CORE_12                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_12                          3426                       59.9475%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_12                      2289                       40.0525%
+SCHED_FAILED_REASON_SUCCESS_CORE_12                          3958                       48.2271%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_12                      4249                       51.7729%
 SCHED_FAILED_NO_PORTS_CORE_12                                   0                             0%
-                                                             5715                           100%
+                                                             8207                           100%
 
-NUM_SAMPLES_CORE_13                                          3135                          3135
+NUM_SAMPLES_CORE_13                                          8508                          8508
 
-NUM_ACTIVE_BLOCKS_CORE_13                                   18435                       5.88038
+NUM_ACTIVE_BLOCKS_CORE_13                                   51042                       5.99929
 
-NUM_ACTIVE_THREADS_CORE_13                                 146690                       46.7911
+NUM_ACTIVE_THREADS_CORE_13                                 383686                       45.0971
 
 NUM_SCHED_IDLE_CYCLE_CORE_13                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_13                                    332                           332
+NUM_NO_SCHED_CYCLE_CORE_13                                   3055                          3055
 
 CORE_DISPATCHED_INST_CORE_13                                 2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_13                                  99453                       45.0421
+CORE_DISPATCH_WAIT_CORE_13                                 113214                       51.2745
 
 CORE_CYCLES_CORE_13                                             0                             0
 
@@ -495,24 +495,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_13                                  0               
 
 CORE_RETIRE_DELTA_CORE_13                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_13                          3426                       59.9161%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_13                      2292                       40.0839%
+SCHED_FAILED_REASON_SUCCESS_CORE_13                          3731                       80.2193%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_13                       920                       19.7807%
 SCHED_FAILED_NO_PORTS_CORE_13                                   0                             0%
-                                                             5718                           100%
+                                                             4651                           100%
 
-NUM_SAMPLES_CORE_14                                          3136                          3136
+NUM_SAMPLES_CORE_14                                         10337                         10337
 
-NUM_ACTIVE_BLOCKS_CORE_14                                   18446                       5.88202
+NUM_ACTIVE_BLOCKS_CORE_14                                   50241                       4.86031
 
-NUM_ACTIVE_THREADS_CORE_14                                 146548                       46.7309
+NUM_ACTIVE_THREADS_CORE_14                                 364744                       35.2853
 
 NUM_SCHED_IDLE_CYCLE_CORE_14                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_14                                    333                           333
+NUM_NO_SCHED_CYCLE_CORE_14                                   3947                          3947
 
 CORE_DISPATCHED_INST_CORE_14                                 2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_14                                  99623                       45.1191
+CORE_DISPATCH_WAIT_CORE_14                                 127275                       57.6427
 
 CORE_CYCLES_CORE_14                                             0                             0
 
@@ -530,24 +530,24 @@ CORE_NUM_RETIRE_CYCLES_CORE_14                                  0               
 
 CORE_RETIRE_DELTA_CORE_14                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_14                          3426                       59.8637%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_14                      2297                       40.1363%
+SCHED_FAILED_REASON_SUCCESS_CORE_14                          3313                       46.9929%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_14                      3737                       53.0071%
 SCHED_FAILED_NO_PORTS_CORE_14                                   0                             0%
-                                                             5723                           100%
+                                                             7050                           100%
 
-NUM_SAMPLES_CORE_15                                          3136                          3136
+NUM_SAMPLES_CORE_15                                          9507                          9507
 
-NUM_ACTIVE_BLOCKS_CORE_15                                   18457                       5.88552
+NUM_ACTIVE_BLOCKS_CORE_15                                   51358                       5.40212
 
-NUM_ACTIVE_THREADS_CORE_15                                 146797                       46.8103
+NUM_ACTIVE_THREADS_CORE_15                                 390432                       41.0678
 
 NUM_SCHED_IDLE_CYCLE_CORE_15                                    0                             0
 
-NUM_NO_SCHED_CYCLE_CORE_15                                    332                           332
+NUM_NO_SCHED_CYCLE_CORE_15                                   3551                          3551
 
 CORE_DISPATCHED_INST_CORE_15                                 2208                          2208
 
-CORE_DISPATCH_WAIT_CORE_15                                  99689                        45.149
+CORE_DISPATCH_WAIT_CORE_15                                 139855                       63.3401
 
 CORE_CYCLES_CORE_15                                             0                             0
 
@@ -565,8 +565,8 @@ CORE_NUM_RETIRE_CYCLES_CORE_15                                  0               
 
 CORE_RETIRE_DELTA_CORE_15                                       0                           NaN
 
-SCHED_FAILED_REASON_SUCCESS_CORE_15                          3426                        59.801%
-SCHED_FAILED_OPERANDS_NOT_READY_CORE_15                      2303                        40.199%
+SCHED_FAILED_REASON_SUCCESS_CORE_15                          3726                       40.0301%
+SCHED_FAILED_OPERANDS_NOT_READY_CORE_15                      5582                       59.9699%
 SCHED_FAILED_NO_PORTS_CORE_15                                   0                             0%
-                                                             5729                           100%
+                                                             9308                           100%
 

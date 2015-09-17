@@ -120,7 +120,7 @@ void schedule_ooo_c::run_a_cycle(void)
     }
 
     // no uop has been scheduled
-    if (m_count == 0) 
+    if (count == 0) 
       STAT_CORE_EVENT(m_core_id, NUM_NO_SCHED_CYCLE);
   }
   else {

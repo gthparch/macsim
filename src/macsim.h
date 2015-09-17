@@ -347,6 +347,26 @@ class macsim_c
   private:
     bool m_started;
 #endif //USING_SST
+
+  private:
+    // Greatest common divisor
+    inline int gcd(int a, int b) {
+      do {
+        int tmp(b);
+        b = a % b;
+        a = tmp;
+      } while (b != 0);
+
+      return a;
+    }
+
+    // Least common multiple of two integers
+    inline int lcm(const int &a, const int &b) {
+      int ret = a;
+      ret /= gcd(a, b);
+      ret *= b;
+      return ret;
+    }
 };
 
 #endif

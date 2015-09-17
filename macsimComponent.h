@@ -52,27 +52,28 @@ class macsimComponent : public SST::Component
     macsim_c* m_macsim;
     bool m_sim_running;
     bool m_cube_connected;
+    uint64_t m_mem_size;
 
     int m_operation_mode;
     bool m_triggered;
     SST::Link *m_ipc_link;
 
-    unsigned int m_num_links;
-    std::vector<Interfaces::SimpleMem*> m_icache_links;
-    std::vector<Interfaces::SimpleMem*> m_dcache_links;
+    unsigned int m_num_link;
+    vector<Interfaces::SimpleMem*> m_icache_links;
+    vector<Interfaces::SimpleMem*> m_dcache_links;
     Interfaces::SimpleMem *m_cube_link;
 
     // debugging 
-    std::vector<uint64_t> m_icache_request_counters;
-    std::vector<uint64_t> m_icache_response_counters;
-    std::vector<uint64_t> m_dcache_request_counters;
-    std::vector<uint64_t> m_dcache_response_counters;
+    vector<uint64_t> m_icache_request_counters;
+    vector<uint64_t> m_icache_response_counters;
+    vector<uint64_t> m_dcache_request_counters;
+    vector<uint64_t> m_dcache_response_counters;
 
-    std::vector<std::map<uint64_t, uint64_t>> m_icache_requests;
-    std::vector<std::map<uint64_t, uint64_t>> m_dcache_requests;
-    std::map<uint64_t, uint64_t> m_cube_requests;
-    std::vector<std::set<uint64_t>> m_icache_responses;
-    std::vector<std::set<uint64_t>> m_dcache_responses;
+    vector<map<uint64_t, uint64_t>> m_icache_requests;
+    vector<map<uint64_t, uint64_t>> m_dcache_requests;
+    vector<set<uint64_t>> m_icache_responses;
+    vector<set<uint64_t>> m_dcache_responses;
+    map<uint64_t, uint64_t> m_cube_requests;
     set<uint64_t> m_cube_responses;
 
     void sendInstReq(int,uint64_t,uint64_t,int);

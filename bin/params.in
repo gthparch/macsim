@@ -1,7 +1,6 @@
-
 # Simulation Configuration
-num_sim_cores 11
-num_sim_small_cores 11
+num_sim_cores 16
+num_sim_small_cores 16
 core_type ptx
 max_threads_per_core 80
 num_sim_medium_cores 0
@@ -9,14 +8,16 @@ num_sim_large_cores 0
 
 
 # Clock
+# from device query for gtx580  - gpu clock - 1.66 GHz, mem clock - 2100 MHz
 clock_cpu 1.2
-clock_gpu 1.2
-clock_l3  1
-clock_noc 1
-clock_mc  1.6
+clock_gpu 1.6
+clock_l3  1.6
+clock_noc 1.6
+clock_mc  2.1
 
 
 # Small Core Configuration
+fetch_wdith 2
 width 1
 fetch_latency 5
 alloc_latency 5
@@ -30,8 +31,8 @@ max_block_per_core 4
 fetch_policy rr
 mt_no_fetch_br 1
 fetch_only_load_ready 0 
-schedule_ratio 4
-fetch_ratio 4
+schedule_ratio 2
+fetch_ratio 2
 gpu_sched 1
 icache_num_set 8
 
@@ -46,25 +47,36 @@ ptx_common_cache 0
 const_cache_size 8192
 texture_cache_size 8192
 shared_mem_size 16384
+shared_mem_banks 32
+shared_mem_cycles 2
+shared_mem_ports 1
 byte_level_access 0
 
+l1_small_line_size 128
+#48 KB
+l1_small_num_set 64
+l1_small_assoc 6
+#16 KB
+#l1_small_num_set 32
+#l1_small_assoc 4
 
 # L3 Cache
-num_l3 4
-l3_num_set 384
-l3_line_size 64
+num_l3 6
+l3_num_set 128
+l3_line_size 128
 l3_assoc 8
 l3_num_bank 4
 l3_latency 10 
 
 
 # DRAM
-dram_bus_width 4
+dram_num_mc 6
+dram_bus_width 8
 dram_column 11
 dram_activate 25
 dram_precharge 10
 dram_num_banks 16
-dram_num_channel 8
+dram_num_channel 1
 dram_rowbuffer_size 2048
 dram_scheduling_policy FRFCFS
 
@@ -73,7 +85,6 @@ dram_scheduling_policy FRFCFS
 infinite_port 0
 pref_train_inst_once 0
 pref_framework_on 1
-enable_pref_small_core 0
 
 
 
@@ -87,6 +98,10 @@ blocks_to_simulate 0
 ptx_exec_ratio 2
 num_warp_scheduler 2
 
+
+noc_topology simple_noc
+noc_dimension 0
+link_width 32
 
 # DEBUG
 debug_core_id 0
@@ -104,5 +119,4 @@ debug_trace_read 0
 debug_sim_thread_schedule 0
 debug_cache_lib 0
 debug_bp_dir 0
-
 

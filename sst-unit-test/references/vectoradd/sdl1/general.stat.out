@@ -6,7 +6,7 @@ INST_COUNT_TOT                                              36015               
 
 UOP_COUNT_TOT                                               36015                         36015
 
-CYC_COUNT_TOT                                               25913                         25913
+CYC_COUNT_TOT                                               10260                         10260
 
 EXE_TIME                                                        2                             2
 
@@ -14,9 +14,9 @@ NUM_REPEAT                                                      0               
 
 CYC_COUNT_X86                                                   0                             0
 
-CYC_COUNT_PTX                                               25912                         25912
+CYC_COUNT_PTX                                               10259                         10259
 
-AVG_BLOCK_EXE_CYCLE                                       2785878                       2785878
+AVG_BLOCK_EXE_CYCLE                                        749387                        749387
 
 AVG_BLOCK_EXE_CYCLE_BASE                                      196                           196
 
@@ -36,7 +36,7 @@ APPL_CYC_COUNT_BASE3                                            0               
 
 APPL_CYC_COUNT_BASE4                                            0                             0
 
-APPL_CYC_COUNT0                                             25912                         25912
+APPL_CYC_COUNT0                                             10259                         10259
 
 APPL_CYC_COUNT1                                                 0                           NaN
 
@@ -70,99 +70,99 @@ CYCLE_CPU                                                       0               
 
 CYCLE_GPU                                                       0                             0
 
-INST_COUNT_CORE_0                                            2895                          2895
+INST_COUNT_CORE_0                                            2208                          2208
 
-UOP_COUNT_CORE_0                                             2895                          2895
+UOP_COUNT_CORE_0                                             2208                          2208
 
-CYC_COUNT_CORE_0                                             4147                          4147
+CYC_COUNT_CORE_0                                             8881                          8881
 
 INST_COUNT_CORE_1                                            2208                          2208
 
 UOP_COUNT_CORE_1                                             2208                          2208
 
-CYC_COUNT_CORE_1                                             3161                          3161
+CYC_COUNT_CORE_1                                             6557                          6557
 
 INST_COUNT_CORE_2                                            2208                          2208
 
 UOP_COUNT_CORE_2                                             2208                          2208
 
-CYC_COUNT_CORE_2                                             3167                          3167
+CYC_COUNT_CORE_2                                             6723                          6723
 
 INST_COUNT_CORE_3                                            2208                          2208
 
 UOP_COUNT_CORE_3                                             2208                          2208
 
-CYC_COUNT_CORE_3                                             3175                          3175
+CYC_COUNT_CORE_3                                             8217                          8217
 
 INST_COUNT_CORE_4                                            2208                          2208
 
 UOP_COUNT_CORE_4                                             2208                          2208
 
-CYC_COUNT_CORE_4                                             3160                          3160
+CYC_COUNT_CORE_4                                             7055                          7055
 
 INST_COUNT_CORE_5                                            2208                          2208
 
 UOP_COUNT_CORE_5                                             2208                          2208
 
-CYC_COUNT_CORE_5                                             3179                          3179
+CYC_COUNT_CORE_5                                             7387                          7387
 
 INST_COUNT_CORE_6                                            2208                          2208
 
 UOP_COUNT_CORE_6                                             2208                          2208
 
-CYC_COUNT_CORE_6                                             3179                          3179
+CYC_COUNT_CORE_6                                             8715                          8715
 
 INST_COUNT_CORE_7                                            2208                          2208
 
 UOP_COUNT_CORE_7                                             2208                          2208
 
-CYC_COUNT_CORE_7                                             3178                          3178
+CYC_COUNT_CORE_7                                             7553                          7553
 
 INST_COUNT_CORE_8                                            2208                          2208
 
 UOP_COUNT_CORE_8                                             2208                          2208
 
-CYC_COUNT_CORE_8                                             3188                          3188
+CYC_COUNT_CORE_8                                             7719                          7719
 
 INST_COUNT_CORE_9                                            2208                          2208
 
 UOP_COUNT_CORE_9                                             2208                          2208
 
-CYC_COUNT_CORE_9                                             3186                          3186
+CYC_COUNT_CORE_9                                             7885                          7885
 
 INST_COUNT_CORE_10                                           2208                          2208
 
 UOP_COUNT_CORE_10                                            2208                          2208
 
-CYC_COUNT_CORE_10                                            3197                          3197
+CYC_COUNT_CORE_10                                            7221                          7221
 
-INST_COUNT_CORE_11                                           2208                          2208
+INST_COUNT_CORE_11                                           2895                          2895
 
-UOP_COUNT_CORE_11                                            2208                          2208
+UOP_COUNT_CORE_11                                            2895                          2895
 
-CYC_COUNT_CORE_11                                            3198                          3198
+CYC_COUNT_CORE_11                                           10260                         10260
 
 INST_COUNT_CORE_12                                           2208                          2208
 
 UOP_COUNT_CORE_12                                            2208                          2208
 
-CYC_COUNT_CORE_12                                            3198                          3198
+CYC_COUNT_CORE_12                                            6889                          6889
 
 INST_COUNT_CORE_13                                           2208                          2208
 
 UOP_COUNT_CORE_13                                            2208                          2208
 
-CYC_COUNT_CORE_13                                            3181                          3181
+CYC_COUNT_CORE_13                                            8549                          8549
 
 INST_COUNT_CORE_14                                           2208                          2208
 
 UOP_COUNT_CORE_14                                            2208                          2208
 
-CYC_COUNT_CORE_14                                            3187                          3187
+CYC_COUNT_CORE_14                                            8383                          8383
 
 INST_COUNT_CORE_15                                           2208                          2208
 
 UOP_COUNT_CORE_15                                            2208                          2208
 
-CYC_COUNT_CORE_15                                            3188                          3188
+CYC_COUNT_CORE_15                                            9102                          9102
 

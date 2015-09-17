@@ -2,13 +2,14 @@
 import sst
 
 # Define SST Program Options:
-sst.setProgramOption("timebase", "1ns")
+sst.setProgramOption("timebase", "1ps")
 sst.setProgramOption("stopAtCycle", "0 ns")
 
 # Define the SST Components:
 comp_gpu0 = sst.Component("gpu0", "macsimComponent.macsimComponent")
 comp_gpu0.addParams({
      "trace_file" : "trace_file_list",
+     "mem_size" : "4*1024*1024*1024",
      "command_line" : "--use_memhierarchy=1",
      "debug_level" : "8",
      "num_link" : "16",
@@ -28,7 +29,7 @@ comp_core0l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -60,7 +61,7 @@ comp_core1l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -92,7 +93,7 @@ comp_core2l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -124,7 +125,7 @@ comp_core3l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -156,7 +157,7 @@ comp_core4l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -188,7 +189,7 @@ comp_core5l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -220,7 +221,7 @@ comp_core6l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -252,7 +253,7 @@ comp_core7l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -284,7 +285,7 @@ comp_core8l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -316,7 +317,7 @@ comp_core9l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -348,7 +349,7 @@ comp_core10l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -380,7 +381,7 @@ comp_core11l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -412,7 +413,7 @@ comp_core12l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -444,7 +445,7 @@ comp_core13l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -476,7 +477,7 @@ comp_core14l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -508,7 +509,7 @@ comp_core15l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
+     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
