@@ -80,7 +80,7 @@ TEXTURE_CACHE_ACCESS                                            0               
 
 SHARED_MEM_INST                                                 0                             0
 
-SHARED_MEM_ACCESS                                            6272                          6272
+SHARED_MEM_ACCESS                                             384                           384
 
 CACHE_BANK_BUSY                                                 0                             0
 
@@ -141,9 +141,9 @@ TM_COAL_INST_MUL_TRANS                                          0               
 DM_COAL_INST_MUL_TRANS                                          0                          NaN 
                                                                 0                           100%
 
-LD_NO_FORWARD                                                3126                           100%
+LD_NO_FORWARD                                                 192                           100%
 FORWARDED_LD                                                    0                             0%
-                                                             3126                           100%
+                                                              192                           100%
 
 MEM_STALL_CYCLE_CORE_0                                          0                             0
 
