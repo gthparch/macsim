@@ -136,8 +136,8 @@ bp_dir_mech gshare                -- in the params.in
 \section{New Hardware Prefetcher}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-There are several steps to add a new branch predictor. We will provide
-an example with a stride~\cite{iac:spr04} branch predictor, which is already
+There are several steps to add a new hardware prefetcher. We will provide
+an example with a stride~\cite{iac:spr04} prefetcher, which is already
 provided by \SIM.
 
 \begin{enumerate}[Step 1.]
@@ -174,9 +174,7 @@ void pref_factory(...)
   \item Enable this new hardware prefetcher by setting
     \Verb+KNOB_PREF_STRIDE_ON+ (please refer to pref\_stride.cc
     pref\_stride\_c::pref\_stride\_c()). \textit{Note that the way we
-      simulate hardware prefetchers are not same as other modules. We
-      will provide the detail of hardware prefetcher in
-      Section~\ref{}}.
+      simulate hardware prefetchers are not same as other modules.}
 \begin{Verbatim}
 switch (type) {
   case UNIT_SMALL:

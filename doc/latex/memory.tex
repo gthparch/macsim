@@ -345,8 +345,8 @@ DRAM bandwidth can be modeled using several factors:
 Factor                                       & Knob 				     \\ \hline \hline
 DRAM Frequency                      		 & \Verb+KNOB_DRAM_FREQUENCY+ \\
 DRAM Data bus width                  	 	 & \Verb+KNOB_DRAM_BUS_WIDTH+  \\
-Number of dram controllers            		 & \Verb+KNOB_DRAM_NUM_MC+    \\
-Number of dram channels Column Access	 	 & \Verb+KNOB_DRAM_NUM_CHANNEL+    \\
+Number of dram controllers            	 & \Verb+KNOB_DRAM_NUM_MC+    \\
+Number of dram channels                  & \Verb+KNOB_DRAM_NUM_CHANNEL+    \\
 \end{tabular}
 \end{footnotesize}
 \end{center}
@@ -370,7 +370,7 @@ some notes:
     FR-FCFS, ...) if no request is being served currently.
 
   \item The channel scheduler picks a request from command-ready banks
-    usually based on the oldest request firs. Based on the command,
+    usually based on the policy (oldest-first). Based on the command,
     appropriate timing constraint (precharge, activate, or column
     access) is enforced to the bank.
 

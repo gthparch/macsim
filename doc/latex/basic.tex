@@ -38,10 +38,8 @@ svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --usernam
 \end{Verbatim}
 
 \noindent
-Note that currently password is not set for readonly account, so
-`enter' when you prompt password. Due to the technical issue, we do
-not allow anonymous checkout now. As soon as the issue has been
-resolved, we will update this documentation.
+Note that currently password is not set for the readonly account. Press `enter' when you are prompted for a password. Due to a technical issue, we do
+not allow anonymous checkout right now. The documentation will be updated when this issue is resolved.
 
 Users will have read-only permission by default and users interested
 in contributing to \SIM must contact
@@ -59,13 +57,11 @@ To build \SIM the following are required:
 \renewcommand\descriptionlabel[1]{\textit{\hspace\labelsep{#1}}}
 %\renewcommand\descriptionlabel[1]{\hspace\labelsep\cs{#1}}
 \begin{description}\firmlist
-  \item[Operating System] At present only Linux distributions are supported. \SIM has been tested on:
-   \Verb+Ubuntu+, \Verb+MacOS(10.10.5)+, \Verb+Redhat (TODO)+
-  \item[Compiler] Any compiler that supports the C++0x (or C++11)
-    standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (will work on)+
-  \item[SConstruct]
-
-    \Verb+apt-get install scons+
+  \item[Operating System]- At present only Linux distributions are supported. \SIM has been tested on:
+   \Verb!Ubuntu 12.04 +!, \Verb!RHEL 6+!, \Verb+MacOS(10.10.5)+
+  \item[Compiler]- Any compiler that supports the C++0x (or C++11)
+    standard. \SIM has been verified to work with: \Verb+gcc 4.4 or higher+, \Verb+icc (should work)+
+  \item[SConstruct]- For Ubuntu, \Verb+apt-get install scons+. For RHEL, enable EPEL followed by \Verb+yum install scons+. 
 
 \ignore
 	 {
@@ -73,14 +69,13 @@ To build \SIM the following are required:
 		...) version 2.65 or higher is required. Autotools can be installed using the commands:
 	\begin{Verbatim}
 	Ubuntu: apt-get install autotools-dev automake autoconf
-	Redhat: todo
 	\end{Verbatim}
 	}
   
-  \item[Libraries] - The zlib library is required and it can be installed using the command:
+  \item[Libraries]- zlib and other dependencies can be installed using the following commands:
 \begin{Verbatim}
 Ubuntu: apt-get install zlib1g-dev
-Redhat: TODO
+RHEL: yum groupinstall "Development Tools" && yum install zlib-devel zlib-static libstdc++-static glibc-static 
 \end{Verbatim}
 \end{description}
 \endgroup
@@ -184,7 +179,7 @@ Redhat: TODO
 \subsection{Build}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The SConstruct is used to build \SIM. After checking out a copy of the
+SConstruct is used to build \SIM. After checking out a copy of the
 \SIM source code, the following commands have to be executed (These
 instructions are also available in \Verb+INSTALL+ file included in the
 \SIM source). Section~\ref{sec:buildoption} details all available build options.
@@ -258,7 +253,7 @@ Users can change the value to 1 for the corresponding option.
 \label{sec:run}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To run \bin binary, two additional files are required to be present 
+To run the \bin binary, two additional files are required to be present 
 the same directory as the binary.
 
 \begin{itemize}
@@ -482,11 +477,11 @@ interpret the contents of \Verb+.stat.out+ files.
 \label{sec:sst}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Structural Simulation Toolkit (SST)~\cite{sst} is a MPI-based 
+The Structural Simulation Toolkit (SST)~\cite{sst} is an MPI-based 
 simulation framework, on which multiple simulators can communicate 
 and run over multiple nodes. 
 \SIM provides SST component wrappers and this section provides 
-an instruction to use \SIM as a SST component.
+instructions to use \SIM as an SST component.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -534,7 +529,7 @@ Some tips regarding building procedure are as follows.
 
 An example configuration is as follows.
 Please note that parameters for other components but \SIM are omitted.
-Several sample configurations can be found in
+Sample configurations can be found in
 <macsim-root>/sst-unit-test/.
 Example files are sdl[1|2].py sdl[1|2].xml . runTest.py test the test
 traces. 
@@ -594,8 +589,8 @@ traces.
 </sst>
 \end{Verbatim}
 Multiple instances of \SIM can be instantiated.
-Each instance can be configured differently using its own params.in file and also run separate traces using its own trace\_file\_list file.
-For instance, one \SIM instance can be configured as X86 processor which runs one of SPEC2006 benchmarks, while the other \SIM instance can be configured as GPU which runs one of CUDA benchmarks. 
+Each instance can be configured differently using its own params.in file, and can also run separate traces using its own trace\_file\_list file.
+For instance, one \SIM instance can be configured as an X86 processor which runs one of the SPEC2006 benchmarks, while the other \SIM instance can be configured as a GPU which runs one of the CUDA benchmarks. 
 
 \subsection{Running a \SIM simulation on top of SST framework}
 
@@ -615,14 +610,14 @@ mpirun -np [x] sst [sdl-file]
 \subsection{Using  SST's Memory Module}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-When \SIM is executed as a SST component, it can use other SST
+When \SIM is executed as an SST component, it can use other SST
 components. MemHierarchy  is one of them.  MemHierarchy supports MESI
 cache coherence and it also connects with other network modules such
-as merlin. VaultSim models HMC memory model.  Please refer to SST homepage for supported other modules. 
-In order to use MemHierarchy,  the command line use assert {\texttt use\_memhierarchy} as shown in {\texttt sdl1.py} example in sst-unit-test
+as merlin. VaultSim models the HMC memory model.  Please refer to the SST homepage for other supported modules. 
+In order to use MemHierarchy,  the command line sets {\texttt use\_memhierarchy} to 1 as shown in {\texttt sdl1.py} example in the sst-unit-test
 directory.  
 
-The code that is guarded with  {\texttt \#ifdef USING\_SST}  include call
+The code that is guarded with  {\texttt \#ifdef USING\_SST}  includes call
 back functions to communicate with macsim.  Caches and DRAMS/3D memory
 modules are modeled inside SST. 
 
