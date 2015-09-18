@@ -206,6 +206,10 @@ typedef struct trace_uop_s {
   uint32_t     m_taken_mask;    /**< branch taken mask */
   Addr         m_reconverge_addr; /**< address of reconvergence */
   bool         m_mul_mem_uops;  /**< multiple memory transactions */
+
+  // HMC simulation
+  // changed by Lifeng
+  HMC_Type m_hmc_inst;  /**<  hmc type of cur uop */
 } trace_uop_s; 
 
 

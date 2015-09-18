@@ -813,6 +813,12 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
  */
 bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id)
 {
+  // use an alternative uop fetch function, if hmc is enabled  
+  if (*KNOB(KNOB_ENABLE_HMC_INST))
+  {
+    return hmc_function_c::get_uops_from_traces_with_hmc_inst(this, core_id, uop, sim_thread_id);
+  }
+
   ASSERT(uop);
 
   trace_uop_s *trace_uop;

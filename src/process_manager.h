@@ -49,7 +49,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "global_defs.h"
 #include "global_types.h"
-
+#include "trace_read.h"
+#include "hmc_process.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Section type
@@ -221,8 +222,13 @@ typedef struct thread_s {
   list<section_info_s*> m_mem_sections; /**< memory sections */
   list<section_info_s*> m_mem_bar_sections; /**< memory barrier sections */
   list<section_info_s*> m_mem_for_bar_sections; /**< memory for barrier sections */
-} thread_s;
 
+  // changed by Lifeng
+  trace_info_cpu_s  cached_inst;      /**< cached inst for resuming after hmc inst */
+  bool              has_cached_inst;  /**< flag: indicate if cached inst exists */
+  HMC_Type          m_prev_hmc_type;  /**< hmc type of prev inst */
+  HMC_Type          m_next_hmc_type;  /**< hmc type of next inst */
+} thread_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Process data structure
@@ -263,6 +269,9 @@ typedef struct process_s {
   map<int, bool>       m_block_list; /**< list of block currently running */
   uns64                m_inst_count_tot; /**< total instruction counts */
   int                  m_block_count; /**< total block counts */
+
+  // changed by Lifeng
+  map<uint64_t, hmc_inst_s> m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
 } process_s;
 
 

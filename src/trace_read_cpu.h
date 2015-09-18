@@ -45,6 +45,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "trace_read.h"
 #include "page_mapping.h"
 
+#include "process_manager.h"
+#include "hmc_process.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
@@ -54,6 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class cpu_decoder_c : public trace_read_c
 {
+  friend class hmc_function_c;  
   public:
     /**
      * Constructor
@@ -143,6 +146,9 @@ class cpu_decoder_c : public trace_read_c
      */
     bool peek_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read);
 
+
+    //changed by Lifeng
+    //HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info, uint64_t hmc_vaddr, trace_info_cpu_s & ret_trace_info);
   private:
     // page mapping support
     bool m_enable_physical_mapping;     //!< use physical mapping 

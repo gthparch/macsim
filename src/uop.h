@@ -44,6 +44,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_types.h"
 #include "global_defs.h"
 
+#include "hmc_types.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief allocation queue types
@@ -478,7 +480,6 @@ typedef enum Dep_Type_enum {
   NUM_DEP_TYPES,
 } Dep_Type;
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Source uop information class
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -649,6 +650,9 @@ class uop_c
     bool              m_bypass_llc; /**< bypass last level cache */
     bool              m_skip_llc; /**< skip last level cache */
 
+    // hmc info 
+    // changed by Lifeng
+    HMC_Type m_hmc_inst;  /**< hmc type of current uop*/
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

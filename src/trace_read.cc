@@ -117,6 +117,8 @@ trace_uop_s::trace_uop_s()
   m_taken_mask      = 0;
   m_reconverge_addr = 0;
   m_mul_mem_uops    = false;
+
+  m_hmc_inst        =HMC_NONE;
 }
 
 

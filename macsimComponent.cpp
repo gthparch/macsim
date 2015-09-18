@@ -175,7 +175,7 @@ void macsimComponent::setup()
   CallbackSendInstReq* sir = 
     new Callback4<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstReq);
   CallbackSendDataReq* sdr =
-    new Callback5<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataReq);
+    new Callback6<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
   CallbackStrobeInstRespQ* sirq = 
     new Callback2<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeInstRespQ);
   CallbackStrobeDataRespQ* sdrq =
@@ -321,7 +321,7 @@ inline bool isStore(Mem_Type type)
       return false;
   }
 }
-
+#ifndef USE_HMC
 void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type)
 {
   bool doWrite = isStore((Mem_Type)type);
@@ -333,6 +333,20 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
   MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
       core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
 }
+#else
+void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
+{
+  bool doWrite = isStore((Mem_Type)type);
+  SimpleMem::Request *req = 
+    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size, 
+            (hmc_type==0)?0:SimpleMem::Request::F_NONCACHEABLE,hmc_type);
+  m_dcache_links[core_id]->sendRequest(req);
+  m_dcache_request_counters[core_id]++;
+  m_dcache_requests[core_id].insert(make_pair(req->id, key));
+  MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
+      core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+}
+#endif
 
 bool macsimComponent::strobeDataRespQ(int core_id, uint64_t key)
 {
