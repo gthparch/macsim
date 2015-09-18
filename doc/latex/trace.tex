@@ -69,7 +69,7 @@ pin -t trace_generator.so -thread N -- $BIN $ARGS (for multi-threaded applicatio
 The following example shows the generation of traces for an execution of /bin/ls. 
 
 \begin{Verbatim}
-pin -t trace\_generator.so -- /bin/ls
+pin -t trace_generator.so -- /bin/ls
 \end{Verbatim}
 
 
@@ -285,7 +285,7 @@ explained in detail in subsequent sections.
 \begin{figure*}[htb]
 \centering
 \includegraphics{figs/trace_format}
-\caption{Trace.txt format}
+\caption{Trace.txt format} 
 \label{fig:trace_format}
 \end{figure*}
 
@@ -305,7 +305,7 @@ Trace.txt has different fields from the rest of the lines.
   streaming multiprocessor(SM) core (occupancy).
 \end{itemize}
 
-From the second line onwards, there are two fields in each line:
+From the second line (5th line on GPU format)  onwards, there are two fields in each line:
 thread id and start instruction number. For each thread, there is a
 Trace\_<thread\_id>.raw file which contains the dynamic instruction
 trace for the thread. Finally, start instruction number indicates when

@@ -28,7 +28,8 @@ The following stat types are supported:
   events. (Eg. If the user wants to know what percent of L1 data cache accesses 
   (in a 2-level hierarchy) resulted in L1 hits, L2 hits or memory accesses, then the
   user should define a distribution consisting on three events - L1 hits,
-  L2 hits and L2 misses  - and update the counter for each event separately) 
+  L2 hits and L2 misses  - and update the
+ counter for each event separately) 
 
 \end{description}
 
@@ -142,14 +143,18 @@ In table \ref{table:stats} some important stats are listed.
 \hline 
 INST\_COUNT\_TOT            & \# of instructions                                    &      & general.stat.out \\ \hline 
 INST\_COUNT\_CORE\_[0-11]   & \# of instructions in only the specificed core [0-11] & core & general.stat.out \\ \hline 
-CYC\_COUNT\_TOT             & simulated cycles                                      &      & general.stat.out \\ \hline 
+CYC\_COUNT\_TOT             & \# of times simulator cycle is called
+(Not total cycle)                                       &      & general.stat.out \\ \hline 
 CYC\_COUNT\_CORE\_[0-11]    & simulated cycles in only the specificed core [0-11]   &      & general.stat.out \\ \hline 
-CYC\_COUNT\_X86             & simulated cycles for x86 only                         &      & general.stat.out \\ \hline 
-CYC\_COUNT\_PTX             & simulated cycles for ptx only                         &      & general.stat.out \\ \hline \hline 
-                            & \# of fp instructions                                 &      &                  \\ \hline 
-                            & \# of int instructions                                &      &                  \\ \hline 
-                            & \# of load instructions                               &      &                  \\ \hline  
-                            & \# of store instructions                              &      &                  \\ \hline  
+CYC\_COUNT\_X86             & simulated cycles for x86 only
+&      & general.stat.out \\ \hline \hline 
+CYC\_COUNT\_PTX             & simulated cycles for ptx only &      & general.stat.out \\ \hline 
+EXE\_Time &  Actual simulation time on the host machine  &  &
+general.stat.out \\ \hline \hline 
+%FP_OPS_TOT            & \# of fp instructions                                 &   inst.stat.out   &                  \\ \hline 
+ %                           & \# of int instructions                                &      &                  \\ \hline 
+  %                          & \# of load instructions                               &      &                  \\ \hline  
+   %                         & \# of store instructions                              &      &                  \\ \hline  
 BP\_ON\_PATH\_CORRECT       & \# of correctly predicted branches (DIST)             & core & bp.stat.def      \\ \hline  
 BP\_ON\_PATH\_MISPREDICT    & \# of mis-predicted branches (DIST)                   & core & bp.stat.def      \\ \hline  
 BP\_ON\_PATH\_MISFETCHT     & \# of mis-fetch branches (BTB MISS)(DIST)             & core & bp.stat.def      \\ \hline  
@@ -162,8 +167,8 @@ AVG\_MEMORY\_LATENCY        & average memory latency                            
 TOTAL\_DRAM                 & \# of DRAM accesses                                   &      & memory.stat.def  \\ \hline  
 TOTAL\_DRAM\_READ           & \# of DRAM reads                                      &      & memory.stat.def  \\ \hline  
 TOTAL\_DRAM\_WB             & \# of DRAM write backs                                &      & memory.stat.def  \\ \hline  
-                            & \# of register reads                                  &      &                  \\ \hline  
-                            & \# of register writes                                 &      &                  \\ \hline   \hline 
+%                            & \# of register reads                                  &      &                  \\ \hline  
+ %                           & \# of register writes                                 &      &                  \\ \hline   \hline 
 COAL\_INST, UNCOAL\_INST    & coalesced/uncoalesced mem requests (DIST)             &      & memory.stat.def  \\ \hline 
 
 
