@@ -208,6 +208,14 @@ void bug_detector_c::print(int core_id, int thread_id)
   out.close();
 }
 
+void bug_detector_c::print_fence_info()
+{
+  ofstream out("bug_detect_fence.out");
+  for (auto it=m_fences.begin(); it != m_fences.end(); ++it) {
+    out	<< *it << endl;
+  }
+  out.close();
+}
 
 void bug_detector_c::allocate_noc(mem_req_s* req)
 {
@@ -263,5 +271,12 @@ void bug_detector_c::print_noc()
   out.close();
 }
 
+void bug_detector_c::ins_fence_entry(int entry)
+{
+  m_fences.insert(entry);
+}
 
-
+void bug_detector_c::del_fence_entry()
+{
+  m_fences.erase(m_fences.begin());
+}

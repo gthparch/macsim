@@ -47,6 +47,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <fstream>
 
 #include "global_types.h"
@@ -80,7 +81,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define BANK(a, num, int)		((a) >> log2_int(int) & N_BIT_MASK(log2_int(num)))
 
 #define L(x) left << setw(x)
-
+#define likely(x)          __builtin_expect(!!(x), 1)
+#define unlikely(x)        __builtin_expect(!!(x), 0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 

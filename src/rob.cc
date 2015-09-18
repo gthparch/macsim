@@ -53,6 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // rob_c constructor
 rob_c::rob_c(Unit_Type type, macsim_c* simBase) 
+  : m_fence(simBase)
 {
 
   m_simBase = simBase;
@@ -89,6 +90,7 @@ rob_c::rob_c(Unit_Type type, macsim_c* simBase)
   m_max_fp_regs = *m_simBase->m_knobs->KNOB_FP_REGFILE_SIZE;
   m_num_fp_regs = *m_simBase->m_knobs->KNOB_FP_REGFILE_SIZE;
 
+  m_wb_empty = true;
 }
 
 
@@ -96,6 +98,7 @@ rob_c::rob_c(Unit_Type type, macsim_c* simBase)
 rob_c::~rob_c()
 {
   delete [] m_rob; 
+  ASSERT(m_fence.is_list_empty());
 }
 
 
@@ -158,4 +161,94 @@ void rob_c::dealloc_fp_reg()
 void rob_c::dealloc_int_reg()
 {
   ++m_num_int_regs;
+}
+
+bool rob_c::pending_mem_ops(int entry)
+{
+  int search_idx = m_first_entry;
+
+  while (search_idx != entry) {
+    uop_c *uop = m_rob[search_idx];
+
+    if (uop->m_mem_type != NOT_MEM)
+      return true;
+
+    search_idx = (search_idx + 1) % m_max_cnt;
+  }
+
+  if (KNOB(KNOB_USE_WB)->getValue())
+    return m_wb_empty == false;
+
+  return false;
+}
+
+int rob_c::get_relative_index(int entry)
+{
+  if (m_first_entry <= entry)
+    return entry - m_first_entry;
+  else
+    return entry + m_max_cnt - m_first_entry;
+}
+
+bool rob_c::is_later_entry(int first_fence_entry, int entry)
+{
+  int relative_fence_entry = get_relative_index(first_fence_entry);
+  int relative_mem_entry   = get_relative_index(entry);
+
+  if (relative_mem_entry < relative_fence_entry)
+    return false;
+
+  return true;
+}
+
+// true: ensure ordering, false: no ordering necessary
+bool rob_c::ensure_mem_ordering(int entry)
+{
+  // ordering is ensured using bitmap method
+  if (KNOB(KNOB_ACQ_REL)->getValue())
+    return false;
+
+  // no fence active, no ordering necessary
+  if (m_fence.is_list_empty())
+    return false;
+
+  bool ret = false;
+
+  for (int i = NOT_FENCE+1; i < FENCE_NUM; i++) {
+    fence_type ft = static_cast<fence_type>(i);
+    for (auto it = m_fence.cbegin(ft); !ret && it != m_fence.cend(ft); it++) {
+      int fence_entry = *it;
+      ret = is_later_entry(fence_entry, entry);
+    }
+  }
+
+  return ret;
+}
+
+// false -> empty: no fence active
+// true  -> a fence is active
+bool rob_c::is_fence_active()
+{
+  return m_fence.is_fence_active();
+}
+
+void rob_c::ins_fence_entry(int entry, fence_type ft)
+{
+  m_fence.ins_fence_entry(entry, ft);
+}
+
+// Deactivate the first fence entry
+void rob_c::del_fence_entry(fence_type ft)
+{
+  m_fence.del_fence_entry(ft);
+}
+
+void rob_c::print_fence_entries(fence_type ft)
+{
+  m_fence.print_fence_entries(ft);
+}
+
+void rob_c::set_wb_empty(bool state)
+{
+  m_wb_empty = state;
 }

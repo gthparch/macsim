@@ -220,6 +220,19 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
       DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%lld ports are not ready \n", m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num); 
       return false;
     }
+
+    // Check if fence is active
+    if (*KNOB(KNOB_FENCE_ENABLE) && cur_uop->m_mem_type != NOT_MEM && m_rob->ensure_mem_ordering(entry)) {
+      *sched_fail_reason = SCHED_FAIL_FENCE_ACTIVE;
+      STAT_CORE_EVENT(m_core_id, FENCE_WAITING);
+
+      if (*KNOB(KNOB_FENCE_PREF_ENABLE))
+        m_exec->insert_fence_pref(cur_uop);
+
+      // prefetch execution hack
+      DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%lld fence is active \n", m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
+      return false;
+    }
   }
   
   cur_uop->m_state = OS_SCHEDULE;

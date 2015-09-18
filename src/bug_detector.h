@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <set>
 
 #include "macsim.h"
 #include "global_types.h"
@@ -96,6 +97,10 @@ class bug_detector_c
      */
     void print_noc();
 
+    void ins_fence_entry(int entry);
+    void del_fence_entry();
+    void print_fence_info();
+
   private:
     int m_num_core; /**< number of simulating cores */
     vector<map<uop_c*, uint64_t> *> m_uop_table; /**< uop table */
@@ -105,5 +110,6 @@ class bug_detector_c
     unordered_map<mem_req_s*, uint64_t>* m_packet_table; /**< memeory requests in noc */
     
     macsim_c* m_simBase; /**< pointer to the simulation base class */
+    set<int> m_fences;
 };
 #endif

@@ -77,6 +77,8 @@ class cpu_decoder_c : public trace_read_c
      */
     bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id);
 
+    virtual inst_info_s* get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id);
+
     /**
      * GPU simulation : Read trace ahead to read synchronization information
      * @param trace_info - trace information
@@ -94,7 +96,7 @@ class cpu_decoder_c : public trace_read_c
       /**
        * Initialize the mapping between trace opcode and uop type
        */
-    void init_pin_convert();
+    virtual void init_pin_convert();
 
     /**
      * Function to decode an instruction from the trace file into a sequence of uops
@@ -123,7 +125,7 @@ class cpu_decoder_c : public trace_read_c
      * @param core_id - core id
      * @param thread_id - thread id
      */
-    void dprint_inst(void *t_info, int core_id, int thread_id);
+    virtual void dprint_inst(void *t_info, int core_id, int thread_id);
 
     /**
      * After peeking trace, in case of failture, we need to rewind trace file.

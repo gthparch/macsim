@@ -105,7 +105,7 @@ void schedule_io_c::run_a_cycle(void)
       // schedule an uop
       if (!uop_schedule(m_next_inorder_to_schedule, &sched_fail_reason)) {
         STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS +
-            MIN2((int)sched_fail_reason, 2));
+            MIN2((int)sched_fail_reason, 3));
         break;
       }
  

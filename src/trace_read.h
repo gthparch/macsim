@@ -57,7 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_GPU_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
-#define MAX_TR_OPCODE GPU_OPCODE_LAST
+#define MAX_TR_OPCODE 452 // ARM_INS_ENDING
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +98,32 @@ typedef struct trace_info_cpu_s {
   bool     m_actually_taken;    /**< branch actually taken */
   uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_cpu_s;
+
+typedef struct trace_info_a64_s {
+  uint8_t  m_num_read_regs;     /**< num read registers */
+  uint8_t  m_num_dest_regs;     /**< num dest registers */
+  uint8_t  m_src[MAX_SRC_NUM];  /**< src register id */
+  uint8_t  m_dst[MAX_DST_NUM];  /**< dest register id */
+  uint8_t  m_cf_type;           /**< branch type */
+  bool     m_has_immediate;     /**< has immediate field */
+  uint16_t m_opcode;            /**< opcode */
+  bool     m_has_st;            /**< has store operation */
+  bool     m_is_fp;             /**< fp operation */
+  bool     m_write_flg;         /**< write flag */
+  uint8_t  m_num_ld;            /**< number of load operations */
+  uint8_t  m_size;              /**< instruction size */
+  // dynamic information
+  uint64_t m_ld_vaddr1;         /**< load address 1 */
+  uint64_t m_ld_vaddr2;         /**< load address 2 */
+  uint64_t m_st_vaddr;          /**< store address */
+  uint64_t m_instruction_addr;  /**< pc address */
+  uint64_t m_branch_target;     /**< branch target address */
+  uint8_t  m_mem_read_size;     /**< memory read size */
+  uint8_t  m_mem_write_size;    /**< memory write size */
+  bool     m_rep_dir;           /**< repetition direction */
+  bool     m_actually_taken;    /**< branch actually taken */
+  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+} trace_info_a64_s;
 
 // identical to structure in trace generator
 typedef struct trace_info_gpu_small_s {
@@ -180,7 +206,7 @@ typedef struct trace_uop_s {
    */
   trace_uop_s();
 
-  uint8_t      m_opcode;        /**< opcode */
+  uint16_t     m_opcode;        /**< opcode */
   Uop_Type     m_op_type;       /**< type of operation */
   Mem_Type     m_mem_type;      /**< type of memory instruction */
   Cf_Type      m_cf_type;       /**< type of control flow instruction */ 
@@ -619,6 +645,11 @@ class trace_read_c
      */
     void setup_trace(int core_id, int sim_thread_id);
 
+      /**
+       * Initialize the mapping between trace opcode and uop type
+       */
+    virtual void init_pin_convert() = 0;
+
     static const char *g_tr_reg_names[MAX_TR_REG]; /**< register name string */
     static const char* g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
     static const char* g_tr_cf_names[10]; /**< cf type string */
@@ -626,11 +657,6 @@ class trace_read_c
     static const char *g_mem_type_names[20]; /**< memeory request type string */
 
   protected:
-      /**
-       * Initialize the mapping between trace opcode and uop type
-       */
-    virtual void init_pin_convert() = 0;
-
     /**
      * Function to decode an instruction from the trace file into a sequence of uops
      * @param pi - raw trace format

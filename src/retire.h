@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <inttypes.h>
 #include <queue>
 #include <unordered_map>
+#include <bitset>
 
 #include "global_types.h"
 #include "debug_macros.h"
@@ -205,6 +206,21 @@ class retire_c
      */
     void repeat_traces(process_s*);
 
+    /**
+     * Free retired uop resources
+     */
+    void free_uop_resources(uop_c* uop);
+
+    /**
+     * Drain the completed stores from write buffer
+     */
+    void drain_wb(void);
+
+    /**
+     * Print write buffer entries for debugging purposes
+     */
+    void print_wb(void);
+
   private:
     RETIRE_INTERFACE_DECL(); /**< declaration macro */
 
@@ -215,6 +231,9 @@ class retire_c
     bool                        m_knob_ptx_sim; /**< gpu simulation */
     unordered_map<int, Counter> m_insts_retired; /**< number of retired inst. per thread */
     unordered_map<int, Counter> m_uops_retired; /**< number of retired uop per thread */
+
+    unordered_map<bitset<8>, uop_c*> m_write_buffer;
+    bitset<8>                        m_store_version;
 
     int m_period_inst_count; /**< counter for periodic logging number of retired inst. */
 

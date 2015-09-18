@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_defs.h"
 #include "global_types.h"
 #include "uop.h"
+#include "bug_detector.h"
 
 
 #define EXEC_INTERFACE_PARAMS() \
@@ -136,6 +137,12 @@ class exec_c
      *  \return void
      */
     bool port_available(int iaq);
+
+    /*! \fn insert_fence_pref (uop_c *uop)
+     * \insert prefetch requets during fence waiting time
+     * \return void
+     */
+    void insert_fence_pref(uop_c *uop);
 
     /*! \fn bool exec(int thread_id, int entry, uop_c* cur_uop)
      *  \brief Function to run the exec stage
