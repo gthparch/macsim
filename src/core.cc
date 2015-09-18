@@ -575,6 +575,7 @@ void core_c::check_forward_progress()
     // print all remaining uop states
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
       m_simBase->m_bug_detector->print(m_core_id, m_last_terminated_tid);
+      m_simBase->m_bug_detector->print_fence_info();
     }
 
     m_simBase->m_network->print();

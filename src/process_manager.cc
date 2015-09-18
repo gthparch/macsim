@@ -383,7 +383,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     ASSERTM(0, "error reading from file:%s", appl.c_str());
 
   int trace_ver = -1;
-  if (trace_type != "x86") {
+  if (trace_type != "x86" && trace_type != "a64") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -504,7 +504,7 @@ void process_manager_c::setup_process(process_s* process)
 
   
   int trace_ver = -1;
-  if (trace_type != "x86") {
+  if (trace_type != "x86" && trace_type != "a64") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -766,10 +766,16 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
   if (process->m_ptx) {
     trace_info->m_prev_trace_info = new trace_info_gpu_s;
     trace_info->m_next_trace_info = new trace_info_gpu_s;
-  }
-  else {
-    trace_info->m_prev_trace_info = new trace_info_cpu_s;
-    trace_info->m_next_trace_info = new trace_info_cpu_s;
+  } else {
+    if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86") {
+      trace_info->m_prev_trace_info = new trace_info_cpu_s;
+      trace_info->m_next_trace_info = new trace_info_cpu_s;
+    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64") {
+      trace_info->m_prev_trace_info = new trace_info_a64_s;
+      trace_info->m_next_trace_info = new trace_info_a64_s;
+    } else {
+      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+    }
   }
   thread_start_info_s* start_info = &process->m_thread_start_info[tid];
 
@@ -954,10 +960,19 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
     delete temp;
   }
   else {
-    trace_info_cpu_s *temp = static_cast<trace_info_cpu_s*>(trace_info->m_prev_trace_info);
-    delete temp;
-    temp = static_cast<trace_info_cpu_s*>(trace_info->m_next_trace_info);
-    delete temp;
+    if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86") {
+      trace_info_cpu_s *temp = static_cast<trace_info_cpu_s*>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_cpu_s*>(trace_info->m_next_trace_info);
+      delete temp;
+    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64") {
+      trace_info_a64_s *temp = static_cast<trace_info_a64_s*>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_a64_s*>(trace_info->m_next_trace_info);
+      delete temp;
+    } else {
+      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+    }
   }
 
   gzclose(trace_info->m_trace_file);

@@ -513,7 +513,7 @@ void schedule_smc_c::run_a_cycle(void)
       }
       else {
         STAT_CORE_EVENT(m_core_id, 
-            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 2));
+            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 3));
       }
     }
     else if (ii == m_first_schlist) {
@@ -598,7 +598,7 @@ void schedule_smc_c::run_a_cycle(void)
       }
       else {
         STAT_CORE_EVENT(m_core_id, 
-            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 2));
+            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 3));
       }
     }
     else if (ii == m_first_schlist) {

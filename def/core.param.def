@@ -182,3 +182,8 @@ param<EI_EXEC_WIDTH, ei_exec_width, int, KNOB_LARGE_WIDTH>
 param<EI_COMMIT_WIDTH, ei_commit_width, int, KNOB_LARGE_WIDTH> 
 param<IS_FERMI, is_fermi, bool, 1>
 
+param<FENCE_ENABLE, fence_enable, bool, 0>
+param<FENCE_PREF_ENABLE, fence_pref_enable, bool, 0>
+param<ACQ_REL, acq_rel, bool, 0>
+param<USE_WB, use_wb, bool, 0>
+param<WB_SIZE, wb_size, int, 8>

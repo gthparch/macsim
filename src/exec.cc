@@ -505,6 +505,33 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         POWER_CORE_EVENT(m_core_id, POWER_INT_REGFILE_W);
         break;
 
+      case UOP_FULL_FENCE:
+      case UOP_REL_FENCE:
+      case UOP_ACQ_FENCE:
+        uop_latency = -1;
+        if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
+
+          DEBUG_CORE(m_core_id, "thread_id:%d uop_num:%llu inst_num:%llu fence operations exec \n",
+                     uop->m_thread_id, uop->m_uop_num, uop->m_inst_num); 
+
+          if (KNOB(KNOB_ACQ_REL)->getValue() == false) {
+            m_rob->ins_fence_entry(entry);
+            if (m_rob->pending_mem_ops(entry)) {
+              return false;
+            }
+          } else {
+            fence_type ft = FENCE_FULL;
+            if (uop->m_uop_type == UOP_REL_FENCE)
+              ft = FENCE_RELEASE;
+            else if (uop->m_uop_type == UOP_ACQ_FENCE)
+              ft = FENCE_ACQUIRE;
+            m_rob->ins_fence_entry(entry, ft);
+          }
+        }
+
+        uop_latency = 1;
+        break;
+
       default:
         POWER_CORE_EVENT(m_core_id, POWER_EX_ALU_R);
         POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
@@ -691,6 +718,23 @@ void exec_c::run_a_cycle(void)
     }
   }
 #endif //USING_SST
+}
+
+void exec_c::insert_fence_pref(uop_c *uop)
+{
+  Addr req_addr = uop->m_vaddr;
+  Addr dummy_line_addr;
+
+  pref_req_info_s info;
+
+  bool dc_hit = (dcache_data_s*)m_simBase->m_memory->access_cache(m_core_id,
+                                           req_addr, &dummy_line_addr, false, 0);
+
+  if (!dc_hit) {
+    bool result  = m_simBase->m_memory->new_mem_req(MRT_DPRF, req_addr, 64, false,
+        false, 1, NULL, NULL, 0, &info, m_core_id, uop->m_thread_id, false);
+    STAT_CORE_EVENT(m_core_id, FENCE_PREF_REQ);
+  }
 }
 
 #ifdef USING_SST

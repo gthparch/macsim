@@ -85,6 +85,12 @@ typedef enum Uop_Type_enum {
   UOP_BYTE,                     //!< byte manipulation
   UOP_MM,                       //!< multimedia instructions
 
+  // fence instruction
+  UOP_LFENCE,                   //!< load fence, TODO
+  UOP_FULL_FENCE,               //!< Full memory fence
+  UOP_ACQ_FENCE,                //!< acquire fence
+  UOP_REL_FENCE,                //!< release fence
+
   // fmem reads one int reg and writes a fp reg
   UOP_FMEM,                     //!< fp memory instruction
 
@@ -423,6 +429,8 @@ typedef enum Bar_Type_enum {
   BAR_FETCH     = 0x1,          //!< causes fetch to halt until a redirect occurs
   BAR_ISSUE     = 0x2,          //!< causes issue to serialize around the instruction
   PTX_BLOCK_BAR = 0x3,          //!< synchronizations with a block 
+  ACQ_BAR       = 0x4,          //!< Acquire barrier, not used
+  REL_BAR       = 0x5,          //!< Release barrier
 } Bar_Type;
 
 
@@ -591,7 +599,7 @@ class uop_c
     int               m_core_id; /**< core id */
     Addr              m_pc; /**< pc address */
     Addr              m_npc; /**< next pc */
-    uint8_t           m_opcode; /**< opcode */
+    uint16_t          m_opcode; /**< opcode */
     Uop_Type          m_uop_type; /**< uop type */
     Cf_Type           m_cf_type; /**< branch type */
     Mem_Type          m_mem_type; /**< memory type */

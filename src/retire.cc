@@ -76,7 +76,6 @@ POSSIBILITY OF SUCH DAMAGE.
 /// <b>set *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N positive number</b>
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include "bug_detector.h"
 #include "core.h"
 #include "frontend.h"
@@ -113,12 +112,16 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERF
 
   if (m_knob_ptx_sim)
     m_knob_width = 1000;
+
+  m_store_version = 1;
 }
 
 
 // retire_c destructor
 retire_c::~retire_c()
 {
+  if (!m_write_buffer.empty())
+    print_wb();
 }
 
 
@@ -177,9 +180,66 @@ void retire_c::run_a_cycle()
 
       cur_uop = rob->front();
 
+      // uncompleted memory store UOPs can be placed in write buffer
+      if (KNOB(KNOB_USE_WB)->getValue() && cur_uop->m_mem_type == MEM_ST &&
+          cur_uop->m_exec_cycle != 0 && cur_uop->m_done_cycle != 0) {
+
+        // write buffer full
+        if (m_write_buffer.size() == KNOB(KNOB_WB_SIZE)->getValue())
+          break;
+
+        ASSERT(m_store_version != 0);
+        m_write_buffer.insert(make_pair(m_store_version, cur_uop));
+
+        if (KNOB(KNOB_ACQ_REL)->getValue() && cur_uop->m_bar_type == REL_BAR) {
+          m_store_version = (m_store_version) | (m_store_version >> 1);
+        }
+      }
       // uop cannot be retired
-      if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle || cur_uop->m_exec_cycle == 0) {
+      else if (!cur_uop->m_done_cycle || !cur_uop->m_exec_cycle ||
+               cur_uop->m_done_cycle > m_cur_core_cycle) {
         break;
+      }
+
+      if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&
+          (cur_uop->m_uop_type == UOP_FULL_FENCE ||
+           cur_uop->m_uop_type == UOP_ACQ_FENCE  ||
+           cur_uop->m_uop_type == UOP_REL_FENCE)) {
+
+        ASSERT(rob->is_fence_active());
+
+        STAT_CORE_EVENT(cur_uop->m_core_id, DYN_FENCE_NUM);
+        // STAT_EVENT(DYN_FENCE_NUM);
+
+        DEBUG_CORE(cur_uop->m_core_id, "thread_id:%d uop_num:%llu inst_num:%llu fence operations \n",
+               cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num);
+
+        if (KNOB(KNOB_ACQ_REL)->getValue()) {
+          fence_type ft;
+          switch(cur_uop->m_uop_type) {
+          case UOP_ACQ_FENCE:
+            ft = FENCE_ACQUIRE;
+            break;
+          case UOP_REL_FENCE:
+            ft = FENCE_RELEASE;
+            m_store_version = m_store_version << 1;
+            break;
+          case UOP_FULL_FENCE:
+            ft = FENCE_FULL;
+            // left rotate write buffer index
+            m_store_version = m_store_version << 1;
+            break;
+          default:
+            break;
+          }
+          rob->del_fence_entry(ft);
+        } else {
+          rob->del_fence_entry(FENCE_FULL);
+          // increment store group
+          m_store_version = m_store_version << 1;
+        }
+        if (m_store_version == 0)
+          ASSERT(0);
       }
 
       rob->pop();
@@ -270,19 +330,6 @@ void retire_c::run_a_cycle()
         m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], cur_uop->m_inst_num, cur_uop->m_uop_num, 
         cur_uop->m_done_cycle);
 
-    // free uop
-    for (int ii = 0; ii < cur_uop->m_num_child_uops; ++ii) {
-			if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
-	      m_simBase->m_bug_detector->deallocate(cur_uop->m_child_uops[ii]);
-      m_uop_pool->release_entry(cur_uop->m_child_uops[ii]->free());
-    }
-
-    if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
-			m_simBase->m_bug_detector->deallocate(cur_uop);
-
-    delete [] cur_uop->m_child_uops;
-    m_uop_pool->release_entry(cur_uop->free());
-  
     // release physical registers
     if (cur_uop->m_req_lb) {
       rob->dealloc_lb();
@@ -296,13 +343,90 @@ void retire_c::run_a_cycle()
     if (cur_uop->m_req_fp_reg) {
       rob->dealloc_fp_reg();
     }
+
+    if (KNOB(KNOB_USE_WB)->getValue()) {
+      // free uop resources only for uops not in write buffer
+      if (cur_uop->m_mem_type != MEM_ST)
+        free_uop_resources(cur_uop);
+    } else {
+        free_uop_resources(cur_uop);
+    }
   }
 
   if (m_core_id == 0) {
     m_simBase->m_core0_inst_count = m_insts_retired[0];
   }
+
+  drain_wb();
 }
 
+
+void retire_c::drain_wb(void)
+{
+  // all stores are complete
+  if (m_write_buffer.empty()) {
+    m_store_version = 1;
+    return;
+  }
+
+  int stores_completed = 0;
+  bool increment_index = true;
+  for (int indices_tried = 0; indices_tried < 8 && increment_index; indices_tried++) {
+
+    auto uop_it = m_write_buffer.begin();
+
+    while(uop_it != m_write_buffer.end()) {
+      auto uop_index = (*uop_it).first;
+
+      if (!uop_index.test(indices_tried)) {
+        ++uop_it;
+        continue;
+      }
+
+      uop_c* cur_uop = (*uop_it).second;
+
+      if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle ||
+          cur_uop->m_exec_cycle == 0) {
+        // there is a store which cannot be completed with current index
+        // and has no other higher indices set, stop completing
+        auto higher_bits = uop_index & (bitset<8>(0xFF) << (indices_tried + 1));
+        if (!higher_bits.any())
+          increment_index = false;
+        ++uop_it;
+      } else {
+        auto uop_it_free = uop_it;
+        free_uop_resources(cur_uop);
+        ++uop_it;
+        m_write_buffer.erase(uop_it_free);
+        stores_completed++;
+      }
+    }
+  }
+
+  // tell rob if WB is empty for memory ordering
+  if (m_write_buffer.empty()) {
+    m_store_version = 1;
+    m_rob->set_wb_empty(true);
+  } else {
+    m_rob->set_wb_empty(false);
+  }
+}
+
+// free uop
+void retire_c::free_uop_resources(uop_c* cur_uop)
+{
+    for (int ii = 0; ii < cur_uop->m_num_child_uops; ++ii) {
+      if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
+        m_simBase->m_bug_detector->deallocate(cur_uop->m_child_uops[ii]);
+      m_uop_pool->release_entry(cur_uop->m_child_uops[ii]->free());
+    }
+
+    if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
+      m_simBase->m_bug_detector->deallocate(cur_uop);
+
+    delete [] cur_uop->m_child_uops;
+    m_uop_pool->release_entry(cur_uop->free());
+}
 
 // When a new thread has been scheduled, reset data
 void retire_c::allocate_retire_data(int tid)
@@ -397,5 +521,18 @@ void retire_c::repeat_traces(process_s* process)
     m_simBase->m_process_manager->create_process(process->m_kernel_config_name, process->m_repeat+1, 
         process->m_orig_pid);
     STAT_EVENT(NUM_REPEAT);
+  }
+}
+
+
+void retire_c::print_wb()
+{
+  DEBUG("Write buffer size:%lu\n", m_write_buffer.size());
+  for (auto it : m_write_buffer) {
+    auto version  = it.first;
+    auto uop = it.second;
+
+    DEBUG("uop num:%llu done:%llu version:%s core:%d\n", uop->m_uop_num,
+                         uop->m_done_cycle, version.to_string().c_str(), uop->m_core_id);
   }
 }

@@ -373,11 +373,17 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
       fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_inst_addr;
     }
     else {
-      trace_info_cpu_s *prev_trace_info = static_cast<trace_info_cpu_s *>(thread->m_prev_trace_info);
-      fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_instruction_addr;
+      if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86") {
+        trace_info_cpu_s *prev_trace_info = static_cast<trace_info_cpu_s *>(thread->m_prev_trace_info);
+        fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_instruction_addr;
+      } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64") {
+        trace_info_a64_s *prev_trace_info = static_cast<trace_info_a64_s *>(thread->m_prev_trace_info);
+        fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_instruction_addr;
+      } else {
+        ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+      }
     }
   }
-
 
   // -------------------------------------
   // check whether previous branch misprediction has been resolved

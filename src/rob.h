@@ -44,7 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "assert_macros.h"
 #include "utils.h"
-
+#include "fence.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief ROB (Reorder Buffer) class
@@ -263,6 +263,41 @@ class rob_c
      */
     void dealloc_fp_reg();
 
+    /**
+     * Check if there are any non-retired memory ops
+     */
+    bool pending_mem_ops(int entry);
+
+    /**
+     * Increment the number of fences in ROB
+     */
+    void ins_fence_entry(int entry, enum fence_type ft = FENCE_FULL);
+
+    /**
+     * Remove the number of fence in ROB
+     */
+    void del_fence_entry(enum fence_type ft = FENCE_FULL);
+
+    /**
+     * Check if a fence is active in the ROB
+     */
+    bool is_fence_active();
+
+    /**
+     * Check if memory ordering is to be ensured
+     */
+    bool ensure_mem_ordering(int entry);
+
+    /**
+     * Set the write buffer empty flag
+     */
+    void set_wb_empty(bool state);
+
+  private:
+    bool is_later_entry(int first_fence_entry, int entry);
+    void print_fence_entries(enum fence_type ft = FENCE_FULL);
+    int  get_relative_index(int entry);
+
   private:
     int       m_max_cnt; /**< max rob entries */
     int       m_usable_cnt; /**< usable rob entries */
@@ -280,8 +315,12 @@ class rob_c
     int       m_num_fp_regs; /**< number of available fp register */
     Unit_Type m_unit_type; /**< core type */ 
     uns16     m_knob_rob_size; /**< reorder buffer size */
+
+    /* All fences in the ROB */
+    fence_c   m_fence;
+    bool      m_wb_empty;
     
     macsim_c*       m_simBase; /**< macsim_c base class for simulation globals */
 };
-#endif // ROB_H_INCLUDED 
 
+#endif // ROB_H_INCLUDED
