@@ -693,9 +693,9 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c* simBase)
   // initialization
   m_dprint_output = new ofstream(KNOB(KNOB_STATISTICS_OUT_DIRECTORY)->getValue() + "/trace_debug.out");
   
-  if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86")
+  if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86")
     m_cpu_decoder = new cpu_decoder_c(simBase, m_dprint_output);
-  else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64")
+  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64")
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());

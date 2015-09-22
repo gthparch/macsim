@@ -80,6 +80,7 @@ src/sw_managed_cache.cc      src/sw_managed_cache.h                    \
 src/trace_read.cc            src/trace_read.h                          \
 src/trace_read_cpu.cc        src/trace_read_cpu.h                      \
 src/trace_read_gpu.cc        src/trace_read_gpu.h                      \
+src/trace_read_a64.cc        src/trace_read_a64.h                      \
 src/uop.cc                   src/uop.h                                 \
 src/utils.cc                 src/utils.h                               \
 src/network.cc               src/network.h                             \

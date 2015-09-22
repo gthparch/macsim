@@ -767,10 +767,10 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
     trace_info->m_prev_trace_info = new trace_info_gpu_s;
     trace_info->m_next_trace_info = new trace_info_gpu_s;
   } else {
-    if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86") {
+    if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info->m_prev_trace_info = new trace_info_cpu_s;
       trace_info->m_next_trace_info = new trace_info_cpu_s;
-    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64") {
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
       trace_info->m_prev_trace_info = new trace_info_a64_s;
       trace_info->m_next_trace_info = new trace_info_a64_s;
     } else {
