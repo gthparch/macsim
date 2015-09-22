@@ -77,7 +77,11 @@ class macsimComponent : public SST::Component
     set<uint64_t> m_cube_responses;
 
     void sendInstReq(int,uint64_t,uint64_t,int);
+#ifdef USE_HMC 
     void sendDataReq(int,uint64_t,uint64_t,int,int,uint8_t);
+#else
+    void sendDataReq(int,uint64_t,uint64_t,int,int);
+#endif
     void sendCubeReq(uint64_t,uint64_t,int,int);
     bool strobeInstRespQ(int,uint64_t);
     bool strobeDataRespQ(int,uint64_t);
