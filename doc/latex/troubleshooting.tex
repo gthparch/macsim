@@ -1,0 +1,12 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Troubleshooting Information}
+\label{sec:troubleshooting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This chapter contains information that might be useful when you encounter 
+a problem in building, running \SIM.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Error opening trace file}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If you encounter ``error opening trace file \ldots'' error message when you run \SIM, it is highly likely because of your operating system's restriction on the maximum number of open file descriptors. At the time of writing, by default, Mac OS X (10.10.5 Yosemite) sets the maximum number of open file descriptor, 256; whereas it is 1024 in Ubuntu 14.04. Once the number of maximum files is reached, trace cannot be opened and the simulation aborts. If this is the case, then simply increase the limitation with ``ulimit -n <N>'' command.
