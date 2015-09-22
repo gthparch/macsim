@@ -174,8 +174,13 @@ void macsimComponent::setup()
 
   CallbackSendInstReq* sir = 
     new Callback4<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstReq);
+#ifdef USE_HMC  
   CallbackSendDataReq* sdr =
     new Callback6<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
+#else
+  CallbackSendDataReq* sdr =
+    new Callback5<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataReq);
+#endif
   CallbackStrobeInstRespQ* sirq = 
     new Callback2<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeInstRespQ);
   CallbackStrobeDataRespQ* sdrq =
