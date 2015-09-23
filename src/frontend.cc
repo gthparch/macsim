@@ -380,7 +380,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
         trace_info_a64_s *prev_trace_info = static_cast<trace_info_a64_s *>(thread->m_prev_trace_info);
         fetch_data->m_MT_scheduler.m_next_fetch_addr = prev_trace_info->m_instruction_addr;
       } else {
-        ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+        ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
       }
     }
   }

@@ -698,7 +698,7 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c* simBase)
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64")
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
   else {
-    ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+    ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
   }
 
   m_cpu_decoder->init_pin_convert();

@@ -774,7 +774,7 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
       trace_info->m_prev_trace_info = new trace_info_a64_s;
       trace_info->m_next_trace_info = new trace_info_a64_s;
     } else {
-      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
   }
   thread_start_info_s* start_info = &process->m_thread_start_info[tid];
