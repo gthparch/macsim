@@ -10,6 +10,7 @@
 
 #include <sst/core/interfaces/stringEvent.h>
 #include <sst/core/interfaces/simpleMem.h>
+#include <sst/elements/memHierarchy/simpleMemHMCExtension.h>
 
 #include "src/global_defs.h"
 #include "src/uop.h"
@@ -343,7 +344,7 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
 {
   bool doWrite = isStore((Mem_Type)type);
   SimpleMem::Request *req = 
-    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size, 
+    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, 
             (hmc_type==0)?0:SimpleMem::Request::F_NONCACHEABLE,hmc_type);
   m_dcache_links[core_id]->sendRequest(req);
   m_dcache_request_counters[core_id]++;
