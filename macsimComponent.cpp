@@ -381,8 +381,13 @@ void macsimComponent::handleDcacheEvent(Interfaces::SimpleMem::Request *req)
       break;
     }
   }
-  
+#ifdef USE_HMC
+  SimpleMemHMCExtension::HMCRequest *req2 =
+    static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
+  delete req2;
+#else  
   delete req;
+#endif  
 }
 
 ////////////////////////////////////////
