@@ -77,7 +77,7 @@ class macsimComponent : public SST::Component
     set<uint64_t> m_cube_responses;
 
     void sendInstReq(int,uint64_t,uint64_t,int);
-#ifdef USE_HMC 
+#ifdef USE_MACSIM_HMC 
     void sendDataReq(int,uint64_t,uint64_t,int,int,uint8_t);
 #else
     void sendDataReq(int,uint64_t,uint64_t,int,int);
