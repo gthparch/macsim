@@ -175,7 +175,7 @@ void macsimComponent::setup()
 
   CallbackSendInstReq* sir = 
     new Callback4<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstReq);
-#ifdef USE_MACSIM_HMC  
+#ifdef USE_VAULTSIM_HMC  
   CallbackSendDataReq* sdr =
     new Callback6<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
 #else
@@ -327,7 +327,7 @@ inline bool isStore(Mem_Type type)
       return false;
   }
 }
-#ifndef USE_MACSIM_HMC
+#ifndef USE_VAULTSIM_HMC
 void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type)
 {
   bool doWrite = isStore((Mem_Type)type);
@@ -381,7 +381,7 @@ void macsimComponent::handleDcacheEvent(Interfaces::SimpleMem::Request *req)
       break;
     }
   }
-#ifdef USE_MACSIM_HMC
+#ifdef USE_VAULTSIM_HMC
   SimpleMemHMCExtension::HMCRequest *req2 =
     static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
   delete req2;
