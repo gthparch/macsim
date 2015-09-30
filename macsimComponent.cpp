@@ -10,7 +10,10 @@
 
 #include <sst/core/interfaces/stringEvent.h>
 #include <sst/core/interfaces/simpleMem.h>
+
+#ifdef USE_VAULTSIM_HMC  
 #include <sst/elements/memHierarchy/simpleMemHMCExtension.h>
+#endif
 
 #include "src/global_defs.h"
 #include "src/uop.h"

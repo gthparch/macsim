@@ -40,7 +40,7 @@ def main():
     #print('result_dir: {}'.format(result_dir))
 
     match_fail = False
-    stats = glob.glob('{0}/*.stat.out'.format(golden_dir))
+    stats = glob.glob('{0}/general.stat.out'.format(golden_dir))
     for stat in stats:
       golden_output = '{0}/{1}'.format(golden_dir, os.path.basename(stat))
       test_output = '{0}/{1}'.format(result_dir, os.path.basename(stat))
@@ -52,12 +52,11 @@ def main():
       diff = difflib.unified_diff(open(test_output).readlines(), open(golden_output).readlines())
       for line in diff:
         line = line.rstrip('\n')
-        if line[0] == '-' and line[1] != '-':
-          if re.match('-EXE_TIME', line):
-            continue
-
-          match_fail = True
-          break
+        if line: ## Skip empty lines
+          if line[0] == '-' and line[1] != '-':
+            if re.match('-CYC_COUNT_TOT', line):
+              match_fail = True
+              break
 
       if match_fail:
         break
