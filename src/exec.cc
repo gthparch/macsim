@@ -515,7 +515,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
                      uop->m_thread_id, uop->m_uop_num, uop->m_inst_num); 
 
           if (KNOB(KNOB_ACQ_REL)->getValue() == false) {
-            m_rob->ins_fence_entry(entry);
+            m_rob->ins_fence_entry(entry, FENCE_FULL);
             if (m_rob->pending_mem_ops(entry)) {
               return false;
             }

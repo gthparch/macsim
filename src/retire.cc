@@ -169,7 +169,7 @@ void retire_c::run_a_cycle()
       rob = m_gpu_rob->get_thread_rob(cur_uop->m_thread_id);
       rob->pop();
     }
-    // retirement logic for x86 simulation
+    // retirement logic for CPU simulation
     else {
       rob = m_rob;
 
@@ -185,8 +185,10 @@ void retire_c::run_a_cycle()
           cur_uop->m_exec_cycle != 0 && cur_uop->m_done_cycle != 0) {
 
         // write buffer full
-        if (m_write_buffer.size() == KNOB(KNOB_WB_SIZE)->getValue())
+        if (m_write_buffer.size() == KNOB(KNOB_WB_SIZE)->getValue()) {
+          STAT_CORE_EVENT(cur_uop->m_core_id, WB_FULL);
           break;
+        }
 
         ASSERT(m_store_version != 0);
         m_write_buffer.insert(make_pair(m_store_version, cur_uop));
@@ -390,8 +392,10 @@ void retire_c::drain_wb(void)
         // there is a store which cannot be completed with current index
         // and has no other higher indices set, stop completing
         auto higher_bits = uop_index & (bitset<8>(0xFF) << (indices_tried + 1));
-        if (!higher_bits.any())
+        if (!higher_bits.any()) {
           increment_index = false;
+          STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
+        }
         ++uop_it;
       } else {
         auto uop_it_free = uop_it;
