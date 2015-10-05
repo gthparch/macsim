@@ -1,0 +1,15 @@
+.opt_build/
+.sconf_temp/
+.sconsign.dblite
+bin/macsim
+config.log
+src/all_knobs.cc
+src/all_knobs.h
+src/all_stats.cc
+src/all_stats.h
+src/statsEnums.h
+src/cscope
+tools/mem_trace_generator/*.raw
+tools/mem_trace_generator/mem_trace
+bin/
+.dbg_build/
