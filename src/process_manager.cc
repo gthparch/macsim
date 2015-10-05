@@ -960,18 +960,18 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
     delete temp;
   }
   else {
-    if (KNOB(KNOB_CORE_TYPE)->getValue() == "x86") {
+    if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info_cpu_s *temp = static_cast<trace_info_cpu_s*>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_cpu_s*>(trace_info->m_next_trace_info);
       delete temp;
-    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "a64") {
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
       trace_info_a64_s *temp = static_cast<trace_info_a64_s*>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_a64_s*>(trace_info->m_next_trace_info);
       delete temp;
     } else {
-      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_CORE_TYPE)->getValue().c_str());
+      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
   }
 
