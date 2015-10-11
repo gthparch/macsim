@@ -82,8 +82,8 @@ bug_detector_c::~bug_detector_c()
   if (!*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE)
     return ;
 
-  delete m_latency_sum;
-  delete m_latency_count;
+  delete [] m_latency_sum;
+  delete [] m_latency_count;
 
   while (!m_uop_table.empty()) {
     auto *new_map = m_uop_table.back();

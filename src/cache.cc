@@ -70,7 +70,7 @@ cache_set_c::cache_set_c(int assoc)
 
 cache_set_c::~cache_set_c()
 {
-  delete m_entry;
+  delete [] m_entry;
 }
 
 

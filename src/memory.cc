@@ -1686,6 +1686,7 @@ memory_c::memory_c(macsim_c* simBase)
 
   // misc
   m_stop_prefetch = 0;
+  m_cycle = 0;
 
   if (*m_simBase->m_knobs->KNOB_DEFAULT_INTERLEAVING) {
     m_l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
