@@ -99,7 +99,6 @@ POSSIBILITY OF SUCH DAMAGE.
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_RETIRE_STAGE, ## args); \
   }
 
-
 // retire_c constructor
 retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERFACE_INIT() 
 {
@@ -191,7 +190,7 @@ void retire_c::run_a_cycle()
         }
 
         ASSERT(m_store_version != 0);
-        m_write_buffer.insert(make_pair(m_store_version, cur_uop));
+        insert_wb(cur_uop);
 
         if (KNOB(KNOB_ACQ_REL)->getValue() && cur_uop->m_bar_type == REL_BAR) {
           m_store_version = (m_store_version) | (m_store_version >> 1);
@@ -378,14 +377,14 @@ void retire_c::drain_wb(void)
     auto uop_it = m_write_buffer.begin();
 
     while(uop_it != m_write_buffer.end()) {
-      auto uop_index = (*uop_it).first;
+      auto uop_index = uop_it->first;
 
       if (!uop_index.test(indices_tried)) {
         ++uop_it;
         continue;
       }
 
-      uop_c* cur_uop = (*uop_it).second;
+      uop_c* cur_uop = uop_it->second;
 
       if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle ||
           cur_uop->m_exec_cycle == 0) {
@@ -398,10 +397,11 @@ void retire_c::drain_wb(void)
         }
         ++uop_it;
       } else {
-        auto uop_it_free = uop_it;
+        // the write uop is completed and can be freed
         free_uop_resources(cur_uop);
+        auto uop_it_tmp = uop_it;
         ++uop_it;
-        m_write_buffer.erase(uop_it_free);
+        delete_wb(uop_it_tmp);
         stores_completed++;
       }
     }
@@ -414,6 +414,16 @@ void retire_c::drain_wb(void)
   } else {
     m_rob->set_wb_empty(false);
   }
+}
+
+void retire_c::insert_wb(uop_c* uop)
+{
+  m_write_buffer.insert(make_pair(m_store_version, uop));
+}
+
+void retire_c::delete_wb(write_buffer_c::iterator it)
+{
+  m_write_buffer.erase(it);
 }
 
 // free uop
