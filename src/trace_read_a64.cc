@@ -1953,7 +1953,8 @@ void a64_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_u
       else 
         trace_uop->m_va = pi->m_ld_vaddr1;
 
-      trace_uop->m_mem_size = pi->m_mem_read_size;
+      if (pi->m_mem_read_size)
+        trace_uop->m_mem_size = pi->m_mem_read_size;
     }
   }
 
