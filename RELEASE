@@ -1,6 +1,14 @@
 This file is used to help provide older releases. Please download the attached
 .tar.gz file to get the particular release.
 ----
+MacSim v2.0.3
+
+Updated compatibility with SST 4.0.0 (rev. 8077)
+
+Added reference results (and corresponding configuration) to compare
+against for SST nightly tests.
+
+----
 MacSim v2.0.2
 
 Updated compatibility with SST 3.1.2 (rev. 7085)
