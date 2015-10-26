@@ -1,6 +1,11 @@
 This file is used to help provide older releases. Please download the attached
 .tar.gz file to get the particular release.
 ----
+MacSim v2.0.1
+
+Fixes to GTX580 parameter file
+
+----
 MacSim v2.0.0
 
 There are several major changes made since last release. (The svn repository
