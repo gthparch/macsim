@@ -2,6 +2,11 @@ This file is used to help provide older releases. Please download the
 attached .tar.gz file to get the particular release.
 
 ----
+MacSim v2.1.1
+
+Trace format has been updated.
+
+----
 MacSim v2.1.0
 
     1. Added support for Mac OS X
