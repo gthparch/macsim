@@ -12,5 +12,4 @@ src/cscope
 tools/mem_trace_generator/*.raw
 tools/mem_trace_generator/mem_trace
 bin/
-internal/
 .dbg_build/
