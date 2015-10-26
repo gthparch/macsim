@@ -1,6 +1,11 @@
 This file is used to help provide older releases. Please download the attached
 .tar.gz file to get the particular release.
 ----
+MacSim v1.2.0
+
+This tag is prepared before the decoupling of trace decoder is made.
+
+----
 MacSim v1.1.0
 
 Note: We've made transition from our googlecode repository and this version is
