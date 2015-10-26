@@ -1,6 +1,13 @@
 This file is used to help provide older releases. Please download the attached
 .tar.gz file to get the particular release.
+----
+MacSim v1.1.0
 
+Note: We've made transition from our googlecode repository and this version is
+up here only for the convenience. There is no modification at all from the
+previously released one.
+
+----
 Initial MacSim release version (v1.0.0)
 
 Note: We've made transition from our googleccode repository and this version is
