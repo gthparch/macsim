@@ -1,5 +1,20 @@
-This file is used to help provide older releases. Please download the attached
-.tar.gz file to get the particular release.
+This file is used to help provide older releases. Please download the
+attached .tar.gz file to get the particular release.
+
+----
+MacSim v2.1.0
+
+    1. Added support for Mac OS X
+    
+    2. SST-MacSim: Enable each core of MacSim instance to have its
+       private instruction and data cache (memHierarchy).
+
+    3. SST-MacSim: Enable receiving a trigger event from another SST
+       component which will cause MacSim to begin execution, and
+       returning an event to another SST component upon completion.
+
+    4. Bug fixes
+
 ----
 MacSim v2.0.3
 
