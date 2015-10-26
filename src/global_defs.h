@@ -117,7 +117,6 @@ class KnobsContainer;
 class ProcessorStatistics;
 class CoreStatistics;
 class cache_partition_framework_c;
-class ei_power_c;
 class dyfr_c;
 
 template <class T> class pqueue_c;
