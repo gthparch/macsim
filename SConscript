@@ -98,7 +98,7 @@ IRIS_srcs = [
 
 if flags['iris'] == '1':
   if flags['power'] == '1':
-    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=env['CPPDEFINES'] + ['POWER_EI', 'IRIS'])
+    env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=env['CPPDEFINES'] + ['IRIS'])
   else:
     env.Library('iris', IRIS_kernel_srcs + IRIS_srcs, CPPDEFINES=env['CPPDEFINES'] + ['IRIS'])
 
@@ -247,9 +247,7 @@ libraries = ['z']
 
 
 if flags['power'] == '1':
-  libraries.append('ei')
   libraries.append('pthread')
-  env['CPPDEFINES'].append('POWER_EI')
 
 if flags['dram'] == '1':
   libraries.append('dramsim')

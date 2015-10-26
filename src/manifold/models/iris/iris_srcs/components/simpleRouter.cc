@@ -972,11 +972,6 @@ void SimpleRouter::power_stats()
 	    << " Router Power:" << Eavg * freq 
 	    << " Link Power:" << Plink << "\n";
 	
-#ifdef POWER_EI
-	m_simBase->total_energy += Eavg * total_cycles;
-	m_simBase->avg_power += Eavg * freq + Plink;
-	m_simBase->total_packets += stat_packets_in;
-#endif
 }
 #endif   /* ----- #ifndef SIMPLEROUTER_CC_INC  ----- */
 

@@ -185,13 +185,6 @@ class macsim_c
      */
         int get_current_frequency_uncore(int type);
 
-#ifdef POWER_EI
-    /**
-     * Compute power consumption
-     */
-		void compute_power(void);
-#endif
-
     /**
      * Finialize simulation
      */
@@ -288,14 +281,6 @@ class macsim_c
 		int Mytid; /**< tid used by IRIS */
 		FILE* log_file; /**< log file used by IRIS */
 		stringstream network_trace; /**< network trace */
-#endif
-
-#ifdef POWER_EI
-		// power stats
-		ei_power_c* m_ei_power; /**< energy introspector */
-		double avg_power; /**< average power */
-		double total_energy; /**< total energy consumption */
-		int total_packets; /**< number of packets */
 #endif
     
   public:
