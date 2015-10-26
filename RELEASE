@@ -1,6 +1,23 @@
 This file is used to help provide older releases. Please download the attached
 .tar.gz file to get the particular release.
 ----
+MacSim v2.0.2
+
+Updated compatibility with SST 3.1.2 (rev. 7085)
+
+  1. MacSim is primarily a core component in SST (The Structural
+     Simulation Toolkit - https://sst-simulator.org/).
+
+  2. Tested out with MemHierarchy component as I$ and D$.
+
+  3. In conjuction with MemHierarchy, MacSim can be configured with
+     DRAMSim2 or VaultSim.
+
+Note - Use "USE_MEMHIERARCHY' knob to use MemHierarchy cache. With it
+turned off, MacSim doesn't interact with other component at all. It
+works as if MacSim-standalone, but on top of SST framework.
+
+----
 MacSim v2.0.1
 
 Fixes to GTX580 parameter file
