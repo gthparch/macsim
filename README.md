@@ -26,12 +26,11 @@ Please see [MacSim documentation file](http://macsim.googlecode.com/files/macsim
 
 ## Download
 
-* You can download tagged versions from [the Releases header item](https://github.com/macsimgt/macsim/releases) of this repository.
-* or you can download the latest copy from our svn repository.
+* You can download tagged versions from [the Releases header item](https://github.com/gthparch/macsim/releases) of this repository.
+* or you can download the latest copy from our git repository.
 
 ```
-   svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim --username readonly
-   When you prompt password, please enter (there is no password).
+  git clone https://github.com/gthparch/macsim
 ```
 
 
