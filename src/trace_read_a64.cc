@@ -1496,6 +1496,8 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
         case ARM64_PRFM_PSTL3KEEP:
           trace_uop[0]->m_mem_type = MEM_SWPREF_T2;
           break;
+        default:
+          break;
         }
       }
 
@@ -1542,6 +1544,8 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
           case ARM64_PRFM_PLDL3KEEP:
           case ARM64_PRFM_PSTL3KEEP:
             trace_uop[1]->m_mem_type = MEM_SWPREF_T2;
+            break;
+          default:
             break;
           }
         } else {

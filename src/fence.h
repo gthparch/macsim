@@ -180,6 +180,8 @@ class fence_c {
         return m_rel_fence_list.cbegin();
       else if (ft == FENCE_FULL)
         return m_full_fence_list.cbegin();
+      else
+        assert(0);
     }
 
     list<int>::const_iterator cend(fence_type ft)
@@ -190,6 +192,8 @@ class fence_c {
         return m_rel_fence_list.cend();
       else if (ft == FENCE_FULL)
         return m_full_fence_list.cend();
+      else
+        assert(0);
     }
 };
 
