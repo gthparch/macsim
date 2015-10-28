@@ -273,8 +273,13 @@ bool macsimComponent::ticReceived(Cycle_t)
 ////////////////////////////////////////
 void macsimComponent::sendInstReq(int core_id, uint64_t key, uint64_t addr, int size)
 {
+#ifndef USE_VAULTSIM_HMC   
   SimpleMem::Request *req = 
     new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
+#else
+  SimpleMem::Request *req = 
+    new SimpleMemHMCExtension::HMCRequest(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
+#endif  
   m_icache_links[core_id]->sendRequest(req);
   m_icache_request_counters[core_id]++;
   m_icache_requests[core_id].insert(make_pair(req->id, key));
