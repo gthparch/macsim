@@ -43,6 +43,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <queue>
 #include <list>
 
+#include "../../src/hmc_types.h"
+
 /*
  * 1. all function of which name start with a capatal letter is used by PIN
  */
@@ -1268,6 +1270,8 @@ VOID RtnEnd(ADDRINT arg)
     sim_end[tid]=true;
 }
 
+/* OLD HMC Inst definition
+   switch to use hmc_types.h in src/
 string HMC_Inst[]=
 {
 "HMC_CAS_greater_16B",
@@ -1277,7 +1281,7 @@ string HMC_Inst[]=
 "HMC_ADD_16B",
 ""//last element must be empty
 };
-
+*/
 
 
 VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
@@ -1325,9 +1329,9 @@ VOID Image(IMG img, VOID *v)
 
     RTN hmc_rtn;
     unsigned i=0;
-    while (!HMC_Inst[i].empty())
+    while (!HMC_Type_str[i].empty())
     {
-        string name = HMC_Inst[i]; i++;
+        string name = HMC_Type_str[i]; i++;
         hmc_rtn = RTN_FindByName(img, name.c_str());
         if (RTN_Valid(hmc_rtn))
         {

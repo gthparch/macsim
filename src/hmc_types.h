@@ -1,6 +1,8 @@
 #ifndef HMC_TYPES_H
 #define HMC_TYPES_H
 
+#include <string>
+
 typedef enum HMC_Type_enum
 {
     HMC_NONE=0,
@@ -19,5 +21,24 @@ typedef enum HMC_Type_enum
     HMC_XOR=13,
     NUM_HMC_TYPES=14
 } HMC_Type;
+
+std::string HMC_Type_str[]=
+{
+    "HMC_NONE", // not really a HMC inst
+    "HMC_CAS_equal_16B",
+    "HMC_CAS_zero_16B",
+    "HMC_CAS_greater_16B",
+    "HMC_CAS_less_16B",
+    "HMC_ADD_16B",
+    "HMC_ADD_8B",
+    "HMC_ADD_DUAL",
+    "HMC_SWAP",
+    "HMC_BIT_WR",
+    "HMC_AND",
+    "HMC_NAND",
+    "HMC_OR",
+    "HMC_XOR",
+    ""          //last element must be empty
+};
 
 #endif
