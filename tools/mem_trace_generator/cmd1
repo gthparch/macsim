@@ -1,0 +1,6 @@
+#!/bin/bash
+for EXPTYPE in `seq 0 6`;
+do 
+  echo "./hmcsim_trace_conv.py physrand.out.$EXPTYPE "
+  ./hmcsim_trace_conv.py physrand.out.$EXPTYPE 
+done 

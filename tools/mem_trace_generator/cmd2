@@ -1,0 +1,12 @@
+#!/bin/bash
+for EXPTYPE in `seq 0 6`;
+do 
+  echo "rm hmc_dram.trace"
+  echo "ln -s dram_physrand.out.$EXPTYPE hmc_dram.trace"
+  echo "./mem_trace"
+  echo "mv coh_trace.1_0.raw dram_physrand_$EXPTYPE.1_0.raw" 
+  rm hmc_dram.trace
+  ln -s dram_physrand.out.$EXPTYPE hmc_dram.trace
+  ./mem_trace  2 > /dev/null
+  mv coh_trace.1_0.raw dram_physrand_$EXPTYPE.1_0.raw 
+done 
