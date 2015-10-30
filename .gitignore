@@ -13,3 +13,5 @@ tools/mem_trace_generator/*.raw
 tools/mem_trace_generator/mem_trace
 bin/
 .dbg_build/
+*.lo
+*.la
