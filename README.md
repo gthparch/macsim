@@ -7,7 +7,7 @@
 ## Introduction
 
 * MacSim is a heterogeneous architecture timing model simulator that is developed from Georgia Institute of Technology.
-* It simulates x86 and NVIDDIA PTX instructions and it is a trace driven cycle level simulator. It models detailed mico-architectural behaviors, including pipeline stages, multi-threading, and memory systems.
+* It simulates x86 and NVIDIA PTX instructions and it is a trace driven cycle level simulator. It models detailed mico-architectural behaviors, including pipeline stages, multi-threading, and memory systems.
 * MacSim is capable of simulating a variety of architectures, such as Intel's Sandy Bridge and NVIDIA's Fermi. It can simulate homogeneous ISA multicore simulations as well as heterogeneous ISA multicore simulations. It also supports asymmetric multicore configurations (small cores + medium cores + big cores) and SMT or MT architectures as well.
 * Currently interconnection network model (based on IRIS) and power model (based on McPAT) are connected.
 * ARM ISA support is on-progress.
