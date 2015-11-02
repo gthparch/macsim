@@ -18,6 +18,7 @@
 #include "src/global_defs.h"
 #include "src/uop.h"
 #include "src/frontend.h"
+#include "src/all_knobs.h"
 
 #include "macsimEvent.h"
 #include "macsimComponent.h"
@@ -351,9 +352,11 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
 void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
 {
   bool doWrite = isStore((Mem_Type)type);
+  unsigned flag = 0;
+  if ( (hmc_type & 0b10000000) != 0)  
+    flag = SimpleMem::Request::F_NONCACHEABLE;
   SimpleMem::Request *req = 
-    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, 
-            (hmc_type==0)?0:SimpleMem::Request::F_NONCACHEABLE,hmc_type);
+    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
   m_dcache_links[core_id]->sendRequest(req);
   m_dcache_request_counters[core_id]++;
   m_dcache_requests[core_id].insert(make_pair(req->id, key));

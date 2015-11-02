@@ -762,9 +762,13 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
     //core_c *core = m_simBase->m_core_pointers[m_core_id];
-#ifdef USE_VAULTSIM_HMC    
+#ifdef USE_VAULTSIM_HMC   
+    uint8_t hmc_type = uop->m_hmc_inst;
+    // mark highest bit if enabled cache bypass
+    if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
+        hmc_type = hmc_type | 0b10000000; 
     (*(m_simBase->sendDataReq))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, 
-                                uop->m_mem_type,(uint8_t)uop->m_hmc_inst);
+                                uop->m_mem_type,hmc_type);
 #else
     (*(m_simBase->sendDataReq))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, 
                                 uop->m_mem_type);
