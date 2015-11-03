@@ -353,8 +353,11 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
-  if ( (hmc_type & 0b10000000) != 0)  
+  if ( (hmc_type & 0b10000000) != 0) 
+  { 
     flag = SimpleMem::Request::F_NONCACHEABLE;
+    hmc_type = hmc_type & 0b01111111;
+  }
   SimpleMem::Request *req = 
     new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
   m_dcache_links[core_id]->sendRequest(req);
