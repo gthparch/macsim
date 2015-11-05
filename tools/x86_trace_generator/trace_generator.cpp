@@ -1328,10 +1328,9 @@ VOID Image(IMG img, VOID *v)
     if (!Knob_enable_hmc.Value()) return;
 
     RTN hmc_rtn;
-    unsigned i=0;
-    while (!HMC_Type_str[i].empty())
+    for (unsigned i=1;i<(unsigned)NUM_HMC_TYPES;i++)
     {
-        string name = HMC_Type_str[i]; i++;
+        string name = hmc_type_c::HMC_Type2String((HMC_Type)i);
         hmc_rtn = RTN_FindByName(img, name.c_str());
         if (RTN_Valid(hmc_rtn))
         {
