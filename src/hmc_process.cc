@@ -37,9 +37,6 @@
   }
 
 
-
-
-
 // get HMC instruction information
 void hmc_function_c::hmc_info_read(string file_name_base,
                                    map<uint64_t, hmc_inst_s> & m_hmc_info)
@@ -100,31 +97,7 @@ HMC_Type hmc_function_c::generate_hmc_inst(const hmc_inst_s & inst_info,
     ret_trace_info.m_branch_target = 0;
     ret_trace_info.m_write_flg = false;
 
-    if (inst_info.name == "HMC_CAS_equal_16B")
-    {
-        return HMC_CAS_equal_16B;
-    }
-    else if (inst_info.name == "HMC_CAS_zero_16B")
-    {
-        return HMC_CAS_zero_16B;
-    }
-    else if (inst_info.name == "HMC_CAS_greater_16B")
-    {
-        return HMC_CAS_greater_16B;
-    }
-    else if (inst_info.name == "HMC_CAS_less_16B")
-    {
-        return HMC_CAS_less_16B;
-    }
-    else if (inst_info.name == "HMC_ADD_16B")
-    {
-        return HMC_ADD_16B;
-    }
-    else
-    {
-        return HMC_NONE;
-    }
-    return HMC_NONE;
+    return hmc_type_c::HMC_String2Type(inst_info.name);
 }
 
 bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
@@ -214,6 +187,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                     thread_trace_info->has_cached_inst = true;
 
                     STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
+                    STAT_EVENT(HMC_INST_COUNT_TOT);
+                    HMC_EVENT_COUNT(core_id, ret);
                 }
             }
             else

@@ -15,3 +15,8 @@ bin/
 .dbg_build/
 *.lo
 *.la
+*.deps/
+*.libs/
+Makefile
+Makefile.in
+*.dirstamp
