@@ -1284,7 +1284,7 @@ string HMC_Inst[]=
 */
 
 
-VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
+VOID RtnHMC(ADDRINT hmctype, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
 {
     THREADID tid = threadMap[PIN_ThreadId()];
     ADDRINT pc = last_call_pc;
@@ -1295,7 +1295,7 @@ VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
         return;
 
     hmc_info_t tmp;
-    tmp.name = name;
+    tmp.name = hmc_type_c::HMC_Type2String((HMC_Type)hmctype);
     tmp.caller_pc = pc;
     tmp.func_pc = func;
     tmp.ret_pc = ret;
@@ -1307,6 +1307,8 @@ VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
 }
 VOID Image(IMG img, VOID *v)
 {
+    THREADID tid = threadMap[PIN_ThreadId()];
+
     RTN rtn = RTN_FindByName(img, "SIM_BEGIN");
     if (RTN_Valid(rtn))
     {
@@ -1327,6 +1329,7 @@ VOID Image(IMG img, VOID *v)
     // HMC atomic functions
     if (!Knob_enable_hmc.Value()) return;
 
+    if (tid != 0) return;
     RTN hmc_rtn;
     for (unsigned i=1;i<(unsigned)NUM_HMC_TYPES;i++)
     {
@@ -1336,7 +1339,7 @@ VOID Image(IMG img, VOID *v)
         {
             RTN_Open(hmc_rtn);
             RTN_InsertCall(hmc_rtn, IPOINT_BEFORE, (AFUNPTR)RtnHMC,
-                    IARG_ADDRINT, name.c_str(),
+                    IARG_ADDRINT, (size_t)i,
                     IARG_ADDRINT, RTN_Funptr(hmc_rtn),
                     IARG_RETURN_IP, 
                     IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
