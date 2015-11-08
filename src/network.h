@@ -172,7 +172,7 @@ class router_c
     virtual void reset(void);
     virtual int* get_num_packet_inserted(void);
 
-    void set_router_map(vector<router_c*>& router_map);
+    void set_router_map(deque<router_c*>& router_map);
     void insert_packet(mem_req_s* req);
     
     /**
@@ -294,7 +294,7 @@ class router_c
     // credit-based flow control
     list<credit_c*>* m_pending_credit; /**< pending credit to model latency */
 
-    vector<router_c*> m_router_map; /**< link to other routers */
+    deque<router_c*> m_router_map; /**< link to other routers */
 
     // clock
     Counter m_cycle; /**< router clock */
@@ -349,7 +349,7 @@ class network_c
     pool_c<flit_c>* m_flit_pool; /**< flit data structure pool */
     pool_c<credit_c>* m_credit_pool; /**< credit pool */
     
-    vector<router_c*> m_router; /**< all routers */
+    deque<router_c*> m_router; /**< all routers */
     unordered_map<int, int> m_router_map;
 
     Counter m_cycle; /**< clock cycle */
