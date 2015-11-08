@@ -208,9 +208,13 @@ void frontend_c::run_a_cycle(void)
   // fetch every KNOB_FETCH_RATIO cycle
   // CPU : every cycle
   // NVIDIA G80 : 1/4 cycles, NVIDIA Fermi: 1/2 cycles
-  m_fetch_modulo = (m_fetch_modulo + 1) % m_fetch_ratio;
-  if (m_fetch_modulo) 
-    return;
+  if (m_fetch_ratio != 1) {
+    m_fetch_modulo++;
+    if (m_fetch_modulo == m_fetch_ratio)
+      m_fetch_modulo = 0;
+    else
+      return;
+  }
 
   // NVIDIA architecture now support dual warp schedulers
   // In every cycle, 2 instructions will be fetched from N different threads
