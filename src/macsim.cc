@@ -893,6 +893,7 @@ int macsim_c::run_a_cycle()
     m_dyfr->update();
   }
 
+#ifndef USING_SST
   // interconnection
   if (m_clock_internal == m_domain_next[CLOCK_NOC]) {
 #ifdef IRIS
@@ -917,7 +918,7 @@ int macsim_c::run_a_cycle()
     }
     GET_NEXT_CYCLE(CLOCK_MC);
   }
-
+#endif /* USING_SST */
 
   // core execution loop
   for (int kk = 0; kk < m_num_sim_cores; ++kk) {
@@ -956,7 +957,11 @@ int macsim_c::run_a_cycle()
     // active core : running a cycle and update stats
     if (!m_sim_end[ii])  {
       // run a cycle
+
+#ifndef USING_SST
       m_memory->run_a_cycle_core(ii, pll_locked);
+#endif
+
       core->run_a_cycle(pll_locked);
 
       m_num_running_core++;
