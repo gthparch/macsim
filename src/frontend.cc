@@ -330,7 +330,7 @@ void frontend_c::run_a_cycle(void)
 
           if (m_core->get_trace_info(tid)->m_block_id == block_id) {
             frontend_s* fetch_data = m_core->get_trace_info(tid)->m_fetch_data;
-            if (!fetch_data->m_fetch_blocked) {
+            if (unlikely(!fetch_data->m_fetch_blocked)) {
               printf("[FE] fetch not blocked!!! %d %d\n", m_core_id, tid);
             }
 
@@ -820,11 +820,15 @@ int frontend_c::fetch_rr(void)
 
   while (m_fetching_thread_num && try_again && try_again <= max_try) {
     // find next thread id to fetch
-    fetch_id = m_fetch_arbiter % m_unique_scheduled_thread_num;
+    fetch_id = m_fetch_arbiter;
+    if (fetch_id >= m_unique_scheduled_thread_num)
+      fetch_id %= m_unique_scheduled_thread_num;
 
     // update arbiter for next fetching
     if (likely(!m_last_fetch_tid_failed)) {
-      m_fetch_arbiter = (m_fetch_arbiter + 1) % m_unique_scheduled_thread_num;
+      m_fetch_arbiter++;
+      if (likely(m_fetch_arbiter == m_unique_scheduled_thread_num))
+        m_fetch_arbiter = 0;
     } else {
       m_last_fetch_tid_failed = false;
     }
@@ -843,7 +847,7 @@ int frontend_c::fetch_rr(void)
 
     // fetch blocked, try next thread
     frontend_s* fetch_data = m_core->get_trace_info(fetch_id)->m_fetch_data;
-    if (fetch_data!= NULL && fetch_data->m_fetch_blocked) {
+    if (unlikely(fetch_data != NULL && fetch_data->m_fetch_blocked)) {
       DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d fetch_blocked\n", m_core_id, fetch_id);
       ++try_again;
       continue;
