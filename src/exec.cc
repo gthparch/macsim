@@ -671,8 +671,6 @@ void exec_c::update_memory_stats(uop_c* uop)
 // For now, reset bank busy mask
 void exec_c::run_a_cycle(void)
 {
-  fill_n(m_bank_busy, 129, false);
-
 #ifdef USING_SST
   // Strobing
   if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
@@ -717,7 +715,9 @@ void exec_c::run_a_cycle(void)
       }
     }
   }
-#endif //USING_SST
+#else //USING_SST
+  fill_n(m_bank_busy, 129, false);
+#endif
 }
 
 void exec_c::insert_fence_pref(uop_c *uop)
@@ -726,9 +726,14 @@ void exec_c::insert_fence_pref(uop_c *uop)
   Addr dummy_line_addr;
 
   pref_req_info_s info;
+  bool dc_hit;
 
-  bool dc_hit = (dcache_data_s*)m_simBase->m_memory->access_cache(m_core_id,
+#ifndef USING_SST
+  dc_hit = (dcache_data_s*)m_simBase->m_memory->access_cache(m_core_id,
                                            req_addr, &dummy_line_addr, false, 0);
+#else
+  dc_hit = access_memhierarchy_cache(uop);
+#endif
 
   if (!dc_hit) {
     bool result  = m_simBase->m_memory->new_mem_req(MRT_DPRF, req_addr, 64, false,
