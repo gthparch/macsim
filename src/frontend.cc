@@ -823,7 +823,7 @@ int frontend_c::fetch_rr(void)
     fetch_id = m_fetch_arbiter % m_unique_scheduled_thread_num;
 
     // update arbiter for next fetching
-    if (!m_last_fetch_tid_failed) {
+    if (likely(!m_last_fetch_tid_failed)) {
       m_fetch_arbiter = (m_fetch_arbiter + 1) % m_unique_scheduled_thread_num;
     } else {
       m_last_fetch_tid_failed = false;
@@ -836,7 +836,7 @@ int frontend_c::fetch_rr(void)
 
     // already terminated or fetch not ready
     if (m_core->m_fetch_ended[fetch_id] || m_core->m_thread_reach_end[fetch_id] || 
-        (*m_simBase->m_knobs->KNOB_NO_FETCH_ON_ICACHE_MISS && !check_fetch_ready(fetch_id))) {
+        (KNOB(KNOB_NO_FETCH_ON_ICACHE_MISS)->getValue() && !check_fetch_ready(fetch_id))) {
       ++try_again;
       continue;
     }
