@@ -216,23 +216,23 @@ typedef struct mt_scheduler_s {
 typedef struct frontend_s {
   FRONTEND_MODE      m_fe_mode; /**< current frontend mode for thread */ 
   FRONTEND_MODE      m_fe_prev_mode; /**< previous frontend mode for thread */
-  bool               m_fetch_blocked; /**< fetch blocked */
   int                m_next_bid; /**< next block id */
   int                m_next_rowid; /**< next dram row id */
   uint64_t           m_sync_wait_start; /**< sync wait start */
   uint64_t           m_sync_wait_count; /**< sync wait count */
   uint32_t           m_sync_count; /**< sync count */
   uint32_t           m_extra_fetch; /**< extra fetch */
-  bool               m_first_time; /**< first time to be called */
   int                m_MT_load_waiting; /**< MT waiting for the load */
+  bool               m_fetch_blocked; /**< fetch blocked */
+  bool               m_first_time; /**< first time to be called */
   bool               m_MT_br_waiting; /**< MT waiting for the branch */
   Addr               m_fetch_ready_addr; /**< fetch address waiting for begin serviced */
-  reconv_data_s      m_reconv_data; /**< GPU : reconvergence data */
-  mt_scheduler_s     m_MT_scheduler; /**< MT scheduler */ 
   uop_c*             m_prev_uop; /**< previous uop */
+  mt_scheduler_s     m_MT_scheduler; /**< MT scheduler */ 
   Counter            m_prev_uop_num; /**< previous uop number */
   Counter            m_prev_uop_thread_num; /**< previous thread id of the uop */
   map<Counter, bool> m_load_waiting; /**< uop is waiting a load begin serviced */
+  reconv_data_s      m_reconv_data; /**< GPU : reconvergence data */
 
   /**
    * Initialize
@@ -430,8 +430,6 @@ class frontend_c
   protected:
     FRONTEND_INTERFACE_DECL(); /**< declaration macro */
 
-    bool          m_fe_stall; /**< frontend stalled */
-    bool          m_fe_running; /**< enabled frontend */
     Counter       m_cur_core_cycle; /**< current core cycle */
     int           m_fetch_modulo; /**< fetch modulo */
     list<int32_t> m_sync_done; /**< synchronization information */
@@ -439,9 +437,12 @@ class frontend_c
     uns16         m_knob_width; /**< width */
     uns16         m_knob_fetch_width; /**< fetch width */
     uns           m_knob_icache_line_size; /**< icache line size */
+    bool          m_fe_stall; /**< frontend stalled */
+    bool          m_fe_running; /**< enabled frontend */
     bool          m_knob_ptx_sim; /**< GPU simulation */
-    core_c*       m_core; /**< core pointer */
     bool          m_ready_thread_available; /**< ready thread available */
+    bool          m_last_fetch_tid_failed;
+    core_c*       m_core; /**< core pointer */
     int           m_mem_access_thread_num; /**< number of threads that access memory */
     int           m_fetch_ratio; /**< how often fetch an instruction (GPU only) */
 
@@ -451,7 +452,6 @@ class frontend_c
     
     int (frontend_c::*MT_fetch_scheduler)(void); /**< current fetch scheduler */
 
-    bool          m_last_fetch_tid_failed;
     
     // FIXME : implement itlb
     // tlb_c            *m_itlb;
