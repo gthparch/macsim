@@ -19,6 +19,7 @@ gpf:
 	perl knobgen.pl
 	perl statgen.pl
 
+distclean:
 clean:
 	rm -rf ../src/*.param.h ../src/*.stat.h ../src/all_knobs.* ../src/all_stats.* ../src/statsEnums.h
 
