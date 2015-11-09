@@ -110,9 +110,9 @@ class AbstractStat
      */
     AbstractStat(const string& str, const string& outputfilename, long ID, 
         bool corewide = false, bool isTemplate = true):
-      m_name(str), m_count(0), m_total_count(0), m_pRatioStat(NULL), 
-      m_fileName(outputfilename), m_ID(ID), m_bCoreWide(corewide), m_coreID(0),
-      m_isTemplate(isTemplate), m_suffix("") {}
+      m_pRatioStat(NULL), m_count(0), m_total_count(0), m_ID(ID),
+      m_coreID(0), m_name(str), m_fileName(outputfilename), m_suffix(""),
+      m_bCoreWide(corewide), m_isTemplate(isTemplate) {}
 
     /**
      * Destructor.
@@ -226,16 +226,16 @@ class AbstractStat
     }
 
   protected:
-    string m_name; /**< name of stat */
+    AbstractStat* m_pRatioStat; /**< stat that to use in the ratio */
     unsigned long long m_count; /**< count during the current stat interval */
     unsigned long long m_total_count; /**< total count from beginning of run */
-    AbstractStat* m_pRatioStat; /**< stat that to use in the ratio */
-    string m_fileName; /**< name of file to print stats */
     long m_ID; /**< stat id */
-    bool m_bCoreWide; /**< when set, add suffix to the name of a stat */
     unsigned int m_coreID; /**< core id */
-    bool m_isTemplate; /**< is template */
+    string m_name; /**< name of stat */
+    string m_fileName; /**< name of file to print stats */
     string m_suffix; /**< stat suffix */
+    bool m_bCoreWide; /**< when set, add suffix to the name of a stat */
+    bool m_isTemplate; /**< is template */
 };
 
 
@@ -1027,8 +1027,8 @@ class CoreStatistics
     unsigned int m_coreID; /**< core id */
     vector<AbstractStat*> m_CoreStats; /**< core stats */
     vector<DIST_Stat*> m_distributions; /**< distribution stats */
-    bool m_isTemplate; /**< is template? */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+    bool m_isTemplate; /**< is template? */
 };
 
 

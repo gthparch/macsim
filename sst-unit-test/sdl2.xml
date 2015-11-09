@@ -388,7 +388,7 @@
   <component name="c0.0" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>0</VaultID>
+      <vault.id>0</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_0" port="bus" latency="1 ns" />
@@ -397,7 +397,7 @@
   <component name="c0.1" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>1</VaultID>
+      <vault.id>1</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_1" port="bus" latency="1 ns" />
@@ -406,7 +406,7 @@
   <component name="c0.2" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>2</VaultID>
+      <vault.id>2</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_2" port="bus" latency="1 ns" />
@@ -415,7 +415,7 @@
   <component name="c0.3" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>3</VaultID>
+      <vault.id>3</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_3" port="bus" latency="1 ns" />
@@ -424,7 +424,7 @@
   <component name="c0.4" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>4</VaultID>
+      <vault.id>4</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_4" port="bus" latency="1 ns" />
@@ -433,7 +433,7 @@
   <component name="c0.5" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>5</VaultID>
+      <vault.id>5</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_5" port="bus" latency="1 ns" />
@@ -442,7 +442,7 @@
   <component name="c0.6" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>6</VaultID>
+      <vault.id>6</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_6" port="bus" latency="1 ns" />
@@ -451,7 +451,7 @@
   <component name="c0.7" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <VaultID>7</VaultID>
+      <vault.id>7</vault.id>
       <numVaults2>3</numVaults2>
     </params>
     <link name="ll2V_0_7" port="bus" latency="1 ns" />

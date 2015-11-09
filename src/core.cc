@@ -755,9 +755,7 @@ int core_c::get_appl_id()
 // get the thread trace information
 thread_s* core_c::get_trace_info(int tid)
 {
-  if (m_thread_trace_info.find(tid) == m_thread_trace_info.end())
-    return NULL;
-
+  ASSERT(tid < m_unique_scheduled_thread_num);
   return m_thread_trace_info[tid];
 }
 

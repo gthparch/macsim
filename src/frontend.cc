@@ -208,9 +208,13 @@ void frontend_c::run_a_cycle(void)
   // fetch every KNOB_FETCH_RATIO cycle
   // CPU : every cycle
   // NVIDIA G80 : 1/4 cycles, NVIDIA Fermi: 1/2 cycles
-  m_fetch_modulo = (m_fetch_modulo + 1) % m_fetch_ratio;
-  if (m_fetch_modulo) 
-    return;
+  if (m_fetch_ratio != 1) {
+    m_fetch_modulo++;
+    if (m_fetch_modulo == m_fetch_ratio)
+      m_fetch_modulo = 0;
+    else
+      return;
+  }
 
   // NVIDIA architecture now support dual warp schedulers
   // In every cycle, 2 instructions will be fetched from N different threads
@@ -330,7 +334,7 @@ void frontend_c::run_a_cycle(void)
 
           if (m_core->get_trace_info(tid)->m_block_id == block_id) {
             frontend_s* fetch_data = m_core->get_trace_info(tid)->m_fetch_data;
-            if (!fetch_data->m_fetch_blocked) {
+            if (unlikely(!fetch_data->m_fetch_blocked)) {
               printf("[FE] fetch not blocked!!! %d %d\n", m_core_id, tid);
             }
 
@@ -820,11 +824,15 @@ int frontend_c::fetch_rr(void)
 
   while (m_fetching_thread_num && try_again && try_again <= max_try) {
     // find next thread id to fetch
-    fetch_id = m_fetch_arbiter % m_unique_scheduled_thread_num;
+    fetch_id = m_fetch_arbiter;
+    if (fetch_id >= m_unique_scheduled_thread_num)
+      fetch_id %= m_unique_scheduled_thread_num;
 
     // update arbiter for next fetching
-    if (!m_last_fetch_tid_failed) {
-      m_fetch_arbiter = (m_fetch_arbiter + 1) % m_unique_scheduled_thread_num;
+    if (likely(!m_last_fetch_tid_failed)) {
+      m_fetch_arbiter++;
+      if (likely(m_fetch_arbiter == m_unique_scheduled_thread_num))
+        m_fetch_arbiter = 0;
     } else {
       m_last_fetch_tid_failed = false;
     }
@@ -836,14 +844,14 @@ int frontend_c::fetch_rr(void)
 
     // already terminated or fetch not ready
     if (m_core->m_fetch_ended[fetch_id] || m_core->m_thread_reach_end[fetch_id] || 
-        (*m_simBase->m_knobs->KNOB_NO_FETCH_ON_ICACHE_MISS && !check_fetch_ready(fetch_id))) {
+        (KNOB(KNOB_NO_FETCH_ON_ICACHE_MISS)->getValue() && !check_fetch_ready(fetch_id))) {
       ++try_again;
       continue;
     }
 
     // fetch blocked, try next thread
     frontend_s* fetch_data = m_core->get_trace_info(fetch_id)->m_fetch_data;
-    if (fetch_data!= NULL && fetch_data->m_fetch_blocked) {
+    if (unlikely(fetch_data != NULL && fetch_data->m_fetch_blocked)) {
       DEBUG_CORE(m_core_id, "m_core_id:%d tid:%d fetch_blocked\n", m_core_id, fetch_id);
       ++try_again;
       continue;

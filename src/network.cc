@@ -827,7 +827,7 @@ router_c* router_c::get_router(int dir)
   return m_link[dir];
 }
 
-void router_c::set_router_map(vector<router_c*>& router_map)
+void router_c::set_router_map(deque<router_c*>& router_map)
 {
   m_router_map = router_map;
 }
