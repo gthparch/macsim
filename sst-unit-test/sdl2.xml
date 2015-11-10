@@ -373,6 +373,7 @@
       <LL_MASK>0</LL_MASK>
       <terminal>1</terminal>
       <debug>0</debug>
+      <debug_level>0</debug_level>
     </params>
       <link name="ll2V_0_0" port="bus_0" latency="1 ns" />
       <link name="ll2V_0_1" port="bus_1" latency="1 ns" />
@@ -388,8 +389,16 @@
   <component name="c0.0" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>0</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>0</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_0" port="bus" latency="1 ns" />
   </component>
@@ -397,8 +406,16 @@
   <component name="c0.1" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>1</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>1</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_1" port="bus" latency="1 ns" />
   </component>
@@ -406,8 +423,16 @@
   <component name="c0.2" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>2</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>2</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_2" port="bus" latency="1 ns" />
   </component>
@@ -415,8 +440,16 @@
   <component name="c0.3" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>3</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>3</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_3" port="bus" latency="1 ns" />
   </component>
@@ -424,8 +457,16 @@
   <component name="c0.4" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>4</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>4</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_4" port="bus" latency="1 ns" />
   </component>
@@ -433,8 +474,16 @@
   <component name="c0.5" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>5</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>5</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_5" port="bus" latency="1 ns" />
   </component>
@@ -442,8 +491,16 @@
   <component name="c0.6" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>6</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>6</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_6" port="bus" latency="1 ns" />
   </component>
@@ -451,8 +508,16 @@
   <component name="c0.7" type=VaultSimC.VaultSimC rank=0>
     <params>
       <clock>750Mhz</clock>
-      <vault.id>7</vault.id>
+      <debug>0</debug>
+      <debug_level>0</debug_level>
       <numVaults2>3</numVaults2>
+      <vault.id>7</vault.id>
+      <vault.debug>0</vault.debug>
+      <vault.debug_level>0</vault.debug_level>
+      <vault.pwd> /home/common/DRAMSim2 </vault.pwd>>
+      <vault.device_ini> ini/DDR3_micron_8M_2B_x8_sg08.ini </vault.device_ini>
+      <vault.system_ini> system.ini.example </vault.system_ini>
+      <vault.mem_size> 32 </vault.mem_size>
     </params>
     <link name="ll2V_0_7" port="bus" latency="1 ns" />
   </component>
