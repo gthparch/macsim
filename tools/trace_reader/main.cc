@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 all_knobs_c* g_knobs;
 
-int read_trace(string trace_path)
+int read_trace(string trace_path, int truncate_size)
 {
   string base_filename = trace_path.substr(0, trace_path.find_last_of("."));
   ifstream trace_file(trace_path.c_str());
@@ -75,14 +75,20 @@ int read_trace(string trace_path)
     // set up thread trace file name
     trace_file >> tid >> start_inst_count;
     stringstream sstr;
+    stringstream wsstr;
     sstr << base_filename << "_" << tid << ".raw";
-
+    wsstr << base_filename << "w" << "_" << tid << ".raw";
     string thread_filename;
     sstr >> thread_filename;
+    
+    string wthread_filename;
+    wsstr >> wthread_filename;
 
     cout << "thread_filename: " << thread_filename.c_str() << endl; 
+    cout << "thread_write_filename: " << wthread_filename.c_str() << endl; 
     // open thread trace file
     gzFile gztrace = gzopen(thread_filename.c_str(), "r");
+    gzFile gzwtrace = gzopen(wthread_filename.c_str(), "w");
 
     const int trace_buffer_size = 100000;
     char trace_buffer[trace_buffer_size * TRACE_SIZE];
@@ -90,6 +96,7 @@ int read_trace(string trace_path)
     trace_reader_c::Singleton.reset();
     while (1) {
       int byte_read = gzread(gztrace, trace_buffer, trace_buffer_size * TRACE_SIZE);
+
       byte_read /= TRACE_SIZE;
       inst_count += byte_read;
 
@@ -100,13 +107,19 @@ int read_trace(string trace_path)
 
         if (trace_info.m_has_st == true)
           ++store_count;
+
+	
       } 
+
+      if (((inst_count - byte_read) < truncate_size) || (truncate_size == 0))  
+        gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
       
       if (byte_read != trace_buffer_size) {
         break;
       }
     } 
     gzclose(gztrace);
+    gzclose(gzwtrace);
   }
   cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << " store_count:" << store_count << "\n";
 
@@ -127,6 +140,7 @@ int main(int argc, char* argv[])
   knob_container->applyParamFile("params.in");
   char* pInvalidArgument = NULL;
   knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
+  int truncate_size = 0; 
 
   register_trace_reader();
 
@@ -135,8 +149,11 @@ int main(int argc, char* argv[])
     exit(0);
   }
 
+  if (argc  == 3) { 
+    truncate_size = atoi(argv[2]); 
+  }
   string trace_path(argv[1]);
-  cout << "> trace_path: " << trace_path << "\n";
+  cout << "> trace_path: " << trace_path << " trunkcate_size: " << truncate_size << "\n";
 
   string base_filename = trace_path.substr(0, trace_path.find_last_of("."));
   ifstream trace_file(trace_path.c_str());
@@ -161,8 +178,8 @@ int main(int argc, char* argv[])
   }
   else {
   */
+    inst_count += read_trace(trace_path, truncate_size);
     trace_file.close();
-    inst_count += read_trace(trace_path);
   // }
 
 
