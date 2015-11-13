@@ -28,7 +28,8 @@ warn_flags = ' '.join(warn_flags)
 
 env = Environment()
 env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s -DNO_DEBUG' % (warn_flags, header_dirs)
-env['LINKFLAGS'] = '-lz'
+env['LIBS'] = 'z'
+
 
 
 #########################################################################################
@@ -57,7 +58,5 @@ env.Program(
     'trace_reader',
     reader_srcs,
 #    LIBS=[static_libcpp],
-    LIBPATH=['.', '/usr/lib', '/usr/local/lib']
+    LIBPATH=['.', '/usr/lib', '/usr/local/lib'] 
 )
-
-
