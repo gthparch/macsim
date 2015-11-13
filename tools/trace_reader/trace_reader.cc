@@ -67,7 +67,7 @@ trace_reader_c::~trace_reader_c()
   m_tracer.clear();
 }
 
-void trace_reader_c::inst_event(trace_info_s* inst)
+void trace_reader_c::inst_event(trace_info_cpu_s* inst)
 {
   for (int ii = 0; ii < m_tracer.size(); ++ii) {
     m_tracer[ii]->inst_event(inst);
@@ -95,7 +95,7 @@ reuse_distance_c::~reuse_distance_c()
 }
 
 
-void reuse_distance_c::inst_event(trace_info_s* inst)
+void reuse_distance_c::inst_event(trace_info_cpu_s* inst)
 {
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
     ++m_self_counter;
@@ -156,7 +156,7 @@ static_pc_c::~static_pc_c()
   m_static_mem_pc.clear();
 }
 
-void static_pc_c::inst_event(trace_info_s* inst)
+void static_pc_c::inst_event(trace_info_cpu_s* inst)
 {
   m_static_pc[inst->m_instruction_addr] = true;
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {

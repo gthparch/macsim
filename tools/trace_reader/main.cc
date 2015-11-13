@@ -45,10 +45,12 @@ int read_trace(string trace_path)
   string base_filename = trace_path.substr(0, trace_path.find_last_of("."));
   ifstream trace_file(trace_path.c_str());
 
+  /*
   if (trace_file.fail()) {
     cout << "> error: trace file does not exist!\n";
     exit(0);
   }
+  */
 
   int num_thread;
   string type;
@@ -57,10 +59,13 @@ int read_trace(string trace_path)
   int store_count = 0;
 
   // read number of threads and type of trace
-  trace_file >> num_thread >> type;
+// trace_file >> num_thread >> type;
+  trace_file >> type>> num_thread ;
   if (type == "newptx") {
     trace_file >> max_block_per_core;
+    cout <<" currently the code only supports x86!! \n"; 
   }
+
 
   // open each thread trace file
   for (int ii = 0; ii < num_thread; ++ii) {
@@ -75,6 +80,7 @@ int read_trace(string trace_path)
     string thread_filename;
     sstr >> thread_filename;
 
+    cout << "thread_filename: " << thread_filename.c_str() << endl; 
     // open thread trace file
     gzFile gztrace = gzopen(thread_filename.c_str(), "r");
 
@@ -88,7 +94,7 @@ int read_trace(string trace_path)
       inst_count += byte_read;
 
       for (int jj = 0; jj < byte_read; ++jj) {
-        trace_info_s trace_info;
+        trace_info_cpu_s trace_info;
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
         trace_reader_c::Singleton.inst_event(&trace_info);
 
@@ -148,15 +154,16 @@ int main(int argc, char* argv[])
   trace_file >> num_thread >> type;
 
   int64_t inst_count = 0;
-  if (type == "newptx") {
+  /* if (type == "newptx") {
     while (trace_file >> trace_path) {
       inst_count += read_trace(trace_path);
     }
   }
   else {
+  */
     trace_file.close();
     inst_count += read_trace(trace_path);
-  }
+  // }
 
 
   cout << "> Total instruction count: " << inst_count << "\n";
