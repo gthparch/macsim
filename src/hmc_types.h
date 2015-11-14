@@ -23,7 +23,8 @@ typedef enum HMC_Type_enum
     HMC_COMP_greater=15,
     HMC_COMP_less=16,
     HMC_COMP_equal=17,
-    NUM_HMC_TYPES=18
+    HMC_CANDIDATE=18,
+    NUM_HMC_TYPES=19
 } HMC_Type;
 
 
@@ -52,6 +53,7 @@ class hmc_type_c
             case HMC_COMP_greater:  return std::string("HMC_COMP_greater");
             case HMC_COMP_less:     return std::string("HMC_COMP_less");
             case HMC_COMP_equal:    return std::string("HMC_COMP_equal");
+            case HMC_CANDIDATE:     return std::string("HMC_CANDIDATE");
             case NUM_HMC_TYPES:
             default: return std::string("");
         }
@@ -75,6 +77,7 @@ class hmc_type_c
         else if (name=="HMC_COMP_greater") return HMC_COMP_greater;
         else if (name=="HMC_COMP_less")    return HMC_COMP_less;
         else if (name=="HMC_COMP_equal")   return HMC_COMP_equal;
+        else if (name=="HMC_CANDIDATE")    return HMC_CANDIDATE;
         else return HMC_NONE;
     }
 
