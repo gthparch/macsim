@@ -472,7 +472,7 @@ void process_manager_c::setup_process(process_s* process)
   process->m_current_file_name_base = trace_info_file_name.substr(0, dot_location);
 
   // get hmc info if hmc inst is enabled
-  if (*KNOB(KNOB_ENABLE_HMC_INST))
+  if (*KNOB(KNOB_ENABLE_HMC_INST) || *KNOB(KNOB_ENABLE_NONHMC_STAT))
       hmc_function_c::hmc_info_read(process->m_current_file_name_base, process->m_hmc_info);
   
   // open TRACE_CONFIG file
@@ -826,6 +826,9 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
 
   // changed by Lifeng
   trace_info->has_cached_inst = false;
+  trace_info->m_inside_hmc_func = false;
+  trace_info->m_prev_hmc_type = HMC_NONE;
+  trace_info->m_next_hmc_type = HMC_NONE;
   return trace_info;
 }
 

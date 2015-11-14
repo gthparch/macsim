@@ -228,6 +228,8 @@ typedef struct thread_s {
   bool              has_cached_inst;  /**< flag: indicate if cached inst exists */
   HMC_Type          m_prev_hmc_type;  /**< hmc type of prev inst */
   HMC_Type          m_next_hmc_type;  /**< hmc type of next inst */
+  bool              m_inside_hmc_func;
+  uint64_t          m_next_hmc_func_ret;
 } thread_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
