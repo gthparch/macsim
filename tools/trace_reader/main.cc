@@ -72,6 +72,8 @@ int read_trace(string trace_path, int truncate_size)
     int tid;
     int start_inst_count;
 
+    inst_count = 0; //reset inst count for each thread
+
     // set up thread trace file name
     trace_file >> tid >> start_inst_count;
     stringstream sstr;

@@ -100,6 +100,7 @@ HMC_Type hmc_function_c::generate_hmc_inst(const hmc_inst_s & inst_info,
     return hmc_type_c::HMC_String2Type(inst_info.name);
 }
 
+
 bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
     void * ptr,
     int core_id,
@@ -178,7 +179,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                     ASSERT(read_success); // should not reach trace end before hmc func ret
 
                     HMC_Type ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
-                    ASSERT(ret != HMC_NONE); // fail if cannot find hmc inst info
+                    ASSERTM(ret != HMC_NONE," hmc_inst: %s hmc_enum: %d\n",hmc_inst.name.c_str(),(unsigned)ret); // fail if cannot find hmc inst info
                     memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
                     thread_trace_info->m_next_hmc_type = ret;
 
