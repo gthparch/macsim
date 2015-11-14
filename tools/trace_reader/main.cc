@@ -56,14 +56,27 @@ int read_trace(string trace_path, int truncate_size)
   string type;
   int max_block_per_core;
   int inst_count = 0;
-  int store_count = 0;
+  int load_count = 0;
 
   // read number of threads and type of trace
 // trace_file >> num_thread >> type;
   trace_file >> type>> num_thread ;
   if (type == "newptx") {
     trace_file >> max_block_per_core;
-    cout <<" currently the code only supports x86!! \n"; 
+#ifndef GPU_TRACE
+    assert(0);
+#endif 
+  }
+  else if (type == "x86")  { 
+#ifndef X86_TRACE
+    assert(0);
+#endif 
+  }
+  else if (type == "a64") { 
+#ifndef ARM64_TRACE
+    assert(0);
+#endif 
+ 
   }
 
 
@@ -71,13 +84,17 @@ int read_trace(string trace_path, int truncate_size)
   for (int ii = 0; ii < num_thread; ++ii) {
     int tid;
     int start_inst_count;
+    int cur_file_inst_count = 0; 
+    int slice_file_num = 0; 
 
     // set up thread trace file name
     trace_file >> tid >> start_inst_count;
+
     stringstream sstr;
     stringstream wsstr;
+
     sstr << base_filename << "_" << tid << ".raw";
-    wsstr << base_filename << "w" << "_" << tid << ".raw";
+    wsstr << base_filename << "_s" << slice_file_num << "_" << tid << ".raw";
     string thread_filename;
     sstr >> thread_filename;
     
@@ -93,6 +110,8 @@ int read_trace(string trace_path, int truncate_size)
     const int trace_buffer_size = 100000;
     char trace_buffer[trace_buffer_size * TRACE_SIZE];
 
+
+
     trace_reader_c::Singleton.reset();
     while (1) {
       int byte_read = gzread(gztrace, trace_buffer, trace_buffer_size * TRACE_SIZE);
@@ -101,27 +120,63 @@ int read_trace(string trace_path, int truncate_size)
       inst_count += byte_read;
 
       for (int jj = 0; jj < byte_read; ++jj) {
-        trace_info_cpu_s trace_info;
+
+
+#if defined(GPU_TRACE) 
+	trace_info_gpu_small_s trace_info; 
+#elif defined(ARM64_TRACE)  
+	trace_info_a64_s trace_info; 
+#else 
+	trace_info_cpu_s trace_info;
+#endif
+
+
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
         trace_reader_c::Singleton.inst_event(&trace_info);
 
-        if (trace_info.m_has_st == true)
-          ++store_count;
+#if defined (GPU_TRACE) 
+	if (trace_info.m_is_load >=1) 
+#else 
+        if (trace_info.m_num_ld >= 1)
+#endif 
+          ++load_count;
 
 	
       } 
 
-      if (((inst_count - byte_read) < truncate_size) || (truncate_size == 0))  
-        gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
+
+      /* generate multiple files of traces */ 
+      
+      gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
+      cur_file_inst_count  += byte_read; 
+
+      if (truncate_size != 0 ) { 
+	
+	if (cur_file_inst_count >= truncate_size) { 
+	  gzclose(gzwtrace); 
+	  // open a new file for next file 
+	  cur_file_inst_count = 0; 
+	  slice_file_num = slice_file_num + 1; 
+	  stringstream wsstr_;
+	  wsstr_ << base_filename << "_s" << slice_file_num << "_" << tid << ".raw";
+	  string wthread_filename_; 
+	  wsstr_ >> wthread_filename_;
+	  cout << "new thread_write_filename: " << wthread_filename_.c_str() << endl; 
+	  gzwtrace = gzopen(wthread_filename_.c_str(), "w");
+	}
+	
+      }
       
       if (byte_read != trace_buffer_size) {
         break;
-      }
-    } 
+      } 
+    }
+    
     gzclose(gztrace);
     gzclose(gzwtrace);
+
   }
-  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << " store_count:" << store_count << "\n";
+  cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << " load_count:" << load_count << "\n";
 
   return inst_count;
 }

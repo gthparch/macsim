@@ -27,9 +27,11 @@ warn_flags = [
 warn_flags = ' '.join(warn_flags)
 
 env = Environment()
-env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s -DNO_DEBUG' % (warn_flags, header_dirs)
+env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s -DNO_DEBUG -TRACE_FORMAT=1' % (warn_flags, header_dirs)
 env['LIBS'] = 'z'
-
+env['CPPDEFINES'] = 'X86_TRACE'
+#env['CPPDEFINES'] = 'GPU_TRACE'
+#env['CPPDEFINES'] = 'ARM64_TRACE'
 
 
 #########################################################################################

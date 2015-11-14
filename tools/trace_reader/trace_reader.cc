@@ -67,7 +67,14 @@ trace_reader_c::~trace_reader_c()
   m_tracer.clear();
 }
 
+#if defined(GPU_TRACE)
+void trace_reader_c::inst_event(trace_info_gpu_small_s* inst)
+#elif defined(ARM64_TRACE)
+void trace_reader_c::inst_event(trace_info_a64_s* inst)
+#else 
 void trace_reader_c::inst_event(trace_info_cpu_s* inst)
+#endif 
+
 {
   for (int ii = 0; ii < m_tracer.size(); ++ii) {
     m_tracer[ii]->inst_event(inst);
@@ -95,6 +102,57 @@ reuse_distance_c::~reuse_distance_c()
 }
 
 
+#if defined(GPU_TRACE)
+void reuse_distance_c::inst_event(trace_info_gpu_small_s* inst) { 
+ if (inst->m_is_load) {
+    ++m_self_counter;
+    Addr addr;
+    addr = inst->m_mem_addr; 
+    
+    addr = addr >> 6;
+
+    if (m_reuse_map.find(addr) != m_reuse_map.end()) {
+      bool same_pc = false;
+      if (inst->m_inst_addr == m_reuse_pc_map[addr]) same_pc = true;
+      cout << dec << m_self_counter << " dist:" << dec << m_self_counter - m_reuse_map[addr] << " addr:" 
+           << hex << addr << " pc:" << hex << m_reuse_pc_map[addr] << " " << hex << inst->m_inst_addr << "\n";
+    }
+    else {
+      cout << hex << inst->m_inst_addr << "\n";
+    }
+    m_reuse_map[addr] = m_self_counter;
+    m_reuse_pc_map[addr] = inst->m_inst_addr;
+  }
+
+}
+#elif defined(ARM64_TRACE)
+void reuse_distance_c::inst_event(trace_info_a64_s* inst) 
+{
+ if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
+    ++m_self_counter;
+    Addr addr;
+    if (inst->m_has_st) {
+      addr = inst->m_st_vaddr;
+    } else {
+      addr = inst->m_ld_vaddr1;
+    }
+
+    addr = addr >> 6;
+
+    if (m_reuse_map.find(addr) != m_reuse_map.end()) {
+      bool same_pc = false;
+      if (inst->m_instruction_addr == m_reuse_pc_map[addr]) same_pc = true;
+      cout << dec << m_self_counter << " dist:" << dec << m_self_counter - m_reuse_map[addr] << " addr:" 
+           << hex << addr << " pc:" << hex << m_reuse_pc_map[addr] << " " << hex << inst->m_instruction_addr << "\n";
+    }
+    else {
+      cout << hex << inst->m_instruction_addr << "\n";
+    }
+    m_reuse_map[addr] = m_self_counter;
+    m_reuse_pc_map[addr] = inst->m_instruction_addr;
+  }
+}
+#else 
 void reuse_distance_c::inst_event(trace_info_cpu_s* inst)
 {
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
@@ -121,6 +179,7 @@ void reuse_distance_c::inst_event(trace_info_cpu_s* inst)
     m_reuse_pc_map[addr] = inst->m_instruction_addr;
   }
 }
+#endif 
 
 
 void reuse_distance_c::print()
@@ -141,7 +200,7 @@ void reuse_distance_c::reset()
 static_pc_c::static_pc_c() 
 {
   m_total_inst_count = 0;
-  m_total_store_count = 0;
+  m_total_load_count = 0;
 }
 
 static_pc_c::~static_pc_c() 
@@ -150,13 +209,28 @@ static_pc_c::~static_pc_c()
   cout << "Total static memory pc:" << m_static_mem_pc.size() << "\n";
 
   cout << "Total instruction count:" << m_total_inst_count << "\n";
-  cout << "Total store count:" << m_total_store_count << "\n";
+  cout << "Total load count:" << m_total_load_count << "\n";
 
   m_static_pc.clear();
   m_static_mem_pc.clear();
 }
 
-void static_pc_c::inst_event(trace_info_cpu_s* inst)
+
+
+#if defined(GPU_TRACE)
+void static_pc_c::inst_event(trace_info_gpu_small_s* inst)
+{
+  m_static_pc[inst->m_inst_addr] = true;
+  if (inst->m_is_load) { 
+    m_static_mem_pc[inst->m_inst_addr] = true;
+    ++m_total_load_count; 
+  }
+  ++m_total_inst_count;
+}
+
+
+#elif defined(ARM64_TRACE)
+void static_pc_c::inst_event(trace_info_a64_s* inst)
 {
   m_static_pc[inst->m_instruction_addr] = true;
   if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
@@ -165,7 +239,22 @@ void static_pc_c::inst_event(trace_info_cpu_s* inst)
 
 
   ++m_total_inst_count;
-  if (inst->m_has_st == true)
-    ++m_total_store_count;
+  if (inst->m_num_ld == true)
+    ++m_total_load_count;
 }
 
+#else 
+void static_pc_c::inst_event(trace_info_cpu_s* inst)
+{
+
+  m_static_pc[inst->m_instruction_addr] = true;
+  if (static_cast<int>(inst->m_num_ld) > 0 or inst->m_has_st == true) {
+    m_static_mem_pc[inst->m_instruction_addr] = true;
+  }
+
+
+  ++m_total_inst_count;
+  if (inst->m_has_st == true)
+    ++m_total_load_count;
+}
+#endif 
