@@ -172,7 +172,9 @@ bool sim_begin[MAX_THREADS]={false};
 bool sim_end[MAX_THREADS]={false};
 bool thread_flushed[MAX_THREADS]={false};
 Knob(bool, Knob_manual_simpoint, "manual", "0", "start/stop trace generation at manually added SIM_BEGIN()/SIM_END function call");
- 
+
+unsigned sim_end_threads = 0;
+
 // variables for HMC 2.0 atomic instruction simulations
 // should be disabled in normal cases
 typedef struct hmc_info_t
@@ -480,7 +482,19 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
          && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid])
   {
       sim_end[tid]=true;
+      GetLock(&g_lock, tid+1);
+      sim_end_threads++;
+      ReleaseLock(&g_lock);
+      if (!thread_flushed[tid])
+          thread_end();
   }
+  if (sim_end_threads == thread_count)
+  {
+      finish();
+      PIN_RemoveInstrumentation();
+      exit(0);
+  } 
+#if 0
   if (tid==0 && sim_end[tid]==true
           && g_enable_thread_instrument[tid]==true)
   {
@@ -505,7 +519,7 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
   }
   if (sim_end[tid]==true && g_enable_thread_instrument[tid]==false)
   {
-      thread_flushed[tid] = true;
+      //thread_flushed[tid] = true;
       thread_end();
   }
   if (tid==0 && sim_end[tid]==true && thread_flushed[tid]==true)
@@ -521,7 +535,7 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
         exit(0);
       }
   }
-    
+#endif
   GetLock(&g_lock, tid+1);
 
   if (g_inst_count[tid] >= last_count[tid] + 5000000) {
@@ -1014,7 +1028,7 @@ void thread_end(THREADID threadid)
   delete trace_info;
   trace_info_array[threadid] = NULL;
 
-  sim_end[threadid]=true;
+  //sim_end[threadid]=true;
   thread_flushed[threadid]=true;
 }
 
@@ -1268,6 +1282,12 @@ VOID RtnEnd(ADDRINT arg)
 
     cout<<"Thread "<<tid<<" sim end"<<endl;
     sim_end[tid]=true;
+    GetLock(&g_lock, tid+1);
+    sim_end_threads++;
+    ReleaseLock(&g_lock);
+    if (!thread_flushed[tid])
+        thread_end();
+
 }
 
 /* OLD HMC Inst definition
