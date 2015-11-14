@@ -369,7 +369,7 @@
       <clock>500Mhz</clock>
       <vaults>8</vaults>
       <llID>0</llID>
-      <bwlimit>32</bwlimit>
+      <req_LimitPerCycle>32</bwlimit>
       <LL_MASK>0</LL_MASK>
       <terminal>1</terminal>
       <debug>0</debug>

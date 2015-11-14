@@ -28,7 +28,7 @@ def main():
   #print('reference directory: {}'.format(refer_dir))
 
   trace = 'vectoradd'
-  for test in glob.glob('sdl*.xml'):
+  for test in glob.glob('sdl*.py'):
     ## Run trace
     os.system('sst {0} > /dev/null'.format(test))
 
