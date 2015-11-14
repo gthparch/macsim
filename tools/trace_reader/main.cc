@@ -87,6 +87,8 @@ int read_trace(string trace_path, int truncate_size)
     int cur_file_inst_count = 0; 
     int slice_file_num = 0; 
 
+    inst_count = 0; //reset inst count for each thread
+
     // set up thread trace file name
     trace_file >> tid >> start_inst_count;
 

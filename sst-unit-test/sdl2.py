@@ -571,7 +571,7 @@ comp_ll0.addParams({
      "terminal" : "1",
      "llID" : "0",
      "LL_MASK" : "0",
-     "bwlimit" : "32"
+     "req_LimitPerCycle" : "32"
 })
 comp_c0_0 = sst.Component("c0.0", "VaultSimC.VaultSimC")
 comp_c0_0.addParams({
