@@ -36,7 +36,18 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "knob.h"
 #include "trace_read.h"
 #include "trace_reader.h"
-  
+
+#define ASSERTM(cond, args...)                                    \
+do {                                                              \
+  if (!(cond)) {                                                  \
+    fprintf(stderr, "%s:%d: ASSERT FAILED ", __FILE__, __LINE__); \
+    fprintf(stderr, "%s\n", #cond);                               \
+    fprintf(stderr, "%s:%d: ASSERT FAILED ", __FILE__, __LINE__); \
+    fprintf(stderr, ## args);                                     \
+    fprintf(stderr, "\n");                                        \
+    exit(15);                                                     \
+  }                                                               \
+} while (0)
 
 all_knobs_c* g_knobs;
 
@@ -59,26 +70,18 @@ int read_trace(string trace_path, int truncate_size)
   int load_count = 0;
 
   // read number of threads and type of trace
-// trace_file >> num_thread >> type;
-  trace_file >> type>> num_thread ;
-  if (type == "newptx") {
-    trace_file >> max_block_per_core;
-#ifndef GPU_TRACE
-    assert(0);
-#endif 
-  }
-  else if (type == "x86")  { 
-#ifndef X86_TRACE
-    assert(0);
-#endif 
-  }
-  else if (type == "a64") { 
-#ifndef ARM64_TRACE
-    assert(0);
-#endif 
- 
-  }
+  trace_file >> type >> num_thread ;
 
+#ifdef GPU_TRACE
+    ASSERTM(type == "newptx", "GPU arch of trace reader being used for %s traces", type.c_str());
+#elif defined(X86_TRACE)
+    ASSERTM(type == "x86", "X86 arch of trace reader being used for %s traces", type.c_str());
+#elif defined(ARM64_TRACE)
+    ASSERTM(type == "a64", "ARM64 arch of trace reader being used for %s traces", type.c_str());
+#endif 
+
+  if (type == "newptx")
+    trace_file >> max_block_per_core;
 
   // open each thread trace file
   for (int ii = 0; ii < num_thread; ++ii) {
@@ -112,8 +115,6 @@ int read_trace(string trace_path, int truncate_size)
     const int trace_buffer_size = 100000;
     char trace_buffer[trace_buffer_size * TRACE_SIZE];
 
-
-
     trace_reader_c::Singleton.reset();
     while (1) {
       int byte_read = gzread(gztrace, trace_buffer, trace_buffer_size * TRACE_SIZE);
@@ -132,7 +133,6 @@ int read_trace(string trace_path, int truncate_size)
 	trace_info_cpu_s trace_info;
 #endif
 
-
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
         trace_reader_c::Singleton.inst_event(&trace_info);
 
@@ -146,27 +146,23 @@ int read_trace(string trace_path, int truncate_size)
 	
       } 
 
-
       /* generate multiple files of traces */ 
-      
       gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
       cur_file_inst_count  += byte_read; 
 
       if (truncate_size != 0 ) { 
-	
-	if (cur_file_inst_count >= truncate_size) { 
-	  gzclose(gzwtrace); 
-	  // open a new file for next file 
-	  cur_file_inst_count = 0; 
-	  slice_file_num = slice_file_num + 1; 
-	  stringstream wsstr_;
-	  wsstr_ << base_filename << "_s" << slice_file_num << "_" << tid << ".raw";
-	  string wthread_filename_; 
-	  wsstr_ >> wthread_filename_;
-	  cout << "new thread_write_filename: " << wthread_filename_.c_str() << endl; 
-	  gzwtrace = gzopen(wthread_filename_.c_str(), "w");
-	}
-	
+        if (cur_file_inst_count >= truncate_size) { 
+          gzclose(gzwtrace); 
+          // open a new file for next file 
+          cur_file_inst_count = 0; 
+          slice_file_num = slice_file_num + 1; 
+          stringstream wsstr_;
+          wsstr_ << base_filename << "_s" << slice_file_num << "_" << tid << ".raw";
+          string wthread_filename_; 
+          wsstr_ >> wthread_filename_;
+          cout << "new thread_write_filename: " << wthread_filename_.c_str() << endl; 
+          gzwtrace = gzopen(wthread_filename_.c_str(), "w");
+        }
       }
       
       if (byte_read != trace_buffer_size) {
@@ -210,7 +206,7 @@ int main(int argc, char* argv[])
     truncate_size = atoi(argv[2]); 
   }
   string trace_path(argv[1]);
-  cout << "> trace_path: " << trace_path << " trunkcate_size: " << truncate_size << "\n";
+  cout << "> trace_path: " << trace_path << " truncate_size: " << truncate_size << "\n";
 
   string base_filename = trace_path.substr(0, trace_path.find_last_of("."));
   ifstream trace_file(trace_path.c_str());
@@ -228,20 +224,10 @@ int main(int argc, char* argv[])
   trace_file >> num_thread >> type;
 
   int64_t inst_count = 0;
-  /* if (type == "newptx") {
-    while (trace_file >> trace_path) {
-      inst_count += read_trace(trace_path);
-    }
-  }
-  else {
-  */
-    inst_count += read_trace(trace_path, truncate_size);
-    trace_file.close();
-  // }
-
+  inst_count += read_trace(trace_path, truncate_size);
+  trace_file.close();
 
   cout << "> Total instruction count: " << inst_count << "\n";
-
 
   return 0;
 }
