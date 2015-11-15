@@ -163,6 +163,8 @@ void rob_c::dealloc_int_reg()
   ++m_num_int_regs;
 }
 
+// First check ROB for pending memory ops
+// then check the write buffer.
 bool rob_c::pending_mem_ops(int entry)
 {
   int search_idx = m_first_entry;

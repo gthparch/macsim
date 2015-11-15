@@ -202,6 +202,11 @@ void retire_c::run_a_cycle()
         break;
       }
 
+      if (cur_uop->m_mem_type == MEM_ST) {
+        STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_RES, m_cur_core_cycle - cur_uop->m_alloc_cycle);
+	STAT_CORE_EVENT(cur_uop->m_core_id, STORE_NUM);
+      }
+
       if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&
           (cur_uop->m_uop_type == UOP_FULL_FENCE ||
            cur_uop->m_uop_type == UOP_ACQ_FENCE  ||
@@ -239,8 +244,11 @@ void retire_c::run_a_cycle()
           // increment store group
           m_store_version = m_store_version << 1;
         }
-        if (m_store_version == 0)
-          ASSERT(0);
+	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_TOT_CYCLES,
+			  m_cur_core_cycle - cur_uop->m_alloc_cycle); 
+	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_EXEC_CYCLES,
+			  m_cur_core_cycle - cur_uop->m_sched_cycle); 
+	ASSERT(m_store_version != 0);
       }
 
       rob->pop();
@@ -392,12 +400,14 @@ void retire_c::drain_wb(void)
         // and has no other higher indices set, stop completing
         auto higher_bits = uop_index & (bitset<8>(0xFF) << (indices_tried + 1));
         if (!higher_bits.any()) {
+          if (increment_index)
+	    STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
           increment_index = false;
-          STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
         }
         ++uop_it;
       } else {
         // the write uop is completed and can be freed
+	STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE, m_cur_core_cycle - cur_uop->m_alloc_cycle);
         free_uop_resources(cur_uop);
         auto uop_it_tmp = uop_it;
         ++uop_it;
