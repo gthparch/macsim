@@ -699,6 +699,11 @@ void macsim_c::initialize(int argc, char** argv)
   g_mystderr = stderr;
   g_mystatus = NULL;
 
+  printf("Arguments: ");
+  for (int i = 0; i < argc; i++)
+	printf("%s ", argv[i]);
+  printf("\n");
+
   // initialize knobs
   init_knobs(argc, argv);
 

@@ -35,7 +35,16 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <unordered_map>
 
+#if defined (GPU_TRACE)
+#define TRACE_SIZE GPU_TRACE_SIZE 
+#elif defined (ARM64_TRACE)
+#define TRACE_SIZE (sizeof(trace_info_a64_s)-sizeof(uint64_t))
+#else 
 #define TRACE_SIZE CPU_TRACE_SIZE
+#endif 
+
+
+
 extern all_knobs_c* g_knobs;
 
 
@@ -44,7 +53,15 @@ class trace_reader_c
   public:
     trace_reader_c();
     virtual ~trace_reader_c();
-    virtual void inst_event(trace_info_cpu_s* inst);
+
+#if defined(GPU_TRACE)
+    void inst_event(trace_info_gpu_small_s* inst);
+#elif defined(ARM64_TRACE)
+    void inst_event(trace_info_a64_s* inst);
+#else 
+    void inst_event(trace_info_cpu_s* inst);
+#endif 
+
     virtual void print();
     virtual void reset();
 
@@ -62,7 +79,13 @@ class reuse_distance_c : public trace_reader_c
   public:
     reuse_distance_c();
     ~reuse_distance_c();
+#if defined(GPU_TRACE)
+    void inst_event(trace_info_gpu_small_s* inst);
+#elif defined(ARM64_TRACE)
+    void inst_event(trace_info_a64_s* inst);
+#else 
     void inst_event(trace_info_cpu_s* inst);
+#endif 
     void print();
     void reset();
 
@@ -80,14 +103,20 @@ class static_pc_c : public trace_reader_c
   public:
     static_pc_c();
     ~static_pc_c();
-    void inst_event(trace_info_cpu_s* inst);
 
+#if defined(GPU_TRACE)
+    void inst_event(trace_info_gpu_small_s* inst);
+#elif defined(ARM64_TRACE)
+    void inst_event(trace_info_a64_s* inst);
+#else 
+    void inst_event(trace_info_cpu_s* inst);
+#endif 
 
   private:
     std::unordered_map<Addr, bool> m_static_pc;
     std::unordered_map<Addr, bool> m_static_mem_pc;
     uint64_t m_total_inst_count;
-    uint64_t m_total_store_count;
+    uint64_t m_total_load_count;
 };
 
 

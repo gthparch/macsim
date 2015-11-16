@@ -8,7 +8,7 @@ sst.setProgramOption("stopAtCycle", "0 ns")
 # Define the SST Components:
 comp_cpu0 = sst.Component("cpu0", "macsimComponent.macsimComponent")
 comp_cpu0.addParams({
-     "trace_file" : "../sst-unit-test/a64_tests/trace_file_list",
+     "trace_file" : "trace_file_list",
      "mem_size" : "4*1024*1024*1024",
      "command_line" : "--use_memhierarchy=1 --max_insts=100000 --use_wb=1 --acq_rel=1",
      "debug_level" : "8",
