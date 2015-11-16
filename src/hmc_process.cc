@@ -148,6 +148,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                 // read next instruction
                 read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, thread_trace_info->m_next_trace_info,
                                sim_thread_id, &inst_read);
+                if (!read_success) return false;
                 thread_trace_info->m_next_hmc_type = HMC_NONE;
 
                 // changed by Lifeng
@@ -156,7 +157,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                 map<uint64_t, hmc_inst_s> & hmc_info = thread_trace_info->m_process->m_hmc_info;
                 uint64_t inst_addr = (static_cast<trace_info_cpu_s*>
                                       (thread_trace_info->m_next_trace_info))->m_instruction_addr;
-                if (hmc_info.find(inst_addr) != hmc_info.end())
+                if (hmc_info.find(inst_addr) != hmc_info.end()
+                        &&(!core->get_trace_info(sim_thread_id)->m_trace_ended))
                 {
 
                     hmc_inst_s hmc_inst = hmc_info[inst_addr];
@@ -172,11 +174,12 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                         if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
                             hmc_vaddr = cur_trace_info.m_ld_vaddr1;
 
-                        if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc
-                                || read_success == false)
+                        if (!read_success) return false;
+
+                        if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc)
                             break;
                     }
-                    ASSERT(read_success); // should not reach trace end before hmc func ret
+                    ASSERT(read_success); // should not reach here
 
                     HMC_Type ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
                     ASSERTM(ret != HMC_NONE," hmc_inst: %s hmc_enum: %d\n",hmc_inst.name.c_str(),(unsigned)ret); // fail if cannot find hmc inst info
