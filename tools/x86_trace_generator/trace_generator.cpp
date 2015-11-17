@@ -174,6 +174,7 @@ bool thread_flushed[MAX_THREADS]={false};
 Knob(bool, Knob_manual_simpoint, "manual", "0", "start/stop trace generation at manually added SIM_BEGIN()/SIM_END function call");
 
 unsigned sim_end_threads = 0;
+bool finished = false;
 
 // variables for HMC 2.0 atomic instruction simulations
 // should be disabled in normal cases
@@ -482,16 +483,22 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
          && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid])
   {
       sim_end[tid]=true;
+      g_enable_thread_instrument[tid]=false;
       GetLock(&g_lock, tid+1);
       sim_end_threads++;
       ReleaseLock(&g_lock);
       if (!thread_flushed[tid])
           thread_end();
   }
-  if (sim_end_threads == thread_count)
+  if (sim_end_threads >= thread_count)
   {
+      //finish();
+      //PIN_RemoveInstrumentation();
+      GetLock(&g_lock, tid+1);
       finish();
-      PIN_RemoveInstrumentation();
+      finished=true;
+      ReleaseLock(&g_lock);
+
       exit(0);
   } 
 #if 0
@@ -1051,6 +1058,8 @@ void Fini(INT32 code, void *v)
 
 void finish(void)
 {
+    if (finished) return;
+
     if (Knob_enable_hmc.Value())
     {
         string fn = Knob_trace_name.Value() + ".HMCinfo";
@@ -1287,7 +1296,15 @@ VOID RtnEnd(ADDRINT arg)
     ReleaseLock(&g_lock);
     if (!thread_flushed[tid])
         thread_end();
+    if (sim_end_threads >= thread_count)
+    {
+      GetLock(&g_lock, tid+1);
+      finish();
+      finished=true;
+      ReleaseLock(&g_lock);
 
+      exit(0);
+    } 
 }
 
 /* OLD HMC Inst definition
@@ -1367,6 +1384,34 @@ VOID Image(IMG img, VOID *v)
             RTN_Close(hmc_rtn);
         }
 
+    }
+    for (SEC sec = IMG_SecHead(img); SEC_Valid(sec); sec = SEC_Next(sec))
+    {
+        for (RTN rtn = SEC_RtnHead(sec); RTN_Valid(rtn); rtn = RTN_Next(rtn))
+        {
+            string demangle_str = PIN_UndecorateSymbolName(RTN_Name(rtn),UNDECORATION_NAME_ONLY);
+            bool found = false;
+            unsigned i;
+            for (i=1;i<(unsigned)NUM_HMC_TYPES;i++)
+            {
+                if (hmc_type_c::HMC_Type2String((HMC_Type)i)==demangle_str)   
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+            {
+                RTN_Open(rtn);
+                RTN_InsertCall(rtn, IPOINT_BEFORE, (AFUNPTR)RtnHMC,
+                        IARG_ADDRINT, (size_t)i,
+                        IARG_ADDRINT, RTN_Funptr(rtn),
+                        IARG_RETURN_IP, 
+                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
+                        IARG_END);
+                RTN_Close(rtn);
+            }
+        }
     }
 }
 
