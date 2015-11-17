@@ -24,7 +24,9 @@ typedef enum HMC_Type_enum
     HMC_COMP_less=16,
     HMC_COMP_equal=17,
     HMC_CANDIDATE=18,
-    NUM_HMC_TYPES=19
+    HMC_hook=19,
+    HMC_unhook=20,
+    NUM_HMC_TYPES=21
 } HMC_Type;
 
 
@@ -54,6 +56,8 @@ class hmc_type_c
             case HMC_COMP_less:     return std::string("HMC_COMP_less");
             case HMC_COMP_equal:    return std::string("HMC_COMP_equal");
             case HMC_CANDIDATE:     return std::string("HMC_CANDIDATE");
+            case HMC_hook:          return std::string("std::__detail::_List_node_base::_M_hook");
+            case HMC_unhook:        return std::string("std::__detail::_List_node_base::_M_unhook");
             case NUM_HMC_TYPES:
             default: return std::string("");
         }
@@ -78,6 +82,8 @@ class hmc_type_c
         else if (name=="HMC_COMP_less")    return HMC_COMP_less;
         else if (name=="HMC_COMP_equal")   return HMC_COMP_equal;
         else if (name=="HMC_CANDIDATE")    return HMC_CANDIDATE;
+        else if (name=="std::__detail::_List_node_base::_M_hook")          return HMC_hook;
+        else if (name=="std::__detail::_List_node_base::_M_unhook")        return HMC_unhook;
         else return HMC_NONE;
     }
 

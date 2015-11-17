@@ -170,29 +170,38 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                     {
                         read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, (&cur_trace_info),
                                        sim_thread_id, &inst_read);
+                        // break when reach trace end
+                        if (core->get_trace_info(sim_thread_id)->m_trace_ended) 
+                            break;
                         // get target mem addr of hmc inst
                         if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
                             hmc_vaddr = cur_trace_info.m_ld_vaddr1;
 
+                        // break when trace read has an error
                         if (!read_success) return false;
 
+                        // break when find the return instruction
                         if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc)
                             break;
                     }
                     ASSERT(read_success); // should not reach here
+                    // replace hmc function with a generated hmc inst
+                    //  only when the full hmc function is found before trace end
+                    if (!core->get_trace_info(sim_thread_id)->m_trace_ended)
+                    {
+                        HMC_Type ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
+                        ASSERTM(ret != HMC_NONE," hmc_inst: %s hmc_enum: %d\n",hmc_inst.name.c_str(),(unsigned)ret); // fail if cannot find hmc inst info
+                        memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
+                        thread_trace_info->m_next_hmc_type = ret;
 
-                    HMC_Type ret = generate_hmc_inst(hmc_inst,hmc_vaddr,hmc_trace_info);
-                    ASSERTM(ret != HMC_NONE," hmc_inst: %s hmc_enum: %d\n",hmc_inst.name.c_str(),(unsigned)ret); // fail if cannot find hmc inst info
-                    memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
-                    thread_trace_info->m_next_hmc_type = ret;
+                        // cache the inst@ret_pc for later fetch
+                        memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
+                        thread_trace_info->has_cached_inst = true;
 
-                    // cache the inst@ret_pc for later fetch
-                    memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
-                    thread_trace_info->has_cached_inst = true;
-
-                    STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
-                    STAT_EVENT(HMC_INST_COUNT_TOT);
-                    HMC_EVENT_COUNT(core_id, ret);
+                        STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
+                        STAT_EVENT(HMC_INST_COUNT_TOT);
+                        HMC_EVENT_COUNT(core_id, ret);
+                    }
                 }
             }
             else
