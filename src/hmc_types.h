@@ -23,11 +23,13 @@ typedef enum HMC_Type_enum
     HMC_COMP_greater=15,
     HMC_COMP_less=16,
     HMC_COMP_equal=17,
-    HMC_CANDIDATE=18,           // Not a HMC-op, it is showing if an instruction could be HMC in other scenarios
-    HMC_TRANS_BEG=19,           // Transaction support
-    HMC_TRANS_MID=20,           // Transaction support
-    HMC_TRANS_END=21,           // Transaction support
-    NUM_HMC_TYPES=22
+    HMC_hook=18,
+    HMC_unhook=19,
+    HMC_CANDIDATE=20,           // Not a HMC-op, it is showing if an instruction could be HMC in other scenarios
+    HMC_TRANS_BEG=21,           // Transaction support
+    HMC_TRANS_MID=22,           // Transaction support
+    HMC_TRANS_END=23,           // Transaction support
+    NUM_HMC_TYPES=24
 } HMC_Type;
 
 
@@ -59,6 +61,9 @@ class hmc_type_c
             case HMC_CANDIDATE:     return std::string("HMC_CANDIDATE");
             case HMC_hook:          return std::string("std::__detail::_List_node_base::_M_hook");
             case HMC_unhook:        return std::string("std::__detail::_List_node_base::_M_unhook");
+            case HMC_TRANS_BEG:     return std::string("HMC_TRANS_BEG");
+            case HMC_TRANS_MID:     return std::string("HMC_TRANS_MID");
+            case HMC_TRANS_END:     return std::string("HMC_TRANS_END");
             case NUM_HMC_TYPES:
             default: return std::string("");
         }
@@ -85,6 +90,9 @@ class hmc_type_c
         else if (name=="HMC_CANDIDATE")    return HMC_CANDIDATE;
         else if (name=="std::__detail::_List_node_base::_M_hook")          return HMC_hook;
         else if (name=="std::__detail::_List_node_base::_M_unhook")        return HMC_unhook;
+        else if (name=="HMC_TRANS_BEG")     return HMC_TRANS_BEG;
+        else if (name=="HMC_TRANS_MID")     return HMC_TRANS_MID;
+        else if (name=="HMC_TRANS_END")     return HMC_TRANS_END; 
         else return HMC_NONE;
     }
 
