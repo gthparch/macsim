@@ -155,10 +155,6 @@ void macsim_c::init_knobs(int argc, char** argv)
   char* pInvalidArgument = NULL;
   if (!m_knobsContainer->applyComandLineArguments(argc-3, argv+3, &pInvalidArgument)) {
   }
-
-  //save the states of all knobs to a file
-  m_knobsContainer->saveToFile(outputPath + "/params.out");
-
 #else
   // apply values from parameters file
   m_knobsContainer->applyParamFile("params.in");
@@ -167,10 +163,10 @@ void macsim_c::init_knobs(int argc, char** argv)
   char* pInvalidArgument = NULL;
   if (!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
   }
-
-  // save the states of all knobs to a file
-  m_knobsContainer->saveToFile("params.out");
 #endif
+
+  //save the states of all knobs to a file
+  m_knobsContainer->saveToFile("params.out");
 }
 
 
