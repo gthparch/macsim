@@ -164,71 +164,76 @@ int main(int argc, char *argv[])
 
     switch(trace_generation_mode) { 
       /* default stream trace generation part */ 
-      case 0: 
-      for (int ii = 0; ii < 1000; ii++) {
-        uint64_t t_addr;
+      case 0:
+        for (int ii = 0; ii < 1000; ii++) {
+          uint64_t t_addr;
+          static uint64_t inst_addr;
+      	
+      	  if (inst_addr ==1024) 
+            inst_addr = 0;
+
+          #define INDEP_TRACE
+          #ifdef INDEP_TRACE
+          	t_addr = ii *64  + threadid*1024*1024;
+          #endif
+          #ifdef DEP_TRACE
+          	t_addr = ii*64;
+          #endif
+
+          set_mem_op(mem_trace, (++inst_addr)*2, t_addr, 0);  // 0: read operation 1: write operation //
+          gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
+
+          if (((inst_addr%4) != 0) && (t_addr > 1024))  {
+            set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr-1024,  1);
+            gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
+          }
+
+          if (((inst_addr%8) != 0))
+            gzwrite(trace_output, fence_trace,  sizeof(trace_info_cpu_s)); 
+        }
+        break;
+
+      case 1:
+        // file open 
+        // while 
+        ifstream myfile (fname);
+        string line;
+        uint64_t t_addr;  
+        size_t pos; 
+        int req_type = 0; 
         static uint64_t inst_addr;
-    	
-    	  if (inst_addr ==1024) 
-          inst_addr = 0;
-	
-        #define INDEP_TRACE
-        #ifdef INDEP_TRACE
-        	t_addr = ii *64  + threadid*1024*1024;
-        #endif
-        #ifdef DEP_TRACE
-        	t_addr = ii*64;
-        #endif
-	
-    	  set_mem_op(mem_trace, (++inst_addr)*2, t_addr, 0);  // 0: read operation 1: write operation //
-    	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
-    	
-      	if (((inst_addr%4) != 0) && (t_addr > 1024))  {
-      	  set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr-1024,  1);
-      	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
-      	}
-    	
-    	  if (((inst_addr%8) != 0))
-          gzwrite(trace_output, fence_trace,  sizeof(trace_info_cpu_s)); 
-      }
+        
+        if (myfile.is_open()) { 
+          while (getline(myfile, line)) {
+            // cout << line << '\n'; 
+            // t_addr = strtol(line.c_str(), &pos, 16); 
+            t_addr = std::stoul(line, &pos, 16); 
+            pos = line.find_first_not_of(' ', pos+1); 
 
-    case 1: {
-      // file open 
-      // while 
-      ifstream myfile (fname);
-      string line;
-      uint64_t t_addr;  
-      size_t pos; 
-      int req_type = 0; 
-      static uint64_t inst_addr;
-      
-      if (myfile.is_open()) { 
-	while (getline(myfile, line)) {
-	  // cout << line << '\n'; 
-	  // t_addr = strtol(line.c_str(), &pos, 16); 
-	  t_addr = std::stoul(line, &pos, 16); 
-	  pos = line.find_first_not_of(' ', pos+1); 
-	  
-	  if (pos == string::npos || line.substr(pos)[0] == 'R') 
-	    req_type = 0; // read 
-	  else if (line.substr(pos)[0] == 'W') 
-	    req_type = 1; // write 
-	  cout << "addr:" << hex << t_addr; 
-	  if (req_type == 1 ) cout << " R" << endl; 
-	  else cout << " W" << endl; 
+            if (pos == string::npos || line.substr(pos)[0] == 'R') 
+              req_type = 0; // read 
+            else if (line.substr(pos)[0] == 'W') 
+              req_type = 1; // write 
+            cout << "addr:" << hex << t_addr; 
+            if (req_type == 1 ) 
+              cout << " R" << endl; 
+            else 
+              cout << " W" << endl; 
 
-	  if (inst_addr > 1024) inst_addr = 0; 
-	  if (req_type  == 0 ) set_mem_op(mem_trace, (++inst_addr)*2, t_addr, req_type);  // 0: read operation 1: write operation //
-	  else set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr, req_type);  // 0: read operation 1: write operation //
-	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
-
-	}
-	myfile.close();
-      }
-      else 
-	cout << " Unable to open file\n"; 
-    }
-
+            if (inst_addr > 1024) 
+              inst_addr = 0; 
+            if (req_type  == 0 ) 
+              set_mem_op(mem_trace, (++inst_addr)*2, t_addr, req_type);  // 0: read operation 1: write operation //
+            else 
+              set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr, req_type);  // 0: read operation 1: write operation //
+            gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
+          }
+          myfile.close();
+        }
+        else {
+          cout << " Unable to open file\n"; 
+        }
+        break;
     }
 
     gzclose(trace_output);
