@@ -163,33 +163,33 @@ int main(int argc, char *argv[])
     char fname[256] = "hmc_dram.trace"; 
 
     switch(trace_generation_mode) { 
-    case 0: 
       /* default stream trace generation part */ 
+      case 0: 
       for (int ii = 0; ii < 1000; ii++) {
-	uint64_t t_addr;
-	static uint64_t inst_addr;
+        uint64_t t_addr;
+        static uint64_t inst_addr;
+    	
+    	  if (inst_addr ==1024) 
+          inst_addr = 0;
 	
-	if (inst_addr ==1024) inst_addr = 0;
+        #define INDEP_TRACE
+        #ifdef INDEP_TRACE
+        	t_addr = ii *64  + threadid*1024*1024;
+        #endif
+        #ifdef DEP_TRACE
+        	t_addr = ii*64;
+        #endif
 	
-#define INDEP_TRACE
-#ifdef INDEP_TRACE
-	t_addr = ii *64  + threadid*1024*1024;
-#endif
-#ifdef DEP_TRACE
-	t_addr = ii*64;
-#endif
-	
-	set_mem_op(mem_trace, (++inst_addr)*2, t_addr, 0);  // 0: read operation 1: write operation //
-	gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
-	
-	if (((inst_addr%4) != 0) && (t_addr > 1024))  {
-	  set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr-1024,  1);
-	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
-	}
-	
-	if (((inst_addr%8) != 0))  {
-	  gzwrite(trace_output, fence_trace,  sizeof(trace_info_cpu_s)); 
-	}
+    	  set_mem_op(mem_trace, (++inst_addr)*2, t_addr, 0);  // 0: read operation 1: write operation //
+    	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
+    	
+      	if (((inst_addr%4) != 0) && (t_addr > 1024))  {
+      	  set_mem_op(mem_trace, (++inst_addr)*2+1, t_addr-1024,  1);
+      	  gzwrite(trace_output, mem_trace,  sizeof(trace_info_cpu_s));
+      	}
+    	
+    	  if (((inst_addr%8) != 0))
+          gzwrite(trace_output, fence_trace,  sizeof(trace_info_cpu_s)); 
       }
 
     case 1: {
