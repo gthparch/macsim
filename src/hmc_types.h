@@ -118,6 +118,12 @@ case HMC_FP_ADD:        STAT_CORE_EVENT(core_id, HMC_INST_COUNT_FP_ADD);break;\
 case HMC_COMP_greater:  STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_greater);break;\
 case HMC_COMP_less:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_less);break;\
 case HMC_COMP_equal:    STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_equal);break;\
+case HMC_CANDIDATE:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_CANDIDATE);break;\
+case HMC_hook:          STAT_CORE_EVENT(core_id, HMC_INST_COUNT_HOOK);break;\
+case HMC_unhook:        STAT_CORE_EVENT(core_id, HMC_INST_COUNT_UNHOOK);break;\
+case HMC_TRANS_BEG:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_TRANS_BEG);break;\
+case HMC_TRANS_MID:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_TRANS_MID);break;\
+case HMC_TRANS_END:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_TRANS_END);break;\
 case NUM_HMC_TYPES: break;}
 
 

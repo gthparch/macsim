@@ -861,7 +861,10 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   {
     return hmc_function_c::get_uops_from_traces_with_hmc_inst(this, core_id, uop, sim_thread_id);
   }
-
+  if (*KNOB(KNOB_ENABLE_HMC_TRANS))
+  {
+    return hmc_function_c::get_uops_from_traces_with_hmc_trans(this, core_id, uop, sim_thread_id);
+  }
   ASSERT(uop);
 
   trace_uop_s *trace_uop;

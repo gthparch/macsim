@@ -78,7 +78,7 @@ class macsimComponent : public SST::Component
 
     void sendInstReq(int,uint64_t,uint64_t,int);
 #ifdef USE_VAULTSIM_HMC 
-    void sendDataReq(int,uint64_t,uint64_t,int,int,uint8_t);
+    void sendDataReq(int,uint64_t,uint64_t,int,int,uint8_t,uint64_t);
 #else
     void sendDataReq(int,uint64_t,uint64_t,int,int);
 #endif

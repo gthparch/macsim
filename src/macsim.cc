@@ -113,6 +113,7 @@ macsim_c::macsim_c()
   m_core0_inst_count = 0;
 
   m_pll_lockout = 0;
+  m_hmc_trans_id_gen = 0;
 }
 
 

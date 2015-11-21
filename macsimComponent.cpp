@@ -181,7 +181,7 @@ void macsimComponent::setup()
     new Callback4<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstReq);
 #ifdef USE_VAULTSIM_HMC  
   CallbackSendDataReq* sdr =
-    new Callback6<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataReq);
+    new Callback7<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t>(this, &macsimComponent::sendDataReq);
 #else
   CallbackSendDataReq* sdr =
     new Callback5<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataReq);
@@ -349,7 +349,7 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
       core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
 }
 #else
-void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
+void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0,uint64_t trans_id=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
@@ -359,7 +359,9 @@ void macsimComponent::sendDataReq(int core_id, uint64_t key, uint64_t addr, int 
     hmc_type = hmc_type & 0b01111111;
   }
   SimpleMem::Request *req = 
-    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
+    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type, trans_id);
+  //if (hmc_type!=0) cout<<"HMC: "<<(unsigned)hmc_type<<"\t trans: "<<trans_id
+  //    <<" isStore: "<<doWrite<<endl;
   m_dcache_links[core_id]->sendRequest(req);
   m_dcache_request_counters[core_id]++;
   m_dcache_requests[core_id].insert(make_pair(req->id, key));
