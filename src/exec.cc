@@ -770,6 +770,10 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
 #ifdef USE_VAULTSIM_HMC   
     uint8_t hmc_type = uop->m_hmc_inst;
     if (hmc_type!=0) HMC_EVENT_COUNT(m_core_id, hmc_type);
+    if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) 
+    {
+        if (hmc_type!=0) cout<<"-HMC- "<<uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<endl;
+    } 
     // mark highest bit if enabled cache bypass
     if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
         hmc_type = hmc_type | 0b10000000;

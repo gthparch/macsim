@@ -34,4 +34,4 @@ param<ENABLE_HMC_BYPASS_CACHE, enable_hmc_bypass_cache, bool, 1>
 param<ENABLE_NONHMC_STAT, enable_nonhmc_stat, bool, 0>
 param<ENABLE_LOCK_SKIP, enable_lock_skip, bool, 0>
 param<ENABLE_HMC_TRANS, enable_hmc_trans, bool, 0>
-
+param<ENABLE_HMC_DEBUG, enable_hmc_debug, bool, 0>

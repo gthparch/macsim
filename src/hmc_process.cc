@@ -599,6 +599,12 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                 {
                     thread_trace_info->m_next_hmc_type = HMC_TRANS_MID;
                     trace_info_cpu_s* next_trace = static_cast<trace_info_cpu_s *>(thread_trace_info->m_next_trace_info);
+                    if (next_trace->m_cf_type==CF_RET) 
+                    {
+                        thread_trace_info->m_inside_hmc_func=false;
+                        thread_trace_info->m_next_hmc_type = HMC_NONE;
+
+                    }
                     while(next_trace->m_num_ld==0 && next_trace->m_has_st==false)
                     {
                         read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, thread_trace_info->m_next_trace_info, sim_thread_id, &inst_read);
@@ -607,7 +613,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                         next_trace = static_cast<trace_info_cpu_s *>(thread_trace_info->m_next_trace_info);
                         if (core->get_trace_info(sim_thread_id)->m_trace_ended) 
                             break;
-                        if (inst_addr == thread_trace_info->m_next_hmc_func_ret)
+                        if (inst_addr == thread_trace_info->m_next_hmc_func_ret
+                                || next_trace->m_cf_type==CF_RET)
                         {
                             thread_trace_info->m_inside_hmc_func=false;
                             thread_trace_info->m_next_hmc_type = HMC_NONE;
@@ -683,7 +690,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                 {
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = curr;
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_trans_id = cur_trace_hmc_trans_id;
-                    //cout<<"[HMC] "<<curr<<"\t id: "<<cur_trace_hmc_trans_id<<endl; 
+                    if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) 
+                        cout<<"[HMC] "<<curr<<"\t id: "<<cur_trace_hmc_trans_id<<endl; 
                     if (curr == HMC_TRANS_BEG) curr = HMC_TRANS_MID;
                 }
                 else
@@ -705,7 +713,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                 {
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = HMC_TRANS_MID;
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_trans_id = cur_trace_hmc_trans_id; 
-                    //cout<<"[HMC] "<<(unsigned)HMC_TRANS_MID<<"\t id: "<<cur_trace_hmc_trans_id<<endl; 
+                    if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) cout<<"[HMC] "<<(unsigned)HMC_TRANS_MID<<"\t id: "<<cur_trace_hmc_trans_id<<endl; 
                 }
                 else
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = HMC_NONE;
@@ -723,7 +731,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                 {
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = curr;
                     thread_trace_info->m_trace_uop_array[i]->m_hmc_trans_id = cur_trace_hmc_trans_id;
-                    //cout<<"[HMC] "<<curr<<"\t id: "<<cur_trace_hmc_trans_id<<endl;  
+                    if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) cout<<"[HMC] "<<curr<<"\t id: "<<cur_trace_hmc_trans_id<<endl;  
                     if (curr == HMC_TRANS_END) curr = HMC_TRANS_MID;
                 }
                 else
@@ -807,6 +815,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
     uop->m_hmc_trans_id = trace_uop->m_hmc_trans_id;
     if (uop->m_hmc_inst != HMC_NONE)
     {
+        if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) 
+            cout<<"<HMC> "<<(unsigned)uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<" memtype: "<<(unsigned)uop->m_mem_type<<endl; 
         STAT_CORE_EVENT(core_id, HMC_UOP_COUNT);
     }
     if (uop->m_cf_type)
