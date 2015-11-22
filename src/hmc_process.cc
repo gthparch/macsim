@@ -611,9 +611,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_trans(
                         inst_addr = (static_cast<trace_info_cpu_s*>
                                   (thread_trace_info->m_next_trace_info))->m_instruction_addr;
                         next_trace = static_cast<trace_info_cpu_s *>(thread_trace_info->m_next_trace_info);
-                        if (core->get_trace_info(sim_thread_id)->m_trace_ended) 
-                            break;
-                        if (inst_addr == thread_trace_info->m_next_hmc_func_ret
+                        if (core->get_trace_info(sim_thread_id)->m_trace_ended ||
+                            inst_addr == thread_trace_info->m_next_hmc_func_ret
                                 || next_trace->m_cf_type==CF_RET)
                         {
                             thread_trace_info->m_inside_hmc_func=false;
