@@ -227,7 +227,7 @@ typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeInstRespQ;
 typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeDataRespQ;
 typedef SST::MacSim::CallbackBase1<bool,uint64_t> CallbackStrobeCubeRespQ;
 
-#define UNIQUE_KEY(C,T,A,I) ((A<<19)|((C&0xF)<<15)|((T&0xFF)<<7)|I)
+#define UNIQUE_KEY(C,T,U,A,I) ((A<<35)|((U&0xFFF)<<23)|((C&0x3F)<<17)|((T&0x7F)<<10)|I)
 #endif //USING_SST
 
 #endif

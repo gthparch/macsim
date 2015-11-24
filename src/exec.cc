@@ -751,9 +751,9 @@ int exec_c::access_memhierarchy_cache(uop_c* uop)
   }
 
   // Sending
-  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_vaddr, id++);
-  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_vaddr = 0x%llx, key = 0x%lx\n", 
-      m_core_id, uop->m_thread_id, uop->m_vaddr, key);
+  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, id++);
+  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n", 
+      m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, key);
   auto i = m_uop_buffer.find(key);
   if (m_uop_buffer.end() == i) { // New Request
     int block_size = KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();

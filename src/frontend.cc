@@ -278,7 +278,7 @@ void frontend_c::run_a_cycle(void)
                 }
               }
 
-              uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, fetch_data->m_fetch_ready_addr, 0);
+              uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, 0, fetch_data->m_fetch_ready_addr, 0);
               auto i = m_fetch_buffer.find(key);
               if (m_fetch_buffer.end() != i) {
                 bool responseArrived = i->second;
@@ -999,7 +999,7 @@ bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s*
   if (KNOB(KNOB_PERFECT_ICACHE)->getValue()) {
     cache_miss = CACHE_HIT;
   } else {
-    uint64_t key = UNIQUE_KEY(m_core_id, tid, fetch_addr, 0);
+    uint64_t key = UNIQUE_KEY(m_core_id, tid, 0, fetch_addr, 0);
     DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, fetch_data = %p, fetch_addr = 0x%llx, key = %lx\n", 
         m_core_id, tid, fetch_data, fetch_addr, key);
 
