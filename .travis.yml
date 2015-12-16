@@ -18,6 +18,6 @@ git:
 notifications:
         email:
             recipients:
-                - bobby.prani@gmail.com
+                - macsim-dev-commits@googlegroups.com
             on_success: always
             on_failure: always
