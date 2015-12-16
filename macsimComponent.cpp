@@ -287,9 +287,17 @@ bool macsimComponent::ticReceived(Cycle_t)
   // Debugging 
   if (m_cycle % 100000 == 0) {
     for (unsigned int l = 0 ; l < m_num_link; ++l) {
-      MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l, 
+      if (m_ptx_core) {
+        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu) C$: (%lu, %lu), T$: (%lu, %lu)\n", l, 
+          m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l], 
+          m_data_cache_request_counters[l], m_data_cache_response_counters[l],
+          m_const_cache_request_counters[l], m_const_cache_response_counters[l],
+          m_texture_cache_request_counters[l], m_texture_cache_response_counters[l]);
+      } else {
+        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l, 
           m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l], 
           m_data_cache_request_counters[l], m_data_cache_response_counters[l]);
+      }
     }
   }
 
