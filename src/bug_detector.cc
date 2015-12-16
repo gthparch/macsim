@@ -173,6 +173,7 @@ void bug_detector_c::print(int core_id, int thread_id)
       << setw(25) << left << "OPCODE"
       << setw(20) << left << "UOP_TYPE"
       << setw(20) << left << "MEM_TYPE"
+      << setw(20) << left << "MEM_ADDR"
       << setw(20) << left << "CF_TYPE"
       << setw(20) << left << "DEP_TYPE" 
       << setw(6)  << left << "CHILD"
@@ -203,6 +204,7 @@ void bug_detector_c::print(int core_id, int thread_id)
                                cpu_decoder_c::g_tr_opcode_names[uop->m_opcode])
         << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type]
         << setw(20) << left << uop_c::g_mem_type_name[uop->m_mem_type]
+        << setw(20) << left << hex << uop->m_vaddr << dec
         << setw(20) << left << uop_c::g_cf_type_name[uop->m_cf_type]
         << setw(20) << left << uop_c::g_dep_type_name[uop->m_bar_type]
         << setw(6)  << left << uop->m_num_child_uops
