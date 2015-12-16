@@ -482,13 +482,13 @@ void core_c::thread_heartbeat(int tid, bool final)
 
     double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
     if (final) {
-      fprintf(m_simBase->g_mystdout, "**Core %d Thread %d Finished:   insts:%-10llu  "
+      fprintf(m_simBase->g_mystdout, "**Core %02d Thread %02d Finished:   insts:%-10llu  "
           "cycles:%-10llu (%llu)  seconds:%-5llu -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
           m_core_id, tid, m_inst_count, m_core_cycle_count, m_simBase->m_simulation_cycle,
           (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
-      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:  Thread:%-6d insts:%-10llu  "
+      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%02d]:  Thread:%-6d insts:%-10llu  "
           "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
           m_core_id, tid, m_inst_count / 100 * 100, m_core_cycle_count, m_simBase->m_simulation_cycle,
           (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
@@ -525,13 +525,13 @@ void core_c::core_heartbeat(bool final)
     double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
 
     if (final) {
-      fprintf(m_simBase->g_mystdout, "**Core %d Core_Total  Finished:   insts:%-10llu  "
+      fprintf(m_simBase->g_mystdout, "**Core %02d Core_Total  Finished:   insts:%-10llu  "
           "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
           m_core_id, m_inst_count, m_core_cycle_count, m_simBase->m_simulation_cycle,
           (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
     } 
     else {
-      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%d]:        insts:%-10llu  "
+      fprintf(m_simBase->g_mystdout, "** Heartbeat for core[%02d]:        insts:%-10llu  "
           "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
           m_core_id, m_inst_count / 100 * 100, m_core_cycle_count, m_simBase->m_simulation_cycle,
           (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
