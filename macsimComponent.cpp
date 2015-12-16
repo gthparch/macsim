@@ -36,6 +36,10 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6) 
     m_dbg->fatal(CALL_INFO, -1, "Debugging level must be between 0 and 9. \n");
 
+  m_debug_addr = (uint64_t)params.find_integer("debug_addr", -1);
+  if (m_debug_addr == -1)
+    m_debug_all = true;
+
   string prefix = "[" + getName() + "] ";
   m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)params.find_integer("debug", Output::NONE));
   MSC_DEBUG("------- Initializing -------\n");
@@ -55,11 +59,6 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_command_line = string(params["command_line"]);
 
   m_ptx_core = params.find_integer("ptx_core", 0);
-  if (m_ptx_core) {
-    if (params.find("param_file") == params.end())
-      m_dbg->fatal(CALL_INFO, -1, "Couldn't find params.in file\n");
-  }
-
   m_num_link = params.find_integer("num_link", 1);
   configureLinks(params);
 
@@ -319,17 +318,17 @@ bool macsimComponent::ticReceived(Cycle_t)
 void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key, uint64_t addr, int size)
 {
 #ifndef USE_VAULTSIM_HMC   
-  SimpleMem::Request *req = 
-    new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
+  SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
 #else
-  SimpleMem::Request *req = 
-    new SimpleMemHMCExtension::HMCRequest(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
+  SimpleMem::Request *req = new SimpleMemHMCExtension::HMCRequest(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
 #endif  
   m_instruction_cache_links[core_id]->sendRequest(req);
   m_instruction_cache_request_counters[core_id]++;
   m_instruction_cache_requests[core_id].insert(make_pair(req->id, key));
-  MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", 
-      core_id, addr & 0x3FFFFFFF, addr, size);
+  
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", core_id, addr & 0x3FFFFFFF, addr, size);
+  }
 }
 
 bool macsimComponent::strobeInstructionCacheRespQ(int core_id, uint64_t key)
@@ -352,7 +351,9 @@ void macsimComponent::handleInstructionCacheEvent(Interfaces::SimpleMem::Request
       // No matching request
       continue;
     } else {
-      MSC_DEBUG("I$[%d] response arrived\n", l);
+      if (m_debug_all || m_debug_addr == req->addr) {
+        MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 "\n", l, req->addr);
+      }     
       m_instruction_cache_responses[l].insert(i->second);
       m_instruction_cache_response_counters[l]++;
       m_instruction_cache_requests[l].erase(i);
@@ -389,26 +390,27 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
-  MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
-      core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+  }
 }
 #else
 void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
-  if ( (hmc_type & 0b10000000) != 0) 
-  { 
+  if ( (hmc_type & 0b10000000) != 0) { 
     flag = SimpleMem::Request::F_NONCACHEABLE;
     hmc_type = hmc_type & 0b01111111;
   }
-  SimpleMem::Request *req = 
-    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
+  SimpleMem::Request *req = new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
-  MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
-      core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+  }
 }
 #endif
 
@@ -432,7 +434,9 @@ void macsimComponent::handleDataCacheEvent(Interfaces::SimpleMem::Request *req)
       // No matching request
       continue;
     } else {
-      MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n", l, req->addr, req->size);
+      if (m_debug_all || m_debug_addr == req->addr) {
+        MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n", l, req->addr, req->size);
+      }
       m_data_cache_responses[l].insert(i->second);
       m_data_cache_response_counters[l]++;
       m_data_cache_requests[l].erase(i);
@@ -440,8 +444,7 @@ void macsimComponent::handleDataCacheEvent(Interfaces::SimpleMem::Request *req)
     }
   }
 #ifdef USE_VAULTSIM_HMC
-  SimpleMemHMCExtension::HMCRequest *req2 =
-    static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
+  SimpleMemHMCExtension::HMCRequest *req2 = static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
   delete req2;
 #else  
   delete req;
@@ -459,7 +462,10 @@ void macsimComponent::sendConstCacheRequest(int core_id, uint64_t key, uint64_t 
   m_const_cache_links[core_id]->sendRequest(req);
   m_const_cache_request_counters[core_id]++;
   m_const_cache_requests[core_id].insert(make_pair(req->id, key));
-  MSC_DEBUG("C$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", core_id, addr & (m_mem_size-1), addr, size);
+
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("C$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", core_id, addr & (m_mem_size-1), addr, size);
+  }
 }
 
 bool macsimComponent::strobeConstCacheRespQ(int core_id, uint64_t key)
@@ -481,7 +487,9 @@ void macsimComponent::handleConstCacheEvent(Interfaces::SimpleMem::Request *req)
     if (m_const_cache_requests[l].end() == i) { // No matching request      
       continue;
     } else {
-      MSC_DEBUG("C$[%d] response arrived\n", l);
+      if (m_debug_all || m_debug_addr == req->addr) {
+        MSC_DEBUG("C$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n", l, req->addr, req->size);
+      }
       m_const_cache_responses[l].insert(i->second);
       m_const_cache_response_counters[l]++;
       m_const_cache_requests[l].erase(i);
@@ -525,7 +533,9 @@ void macsimComponent::handleTextureCacheEvent(Interfaces::SimpleMem::Request *re
     if (m_texture_cache_requests[l].end() == i) { // No matching request      
       continue;
     } else {
-      MSC_DEBUG("T$[%d] response arrived\n", l);
+      if (m_debug_all || m_debug_addr == req->addr) {
+        MSC_DEBUG("T$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n", l, req->addr, req->size);
+      }
       m_texture_cache_responses[l].insert(i->second);
       m_texture_cache_response_counters[l]++;
       m_texture_cache_requests[l].erase(i);
@@ -547,8 +557,10 @@ void macsimComponent::sendCubeRequest(uint64_t key, uint64_t addr, int size, int
   SimpleMem::Request *req = 
     new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
   m_cube_link->sendRequest(req);
-  MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64 "), %s %s, size = %d\n", 
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64 "), %s %s, size = %d\n", 
       addr & 0x3FFFFFFF, addr, (type == -1) ? "instruction" : "data",  doWrite ? "write" : "read", size);
+  }
   m_cube_requests.insert(make_pair(req->id, key));
 }
 
@@ -571,7 +583,9 @@ void macsimComponent::handleCubeEvent(Interfaces::SimpleMem::Request *req)
     // No matching request
     m_dbg->fatal(CALL_INFO, -1, "Event (%#" PRIx64 ") not found!\n", req->id);
   } else {
-    MSC_DEBUG("Cube response arrived\n");
+    if (m_debug_all || m_debug_addr == req->addr) {
+      MSC_DEBUG("Cube response arrived: addr = %#" PRIx64 ", size = %lu\n", req->addr, req->size);
+    }
     m_cube_responses.insert(i->second);
     m_cube_requests.erase(i);
   }

@@ -55,6 +55,8 @@ private:
     bool m_sim_running;
     bool m_ptx_core;
     bool m_cube_connected;
+    bool m_debug_all;
+    uint64_t m_debug_addr;
     uint64_t m_mem_size;
 
     int m_operation_mode;
