@@ -103,7 +103,8 @@ case HMC_FP_ADD:        STAT_CORE_EVENT(core_id, HMC_INST_COUNT_FP_ADD);break;\
 case HMC_COMP_greater:  STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_greater);break;\
 case HMC_COMP_less:     STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_less);break;\
 case HMC_COMP_equal:    STAT_CORE_EVENT(core_id, HMC_INST_COUNT_COMP_equal);break;\
-case NUM_HMC_TYPES: break;}
+case NUM_HMC_TYPES: break;\
+default: break;}
 
 
 /*
