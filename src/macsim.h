@@ -316,15 +316,37 @@ class macsim_c
 #ifdef USING_SST
 #include "callback.h"
   public:
-    CallbackSendInstReq *sendInstReq;
-    CallbackSendDataReq *sendDataReq;
-    CallbackSendCubeReq *sendCubeReq;
-    CallbackStrobeInstRespQ *strobeInstRespQ;
-    CallbackStrobeDataRespQ *strobeDataRespQ;
+    // callback functions for sending requests
+    CallbackSendInstructionCacheRequest *sendInstructionCacheRequest;
+    CallbackSendDataCacheRequest *sendDataCacheRequest;
+    CallbackSendConstCacheRequest *sendConstCacheRequest;
+    CallbackSendTextureCacheRequest *sendTextureCacheRequest;
+    CallbackSendCubeRequest *sendCubeRequest;
+
+    // callback functions for strobing responses
+    CallbackStrobeInstructionCacheRespQ *strobeInstructionCacheRespQ;
+    CallbackStrobeDataCacheRespQ *strobeDataCacheRespQ;
+    CallbackStrobeConstCacheRespQ *strobeConstCacheRespQ;
+    CallbackStrobeTextureCacheRespQ *strobeTextureCacheRespQ;
     CallbackStrobeCubeRespQ *strobeCubeRespQ;
 
-    void registerCallback(CallbackSendInstReq*, CallbackSendDataReq*, CallbackStrobeInstRespQ*, CallbackStrobeDataRespQ*);
-    void registerCallback(CallbackSendCubeReq*, CallbackStrobeCubeRespQ*);
+    void registerCallback(
+      CallbackSendInstructionCacheRequest*, 
+      CallbackSendDataCacheRequest*, 
+      CallbackSendConstCacheRequest*, 
+      CallbackSendTextureCacheRequest*,
+      CallbackStrobeInstructionCacheRespQ*, 
+      CallbackStrobeDataCacheRespQ*, 
+      CallbackStrobeConstCacheRespQ*, 
+      CallbackStrobeTextureCacheRespQ*);
+    void registerCallback(
+      CallbackSendInstructionCacheRequest*, 
+      CallbackSendDataCacheRequest*, 
+      CallbackStrobeInstructionCacheRespQ*, 
+      CallbackStrobeDataCacheRespQ*);
+    void registerCallback(
+      CallbackSendCubeRequest*, 
+      CallbackStrobeCubeRespQ*);
 
     void start() { m_started = true; }
     void halt() { m_started = false; }

@@ -130,7 +130,7 @@ void dram_sst_vaultsim_c::send_packet(mem_req_s* req)
   int size = req->m_size;
   int type = req->m_type == MRT_DSTORE ? MEM_ST : MEM_LD;
 
-  (*(m_simBase->sendCubeReq))(key, addr, size, type);
+  (*(m_simBase->sendCubeRequest))(key, addr, size, type);
 }
 
 void dram_sst_vaultsim_c::receive(void)

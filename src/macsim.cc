@@ -1111,24 +1111,42 @@ int macsim_c::get_current_frequency_uncore(int type)
 
 #ifdef USING_SST
 void macsim_c::registerCallback(
-    CallbackSendInstReq* sir, 
-    CallbackSendDataReq* sdr, 
-    CallbackStrobeInstRespQ* sirq, 
-    CallbackStrobeDataRespQ* sdrq)
+  CallbackSendInstructionCacheRequest* sir, 
+  CallbackSendDataCacheRequest* sdr, 
+  CallbackSendConstCacheRequest* scr, 
+  CallbackSendTextureCacheRequest* str,
+  CallbackStrobeInstructionCacheRespQ* sirq, 
+  CallbackStrobeDataCacheRespQ* sdrq, 
+  CallbackStrobeConstCacheRespQ* scrq, 
+  CallbackStrobeTextureCacheRespQ* strq) 
 {
-  sendInstReq = sir;
-  sendDataReq = sdr;
-  strobeInstRespQ = sirq;
-  strobeDataRespQ = sdrq;
-
-  sendCubeReq = NULL;
+  sendInstructionCacheRequest = sir;
+  sendDataCacheRequest = sdr;
+  sendConstCacheRequest = scr;
+  sendTextureCacheRequest = str;
+  strobeInstructionCacheRespQ = sirq;
+  strobeDataCacheRespQ = sdrq;
+  strobeConstCacheRespQ = scrq;
+  strobeTextureCacheRespQ = strq;
 }
 
 void macsim_c::registerCallback(
-    CallbackSendCubeReq* scr, 
-    CallbackStrobeCubeRespQ* scrq)
+  CallbackSendInstructionCacheRequest* sir, 
+  CallbackSendDataCacheRequest* sdr, 
+  CallbackStrobeInstructionCacheRespQ* sirq, 
+  CallbackStrobeDataCacheRespQ* sdrq) 
 {
-  sendCubeReq = scr;
+  sendInstructionCacheRequest = sir;
+  sendDataCacheRequest = sdr;
+  strobeInstructionCacheRespQ = sirq;
+  strobeDataCacheRespQ = sdrq;
+}
+
+void macsim_c::registerCallback(
+  CallbackSendCubeRequest* scr, 
+  CallbackStrobeCubeRespQ* scrq)
+{
+  sendCubeRequest = scr;
   strobeCubeRespQ = scrq;
 }
 #endif //USING_SST

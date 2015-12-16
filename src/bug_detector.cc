@@ -47,6 +47,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "uop.h"
 #include "trace_read.h"
+#include "trace_read_gpu.h"
+#include "trace_read_cpu.h"
 
 #include "all_knobs.h"
 
@@ -147,6 +149,9 @@ void bug_detector_c::print(int core_id, int thread_id)
 
   ofstream out("bug_detect_uop.out");
   for (int ii = 0; ii < m_num_core; ++ii) {
+    core_c *core = m_simBase->m_core_pointers[ii];
+    string core_type = core->get_core_type();
+    
     unsigned int average_latency = 0;
     if (m_latency_count[ii] > 0)
       average_latency = m_latency_sum[ii] / m_latency_count[ii];
@@ -168,6 +173,7 @@ void bug_detector_c::print(int core_id, int thread_id)
       << setw(25) << left << "OPCODE"
       << setw(20) << left << "UOP_TYPE"
       << setw(20) << left << "MEM_TYPE"
+      << setw(20) << left << "MEM_ADDR"
       << setw(20) << left << "CF_TYPE"
       << setw(20) << left << "DEP_TYPE" 
       << setw(6)  << left << "CHILD"
@@ -193,9 +199,12 @@ void bug_detector_c::print(int core_id, int thread_id)
         << setw(15) << left << (*m_uop_table[ii])[(*I)]
         << setw(15) << left << CYCLE - (*m_uop_table[ii])[(*I)]
         << setw(25) << left << uop_c::g_uop_state_name[uop->m_state] 
-        << setw(25) << left << trace_read_c::g_tr_opcode_names[uop->m_opcode] 
+        << setw(25) << left << (core_type == "ptx" ? 
+                               gpu_decoder_c::g_tr_opcode_names[uop->m_opcode] : 
+                               cpu_decoder_c::g_tr_opcode_names[uop->m_opcode])
         << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type]
         << setw(20) << left << uop_c::g_mem_type_name[uop->m_mem_type]
+        << setw(20) << left << hex << uop->m_vaddr << dec
         << setw(20) << left << uop_c::g_cf_type_name[uop->m_cf_type]
         << setw(20) << left << uop_c::g_dep_type_name[uop->m_bar_type]
         << setw(6)  << left << uop->m_num_child_uops
