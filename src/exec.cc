@@ -352,26 +352,45 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             //  0 - could not execute / no space in the memory hierarchy, try again
             //  x > 0 - cache hit
             //  FIXME
-          #if PORT_FIXME
-            if (0 && m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] == true) {
-              STAT_EVENT(CACHE_BANK_BUSY);
-              uop_latency = 0;
-            }
-            else {
-          #endif
-            #ifdef USING_SST
-              latency = access_data_cache(uop->m_child_uops[next_set_bit]); 
-            #else //USING_SST
-              latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
-            #endif //USING_SST
 
-          #if PORT_FIXME
-              if (latency == 0) {
-                if (m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] < 128)
-                  m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] = true;
-              }
+            // constant memory
+            if (uop->m_mem_type == MEM_LD_CM) {
+            #ifdef USING_SST
+              latency = access_const_texture_cache(uop->m_child_uops[next_set_bit]);
+            #else
+              latency = core->get_const_cache()->load(uop->m_child_uops[next_set_bit]);
+            #endif
             }
-          #endif
+            else if (uop->m_mem_type == MEM_LD_TM) {
+            #ifdef USING_SST
+              latency = access_const_texture_cache(uop->m_child_uops[next_set_bit]);
+            #else
+              latency = core->get_texture_cache()->load(uop->m_child_uops[next_set_bit]);
+            #endif            
+            }
+            // other (global, texture, local) memory access
+            else {
+            #if PORT_FIXME
+              if (0 && m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] == true) {
+                STAT_EVENT(CACHE_BANK_BUSY);
+                uop_latency = 0;
+              }
+              else {
+            #endif
+              #ifdef USING_SST
+                latency = access_data_cache(uop->m_child_uops[next_set_bit]); 
+              #else //USING_SST
+                latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
+              #endif //USING_SST
+
+            #if PORT_FIXME
+                if (latency == 0) {
+                  if (m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] < 128)
+                    m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] = true;
+                }
+              }
+            #endif
+            }
           }
 
           if (0 != latency) { // successful execution
