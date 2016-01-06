@@ -265,18 +265,22 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
 
   // Uop exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
+  ASSERT(m_num_in_sched > 0);
   --m_num_in_sched;
   POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_W);
   POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_W);
 
   switch (q_num) {
     case gen_ALLOCQ : 
+      ASSERT(m_num_per_sched[gen_ALLOCQ] > 0);
       --m_num_per_sched[gen_ALLOCQ]; 
       break;
     case mem_ALLOCQ : 
+      ASSERT(m_num_per_sched[mem_ALLOCQ] > 0);
       --m_num_per_sched[mem_ALLOCQ];  
       break;
     case fp_ALLOCQ : 
+      ASSERT(m_num_per_sched[fp_ALLOCQ] > 0);
       --m_num_per_sched[fp_ALLOCQ]; 
       break;
     default:

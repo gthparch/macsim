@@ -272,13 +272,13 @@ void frontend_c::run_a_cycle(void)
             if (!(KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))) {
               // Strobing
               for (auto I = m_fetch_buffer.begin(), E = m_fetch_buffer.end(); I != E; I++) {
-                bool responseArrived = (*(m_simBase->strobeInstRespQ))(m_core_id, I->first);
+                bool responseArrived = (*(m_simBase->strobeInstructionCacheRespQ))(m_core_id, I->first);
                 if (responseArrived) {
                   I->second = true;
                 }
               }
 
-              uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, fetch_data->m_fetch_ready_addr, 0);
+              uint64_t key = UNIQUE_KEY(m_core_id, fetch_thread, 0, fetch_data->m_fetch_ready_addr, 0);
               auto i = m_fetch_buffer.find(key);
               if (m_fetch_buffer.end() != i) {
                 bool responseArrived = i->second;
@@ -417,23 +417,16 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
     // -------------------------------------
     // instruction cache access
     // -------------------------------------
+    bool icache_miss = true;
 #ifdef USING_SST
-    bool icache_miss;
     // Access instruction cache only for new cache block
     if (last_fetched_addr[tid] != fetch_addr) {
-      if (KNOB(KNOB_USE_MEMHIERARCHY)->getValue()) {
-        if (KNOB(KNOB_USE_VAULTSIM_LINK)->getValue() && (m_core->get_unit_type() == UNIT_SMALL))
-          icache_miss = access_icache(tid, fetch_addr, fetch_data);
-        else
-          icache_miss = access_memhierarchy_cache(tid, fetch_addr, fetch_data);
-      } else {
-        icache_miss = access_icache(tid, fetch_addr, fetch_data);
-      }
+      icache_miss = access_icache(tid, fetch_addr, fetch_data);
     } else {
       icache_miss = false;
     }
-#else // USING_SST
-    bool icache_miss = access_icache(tid, fetch_addr, fetch_data);
+#else
+    icache_miss = access_icache(tid, fetch_addr, fetch_data);
 #endif // USING_SST
 
     // instruction cache miss
@@ -580,6 +573,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
 // instruction cache access 
 bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
 {
+#ifndef USING_SST
   Addr line_addr;
   Addr new_fetch_addr;
   icache_data_c *icache_line;
@@ -641,6 +635,50 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr, frontend_s* fetch_data)
     fetch_data->m_fetch_ready_addr = line_addr;  
   }
   return cache_miss;
+#else
+  bool cache_miss = CACHE_MISS;
+
+  if (fetch_addr == 0) {
+    return CACHE_HIT;
+  }
+
+  if (KNOB(KNOB_PERFECT_ICACHE)->getValue()) {
+    cache_miss = CACHE_HIT;
+  } else {
+    // assign unique key to each memory request; this will be used later in time for strobbing
+    uint64_t key = UNIQUE_KEY(m_core_id, tid, 0, fetch_addr, 0);
+    DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, fetch_data = %p, fetch_addr = 0x%llx, key = %lx\n", 
+      m_core_id, tid, fetch_data, fetch_addr, key);
+
+    auto i = m_fetch_buffer.find(key);
+    if (m_fetch_buffer.end() == i) { // New Request
+      DEBUG_CORE(m_core_id, "sending memory request (fetch_addr = 0x%llx) to instruction cache\n", fetch_addr);
+      int line_size = KNOB(KNOB_ICACHE_LARGE_LINE_SIZE)->getValue();
+      Addr line_addr = fetch_addr & ~((uint64_t)line_size-1);
+      (*(m_simBase->sendInstructionCacheRequest))(m_core_id, key, line_addr, line_size);
+
+      DEBUG_CORE(m_core_id, "fetch_data inserted into buffer. fetch_addr = 0x%llx\n", fetch_addr);
+      m_fetch_buffer.insert(std::make_pair(key, false));
+
+      // by setting m_fetch_ready_addr non-zero, fetch will be blocked
+      fetch_data->m_fetch_ready_addr = fetch_addr;  
+      cache_miss = CACHE_MISS;
+    } else {
+      //DEBUG_CORE(m_core_id, "strobing fetch_data = %p\n", i->first);
+      bool responseArrived = i->second;
+      if (responseArrived) {
+        DEBUG_CORE(m_core_id, "response has arrived from memHierarchy! Good to go\n");
+        m_fetch_buffer.erase(i);
+        cache_miss = CACHE_HIT;
+      } else {
+        DEBUG_CORE(m_core_id, "response has not arrived yet! Wait more\n");
+        cache_miss = CACHE_MISS;
+      }
+    }
+  }
+
+  return cache_miss;
+#endif
 }
 
 
@@ -985,52 +1023,3 @@ void frontend_c::set_load_wait(int fetch_id, Counter uop_num)
   ++fetch_data->m_MT_load_waiting;
   fetch_data->m_load_waiting[uop_num] = true;
 }
-
-
-#ifdef USING_SST
-bool frontend_c::access_memhierarchy_cache(int tid, Addr fetch_addr, frontend_s* fetch_data)
-{
-  bool cache_miss = CACHE_MISS;
-
-  if (fetch_addr == 0) {
-    return CACHE_HIT;
-  }
-
-  if (KNOB(KNOB_PERFECT_ICACHE)->getValue()) {
-    cache_miss = CACHE_HIT;
-  } else {
-    uint64_t key = UNIQUE_KEY(m_core_id, tid, fetch_addr, 0);
-    DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, fetch_data = %p, fetch_addr = 0x%llx, key = %lx\n", 
-        m_core_id, tid, fetch_data, fetch_addr, key);
-
-    // Sending
-    auto i = m_fetch_buffer.find(key);
-    if (m_fetch_buffer.end() == i) { // New Request
-      DEBUG_CORE(m_core_id, "sending memory request (fetch_addr = 0x%llx) to memHierarchy\n", fetch_addr);
-      int line_size = KNOB(KNOB_ICACHE_LARGE_LINE_SIZE)->getValue();
-      Addr line_addr = fetch_addr & ~((uint64_t)line_size-1);
-      (*(m_simBase->sendInstReq))(m_core_id, key, line_addr, line_size);
-
-      DEBUG_CORE(m_core_id, "fetch_data inserted into buffer. fetch_addr = 0x%llx\n", fetch_addr);
-      m_fetch_buffer.insert(std::make_pair(key, false));
-
-      // by setting m_fetch_ready_addr non-zero, fetch will be blocked
-      fetch_data->m_fetch_ready_addr = fetch_addr;  
-      cache_miss = CACHE_MISS;
-    } else {
-      //DEBUG_CORE(m_core_id, "strobing fetch_data = %p\n", i->first);
-      bool responseArrived = i->second;
-      if (responseArrived) {
-        DEBUG_CORE(m_core_id, "response has arrived from memHierarchy! Good to go\n");
-        m_fetch_buffer.erase(i);
-        cache_miss = CACHE_HIT;
-      } else {
-        DEBUG_CORE(m_core_id, "response has not arrived yet! Wait more\n");
-        cache_miss = CACHE_MISS;
-      }
-    }
-  }
-
-  return cache_miss;
-}
-#endif //USING_SST

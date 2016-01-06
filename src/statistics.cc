@@ -171,7 +171,7 @@ void DIST_Stat::writeTo(ofstream& stream)
   iter = m_distributionMembers.begin();
   end = m_distributionMembers.end();
 
-  int count = 0;
+  unsigned long long count = 0;
   float percent = 0;
 
   while (iter != end) {

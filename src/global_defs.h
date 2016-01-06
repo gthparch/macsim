@@ -216,18 +216,22 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 
 #ifdef USING_SST
 #include "callback.h"
-typedef SST::MacSim::CallbackBase4<void,int,uint64_t,uint64_t,int> CallbackSendInstReq;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendInstructionCacheRequest;
 #ifdef USE_VAULTSIM_HMC
-typedef SST::MacSim::CallbackBase7<void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t> CallbackSendDataReq;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t> CallbackSendDataCacheRequest;
 #else
-typedef SST::MacSim::CallbackBase5<void,int,uint64_t,uint64_t,int,int> CallbackSendDataReq;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int> CallbackSendDataCacheRequest;
 #endif
-typedef SST::MacSim::CallbackBase4<void,uint64_t,uint64_t,int,int> CallbackSendCubeReq;
-typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeInstRespQ;
-typedef SST::MacSim::CallbackBase2<bool,int,uint64_t> CallbackStrobeDataRespQ;
-typedef SST::MacSim::CallbackBase1<bool,uint64_t> CallbackStrobeCubeRespQ;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendConstCacheRequest;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendTextureCacheRequest;
+typedef SST::MacSim::CallbackBase<void,uint64_t,uint64_t,int,int> CallbackSendCubeRequest;
+typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeInstructionCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeDataCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeConstCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeTextureCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool,uint64_t> CallbackStrobeCubeRespQ;
 
-#define UNIQUE_KEY(C,T,A,I) ((A<<19)|((C&0xF)<<15)|((T&0xFF)<<7)|I)
+#define UNIQUE_KEY(C,T,U,A,I) ((A<<35)|((U&0xFFF)<<23)|((C&0x3F)<<17)|((T&0x7F)<<10)|I)
 #endif //USING_SST
 
 #endif

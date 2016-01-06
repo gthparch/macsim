@@ -15,6 +15,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/src/orion \
   -std=c++0x \
 	-DUSING_SST \
+	-DNO_DEBUG \
 	$(HMC_FLAG) \
 	-g
 

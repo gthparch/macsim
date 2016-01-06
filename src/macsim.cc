@@ -156,10 +156,6 @@ void macsim_c::init_knobs(int argc, char** argv)
   char* pInvalidArgument = NULL;
   if (!m_knobsContainer->applyComandLineArguments(argc-3, argv+3, &pInvalidArgument)) {
   }
-
-  //save the states of all knobs to a file
-  m_knobsContainer->saveToFile(outputPath + "/params.out");
-
 #else
   // apply values from parameters file
   m_knobsContainer->applyParamFile("params.in");
@@ -168,10 +164,10 @@ void macsim_c::init_knobs(int argc, char** argv)
   char* pInvalidArgument = NULL;
   if (!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
   }
-
-  // save the states of all knobs to a file
-  m_knobsContainer->saveToFile("params.out");
 #endif
+
+  //save the states of all knobs to a file
+  m_knobsContainer->saveToFile("params.out");
 }
 
 
@@ -1116,24 +1112,42 @@ int macsim_c::get_current_frequency_uncore(int type)
 
 #ifdef USING_SST
 void macsim_c::registerCallback(
-    CallbackSendInstReq* sir, 
-    CallbackSendDataReq* sdr, 
-    CallbackStrobeInstRespQ* sirq, 
-    CallbackStrobeDataRespQ* sdrq)
+  CallbackSendInstructionCacheRequest* sir, 
+  CallbackSendDataCacheRequest* sdr, 
+  CallbackSendConstCacheRequest* scr, 
+  CallbackSendTextureCacheRequest* str,
+  CallbackStrobeInstructionCacheRespQ* sirq, 
+  CallbackStrobeDataCacheRespQ* sdrq, 
+  CallbackStrobeConstCacheRespQ* scrq, 
+  CallbackStrobeTextureCacheRespQ* strq) 
 {
-  sendInstReq = sir;
-  sendDataReq = sdr;
-  strobeInstRespQ = sirq;
-  strobeDataRespQ = sdrq;
-
-  sendCubeReq = NULL;
+  sendInstructionCacheRequest = sir;
+  sendDataCacheRequest = sdr;
+  sendConstCacheRequest = scr;
+  sendTextureCacheRequest = str;
+  strobeInstructionCacheRespQ = sirq;
+  strobeDataCacheRespQ = sdrq;
+  strobeConstCacheRespQ = scrq;
+  strobeTextureCacheRespQ = strq;
 }
 
 void macsim_c::registerCallback(
-    CallbackSendCubeReq* scr, 
-    CallbackStrobeCubeRespQ* scrq)
+  CallbackSendInstructionCacheRequest* sir, 
+  CallbackSendDataCacheRequest* sdr, 
+  CallbackStrobeInstructionCacheRespQ* sirq, 
+  CallbackStrobeDataCacheRespQ* sdrq) 
 {
-  sendCubeReq = scr;
+  sendInstructionCacheRequest = sir;
+  sendDataCacheRequest = sdr;
+  strobeInstructionCacheRespQ = sirq;
+  strobeDataCacheRespQ = sdrq;
+}
+
+void macsim_c::registerCallback(
+  CallbackSendCubeRequest* scr, 
+  CallbackStrobeCubeRespQ* scrq)
+{
+  sendCubeRequest = scr;
   strobeCubeRespQ = scrq;
 }
 #endif //USING_SST
