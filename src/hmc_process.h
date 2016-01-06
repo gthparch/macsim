@@ -26,6 +26,8 @@ public:
     // get HMC instruction information
     static void hmc_info_read(string file_name_base,
                               map<uint64_t, hmc_inst_s> & m_hmc_info);
+    static void lock_info_read(string file_name_base,
+                              map<uint64_t, hmc_inst_s> & m_lock_info);
 
     // generate hmc inst
     static HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info,
@@ -40,7 +42,11 @@ public:
         uop_c *uop,
         int sim_thread_id);
 
-
+    static bool get_uops_from_traces_with_hmc_trans(
+        void * ptr,
+        int core_id,
+        uop_c *uop,
+        int sim_thread_id);
 };
 
 

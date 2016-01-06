@@ -485,6 +485,7 @@ void uop_c::init()
   m_in_scheduler                      = false;
 
   m_hmc_inst                          = HMC_NONE;
+  m_hmc_trans_id                      = 0;
 }
 
 

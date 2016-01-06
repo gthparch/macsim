@@ -218,7 +218,7 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 #include "callback.h"
 typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendInstructionCacheRequest;
 #ifdef USE_VAULTSIM_HMC
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint8_t> CallbackSendDataCacheRequest;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t> CallbackSendDataCacheRequest;
 #else
 typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int> CallbackSendDataCacheRequest;
 #endif

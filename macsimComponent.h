@@ -98,7 +98,7 @@ private:
     // callback functions for sending requests; these will be called by macsim 
     void sendInstructionCacheRequest(int,uint64_t,uint64_t,int);
 #ifdef USE_VAULTSIM_HMC 
-    void sendDataCacheRequest(int,uint64_t,uint64_t,int,int,uint8_t);
+    void sendDataCacheRequest(int,uint64_t,uint64_t,int,int,uint8_t,uint64_t);
 #else
     void sendDataCacheRequest(int,uint64_t,uint64_t,int,int);
 #endif

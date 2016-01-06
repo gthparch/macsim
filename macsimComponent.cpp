@@ -212,7 +212,7 @@ void macsimComponent::setup()
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstructionCacheRequest);
   CallbackSendDataCacheRequest* sdr = 
 #ifdef USE_VAULTSIM_HMC  
-    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t>(this, &macsimComponent::sendDataCacheRequest);
+    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t>(this, &macsimComponent::sendDataCacheRequest);
 #else
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataCacheRequest);
 #endif
@@ -403,7 +403,7 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
   }
 }
 #else
-void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0)
+void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0,uint64_t trans_id=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
@@ -411,13 +411,16 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
     flag = SimpleMem::Request::F_NONCACHEABLE;
     hmc_type = hmc_type & 0b01111111;
   }
-  SimpleMem::Request *req = new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
+  SimpleMem::Request *req = 
+    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type, trans_id);
+  //if (hmc_type!=0) cout<<"HMC: "<<(unsigned)hmc_type<<"\t trans: "<<trans_id
+  //    <<" isStore: "<<doWrite<<endl;
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
-
   if (m_debug_all || m_debug_addr == addr) {
-    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
+      core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
   }
 }
 #endif

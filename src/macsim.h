@@ -198,6 +198,7 @@ class macsim_c
 #endif
 
 	public:
+        uint64_t m_hmc_trans_id_gen;
 		int m_num_active_threads; /**< number of active threads */
 		int m_num_waiting_dispatched_threads; /**< number of threads waiting for begin dispatched */
 		int m_total_num_application; /**< total number of applications */

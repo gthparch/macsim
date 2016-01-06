@@ -228,6 +228,11 @@ typedef struct thread_s {
   bool              has_cached_inst;  /**< flag: indicate if cached inst exists */
   HMC_Type          m_prev_hmc_type;  /**< hmc type of prev inst */
   HMC_Type          m_next_hmc_type;  /**< hmc type of next inst */
+  bool              m_inside_hmc_func;
+  uint64_t          m_next_hmc_func_ret;
+  uint64_t          m_prev_hmc_trans_id;
+  uint64_t          m_next_hmc_trans_id;
+  uint64_t          m_cur_hmc_trans_cnt; // the #th mem uop in the trans
 } thread_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,6 +277,7 @@ typedef struct process_s {
 
   // changed by Lifeng
   map<uint64_t, hmc_inst_s> m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
+  map<uint64_t, hmc_inst_s> m_lock_info;
 } process_s;
 
 
