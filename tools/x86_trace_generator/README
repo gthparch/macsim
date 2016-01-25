@@ -1,3 +1,5 @@
+Please use Pin 2.12 (version number 56759) for the current trace generator 
+
 How to generate x86 traces
 
   1. Simpoint - Mostly we use SimPoint (PinPoint). Follow instruction
