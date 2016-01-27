@@ -199,6 +199,9 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                     trace_info_cpu_s hmc_trace_info;
                     trace_info_cpu_s cur_trace_info;
                     uint64_t hmc_vaddr = 0; // target mem vaddr for HMC inst
+
+		    printf("HMC---!!! cycle_count:%lld --begining \n", core->get_cycle_count()); 
+
                     while (true)
                     {
                         read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, (&cur_trace_info),
@@ -210,9 +213,14 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                         if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
                             hmc_vaddr = cur_trace_info.m_ld_vaddr1;
 
+			printf("HMC---!!! cycle_count:%lld --begining : vaddr:%lx removing instructions....\n", 
+			       core->get_cycle_count(), hmc_vaddr); 
                         // break when trace read has an error
                         if (!read_success) return false;
 
+			STAT_CORE_EVENT(core_id, HMC_REMOVE_INST_COUNT);
+			STAT_EVENT(HMC_REMOVE_INST_COUNT_TOT);
+			
                         // break when find the return instruction
                         if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc)
                             break;
@@ -230,7 +238,9 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                         // cache the inst@ret_pc for later fetch
                         memcpy(&(thread_trace_info->cached_inst), &cur_trace_info, sizeof(trace_info_cpu_s));
                         thread_trace_info->has_cached_inst = true;
-
+			printf("HMC---!!! cycle_count:%lld \n", core->get_cycle_count()); 
+			DEBUG_CORE(core_id, "core_id:%d thread_id:%d hmc_inst\n", 
+				   core_id, sim_thread_id); 
                         STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
                         STAT_EVENT(HMC_INST_COUNT_TOT);
                         HMC_EVENT_COUNT(core_id, ret);
@@ -434,9 +444,9 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
     // uop number is specific to the core
     uop->m_unique_num = core->inc_and_get_unique_uop_num();
 
-    DEBUG_CORE(uop->m_core_id, "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d "
-               "pc:0x%llx dir:%d \n", uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests,
-               thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
+    DEBUG_CORE(uop->m_core_id, "unique_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d "
+               "pc:0x%llx dir:%d va:%llx hmc_type:%d\n", uop->m_unique_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests,
+               thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir, uop->m_vaddr, uop->m_hmc_inst);
 
     // filling the src_info, dest_info
     if (uop->m_num_srcs < MAX_SRCS)
@@ -444,7 +454,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
         for (int index=0; index < uop->m_num_srcs; ++index)
         {
             uop->m_src_info[index] = trace_uop->m_srcs[index].m_id;
-            //DEBUG("uop_num:%lld src_info[%d]:%d\n", uop->uop_num, index, uop->src_info[index]);
+            DEBUG_CORE(uop->m_core_id, "unique_num:%lld src_info[%d]:%u\n", uop->m_unique_num, index, uop->m_src_info[index]);
         }
     }
     else
@@ -457,9 +467,11 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
     for (int index = 0; index < uop->m_num_dests; ++index)
     {
         uop->m_dest_info[index] = trace_uop->m_dests[index].m_id;
+	DEBUG_CORE(uop->m_core_id, "unique_num:%lld dest_info[%d]:%u\n", uop->m_unique_num, index, uop->m_dest_info[index]);
         ASSERT(trace_uop->m_dests[index].m_reg < NUM_REG_IDS);
     }
 
+    
     uop->m_uop_num          = (thread_trace_info->m_temp_uop_count++);
     uop->m_thread_id        = sim_thread_id;
     uop->m_block_id         = ((core)->get_trace_info(sim_thread_id))->m_block_id;
@@ -473,8 +485,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
     /// removed
     ///
 
-    DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
-               uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+    DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld hmc_inst:%d\n",
+               uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_hmc_inst);
 
     return read_success;
 }
