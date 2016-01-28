@@ -42,6 +42,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 all_knobs_c::all_knobs_c() {
 
+    const char* qsim_prefix = getenv("QSIM_PREFIX");
+
+    if (!qsim_prefix) qsim_prefix = "/usr/local";
+
     Knob_trace_name = new KnobTemplate<string> ("tracename","trace");
     Knob_inst_dump = new KnobTemplate<bool> ("dump", 1);
     Knob_dump_max = new KnobTemplate<UINT32> ("dump_max", 50000);
@@ -50,9 +54,9 @@ all_knobs_c::all_knobs_c() {
     Knob_max = new KnobTemplate<UINT64> ("max", 0);
     Knob_extra_memops = new KnobTemplate<bool> ("extra_memops", 0);
     Knob_trace_mode = new KnobTemplate<string> ("tracemode","all");
-    Knob_state_file = new KnobTemplate<string> ("statefile", "../../state.1");
+    Knob_state_file = new KnobTemplate<string> ("statefile", std::string(qsim_prefix) + "/state.1");
     Knob_qsim_trace_name = new KnobTemplate<string> ("qsim_tracename", "qsim_trace");
-    Knob_tar = new KnobTemplate<string> ("tar", "./examples/example1.tar");
+    Knob_tar = new KnobTemplate<string> ("tar", "./examples/hello_world.tar");
     Knob_use_va = new KnobTemplate<bool> ("use_va", 0);
 }
 

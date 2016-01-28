@@ -40,6 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <qsim.h>
 #include <qsim-load.h>
+#include <qsim-x86-regs.h>
 
 #include "distorm.h"
 #include "trace_generator.h"
@@ -775,7 +776,7 @@ void TraceWriter::mem_cb(int c, uint64_t v, uint64_t p, uint8_t s, int w) {
                         Inst_info *info = g_inst_storage[tid][curr_iaddr[tid]];
                         
                         // Set the direction flag. Useful for MOVS/STOS 
-                        info -> rep_dir =  ((osd.get_reg(c, QSIM_RFLAGS) & (0x400)) >> 10); 
+                        info -> rep_dir =  ((osd.get_reg(c, QSIM_X86_RFLAGS) & (0x400)) >> 10); 
 		        
                         if ((info -> num_ld) && !w){
 
@@ -900,6 +901,7 @@ int TraceWriter::atomic_cb(int c) {
 
 int TraceWriter::app_end_cb(int c)   { 
 
+    std::cout << "App end cb called." << std::endl;
 	if(!finished){
 		finished = true; 
 
@@ -1173,9 +1175,9 @@ int main(int argc, char** argv) {
 	outfile = new ofstream(KNOB(Knob_qsim_trace_name)->getValue().c_str());
     
 	OSDomain *osd_p(NULL);
-	OSDomain &osd(*osd_p);
 	// Create new OSDomain from saved state.
-	osd_p = new OSDomain(KNOB(Knob_state_file)->getValue().c_str());
+    osd_p = new OSDomain(KNOB(Knob_num_cpus)->getValue(), KNOB(Knob_state_file)->getValue().c_str());
+    OSDomain &osd(*osd_p);
 	unsigned n_cpus = osd.get_n();
 
 	if (KNOB(Knob_num_cpus)->getValue() != n_cpus){
@@ -1190,14 +1192,7 @@ int main(int argc, char** argv) {
 
 	// The main loop: run until 'finished' is true.
 	while (!tw.hasFinished()) {
-
-		for (unsigned i = 0; i < 1000000; i++) {
-			for (unsigned j = 0; j < n_cpus; j++) {
-				osd.run(j, 1);
-			}
-		}
-
-		osd.timer_interrupt();
+        osd.run(0, 1000);
 	}
 
 	if (outfile) { outfile->close(); }
