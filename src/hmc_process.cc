@@ -473,7 +473,8 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
         for (int index=0; index < uop->m_num_srcs; ++index)
         {
 	  uop->m_src_info[index] = trace_uop->m_srcs[index].m_id;
-	  if (uop->m_hmc_inst)   uop->m_src_info[index]  = thread_trace_info->m_last_dest_reg;
+	  if (*KNOB(KNOB_HMC_ADD_DEP))
+	      if (uop->m_hmc_inst)   uop->m_src_info[index]  = thread_trace_info->m_last_dest_reg;
 	  DEBUG_CORE(uop->m_core_id, "unique_num:%lld src_info[%d]:%u last_dest_reg:%d\n", uop->m_unique_num, index, uop->m_src_info[index], thread_trace_info->m_last_dest_reg);
         }
     }
