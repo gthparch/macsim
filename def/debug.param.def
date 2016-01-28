@@ -51,3 +51,4 @@ param<DEBUG_DRAM,                debug_dram,                uns,             0>
 param<DEBUG_PRINT_TRACE,         debug_print_trace,         uns,             0>
 param<DEBUG_MEM_TRACE,           debug_mem_trace,           bool,            false>
 param<DEBUG_NOC,                 debug_noc,                 bool,            false>
+param<DEBUG_HMC,                 debug_hmc,                 bool,            false>

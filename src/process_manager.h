@@ -233,6 +233,7 @@ typedef struct thread_s {
   uint64_t          m_prev_hmc_trans_id;
   uint64_t          m_next_hmc_trans_id;
   uint64_t          m_cur_hmc_trans_cnt; // the #th mem uop in the trans
+  uns16             m_last_dest_reg; 
 } thread_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

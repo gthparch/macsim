@@ -70,9 +70,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ## args)
+#define DEBUG_HMC(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_HMC, ## args)
 #define DEBUG_CORE(m_core_id, args...)       \
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ## args); \
+  }
+#define DEBUG_HMC_CORE(m_core_id, args...)       \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_HMC, ## args); \
   }
 
 #define CLEAR_BIT(val, pos)   (val & ~(0x1ULL << pos))
@@ -786,9 +791,12 @@ int exec_c::access_data_cache(uop_c* uop)
 #ifdef USE_VAULTSIM_HMC   
     uint8_t hmc_type = uop->m_hmc_inst;
     if (hmc_type!=0) HMC_EVENT_COUNT(m_core_id, hmc_type);
-    if (*KNOB(KNOB_ENABLE_HMC_DEBUG)) 
-    {
-        if (hmc_type!=0) cout<<"-HMC- "<<uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<endl;
+    if (*KNOB(KNOB_DEBUG_HMC)) {
+      if (hmc_type!=0) {
+	// cout<<"-HMC- "<<uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<endl;
+	DEBUG_HMC_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu unique_num:%llu pc:%llx va:%llx hmc_type:%d trans_id:%d\n",
+		       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, uop->m_pc, uop->m_vaddr, (int)hmc_type, (int)uop->m_hmc_trans_id);
+      }
     } 
     // mark highest bit if enabled cache bypass
     if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
