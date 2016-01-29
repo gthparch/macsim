@@ -11,10 +11,10 @@ import sys
 import ConfigParser
 
 
-## Check c++0x support
-def CheckCPP0x():
+## Check c++11 support
+def CheckCPP11():
   def SimpleCall(context):
-    cpp0x_test = '''
+    cpp11_test = '''
     #include <vector>
     #include <iostream>
   
@@ -27,18 +27,18 @@ def CheckCPP0x():
       for (auto itr = test_vector.begin(); itr != test_vector.end(); ++itr) {
         sum += (*itr);
       }
-      cout << sum << "\N";
+      cout << sum;
     }
     '''
-    context.Message('Checking for c++0x conformance...')
-    context.env.AppendUnique(CXXFLAGS=['-std=c++0x'])
-    result = context.TryCompile(cpp0x_test, '.cpp')
+    context.Message('Checking for c++11 conformance...')
+    context.env.AppendUnique(CXXFLAGS=['-std=c++11'])
+    result = context.TryCompile(cpp11_test, '.cpp')
     context.Result(result)
     return result
   return SimpleCall
 
 
-## Check c++0x support
+## Check c++11 support
 def pre_compile_check():
   ## Environment
   env = Environment()
@@ -48,14 +48,15 @@ def pre_compile_check():
     if key in custom_vars:
       env[key] = val
 
-  conf = Configure(env, custom_tests = {'CheckCPP0x' : CheckCPP0x()})
+  conf = Configure(env, custom_tests = {'CheckCPP11' : CheckCPP11()})
 
-  if not conf.CheckCPP0x():
-    print('Error: Your compiler does not support c++0x. Exit now...')
+  if not conf.CheckCPP11():
+    print('Error: Your compiler does not support c++11. Exit now...')
+    os.system('cat config.log')
     sys.exit()
 
 
-pre_compile_check()
+#pre_compile_check()
 
 
 ## Configuration
