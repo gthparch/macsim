@@ -1,21 +1,22 @@
+sudo: false
 language: cpp
-sudo: required
-dist: trusty
+compiler:
+  - gcc
+  - clang
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 addons:
-    apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        packages:
-        - g++-4.9
-        - clang-3.5
-        - zlib1g-dev
-        - scons
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - clang
+    - zlib1g-dev
 script:
         - scons
         - scons debug=1
-compiler:
-        - clang
-        - gcc
 git:
         submodules: false
 notifications:
