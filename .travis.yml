@@ -1,15 +1,18 @@
 language: cpp
-before_install:
-        - sudo apt-get install zlib1g-dev
+sudo: required
+dist: trusty
+addons:
+    apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.9
+        - clang-3.5
+        - zlib1g-dev
+        - scons
 script:
         - scons
         - scons debug=1
-install:
-        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test  # gcc v4.8
-        - sudo apt-get -qq update
-        - sudo apt-get -qq install g++-4.8
-        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-        - sudo apt-get -qq install clang-3.4
 compiler:
         - clang
         - gcc
@@ -19,5 +22,5 @@ notifications:
         email:
             recipients:
                 - macsim-dev-commits@googlegroups.com
-            on_success: always
+            on_success: change
             on_failure: always
