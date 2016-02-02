@@ -56,7 +56,7 @@ def pre_compile_check():
     sys.exit()
 
 
-#pre_compile_check()
+pre_compile_check()
 
 
 ## Configuration
