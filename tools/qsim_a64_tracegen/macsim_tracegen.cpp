@@ -505,7 +505,7 @@ int main(int argc, char** argv) {
   uint64_t inst_per_iter = 1000000000;
   int inst_run = inst_per_iter;
   while (!(inst_per_iter - inst_run)) {
-    inst_run = osd.run(0, inst_per_iter);
+    inst_run = osd.run(inst_per_iter);
     osd.timer_interrupt();
   }
 
