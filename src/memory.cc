@@ -350,6 +350,7 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
   m_memory = mem;
   m_next   = next;
   m_prev   = prev;
+  m_bypass = false;
 
   // clock cycle
   m_cycle = 0;
@@ -1613,6 +1614,8 @@ memory_c::memory_c(macsim_c* simBase)
   m_num_l3   = *m_simBase->m_knobs->KNOB_NUM_L3;
   m_num_mc   = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
 
+  m_num_gpu  = 0;
+  m_num_cpu  = 0;
 
   if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
     m_num_gpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
