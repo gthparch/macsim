@@ -1006,6 +1006,7 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       num_uop = 1;
 
       trace_uop[0]->m_mem_type = MEM_LD;
+      trace_uop[0]->m_mem_size = 4;
 
       // prefetch instruction
       if (pi->m_opcode == ARM64_INS_PRFM || pi->m_opcode == ARM64_INS_PRFUM)  {
@@ -1087,6 +1088,7 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
           }
         } else {
           trace_uop[1]->m_mem_type = MEM_LD;
+          trace_uop[1]->m_mem_size = 4;
         }
         trace_uop[1]->m_cf_type    = NOT_CF;
         trace_uop[1]->m_op_type    = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;

@@ -23,6 +23,8 @@ class a64_decoder_c : public cpu_decoder_c
     void dprint_inst(void *t_info, int core_id, int thread_id);
 };
 
+#ifndef USING_QSIM
+
 //> Memory barrier operands
 typedef enum arm64_barrier_op : int {
 	ARM64_BARRIER_INVALID = 0,
@@ -527,6 +529,8 @@ typedef enum ARM64_OPCODE_ENUM_ {
 
 	ARM64_INS_ENDING,  // <-- mark the end of the list of insn
 } ARM64_OPCODE;
+
+#endif /* USING_QSIM */
 
 static char* a64_opcode_names[ARM64_INS_ENDING] =  {
   "ARM64_INS_INVALID",

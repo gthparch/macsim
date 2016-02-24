@@ -33,7 +33,7 @@ warn_flags = ' '.join(warn_flags)
 
 
 ## Environment
-env = Environment()
+env = Environment(ENV = os.environ)
 custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
 
 for key,val in os.environ.iteritems():
@@ -42,9 +42,15 @@ for key,val in os.environ.iteritems():
 
 env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
+env['LIBPATH']    = ['/usr/lib', '/usr/local/lib']
+
+if os.environ.get('USING_QSIM') == '1':
+  env['CPPDEFINES'] += ['USING_QSIM']
+  env['CPPPATH']    += [os.environ['QSIM_PREFIX'] + "/include"]
+  env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib"]
 
 ## MAC OS X does not support static linking
-if sys.platform != "darwin":
+if sys.platform != "darwin" and os.environ.get('USING_QSIM') != '1':
   env['LINKFLAGS']  = ['--static']
 # env['CXX']        = ['icpc']
 
@@ -233,6 +239,8 @@ macsim_src = [
   'src/page_mapping.cc',
   'src/dyfr.cc',
   'src/hmc_process.cc',
+  'src/trace_gen_a64.cc',
+  'src/cs_disas.cc',
 ]
 
 
@@ -241,6 +249,9 @@ macsim_src = [
 # Libraries
 #########################################################################################
 libraries = ['z']
+
+if os.environ.get('USING_QSIM') == '1':
+  libraries += ['qsim', 'capstone', 'pthread', 'dl']
 
 
 if flags['power'] == '1':

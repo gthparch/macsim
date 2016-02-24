@@ -187,3 +187,5 @@ param<FENCE_PREF_ENABLE, fence_pref_enable, bool, 0>
 param<ACQ_REL, acq_rel, bool, 0>
 param<USE_WB, use_wb, bool, 0>
 param<WB_SIZE, wb_size, int, 8>
+param<QSIM_STATE, qsim_state, string, 'state.1'>
+param<QSIM_BENCH, qsim_bench, string, 'benchmark.tar'>
