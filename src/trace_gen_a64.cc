@@ -88,21 +88,21 @@ InstHandler::~InstHandler()
 
 int InstHandler::read_trace(void *buffer, unsigned int len)
 {
-	trace_info_a64_qsim_s* trace_buffer = (trace_info_a64_qsim_s *)buffer;
-	int i = 0, num_elements = len / sizeof(trace_info_a64_qsim_s);
-	trace_info_a64_qsim_s* op = NULL;
+  trace_info_a64_qsim_s* trace_buffer = (trace_info_a64_qsim_s *)buffer;
+  int i = 0, num_elements = len / sizeof(trace_info_a64_qsim_s);
+  trace_info_a64_qsim_s* op = NULL;
 
-	do {
-		if (stream.try_dequeue(op)) {
-			memcpy(trace_buffer+i, op, sizeof(trace_info_a64_qsim_s));
-			delete op;
-		} else {
-			memcpy(trace_buffer+i, nop, sizeof(trace_info_a64_qsim_s));
+  do {
+    if (stream.try_dequeue(op)) {
+      memcpy(trace_buffer+i, op, sizeof(trace_info_a64_qsim_s));
+      delete op;
+    } else {
+      memcpy(trace_buffer+i, nop, sizeof(trace_info_a64_qsim_s));
     }
     i++;
-	} while (i < num_elements);
+  } while (i < num_elements);
 
-	return i * sizeof(trace_info_a64_qsim_s);
+  return i * sizeof(trace_info_a64_qsim_s);
 }
 
 void InstHandler::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w)

@@ -69,6 +69,7 @@ Config.read('macsim.config')
 flags['dram']  = Config.get('Library', 'dram', '0')
 flags['power'] = Config.get('Library', 'power', '0')
 flags['iris']  = Config.get('Library', 'iris', '0')
+flags['qsim']  = Config.get('Library', 'qsim', '0')
 flags['debug'] = Config.get('Build', 'debug', '0')
 flags['gprof'] = Config.get('Build', 'gprof', '0')
 flags['val']   = Config.get('Build_Extra', 'val', '0')
@@ -81,6 +82,7 @@ flags['power'] = ARGUMENTS.get('power', flags['power'])
 flags['iris']  = ARGUMENTS.get('iris', flags['iris'])
 flags['dram']  = ARGUMENTS.get('dram', flags['dram'])
 flags['val']   = ARGUMENTS.get('val', flags['val'])
+flags['qsim']  = ARGUMENTS.get('qsim', flags['qsim'])
 
 
 ## Checkout DRAMSim2 copy
