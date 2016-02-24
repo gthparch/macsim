@@ -803,10 +803,12 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
   string filename = "";
   sstr >> filename;
 
+  #ifndef USING_QSIM
   // open trace file
   trace_info->m_trace_file = gzopen(filename.c_str(), "r");
   if (trace_info->m_trace_file == NULL) 
     ASSERTM(0, "error opening trace file:%s\n", filename.c_str());
+  #endif
 
   trace_info->m_file_opened      = true;
   trace_info->m_trace_ended      = false;

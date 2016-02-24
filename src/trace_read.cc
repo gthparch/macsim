@@ -125,6 +125,9 @@ trace_uop_s::trace_uop_s()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef USING_QSIM
+tracegen_a64* trace_read_c::m_tg;
+#endif
 
 /**
  * Constructor
@@ -134,6 +137,21 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
   m_simBase = simBase;
   m_dprint_count = 0;
   m_dprint_output = dprint_output;
+
+#ifdef USING_QSIM
+  using namespace Qsim;
+  if (!m_tg) {
+    std::string qsim_prefix(getenv("QSIM_PREFIX"));
+    int n_cpus = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
+
+    OSDomain *osd = new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
+    Qsim::load_file(*osd, KNOB(KNOB_QSIM_BENCH)->getValue().c_str());
+
+    osd->set_sys_cbs(true);
+    m_tg = new tracegen_a64(*osd);
+    m_tg->app_start_cb(0);
+  }
+#endif
 }
 
 
@@ -159,8 +177,12 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id)
   // read one instruction from the trace file to get next instruction. Always one instruction
   // will be read ahead to get next pc address
   if (core->m_running_thread_num) {
+#ifndef USING_QSIM
     gzread(thread_trace_info->m_trace_file, thread_trace_info->m_prev_trace_info, 
         m_trace_size);
+#else
+    m_tg->read_trace(core_id, (void *)(thread_trace_info->m_prev_trace_info), m_trace_size);
+#endif
 
     if (*KNOB(KNOB_DEBUG_TRACE_READ)) {
       dprint_inst(thread_trace_info->m_prev_trace_info, core_id, sim_thread_id);
@@ -193,8 +215,19 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
       /// buffer index), read another chunk, and so on.
       ///
       if (thread_trace_info->m_buffer_index == 0) {
-        thread_trace_info->m_buffer_index_max  = gzread(thread_trace_info->m_trace_file, 
-            thread_trace_info->m_buffer, m_trace_size*k_trace_buffer_size);
+#ifndef USING_QSIM
+        thread_trace_info->m_buffer_index_max  = gzread(thread_trace_info->m_trace_file,
+                                                        thread_trace_info->m_buffer,
+                                                        m_trace_size*k_trace_buffer_size);
+#else
+	      if (m_tg->trace_avail(core_id)) {
+		      thread_trace_info->m_buffer_index_max = m_tg->read_trace(core_id,
+		                                                               thread_trace_info->m_buffer,
+                                                                   m_trace_size*k_trace_buffer_size);
+	      } else {
+		      thread_trace_info->m_trace_ended = true;
+	      }
+#endif
         thread_trace_info->m_buffer_index_max /= m_trace_size;
         thread_trace_info->m_buffer_exhausted  = false;
 

@@ -23,6 +23,7 @@ def parse_arg():
   parser.add_option("-c", "--clean", action="store_true", dest="clean", default=False, help="clean")
   parser.add_option("-t", "--test", action="store_true", dest="test", default=False, help="clean")
   parser.add_option("-v", "--val", action="store_true", dest="val", default=False, help="build version used for gpu validation")
+  parser.add_option("-q", "--qsim", action="store_true", dest="qsim", default=False, help="use qsim to drive macsim")
   parser.add_option("--dramsim", action="store_true", dest="dramsim", default=False, help="DRAMSim2")
   parser.add_option("--power", action="store_true", dest="power", default=False, help="EI Power")
   parser.add_option("--iris", action="store_true", dest="iris", default=False, help="IRIS")
@@ -34,7 +35,7 @@ def parse_arg():
 # build test for all possible build combinations
 #########################################################################################
 def build_test():
-  build_option = ['', 'debug=1', 'gprof=1']
+  build_option = ['', 'debug=1', 'gprof=1', 'qsim=1']
   build_dir    = ['.opt_build', '.dbg_build', '.gpf_build']
   build_libs   = ['dram=1', 'power=1', 'iris=1']
 
@@ -92,6 +93,10 @@ def main():
   # IRIS
   if options.iris:
     cmd += 'iris=1 '
+
+  # Qsim
+  if options.qsim:
+    cmd += 'qsim=1 '
 
   ## Parallel building 
   cmd += '-j %s ' % options.thread

@@ -42,9 +42,10 @@ for key,val in os.environ.iteritems():
 
 env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
+env['LIBPATH']    = ['/usr/lib', '/usr/local/lib']
 
 ## MAC OS X does not support static linking
-if sys.platform != "darwin":
+if sys.platform != "darwin" and flags.get('qsim') != '1':
   env['LINKFLAGS']  = ['--static']
 # env['CXX']        = ['icpc']
 
@@ -64,6 +65,11 @@ else:
 
 if flags['val'] == '1':
   env['CPPDEFINES'].append('GPU_VALIDATION')
+
+if flags['qsim'] == '1':
+  env['CPPDEFINES'] += ['USING_QSIM']
+  env['CPPPATH']    += [os.environ['QSIM_PREFIX'] + "/include", '#src/rwqueue']
+  env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib"]
 
 
 #########################################################################################
@@ -233,6 +239,8 @@ macsim_src = [
   'src/page_mapping.cc',
   'src/dyfr.cc',
   'src/hmc_process.cc',
+  'src/trace_gen_a64.cc',
+  'src/cs_disas.cc',
 ]
 
 
@@ -241,7 +249,6 @@ macsim_src = [
 # Libraries
 #########################################################################################
 libraries = ['z']
-
 
 if flags['power'] == '1':
   libraries.append('pthread')
@@ -259,6 +266,10 @@ if flags['iris'] == '1':
   env['CPPPATH'] += ['#src/manifold/kernel/include']
   env['CPPPATH'] += ['#src/manifold/models/iris/interfaces']
   env['CPPPATH'] += ['#src/orion']
+
+if flags['qsim'] == '1':
+  libraries += ['qsim', 'capstone', 'pthread', 'dl']
+
 
 
 env.Program(
