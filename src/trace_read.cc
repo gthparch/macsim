@@ -147,7 +147,6 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
     OSDomain *osd = new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
     Qsim::load_file(*osd, KNOB(KNOB_QSIM_BENCH)->getValue().c_str());
 
-    osd->set_sys_cbs(true);
     m_tg = new tracegen_a64(*osd);
     m_tg->app_start_cb(0);
   }

@@ -77,10 +77,13 @@ class tracegen_a64 {
 
     int read_trace(int c, void *buffer, unsigned int len)
     {
-      if (!finished)
+
+      if (!finished || inst_handle[c].instq_size() > 0) {
+        std::cout << "Core: " << c << " inst: " << inst_handle[c].instq_size() << std::endl;
         return inst_handle[c].read_trace(buffer, len);
-      else
+      } else {
         return 0;
+      }
     }
 
     void gen_trace(void);
