@@ -97,7 +97,7 @@ class tracegen_a64 {
     void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
         enum inst_type t)
     {
-      inst_handle[c].processInst((unsigned char*)b, uint64_t v, l);
+      inst_handle[c].processInst((unsigned char*)b, v, l);
 
       return;
     }
