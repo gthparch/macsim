@@ -28,7 +28,7 @@ class InstHandler {
     void dumpInstInfo();
     void openDebugFile();
     void closeDebugFile();
-    void processInst(unsigned char *b, uint8_t len);
+    void processInst(unsigned char *b, uint64_t v, uint8_t len);
     void processMem(uint64_t v, uint64_t p, uint8_t len, int w);
     void finish(void) { finished = true; }
     int  read_trace(void *buffer, unsigned int len);
@@ -77,9 +77,15 @@ class tracegen_a64 {
 
     int read_trace(int c, void *buffer, unsigned int len)
     {
+      /* DEBUG */
+      /*
+      for (int i = 0; i < osd.get_n(); i++)
+        std::cout << "(" << i << ", " << osd.get_tid(i) << ", " << osd.idle(i)
+                  << ", " << inst_handle[i].instq_size() << ") ";
+      std::cout << "\r";
+      */
 
       if (!finished || inst_handle[c].instq_size() > 0) {
-        std::cout << "Core: " << c << " inst: " << inst_handle[c].instq_size() << std::endl;
         return inst_handle[c].read_trace(buffer, len);
       } else {
         return 0;
@@ -91,7 +97,7 @@ class tracegen_a64 {
     void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
         enum inst_type t)
     {
-      inst_handle[c].processInst((unsigned char*)b, l);
+      inst_handle[c].processInst((unsigned char*)b, uint64_t v, l);
 
       return;
     }

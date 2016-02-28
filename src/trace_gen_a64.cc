@@ -33,13 +33,14 @@ cs_disas dis(CS_ARCH_ARM64, CS_MODE_ARM);
 
 #define MILLION(x) (x * 1000000)
 
-void InstHandler::processInst(unsigned char *b, uint8_t len)
+void InstHandler::processInst(unsigned char *b, uint64_t v, uint8_t len)
 {
   cs_insn *insn = NULL;
   uint8_t regs_read_count, regs_write_count;
   cs_regs regs_read, regs_write;
 
   int count = dis.decode(b, len, insn);
+  insn->address = v;
   if (count) {
     dis.get_regs_access(insn, regs_read, regs_write, &regs_read_count, &regs_write_count);
     populateInstInfo(insn, regs_read, regs_write, regs_read_count, regs_write_count);
