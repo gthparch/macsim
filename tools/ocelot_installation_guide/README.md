@@ -31,6 +31,6 @@ There are two paths to using ocelot for trace generation:
 - The docker image is updated whenever someone pushes changes to our fork of gpuocelot on github. You'll have to do a docker pull to get the latest image when that happens. 
 
 # 2. Compile ocelot natively
-- Start with an Ubuntu 14.04 system, and mimic the steps in the dockerfile located at https://github.com/gthparch/gpuocelot/blob/master/docker/Dockerfile.
+- Start with an Ubuntu 14.04 system, and mimic the steps from *apt-key adv* onwards in the dockerfile located at https://github.com/gthparch/gpuocelot/blob/master/docker/Dockerfile.
 - If you already have conflicting versions of packages, uninstall them first.
 
