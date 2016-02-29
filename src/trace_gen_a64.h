@@ -63,7 +63,6 @@ class tracegen_a64 {
       finished = false;
       gen_thread = new std::thread(&tracegen_a64::gen_trace, this);
       inst_handle = NULL;
-      osd.set_gen_cbs(true);
     }
 
     ~tracegen_a64()
