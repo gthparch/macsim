@@ -63,6 +63,8 @@ InstHandler::InstHandler()
   nop = new trace_info_a64_qsim_s();
   memset(nop, 0, sizeof(trace_info_a64_qsim_s));
   nop->m_opcode = ARM64_INS_NOP;
+
+  nop_count = 0;
 }
 
 void InstHandler::openDebugFile()
@@ -99,6 +101,7 @@ int InstHandler::read_trace(void *buffer, unsigned int len)
       delete op;
     } else {
       memcpy(trace_buffer+i, nop, sizeof(trace_info_a64_qsim_s));
+      nop_count++;
     }
     i++;
   } while (i < num_elements);
@@ -302,12 +305,16 @@ int tracegen_a64::app_end_cb(int c)
   if (finished)
     return 1;
 
-  std::cout << "App end cb called" << std::endl;
-  finished = true;
+  uint64_t tot_nops = 0;
 
   for (int i = 0; i < osd.get_n(); i++) {
     inst_handle[i].finish();
+    tot_nops += inst_handle[i].ins_nops();
   }
+
+  std::cout << "App end cb called. inst: " << inst_count << " nop: " << tot_nops
+                                           << std::endl;
+  finished = true;
 
   inst_handle[0].closeDebugFile();
 
@@ -329,7 +336,7 @@ void tracegen_a64::gen_trace(void)
     for (i = 0; i < osd.get_n(); i++)
       std::cout << "(" << i << ", " << osd.get_tid(i) << ", " << osd.idle(i)
                 << ", " << inst_handle[i].instq_size() << ") ";
-    std::cout << std::endl;
+    std::cout << "\r";
     */
 
     for (i = 0; i < osd.get_n(); i++) {
@@ -340,7 +347,8 @@ void tracegen_a64::gen_trace(void)
     if (i != osd.get_n())
       continue;
 
-    osd.run(10000);
+    for (i = 0; i < osd.get_n(); i++)
+      osd.run(i, 10000);
   }
 }
 

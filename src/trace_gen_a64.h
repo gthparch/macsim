@@ -40,11 +40,14 @@ class InstHandler {
 
     std::atomic<bool> stop_gen;
 
+    uint64_t ins_nops() { return nop_count; }
+
   private:
 
     int m_fp_uop_table[ARM64_INS_ENDING];
     int m_int_uop_table[ARM64_INS_ENDING];
     bool finished;
+    uint64_t nop_count;
 
     trace_info_a64_qsim_s *prev_op, *nop;
     BlockingReaderWriterQueue<trace_info_a64_qsim_s*> stream;
@@ -53,7 +56,7 @@ class InstHandler {
 class tracegen_a64 {
   public:
     tracegen_a64(OSDomain &osd) :
-      osd(osd), finished(false), started(false)
+      osd(osd), finished(false), started(false), inst_count(0)
     { 
       osd.set_app_start_cb(this, &tracegen_a64::app_start_cb);
       trace_file_count = 0;
@@ -81,7 +84,8 @@ class tracegen_a64 {
       /*
       for (int i = 0; i < osd.get_n(); i++)
         std::cout << "(" << i << ", " << osd.get_tid(i) << ", " << osd.idle(i)
-                  << ", " << inst_handle[i].instq_size() << ") ";
+                  << ", " << std::setw(7) << inst_handle[i].ins_nops()
+                  << ", " << std::setw(6) << inst_handle[i].instq_size() << ") ";
       std::cout << "\r";
       */
 
@@ -98,6 +102,7 @@ class tracegen_a64 {
         enum inst_type t)
     {
       inst_handle[c].processInst((unsigned char*)b, v, l);
+      inst_count++;
 
       return;
     }
@@ -116,6 +121,7 @@ class tracegen_a64 {
     bool finished, started;
     int  trace_file_count;
     InstHandler *inst_handle;
+    uint64_t     inst_count;
     std::thread *gen_thread;
 };
 
