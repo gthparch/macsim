@@ -1,6 +1,6 @@
 There are two paths to using ocelot for trace generation:
-1. Use a prebuilt Docker image. This can be used on any linux system
-2. Compile ocelot natively. Since ocelot has specific dependencies on old packages, you might have some package conflicts. 
+ 1. Use a prebuilt Docker image. This can be used on any linux system
+ 2. Compile ocelot natively. Since ocelot has specific dependencies on old packages, you might have some package conflicts. 
 
 # 1. Use the docker image
 - Install docker. For RHEL 7, sudo yum install docker. For Ubuntu, follow the steps in https://docs.docker.com/engine/installation/linux/ubuntulinux/
@@ -16,6 +16,7 @@ There are two paths to using ocelot for trace generation:
 - Call *id* on the terminal on your host. Note down the uid and the gid. For example, it would show something like uid=6074(username) gid=7001(hparch)
 - **sudo docker run --privileged -i -t -v /home/username:/home/username -v /trace2:/trace2 hparch/gpuocelot /bin/bash**
 - This will drop you to the container's root shell. Now, we create a user here with the same uid and gid as host. 
+  
     ```
     addgroup --gid 7001 hparch
     adduser --no-create-home --uid 6074 --gid 7001 username
