@@ -27,9 +27,7 @@ AC_DEFUN([SST_macsimComponent_CONFIG],[
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS([qsim.h], [], [sst_check_qsim_happy="no"])
   AC_CHECK_LIB([qsim], [qsim_present], 
-    [QSIM_LIBS="-lqsim"], [sst_check_qsim_happy="no"])
-  AC_CHECK_LIB([capstone], [capstone_present], 
-    [QSIM_LIBS="-lcapstone"], [sst_check_qsim_happy="no"])
+    [QSIM_LIBS="-lqsim -lcapstone"], [sst_check_qsim_happy="no"])
   AC_LANG_POP(C++)
 
   CPPFLAGS="$CPPFLAGS_saved"
