@@ -12,11 +12,13 @@ AM_CPPFLAGS = \
   -I$(srcdir)/src/manifold/models/iris/iris_srcs/topology \
   -I$(srcdir)/src/manifold/kernel/include \
   -I$(srcdir)/src/manifold/kernel/include/kernel \
-	-I$(srcdir)/src/orion \
+  -I$(srcdir)/src/orion \
+  -I$(srcdir)/src/rwqueue \
   -std=c++0x \
-	-DUSING_SST \
-	-DNO_DEBUG \
-	$(HMC_FLAG) \
+	-DUSING_SST  \
+	-DNO_DEBUG   \
+	$(HMC_FLAG)  \
+	$(QSIM_CPPFLAGS) \
 	-g
 
 
@@ -25,11 +27,10 @@ SUBDIRS = scripts
 compdir = $(pkglibdir)
 comp_LTLIBRARIES = libmacsimComponent.la
 libmacsimComponent_la_SOURCES =                                        \
-macsimEvent.h          																								 \
+macsimEvent.h                                                          \
 macsimComponent.cpp          macsimComponent.h                         \
 libmacsimComponent.cc                                                  \
 src/dram_sst_vaultsim.cc     src/dram_sst_vaultsim.h                   \
-                                                                       \
 src/all_knobs.cc             src/all_knobs.h                           \
 src/allocate.cc              src/allocate.h                            \
 src/allocate_smc.cc          src/allocate_smc.h                        \
@@ -46,7 +47,7 @@ src/debug_macros.h                                                     \
 src/dram.cc                  src/dram.h                                \
 src/dram_ctrl.cc             src/dram_ctrl.h                           \
 src/dram_dramsim.cc          src/dram_dramsim.h                        \
-src/dyfr.cc									 src/dyfr.h																 \
+src/dyfr.cc                  src/dyfr.h                                \
 src/exec.cc                  src/exec.h                                \
 src/factory_class.cc         src/factory_class.h                       \
 src/fetch_factory.cc         src/fetch_factory.h                       \
@@ -89,16 +90,17 @@ src/network_ring.cc          src/network_ring.h                        \
 src/network_mesh.cc          src/network_mesh.h                        \
 src/network_simple.cc        src/network_simple.h                      \
 src/page_mapping.cc          src/page_mapping.h                        \
-                                                                       \
 src/allocate_interface.h                                               \
 src/exec_interface.h                                                   \
 src/frontend_interface.h                                               \
 src/retire_interface.h                                                 \
-src/schedule_interface.h                                              \
-src/hmc_process.cc 			 src/hmc_process.h
+src/schedule_interface.h                                               \
+src/hmc_process.cc           src/hmc_process.h                         \
+src/trace_gen_a64.cc         src/trace_gen_a64.h                       \
+src/cs_disas.cc              src/cs_disas.h
 
 
 EXTRA_DIST = 
 
-libmacsimComponent_la_LDFLAGS = -module -avoid-version
-libmacsimComponent_la_LIBADD = -lz
+libmacsimComponent_la_LDFLAGS = -module -avoid-version $(QSIM_LDFLAGS)
+libmacsimComponent_la_LIBADD = -lz $(QSIM_LIBS)
