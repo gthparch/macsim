@@ -534,7 +534,7 @@ comp_memory0.addParams({
 sst.setStatisticLoadLevel(7)
 sst.setStatisticOutput("sst.statoutputcsv", {
   "separator" : ",",
-  "filepath" : "sst.stat.out",
+  "filepath" : "sst.stat.csv",
   "outputtopheader" : 1,
   "outputsimtime" : 1,
   "outputrank" : 1,
