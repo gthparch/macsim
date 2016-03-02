@@ -532,7 +532,7 @@ typedef enum ARM64_OPCODE_ENUM_ {
 
 #endif /* USING_QSIM */
 
-static char* a64_opcode_names[ARM64_INS_ENDING] =  {
+static const char* a64_opcode_names[ARM64_INS_ENDING] =  {
   "ARM64_INS_INVALID",
 
   "ARM64_INS_ABS",
