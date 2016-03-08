@@ -123,11 +123,18 @@ void smc_allocate_c::run_a_cycle(void)
     int req_int_reg = 0;        // required alloc queue type
     int req_fp_reg  = 0;        // required integer registers 
 
-    if (uop->m_uop_type == UOP_LD) // load queue
+    if ((uop->m_mem_type == MEM_LD_LM) || 
+	(uop->m_mem_type == MEM_LD_SM) || 
+	(uop->m_mem_type == MEM_LD_GM) || 
+	(uop->m_mem_type == MEM_LD_CM) || 
+	(uop->m_mem_type == MEM_LD_TM) || 
+	(uop->m_mem_type == MEM_LD_PM) ) // load queue
       req_lb = 1;
-    else if (uop->m_uop_type == UOP_ST) // store queue 
+    else if ((uop->m_mem_type == MEM_ST_LM) || 
+	     (uop->m_mem_type == MEM_ST_SM) || 
+	     (uop->m_mem_type == MEM_ST_GM)) // store queue 
       req_sb = 1;
-    else if (uop->m_uop_type == UOP_IADD || // integer register
+    else if (uop->m_uop_type == UOP_IADD || // integer register // FIXME(replace  with GPU uops) !! hkim  mar-8-2016
              uop->m_uop_type == UOP_IMUL ||
              uop->m_uop_type == UOP_ICMP) 
       req_int_reg = 1;
