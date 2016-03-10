@@ -49,6 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
     pqueue_c<gpu_allocq_entry_s>** gpu_q_iaq, \
     pool_c<uop_c>* uop_pool, \
     rob_c* rob, \
+		resource_c* resource,\
     smc_rob_c* gpu_rob, \
     memory_c* mem_system, \
     bp_data_c* m_bp_data, \
@@ -63,6 +64,7 @@ POSSIBILITY OF SUCH DAMAGE.
     pqueue_c<gpu_allocq_entry_s>** gpu_q_iaq; \
     pool_c<uop_c>* uop_pool; \
     rob_c* rob; \
+		resource_c* resource; \
     smc_rob_c* gpu_rob; \
     memory_c* mem_system; \
     bp_data_c* m_bp_data; \
@@ -77,6 +79,7 @@ POSSIBILITY OF SUCH DAMAGE.
     gpu_q_iaq, \
     uop_pool, \
     rob, \
+		resource,	\
     gpu_rob, \
     mem_system, \
     m_bp_data, \
@@ -91,6 +94,7 @@ POSSIBILITY OF SUCH DAMAGE.
     gpu_q_iaq ( gpu_q_iaq ), \
     uop_pool ( uop_pool ), \
     rob ( rob ), \
+		resource ( resouce ),	\
     gpu_rob ( gpu_rob ), \
     mem_system ( mem_system ), \
     m_bp_data ( m_bp_data ), \
@@ -105,6 +109,7 @@ POSSIBILITY OF SUCH DAMAGE.
     static_cast<void>(gpu_q_iaq); \
     static_cast<void>(uop_pool); \
     static_cast<void>(rob); \
+		static_cast<void>(resource); \
     static_cast<void>(gpu_rob); \
     static_cast<void>(mem_system); \
     static_cast<void>(m_bp_data); \
@@ -134,7 +139,7 @@ class allocate_c
      */
     allocate_c(int core_id, pqueue_c<int*>* q_frontend, pqueue_c<int>** alloc_q, 
         pool_c<uop_c>* uop_pool, rob_c* rob, Unit_Type unit_type, int num_queues,
-        macsim_c* simBase);
+        resource_c* resource, macsim_c* simBase);
 
     /*! \fn ~allocate_c()
      *  \brief Destructor
@@ -181,6 +186,7 @@ class allocate_c
     pqueue_c<int>** m_alloc_q;  /**< allocation queue */
     pool_c<uop_c>*  m_uop_pool; /**< uop pool */
     rob_c*          m_rob; /**< reorder buffer */
+		resource_c*     m_resource; /**< resource structure */ 
     Unit_Type       m_unit_type; /**< core type */
     uns16           m_knob_width; /**< width */
     bool            m_allocate_running; /**< Enable allocation stage */
@@ -188,7 +194,7 @@ class allocate_c
     int             m_num_queues; /**< number of allocation queue types */
     bp_data_c*      m_bp_data;  /**< branch predictor data structure */ 
     macsim_c*       m_simBase; /**< macsim_c base class for simulation globals */
-
+		
 };
 
 #endif // ALLOCATE_H_INCLUDED 

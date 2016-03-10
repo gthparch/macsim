@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "pqueue.h"
 #include "rob_smc.h"
 #include "uop.h"
+#include "resource.h"
 #include "utils.h"
 #include "statistics.h"
 
@@ -65,7 +66,7 @@ POSSIBILITY OF SUCH DAMAGE.
 // constructor
 smc_allocate_c::smc_allocate_c(int core_id, pqueue_c<int*> *q_frontend, 
     pqueue_c<gpu_allocq_entry_s> **gpu_alloc_q, pool_c<uop_c> *uop_pool, smc_rob_c *gpu_rob, 
-    Unit_Type unit_type, int num_queues, macsim_c* simBase)
+	 Unit_Type unit_type, int num_queues, resource_c* resource, macsim_c* simBase)
 {
   m_core_id          = core_id;
   m_frontend_q       = q_frontend;
@@ -75,7 +76,7 @@ smc_allocate_c::smc_allocate_c(int core_id, pqueue_c<int*> *q_frontend,
   m_unit_type        = unit_type;
   m_allocate_running = true;
   m_num_queues       = num_queues;
-
+	m_resource         = resource; 
   m_simBase          = simBase;
 
   switch (m_unit_type) {
@@ -124,15 +125,15 @@ void smc_allocate_c::run_a_cycle(void)
     int req_fp_reg  = 0;        // required integer registers 
 
     if ((uop->m_mem_type == MEM_LD_LM) || 
-	(uop->m_mem_type == MEM_LD_SM) || 
-	(uop->m_mem_type == MEM_LD_GM) || 
-	(uop->m_mem_type == MEM_LD_CM) || 
-	(uop->m_mem_type == MEM_LD_TM) || 
-	(uop->m_mem_type == MEM_LD_PM) ) // load queue
+        (uop->m_mem_type == MEM_LD_SM) || 
+        (uop->m_mem_type == MEM_LD_GM) || 
+        (uop->m_mem_type == MEM_LD_CM) || 
+        (uop->m_mem_type == MEM_LD_TM) || 
+        (uop->m_mem_type == MEM_LD_PM) ) // load queue
       req_lb = 1;
-    else if ((uop->m_mem_type == MEM_ST_LM) || 
-	     (uop->m_mem_type == MEM_ST_SM) || 
-	     (uop->m_mem_type == MEM_ST_GM)) // store queue 
+    else if ((uop->m_mem_type == MEM_ST_LM) ||
+             (uop->m_mem_type == MEM_ST_SM) || 
+             (uop->m_mem_type == MEM_ST_GM)) // store queue 
       req_sb = 1;
     else if (uop->m_uop_type == UOP_IADD || // integer register // FIXME(replace  with GPU uops) !! hkim  mar-8-2016
              uop->m_uop_type == UOP_IMUL ||
@@ -173,10 +174,13 @@ void smc_allocate_c::run_a_cycle(void)
     // FIXME
     // check rob and load store spaces 
     rob_c *thread_rob = m_gpu_rob->get_thread_rob(uop->m_thread_id);
-    if (thread_rob->space() < req_rob || thread_rob->get_num_sb() < req_sb ||
-        thread_rob->get_num_lb() < req_lb || gpu_alloc_q->space() < 1 ||
-        thread_rob->get_num_int_regs () < req_int_reg ||
-        thread_rob->get_num_fp_regs() < req_fp_reg) {
+	 
+    if (thread_rob->space() < req_rob || 
+				gpu_alloc_q->space() < 1 ||
+				m_resource->get_num_sb() < req_sb ||
+        m_resource->get_num_lb() < req_lb || 
+        m_resource->get_num_int_regs () < req_int_reg ||
+        m_resource->get_num_fp_regs() < req_fp_reg) {
       break;
     }
 
@@ -185,19 +189,19 @@ void smc_allocate_c::run_a_cycle(void)
 
     // allocate physical resources
     if (req_sb) {
-      thread_rob->alloc_sb(); 
+      m_resource->alloc_sb(); 
       uop->m_req_sb = true; 
     }
     else if (req_lb) {
-      thread_rob->alloc_lb(); 
+      m_resource->alloc_lb(); 
       uop->m_req_lb = true;
     }
     else if (req_int_reg) {
-      thread_rob->alloc_int_reg();
+      m_resource->alloc_int_reg();
       uop->m_req_int_reg = true;
     }
     else if (req_fp_reg) {
-      thread_rob->alloc_fp_reg();
+      m_resource->alloc_fp_reg();
       uop->m_req_fp_reg = true;
     }
     

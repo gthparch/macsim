@@ -152,6 +152,12 @@ class core_c
      *  \return void 
      */
     void advance_queues(void);
+		
+		/*! \fn resource_c*  get_resource_c(void);
+     *  \brief Function to get pointer to resource structure 
+     *  \return resource_c* -- pointer to resource class 
+     */
+    resource_c* get_resouce(void) { return m_resource;} 
 
     /*! \fn retire_c* get_retire(void)
      *  \brief Function to get pointer to retire class
@@ -361,6 +367,7 @@ class core_c
     exec_c*                         m_exec; /**< execution */
     retire_c*                       m_retire; /**< retire */
     rob_c*                          m_rob; /**< reorder buffer */
+    resource_c*                     m_resource; /**< resource (ld/st buffer, FP/INT reg */ 
     smc_rob_c*                      m_gpu_rob; /**< GPU rob */
     cache_c*                        m_icache; /**< instruction cache */
     pqueue_c<int*>*                 m_q_frontend; /**< frontend queue */

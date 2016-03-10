@@ -79,6 +79,7 @@ class port_c;
 class retire_c;
 class recovery_info_c;
 class rob_c;
+class resource_c;
 class network_c;
 class schedule_c;
 class tlb_c;
@@ -118,6 +119,7 @@ class ProcessorStatistics;
 class CoreStatistics;
 class cache_partition_framework_c;
 class dyfr_c;
+
 
 template <class T> class pqueue_c;
 template <typename T> class hash_c;

@@ -20,3 +20,4 @@ bin/
 Makefile
 Makefile.in
 *.dirstamp
+sst-unit-test/*.out

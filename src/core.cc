@@ -91,6 +91,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "sw_managed_cache.h"
 #include "network.h"
 #include "dram.h"
+#include "resource.h"
 
 #include "config.h"
 
@@ -220,6 +221,8 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   // branch predictor
   m_bp_data = new bp_data_c(c_id, m_simBase); 
 
+	m_resource = new resource_c (type, m_simBase); 
+
   // frontend stage
   m_frontend = fetch_factory_c::get()->allocate_frontend(FRONTEND_INTERFACE_ARGS(), m_simBase);
   
@@ -227,11 +230,11 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
     m_allocate = NULL;
     m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq, m_uop_pool, 
-        m_gpu_rob, m_unit_type, max_ALLOCQ, m_simBase);
+																				m_gpu_rob, m_unit_type, max_ALLOCQ, m_resource, m_simBase);
   }
   else {
     m_allocate = new allocate_c(m_core_id, m_q_frontend, m_q_iaq, m_uop_pool, m_rob, 
-        m_unit_type, max_ALLOCQ, m_simBase);
+																m_unit_type, max_ALLOCQ, m_resource, m_simBase);
     m_gpu_allocate = NULL;
   }
 
@@ -321,6 +324,7 @@ core_c::~core_c()
   }
   delete m_map;
   delete m_bp_data;
+	delete m_resource; 
   delete m_exec;
   delete m_schedule;
   delete m_retire;

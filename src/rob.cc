@@ -76,20 +76,6 @@ rob_c::rob_c(Unit_Type type, macsim_c* simBase)
   m_last_entry  = 0;
   m_free_cnt    = m_usable_cnt;
 
-  // load and store buffers
-  m_max_sb_cnt = m_knob_meu_nsb;
-  m_num_sb     = m_knob_meu_nsb;
-
-  m_max_lb_cnt = m_knob_meu_nlb;
-  m_num_lb     = m_knob_meu_nlb;
-
-  // int and fp registers
-  m_max_int_regs = *m_simBase->m_knobs->KNOB_INT_REGFILE_SIZE;
-  m_num_int_regs = *m_simBase->m_knobs->KNOB_INT_REGFILE_SIZE;
-
-  m_max_fp_regs = *m_simBase->m_knobs->KNOB_FP_REGFILE_SIZE;
-  m_num_fp_regs = *m_simBase->m_knobs->KNOB_FP_REGFILE_SIZE;
-
   m_wb_empty = true;
 }
 
@@ -134,34 +120,6 @@ void rob_c::reinit()
 }
 
 
-// allocate a physical integer register
-void rob_c::alloc_int_reg()
-{
-  ASSERT(m_num_int_regs > 0);
-  --m_num_int_regs;
-}
-
-
-// allocate a physical fp register
-void rob_c::alloc_fp_reg()
-{
-  ASSERT(m_num_fp_regs > 0);
-  --m_num_fp_regs;
-}
-
-
-// deallocate a physical fp register
-void rob_c::dealloc_fp_reg()
-{
-  ++m_num_fp_regs;
-}
-
-
-// deallocate a physical int register
-void rob_c::dealloc_int_reg()
-{
-  ++m_num_int_regs;
-}
 
 // First check ROB for pending memory ops
 // then check the write buffer.
