@@ -145,7 +145,29 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
     int n_cpus = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
 
     OSDomain *osd = new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
-    Qsim::load_file(*osd, KNOB(KNOB_QSIM_BENCH)->getValue().c_str());
+    string bench_name = KNOB(KNOB_QSIM_BENCH)->getValue();
+    if (bench_name == "") {
+	    int num_apps;
+	    string line;
+
+	    bench_name = KNOB(KNOB_TRACE_NAME_FILE)->getValue();
+	    fstream tracefile(bench_name.c_str(), ios::in);
+	    tracefile >> num_apps;
+	    tracefile >> line;
+
+	    size_t dot_location = line.find_last_of(".");
+	    string base = line.substr(0, dot_location);
+
+	    stringstream tarfile;
+
+	    tarfile << base + ".tar";
+	    bench_name = "";
+
+	    tarfile >> bench_name;
+	    report("loading benchmark " + bench_name);
+    }
+
+    Qsim::load_file(*osd, bench_name.c_str());
 
     m_tg = new tracegen_a64(*osd);
     m_tg->app_start_cb(0);
