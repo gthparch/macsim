@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <zlib.h>
 #include <getopt.h>
+#include <assert.h>
 
 #include "trace_gen_a64.h"
 
@@ -40,12 +41,12 @@ void InstHandler::processInst(unsigned char *b, uint64_t v, uint8_t len)
   cs_regs regs_read, regs_write;
 
   int count = dis.decode(b, len, insn);
-  insn->address = v;
   if (count) {
+    insn->address = v;
     dis.get_regs_access(insn, regs_read, regs_write, &regs_read_count, &regs_write_count);
     populateInstInfo(insn, regs_read, regs_write, regs_read_count, regs_write_count);
+    dis.free_insn(insn, count);
   }
-  dis.free_insn(insn, count);
 }
 
 void InstHandler::processMem(uint64_t v, uint64_t p, uint8_t len, int w)
@@ -58,13 +59,6 @@ InstHandler::InstHandler()
   prev_op      = NULL;
   finished     = false;
   stop_gen     = false;
-
-  // create a dummp NOP instruction
-  nop = new trace_info_a64_qsim_s();
-  memset(nop, 0, sizeof(trace_info_a64_qsim_s));
-  nop->m_opcode = ARM64_INS_NOP;
-
-  nop_count = 0;
 }
 
 void InstHandler::openDebugFile()
@@ -95,16 +89,23 @@ int InstHandler::read_trace(void *buffer, unsigned int len)
   int i = 0, num_elements = len / sizeof(trace_info_a64_qsim_s);
   trace_info_a64_qsim_s* op = NULL;
 
-  do {
+  while (i < num_elements) {
+    if (stream.size_approx() == 0) {
+
+      if (finished)
+        break;
+
+      std::this_thread::yield();
+      continue;
+    }
+
     if (stream.try_dequeue(op)) {
+      assert(op->m_opcode != ARM64_INS_INVALID);
       memcpy(trace_buffer+i, op, sizeof(trace_info_a64_qsim_s));
       delete op;
-    } else {
-      memcpy(trace_buffer+i, nop, sizeof(trace_info_a64_qsim_s));
-      nop_count++;
+      i++;
     }
-    i++;
-  } while (i < num_elements);
+  }
 
   return i * sizeof(trace_info_a64_qsim_s);
 }
@@ -305,18 +306,14 @@ int tracegen_a64::app_end_cb(int c)
   if (finished)
     return 1;
 
-  uint64_t tot_nops = 0;
-
   for (int i = 0; i < osd.get_n(); i++) {
     inst_handle[i].finish();
-    tot_nops += inst_handle[i].ins_nops();
   }
 
-  std::cout << "App end cb called. inst: " << inst_count << " nop: " << tot_nops
-                                           << std::endl;
   finished = true;
-
   inst_handle[0].closeDebugFile();
+
+  std::cout << "App end cb called. inst: " << inst_count << std::endl;
 
   return 1;
 }
@@ -340,15 +337,10 @@ void tracegen_a64::gen_trace(void)
     */
 
     for (i = 0; i < osd.get_n(); i++) {
-      if (inst_handle[i].instq_size() > 0)
-        break;
+      if (inst_handle[i].instq_size() < 1000000) {
+        osd.run(i, 10000);
+      }
     }
-
-    if (i != osd.get_n())
-      continue;
-
-    for (i = 0; i < osd.get_n(); i++)
-      osd.run(i, 10000);
   }
 }
 

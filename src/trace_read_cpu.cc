@@ -876,9 +876,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   if (core->m_fetch_ended[sim_thread_id]) 
     return false;
 
-  // uop number is specific to the core
-  uop->m_unique_num = core->inc_and_get_unique_uop_num();
-
   bool read_success = true;
   thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -935,14 +932,13 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       }
     }
 
-    info = get_inst_info(thread_trace_info, core_id, sim_thread_id);
-
     ///
     /// Trace read failed
     ///
     if (!read_success) 
       return false;
 
+    info = get_inst_info(thread_trace_info, core_id, sim_thread_id);
 
     // read a new instruction, so update stats
     if (inst_read) { 
@@ -979,6 +975,8 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     ++thread_trace_info->m_num_sending_uop;
   }
 
+  // uop number is specific to the core
+  uop->m_unique_num = core->inc_and_get_unique_uop_num();
 
   // set end of macro flag
   if (thread_trace_info->m_eom) {
