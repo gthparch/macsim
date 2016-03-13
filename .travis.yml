@@ -1,4 +1,7 @@
 sudo: false
+branches:
+  only:
+    - master
 language: cpp
 compiler:
   - gcc
