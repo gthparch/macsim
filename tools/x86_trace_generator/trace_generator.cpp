@@ -130,6 +130,7 @@ map<ADDRINT, Inst_info*> g_inst_storage[MAX_THREADS];
 PIN_LOCK g_lock;
 UINT64 g_inst_count[MAX_THREADS]={0};
 INT64 g_start_inst_count[MAX_THREADS] = {0};
+INT64 g_end_inst_count[MAX_THREADS] = {-1};
 map<THREADID, THREADID> threadMap;
 THREADID main_thread_id;
 Thread_info thread_info[MAX_THREADS];
@@ -482,24 +483,29 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
          && sim_end[tid] == false
          && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid])
   {
+      GetLock(&g_lock, tid+1);
+      cout<<"Thread "<<tid<<" reach max inst: "<<g_inst_count[tid]<<endl;
       sim_end[tid]=true;
       g_enable_thread_instrument[tid]=false;
-      GetLock(&g_lock, tid+1);
+      PIN_RemoveInstrumentation();
       sim_end_threads++;
-      ReleaseLock(&g_lock);
+      g_end_inst_count[tid] = g_inst_count[tid];
       if (!thread_flushed[tid])
           thread_end();
-  }
-  if (sim_end_threads >= thread_count)
-  {
-      //finish();
-      //PIN_RemoveInstrumentation();
-      GetLock(&g_lock, tid+1);
-      finish();
-      finished=true;
       ReleaseLock(&g_lock);
+  
+      if (sim_end_threads >= thread_count)
+      {
+          //finish();
+          //PIN_RemoveInstrumentation();
+          GetLock(&g_lock, tid+1);
+          finish();
+          finished=true;
+          exit(0);
+          ReleaseLock(&g_lock);
 
-      exit(0);
+          //exit(0);
+      }
   } 
 #if 0
   if (tid==0 && sim_end[tid]==true
@@ -550,20 +556,21 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
     last_count[tid] = g_inst_count[tid];
   }
 
-  ReleaseLock(&g_lock);
 
   // Added by Lifeng
   if (manual_simpoint == true && g_enable_thread_instrument[tid] == false
           && sim_begin[tid] == true && sim_end[tid]==false)
   {
     if (g_inst_count[tid] >= Knob_skip.Value() + g_start_inst_count[tid])
-    {  
+    { 
+
         cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << endl;
         g_start_inst_count[tid] = g_inst_count[tid];
         g_enable_thread_instrument[tid] = true;
-  
+        PIN_RemoveInstrumentation(); 
     }
   }
+  ReleaseLock(&g_lock);
 #if 0
   if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
     if (g_start_inst_count[tid] == -1) {
@@ -1037,6 +1044,9 @@ void thread_end(THREADID threadid)
 
   //sim_end[threadid]=true;
   thread_flushed[threadid]=true;
+
+  if (g_end_inst_count[threadid] < 0) 
+      g_end_inst_count[threadid] = g_inst_count[threadid];
 }
 
 
@@ -1096,7 +1106,7 @@ void finish(void)
   /**< Final print to standard output */
   for (unsigned ii = 0; ii < thread_count; ++ii) {
     cout << "-> tid " << thread_info[ii].thread_id << " inst count " << g_inst_count[ii]
-      << "  instrumented inst# "<< g_inst_count[ii] - g_start_inst_count[ii]
+      << "  instrumented inst# "<< g_end_inst_count[ii] - g_start_inst_count[ii]
       << " (from " << thread_info[ii].inst_count << ")\n";
   }
   cout << "-> Final icount: " << g_inst_count[0] << endl;
@@ -1179,8 +1189,9 @@ void sanity_check(void)
 void write_inst_to_file(ofstream* file, Inst_info *t_info)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
-  if (tid == 100000 || !g_enable_thread_instrument[tid] || g_inst_print_count[tid] > Knob_dump_max.Value())
-    return ;
+  //if (tid == 100000 || !g_enable_thread_instrument[tid] || g_inst_print_count[tid] > Knob_dump_max.Value())
+    if (tid == 100000 || g_inst_print_count[tid] > Knob_dump_max.Value())
+        return ;
 
   g_inst_print_count[tid]++;
 
@@ -1224,7 +1235,7 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
 void dprint_inst(ADDRINT iaddr, string *disassemble_info, THREADID threadid) 
 {
   THREADID tid = threadMap[threadid];
-  if (tid == 100000 || !g_enable_thread_instrument[tid])
+  if (tid == 100000)
     return ;
 
   Inst_info *t_info = NULL;
@@ -1277,8 +1288,10 @@ VOID RtnBegin(ADDRINT ret)
 
     // enable corresponding thread's instrumentation
     THREADID tid = threadMap[PIN_ThreadId()];
+    GetLock(&g_lock, tid+1);
     cout<<"Thread "<<tid<<" sim begin"<<endl;
     sim_begin[tid] = true;
+    ReleaseLock(&g_lock);
 }
 VOID RtnEnd(ADDRINT arg)
 {
@@ -1289,21 +1302,26 @@ VOID RtnEnd(ADDRINT arg)
     if (g_enable_thread_instrument[tid]==false) return;
     if (sim_end[tid]) return;
 
-    cout<<"Thread "<<tid<<" sim end"<<endl;
-    sim_end[tid]=true;
     GetLock(&g_lock, tid+1);
+    cout<<"Thread "<<tid<<" sim end at "<<g_inst_count[tid]<<endl;
+    sim_end[tid]=true;
     sim_end_threads++;
-    ReleaseLock(&g_lock);
+    g_enable_thread_instrument[tid] = false;
+    PIN_RemoveInstrumentation();
+    g_end_inst_count[tid] = g_inst_count[tid];
     if (!thread_flushed[tid])
         thread_end();
+    ReleaseLock(&g_lock);
+
     if (sim_end_threads >= thread_count)
     {
       GetLock(&g_lock, tid+1);
       finish();
       finished=true;
+      exit(0);
       ReleaseLock(&g_lock);
 
-      exit(0);
+      //exit(0);
     } 
 }
 
