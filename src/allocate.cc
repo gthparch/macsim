@@ -50,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "core.h"
 #include "pqueue.h"
 #include "rob.h"
+#include "resource.h"
 #include "uop.h"
 #include "utils.h"
 #include "statistics.h"
@@ -69,7 +70,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // allocate_c constructor
 allocate_c::allocate_c(int core_id, pqueue_c<int *> *q_frontend, pqueue_c<int> **alloc_q, 
-    pool_c<uop_c> *uop_pool, rob_c *rob, Unit_Type unit_type, int num_queues,
+					 pool_c<uop_c> *uop_pool, rob_c *rob, Unit_Type unit_type, int num_queues, resource_c* resource, 
     macsim_c* simBase) 
 {
   m_core_id          = core_id;
@@ -77,6 +78,7 @@ allocate_c::allocate_c(int core_id, pqueue_c<int *> *q_frontend, pqueue_c<int> *
   m_alloc_q          = alloc_q;
   m_uop_pool         = uop_pool;
   m_rob              = rob;
+	m_resource         = resource; 
   m_unit_type        = unit_type;
   m_allocate_running = true; 
   m_num_queues       = num_queues;
@@ -157,11 +159,13 @@ void allocate_c::run_a_cycle(void)
 
     // check rob and other physical resources
     if (m_rob->space() < req_rob || 
-        m_rob->get_num_sb() < req_sb || 
-        m_rob->get_num_lb() < req_lb || 
+        m_resource->get_num_sb() < req_sb || 
+        m_resource->get_num_lb() < req_lb || 
         alloc_q->space() < 1 || 
-        m_rob->get_num_int_regs () < req_int_reg || 
-        m_rob->get_num_fp_regs() < req_fp_reg) {
+        m_resource->get_num_int_regs () < req_int_reg || 
+        m_resource->get_num_fp_regs() < req_fp_reg) {
+			DEBUG_CORE(m_core_id,"not enough physical resources: rob_space:%d num_sb:%d num_lb:%d alloc_q:%d int_reg:%d fp_reg:%d \n",
+								 m_rob->space(), m_resource->get_num_sb(), m_resource->get_num_lb(), alloc_q->space(), m_resource->get_num_int_regs(), m_resource->get_num_fp_regs()); 
       break;
     }
 
@@ -171,19 +175,19 @@ void allocate_c::run_a_cycle(void)
 
     // allocate physical resources
     if (req_sb) {
-      m_rob->alloc_sb(); 
+      m_resource->alloc_sb(); 
       uop->m_req_sb = true; 
     }
     else if (req_lb) {
-      m_rob->alloc_lb(); 
+      m_resource->alloc_lb(); 
       uop->m_req_lb = true;
     }
     else if (req_int_reg) {
-      m_rob->alloc_int_reg();
+      m_resource->alloc_int_reg();
       uop->m_req_int_reg = true;
     }
     else if (req_fp_reg) {
-      m_rob->alloc_fp_reg();
+      m_resource->alloc_fp_reg();
       uop->m_req_fp_reg = true;
     }
 

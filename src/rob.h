@@ -167,102 +167,6 @@ class rob_c
       return (index + m_max_cnt - 1) % m_max_cnt;
     }
 
-    /*! \fn void alloc_sb()
-     *  \brief Function to allocate store buffers.
-     *  \return void. 
-     */
-    void alloc_sb() 
-    {
-      ASSERT(m_num_sb > 0);
-      m_num_sb--;
-    }
-
-    /*! \fn dealloc_sb()
-     *  \brief Function to deallocate store buffers.
-     *  \return void. 
-     */
-    void dealloc_sb() 
-    {
-      ASSERT(m_num_sb < m_max_sb_cnt);
-      m_num_sb++;
-    }
-
-    /*! \fn int get_num_sb()
-     *  \brief Function to return count of store buffers.
-     *  \return int Storage buffer count. 
-     */
-    int get_num_sb() 
-    {
-      return m_num_sb;
-    }
-
-    /*! \fn void alloc_lb()
-     *  \brief Function allocate load buffer.
-     *  \return void. 
-     */
-    void alloc_lb() 
-    {
-      ASSERT(m_num_lb > 0);
-      m_num_lb--;
-    }
-
-    /*! \fn dealloc_lb()
-     *  \brief Function deallocate load buffer.
-     *  \return void. 
-     */
-    void dealloc_lb() 
-    {
-      ASSERT(m_num_lb < m_max_lb_cnt);
-      m_num_lb++;
-    }
-
-    /*! \fn int get_num_lb()
-     *  \brief Function to return load buffer count.
-     *  \return int Load buffer count. 
-     */
-    int get_num_lb() 
-    {
-      return m_num_lb;
-    }
-
-    /*! \fn get_num_int_regs()
-     *  \brief Function to return count of integer registers.
-     *  \return int Integer register count. 
-     */
-    int get_num_int_regs() 
-    {
-      return m_num_int_regs;
-    }
-
-    /*! \fn get_num_fp_regs()
-     *  \brief Function to return count of floating point registers. 
-     *  \return int Floating point register count.
-     */
-    int get_num_fp_regs() 
-    {
-      return m_num_fp_regs;
-    }
-
-    /**
-     * Allocate a integer register
-     */
-    void alloc_int_reg();
-
-    /**
-     * Allocate a fp register
-     */
-    void alloc_fp_reg();
-
-    /**
-     * Deallocate integer register
-     */
-    void dealloc_int_reg();
-
-    /**
-     * Deallocate fp register
-     */
-    void dealloc_fp_reg();
-
     /**
      * Check if there are any non-retired memory ops
      */
@@ -305,14 +209,6 @@ class rob_c
     uop_c**   m_rob; /**< rob */
     int       m_first_entry; /**< to maintain circular rob */ 
     int       m_last_entry; /**< to maintain circular rob */
-    int       m_max_sb_cnt; /**< max store buffer size */
-    int       m_num_sb; /**< number of available store buffer */
-    int       m_max_lb_cnt; /**< max load buffer size */
-    int       m_num_lb; /**< number of available load buffer */
-    int       m_max_int_regs; /**< max integer register */
-    int       m_num_int_regs; /**< number of available int register */ 
-    int       m_max_fp_regs; /**< max fp register */
-    int       m_num_fp_regs; /**< number of available fp register */
     Unit_Type m_unit_type; /**< core type */ 
     uns16     m_knob_rob_size; /**< reorder buffer size */
 

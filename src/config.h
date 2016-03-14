@@ -164,6 +164,24 @@ POSSIBILITY OF SUCH DAMAGE.
       break; \
   } 
 
+#define RESOURCE_CONFIG() \
+  uns16 m_knob_meu_nsb = 0; \
+  uns16 m_knob_meu_nlb = 0; \
+  switch (m_unit_type) {\
+    case UNIT_SMALL: \
+      m_knob_meu_nsb  = *m_simBase->m_knobs->KNOB_MEU_NSB; \
+      m_knob_meu_nlb  = *m_simBase->m_knobs->KNOB_MEU_NLB; \
+      break; \
+    case UNIT_MEDIUM: \
+      m_knob_meu_nsb  = *m_simBase->m_knobs->KNOB_MEU_MEDIUM_NSB; \
+      m_knob_meu_nlb  = *m_simBase->m_knobs->KNOB_MEU_MEDIUM_NLB; \
+      break; \
+    case UNIT_LARGE: \
+      m_knob_meu_nsb  = *m_simBase->m_knobs->KNOB_MEU_LARGE_NSB; \
+      m_knob_meu_nlb  = *m_simBase->m_knobs->KNOB_MEU_LARGE_NLB; \
+      break; \
+  } 
+
 
 #define RETIRE_CONFIG() \
   switch (m_unit_type) { \

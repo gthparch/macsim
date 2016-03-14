@@ -241,6 +241,7 @@ macsim_src = [
   'src/hmc_process.cc',
   'src/trace_gen_a64.cc',
   'src/cs_disas.cc',
+  'src/resource.cc'
 ]
 
 

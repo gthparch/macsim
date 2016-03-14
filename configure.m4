@@ -6,9 +6,7 @@ AC_DEFUN([SST_macsimComponent_CONFIG],[
     [AS_HELP_STRING([--with-qsim@<:@=DIR@:>@],
       [Use QSim installed at optionally-specified prefix DIR])])
 
-  sst_check_qsim_happy="yes"
-
-  AS_IF([test "$with_qsim" = "no"], [sst_check_qsim_happy="no"])
+  macsim_happy="yes"
 
   CPPFLAGS_saved="$CPPFLAGS"
   LDFLAGS_saved="$LDFLAGS"
@@ -42,5 +40,5 @@ AC_DEFUN([SST_macsimComponent_CONFIG],[
         [AC_DEFINE([HAVE_QSIM], [1], [Set to 1 if QSim was found])])
   AC_DEFINE_UNQUOTED([QSIM_LIBDIR], ["$QSIM_LIBDIR"], [Path to QSim library])
 
-  #AS_IF([test "$sst_check_qsim_happy" = "yes"], [$1], [$2])
+  AS_IF([test "$macsim_happy" = "yes"], [$1], [$2])
 ])

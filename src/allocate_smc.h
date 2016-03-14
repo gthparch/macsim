@@ -92,7 +92,7 @@ class smc_allocate_c
      */
     smc_allocate_c(int core_id, pqueue_c<int*>* q_frontend, 
         pqueue_c<gpu_allocq_entry_s>** gpu_alloc_q, pool_c<uop_c>* uop_pool, 
-        smc_rob_c* gpu_rob, Unit_Type unit_type, int num_queues,
+      	smc_rob_c* gpu_rob, Unit_Type unit_type, int num_queues, resource_c* resource,
         macsim_c* simBase);
 
     /*! \fn ~smc_allocate_c()
@@ -145,7 +145,8 @@ class smc_allocate_c
     bool                           m_allocate_running; /**< Enable allocation stage */
     Counter                        m_cur_core_cycle; /**< current core cycle */
     int                            m_num_queues; /**< number of allocation queue types */
-    
+
+		resource_c*                    m_resource; /**< resource structure to hold ld/st buffer, INT/REG buffer */
     macsim_c*                      m_simBase; /**< macsim_c base class for simulation globals */
 };
 

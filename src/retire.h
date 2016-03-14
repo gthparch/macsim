@@ -56,6 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
     pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq, \
     pool_c<uop_c>* m_uop_pool, \
     rob_c* m_rob, \
+		resource_c* m_resource, \
     smc_rob_c* m_gpu_rob, \
     Unit_Type m_unit_type \
 // end macro
@@ -68,6 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
     pqueue_c<gpu_allocq_entry_s>** m_gpu_q_iaq; /**< gpu ia queue */ \
     pool_c<uop_c>* m_uop_pool; /**< uop pool */ \
     rob_c* m_rob; /**< reorder buffer */ \
+		resource_c* m_resource; /**< resource data structure */ \
     smc_rob_c* m_gpu_rob; /**< gpu reorder buffer */ \
     Unit_Type m_unit_type; /**< unit type */ \
 // end macro
@@ -80,6 +82,7 @@ POSSIBILITY OF SUCH DAMAGE.
     m_gpu_q_iaq, \
     m_uop_pool, \
     m_rob, \
+		m_resource, \
     m_gpu_rob, \
     m_unit_type \
 // end macro
@@ -92,6 +95,7 @@ POSSIBILITY OF SUCH DAMAGE.
     m_gpu_q_iaq ( m_gpu_q_iaq ), \
     m_uop_pool ( m_uop_pool ), \
     m_rob ( m_rob ), \
+		m_resource ( m_resource ), \
     m_gpu_rob ( m_gpu_rob ), \
     m_unit_type ( m_unit_type ) \
 // end macro
@@ -104,6 +108,7 @@ POSSIBILITY OF SUCH DAMAGE.
     static_cast<void>(m_gpu_q_iaq); \
     static_cast<void>(m_uop_pool); \
     static_cast<void>(m_rob); \
+		static_cast<void>(m_zL/resource); \
     static_cast<void>(m_gpu_rob); \
     static_cast<void>(m_unit_type); \
 // end macro
@@ -245,7 +250,7 @@ class retire_c
 
     write_buffer_c              m_write_buffer;
     bitset<8>                   m_store_version;
-
+		
     int m_period_inst_count; /**< counter for periodic logging number of retired inst. */
 
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */

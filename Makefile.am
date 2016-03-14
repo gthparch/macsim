@@ -16,7 +16,7 @@ AM_CPPFLAGS = \
   -I$(srcdir)/src/rwqueue \
   -std=c++0x \
 	-DUSING_SST  \
-	-DNO_DEBUG   \
+  -DNO_DEBUG \
 	$(HMC_FLAG)  \
 	$(QSIM_CPPFLAGS) \
 	-g
@@ -69,6 +69,7 @@ src/pref_factory.cc          src/pref_factory.h                        \
 src/pref_stride.cc           src/pref_stride.h                         \
 src/process_manager.cc       src/process_manager.h                     \
 src/readonly_cache.cc        src/readonly_cache.h                      \
+src/resource.cc              src/resource.h                            \
 src/retire.cc                src/retire.h                              \
 src/rob.cc                   src/rob.h                                 \
 src/rob_smc.cc               src/rob_smc.h                             \
