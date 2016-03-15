@@ -40,14 +40,11 @@ class InstHandler {
 
     std::atomic<bool> stop_gen;
 
-    uint64_t ins_nops() { return nop_count; }
-
   private:
 
     int m_fp_uop_table[ARM64_INS_ENDING];
     int m_int_uop_table[ARM64_INS_ENDING];
     bool finished;
-    uint64_t nop_count;
 
     trace_info_a64_qsim_s *prev_op, *nop;
     BlockingReaderWriterQueue<trace_info_a64_qsim_s*> stream;
@@ -83,7 +80,6 @@ class tracegen_a64 {
       /*
       for (int i = 0; i < osd.get_n(); i++)
         std::cout << "(" << i << ", " << osd.get_tid(i) << ", " << osd.idle(i)
-                  << ", " << std::setw(7) << inst_handle[i].ins_nops()
                   << ", " << std::setw(6) << inst_handle[i].instq_size() << ") ";
       std::cout << "\r";
       */
