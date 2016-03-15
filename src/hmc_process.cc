@@ -245,28 +245,34 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                     trace_info_cpu_s hmc_trace_info;
                     trace_info_cpu_s cur_trace_info;
                     uint64_t hmc_vaddr = 0; // target mem vaddr for HMC inst
-    cout<<"thread-"<<sim_thread_id<<"  hmc-inst: "<<inst_addr<<endl;
 
-                    while (inst_addr!=hmc_inst.ret_pc)
+                    if (inst_addr==hmc_inst.ret_pc)
                     {
-                        read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, (&cur_trace_info),
-                                       sim_thread_id, &inst_read);
-                        // break when reach trace end
-                        if (core->get_trace_info(sim_thread_id)->m_trace_ended)
-                            break;
-                        // get target mem addr of hmc inst
-                        if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
-                            hmc_vaddr = cur_trace_info.m_ld_vaddr1;
+                        hmc_vaddr = (static_cast<trace_info_cpu_s*>
+                                      (thread_trace_info->m_next_trace_info))->m_ld_vaddr1;
+                    }
+                    else
+                    {
+                        while (true)
+                        {
+                            read_success = ((cpu_decoder_c*)ptr)->read_trace(core_id, (&cur_trace_info), sim_thread_id, &inst_read);
+                            // break when reach trace end
+                            if (core->get_trace_info(sim_thread_id)->m_trace_ended)
+                                break;
+                            // get target mem addr of hmc inst
+                            if (cur_trace_info.m_instruction_addr == hmc_inst.addr_pc)
+                                hmc_vaddr = cur_trace_info.m_ld_vaddr1;
 
-                        // break when trace read has an error
-                        if (!read_success) return false;
+                            // break when trace read has an error
+                            if (!read_success) return false;
 
-                        STAT_CORE_EVENT(core_id, HMC_REMOVE_INST_COUNT);
-                        STAT_EVENT(HMC_REMOVE_INST_COUNT_TOT);
+                            STAT_CORE_EVENT(core_id, HMC_REMOVE_INST_COUNT);
+                            STAT_EVENT(HMC_REMOVE_INST_COUNT_TOT);
 
-                        // break when find the return instruction
-                        if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc)
-                            break;
+                            // break when find the return instruction
+                            if (cur_trace_info.m_instruction_addr == hmc_inst.ret_pc)
+                                break;
+                        }
                     }
                     ASSERT(read_success); // should not reach here
                     // replace hmc function with a generated hmc inst
@@ -277,6 +283,9 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
                         ASSERTM(ret != HMC_NONE," hmc_inst: %s hmc_enum: %d\n",hmc_inst.name.c_str(),(unsigned)ret); // fail if cannot find hmc inst info
                         memcpy(thread_trace_info->m_next_trace_info, &hmc_trace_info, sizeof(trace_info_cpu_s));
                         thread_trace_info->m_next_hmc_type = ret;
+
+                        //cout<<"core-"<<core_id<<" thread-"<<sim_thread_id<<"  hmc-inst-pc: "<<inst_addr<<" vaddr: "<<hmc_vaddr<<endl;
+
 
                         // If HMC function is inlined, the ret inst should be skipped
                         // Only for non-inline HMC func, we cache the ret inst for later
