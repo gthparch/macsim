@@ -841,6 +841,27 @@ inst_info_s* cpu_decoder_c::get_inst_info(thread_s *thread_trace_info, int core_
     {
         thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
     }
+    if (*KNOB(KNOB_ENABLE_HMC_FENCE))
+    {
+        set<uint64_t> & hmc_fence_info = thread_trace_info->m_process->m_hmc_fence_info;
+        if (hmc_fence_info.find(trace_info.m_instruction_addr)!=hmc_fence_info.end())
+        {
+            unsigned end = info->m_trace_info.m_num_uop;
+            info->m_trace_info.m_num_uop++;
+            thread_trace_info->m_trace_uop_array[end-1]->m_eom = 0;
+            thread_trace_info->m_trace_uop_array[end]->m_opcode = XED_CATEGORY_MISC;
+            thread_trace_info->m_trace_uop_array[end]->m_mem_type = NOT_MEM;
+            thread_trace_info->m_trace_uop_array[end]->m_cf_type = NOT_CF;
+            thread_trace_info->m_trace_uop_array[end]->m_op_type = UOP_FULL_FENCE;
+            thread_trace_info->m_trace_uop_array[end]->m_bar_type = NOT_BAR;
+            thread_trace_info->m_trace_uop_array[end]->m_num_dest_regs = 0;
+            thread_trace_info->m_trace_uop_array[end]->m_num_src_regs = 0;
+            thread_trace_info->m_trace_uop_array[end]->m_pin_2nd_mem = 0;
+            thread_trace_info->m_trace_uop_array[end]->m_eom = 1;
+            thread_trace_info->m_trace_uop_array[end]->m_inst_size = trace_info.m_size;
+
+        }
+    }
   return info;
 }
 

@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <zlib.h>
 #include <unordered_map>
+#include <set>
 
 #include "global_defs.h"
 #include "global_types.h"
@@ -278,6 +279,7 @@ typedef struct process_s {
 
   // changed by Lifeng
   map<uint64_t, hmc_inst_s> m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
+  set<uint64_t> m_hmc_fence_info; /**<set of hmc instructions with implicit fence */
   map<uint64_t, hmc_inst_s> m_lock_info;
 } process_s;
 

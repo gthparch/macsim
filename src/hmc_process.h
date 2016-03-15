@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sstream>
 #include <map>
+#include <set>
 
 #include "hmc_types.h"
 #include "trace_read.h"
@@ -26,6 +27,8 @@ public:
     // get HMC instruction information
     static void hmc_info_read(string file_name_base,
                               map<uint64_t, hmc_inst_s> & m_hmc_info);
+    static void hmc_fence_info_read(string file_name_base, 
+                              set<uint64_t> & m_hmc_fence_info);
     static void lock_info_read(string file_name_base,
                               map<uint64_t, hmc_inst_s> & m_lock_info);
 
