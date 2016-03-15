@@ -164,9 +164,9 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
 	    bench_name = "";
 
 	    tarfile >> bench_name;
-	    report("loading benchmark " + bench_name);
     }
 
+    report("loading benchmark " + bench_name);
     Qsim::load_file(*osd, bench_name.c_str());
 
     m_tg = new tracegen_a64(*osd);
@@ -241,13 +241,15 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
                                                         thread_trace_info->m_buffer,
                                                         m_trace_size*k_trace_buffer_size);
 #else
-	      if (m_tg->trace_avail(core_id)) {
-		      thread_trace_info->m_buffer_index_max = m_tg->read_trace(core_id,
-		                                                               thread_trace_info->m_buffer,
-                                                                   m_trace_size*k_trace_buffer_size);
-	      } else {
-		      thread_trace_info->m_trace_ended = true;
-	      }
+        if (m_tg->trace_avail(core_id)) {
+          int uops_read  = m_tg->read_trace(core_id,
+                                            thread_trace_info->m_buffer,
+                                            m_trace_size*k_trace_buffer_size);
+
+          thread_trace_info->m_buffer_index_max = uops_read;
+        } else {
+          thread_trace_info->m_trace_ended = true;
+        }
 #endif
         thread_trace_info->m_buffer_index_max /= m_trace_size;
         thread_trace_info->m_buffer_exhausted  = false;
