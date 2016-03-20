@@ -313,7 +313,8 @@ int tracegen_a64::app_end_cb(int c)
   finished = true;
   inst_handle[0].closeDebugFile();
 
-  std::cout << "App end cb called. inst: " << inst_count << std::endl;
+  std::cout << "App end cb called. inst: " << inst_count
+	    << " nop: " << nop_count << std::endl;
 
   return 1;
 }
