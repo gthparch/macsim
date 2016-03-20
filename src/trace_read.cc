@@ -250,9 +250,11 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
         thread_trace_info->m_buffer_index_max /= m_trace_size;
         thread_trace_info->m_buffer_exhausted  = false;
 
-//        if (thread_trace_info->m_buffer_index_max < k_trace_buffer_size) {
-//          gzclose(thread_trace_info->m_trace_file);
-//        }
+        /*
+        if (thread_trace_info->m_buffer_index_max < k_trace_buffer_size) {
+          gzclose(thread_trace_info->m_trace_file);
+        }
+        */
       }
 
       memcpy(trace_info, 

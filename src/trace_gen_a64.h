@@ -92,7 +92,6 @@ class tracegen_a64 {
       nop = new trace_info_a64_qsim_s();
       memset(nop, 0, sizeof(trace_info_a64_qsim_s));
       nop->m_opcode = ARM64_INS_NOP;
-      //nop->m_bogus  = true;
 
       m_simBase = simBase;
 
@@ -125,8 +124,8 @@ class tracegen_a64 {
         return inst_handle[c].read_trace(buffer, len);
       } else if (osd.runnable(c)) {
         if (osd.get_tid(c) == osd.get_bench_pid()) {
-        // wait for instructions since a thread of the benchmark is running
-        return inst_handle[c].read_trace(buffer, len);
+          // wait for instructions since a thread of the benchmark is running
+          return inst_handle[c].read_trace(buffer, len);
         } else {
           // the benchmark thread is not running, use NOPs
           trace_info_a64_qsim_s* trace_buffer = (trace_info_a64_qsim_s *)buffer;
@@ -173,4 +172,3 @@ class tracegen_a64 {
     macsim_c *m_simBase;
     uint64_t unid_fences, full_fences, llsc;
 };
-
