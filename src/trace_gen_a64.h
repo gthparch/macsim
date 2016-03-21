@@ -1,10 +1,11 @@
 /* ****************************************************************************************** */
 /* ****************************************************************************************** */ 
+#include "macsim.h"
 
 #include <zlib.h>
 #include <thread>
 
-#include <capstone.h>
+#include "capstone.h"
 #include "cs_disas.h"
 #include "readerwriterqueue.h"
 
@@ -61,6 +62,8 @@ class InstHandler {
       return stream.size_approx();
     }
 
+    void set_simbase(macsim_c *simBase) { m_simBase = simBase; }
+
     std::atomic<bool> stop_gen;
 
   private:
@@ -71,11 +74,13 @@ class InstHandler {
 
     trace_info_a64_qsim_s *prev_op, *nop;
     BlockingReaderWriterQueue<trace_info_a64_qsim_s*> stream;
+
+    macsim_c *m_simBase;
 };
 
 class tracegen_a64 {
   public:
-    tracegen_a64(OSDomain &osd) :
+    tracegen_a64(macsim_c* simBase, OSDomain &osd) :
     osd(osd), finished(false), started(false), inst_count(0), nop_count(0)
     { 
       osd.set_app_start_cb(this, &tracegen_a64::app_start_cb);
@@ -87,6 +92,8 @@ class tracegen_a64 {
       nop = new trace_info_a64_qsim_s();
       memset(nop, 0, sizeof(trace_info_a64_qsim_s));
       nop->m_opcode = ARM64_INS_NOP;
+
+      m_simBase = simBase;
     }
 
     ~tracegen_a64()
@@ -164,5 +171,7 @@ class tracegen_a64 {
     uint64_t     inst_count, nop_count;
     std::thread *gen_thread;
     trace_info_a64_qsim_s *nop;
+
+    macsim_c *m_simBase;
 };
 

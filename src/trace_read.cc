@@ -169,7 +169,7 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
     report("loading benchmark " + bench_name);
     Qsim::load_file(*osd, bench_name.c_str());
 
-    m_tg = new tracegen_a64(*osd);
+    m_tg = new tracegen_a64(m_simBase, *osd);
     m_tg->app_start_cb(0);
   }
 #endif

@@ -18,9 +18,9 @@
 #include <stdio.h>
 #include <zlib.h>
 #include <getopt.h>
-#include <assert.h>
 
 #include "trace_gen_a64.h"
+#include "assert_macros.h"
 
 #define DEBUG 0
 
@@ -100,7 +100,7 @@ int InstHandler::read_trace(void *buffer, unsigned int len)
     }
 
     if (stream.try_dequeue(op)) {
-      assert(op->m_opcode != ARM64_INS_INVALID);
+      ASSERT(op->m_opcode != ARM64_INS_INVALID);
       memcpy(trace_buffer+i, op, sizeof(trace_info_a64_qsim_s));
       delete op;
       i++;
@@ -287,6 +287,9 @@ int tracegen_a64::app_start_cb(int c)
 {
   int n_cpus = osd.get_n();
   inst_handle = new InstHandler[osd.get_n()];
+
+  for (int i = 0; i < osd.get_n(); i++)
+    inst_handle[i].set_simbase(m_simBase);
 
   if (!started) {
     started = true;
