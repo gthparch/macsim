@@ -544,24 +544,50 @@ inst_info_s* cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
     //////
     if (*KNOB(KNOB_ENABLE_HMC_FENCE))
     {
+        // insert fences for HMC offloading targets
+        // it can also be abled when HMC is disabled
         core_c* core = m_simBase->m_core_pointers[core_id];
         thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
         set<uint64_t> & hmc_fence_info = thread_trace_info->m_process->m_hmc_fence_info;
         if (hmc_fence_info.find(pi->m_instruction_addr)!=hmc_fence_info.end())
         {
-          trace_uop[num_uop-1]->m_eom = 0;
+            if (*KNOB(KNOB_ENABLE_HMC_DOUBLE_FENCE))
+            {
+                // shift existing uops
+                trace_uop_s * tmp = trace_uop[num_uop];
+                for (int idx=num_uop-1;idx>=0;idx--)
+                    trace_uop[idx+1] = trace_uop[idx];
+                trace_uop[0] = tmp;
 
-          trace_uop[num_uop]->m_opcode        = XED_CATEGORY_MISC;
-          trace_uop[num_uop]->m_mem_type      = NOT_MEM;
-          trace_uop[num_uop]->m_cf_type       = NOT_CF;
-          trace_uop[num_uop]->m_op_type       = UOP_FULL_FENCE;
-          trace_uop[num_uop]->m_bar_type      = NOT_BAR;
-          trace_uop[num_uop]->m_num_dest_regs = 0;
-          trace_uop[num_uop]->m_num_src_regs  = 0;
-          trace_uop[num_uop]->m_pin_2nd_mem   = 0;
-          trace_uop[num_uop]->m_eom           = 1;
-          trace_uop[num_uop]->m_inst_size     = pi->m_size;
-          ++num_uop;
+                num_uop++;
+
+                // insert fence at the beginning
+                trace_uop[0]->m_opcode        = XED_CATEGORY_MISC;
+                trace_uop[0]->m_mem_type      = NOT_MEM;
+                trace_uop[0]->m_cf_type       = NOT_CF;
+                trace_uop[0]->m_op_type       = UOP_FULL_FENCE;
+                trace_uop[0]->m_bar_type      = NOT_BAR;
+                trace_uop[0]->m_num_dest_regs = 0;
+                trace_uop[0]->m_num_src_regs  = 0;
+                trace_uop[0]->m_pin_2nd_mem   = 0;
+                trace_uop[0]->m_eom           = 0;
+                trace_uop[0]->m_inst_size     = pi->m_size;
+            }
+
+
+            // insert fence at the end
+            trace_uop[num_uop-1]->m_eom = 0;
+            trace_uop[num_uop]->m_opcode        = XED_CATEGORY_MISC;
+            trace_uop[num_uop]->m_mem_type      = NOT_MEM;
+            trace_uop[num_uop]->m_cf_type       = NOT_CF;
+            trace_uop[num_uop]->m_op_type       = UOP_FULL_FENCE;
+            trace_uop[num_uop]->m_bar_type      = NOT_BAR;
+            trace_uop[num_uop]->m_num_dest_regs = 0;
+            trace_uop[num_uop]->m_num_src_regs  = 0;
+            trace_uop[num_uop]->m_pin_2nd_mem   = 0;
+            trace_uop[num_uop]->m_eom           = 1;
+            trace_uop[num_uop]->m_inst_size     = pi->m_size;
+            ++num_uop;
         }
     }
 
@@ -870,6 +896,14 @@ inst_info_s* cpu_decoder_c::get_inst_info(thread_s *thread_trace_info, int core_
         {
             STAT_CORE_EVENT(core_id, HMC_FENCE_INST_COUNT);
             STAT_EVENT(HMC_FENCE_INST_COUNT_TOT);
+        }
+        if (*KNOB(KNOB_ENABLE_HMC_DOUBLE_FENCE))
+        {
+            if (thread_trace_info->m_trace_uop_array[0]->m_op_type == UOP_FULL_FENCE)
+            {
+                STAT_CORE_EVENT(core_id, HMC_FENCE_INST_COUNT);
+                STAT_EVENT(HMC_FENCE_INST_COUNT_TOT);
+            }
         }
     }
   return info;

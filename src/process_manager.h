@@ -279,6 +279,7 @@ typedef struct process_s {
 
   // changed by Lifeng
   map<uint64_t, hmc_inst_s> m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
+  map<std::pair<uint64_t,uint64_t>, hmc_inst_s> m_hmc_info_ext;
   set<uint64_t> m_hmc_fence_info; /**<set of hmc instructions with implicit fence */
   map<uint64_t, hmc_inst_s> m_lock_info;
 } process_s;

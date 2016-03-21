@@ -17,6 +17,8 @@ typedef struct hmc_inst_s
     uint64_t ret_pc;
     uint64_t addr_pc;
     string name;
+
+    uint16_t cnt;
 } hmc_inst_s;
 
 
@@ -26,7 +28,8 @@ public:
 
     // get HMC instruction information
     static void hmc_info_read(string file_name_base,
-                              map<uint64_t, hmc_inst_s> & m_hmc_info);
+                              map<uint64_t, hmc_inst_s> & m_hmc_info,
+                              map<std::pair<uint64_t,uint64_t>, hmc_inst_s> & m_hmc_info_ext);
     static void hmc_fence_info_read(string file_name_base, 
                               set<uint64_t> & m_hmc_fence_info);
     static void lock_info_read(string file_name_base,

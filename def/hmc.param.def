@@ -34,6 +34,10 @@ param<ENABLE_HMC_BYPASS_CACHE, enable_hmc_bypass_cache, bool, 1>
 param<ENABLE_NONHMC_STAT, enable_nonhmc_stat, bool, 0>
 param<ENABLE_LOCK_SKIP, enable_lock_skip, bool, 0>
 param<ENABLE_HMC_TRANS, enable_hmc_trans, bool, 0>
-param<ENABLE_HMC_FUNC_INLINE, enable_hmc_func_inline, bool, 0>
 param<ENABLE_HMC_FENCE, enable_hmc_fence, bool, 0>
-param<HMC_ADD_DEP, hmc_add_dep, bool, 1> 
+param<ENABLE_HMC_DOUBLE_FENCE, enable_hmc_double_fence, bool, 0>
+param<COUNT_HMC_REMOVED_IN_MAX_INSTS, count_hmc_removed_in_max_insts, bool, 0>
+param<HMC_ADD_DEP, hmc_add_dep, bool, 1>
+
+param<ENABLE_TRACE_MAX_THREAD, enable_trace_max_thread, bool, 0>
+param<TRACE_MAX_THREAD_COUNT, trace_max_thread_count, int, 8>

@@ -474,7 +474,7 @@ void process_manager_c::setup_process(process_s* process)
   // get hmc info if hmc inst is enabled
   if (*KNOB(KNOB_ENABLE_HMC_INST) || *KNOB(KNOB_ENABLE_NONHMC_STAT)
           || *KNOB(KNOB_ENABLE_HMC_TRANS))
-      hmc_function_c::hmc_info_read(process->m_current_file_name_base, process->m_hmc_info);
+      hmc_function_c::hmc_info_read(process->m_current_file_name_base, process->m_hmc_info, process->m_hmc_info_ext);
   if (*KNOB(KNOB_ENABLE_HMC_FENCE))
       hmc_function_c::hmc_fence_info_read(process->m_current_file_name_base, process->m_hmc_fence_info);
 
@@ -538,6 +538,12 @@ void process_manager_c::setup_process(process_s* process)
   // # thread_count > 0
   if (thread_count <= 0) 
     ASSERTM(0, "invalid thread count:%d", thread_count);
+
+  if (*KNOB(KNOB_ENABLE_TRACE_MAX_THREAD))
+  {
+      if (thread_count>*KNOB(KNOB_TRACE_MAX_THREAD_COUNT))
+        thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
+  }
 
   report("thread_count:" << thread_count);
 
