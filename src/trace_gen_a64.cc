@@ -283,6 +283,50 @@ bool InstHandler::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs reg
   return true;
 }
 
+void tracegen_a64::count_fences(const uint8_t *b, uint8_t l)
+{
+  cs_insn *insn = NULL;
+
+  int count = dis.decode((unsigned char *)b, l, insn);
+
+  switch (insn[0].id) {
+  case ARM64_INS_STLR:
+  case ARM64_INS_STLRB:
+  case ARM64_INS_STLRH:
+  case ARM64_INS_LDAR:
+  case ARM64_INS_LDARB:
+  case ARM64_INS_LDARH:
+	  unid_fences++;
+	  break;
+  case ARM64_INS_STLXR:
+  case ARM64_INS_STLXRB:
+  case ARM64_INS_STLXRH:
+  case ARM64_INS_LDAXR:
+  case ARM64_INS_LDAXRB:
+  case ARM64_INS_LDAXRH:
+	  llsc++;
+	  break;
+  case ARM64_INS_DMB:
+  case ARM64_INS_DSB:
+  case ARM64_INS_ISB:
+	  full_fences++;
+	  break;
+  default:
+	  break;
+  }
+
+  dis.free_insn(insn, count);
+}
+
+void tracegen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
+	     enum inst_type t)
+{
+  inst_handle[c].processInst((unsigned char*)b, v, l);
+  inst_count++;
+
+  return;
+}
+
 int tracegen_a64::app_start_cb(int c)
 {
   int n_cpus = osd.get_n();
@@ -316,8 +360,11 @@ int tracegen_a64::app_end_cb(int c)
   finished = true;
   inst_handle[0].closeDebugFile();
 
-  std::cout << "App end cb called. inst: " << inst_count
-	    << " nop: " << nop_count << std::endl;
+  std::cout << "App end cb called. inst: " << inst_count << std::endl
+	    << " nop: " << nop_count << std::endl
+	    << " unid: " << unid_fences << std::endl
+	    << " full: " << full_fences << std::endl
+	    << " llsc: " << llsc << std::endl;
 
   return 1;
 }

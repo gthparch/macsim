@@ -1039,17 +1039,24 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
         }
       }
 
-      trace_uop[0]->m_cf_type  = NOT_CF;
-      trace_uop[0]->m_op_type  = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
-      trace_uop[0]->m_bar_type = NOT_BAR;
+      trace_uop[0]->m_cf_type         = NOT_CF;
+      trace_uop[0]->m_op_type         = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
+      if (pi->m_opcode == ARM64_INS_LDXR  ||
+          pi->m_opcode == ARM64_INS_LDXRB ||
+          pi->m_opcode == ARM64_INS_LDXRH ||
+          pi->m_opcode == ARM64_INS_LDR   ||
+          pi->m_opcode == ARM64_INS_LDRB  ||
+          pi->m_opcode == ARM64_INS_LDRH)
+        trace_uop[0]->m_bar_type      = ACQ_BAR;
+      else
+        trace_uop[0]->m_bar_type      = NOT_BAR;
 
-      trace_uop[0]->m_num_src_regs = pi->m_num_read_regs;
-      trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
-
-      trace_uop[0]->m_pin_2nd_mem  = 0;
-      trace_uop[0]->m_eom      = 0;
-      trace_uop[0]->m_alu_uop  = false;
-      trace_uop[0]->m_inst_size = pi->m_size;
+      trace_uop[0]->m_num_src_regs    = pi->m_num_read_regs;
+      trace_uop[0]->m_num_dest_regs   = pi->m_num_dest_regs;
+      trace_uop[0]->m_pin_2nd_mem     = 0;
+      trace_uop[0]->m_eom             = 0;
+      trace_uop[0]->m_alu_uop         = false;
+      trace_uop[0]->m_inst_size       = pi->m_size;
 
       ///
       /// There are two load operations in an instruction. Note that now array index becomes 1
@@ -1090,18 +1097,18 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
           trace_uop[1]->m_mem_type = MEM_LD;
           trace_uop[1]->m_mem_size = 4;
         }
-        trace_uop[1]->m_cf_type    = NOT_CF;
-        trace_uop[1]->m_op_type    = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
-        trace_uop[1]->m_bar_type   = NOT_BAR;
+        trace_uop[1]->m_cf_type       = NOT_CF;
+        trace_uop[1]->m_op_type       = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
+        trace_uop[1]->m_bar_type      = NOT_BAR;
         trace_uop[1]->m_num_dest_regs = 0;
-        trace_uop[1]->m_num_src_regs = pi->m_num_read_regs;
+        trace_uop[1]->m_num_src_regs  = pi->m_num_read_regs;
         trace_uop[1]->m_num_dest_regs = pi->m_num_dest_regs;
 
-        trace_uop[1]->m_pin_2nd_mem  = 1;
-        trace_uop[1]->m_eom          = 0;
-        trace_uop[1]->m_alu_uop      = false;
-        trace_uop[1]->m_inst_size    = pi->m_size;
-        trace_uop[1]->m_mul_mem_uops = 0; //pi->m_has_immediate; // uncoalesced memory accesses
+        trace_uop[1]->m_pin_2nd_mem   = 1;
+        trace_uop[1]->m_eom           = 0;
+        trace_uop[1]->m_alu_uop       = false;
+        trace_uop[1]->m_inst_size     = pi->m_size;
+        trace_uop[1]->m_mul_mem_uops  = 0; //pi->m_has_immediate; // uncoalesced memory accesses
 
         num_uop = 2;
       } // num_loads == 2

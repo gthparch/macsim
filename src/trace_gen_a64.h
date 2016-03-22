@@ -94,6 +94,8 @@ class tracegen_a64 {
       nop->m_opcode = ARM64_INS_NOP;
 
       m_simBase = simBase;
+
+      unid_fences = full_fences = llsc = 0;
     }
 
     ~tracegen_a64()
@@ -145,14 +147,9 @@ class tracegen_a64 {
 
     void gen_trace(void);
 
+    void count_fences(const uint8_t *b, uint8_t l);
     void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
-        enum inst_type t)
-    {
-      inst_handle[c].processInst((unsigned char*)b, v, l);
-      inst_count++;
-
-      return;
-    }
+		 enum inst_type t);
 
     void mem_cb(int c, uint64_t v, uint64_t p, uint8_t s, int w)
     {
@@ -173,5 +170,6 @@ class tracegen_a64 {
     trace_info_a64_qsim_s *nop;
 
     macsim_c *m_simBase;
+    uint64_t unid_fences, full_fences, llsc;
 };
 

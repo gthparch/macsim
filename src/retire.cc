@@ -222,7 +222,7 @@ void retire_c::run_a_cycle()
 
         ASSERT(rob->is_fence_active());
 
-        STAT_CORE_EVENT(cur_uop->m_core_id, DYN_FENCE_NUM);
+        // STAT_CORE_EVENT(cur_uop->m_core_id, DYN_FENCE_NUM);
         // STAT_EVENT(DYN_FENCE_NUM);
 
         DEBUG_CORE(cur_uop->m_core_id, "thread_id:%d uop_num:%llu inst_num:%llu fence operations \n",
