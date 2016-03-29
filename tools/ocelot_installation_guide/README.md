@@ -29,6 +29,8 @@ There are two paths to using ocelot for trace generation:
 - **Important: Root inside the container has total access to the host too. Use it with caution. For development, use the user you created and use sudo for system commands.** 
 - Docker will save the state if you exit. You can restart the container by calling sudo docker start container_id, followed by sudo docker attach container_id. Again, google or read up on docker documentation for these details.  
 - The docker image is updated whenever someone pushes changes to our fork of gpuocelot on github. You'll have to do a docker pull to get the latest image when that happens. 
+- gpuocelot needs gcc/g++ 4.6 for compilation. However, gpu applications that link against ocelot have better compatibility with gcc/g++ 4.4. 
+- When you drop into the docker container, the default gcc/g++ version is set to 4.4 since the assumption is that you are using this container to generate traces. If you want to modify and recompile ocelot itself, you should change it to 4.6 first by calling "update-alternatives --set gcc "/usr/bin/gcc-4.6" && update-alternatives --set g++ "/usr/bin/g++-4.6" as the root user. Change it back to 4.4 before you compile your applications. 
 
 # 2. Compile ocelot natively
 - Start with an Ubuntu 14.04 system, and mimic the steps from *apt-key adv* onwards in the dockerfile located at https://github.com/gthparch/gpuocelot/blob/master/docker/Dockerfile.
