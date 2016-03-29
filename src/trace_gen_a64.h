@@ -92,6 +92,7 @@ class tracegen_a64 {
       nop = new trace_info_a64_qsim_s();
       memset(nop, 0, sizeof(trace_info_a64_qsim_s));
       nop->m_opcode = ARM64_INS_NOP;
+      nop->m_bogus  = true;
 
       m_simBase = simBase;
 
