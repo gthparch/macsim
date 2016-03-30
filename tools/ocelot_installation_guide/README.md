@@ -44,12 +44,12 @@ There are two paths to using ocelot for trace generation:
 - This will drop you to the root shell. Change to your local user by calling su - username.
 - If you stopped your container, it won't show up when you call sudo docker ps. Howerver, it will show up if you call sudo docker ps -a. The status would show "Exited". For example,
 
-```
+ ```
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
 43a1f1e80ffc        hparch/gpuocelot    "/bin/bash"         5 weeks ago         Exited (0) 3 minutes ago                       stupefied_feynman
 0ceeab137ff5        hparch/gpuocelot    "/bin/bash"         6 weeks ago         Exited (130) 6 weeks ago                       clever_mccarthy
 fed37ca26a79        hparch/gpuocelot    "/bin/bash"         6 weeks ago         Exited (0) 6 weeks ago                         kickass_leakey
-```
+ ```
 - Before you can attach to an exited container, you need to start it first. For example, sudo docker start stupefied_feynman
 - Then you can follow the same instructions as before to attach to it.
 - If you want to delete old containers, first stop them, and then call sudo docker rm container_name. For example, sudo docker rm kickass_leakey in the previous list of exited containers. 
