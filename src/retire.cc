@@ -112,9 +112,6 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERF
 
   if (m_knob_ptx_sim)
     m_knob_width = 1000;
-
-  m_store_version = 1;
-
 }
 
 
@@ -190,12 +187,7 @@ void retire_c::run_a_cycle()
           break;
         }
 
-        ASSERT(m_store_version != 0);
         insert_wb(cur_uop);
-
-        if (KNOB(KNOB_ACQ_REL)->getValue() && cur_uop->m_bar_type == REL_BAR) {
-          m_store_version = (m_store_version) | (m_store_version >> 1);
-        }
       }
 
       // uop cannot be retired
@@ -236,28 +228,28 @@ void retire_c::run_a_cycle()
             break;
           case UOP_REL_FENCE:
             ft = FENCE_RELEASE;
-            m_store_version = m_store_version << 1;
             break;
           case UOP_FULL_FENCE:
             ft = FENCE_FULL;
-            // left rotate write buffer index
-            m_store_version = m_store_version << 1;
             break;
           default:
+            ASSERT(false);
             break;
           }
           rob->del_fence_entry(ft);
         } else {
           rob->del_fence_entry(FENCE_FULL);
-          // increment store group
-          m_store_version = m_store_version << 1;
         }
-	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_TOT_CYCLES,
-			  m_cur_core_cycle - cur_uop->m_alloc_cycle);
-	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_EXEC_CYCLES,
-			  m_cur_core_cycle - cur_uop->m_sched_cycle);
-	ASSERT(m_store_version != 0);
+        STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_TOT_CYCLES,
+			  m_cur_core_cycle - cur_uop->m_alloc_cycle); 
+        STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_EXEC_CYCLES,
+			  m_cur_core_cycle - cur_uop->m_sched_cycle); 
+
+        rob->update_orq(cur_uop);
       }
+
+      if (cur_uop->m_bar_type == ACQ_BAR)
+        rob->update_orq(cur_uop);
 
       rob->pop();
       POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
@@ -382,52 +374,41 @@ void retire_c::drain_wb(void)
 {
   // all stores are complete
   if (m_write_buffer.empty()) {
-    m_store_version = 1;
     return;
   }
 
   int stores_completed = 0;
   bool increment_index = true;
-  for (int indices_tried = 0; indices_tried < 8 && increment_index; indices_tried++) {
-
-    auto uop_it = m_write_buffer.begin();
-
-    while(uop_it != m_write_buffer.end()) {
-      auto uop_index = uop_it->first;
-
-      if (!uop_index.test(indices_tried)) {
-        ++uop_it;
-        continue;
-      }
-
-      uop_c* cur_uop = uop_it->second;
+  for (auto uop_it = m_write_buffer.begin(); uop_it != m_write_buffer.end();) {
+      auto cur_uop = *uop_it;
 
       if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle ||
           cur_uop->m_exec_cycle == 0) {
         // there is a store which cannot be completed with current index
         // and has no other higher indices set, stop completing
-        auto higher_bits = uop_index & (bitset<8>(0xFF) << (indices_tried + 1));
-        if (!higher_bits.any()) {
-          if (increment_index)
-            STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
-          increment_index = false;
-        }
         ++uop_it;
       } else {
         // the write uop is completed and can be freed
-        STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE, m_cur_core_cycle - cur_uop->m_alloc_cycle);
+
+        // if version of the uop is greater than root fence version
+        // then you cannot retire this uop yet
+        if (KNOB(KNOB_ACQ_REL)->getValue() &&
+            m_rob->version_ordering_check(cur_uop)) {
+          ++uop_it;
+          continue;
+        }
+
+        STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE,
+                          m_cur_core_cycle - cur_uop->m_alloc_cycle);
+
         free_uop_resources(cur_uop);
-        auto uop_it_tmp = uop_it;
-        ++uop_it;
-        delete_wb(uop_it_tmp);
+        uop_it = delete_wb(uop_it);
         stores_completed++;
       }
-    }
   }
 
   // tell rob if WB is empty for memory ordering
   if (m_write_buffer.empty()) {
-    m_store_version = 1;
     m_rob->set_wb_empty(true);
   } else {
     m_rob->set_wb_empty(false);
@@ -436,12 +417,12 @@ void retire_c::drain_wb(void)
 
 void retire_c::insert_wb(uop_c* uop)
 {
-  m_write_buffer.insert(make_pair(m_store_version, uop));
+  m_write_buffer.push_back(uop);
 }
 
-void retire_c::delete_wb(write_buffer_c::iterator it)
+write_buffer_c::iterator retire_c::delete_wb(write_buffer_c::iterator it)
 {
-  m_write_buffer.erase(it);
+  return m_write_buffer.erase(it);
 }
 
 // free uop
@@ -560,11 +541,10 @@ void retire_c::repeat_traces(process_s* process)
 void retire_c::print_wb()
 {
   DEBUG("Write buffer size:%lu\n", m_write_buffer.size());
-  for (auto it : m_write_buffer) {
-    auto version  = it.first;
-    auto uop = it.second;
+  for (auto uop : m_write_buffer) {
+    auto version  = uop->m_mem_version;
 
-    DEBUG("uop num:%llu done:%llu version:%s core:%d\n", uop->m_uop_num,
-                         uop->m_done_cycle, version.to_string().c_str(), uop->m_core_id);
+    DEBUG("uop num:%llu done:%llu version:%d core:%d\n", uop->m_uop_num,
+                         uop->m_done_cycle, version, uop->m_core_id);
   }
 }

@@ -42,8 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <inttypes.h>
 #include <queue>
-#include <unordered_map>
-#include <bitset>
+#include <vector>
 
 #include "global_types.h"
 #include "debug_macros.h"
@@ -113,7 +112,7 @@ POSSIBILITY OF SUCH DAMAGE.
     static_cast<void>(m_unit_type); \
 // end macro
 
-typedef unordered_multimap<bitset<8>, uop_c*> write_buffer_c;
+typedef vector<uop_c*> write_buffer_c;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief retirement stage
@@ -235,7 +234,7 @@ class retire_c
     /**
      * Delete store from write buffer
      */
-    void delete_wb(write_buffer_c::iterator it);
+    write_buffer_c::iterator delete_wb(write_buffer_c::iterator it);
 
   private:
     RETIRE_INTERFACE_DECL(); /**< declaration macro */
@@ -249,7 +248,7 @@ class retire_c
     unordered_map<int, Counter> m_uops_retired; /**< number of retired uop per thread */
 
     write_buffer_c              m_write_buffer;
-    bitset<8>                   m_store_version;
+    queue<int>                  m_orq;
 		
     int m_period_inst_count; /**< counter for periodic logging number of retired inst. */
 

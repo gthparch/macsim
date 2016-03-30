@@ -197,6 +197,37 @@ class rob_c
      */
     void set_wb_empty(bool state);
 
+    /**
+     * Update and populate version information
+     */
+    void process_version(uop_c* uop);
+
+    /**
+     * Get the lowest version in the ordering root queue
+     */
+    uint8_t get_orq_version(void)
+    {
+      if (m_orq.empty())
+        return -1;
+
+      return m_orq.front();
+    }
+
+    /**
+     * Check if fence in orq can be removed
+     */
+    void update_orq(uop_c* uop);
+
+    /** 
+     * Debug: Print version info
+     */
+    void print_version_info(void);
+
+    /**
+     * Check if ordering satisfied according to version
+     */
+    bool version_ordering_check(uop_c* uop);
+
   private:
     bool is_later_entry(int first_fence_entry, int entry);
     void print_fence_entries(enum fence_type ft = FENCE_FULL);
@@ -213,8 +244,13 @@ class rob_c
     uns16     m_knob_rob_size; /**< reorder buffer size */
 
     /* All fences in the ROB */
-    fence_c   m_fence;
-    bool      m_wb_empty;
+    fence_c         m_fence;
+    bool            m_wb_empty;
+    list<uint8_t>  m_orq; /*< FIFO queue of root fence versions */
+    uint8_t         m_version; /*< Current version of loads/stores */
+    Counter         m_reset_uop_num;
+    uint8_t         m_last_fence_version; /*< version of the last scheduled fence */
+    unordered_map<uop_c*, uint8_t> m_root_fences; /*< parent uop of fence inst */ 
     
     macsim_c*       m_simBase; /**< macsim_c base class for simulation globals */
 };

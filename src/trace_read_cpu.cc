@@ -1097,12 +1097,13 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   uop->m_npc         = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
     
-    // pass over hmc inst info
-    uop->m_hmc_inst    = trace_uop->m_hmc_inst;
-    if (uop->m_hmc_inst != HMC_NONE)
-    {
-        STAT_CORE_EVENT(core_id, HMC_UOP_COUNT);
-    }
+  // pass over hmc inst info
+  uop->m_hmc_inst    = trace_uop->m_hmc_inst;
+  if (uop->m_hmc_inst != HMC_NONE)
+  {
+    STAT_CORE_EVENT(core_id, HMC_UOP_COUNT);
+  }
+
   if (uop->m_cf_type) { 
     uop->m_taken_mask      = trace_uop->m_taken_mask;
     uop->m_reconverge_addr = trace_uop->m_reconverge_addr;
@@ -1157,7 +1158,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   ASSERTM(uop->m_num_dests < MAX_DST_NUM, "uop->num_dests=%d MAX_DST_NUM=%d\n", 
       uop->m_num_dests, MAX_DST_NUM);
 
-  DEBUG_CORE(uop->m_core_id, "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d "
+  DEBUG_CORE(uop->m_core_id, "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_sending_uop:%d "
       "pc:0x%llx dir:%d \n", uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests, 
       thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
 

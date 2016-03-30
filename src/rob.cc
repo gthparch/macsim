@@ -94,8 +94,117 @@ void rob_c::push(uop_c *uop)
   m_rob[m_last_entry] = uop;
   m_last_entry        = (m_last_entry + 1) % m_max_cnt;
   --m_free_cnt;
+
+  process_version(uop);
 }
 
+// process version info
+void rob_c::process_version(uop_c* uop)
+{
+  if (uop->m_mem_type != NOT_MEM) {
+    // store release uop has greater version
+    if (uop->m_bar_type == REL_BAR)
+      uop->m_mem_version = m_version + 1;
+    else
+      uop->m_mem_version = m_version;
+  }
+
+  // increment last fence version for all fences
+  if (uop->m_uop_type == UOP_FULL_FENCE ||
+      uop->m_uop_type == UOP_ACQ_FENCE  ||
+      uop->m_uop_type == UOP_REL_FENCE)
+    m_last_fence_version++;
+
+  // save acquire and full fences in orq
+  if (uop->m_uop_type == UOP_FULL_FENCE ||
+      uop->m_uop_type == UOP_ACQ_FENCE) {
+
+    if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
+      if (m_root_fences.count(uop) > 0)
+        ASSERT(0);
+      // we remove this uop when parent uop retires
+      // for full fence: parent is self
+      // for acq  fence: parent is load uop
+      if (uop->m_uop_type == UOP_FULL_FENCE) {
+        m_orq.push_back(m_version);
+        m_root_fences.insert(make_pair(uop, m_version));
+        //printf("Pushing uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.back());
+        //print_version_info();
+      } if (entries() > 1 && uop->m_uop_type == UOP_ACQ_FENCE) {
+        // save acquire fence parent uop
+        int prev_entry = ((m_last_entry - 1) - 1 + m_max_cnt) % m_max_cnt;
+        ASSERT(m_rob[prev_entry]->m_bar_type == ACQ_BAR);
+        m_root_fences.insert(make_pair(m_rob[prev_entry], m_version));
+        m_orq.push_back(m_version);
+        //printf("Pushing uop on core %d: %p with version %d %d\n", uop->m_core_id, m_rob[prev_entry], m_root_fences[m_rob[prev_entry]], m_orq.back());
+        //print_version_info();
+      }
+    }
+
+    // following loads/stores get new version
+    m_version = m_last_fence_version;
+  }
+}
+
+void rob_c::update_orq(uop_c* uop)
+{
+  if (m_root_fences.size() != m_orq.size()) {
+    print_version_info();
+    ASSERT(0);
+  }
+
+  if (m_orq.size() == 0)
+    return;
+
+  // load acquire retirement will remove corr. fence from orq
+  if (uop->m_bar_type == ACQ_BAR) {
+    if (m_root_fences.find(uop) != m_root_fences.end()) {
+      ASSERT(m_root_fences.count(uop) == 1);
+      ASSERT(m_reset_uop_num >= uop->m_uop_num || m_root_fences[uop] == uop->m_mem_version);
+      ASSERT(m_root_fences[uop] == m_orq.front());
+      //printf("\tPopping uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.front());
+      m_root_fences.erase(uop);
+      m_orq.pop_front();
+    }
+  }
+
+  // full fence retirement will remove corr. fence from orq
+  else if (uop->m_uop_type == UOP_FULL_FENCE) {
+    //printf("\tPopping uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.front());
+    ASSERT(m_root_fences.count(uop) == 1);
+    ASSERT(m_root_fences[uop] == m_orq.front());
+    m_root_fences.erase(uop);
+    m_orq.pop_front();
+  }
+
+  if (m_orq.size() == 0) {
+    //printf("Resetting version from %d to 0\n", m_version);
+    m_version = 0;
+    m_last_fence_version = 0;
+    m_reset_uop_num = back()->m_uop_num;
+  }
+}
+
+bool rob_c::version_ordering_check(uop_c* uop)
+{
+  if (m_orq.front() >= uop->m_mem_version || m_reset_uop_num > uop->m_uop_num)
+    return false;
+
+  return true;
+}
+
+void rob_c::print_version_info(void)
+{
+  printf("m_orq: ");
+  for (auto it : m_orq)// = 0; i < m_orq.size(); i++)
+    printf("%d ", it);
+  printf("\n");
+
+  printf("m_root_fences: ");
+  for (auto it: m_root_fences)
+    printf("(%p, %d) ", it.first, it.second);
+  printf("\n");
+}
 
 // pop an uop from reorder buffer (doesn't actually return an uop)
 // one can get an uop using [] operator (defined in rob.h)
@@ -164,7 +273,7 @@ bool rob_c::is_later_entry(int first_fence_entry, int entry)
 // true: ensure ordering, false: no ordering necessary
 bool rob_c::ensure_mem_ordering(int entry)
 {
-  // ordering is ensured using bitmap method
+  // ordering is ensured using versions
   if (KNOB(KNOB_ACQ_REL)->getValue())
     return false;
 

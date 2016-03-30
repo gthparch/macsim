@@ -657,6 +657,7 @@ class uop_c
     int               m_dcache_bank_id; /**< dcache bank id */
     bool              m_bypass_llc; /**< bypass last level cache */
     bool              m_skip_llc; /**< skip last level cache */
+    uint8_t           m_mem_version; /**< version number for load/store */
 
     // hmc info 
     // changed by Lifeng

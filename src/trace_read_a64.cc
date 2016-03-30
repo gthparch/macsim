@@ -1041,12 +1041,12 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
       trace_uop[0]->m_cf_type         = NOT_CF;
       trace_uop[0]->m_op_type         = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
-      if (pi->m_opcode == ARM64_INS_LDXR  ||
-          pi->m_opcode == ARM64_INS_LDXRB ||
-          pi->m_opcode == ARM64_INS_LDXRH ||
-          pi->m_opcode == ARM64_INS_LDR   ||
-          pi->m_opcode == ARM64_INS_LDRB  ||
-          pi->m_opcode == ARM64_INS_LDRH)
+      if  (pi->m_opcode == ARM64_INS_LDAXR  ||
+           pi->m_opcode == ARM64_INS_LDAXRB ||
+           pi->m_opcode == ARM64_INS_LDAXRH ||
+           pi->m_opcode == ARM64_INS_LDAR   ||
+           pi->m_opcode == ARM64_INS_LDARB  ||
+           pi->m_opcode == ARM64_INS_LDARH)
         trace_uop[0]->m_bar_type      = ACQ_BAR;
       else
         trace_uop[0]->m_bar_type      = NOT_BAR;
@@ -1283,7 +1283,7 @@ inst_info_s* a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       cur_trace_uop->m_inst_size     = pi->m_size;
     }
 
-    // Fence instruction: m_opcode == MISC && actually_taken == 1
+    // Full Fence instruction
     if (num_uop == 0 && (pi->m_opcode == ARM64_INS_DMB ||
                          pi->m_opcode == ARM64_INS_DSB))
     {
