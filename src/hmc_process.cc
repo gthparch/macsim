@@ -186,7 +186,17 @@ HMC_Type hmc_function_c::generate_hmc_inst(const hmc_inst_s & inst_info,
     ret_trace_info.m_branch_target = 0;
     ret_trace_info.m_write_flg = false;
 
-    return hmc_type_c::HMC_String2Type(inst_info.name);
+    HMC_Type type = hmc_type_c::HMC_String2Type(inst_info.name);
+    //if (*KNOB(KNOB_ENABLE_HMC_INST_DEP) )
+    //{
+        // for all CAS operations: add dest reg - rflags
+        if (type>HMC_NONE && type<=HMC_CAS_less_16B)
+        {
+            ret_trace_info.m_num_dest_regs = 1;
+            ret_trace_info.m_dst[0] = 34; // "rflags"
+        }
+    //}
+    return type;
 }
 
 

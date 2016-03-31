@@ -84,7 +84,7 @@ rob_c::rob_c(Unit_Type type, macsim_c* simBase)
 rob_c::~rob_c()
 {
   delete [] m_rob; 
-  ASSERT(m_fence.is_list_empty());
+  //ASSERT(m_fence.is_list_empty());
 }
 
 
