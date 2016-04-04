@@ -92,8 +92,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug_macros.h"
 #include "statistics.h"
 
-#include "hmc_types.h"
-
 #include "all_knobs.h"
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_RETIRE_STAGE, ## args)
@@ -204,27 +202,6 @@ void retire_c::run_a_cycle()
       else if (!cur_uop->m_done_cycle || !cur_uop->m_exec_cycle ||
                cur_uop->m_done_cycle > m_cur_core_cycle) {
         break;
-      }
-
-      // HMC atomics nobypass cache case
-      if (!(*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE))) {
-        if (cur_uop->m_mem_type == MEM_ST && cur_uop->m_hmc_inst != HMC_NONE) {
-          Counter mem_delay = cur_uop->m_done_cycle - cur_uop->m_exec_cycle;
-          //cout << mem_delay << " " << hmc_type_c::HMC_Type2String(cur_uop->m_hmc_inst) << endl;
-          //Cache miss
-          if (mem_delay > 150) {
-            //go ahead and retire, it is taken care on HMC
-          }
-          //Cache Hit
-          else {
-            //+ALU delay +one L1 hit
-            //cout << cur_uop->m_done_cycle << "->";
-            cur_uop->m_done_cycle += 8;
-            //cout << cur_uop->m_done_cycle << endl;
-            break;
-          }
-
-        }
       }
 
       if (cur_uop->m_mem_type == MEM_ST) {

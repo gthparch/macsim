@@ -1,28 +1,28 @@
 /*
 Copyright (c) <2012>, <Georgia Institute of Technology> All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted 
+Redistribution and use in source and binary forms, with or without modification, are permitted
 provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions 
+Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
 
-Redistributions in binary form must reproduce the above copyright notice, this list of 
-conditions and the following disclaimer in the documentation and/or other materials provided 
+Redistributions in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or other materials provided
 with the distribution.
 
-Neither the name of the <Georgia Institue of Technology> nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior 
+Neither the name of the <Georgia Institue of Technology> nor the names of its contributors
+may be used to endorse or promote products derived from this software without specific prior
 written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -56,6 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "memory.h"
 #include "statistics.h"
 #include "statsEnums.h"
+#include "hmc_types.h"
 
 #include "core.h"
 #include "readonly_cache.h"
@@ -84,10 +85,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Uop latency table 
+/// \brief Uop latency table
 ///
-/// We maintain two types of uop latency. 
-/// Based on the core type, we bind different latency map 
+/// We maintain two types of uop latency.
+/// Based on the core type, we bind different latency map
 ///////////////////////////////////////////////////////////////////////////////////////////////
 struct Uop_LatencyBinding_Init
 {
@@ -123,8 +124,8 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
     int latency_array_size = (sizeof uop_latencybinding_init_ptx /
         sizeof (uop_latencybinding_init_ptx[0]));
 
-    for (int ii = 0; ii < latency_array_size; ++ii) { 
-      m_latency[uop_latencybinding_init_ptx[ii].uop_type_s] = 
+    for (int ii = 0; ii < latency_array_size; ++ii) {
+      m_latency[uop_latencybinding_init_ptx[ii].uop_type_s] =
         uop_latencybinding_init_ptx[ii].m_latency;
     }
   }
@@ -216,11 +217,11 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   int uop_latency   = -1;
   core_c *core      = m_simBase->m_core_pointers[m_core_id];
 
-  //DEBUG("m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu mem_type:%d bogus:%d \n", 
-      //m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num, 
+  //DEBUG("m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu mem_type:%d bogus:%d \n",
+      //m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num,
       //uop->m_inst_num, uop->m_mem_type, uop->m_bogus);
 
-  DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu mem_type:%d bogus:%d \n", 
+  DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu mem_type:%d bogus:%d \n",
       m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num, uop->m_inst_num, uop->m_mem_type, uop->m_bogus);
 
   uop->m_state = OS_EXEC_BEGIN;
@@ -264,7 +265,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             uop_latency = access_const_texture_cache(uop);
           #else
             uop_latency = core->get_texture_cache()->load(uop);
-          #endif            
+          #endif
           }
           // other (global, texture, local) memory access
           else {
@@ -290,7 +291,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
           #endif
           }
-            
+
           if (uop_latency != 0) {
             uop->m_mem_start_cycle = m_cur_core_cycle;
           }
@@ -324,15 +325,15 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
       }
       // -------------------------------------
       // memory instructions that result in multiple memory requests
-      // are represented by a parent uop (to make it easy to handle 
-      // these instructions in schedule and retire stages) and a list 
+      // are represented by a parent uop (to make it easy to handle
+      // these instructions in schedule and retire stages) and a list
       // of child uops for the addresses to be accessed
       // -------------------------------------
       else {
         uop_latency      = 0;
         int latency      = -1;
         int max_latency  = 0;
-        // m_pending_child_uops is a bitmask that tracks which of the 
+        // m_pending_child_uops is a bitmask that tracks which of the
         // child uops have been sent to the memory hierarchy.
         // get the next child uop for the current parent uop
         int next_set_bit = get_next_set_bit64(uop->m_pending_child_uops, 0);
@@ -371,7 +372,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
               latency = access_const_texture_cache(uop->m_child_uops[next_set_bit]);
             #else
               latency = core->get_texture_cache()->load(uop->m_child_uops[next_set_bit]);
-            #endif            
+            #endif
             }
             // other (global, texture, local) memory access
             else {
@@ -383,7 +384,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
               else {
             #endif
               #ifdef USING_SST
-                latency = access_data_cache(uop->m_child_uops[next_set_bit]); 
+                latency = access_data_cache(uop->m_child_uops[next_set_bit]);
               #else //USING_SST
                 latency = MEMORY->access(uop->m_child_uops[next_set_bit]);
               #endif //USING_SST
@@ -404,13 +405,13 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             }
 
             // mark current uop as executed
-            uop->m_pending_child_uops = 
+            uop->m_pending_child_uops =
               CLEAR_BIT(uop->m_pending_child_uops, next_set_bit);
 
             // cache hit
             if (latency > 0) {
               ++uop->m_num_child_uops_done;
-              DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu hit\n", 
+              DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu hit\n",
                   m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_child_uops[next_set_bit]->m_uop_num);
 
               if (latency > max_latency) {
@@ -420,7 +421,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
             // cache miss
             else if (-1 == latency) {
               uop_latency = -1;
-              DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu miss\n", 
+              DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu miss\n",
                   m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_child_uops[next_set_bit]->m_uop_num);
             }
           }
@@ -432,7 +433,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         // uop_latency can be
         // -1 - all child uops have been issued and some of them were cache misses
         //  0 - some child uops are yet to be issued
-        //  x > 0 - all child uops have been issued and all children will complete 
+        //  x > 0 - all child uops have been issued and all children will complete
         // in x cycles
         if (uop->m_pending_child_uops) {
           uop_latency = 0;
@@ -451,7 +452,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
       // memory instruction was not executed
       if (uop_latency == 0) {
-        return false; 
+        return false;
       }
 
       // stats
@@ -464,7 +465,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
       // GPU : if we use load-block policy, block current thread due to load instruction
       if (uop_latency == -1 && m_ptx_sim && *m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-        m_frontend->set_load_wait(uop->m_thread_id, uop->m_uop_num); 
+        m_frontend->set_load_wait(uop->m_thread_id, uop->m_uop_num);
 
         DEBUG_CORE(m_core_id, "set_load_wait m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu\n",
             uop->m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
@@ -472,7 +473,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
       DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d vaddr:0x%llx uop_num:%llu inst_num:%llu "
           "uop->m_uop_info.dcmiss:%d latency:%d done_cycle:%llu\n",
-          m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num, 
+          m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num,
           uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle);
     }
     POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_R);
@@ -530,7 +531,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
 
           DEBUG_CORE(m_core_id, "thread_id:%d uop_num:%llu inst_num:%llu fence operations exec \n",
-                     uop->m_thread_id, uop->m_uop_num, uop->m_inst_num); 
+                     uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
 
           if (KNOB(KNOB_ACQ_REL)->getValue() == false) {
             m_rob->ins_fence_entry(entry, FENCE_FULL);
@@ -577,8 +578,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
   DEBUG_CORE(m_core_id, "done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
     " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
     "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx\n",
-    m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num, uop->m_inst_num, 
-    uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle, uop->m_inst_num, 
+    m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num, uop->m_inst_num,
+    uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle, uop->m_inst_num,
     uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle, uop->m_pc);
 
   // branch execution
@@ -616,43 +617,43 @@ void exec_c::br_exec(uop_c *uop)
   }
 
 
-  // handle mispredicted branches 
+  // handle mispredicted branches
   if (uop->m_mispredicted) {
-    (m_bp_data->m_bp)->recover(&(uop->m_recovery_info)); 
-    m_bp_data->m_bp_recovery_cycle[uop->m_thread_id] = 
+    (m_bp_data->m_bp)->recover(&(uop->m_recovery_info));
+    m_bp_data->m_bp_recovery_cycle[uop->m_thread_id] =
       m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;
     m_bp_data->m_bp_cause_op[uop->m_thread_id] = 0;
 
 
-    STAT_CORE_EVENT(m_core_id, BP_RESOLVED); 
+    STAT_CORE_EVENT(m_core_id, BP_RESOLVED);
 
     DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch is resolved: "
-          "recovery_cycle:%llu uop_num:%llu\n", 
-          m_core_id, uop->m_thread_id, m_cur_core_cycle, 
+          "recovery_cycle:%llu uop_num:%llu\n",
+          m_core_id, uop->m_thread_id, m_cur_core_cycle,
           m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
   }
 
-  // handle misfetched branch  (miss target prediction: indirect branches) 
-  if (uop->m_uop_info.m_btb_miss) { 
-    
-    if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) { 
-      
-      STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED); 
-      
-      m_bp_data->m_bp_targ_pred->update (uop);  // update 
+  // handle misfetched branch  (miss target prediction: indirect branches)
+  if (uop->m_uop_info.m_btb_miss) {
+
+    if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) {
+
+      STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED);
+
+      m_bp_data->m_bp_targ_pred->update (uop);  // update
 
       // redirect cycle
-      m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] = 
+      m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] =
         m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;
 
-      uop->m_uop_info.m_btb_miss_resolved = true; 
+      uop->m_uop_info.m_btb_miss_resolved = true;
       DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch misprediction is resolved: "
-          "redirect_cycle:%llu uop_num:%llu\n", 
-          m_core_id, uop->m_thread_id, m_cur_core_cycle, 
+          "redirect_cycle:%llu uop_num:%llu\n",
+          m_core_id, uop->m_thread_id, m_cur_core_cycle,
           m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
     }
   }
-  
+
   // GPU : stall on branch policy
   if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
     m_frontend->set_br_ready(uop->m_thread_id);
@@ -662,7 +663,7 @@ void exec_c::br_exec(uop_c *uop)
 
 // update memory related stats
 void exec_c::update_memory_stats(uop_c* uop)
-{ 
+{
   switch (uop->m_mem_type) {
     case MEM_LD_SM:
     case MEM_ST_SM:
@@ -704,7 +705,7 @@ void exec_c::run_a_cycle(void)
     } else {
       responseArrived = (*(m_simBase->strobeDataCacheRespQ))(m_core_id, key);
     }
-    
+
     if (responseArrived) {
       DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
       if (m_ptx_sim) {
@@ -732,7 +733,18 @@ void exec_c::run_a_cycle(void)
       uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
       uop->m_state = OS_SCHEDULED;
 
-      DEBUG_CORE(m_core_id, "response to m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx has arrived from memHierarchy!\n", 
+      // HMC atomics nobypass cache case
+      if (!(*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
+        if (uop->m_mem_type == MEM_ST && uop->m_hmc_inst != HMC_NONE) {
+          Counter mem_delay = uop->m_done_cycle - uop->m_exec_cycle;
+          //cout << mem_delay << " " << hmc_type_c::HMC_Type2String(uop->m_hmc_inst) << endl;
+            //Cache miss :go ahead and retire, it is taken care on HMC
+            //Cache Hit: +ALU delay +one L1 hit
+          if (mem_delay < 150)
+            uop->m_done_cycle += 8;
+        }
+
+      DEBUG_CORE(m_core_id, "response to m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx has arrived from memHierarchy!\n",
           m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
       m_uop_buffer.erase(I);
     }
@@ -769,26 +781,26 @@ int exec_c::access_data_cache(uop_c* uop)
 {
   // assign unique key to each memory request; this will be used later in time for strobbing
   uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, m_unique_request_id++);
-  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n", 
+  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n",
       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, key);
 
   // check if this uop has already been executed;
   auto i = m_uop_buffer.find(key);
   ASSERTM(m_uop_buffer.end() == i, "uop has already been executed!\n");
-  
+
   int block_size = m_ptx_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue() : KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
   //Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
-  
+
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
   if (offset + uop->m_mem_size > block_size)
     uop->m_mem_size = block_size - offset;
 
-  DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to data cache\n", 
+  DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to data cache\n",
       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
 
   //core_c *core = m_simBase->m_core_pointers[m_core_id];
-#ifdef USE_VAULTSIM_HMC   
+#ifdef USE_VAULTSIM_HMC
     uint8_t hmc_type = uop->m_hmc_inst;
     //if (hmc_type!=0) HMC_EVENT_COUNT(m_core_id, hmc_type);
     if (*KNOB(KNOB_DEBUG_HMC)) {
@@ -797,14 +809,14 @@ int exec_c::access_data_cache(uop_c* uop)
 	DEBUG_HMC_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu unique_num:%llu pc:%llx va:%llx hmc_type:%d trans_id:%d\n",
 		       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, uop->m_pc, uop->m_vaddr, (int)hmc_type, (int)uop->m_hmc_trans_id);
       }
-    } 
+    }
     // mark highest bit if enabled cache bypass
     if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
         hmc_type = hmc_type | 0b10000000;
     uint64_t trans_id = uop->m_hmc_trans_id;
     if (! *KNOB(KNOB_ENABLE_HMC_TRANS)) trans_id = 0;
- 
-    (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, 
+
+    (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size,
                                 uop->m_mem_type,hmc_type,trans_id);
 #else
   (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
@@ -813,7 +825,7 @@ int exec_c::access_data_cache(uop_c* uop)
   // insert uop into the buffer; this will be taken out when a response arrives
   m_uop_buffer.insert(std::make_pair(key, uop));
   DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
-  
+
   return -1; // cache miss
 }
 
@@ -824,27 +836,27 @@ int exec_c::access_const_texture_cache(uop_c* uop)
 
   // assign unique key to each memory request; this will be used later in time for strobbing
   uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, m_unique_request_id++);
-  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n", 
+  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n",
       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, key);
 
   // check if this uop has already been executed;
   auto i = m_uop_buffer.find(key);
   ASSERTM(m_uop_buffer.end() == i, "uop has already been executed!\n");
-  
+
   int block_size = KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue();
   //Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
-  
+
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
   if (offset + uop->m_mem_size > block_size)
     uop->m_mem_size = block_size - offset;
 
   if (uop->m_mem_type == MEM_LD_CM) {
-    DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to const cache\n", 
+    DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to const cache\n",
       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
     (*(m_simBase->sendConstCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size);
   } else { // uop->m_mem_type == MEM_LD_TM
-    DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to texture cache\n", 
+    DEBUG_CORE(m_core_id, "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to texture cache\n",
       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
     (*(m_simBase->sendTextureCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size);
   }
@@ -852,7 +864,7 @@ int exec_c::access_const_texture_cache(uop_c* uop)
   // insert uop into the buffer; this will be taken out when a response arrives
   m_uop_buffer.insert(std::make_pair(key, uop));
   DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
-  
+
   return -1; // cache miss
 }
 #endif //USING_SST
