@@ -1,28 +1,28 @@
 /*
 Copyright (c) <2012>, <Georgia Institute of Technology> All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted 
+Redistribution and use in source and binary forms, with or without modification, are permitted
 provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions 
+Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
 
-Redistributions in binary form must reproduce the above copyright notice, this list of 
-conditions and the following disclaimer in the documentation and/or other materials provided 
+Redistributions in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or other materials provided
 with the distribution.
 
-Neither the name of the <Georgia Institue of Technology> nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior 
+Neither the name of the <Georgia Institue of Technology> nor the names of its contributors
+may be used to endorse or promote products derived from this software without specific prior
 written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -40,8 +40,8 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \page retire Retirement stage
 ///
-/// This models retire (commit) stage in the processor pipeline. All instructions are retired 
-/// in-order. However, basic execution is in the micro-op granularity. Thus, retirement 
+/// This models retire (commit) stage in the processor pipeline. All instructions are retired
+/// in-order. However, basic execution is in the micro-op granularity. Thus, retirement
 /// should carefully handle this cases.
 /// \li <c>Instruction termination condition</c> - All uops of an instruction retired in-order
 /// \li <c>Thread termination condition</c> - Last uop of a thread
@@ -65,14 +65,14 @@ POSSIBILITY OF SUCH DAMAGE.
 /// When an application has been terminated, run this application again
 ///
 /// \section repeat_2 Why do we need to repeat traces?
-/// In typical multi-programmed workloads (not multi-threaded), whan an application is 
-/// terminated earlier than other applications, typically we keep running early-terminated 
+/// In typical multi-programmed workloads (not multi-threaded), whan an application is
+/// terminated earlier than other applications, typically we keep running early-terminated
 /// application until the last application is terminated.
 ///
 /// \section repeat_3 How to enable repeating trace?
 /// There are two ways to enable repeating traces.
 /// \li Multi-programmed workloads - set <b>*m_simBase->m_knobs->KNOB_REPEAT_TRACE 1</b>
-/// \li Single-application - set <b>*m_simBase->m_knobs->KNOB_REPEAT_TRACE 1</b> and 
+/// \li Single-application - set <b>*m_simBase->m_knobs->KNOB_REPEAT_TRACE 1</b> and
 /// <b>set *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N positive number</b>
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,6 +92,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug_macros.h"
 #include "statistics.h"
 
+#include "hmc_types.h"
+
 #include "all_knobs.h"
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_RETIRE_STAGE, ## args)
@@ -101,7 +103,7 @@ POSSIBILITY OF SUCH DAMAGE.
   }
 
 // retire_c constructor
-retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERFACE_INIT() 
+retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERFACE_INIT()
 {
   m_simBase = simBase;
 
@@ -114,7 +116,7 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERF
     m_knob_width = 1000;
 
   m_store_version = 1;
-	
+
 }
 
 
@@ -138,7 +140,7 @@ void retire_c::run_a_cycle()
 
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
   core_c *core = m_simBase->m_core_pointers[m_core_id];
-    
+
 
   //Ramyad: based on document gpu_sched knob should be removed
   //gpu_sched 1 use GPU scheduler for GPU cores \todo{this knob should be removed!, it is unnecessary now}
@@ -156,7 +158,7 @@ void retire_c::run_a_cycle()
     rob_c* rob;
 
     // we need to handle retirement for x86 and ptx separately
-    
+
     // retirement logic for GPU
     if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
       // GPU : many retireable uops from multiple threads. Get entire retireable uops
@@ -184,7 +186,6 @@ void retire_c::run_a_cycle()
       // uncompleted memory store UOPs can be placed in write buffer
       if (KNOB(KNOB_USE_WB)->getValue() && cur_uop->m_mem_type == MEM_ST &&
           cur_uop->m_exec_cycle != 0 && cur_uop->m_done_cycle != 0) {
-
         // write buffer full
         if (m_write_buffer.size() == KNOB(KNOB_WB_SIZE)->getValue()) {
           STAT_CORE_EVENT(cur_uop->m_core_id, WB_FULL);
@@ -198,15 +199,35 @@ void retire_c::run_a_cycle()
           m_store_version = (m_store_version) | (m_store_version >> 1);
         }
       }
+
       // uop cannot be retired
       else if (!cur_uop->m_done_cycle || !cur_uop->m_exec_cycle ||
                cur_uop->m_done_cycle > m_cur_core_cycle) {
         break;
       }
 
+      // HMC atomics nobypass cache case
+      if (!(*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE))) {
+        if (cur_uop->m_mem_type == MEM_ST && cur_uop->m_hmc_inst != HMC_NONE) {
+          Counter  = cur_uop->m_done_cycle - cur_uop->m_exec_cycle;
+          //cout << mem_delay << " " << hmc_type_c::HMC_Type2String(cur_uop->m_hmc_inst) << endl;
+          //Cache miss
+          if (mem_delay > 150) {
+            //go ahead and retire, it is taken care on HMC
+          }
+          //Cache Hit
+          else {
+            //+ALU delay +one L1 hit
+            cur_uop->m_done_cycle += 8;
+            break;
+          }
+
+        }
+      }
+
       if (cur_uop->m_mem_type == MEM_ST) {
         STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_RES, m_cur_core_cycle - cur_uop->m_alloc_cycle);
-	STAT_CORE_EVENT(cur_uop->m_core_id, STORE_NUM);
+        STAT_CORE_EVENT(cur_uop->m_core_id, STORE_NUM);
 
         if (cur_uop->m_dep_on_hmc_inst)
         {
@@ -253,9 +274,9 @@ void retire_c::run_a_cycle()
           m_store_version = m_store_version << 1;
         }
 	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_TOT_CYCLES,
-			  m_cur_core_cycle - cur_uop->m_alloc_cycle); 
+			  m_cur_core_cycle - cur_uop->m_alloc_cycle);
 	STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_EXEC_CYCLES,
-			  m_cur_core_cycle - cur_uop->m_sched_cycle); 
+			  m_cur_core_cycle - cur_uop->m_sched_cycle);
 	ASSERT(m_store_version != 0);
       }
 
@@ -268,7 +289,7 @@ void retire_c::run_a_cycle()
     // all uops belong to previous instruction have been retired : inst_count++
     // nagesh - why are we marking the instruction as retired when the uop
     // marked BOM is retired? shouldn't we do that when the EOM is retired?
-    // nagesh - ISTR that I tried changing and something failed - not 100% 
+    // nagesh - ISTR that I tried changing and something failed - not 100%
     // sure though : (jaekyu) I think this is the matter of the design. we can update
     // everything from the first uop of an instruction.
     if (cur_uop->m_isitBOM) {
@@ -317,7 +338,7 @@ void retire_c::run_a_cycle()
 
         // all threads in an application have been retired. Thus, we can retire an appliacation
         if (process->m_no_of_threads_terminated == process->m_no_of_threads_created) {
-          if (process->m_current_vector_index == process->m_applications.size() 
+          if (process->m_current_vector_index == process->m_applications.size()
             || (*m_simBase->m_ProcessorStats)[INST_COUNT_TOT].getCount() >= *KNOB(KNOB_MAX_INSTS1)) {
             update_stats(process);
             m_simBase->m_process_manager->terminate_process(process);
@@ -344,7 +365,7 @@ void retire_c::run_a_cycle()
     ++m_uops_retired[cur_uop->m_thread_id];
 
     DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d retired_insts:%lld uop->inst_num:%lld uop_num:%lld done_cycle:%lld\n",
-        m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], cur_uop->m_inst_num, cur_uop->m_uop_num, 
+        m_core_id, cur_uop->m_thread_id, m_insts_retired[cur_uop->m_thread_id], cur_uop->m_inst_num, cur_uop->m_uop_num,
         cur_uop->m_done_cycle);
 
     // release physical registers
@@ -409,13 +430,13 @@ void retire_c::drain_wb(void)
         auto higher_bits = uop_index & (bitset<8>(0xFF) << (indices_tried + 1));
         if (!higher_bits.any()) {
           if (increment_index)
-	    STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
+            STAT_CORE_EVENT(cur_uop->m_core_id, WB_ORDERING_STALL);
           increment_index = false;
         }
         ++uop_it;
       } else {
         // the write uop is completed and can be freed
-	STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE, m_cur_core_cycle - cur_uop->m_alloc_cycle);
+        STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE, m_cur_core_cycle - cur_uop->m_alloc_cycle);
         free_uop_resources(cur_uop);
         auto uop_it_tmp = uop_it;
         ++uop_it;
@@ -489,24 +510,24 @@ bool retire_c::is_running()
 
 #if 0
 // return number of retired instructions per thread
-inline Counter retire_c::get_instrs_retired(int thread_id) 
-{ 
-  return m_insts_retired[thread_id]; 
+inline Counter retire_c::get_instrs_retired(int thread_id)
+{
+  return m_insts_retired[thread_id];
 }
 #endif
 
 
 // return number of retired uops per thread
-Counter retire_c::get_uops_retired(int thread_id) 
-{ 
-  return m_uops_retired[thread_id]; 
+Counter retire_c::get_uops_retired(int thread_id)
+{
+  return m_uops_retired[thread_id];
 }
 
 
 // return total number of retired instructions
-Counter retire_c::get_total_insts_retired() 
-{ 
-  return m_total_insts_retired; 
+Counter retire_c::get_total_insts_retired()
+{
+  return m_total_insts_retired;
 }
 
 
@@ -522,11 +543,11 @@ void retire_c::update_stats(process_s* process)
     if ((process->m_repeat+1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
       STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
-      report("application " << process->m_process_id << " terminated " 
-          << "(" << process->m_applications[process->m_current_vector_index-1] 
+      report("application " << process->m_process_id << " terminated "
+          << "(" << process->m_applications[process->m_current_vector_index-1]
           << "," << process->m_repeat << ") at " << CYCLE);
     }
-  } 
+  }
   else {
     if (process->m_repeat == 0) {
       if (core->get_core_type() == "ptx") {
@@ -536,21 +557,21 @@ void retire_c::update_stats(process_s* process)
         STAT_EVENT_N(CYC_COUNT_X86, CYCLE);
       }
       --m_simBase->m_process_count_without_repeat;
-      report("----- application " << process->m_process_id << " terminated (" 
-          << process->m_applications[process->m_current_vector_index-1] 
+      report("----- application " << process->m_process_id << " terminated ("
+          << process->m_applications[process->m_current_vector_index-1]
           << "," << process->m_repeat << ") at " << CYCLE);
     }
   }
 }
-          
+
 
 // repeat (terminated) trace, if necessary
 void retire_c::repeat_traces(process_s* process)
 {
-  if ((*KNOB(KNOB_REPEAT_TRACE) || (*KNOB(KNOB_REPEAT_TRACE) && *KNOB(KNOB_REPEAT_TRACE_N) > 0)) && 
+  if ((*KNOB(KNOB_REPEAT_TRACE) || (*KNOB(KNOB_REPEAT_TRACE) && *KNOB(KNOB_REPEAT_TRACE_N) > 0)) &&
       m_simBase->m_process_count_without_repeat > 0) {
     // create duplicate process once previous one is terminated
-    m_simBase->m_process_manager->create_process(process->m_kernel_config_name, process->m_repeat+1, 
+    m_simBase->m_process_manager->create_process(process->m_kernel_config_name, process->m_repeat+1,
         process->m_orig_pid);
     STAT_EVENT(NUM_REPEAT);
   }
