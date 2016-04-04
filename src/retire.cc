@@ -209,7 +209,7 @@ void retire_c::run_a_cycle()
       // HMC atomics nobypass cache case
       if (!(*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE))) {
         if (cur_uop->m_mem_type == MEM_ST && cur_uop->m_hmc_inst != HMC_NONE) {
-          Counter  = cur_uop->m_done_cycle - cur_uop->m_exec_cycle;
+          Counter mem_delay = cur_uop->m_done_cycle - cur_uop->m_exec_cycle;
           //cout << mem_delay << " " << hmc_type_c::HMC_Type2String(cur_uop->m_hmc_inst) << endl;
           //Cache miss
           if (mem_delay > 150) {
@@ -218,7 +218,9 @@ void retire_c::run_a_cycle()
           //Cache Hit
           else {
             //+ALU delay +one L1 hit
+            //cout << cur_uop->m_done_cycle << "->";
             cur_uop->m_done_cycle += 8;
+            //cout << cur_uop->m_done_cycle << endl;
             break;
           }
 
