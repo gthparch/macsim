@@ -486,6 +486,7 @@ void uop_c::init()
 
   m_hmc_inst                          = HMC_NONE;
   m_hmc_trans_id                      = 0;
+  m_dep_on_hmc_inst                   = false;
 }
 
 

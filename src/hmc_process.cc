@@ -190,11 +190,13 @@ HMC_Type hmc_function_c::generate_hmc_inst(const hmc_inst_s & inst_info,
     //if (*KNOB(KNOB_ENABLE_HMC_INST_DEP) )
     //{
         // for all CAS operations: add dest reg - rflags
-        if (type>HMC_NONE && type<=HMC_CAS_less_16B)
+        /*if (type>HMC_NONE && type<=HMC_CAS_less_16B)
         {
             ret_trace_info.m_num_dest_regs = 1;
             ret_trace_info.m_dst[0] = 34; // "rflags"
-        }
+            printf("pc:0x%lx m_num_dest_regs:%d \n", ret_trace_info.m_instruction_addr, ret_trace_info.m_num_dest_regs);
+
+        }*/
     //}
     return type;
 }
@@ -415,7 +417,6 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
         {
             thread_trace_info->m_trace_uop_array[i]->m_hmc_inst = cur_trace_hmc_type;
         }
-
         trace_uop = thread_trace_info->m_trace_uop_array[0];
         num_uop   = info->m_trace_info.m_num_uop;
         ASSERT(info->m_trace_info.m_num_uop > 0);
@@ -478,6 +479,7 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
 
     // pass over hmc inst info
     uop->m_hmc_inst    = trace_uop->m_hmc_inst;
+   
     if (uop->m_hmc_inst != HMC_NONE)
     {
         DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%lld uop_num:%lld pc:%llx va:%llx\n",
@@ -558,9 +560,11 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
         for (int index=0; index < uop->m_num_srcs; ++index)
         {
             uop->m_src_info[index] = trace_uop->m_srcs[index].m_id;
-            if (*KNOB(KNOB_HMC_ADD_DEP))
-                if (uop->m_hmc_inst)   uop->m_src_info[index]  = thread_trace_info->m_last_dest_reg;
-            DEBUG_CORE(uop->m_core_id, "unique_num:%lld src_info[%d]:%u last_dest_reg:%d\n", uop->m_unique_num, index, uop->m_src_info[index], thread_trace_info->m_last_dest_reg);
+            //if (*KNOB(KNOB_HMC_ADD_DEP))
+                //if (uop->m_hmc_inst)   uop->m_src_info[index]  = thread_trace_info->m_last_dest_reg;
+            DEBUG_CORE(uop->m_core_id, "thread_id:%d uop_num:%llu unique_num:%lld src_info[%d]:%u last_dest_reg:%d dest_id[%d]:%u m_num_dests:%d\n", 
+                       uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, index, uop->m_src_info[index], thread_trace_info->m_last_dest_reg, index, uop->m_dest_info[index], uop->m_num_dests
+                       );
         }
     }
     else
@@ -588,14 +592,24 @@ bool hmc_function_c::get_uops_from_traces_with_hmc_inst(
     uop->m_unique_thread_id = ((core)->get_trace_info(sim_thread_id))->m_unique_thread_id;
     uop->m_orig_thread_id   = ((core)->get_trace_info(sim_thread_id))->m_orig_thread_id;
 
+    if (uop->m_hmc_inst > HMC_NONE && uop->m_hmc_inst <= HMC_CAS_less_16B)
+    {
 
+
+        DEBUG_CORE(core_id, "-------core_id:%d thread_id:%d inst_num:%lld uop_num:%lld pc:%llx va:%llx\n",
+                   core_id, sim_thread_id, uop->m_inst_num, uop->m_uop_num, trace_uop->m_addr, trace_uop->m_va);
+        // add-dep 
+        uop->m_num_dests = 1;
+        uop->m_dest_info[0] = 34; 
+    }
     ///
     /// GPU simulation : handling uncoalesced accesses
     /// removed
     ///
 
-    DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld src[0]:%d dst[0]:%d hmc_inst:%d\n",
-               uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_src_info[0], uop->m_dest_info[0], uop->m_hmc_inst);
+    DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld src[0]:%d dst[0]:%d hmc_inst:%d m_num_dests:%d\n",
+               uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_src_info[0], uop->m_dest_info[0], uop->m_hmc_inst, uop->m_num_dests
+               );
 
     return read_success;
 }

@@ -207,6 +207,12 @@ void retire_c::run_a_cycle()
       if (cur_uop->m_mem_type == MEM_ST) {
         STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_RES, m_cur_core_cycle - cur_uop->m_alloc_cycle);
 	STAT_CORE_EVENT(cur_uop->m_core_id, STORE_NUM);
+
+        if (cur_uop->m_dep_on_hmc_inst)
+        {
+            STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_CYC_TOT, m_cur_core_cycle - cur_uop->m_alloc_cycle);
+            STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_RETIRE_COUNT, 1);
+        }
       }
 
       if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&

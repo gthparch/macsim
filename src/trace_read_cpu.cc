@@ -960,15 +960,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
           sim_thread_id, &inst_read);
       //=====================================================//
-      if (thread_trace_info->m_inside_hmc_func)
-      {
-        thread_trace_info->m_next_hmc_type = HMC_CANDIDATE;
-        STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
-        STAT_CORE_EVENT(core_id, HMC_INST_COUNT_CANDIDATE);
-      }
-      else
-        thread_trace_info->m_next_hmc_type = HMC_NONE;
-
       map<uint64_t, hmc_inst_s> & hmc_info = thread_trace_info->m_process->m_hmc_info;
       uint64_t inst_addr = (static_cast<trace_info_cpu_s*>
                         (thread_trace_info->m_next_trace_info))->m_instruction_addr;
@@ -988,6 +979,16 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
           thread_trace_info->m_next_hmc_type = HMC_NONE;
         }
       }
+      if (thread_trace_info->m_inside_hmc_func)
+      {
+        thread_trace_info->m_next_hmc_type = HMC_CANDIDATE;
+        STAT_CORE_EVENT(core_id, HMC_INST_COUNT);
+        STAT_CORE_EVENT(core_id, HMC_INST_COUNT_CANDIDATE);
+        STAT_EVENT(HMC_INST_COUNT_TOT);
+      }
+      else
+        thread_trace_info->m_next_hmc_type = HMC_NONE;
+
       //=====================================================//
     }
     else {

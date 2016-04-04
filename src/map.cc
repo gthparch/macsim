@@ -147,6 +147,11 @@ void map_c::add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_ent
   ASSERT(map_entry->m_uop);
   ASSERT(type < NUM_DEP_TYPES);
 
+  // changed by Lifeng
+  // mark the uop that is depending on HMC uops
+  if (map_entry->m_uop->m_hmc_inst > 0 && uop->m_hmc_inst == 0)
+    uop->m_dep_on_hmc_inst = true;
+
   DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d Added dep uop_num:%llu inst_num:%llu "
       "src_uop_num:%llu src_num:%d\n", uop->m_core_id, uop->m_thread_id, uop->m_uop_num, 
       uop->m_inst_num, map_entry->m_uop_num, src_num);

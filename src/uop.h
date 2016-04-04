@@ -662,6 +662,7 @@ class uop_c
     // changed by Lifeng
     HMC_Type m_hmc_inst;  /**< hmc type of current uop*/
     uint64_t m_hmc_trans_id;
+    bool m_dep_on_hmc_inst;
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
