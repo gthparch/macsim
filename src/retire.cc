@@ -183,7 +183,7 @@ void retire_c::run_a_cycle()
 
       // uncompleted memory store UOPs can be placed in write buffer
       if (KNOB(KNOB_USE_WB)->getValue() && cur_uop->m_mem_type == MEM_ST &&
-          cur_uop->m_exec_cycle != 0 && cur_uop->m_done_cycle != 0) {
+          cur_uop->m_exec_cycle != 0) {
         // write buffer full
         if (m_write_buffer.size() == KNOB(KNOB_WB_SIZE)->getValue()) {
           STAT_CORE_EVENT(cur_uop->m_core_id, WB_FULL);
