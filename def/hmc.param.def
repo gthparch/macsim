@@ -41,3 +41,4 @@ param<HMC_ADD_DEP, hmc_add_dep, bool, 1>
 
 param<ENABLE_TRACE_MAX_THREAD, enable_trace_max_thread, bool, 0>
 param<TRACE_MAX_THREAD_COUNT, trace_max_thread_count, int, 8>
+param<HMC_TEST_OVERHEAD, hmc_test_overhead, int, 8>

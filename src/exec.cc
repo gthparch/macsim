@@ -741,7 +741,10 @@ void exec_c::run_a_cycle(void)
             //Cache miss :go ahead and retire, it is taken care on HMC
             //Cache Hit: +ALU delay +one L1 hit
           if (mem_delay < 150)
-            uop->m_done_cycle += 8;
+          {
+            STAT_CORE_EVENT(m_core_id, HMC_ADD_OVERHEAD_COUNT); 
+            uop->m_done_cycle += *KNOB(KNOB_HMC_TEST_OVERHEAD);
+          }
         }
 
       DEBUG_CORE(m_core_id, "response to m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx has arrived from memHierarchy!\n",
