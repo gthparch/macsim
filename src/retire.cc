@@ -245,11 +245,9 @@ void retire_c::run_a_cycle()
         STAT_CORE_EVENT_N(cur_uop->m_core_id, FENCE_EXEC_CYCLES,
 			  m_cur_core_cycle - cur_uop->m_sched_cycle); 
 
-        rob->update_orq(cur_uop);
+        // update the uop version information
+        rob->update_root(cur_uop);
       }
-
-      if (cur_uop->m_bar_type == ACQ_BAR)
-        rob->update_orq(cur_uop);
 
       rob->pop();
       POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_R);
@@ -413,6 +411,15 @@ void retire_c::drain_wb(void)
   } else {
     m_rob->set_wb_empty(false);
   }
+
+  uint8_t lowest_version = -1;
+  // get the lowest version in the write buffer
+  // and update the orq
+  for (auto uop_it : m_write_buffer) {
+    if (uop_it->m_mem_version < lowest_version)
+      lowest_version = uop_it->m_mem_version;
+  }
+  m_rob->update_orq(lowest_version);
 }
 
 void retire_c::insert_wb(uop_c* uop)

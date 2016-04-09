@@ -102,43 +102,30 @@ void rob_c::push(uop_c *uop)
 void rob_c::process_version(uop_c* uop)
 {
   if (uop->m_mem_type != NOT_MEM) {
-    // store release uop has greater version
-    if (uop->m_bar_type == REL_BAR)
-      uop->m_mem_version = m_version + 1;
-    else
+    // fence operations are sequentially consistent
+    // hence they get higher version than previous fence version
+    if (uop->m_bar_type == REL_BAR || uop->m_bar_type == ACQ_BAR) {
+      uop->m_mem_version = m_last_fence_version;
+    } else {
       uop->m_mem_version = m_version;
+    }
   }
 
   // increment last fence version for all fences
   if (uop->m_uop_type == UOP_FULL_FENCE ||
       uop->m_uop_type == UOP_ACQ_FENCE  ||
-      uop->m_uop_type == UOP_REL_FENCE)
+      uop->m_uop_type == UOP_REL_FENCE) {
     m_last_fence_version++;
+  }
 
-  // save acquire and full fences in orq
-  if (uop->m_uop_type == UOP_FULL_FENCE ||
-      uop->m_uop_type == UOP_ACQ_FENCE) {
-
+  // save full fences in orq
+  if (uop->m_uop_type == UOP_FULL_FENCE) {
     if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
-      if (m_root_fences.count(uop) > 0)
-        ASSERT(0);
-      // we remove this uop when parent uop retires
-      // for full fence: parent is self
-      // for acq  fence: parent is load uop
-      if (uop->m_uop_type == UOP_FULL_FENCE) {
-        m_orq.push_back(m_version);
-        m_root_fences.insert(make_pair(uop, m_version));
-        //printf("Pushing uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.back());
-        //print_version_info();
-      } if (entries() > 1 && uop->m_uop_type == UOP_ACQ_FENCE) {
-        // save acquire fence parent uop
-        int prev_entry = ((m_last_entry - 1) - 1 + m_max_cnt) % m_max_cnt;
-        ASSERT(m_rob[prev_entry]->m_bar_type == ACQ_BAR);
-        m_root_fences.insert(make_pair(m_rob[prev_entry], m_version));
-        m_orq.push_back(m_version);
-        //printf("Pushing uop on core %d: %p with version %d %d\n", uop->m_core_id, m_rob[prev_entry], m_root_fences[m_rob[prev_entry]], m_orq.back());
-        //print_version_info();
-      }
+      orq_entry oentry = {uop->m_uop_num, m_last_fence_version};
+      // we remove this uop when the lowest version in write buffer is greater
+      // than this version 
+      m_orq.push_back(oentry);
+      m_root_fences.insert(make_pair(uop->m_uop_num, false));
     }
 
     // following loads/stores get new version
@@ -146,48 +133,59 @@ void rob_c::process_version(uop_c* uop)
   }
 }
 
-void rob_c::update_orq(uop_c* uop)
+void rob_c::update_orq(uint16_t lowest_version)
 {
-  if (m_root_fences.size() != m_orq.size()) {
-    print_version_info();
-    ASSERT(0);
+  if (m_orq.size() == 0) {
+    return;
   }
 
-  if (m_orq.size() == 0)
-    return;
-
-  // load acquire retirement will remove corr. fence from orq
-  if (uop->m_bar_type == ACQ_BAR) {
-    if (m_root_fences.find(uop) != m_root_fences.end()) {
-      ASSERT(m_root_fences.count(uop) == 1);
-      ASSERT(m_reset_uop_num >= uop->m_uop_num || m_root_fences[uop] == uop->m_mem_version);
-      ASSERT(m_root_fences[uop] == m_orq.front());
-      //printf("\tPopping uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.front());
-      m_root_fences.erase(uop);
+  if (lowest_version > m_orq.front().version) {
+    // lowest version in write buffer is greater than the version at the front
+    // of the orq. Try to pop the orq if the fence is already retired
+    auto it = m_root_fences.find(m_orq.front().uop_num);
+    ASSERTM(it != m_root_fences.end(), "Could not find the root fence\n");
+    if (it->second == true) {
+      // fence has retired and is no need to be the lowest version
+      // remove from the root queues
+      auto uop_num = m_orq.front().uop_num;
+      if (m_orq.size() != m_root_fences.size())
+        ASSERTM(0, "Sizes do not match!!!\n");
       m_orq.pop_front();
+      m_root_fences.erase(uop_num);
+      if (m_orq.size() != m_root_fences.size())
+        ASSERTM(0, "Sizes do not match!!!\n");
     }
   }
+}
 
-  // full fence retirement will remove corr. fence from orq
-  else if (uop->m_uop_type == UOP_FULL_FENCE) {
-    //printf("\tPopping uop on core %d: %p with version %d %d\n", uop->m_core_id, uop, m_root_fences[uop], m_orq.front());
-    ASSERT(m_root_fences.count(uop) == 1);
-    ASSERT(m_root_fences[uop] == m_orq.front());
-    m_root_fences.erase(uop);
-    m_orq.pop_front();
-  }
+// called when a uop is retired
+void rob_c::update_root(uop_c* uop)
+{
+  if (uop->m_uop_type != UOP_FULL_FENCE)
+    return;
 
-  if (m_orq.size() == 0) {
-    //printf("Resetting version from %d to 0\n", m_version);
-    m_version = 0;
-    m_last_fence_version = 0;
-    m_reset_uop_num = back()->m_uop_num;
-  }
+  if (m_orq.size() != m_root_fences.size())
+    ASSERTM(0, "Sizes do not match!!!\n");
+
+  if (m_orq.size() == 0)
+    ASSERTM(0, "ORQ empty!!!\n");
+
+  auto it = m_root_fences.find(uop->m_uop_num);
+  ASSERT(it != m_root_fences.end());
+
+  // this fence has completed
+  it->second = true;
 }
 
 bool rob_c::version_ordering_check(uop_c* uop)
 {
-  if (m_orq.front() >= uop->m_mem_version || m_reset_uop_num > uop->m_uop_num)
+  if (uop->m_mem_version == 0xFFFF && m_reset_uop_num < uop->m_uop_num &&
+      m_orq.front().version < uop->m_mem_version) {
+    fprintf(stderr, "Possible deadlock\n");
+  }
+
+  if (m_orq.size() == 0 || m_orq.front().version >= uop->m_mem_version ||
+      m_reset_uop_num > uop->m_uop_num)
     return false;
 
   return true;
@@ -195,14 +193,14 @@ bool rob_c::version_ordering_check(uop_c* uop)
 
 void rob_c::print_version_info(void)
 {
-  printf("m_orq: ");
+  printf("\nm_orq: ");
   for (auto it : m_orq)// = 0; i < m_orq.size(); i++)
-    printf("%d ", it);
+    printf("(%p %d) ", (void *)it.uop_num, it.version);
   printf("\n");
 
   printf("m_root_fences: ");
   for (auto it: m_root_fences)
-    printf("(%p, %d) ", it.first, it.second);
+    printf("(%p, %d) ", (void *)it.first, it.second);
   printf("\n");
 }
 
@@ -210,6 +208,14 @@ void rob_c::print_version_info(void)
 // one can get an uop using [] operator (defined in rob.h)
 void rob_c::pop()
 {
+  // if last entry, reset versions
+  if (entries() == 1) {
+    //printf("Resetting version from %d to 0\n", m_version);
+    m_version = 0;
+    m_last_fence_version = 0;
+    m_reset_uop_num = back()->m_uop_num;
+  }
+
   m_first_entry = (m_first_entry + 1) % m_max_cnt;
   ++m_free_cnt;
 }

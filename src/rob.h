@@ -205,18 +205,19 @@ class rob_c
     /**
      * Get the lowest version in the ordering root queue
      */
-    uint8_t get_orq_version(void)
+    uint16_t get_orq_version(void)
     {
       if (m_orq.empty())
         return -1;
 
-      return m_orq.front();
+      return m_orq.front().version;
     }
 
     /**
      * Check if fence in orq can be removed
      */
-    void update_orq(uop_c* uop);
+    void update_orq(uint16_t version);
+    void update_root(uop_c* uop);
 
     /** 
      * Debug: Print version info
@@ -227,6 +228,11 @@ class rob_c
      * Check if ordering satisfied according to version
      */
     bool version_ordering_check(uop_c* uop);
+
+    /**
+     * Check if version bits are available
+     */
+    bool version_bits_avail(void) { return m_last_fence_version < 0xFFFF;  }
 
   private:
     bool is_later_entry(int first_fence_entry, int entry);
@@ -246,11 +252,19 @@ class rob_c
     /* All fences in the ROB */
     fence_c         m_fence;
     bool            m_wb_empty;
-    list<uint8_t>  m_orq; /*< FIFO queue of root fence versions */
-    uint8_t         m_version; /*< Current version of loads/stores */
+    bool            m_wb_perm;
+
+    uint16_t        m_version; /*< Current version of loads/stores */
     Counter         m_reset_uop_num;
-    uint8_t         m_last_fence_version; /*< version of the last scheduled fence */
-    unordered_map<uop_c*, uint8_t> m_root_fences; /*< parent uop of fence inst */ 
+    uint16_t        m_last_fence_version; /*< version of the last scheduled fence */
+
+    struct orq_entry {
+      Counter  uop_num;
+      uint16_t  version;
+    };
+
+    list<orq_entry>  m_orq; /*< FIFO queue of root fence versions */
+    unordered_map<Counter, bool> m_root_fences; /*< parent uop of fence inst */ 
     
     macsim_c*       m_simBase; /**< macsim_c base class for simulation globals */
 };
