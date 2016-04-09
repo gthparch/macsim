@@ -119,7 +119,7 @@ void rob_c::process_version(uop_c* uop)
   }
 
   // save full fences in orq
-  if (uop->m_uop_type == UOP_FULL_FENCE) {
+  if (uop->m_uop_type == UOP_FULL_FENCE || uop->m_uop_type == UOP_REL_FENCE) {
     if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
       orq_entry oentry = {uop->m_uop_num, m_last_fence_version};
       // we remove this uop when the lowest version in write buffer is greater
@@ -128,19 +128,21 @@ void rob_c::process_version(uop_c* uop)
       m_root_fences.insert(make_pair(uop->m_uop_num, false));
     }
 
-    // following loads/stores get new version
-    m_version = m_last_fence_version;
+    // following loads/stores get new version for full fences
+    if (uop->m_uop_type == UOP_FULL_FENCE)
+      m_version = m_last_fence_version;
   }
 }
 
-void rob_c::update_orq(uint16_t lowest_version)
+void rob_c::update_orq(Counter lowest_age)
 {
   if (m_orq.size() == 0) {
     return;
   }
 
-  if (lowest_version > m_orq.front().version) {
-    // lowest version in write buffer is greater than the version at the front
+  // remove all orq entries which are older than in SSB
+  while (m_orq.size() && lowest_age > m_orq.front().uop_num) {
+    // lowest age in write buffer is greater than the age at the front
     // of the orq. Try to pop the orq if the fence is already retired
     auto it = m_root_fences.find(m_orq.front().uop_num);
     ASSERTM(it != m_root_fences.end(), "Could not find the root fence\n");
@@ -148,12 +150,11 @@ void rob_c::update_orq(uint16_t lowest_version)
       // fence has retired and is no need to be the lowest version
       // remove from the root queues
       auto uop_num = m_orq.front().uop_num;
-      if (m_orq.size() != m_root_fences.size())
-        ASSERTM(0, "Sizes do not match!!!\n");
       m_orq.pop_front();
       m_root_fences.erase(uop_num);
-      if (m_orq.size() != m_root_fences.size())
-        ASSERTM(0, "Sizes do not match!!!\n");
+    } else {
+      // cannot remove head of orq yet
+      break;
     }
   }
 }
@@ -161,11 +162,8 @@ void rob_c::update_orq(uint16_t lowest_version)
 // called when a uop is retired
 void rob_c::update_root(uop_c* uop)
 {
-  if (uop->m_uop_type != UOP_FULL_FENCE)
+  if (uop->m_uop_type != UOP_FULL_FENCE && uop->m_uop_type != UOP_REL_FENCE)
     return;
-
-  if (m_orq.size() != m_root_fences.size())
-    ASSERTM(0, "Sizes do not match!!!\n");
 
   if (m_orq.size() == 0)
     ASSERTM(0, "ORQ empty!!!\n");

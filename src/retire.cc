@@ -382,8 +382,11 @@ void retire_c::drain_wb(void)
 
       if (!cur_uop->m_done_cycle || cur_uop->m_done_cycle > m_cur_core_cycle ||
           cur_uop->m_exec_cycle == 0) {
-        // there is a store which cannot be completed with current index
-        // and has no other higher indices set, stop completing
+
+        // this store cannot be completed yet
+        if (KNOB(KNOB_ACQ_REL)->getValue() == 0)
+          return;
+
         ++uop_it;
       } else {
         // the write uop is completed and can be freed
@@ -406,10 +409,13 @@ void retire_c::drain_wb(void)
   }
 
   // tell rob if WB is empty for memory ordering
+  // also update the root of the orq
   if (m_write_buffer.empty()) {
     m_rob->set_wb_empty(true);
+    m_rob->update_orq(-1);
   } else {
     m_rob->set_wb_empty(false);
+    m_rob->update_orq(m_write_buffer[0]->m_uop_num);
   }
 
   uint8_t lowest_version = -1;

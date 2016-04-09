@@ -214,9 +214,9 @@ class rob_c
     }
 
     /**
-     * Check if fence in orq can be removed
+     * Check if fences in orq can be removed
      */
-    void update_orq(uint16_t version);
+    void update_orq(Counter lowest_age);
     void update_root(uop_c* uop);
 
     /** 
