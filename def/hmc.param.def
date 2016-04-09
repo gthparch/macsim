@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // for HMC inst simulation
 param<ENABLE_HMC_INST, enable_hmc_inst, bool, 0>
+param<ENABLE_HMC_INST_SKIP, enable_hmc_inst_skip, bool, 0>
 param<ENABLE_HMC_BYPASS_CACHE, enable_hmc_bypass_cache, bool, 1>
 param<ENABLE_NONHMC_STAT, enable_nonhmc_stat, bool, 0>
 param<ENABLE_LOCK_SKIP, enable_lock_skip, bool, 0>

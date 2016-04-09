@@ -473,7 +473,7 @@ void process_manager_c::setup_process(process_s* process)
 
   // get hmc info if hmc inst is enabled
   if (*KNOB(KNOB_ENABLE_HMC_INST) || *KNOB(KNOB_ENABLE_NONHMC_STAT)
-          || *KNOB(KNOB_ENABLE_HMC_TRANS))
+          || *KNOB(KNOB_ENABLE_HMC_TRANS) || *KNOB(KNOB_ENABLE_HMC_INST_SKIP))
       hmc_function_c::hmc_info_read(process->m_current_file_name_base, process->m_hmc_info, process->m_hmc_info_ext);
   if (*KNOB(KNOB_ENABLE_HMC_FENCE))
       hmc_function_c::hmc_fence_info_read(process->m_current_file_name_base, process->m_hmc_fence_info);
