@@ -118,8 +118,8 @@ void rob_c::process_version(uop_c* uop)
     m_last_fence_version++;
   }
 
-  // save full fences in orq
-  if (uop->m_uop_type == UOP_FULL_FENCE || uop->m_uop_type == UOP_REL_FENCE) {
+  // save full fences and load acquire fences in orq
+  if (uop->m_uop_type == UOP_FULL_FENCE || uop->m_uop_type == UOP_ACQ_FENCE) {
     if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
       orq_entry oentry = {uop->m_uop_num, m_last_fence_version};
       // we remove this uop when the lowest version in write buffer is greater
@@ -162,7 +162,7 @@ void rob_c::update_orq(Counter lowest_age)
 // called when a uop is retired
 void rob_c::update_root(uop_c* uop)
 {
-  if (uop->m_uop_type != UOP_FULL_FENCE && uop->m_uop_type != UOP_REL_FENCE)
+  if (uop->m_uop_type != UOP_FULL_FENCE && uop->m_uop_type != UOP_ACQ_FENCE)
     return;
 
   if (m_orq.size() == 0)
@@ -207,7 +207,7 @@ void rob_c::print_version_info(void)
 void rob_c::pop()
 {
   // if last entry, reset versions
-  if (entries() == 1) {
+  if (entries() == 1 && m_orq.size() == 0) {
     //printf("Resetting version from %d to 0\n", m_version);
     m_version = 0;
     m_last_fence_version = 0;

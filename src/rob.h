@@ -208,7 +208,7 @@ class rob_c
     uint16_t get_orq_version(void)
     {
       if (m_orq.empty())
-        return -1;
+        return 0xFFFF;
 
       return m_orq.front().version;
     }

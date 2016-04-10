@@ -205,6 +205,11 @@ void retire_c::run_a_cycle()
             STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_CYC_TOT, m_cur_core_cycle - cur_uop->m_alloc_cycle);
             STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_RETIRE_COUNT, 1);
         }
+      } else if (cur_uop->m_mem_type == MEM_LD) {
+        // check if 
+        if (m_write_buffer.size() &&
+            cur_uop->m_mem_version > get_min_wb())
+          break;
       }
 
       if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&
@@ -367,6 +372,19 @@ void retire_c::run_a_cycle()
   drain_wb();
 }
 
+uint16_t retire_c::get_min_wb(void)
+{
+  if (m_write_buffer.empty())
+    return 0xFFFF;
+
+  uint16_t lowest_version = 0xFFFF;
+  for (auto uop_it : m_write_buffer) {
+    if (uop_it->m_mem_version < lowest_version)
+      lowest_version = uop_it->m_mem_version;
+  }
+
+  return lowest_version;
+}
 
 void retire_c::drain_wb(void)
 {
@@ -393,10 +411,17 @@ void retire_c::drain_wb(void)
 
         // if version of the uop is greater than root fence version
         // then you cannot retire this uop yet
-        if (KNOB(KNOB_ACQ_REL)->getValue() &&
-            m_rob->version_ordering_check(cur_uop)) {
-          ++uop_it;
-          continue;
+        if (KNOB(KNOB_ACQ_REL)->getValue()) {
+          // if current uop is store release and is oldest in wb, drain it
+          if (cur_uop->m_bar_type == REL_BAR) {
+            if (uop_it != m_write_buffer.begin()) {
+              ++uop_it;
+              continue;
+            }
+          } else if (m_rob->version_ordering_check(cur_uop)) {
+            ++uop_it;
+            continue;
+          }
         }
 
         STAT_CORE_EVENT_N(cur_uop->m_core_id, STORE_WB_FREE,

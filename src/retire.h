@@ -236,6 +236,8 @@ class retire_c
      */
     write_buffer_c::iterator delete_wb(write_buffer_c::iterator it);
 
+    uint16_t get_min_wb(void);
+
   private:
     RETIRE_INTERFACE_DECL(); /**< declaration macro */
 
