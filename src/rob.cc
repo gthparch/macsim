@@ -183,7 +183,7 @@ bool rob_c::version_ordering_check(uop_c* uop)
   }
 
   if (m_orq.size() == 0 || m_orq.front().version >= uop->m_mem_version ||
-      m_reset_uop_num > uop->m_uop_num)
+      m_reset_uop_num >= uop->m_uop_num)
     return false;
 
   return true;
