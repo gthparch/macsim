@@ -207,10 +207,10 @@ void retire_c::run_a_cycle()
         }
       } else if (cur_uop->m_mem_type == MEM_LD) {
         // check if 
-	if (check_ordering_wb(cur_uop)) {
+        if (check_ordering_wb(cur_uop)) {
           STAT_EVENT(RETIRE_SPECLD_NUM);
           break;
-	}
+        }
       }
 
       if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&
@@ -377,17 +377,34 @@ void retire_c::run_a_cycle()
 // If not, check if its version is less than all entries in WB
 bool retire_c::check_ordering_wb(uop_c* uop)
 {
+  if (m_write_buffer.size() == 0)
+    return false;
+
+  Counter age;
+
+  if (uop->m_mem_version <= get_min_wb(age))
+    return false;
+
+  if (uop->m_uop_num > age)
+    return false;
+
+  return true;
 }
 
-uint16_t retire_c::get_min_wb(void)
+// returns youngest store with lowest version
+uint16_t retire_c::get_min_wb(Counter& age)
 {
   if (m_write_buffer.empty())
     return 0xFFFF;
 
+  age = -1;
   uint16_t lowest_version = 0xFFFF;
   for (auto uop_it : m_write_buffer) {
-    if (uop_it->m_mem_version < lowest_version)
+    if (uop_it->m_mem_version <= lowest_version) {
       lowest_version = uop_it->m_mem_version;
+      if (uop_it->m_uop_num < age)
+        age = uop_it->m_uop_num;
+    }
   }
 
   return lowest_version;
