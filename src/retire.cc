@@ -207,10 +207,10 @@ void retire_c::run_a_cycle()
         }
       } else if (cur_uop->m_mem_type == MEM_LD) {
         // check if 
-        if (m_write_buffer.size() &&
-            cur_uop->m_mem_version > get_min_wb())
+	if (check_ordering_wb(cur_uop)) {
           STAT_EVENT(RETIRE_SPECLD_NUM);
           break;
+	}
       }
 
       if (KNOB(KNOB_FENCE_ENABLE)->getValue() &&
@@ -371,6 +371,12 @@ void retire_c::run_a_cycle()
   }
 
   drain_wb();
+}
+
+// Check if the uop is older than all entries in WB
+// If not, check if its version is less than all entries in WB
+bool retire_c::check_ordering_wb(uop_c* uop)
+{
 }
 
 uint16_t retire_c::get_min_wb(void)
