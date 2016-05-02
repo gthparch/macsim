@@ -193,6 +193,11 @@ void retire_c::run_a_cycle()
       // uop cannot be retired
       else if (!cur_uop->m_done_cycle || !cur_uop->m_exec_cycle ||
                cur_uop->m_done_cycle > m_cur_core_cycle) {
+        if (cur_uop->m_uop_type == UOP_FULL_FENCE ||
+            cur_uop->m_uop_type == UOP_ACQ_FENCE  ||
+            cur_uop->m_uop_type == UOP_REL_FENCE) {
+          STAT_EVENT(FENCE_HEAD_ROB_WAIT);
+        }
         break;
       }
 
