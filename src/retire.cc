@@ -431,7 +431,8 @@ void retire_c::drain_wb(void)
           cur_uop->m_exec_cycle == 0) {
 
         // this store cannot be completed yet
-        if (KNOB(KNOB_ACQ_REL)->getValue() == 0)
+        // if FIFO completion, we cannot complete any later stores
+        if (KNOB(KNOB_WB_FIFO)->getValue())
           break;
 
         ++uop_it;
@@ -444,13 +445,18 @@ void retire_c::drain_wb(void)
           // if current uop is store release and is oldest in wb, drain it
           if (cur_uop->m_bar_type == REL_BAR) {
             if (uop_it != m_write_buffer.begin()) {
-            STAT_EVENT(RETIRE_SPECST_NUM);
+              STAT_EVENT(RETIRE_SPECST_NUM);
               ++uop_it;
               continue;
             }
           } else if (m_rob->version_ordering_check(cur_uop)) {
             STAT_EVENT(RETIRE_SPECST_NUM);
             ++uop_it;
+
+            // if FIFO completioin, we cannot complete any more stores
+            if (KNOB(KNOB_WB_FIFO)->getValue())
+              break;
+            
             continue;
           }
         }
