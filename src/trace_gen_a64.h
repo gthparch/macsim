@@ -78,15 +78,15 @@ class InstHandler {
     macsim_c *m_simBase;
 };
 
-class tracegen_a64 {
+class trace_gen_a64 {
   public:
-    tracegen_a64(macsim_c* simBase, OSDomain &osd) :
+    trace_gen_a64(macsim_c* simBase, OSDomain &osd) :
     osd(osd), finished(false), started(false), inst_count(0), nop_count(0)
     { 
-      osd.set_app_start_cb(this, &tracegen_a64::app_start_cb);
+      osd.set_app_start_cb(this, &trace_gen_a64::app_start_cb);
       trace_file_count = 0;
       finished = false;
-      gen_thread = new std::thread(&tracegen_a64::gen_trace, this);
+      gen_thread = new std::thread(&trace_gen_a64::gen_trace, this);
       inst_handle = NULL;
 
       nop = new trace_info_a64_qsim_s();
@@ -98,7 +98,7 @@ class tracegen_a64 {
       unid_fences = full_fences = llsc = 0;
     }
 
-    ~tracegen_a64()
+    ~trace_gen_a64()
     {
     }
 

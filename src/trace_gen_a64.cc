@@ -283,7 +283,7 @@ bool InstHandler::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs reg
   return true;
 }
 
-void tracegen_a64::count_fences(const uint8_t *b, uint8_t l)
+void trace_gen_a64::count_fences(const uint8_t *b, uint8_t l)
 {
   cs_insn *insn = NULL;
 
@@ -318,7 +318,7 @@ void tracegen_a64::count_fences(const uint8_t *b, uint8_t l)
   dis.free_insn(insn, count);
 }
 
-void tracegen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
+void trace_gen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
 	     enum inst_type t)
 {
   inst_handle[c].processInst((unsigned char*)b, v, l);
@@ -327,7 +327,7 @@ void tracegen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8
   return;
 }
 
-int tracegen_a64::app_start_cb(int c)
+int trace_gen_a64::app_start_cb(int c)
 {
   int n_cpus = osd.get_n();
   inst_handle = new InstHandler[osd.get_n()];
@@ -337,9 +337,9 @@ int tracegen_a64::app_start_cb(int c)
 
   if (!started) {
     started = true;
-    osd.set_inst_cb(this, &tracegen_a64::inst_cb);
-    osd.set_mem_cb(this, &tracegen_a64::mem_cb);
-    osd.set_app_end_cb(this, &tracegen_a64::app_end_cb);
+    osd.set_inst_cb(this, &trace_gen_a64::inst_cb);
+    osd.set_mem_cb(this, &trace_gen_a64::mem_cb);
+    osd.set_app_end_cb(this, &trace_gen_a64::app_end_cb);
   }
 
   inst_handle[0].openDebugFile();
@@ -348,7 +348,7 @@ int tracegen_a64::app_start_cb(int c)
   return 0;
 }
 
-int tracegen_a64::app_end_cb(int c)
+int trace_gen_a64::app_end_cb(int c)
 {
   if (finished)
     return 1;
@@ -369,7 +369,7 @@ int tracegen_a64::app_end_cb(int c)
   return 1;
 }
 
-void tracegen_a64::gen_trace(void)
+void trace_gen_a64::gen_trace(void)
 {
   int i;
 

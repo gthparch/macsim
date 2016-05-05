@@ -748,7 +748,7 @@ class trace_read_c
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
     int m_trace_size;
 #ifdef USING_QSIM
-    static tracegen_a64* m_tg;
+    static trace_gen_a64* m_tg;
 #endif
 };
 
