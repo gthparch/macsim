@@ -147,29 +147,29 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
     OSDomain *osd = new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
     string bench_name = KNOB(KNOB_QSIM_BENCH)->getValue();
     if (bench_name == "") {
-	    int num_apps;
-	    string line;
+      int num_apps;
+      string line;
 
-	    bench_name = KNOB(KNOB_TRACE_NAME_FILE)->getValue();
-	    fstream tracefile(bench_name.c_str(), ios::in);
-	    tracefile >> num_apps;
-	    tracefile >> line;
+      bench_name = KNOB(KNOB_TRACE_NAME_FILE)->getValue();
+      fstream tracefile(bench_name.c_str(), ios::in);
+      tracefile >> num_apps;
+      tracefile >> line;
 
-	    size_t dot_location = line.find_last_of(".");
-	    string base = line.substr(0, dot_location);
+      size_t dot_location = line.find_last_of(".");
+      string base = line.substr(0, dot_location);
 
-	    stringstream tarfile;
+      stringstream tarfile;
 
-	    tarfile << base + ".tar";
-	    bench_name = "";
+      tarfile << base + ".tar";
+      bench_name = "";
 
-	    tarfile >> bench_name;
+      tarfile >> bench_name;
     }
 
     report("loading benchmark " + bench_name);
     Qsim::load_file(*osd, bench_name.c_str());
 
-    m_tg = new tracegen_a64(*osd);
+    m_tg = new tracegen_a64(m_simBase, *osd);
     m_tg->app_start_cb(0);
   }
 #endif
@@ -241,22 +241,20 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
                                                         thread_trace_info->m_buffer,
                                                         m_trace_size*k_trace_buffer_size);
 #else
-        if (m_tg->trace_avail(core_id)) {
-          int uops_read  = m_tg->read_trace(core_id,
-                                            thread_trace_info->m_buffer,
-                                            m_trace_size*k_trace_buffer_size);
+        int uops_read  = m_tg->read_trace(core_id,
+                                          thread_trace_info->m_buffer,
+                                          m_trace_size*k_trace_buffer_size);
 
-          thread_trace_info->m_buffer_index_max = uops_read;
-        } else {
-          thread_trace_info->m_trace_ended = true;
-        }
+        thread_trace_info->m_buffer_index_max = uops_read;
 #endif
         thread_trace_info->m_buffer_index_max /= m_trace_size;
         thread_trace_info->m_buffer_exhausted  = false;
 
-//        if (thread_trace_info->m_buffer_index_max < k_trace_buffer_size) {
-//          gzclose(thread_trace_info->m_trace_file);
-//        }
+        /*
+        if (thread_trace_info->m_buffer_index_max < k_trace_buffer_size) {
+          gzclose(thread_trace_info->m_trace_file);
+        }
+        */
       }
 
       memcpy(trace_info, 
@@ -276,10 +274,8 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
         thread_trace_info->m_buffer_exhausted = true;
       }
 
-
       if (*KNOB(KNOB_DEBUG_TRACE_READ))
         dprint_inst(trace_info, core_id, sim_thread_id);
-
 
       ///
       /// When an application is created, only the main thread will be allocated to the

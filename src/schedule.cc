@@ -260,6 +260,11 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
   STAT_CORE_EVENT_N(m_core_id, CORE_DISPATCH_WAIT, 
       m_cur_core_cycle - cur_uop->m_alloc_cycle);
 
+  if (cur_uop->m_uop_type == UOP_FULL_FENCE ||
+      cur_uop->m_uop_type == UOP_ACQ_FENCE  ||
+      cur_uop->m_uop_type == UOP_REL_FENCE)
+    STAT_CORE_EVENT(m_core_id, DYN_FENCE_NUM);
+
   // Decrement dispatch m_count for the current thread
   --m_simBase->m_core_pointers[m_core_id]->m_ops_to_be_dispatched[cur_uop->m_thread_id];
 

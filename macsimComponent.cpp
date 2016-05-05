@@ -281,8 +281,8 @@ bool macsimComponent::ticReceived(Cycle_t)
     }
   }
 
-	// Run a cycle of the simulator
-	m_sim_running = m_macsim->run_a_cycle();
+  // Run a cycle of the simulator
+  m_sim_running = m_macsim->run_a_cycle();
 
   // Debugging 
   if (m_cycle % 100000 == 0) {
@@ -301,12 +301,12 @@ bool macsimComponent::ticReceived(Cycle_t)
     }
   }
 
-	// Still has more cycles to run
-	if (m_sim_running) {
-		return false;
-	}
-	// Let SST know that this component is done and could be terminated
-	else {
+  // Still has more cycles to run
+  if (m_sim_running) {
+    return false;
+  }
+  // Let SST know that this component is done and could be terminated
+  else {
     if (m_operation_mode == SLAVE) {
       // Send a report event to another SST component upon completion
       MacSimEvent *event = new MacSimEvent(FINISHED);
@@ -314,8 +314,8 @@ bool macsimComponent::ticReceived(Cycle_t)
     }
 
     primaryComponentOKToEndSim();
-		return true;
-	}
+    return true;
+  }
 }
 
 ////////////////////////////////////////

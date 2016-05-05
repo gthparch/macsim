@@ -483,6 +483,7 @@ void uop_c::init()
   m_bypass_llc                        = false;
   m_skip_llc                          = false;
   m_in_scheduler                      = false;
+  m_mem_version                       = 0;
 
   m_hmc_inst                          = HMC_NONE;
   m_hmc_trans_id                      = 0;
