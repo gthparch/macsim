@@ -237,7 +237,7 @@ class retire_c
     write_buffer_c::iterator delete_wb(write_buffer_c::iterator it);
 
     uint16_t get_min_wb(Counter& age);
-    bool check_ordering_wb(uop_c* uop);
+    bool check_ld_ordering_wb(uop_c* uop);
 
   private:
     RETIRE_INTERFACE_DECL(); /**< declaration macro */

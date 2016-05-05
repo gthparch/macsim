@@ -211,8 +211,8 @@ void retire_c::run_a_cycle()
             STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_RETIRE_COUNT, 1);
         }
       } else if (cur_uop->m_mem_type == MEM_LD) {
-        // check if 
-        if (check_ordering_wb(cur_uop)) {
+        // check if load can be retired before any previous stores
+        if (check_ld_ordering_wb(cur_uop)) {
           STAT_EVENT(RETIRE_SPECLD_NUM);
           break;
         }
@@ -380,7 +380,7 @@ void retire_c::run_a_cycle()
 
 // Check if the uop is older than all entries in WB
 // If not, check if its version is less than all entries in WB
-bool retire_c::check_ordering_wb(uop_c* uop)
+bool retire_c::check_ld_ordering_wb(uop_c* uop)
 {
   if (m_write_buffer.size() == 0)
     return false;
