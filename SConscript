@@ -69,8 +69,8 @@ if flags['val'] == '1':
 if flags['qsim'] == '1':
   env['CPPDEFINES'] += ['USING_QSIM']
   env['CPPPATH']    += [os.environ['QSIM_PREFIX'] + "/include", '#src/rwqueue']
-  env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib"]
-
+  env['CPPPATH']    += [os.environ['XED_HOME'] + "/include"]
+  env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib", os.environ['XED_HOME'] + "/lib"]
 
 #########################################################################################
 # IRIS
@@ -240,6 +240,7 @@ macsim_src = [
   'src/dyfr.cc',
   'src/hmc_process.cc',
   'src/trace_gen_a64.cc',
+  'src/trace_gen_x86.cc',
   'src/cs_disas.cc',
   'src/resource.cc'
 ]
@@ -269,7 +270,7 @@ if flags['iris'] == '1':
   env['CPPPATH'] += ['#src/orion']
 
 if flags['qsim'] == '1':
-  libraries += ['qsim', 'capstone', 'pthread', 'dl']
+  libraries += ['xed', 'qsim', 'capstone', 'pthread', 'dl']
 
 
 

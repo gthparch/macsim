@@ -1,11 +1,3 @@
-/*****************************************************************************\
- * Qemu Simulation Framework (qsim)                                            *
- * Qsim is a modified version of the Qemu emulator (www.qemu.org), couled     *
- * a C++ API, for the use of computer architecture researchers.                *
- *                                                                             *
- * This work is licensed under the terms of the GNU GPL, version 2. See the    *
- * COPYING file in the top-level directory.                                    *
- \*****************************************************************************/
 #ifdef USING_QSIM
 
 #include <iostream>
@@ -34,7 +26,7 @@ cs_disas dis(CS_ARCH_ARM64, CS_MODE_ARM);
 
 #define MILLION(x) (x * 1000000)
 
-void InstHandler::processInst(unsigned char *b, uint64_t v, uint8_t len)
+void InstHandler_a64::processInst(unsigned char *b, uint64_t v, uint8_t len)
 {
   cs_insn *insn = NULL;
   uint8_t regs_read_count, regs_write_count;
@@ -49,12 +41,12 @@ void InstHandler::processInst(unsigned char *b, uint64_t v, uint8_t len)
   }
 }
 
-void InstHandler::processMem(uint64_t v, uint64_t p, uint8_t len, int w)
+void InstHandler_a64::processMem(uint64_t v, uint64_t p, uint8_t len, int w)
 {
   populateMemInfo(v, p, len, w);
 }
 
-InstHandler::InstHandler()
+InstHandler_a64::InstHandler_a64()
 {
   prev_op      = NULL;
   finished     = false;
@@ -79,11 +71,11 @@ void InstHandler::closeDebugFile()
 #endif
 }
 
-InstHandler::~InstHandler()
+InstHandler_a64::~InstHandler_a64()
 {
 }
 
-int InstHandler::read_trace(void *buffer, unsigned int len)
+int InstHandler_a64::read_trace(void *buffer, unsigned int len)
 {
   trace_info_a64_qsim_s* trace_buffer = (trace_info_a64_qsim_s *)buffer;
   int i = 0, num_elements = len / sizeof(trace_info_a64_qsim_s);
@@ -110,7 +102,7 @@ int InstHandler::read_trace(void *buffer, unsigned int len)
   return i * sizeof(trace_info_a64_qsim_s);
 }
 
-void InstHandler::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w)
+void InstHandler_a64::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w)
 {
   trace_info_a64_qsim_s *op = prev_op;
 
@@ -152,7 +144,7 @@ void InstHandler::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w)
   return;
 }
 
-bool InstHandler::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs regs_write, 
+bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs regs_write,
     uint8_t regs_read_count, uint8_t regs_write_count)
 {
   cs_arm64* arm64;
@@ -330,7 +322,7 @@ void trace_gen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint
 int trace_gen_a64::app_start_cb(int c)
 {
   int n_cpus = osd.get_n();
-  inst_handle = new InstHandler[osd.get_n()];
+  inst_handle = new InstHandler_a64[osd.get_n()];
 
   for (int i = 0; i < osd.get_n(); i++)
     inst_handle[i].set_simbase(m_simBase);
@@ -394,6 +386,5 @@ void trace_gen_a64::gen_trace(void)
     }
   }
 }
-
 
 #endif /* USING_QSIM */
