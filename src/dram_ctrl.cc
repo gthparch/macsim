@@ -244,6 +244,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
   }
 
   m_cycle = 0;
+  m_total_req = 0;
 
   // latency
   m_precharge_latency = *KNOB(KNOB_DRAM_PRECHARGE);
