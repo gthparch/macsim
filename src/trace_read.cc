@@ -61,6 +61,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "trace_read_a64.h"
 #include "trace_read_gpu.h"
 
+#ifdef USING_QSIM
+#include "trace_gen_x86.h"
+#include "trace_gen_a64.h"
+#endif
+
 #include "all_knobs.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +131,7 @@ trace_uop_s::trace_uop_s()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef USING_QSIM
-tracegen_a64* trace_read_c::m_tg;
+trace_gen* trace_read_c::m_tg;
 #endif
 
 /**
@@ -169,7 +174,11 @@ trace_read_c::trace_read_c(macsim_c* simBase, ofstream* dprint_output)
     report("loading benchmark " + bench_name);
     Qsim::load_file(*osd, bench_name.c_str());
 
-    m_tg = new tracegen_a64(m_simBase, *osd);
+    if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64")
+      m_tg = new trace_gen_a64(m_simBase, *osd);
+    else
+      m_tg = new trace_gen_x86(m_simBase, *osd);
+
     m_tg->app_start_cb(0);
   }
 #endif

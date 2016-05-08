@@ -97,6 +97,7 @@ src/frontend_interface.h                                               \
 src/retire_interface.h                                                 \
 src/schedule_interface.h                                               \
 src/hmc_process.cc           src/hmc_process.h                         \
+src/trace_gen.h                                                        \
 src/trace_gen_a64.cc         src/trace_gen_a64.h                       \
 src/cs_disas.cc              src/cs_disas.h
 

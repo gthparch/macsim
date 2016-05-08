@@ -46,7 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifdef USING_QSIM
 #include "qsim.h"
 #include "qsim-load.h"
-#include "trace_gen_a64.h"
+#include "trace_gen.h"
 #endif
 
 
@@ -748,7 +748,7 @@ class trace_read_c
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
     int m_trace_size;
 #ifdef USING_QSIM
-    static tracegen_a64* m_tg;
+    static trace_gen* m_tg;
 #endif
 };
 
