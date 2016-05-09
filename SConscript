@@ -27,6 +27,7 @@ warn_flags = [
 #  '-Wunused-function',
 #  '-Wreturn-type',
 #  '-Wpointer-arith',
+  '-Wuninitialized',
   '-Wno-write-strings'
 ]
 warn_flags = ' '.join(warn_flags)

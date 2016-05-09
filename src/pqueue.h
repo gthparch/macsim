@@ -193,7 +193,7 @@ class pqueue_c
     {
       ASSERT(entry <= m_num_entry);
 
-      T data;
+      T data = 0;
       int count = 0;
       for (int ii = m_current_index; ii < m_current_index + m_size; ++ii) {
         int index = ii % m_size;

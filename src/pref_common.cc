@@ -1240,7 +1240,7 @@ float hwp_common_c::pref_get_accuracy(uns8 prefetcher_id)
 // Get overall prefetch accuracy
 float hwp_common_c::pref_get_overallaccuracy(HWP_Type type)
 {
-  float acc;
+  float acc = 1.0;
   switch (type) {
     case Mem_To_UL1:
       acc = (m_overall_l2sent > 20) ? 

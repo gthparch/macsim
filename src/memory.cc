@@ -207,7 +207,7 @@ cache_c *default_llc(macsim_c* m_simBase)
   assert(llc_type == "default");
 
   int num_tiles;
-  int interleaving;
+  int interleaving = -1;
 
   if (*KNOB(KNOB_DEFAULT_INTERLEAVING)) {
     num_tiles = 1;
