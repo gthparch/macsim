@@ -41,7 +41,8 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_debug_all = true;
 
   string prefix = "[" + getName() + "] ";
-  m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)params.find("debug", Output::NONE));
+  int debug_output = params.find("debug", (int)Output::NONE);
+  m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)debug_output);
   MSC_DEBUG("------- Initializing -------\n");
 
   bool found;
@@ -72,8 +73,9 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  string clock_freq = params.find("frequency", "1GHz");
-  registerClock(clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+  //FIXME
+  //string clock_freq = params.find("frequency", found);
+  //registerClock(clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
   m_mem_size = params.find("mem_size", 1*1024*1024*1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
@@ -87,7 +89,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   // When MASTER mode, MacSim begins execution right away.
   // When SLAVE mode, MacSim awaits trigger event to arrive, which will cause MacSim to begin execution of a specified kernel.
   //   Upon completion, MacSim will return an event to another SST component.
-  m_operation_mode = params.find("operation_mode", MASTER);
+  m_operation_mode = params.find("operation_mode", (int)OperationMode::MASTER);
   if (m_operation_mode == OperationMode::MASTER) {
     m_triggered = true;
     m_ipc_link = NULL;
