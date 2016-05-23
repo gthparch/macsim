@@ -73,9 +73,8 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  //FIXME
-  //string clock_freq = params.find("frequency", found);
-  //registerClock(clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+  m_clock_freq = params.find("frequency", found);
+  registerClock(m_clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
   m_mem_size = params.find("mem_size", 1*1024*1024*1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
