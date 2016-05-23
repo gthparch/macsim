@@ -13,6 +13,13 @@ class MacSimEvent : public SST::Event {
     MacSimEventType getType() { return m_type; }
     void setType(MacSimEventType type) { m_type = type; }
 
+    // pure virtual functions overrides
+    virtual const char* cls_name() const
+    { return "macsim"; }
+
+    virtual uint32_t cls_id() const
+    { return 1; }
+
   private:
     MacSimEventType m_type;
 
