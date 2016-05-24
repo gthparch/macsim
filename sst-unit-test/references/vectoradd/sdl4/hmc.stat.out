@@ -1,0 +1,970 @@
+####################################################################################################
+Interval
+####################################################################################################
+Cumulative:         Cycles:                  20000     Instructions:                  1200
+HMC_INST_COUNT_TOT                                              0                             0
+
+HMC_REMOVE_INST_COUNT_TOT                                       0                             0
+
+HMC_FENCE_INST_COUNT_TOT                                        0                             0
+
+HMC_INST_COUNT_CORE_0                                           0                             0
+
+HMC_UOP_COUNT_CORE_0                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_0                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_0                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_0                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_0                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_0                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_0                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_0                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_0                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_0                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_0                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_0                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_0                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_0                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_0                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_0                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_0                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_0                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_0                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_0                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_0                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_0                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_0                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_0                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_0                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_0                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_0                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_0                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_0                                 0                             0
+
+HMC_INST_COUNT_CORE_1                                           0                             0
+
+HMC_UOP_COUNT_CORE_1                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_1                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_1                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_1                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_1                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_1                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_1                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_1                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_1                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_1                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_1                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_1                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_1                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_1                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_1                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_1                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_1                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_1                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_1                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_1                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_1                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_1                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_1                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_1                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_1                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_1                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_1                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_1                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_1                                 0                             0
+
+HMC_INST_COUNT_CORE_2                                           0                             0
+
+HMC_UOP_COUNT_CORE_2                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_2                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_2                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_2                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_2                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_2                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_2                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_2                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_2                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_2                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_2                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_2                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_2                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_2                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_2                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_2                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_2                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_2                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_2                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_2                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_2                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_2                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_2                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_2                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_2                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_2                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_2                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_2                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_2                                 0                             0
+
+HMC_INST_COUNT_CORE_3                                           0                             0
+
+HMC_UOP_COUNT_CORE_3                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_3                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_3                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_3                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_3                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_3                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_3                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_3                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_3                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_3                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_3                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_3                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_3                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_3                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_3                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_3                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_3                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_3                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_3                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_3                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_3                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_3                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_3                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_3                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_3                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_3                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_3                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_3                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_3                                 0                             0
+
+HMC_INST_COUNT_CORE_4                                           0                             0
+
+HMC_UOP_COUNT_CORE_4                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_4                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_4                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_4                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_4                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_4                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_4                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_4                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_4                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_4                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_4                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_4                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_4                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_4                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_4                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_4                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_4                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_4                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_4                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_4                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_4                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_4                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_4                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_4                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_4                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_4                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_4                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_4                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_4                                 0                             0
+
+HMC_INST_COUNT_CORE_5                                           0                             0
+
+HMC_UOP_COUNT_CORE_5                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_5                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_5                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_5                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_5                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_5                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_5                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_5                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_5                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_5                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_5                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_5                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_5                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_5                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_5                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_5                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_5                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_5                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_5                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_5                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_5                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_5                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_5                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_5                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_5                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_5                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_5                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_5                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_5                                 0                             0
+
+HMC_INST_COUNT_CORE_6                                           0                             0
+
+HMC_UOP_COUNT_CORE_6                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_6                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_6                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_6                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_6                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_6                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_6                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_6                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_6                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_6                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_6                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_6                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_6                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_6                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_6                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_6                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_6                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_6                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_6                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_6                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_6                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_6                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_6                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_6                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_6                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_6                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_6                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_6                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_6                                 0                             0
+
+HMC_INST_COUNT_CORE_7                                           0                             0
+
+HMC_UOP_COUNT_CORE_7                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_7                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_7                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_7                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_7                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_7                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_7                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_7                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_7                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_7                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_7                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_7                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_7                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_7                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_7                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_7                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_7                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_7                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_7                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_7                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_7                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_7                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_7                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_7                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_7                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_7                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_7                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_7                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_7                                 0                             0
+
+HMC_INST_COUNT_CORE_8                                           0                             0
+
+HMC_UOP_COUNT_CORE_8                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_8                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_8                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_8                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_8                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_8                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_8                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_8                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_8                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_8                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_8                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_8                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_8                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_8                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_8                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_8                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_8                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_8                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_8                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_8                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_8                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_8                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_8                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_8                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_8                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_8                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_8                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_8                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_8                                 0                             0
+
+HMC_INST_COUNT_CORE_9                                           0                             0
+
+HMC_UOP_COUNT_CORE_9                                            0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_9                                    0                             0
+
+HMC_FENCE_INST_COUNT_CORE_9                                     0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_9                                   0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_9                                      0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_9                                 0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_9                             0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_9                              0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_9                           0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_9                              0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_9                                   0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_9                                    0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_9                                  0                             0
+
+HMC_INST_COUNT_SWAP_CORE_9                                      0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_9                                    0                             0
+
+HMC_INST_COUNT_AND_CORE_9                                       0                             0
+
+HMC_INST_COUNT_NAND_CORE_9                                      0                             0
+
+HMC_INST_COUNT_OR_CORE_9                                        0                             0
+
+HMC_INST_COUNT_XOR_CORE_9                                       0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_9                                    0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_9                              0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_9                                 0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_9                                0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_9                                 0                             0
+
+HMC_INST_COUNT_HOOK_CORE_9                                      0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_9                                    0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_9                                 0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_9                                 0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_9                                 0                             0
+
+HMC_INST_COUNT_CORE_10                                          0                             0
+
+HMC_UOP_COUNT_CORE_10                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_10                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_10                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_10                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_10                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_10                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_10                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_10                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_10                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_10                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_10                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_10                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_10                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_10                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_10                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_10                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_10                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_10                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_10                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_10                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_10                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_10                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_10                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_10                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_10                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_10                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_10                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_10                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_10                                0                             0
+
+HMC_INST_COUNT_CORE_11                                          0                             0
+
+HMC_UOP_COUNT_CORE_11                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_11                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_11                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_11                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_11                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_11                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_11                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_11                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_11                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_11                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_11                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_11                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_11                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_11                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_11                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_11                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_11                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_11                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_11                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_11                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_11                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_11                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_11                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_11                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_11                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_11                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_11                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_11                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_11                                0                             0
+
+HMC_INST_COUNT_CORE_12                                          0                             0
+
+HMC_UOP_COUNT_CORE_12                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_12                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_12                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_12                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_12                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_12                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_12                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_12                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_12                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_12                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_12                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_12                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_12                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_12                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_12                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_12                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_12                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_12                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_12                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_12                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_12                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_12                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_12                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_12                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_12                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_12                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_12                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_12                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_12                                0                             0
+
+HMC_INST_COUNT_CORE_13                                          0                             0
+
+HMC_UOP_COUNT_CORE_13                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_13                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_13                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_13                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_13                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_13                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_13                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_13                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_13                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_13                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_13                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_13                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_13                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_13                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_13                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_13                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_13                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_13                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_13                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_13                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_13                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_13                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_13                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_13                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_13                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_13                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_13                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_13                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_13                                0                             0
+
+HMC_INST_COUNT_CORE_14                                          0                             0
+
+HMC_UOP_COUNT_CORE_14                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_14                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_14                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_14                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_14                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_14                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_14                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_14                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_14                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_14                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_14                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_14                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_14                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_14                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_14                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_14                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_14                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_14                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_14                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_14                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_14                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_14                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_14                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_14                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_14                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_14                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_14                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_14                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_14                                0                             0
+
+HMC_INST_COUNT_CORE_15                                          0                             0
+
+HMC_UOP_COUNT_CORE_15                                           0                             0
+
+HMC_REMOVE_INST_COUNT_CORE_15                                   0                             0
+
+HMC_FENCE_INST_COUNT_CORE_15                                    0                             0
+
+HMC_ADD_OVERHEAD_COUNT_CORE_15                                  0                             0
+
+HMC_DEP_UOP_CYC_TOT_CORE_15                                     0                             0
+
+HMC_DEP_UOP_RETIRE_COUNT_CORE_15                                0                             0
+
+HMC_INST_COUNT_CAS_equal_16B_CORE_15                            0                             0
+
+HMC_INST_COUNT_CAS_zero_16B_CORE_15                             0                             0
+
+HMC_INST_COUNT_CAS_greater_16B_CORE_15                          0                             0
+
+HMC_INST_COUNT_CAS_less_16B_CORE_15                             0                             0
+
+HMC_INST_COUNT_ADD_16B_CORE_15                                  0                             0
+
+HMC_INST_COUNT_ADD_8B_CORE_15                                   0                             0
+
+HMC_INST_COUNT_ADD_DUAL_CORE_15                                 0                             0
+
+HMC_INST_COUNT_SWAP_CORE_15                                     0                             0
+
+HMC_INST_COUNT_BIT_WR_CORE_15                                   0                             0
+
+HMC_INST_COUNT_AND_CORE_15                                      0                             0
+
+HMC_INST_COUNT_NAND_CORE_15                                     0                             0
+
+HMC_INST_COUNT_OR_CORE_15                                       0                             0
+
+HMC_INST_COUNT_XOR_CORE_15                                      0                             0
+
+HMC_INST_COUNT_FP_ADD_CORE_15                                   0                             0
+
+HMC_INST_COUNT_COMP_greater_CORE_15                             0                             0
+
+HMC_INST_COUNT_COMP_less_CORE_15                                0                             0
+
+HMC_INST_COUNT_COMP_equal_CORE_15                               0                             0
+
+HMC_INST_COUNT_CANDIDATE_CORE_15                                0                             0
+
+HMC_INST_COUNT_HOOK_CORE_15                                     0                             0
+
+HMC_INST_COUNT_UNHOOK_CORE_15                                   0                             0
+
+HMC_INST_COUNT_TRANS_BEG_CORE_15                                0                             0
+
+HMC_INST_COUNT_TRANS_MID_CORE_15                                0                             0
+
+HMC_INST_COUNT_TRANS_END_CORE_15                                0                             0
+
