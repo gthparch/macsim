@@ -11,10 +11,6 @@
 #include <sst/core/interfaces/stringEvent.h>
 #include <sst/core/interfaces/simpleMem.h>
 
-#ifdef USE_VAULTSIM_HMC
-#include <sst/elements/memHierarchy/simpleMemHMCExtension.h>
-#endif
-
 #include "src/global_defs.h"
 #include "src/uop.h"
 #include "src/frontend.h"
@@ -214,7 +210,7 @@ void macsimComponent::setup()
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstructionCacheRequest);
   CallbackSendDataCacheRequest* sdr =
 #ifdef USE_VAULTSIM_HMC
-    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t>(this, &macsimComponent::sendDataCacheRequest);
+    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint32_t,uint64_t>(this, &macsimComponent::sendDataCacheRequest);
 #else
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataCacheRequest);
 #endif
@@ -330,7 +326,7 @@ void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key, uin
 #ifndef USE_VAULTSIM_HMC
   SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
 #else
-  SimpleMem::Request *req = new SimpleMemHMCExtension::HMCRequest(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
+  SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
 #endif
   m_instruction_cache_links[core_id]->sendRequest(req);
   m_instruction_cache_request_counters[core_id]++;
@@ -405,18 +401,16 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
   }
 }
 #else
-void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0,uint64_t trans_id=0)
+void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type, uint32_t hmc_type=0, uint64_t hmc_trans=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
-  if ( (hmc_type & 0b10000000) != 0) {
+  if ( (hmc_type & 0x0080) != 0) {
     flag = SimpleMem::Request::F_NONCACHEABLE;
     hmc_type = hmc_type & 0b01111111;
   }
   SimpleMem::Request *req =
-    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type, trans_id);
-  //if (hmc_type!=0) cout<<"HMC: "<<(unsigned)hmc_type<<"\t trans: "<<trans_id
-  //    <<" isStore: "<<doWrite<<endl;
+    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
@@ -456,12 +450,7 @@ void macsimComponent::handleDataCacheEvent(Interfaces::SimpleMem::Request *req)
       break;
     }
   }
-#ifdef USE_VAULTSIM_HMC
-  SimpleMemHMCExtension::HMCRequest *req2 = static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
-  delete req2;
-#else
   delete req;
-#endif
 }
 
 ////////////////////////////////////////
