@@ -58,7 +58,7 @@ private:
     bool m_ptx_core;
     bool m_cube_connected;
     bool m_debug_all;
-    uint64_t m_debug_addr;
+    int64_t m_debug_addr;
     uint64_t m_mem_size;
 
     int m_operation_mode;
@@ -66,7 +66,7 @@ private:
     SST::Link *m_ipc_link;
 
     // links
-    unsigned int m_num_link;
+    uint32_t m_num_link;
     vector<Interfaces::SimpleMem*> m_instruction_cache_links;
     vector<Interfaces::SimpleMem*> m_data_cache_links;
     vector<Interfaces::SimpleMem*> m_const_cache_links;

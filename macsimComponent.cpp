@@ -28,39 +28,39 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 {
   m_dbg = new Output();
 
-  int debug_level = params.find("debug_level", (int)DebugLevel::ERROR);
+  int debug_level = params.find<int>("debug_level", (int)DebugLevel::ERROR);
   if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6)
     m_dbg->fatal(CALL_INFO, -1, "Debugging level must be between 0 and 9. \n");
 
-  m_debug_addr = (uint64_t)params.find("debug_addr", -1);
+  m_debug_addr = params.find<int64_t>("debug_addr", -1);
   if (m_debug_addr == -1)
     m_debug_all = true;
 
   string prefix = "[" + getName() + "] ";
-  int debug_output = params.find("debug", (int)Output::NONE);
+  int debug_output = params.find<int>("debug", (int)Output::NONE);
   m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)debug_output);
   MSC_DEBUG("------- Initializing -------\n");
 
   bool found;
-  m_param_file = params.find("param_file", found);
+  m_param_file = params.find<string>("param_file", found);
   if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find params.in file\n");
   //
-  m_trace_file = params.find("trace_file", found);
+  m_trace_file = params.find<string>("trace_file", found);
   if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find trace_file_list file\n");
   //
-  m_output_dir = params.find("output_dir", found);
+  m_output_dir = params.find<string>("output_dir", found);
   if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find statistics output directory parameter");
 
-  m_command_line = params.find("command_line", found);
+  m_command_line = params.find<string>("command_line", found);
 
-  m_ptx_core = params.find("ptx_core", 0);
-  m_num_link = params.find("num_link", 1);
+  m_ptx_core = params.find<bool>("ptx_core", 0);
+  m_num_link = params.find<uint32_t>("num_link", 1);
   configureLinks(params);
 
-  m_cube_connected = params.find("cube_connected", 0);
+  m_cube_connected = params.find<bool>("cube_connected", 0);
   if (m_cube_connected) {
     m_cube_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
     if (!m_cube_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
@@ -69,10 +69,10 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  m_clock_freq = params.find("frequency", found);
+  m_clock_freq = params.find<string>("frequency", found);
   registerClock(m_clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
-  m_mem_size = params.find("mem_size", 1*1024*1024*1024);
+  m_mem_size = params.find<uint64_t>("mem_size", 1*1024*1024*1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
 
   registerAsPrimaryComponent();
@@ -84,7 +84,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   // When MASTER mode, MacSim begins execution right away.
   // When SLAVE mode, MacSim awaits trigger event to arrive, which will cause MacSim to begin execution of a specified kernel.
   //   Upon completion, MacSim will return an event to another SST component.
-  m_operation_mode = params.find("operation_mode", (int)OperationMode::MASTER);
+  m_operation_mode = params.find<int>("operation_mode", (int)OperationMode::MASTER);
   if (m_operation_mode == OperationMode::MASTER) {
     m_triggered = true;
     m_ipc_link = NULL;
