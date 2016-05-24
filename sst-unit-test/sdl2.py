@@ -2,6 +2,8 @@
 import sst
 import os
 
+import math
+
 vault_pwd = os.environ["DRAMSIM2_HOME"]
 if vault_pwd == "":
     vault_pwd = "/home/common/DRAMSim2"
@@ -34,7 +36,6 @@ comp_core0l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -50,7 +51,6 @@ comp_core0l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -66,7 +66,6 @@ comp_core1l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -82,7 +81,6 @@ comp_core1l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -98,7 +96,6 @@ comp_core2l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -114,7 +111,6 @@ comp_core2l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -130,7 +126,6 @@ comp_core3l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -146,7 +141,6 @@ comp_core3l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -162,7 +156,6 @@ comp_core4l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -178,7 +171,6 @@ comp_core4l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -194,7 +186,6 @@ comp_core5l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -210,7 +201,6 @@ comp_core5l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -226,7 +216,6 @@ comp_core6l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -242,7 +231,6 @@ comp_core6l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -258,7 +246,6 @@ comp_core7l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -274,7 +261,6 @@ comp_core7l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -290,7 +276,6 @@ comp_core8l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -306,7 +291,6 @@ comp_core8l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -322,7 +306,6 @@ comp_core9l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -338,7 +321,6 @@ comp_core9l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -354,7 +336,6 @@ comp_core10l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -370,7 +351,6 @@ comp_core10l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -402,7 +382,6 @@ comp_core11l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -418,7 +397,6 @@ comp_core12l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -434,7 +412,6 @@ comp_core12l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -450,7 +427,6 @@ comp_core13l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -466,7 +442,6 @@ comp_core13l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -482,7 +457,6 @@ comp_core14l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -498,7 +472,6 @@ comp_core14l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -514,7 +487,6 @@ comp_core15l1icache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -530,7 +502,6 @@ comp_core15l1dcache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -551,7 +522,6 @@ comp_gpu0l2cache.addParams({
      "associativity" : "8",
      "cache_line_size" : "128",
      "directory_at_next_level" : "0",
-     "statistics" : "1",
      "L1" : "0",
      "cache_size" : "512 KB",
      "mshr_latency_cycles" : "0"
@@ -560,135 +530,156 @@ comp_memory0 = sst.Component("memory0", "memHierarchy.MemController")
 comp_memory0.addParams({
      "debug" : "0",
      "coherence_protocol" : "MESI",
-     "statistics" : "1",
      "clock" : "1 GHz",
      "access_time" : "97 ns",
      "rangeStart" : "0",
      "backend.mem_size" : "4096",
      "backend" : "memHierarchy.vaultsim"
 })
+
+numVaults = 8
+
 comp_ll0 = sst.Component("ll0", "VaultSimC.logicLayer")
 comp_ll0.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
+     "debug" : 0,
+     "debug_level" : 0,
      "clock" : "500Mhz",
-     "vaults" : "8",
-     "terminal" : "1",
-     "llID" : "0",
-     "LL_MASK" : "0",
-     "req_LimitPerCycle" : "32"
+     "vaults" : 8,
+     "terminal" : 1,
+     "llID" : 0,
+     "LL_MASK" : 0,
+     "req_LimitPerWindow" : 2,
+     "req_LimitWindowSize" : 1,
+     "cacheLineSize" : 128
 })
+
 comp_c0_0 = sst.Component("c0.0", "VaultSimC.VaultSimC")
 comp_c0_0.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """0""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 0,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_1 = sst.Component("c0.1", "VaultSimC.VaultSimC")
 comp_c0_1.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """1""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 1,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_2 = sst.Component("c0.2", "VaultSimC.VaultSimC")
 comp_c0_2.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """2""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 2,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_3 = sst.Component("c0.3", "VaultSimC.VaultSimC")
 comp_c0_3.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """3""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 3,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_4 = sst.Component("c0.4", "VaultSimC.VaultSimC")
 comp_c0_4.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """4""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 4,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_5 = sst.Component("c0.5", "VaultSimC.VaultSimC")
 comp_c0_5.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """5""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 5,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_6 = sst.Component("c0.6", "VaultSimC.VaultSimC")
 comp_c0_6.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """6""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 6,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 comp_c0_7 = sst.Component("c0.7", "VaultSimC.VaultSimC")
 comp_c0_7.addParams({
-     "debug" : """0""",
-     "debug_level" : """0""",
-     "clock" : """750Mhz""",
-     "numVaults2" : """3""",
-     "vault.id" : """7""",
-     "vault.debug" : """0""",
-     "vault.debug_level" : """0""",
-     "vault.pwd" : vault_pwd,
-     "vault.device_ini" : """ini/DDR3_micron_8M_2B_x8_sg08.ini""",
-     "vault.system_ini" : """system.ini.example""",
-     "vault.mem_size" : """32"""
+    "debug" : 0,
+    "debug_level" : 0,
+    "clock" : "750Mhz",
+    "num_bit_shift_address_dram" : math.log(numVaults,2),
+    "vault.id" : 7,
+    "vault.debug" : 0,
+    "vault.debug_level" : 0,
+    "vault.pwd" : vault_pwd,
+    "vault.device_ini" : "ini/DDR3_micron_8M_2B_x8_sg08.ini",
+    "vault.system_ini" : "system.ini.example",
+    "vault.mem_size" : 32, #MB
+    "vault.num_dram_banks_per_rank" : 2,          #For HMC atomic bank-locking
+    "cacheLineSize" : 128
 })
 
 
@@ -850,4 +841,3 @@ link_ll2V_0_6.connect( (comp_ll0, "bus_6", "1000ps"), (comp_c0_6, "bus", "1000ps
 link_ll2V_0_7 = sst.Link("link_ll2V_0_7ll2V_0_7")
 link_ll2V_0_7.connect( (comp_ll0, "bus_7", "1000ps"), (comp_c0_7, "bus", "1000ps") )
 # End of generated output.
-

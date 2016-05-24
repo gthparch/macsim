@@ -34,7 +34,7 @@ def main():
 
     ## Compare against reference results
     sdl_filename = os.path.splitext(os.path.basename(test))[0]
-    golden_dir = '{0}/{1}/{2}'.format(refer_dir, trace, sdl_filename) 
+    golden_dir = '{0}/{1}/{2}'.format(refer_dir, trace, sdl_filename)
     result_dir = '{0}/results'.format(os.getcwd())
     #print('golden_dir: {}'.format(golden_dir))
     #print('result_dir: {}'.format(result_dir))
@@ -60,7 +60,7 @@ def main():
 
       if match_fail:
         break
-  
+
     if match_fail:
       print('{0} failed'.format(test))
     else:
@@ -72,5 +72,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-
-

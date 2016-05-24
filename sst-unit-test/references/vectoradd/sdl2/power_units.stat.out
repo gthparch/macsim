@@ -24,15 +24,15 @@ POWER_MC_R                                                      0               
 
 POWER_MC_W                                                      0                             0
 
-POWER_BLOCK_STATES_R_CORE_0                                   931                           931
+POWER_BLOCK_STATES_R_CORE_0                                  1019                          1019
 
-POWER_BLOCK_STATES_W_CORE_0                                   931                           931
+POWER_BLOCK_STATES_W_CORE_0                                  1019                          1019
 
 POWER_FETCH_QUEUE_R_CORE_0                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_0                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_0                                     340                           340
+POWER_INST_QUEUE_R_CORE_0                                     372                           372
 
 POWER_INST_QUEUE_W_CORE_0                                     184                           184
 
@@ -74,7 +74,7 @@ POWER_OPERAND_DECODER_R_CORE_0                                184               
 
 POWER_OPERAND_DECODER_W_CORE_0                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_0                                      340                           340
+POWER_UOP_QUEUE_R_CORE_0                                      372                           372
 
 POWER_UOP_QUEUE_W_CORE_0                                      184                           184
 
@@ -254,15 +254,15 @@ POWER_SHARED_MEM_R_TAG_CORE_0                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_0                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_1                                  1089                          1089
+POWER_BLOCK_STATES_R_CORE_1                                   931                           931
 
-POWER_BLOCK_STATES_W_CORE_1                                  1089                          1089
+POWER_BLOCK_STATES_W_CORE_1                                   931                           931
 
 POWER_FETCH_QUEUE_R_CORE_1                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_1                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_1                                     306                           306
+POWER_INST_QUEUE_R_CORE_1                                     350                           350
 
 POWER_INST_QUEUE_W_CORE_1                                     184                           184
 
@@ -304,7 +304,7 @@ POWER_OPERAND_DECODER_R_CORE_1                                184               
 
 POWER_OPERAND_DECODER_W_CORE_1                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_1                                      306                           306
+POWER_UOP_QUEUE_R_CORE_1                                      350                           350
 
 POWER_UOP_QUEUE_W_CORE_1                                      184                           184
 
@@ -318,7 +318,7 @@ POWER_FREELIST_R_CORE_1                                         0               
 
 POWER_FREELIST_W_CORE_1                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_1                            207                           207
+POWER_RESERVATION_STATION_R_CORE_1                            210                           210
 
 POWER_RESERVATION_STATION_W_CORE_1                            184                           184
 
@@ -484,15 +484,15 @@ POWER_SHARED_MEM_R_TAG_CORE_1                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_1                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_2                                  1041                          1041
+POWER_BLOCK_STATES_R_CORE_2                                  1083                          1083
 
-POWER_BLOCK_STATES_W_CORE_2                                  1041                          1041
+POWER_BLOCK_STATES_W_CORE_2                                  1083                          1083
 
 POWER_FETCH_QUEUE_R_CORE_2                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_2                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_2                                     350                           350
+POWER_INST_QUEUE_R_CORE_2                                     329                           329
 
 POWER_INST_QUEUE_W_CORE_2                                     184                           184
 
@@ -534,7 +534,7 @@ POWER_OPERAND_DECODER_R_CORE_2                                184               
 
 POWER_OPERAND_DECODER_W_CORE_2                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_2                                      350                           350
+POWER_UOP_QUEUE_R_CORE_2                                      329                           329
 
 POWER_UOP_QUEUE_W_CORE_2                                      184                           184
 
@@ -714,15 +714,15 @@ POWER_SHARED_MEM_R_TAG_CORE_2                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_2                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_3                                  1005                          1005
+POWER_BLOCK_STATES_R_CORE_3                                  1043                          1043
 
-POWER_BLOCK_STATES_W_CORE_3                                  1005                          1005
+POWER_BLOCK_STATES_W_CORE_3                                  1043                          1043
 
 POWER_FETCH_QUEUE_R_CORE_3                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_3                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_3                                     351                           351
+POWER_INST_QUEUE_R_CORE_3                                     313                           313
 
 POWER_INST_QUEUE_W_CORE_3                                     184                           184
 
@@ -764,7 +764,7 @@ POWER_OPERAND_DECODER_R_CORE_3                                184               
 
 POWER_OPERAND_DECODER_W_CORE_3                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_3                                      351                           351
+POWER_UOP_QUEUE_R_CORE_3                                      313                           313
 
 POWER_UOP_QUEUE_W_CORE_3                                      184                           184
 
@@ -778,7 +778,7 @@ POWER_FREELIST_R_CORE_3                                         0               
 
 POWER_FREELIST_W_CORE_3                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_3                            210                           210
+POWER_RESERVATION_STATION_R_CORE_3                            206                           206
 
 POWER_RESERVATION_STATION_W_CORE_3                            184                           184
 
@@ -944,9 +944,9 @@ POWER_SHARED_MEM_R_TAG_CORE_3                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_3                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_4                                  1001                          1001
+POWER_BLOCK_STATES_R_CORE_4                                  1021                          1021
 
-POWER_BLOCK_STATES_W_CORE_4                                  1001                          1001
+POWER_BLOCK_STATES_W_CORE_4                                  1021                          1021
 
 POWER_FETCH_QUEUE_R_CORE_4                                    184                           184
 
@@ -1008,7 +1008,7 @@ POWER_FREELIST_R_CORE_4                                         0               
 
 POWER_FREELIST_W_CORE_4                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_4                            206                           206
+POWER_RESERVATION_STATION_R_CORE_4                            210                           210
 
 POWER_RESERVATION_STATION_W_CORE_4                            184                           184
 
@@ -1174,15 +1174,15 @@ POWER_SHARED_MEM_R_TAG_CORE_4                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_4                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_5                                  1001                          1001
+POWER_BLOCK_STATES_R_CORE_5                                  1005                          1005
 
-POWER_BLOCK_STATES_W_CORE_5                                  1001                          1001
+POWER_BLOCK_STATES_W_CORE_5                                  1005                          1005
 
 POWER_FETCH_QUEUE_R_CORE_5                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_5                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_5                                     351                           351
+POWER_INST_QUEUE_R_CORE_5                                     355                           355
 
 POWER_INST_QUEUE_W_CORE_5                                     184                           184
 
@@ -1224,7 +1224,7 @@ POWER_OPERAND_DECODER_R_CORE_5                                184               
 
 POWER_OPERAND_DECODER_W_CORE_5                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_5                                      351                           351
+POWER_UOP_QUEUE_R_CORE_5                                      355                           355
 
 POWER_UOP_QUEUE_W_CORE_5                                      184                           184
 
@@ -1404,15 +1404,15 @@ POWER_SHARED_MEM_R_TAG_CORE_5                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_5                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_6                                  1001                          1001
+POWER_BLOCK_STATES_R_CORE_6                                  1007                          1007
 
-POWER_BLOCK_STATES_W_CORE_6                                  1001                          1001
+POWER_BLOCK_STATES_W_CORE_6                                  1007                          1007
 
 POWER_FETCH_QUEUE_R_CORE_6                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_6                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_6                                     351                           351
+POWER_INST_QUEUE_R_CORE_6                                     358                           358
 
 POWER_INST_QUEUE_W_CORE_6                                     184                           184
 
@@ -1454,7 +1454,7 @@ POWER_OPERAND_DECODER_R_CORE_6                                184               
 
 POWER_OPERAND_DECODER_W_CORE_6                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_6                                      351                           351
+POWER_UOP_QUEUE_R_CORE_6                                      358                           358
 
 POWER_UOP_QUEUE_W_CORE_6                                      184                           184
 
@@ -1468,7 +1468,7 @@ POWER_FREELIST_R_CORE_6                                         0               
 
 POWER_FREELIST_W_CORE_6                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_6                            206                           206
+POWER_RESERVATION_STATION_R_CORE_6                            210                           210
 
 POWER_RESERVATION_STATION_W_CORE_6                            184                           184
 
@@ -1634,15 +1634,15 @@ POWER_SHARED_MEM_R_TAG_CORE_6                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_6                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_7                                  1001                          1001
+POWER_BLOCK_STATES_R_CORE_7                                  1009                          1009
 
-POWER_BLOCK_STATES_W_CORE_7                                  1001                          1001
+POWER_BLOCK_STATES_W_CORE_7                                  1009                          1009
 
 POWER_FETCH_QUEUE_R_CORE_7                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_7                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_7                                     352                           352
+POWER_INST_QUEUE_R_CORE_7                                     361                           361
 
 POWER_INST_QUEUE_W_CORE_7                                     184                           184
 
@@ -1684,7 +1684,7 @@ POWER_OPERAND_DECODER_R_CORE_7                                184               
 
 POWER_OPERAND_DECODER_W_CORE_7                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_7                                      352                           352
+POWER_UOP_QUEUE_R_CORE_7                                      361                           361
 
 POWER_UOP_QUEUE_W_CORE_7                                      184                           184
 
@@ -1864,15 +1864,15 @@ POWER_SHARED_MEM_R_TAG_CORE_7                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_7                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_8                                  1003                          1003
+POWER_BLOCK_STATES_R_CORE_8                                  1011                          1011
 
-POWER_BLOCK_STATES_W_CORE_8                                  1003                          1003
+POWER_BLOCK_STATES_W_CORE_8                                  1011                          1011
 
 POWER_FETCH_QUEUE_R_CORE_8                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_8                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_8                                     352                           352
+POWER_INST_QUEUE_R_CORE_8                                     364                           364
 
 POWER_INST_QUEUE_W_CORE_8                                     184                           184
 
@@ -1914,7 +1914,7 @@ POWER_OPERAND_DECODER_R_CORE_8                                184               
 
 POWER_OPERAND_DECODER_W_CORE_8                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_8                                      352                           352
+POWER_UOP_QUEUE_R_CORE_8                                      364                           364
 
 POWER_UOP_QUEUE_W_CORE_8                                      184                           184
 
@@ -2094,15 +2094,15 @@ POWER_SHARED_MEM_R_TAG_CORE_8                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_8                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_9                                  1003                          1003
+POWER_BLOCK_STATES_R_CORE_9                                  1013                          1013
 
-POWER_BLOCK_STATES_W_CORE_9                                  1003                          1003
+POWER_BLOCK_STATES_W_CORE_9                                  1013                          1013
 
 POWER_FETCH_QUEUE_R_CORE_9                                    184                           184
 
 POWER_FETCH_QUEUE_W_CORE_9                                    184                           184
 
-POWER_INST_QUEUE_R_CORE_9                                     352                           352
+POWER_INST_QUEUE_R_CORE_9                                     367                           367
 
 POWER_INST_QUEUE_W_CORE_9                                     184                           184
 
@@ -2144,7 +2144,7 @@ POWER_OPERAND_DECODER_R_CORE_9                                184               
 
 POWER_OPERAND_DECODER_W_CORE_9                                  0                             0
 
-POWER_UOP_QUEUE_R_CORE_9                                      352                           352
+POWER_UOP_QUEUE_R_CORE_9                                      367                           367
 
 POWER_UOP_QUEUE_W_CORE_9                                      184                           184
 
@@ -2158,7 +2158,7 @@ POWER_FREELIST_R_CORE_9                                         0               
 
 POWER_FREELIST_W_CORE_9                                         0                             0
 
-POWER_RESERVATION_STATION_R_CORE_9                            210                           210
+POWER_RESERVATION_STATION_R_CORE_9                            206                           206
 
 POWER_RESERVATION_STATION_W_CORE_9                            184                           184
 
@@ -2324,15 +2324,15 @@ POWER_SHARED_MEM_R_TAG_CORE_9                                  32               
 
 POWER_SHARED_MEM_W_TAG_CORE_9                                   0                             0
 
-POWER_BLOCK_STATES_R_CORE_10                                 1003                          1003
+POWER_BLOCK_STATES_R_CORE_10                                 1015                          1015
 
-POWER_BLOCK_STATES_W_CORE_10                                 1003                          1003
+POWER_BLOCK_STATES_W_CORE_10                                 1015                          1015
 
 POWER_FETCH_QUEUE_R_CORE_10                                   184                           184
 
 POWER_FETCH_QUEUE_W_CORE_10                                   184                           184
 
-POWER_INST_QUEUE_R_CORE_10                                    352                           352
+POWER_INST_QUEUE_R_CORE_10                                    370                           370
 
 POWER_INST_QUEUE_W_CORE_10                                    184                           184
 
@@ -2374,7 +2374,7 @@ POWER_OPERAND_DECODER_R_CORE_10                               184               
 
 POWER_OPERAND_DECODER_W_CORE_10                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_10                                     352                           352
+POWER_UOP_QUEUE_R_CORE_10                                     370                           370
 
 POWER_UOP_QUEUE_W_CORE_10                                     184                           184
 
@@ -2554,15 +2554,15 @@ POWER_SHARED_MEM_R_TAG_CORE_10                                 32               
 
 POWER_SHARED_MEM_W_TAG_CORE_10                                  0                             0
 
-POWER_BLOCK_STATES_R_CORE_11                                 1003                          1003
+POWER_BLOCK_STATES_R_CORE_11                                 1017                          1017
 
-POWER_BLOCK_STATES_W_CORE_11                                 1003                          1003
+POWER_BLOCK_STATES_W_CORE_11                                 1017                          1017
 
 POWER_FETCH_QUEUE_R_CORE_11                                   184                           184
 
 POWER_FETCH_QUEUE_W_CORE_11                                   184                           184
 
-POWER_INST_QUEUE_R_CORE_11                                    353                           353
+POWER_INST_QUEUE_R_CORE_11                                    380                           380
 
 POWER_INST_QUEUE_W_CORE_11                                    184                           184
 
@@ -2604,7 +2604,7 @@ POWER_OPERAND_DECODER_R_CORE_11                               184               
 
 POWER_OPERAND_DECODER_W_CORE_11                                 0                             0
 
-POWER_UOP_QUEUE_R_CORE_11                                     353                           353
+POWER_UOP_QUEUE_R_CORE_11                                     380                           380
 
 POWER_UOP_QUEUE_W_CORE_11                                     184                           184
 
@@ -2618,7 +2618,7 @@ POWER_FREELIST_R_CORE_11                                        0               
 
 POWER_FREELIST_W_CORE_11                                        0                             0
 
-POWER_RESERVATION_STATION_R_CORE_11                           210                           210
+POWER_RESERVATION_STATION_R_CORE_11                           206                           206
 
 POWER_RESERVATION_STATION_W_CORE_11                           184                           184
 
