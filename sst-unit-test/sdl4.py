@@ -35,7 +35,6 @@ comp_core0l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -50,7 +49,6 @@ comp_core0l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -65,7 +63,6 @@ comp_core1l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -80,7 +77,6 @@ comp_core1l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -95,7 +91,6 @@ comp_core2l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -110,7 +105,6 @@ comp_core2l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -125,7 +119,6 @@ comp_core3l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -140,7 +133,6 @@ comp_core3l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -155,7 +147,6 @@ comp_core4l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -170,7 +161,6 @@ comp_core4l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -185,7 +175,6 @@ comp_core5l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -200,7 +189,6 @@ comp_core5l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -215,7 +203,6 @@ comp_core6l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -230,7 +217,6 @@ comp_core6l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -245,7 +231,6 @@ comp_core7l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -260,7 +245,6 @@ comp_core7l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -275,7 +259,6 @@ comp_core8l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -290,7 +273,6 @@ comp_core8l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -305,7 +287,6 @@ comp_core9l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -320,7 +301,6 @@ comp_core9l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -335,7 +315,6 @@ comp_core10l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -350,7 +329,6 @@ comp_core10l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -365,7 +343,6 @@ comp_core11l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "statistics" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
@@ -381,7 +358,6 @@ comp_core11l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -396,7 +372,6 @@ comp_core12l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -411,7 +386,6 @@ comp_core12l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -426,7 +400,6 @@ comp_core13l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -441,7 +414,6 @@ comp_core13l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -456,7 +428,6 @@ comp_core14l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -471,7 +442,6 @@ comp_core14l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -486,7 +456,6 @@ comp_core15l1icache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -501,7 +470,6 @@ comp_core15l1dcache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -521,7 +489,6 @@ comp_gpu0l2cache.addParams({
      "coherence_protocol" : "MESI",
      "associativity" : "8",
      "cache_line_size" : "128",
-     "directory_at_next_level" : "0",
      "L1" : "0",
      "cache_size" : "512 KB",
      "mshr_latency_cycles" : "0"

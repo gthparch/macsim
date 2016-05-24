@@ -24,7 +24,7 @@ namespace SST { namespace MacSim {
 enum DebugLevel { ERROR, WARNING, INFO, L0, L1, L2, L3, L4, L5, L6 }; // debug level
 enum OperationMode { MASTER, SLAVE }; // mode
 
-class macsimComponent : public SST::Component 
+class macsimComponent : public SST::Component
 {
 public:
     macsimComponent(SST::ComponentId_t id, SST::Params& params);
@@ -51,12 +51,14 @@ private:
     string m_output_dir;
     string m_command_line;
 
+    string m_clock_freq;
+
     macsim_c* m_macsim;
     bool m_sim_running;
     bool m_ptx_core;
     bool m_cube_connected;
     bool m_debug_all;
-    uint64_t m_debug_addr;
+    int64_t m_debug_addr;
     uint64_t m_mem_size;
 
     int m_operation_mode;
@@ -64,14 +66,14 @@ private:
     SST::Link *m_ipc_link;
 
     // links
-    unsigned int m_num_link;
+    uint32_t m_num_link;
     vector<Interfaces::SimpleMem*> m_instruction_cache_links;
     vector<Interfaces::SimpleMem*> m_data_cache_links;
     vector<Interfaces::SimpleMem*> m_const_cache_links;
     vector<Interfaces::SimpleMem*> m_texture_cache_links;
     Interfaces::SimpleMem *m_cube_link;
 
-    // debugging 
+    // debugging
     vector<uint64_t> m_instruction_cache_request_counters;
     vector<uint64_t> m_instruction_cache_response_counters;
     vector<uint64_t> m_data_cache_request_counters;
@@ -95,10 +97,10 @@ private:
     vector<set<uint64_t>> m_texture_cache_responses;
     set<uint64_t> m_cube_responses;
 
-    // callback functions for sending requests; these will be called by macsim 
+    // callback functions for sending requests; these will be called by macsim
     void sendInstructionCacheRequest(int,uint64_t,uint64_t,int);
-#ifdef USE_VAULTSIM_HMC 
-    void sendDataCacheRequest(int,uint64_t,uint64_t,int,int,uint8_t,uint64_t);
+#ifdef USE_VAULTSIM_HMC
+    void sendDataCacheRequest(int,uint64_t,uint64_t,int,int,uint32_t,uint64_t);
 #else
     void sendDataCacheRequest(int,uint64_t,uint64_t,int,int);
 #endif
@@ -106,7 +108,7 @@ private:
     void sendTextureCacheRequest(int,uint64_t,uint64_t,int);
     void sendCubeRequest(uint64_t,uint64_t,int,int);
 
-    // callback functions for strobbing responses; these will be called by macsim 
+    // callback functions for strobbing responses; these will be called by macsim
     bool strobeInstructionCacheRespQ(int,uint64_t);
     bool strobeDataCacheRespQ(int,uint64_t);
     bool strobeConstCacheRespQ(int,uint64_t);

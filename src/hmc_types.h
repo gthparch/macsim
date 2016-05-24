@@ -35,7 +35,7 @@ typedef enum HMC_Type_enum
 
 class hmc_type_c
 {
-    public:    
+    public:
     static std::string HMC_Type2String(HMC_Type hmctype)
     {
         switch(hmctype)
@@ -92,7 +92,7 @@ class hmc_type_c
         else if (name=="std::__detail::_List_node_base::_M_unhook")        return HMC_unhook;
         else if (name=="HMC_TRANS_BEG")     return HMC_TRANS_BEG;
         else if (name=="HMC_TRANS_MID")     return HMC_TRANS_MID;
-        else if (name=="HMC_TRANS_END")     return HMC_TRANS_END; 
+        else if (name=="HMC_TRANS_END")     return HMC_TRANS_END;
         else return HMC_NONE;
     }
 

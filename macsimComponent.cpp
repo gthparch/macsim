@@ -11,10 +11,6 @@
 #include <sst/core/interfaces/stringEvent.h>
 #include <sst/core/interfaces/simpleMem.h>
 
-#ifdef USE_VAULTSIM_HMC  
-#include <sst/elements/memHierarchy/simpleMemHMCExtension.h>
-#endif
-
 #include "src/global_defs.h"
 #include "src/uop.h"
 #include "src/frontend.h"
@@ -32,37 +28,39 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 {
   m_dbg = new Output();
 
-  int debug_level = params.find_integer("debug_level", DebugLevel::ERROR);
-  if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6) 
+  int debug_level = params.find<int>("debug_level", (int)DebugLevel::ERROR);
+  if (debug_level < DebugLevel::ERROR || debug_level > DebugLevel::L6)
     m_dbg->fatal(CALL_INFO, -1, "Debugging level must be between 0 and 9. \n");
 
-  m_debug_addr = (uint64_t)params.find_integer("debug_addr", -1);
+  m_debug_addr = params.find<int64_t>("debug_addr", -1);
   if (m_debug_addr == -1)
     m_debug_all = true;
 
   string prefix = "[" + getName() + "] ";
-  m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)params.find_integer("debug", Output::NONE));
+  int debug_output = params.find<int>("debug", (int)Output::NONE);
+  m_dbg->init(prefix, debug_level, 0, (Output::output_location_t)debug_output);
   MSC_DEBUG("------- Initializing -------\n");
 
-  if (params.find("param_file") == params.end())
+  bool found;
+  m_param_file = params.find<string>("param_file", found);
+  if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find params.in file\n");
-  if (params.find("trace_file") == params.end()) 
+  //
+  m_trace_file = params.find<string>("trace_file", found);
+  if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find trace_file_list file\n");
-  if (params.find("output_dir") == params.end()) 
+  //
+  m_output_dir = params.find<string>("output_dir", found);
+  if (!found)
     m_dbg->fatal(CALL_INFO, -1, "Couldn't find statistics output directory parameter");
 
-  m_param_file = string(params["param_file"]);
-  m_trace_file = string(params["trace_file"]);
-  m_output_dir = string(params["output_dir"]);
+  m_command_line = params.find<string>("command_line", found);
 
-  if (params.find("command_line") != params.end()) 
-    m_command_line = string(params["command_line"]);
-
-  m_ptx_core = params.find_integer("ptx_core", 0);
-  m_num_link = params.find_integer("num_link", 1);
+  m_ptx_core = params.find<bool>("ptx_core", 0);
+  m_num_link = params.find<uint32_t>("num_link", 1);
   configureLinks(params);
 
-  m_cube_connected = params.find_integer("cube_connected", 0);
+  m_cube_connected = params.find<bool>("cube_connected", 0);
   if (m_cube_connected) {
     m_cube_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
     if (!m_cube_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
@@ -71,10 +69,10 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
     m_cube_link = NULL;
   }
 
-  string clock_freq = params.find_string("frequency", "1GHz");
-  registerClock(clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+  m_clock_freq = params.find<string>("frequency", found);
+  registerClock(m_clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
-  m_mem_size = params.find_integer("mem_size", 1*1024*1024*1024);
+  m_mem_size = params.find<uint64_t>("mem_size", 1*1024*1024*1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
 
   registerAsPrimaryComponent();
@@ -86,8 +84,8 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   // When MASTER mode, MacSim begins execution right away.
   // When SLAVE mode, MacSim awaits trigger event to arrive, which will cause MacSim to begin execution of a specified kernel.
   //   Upon completion, MacSim will return an event to another SST component.
-  m_operation_mode = params.find_integer("operation_mode", MASTER);
-  if (m_operation_mode == MASTER) {
+  m_operation_mode = params.find<int>("operation_mode", (int)OperationMode::MASTER);
+  if (m_operation_mode == OperationMode::MASTER) {
     m_triggered = true;
     m_ipc_link = NULL;
     m_macsim->start();
@@ -98,9 +96,9 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
   }
 }
 
-macsimComponent::macsimComponent() : Component(-1) {}  //for serialization only 
+macsimComponent::macsimComponent() : Component(-1) {}  //for serialization only
 
-void macsimComponent::configureLinks(SST::Params& params) 
+void macsimComponent::configureLinks(SST::Params& params)
 {
   for (unsigned int l = 0 ; l < m_num_link; ++l) {
     Interfaces::SimpleMem *icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
@@ -148,7 +146,7 @@ void macsimComponent::configureLinks(SST::Params& params)
   m_instruction_cache_response_counters = std::vector<uint64_t>(m_num_link, 0);
   m_data_cache_request_counters = std::vector<uint64_t>(m_num_link, 0);
   m_data_cache_response_counters = std::vector<uint64_t>(m_num_link, 0);
-  
+
   if (m_ptx_core) {
     m_const_cache_request_counters = std::vector<uint64_t>(m_num_link, 0);
     m_const_cache_response_counters = std::vector<uint64_t>(m_num_link, 0);
@@ -180,7 +178,7 @@ int countTokens(string command_line)
   return count;
 }
 
-void macsimComponent::setup() 
+void macsimComponent::setup()
 {
   MSC_DEBUG("------- Setting up -------\n");
 
@@ -204,15 +202,15 @@ void macsimComponent::setup()
   m_macsim->initialize(argc, argv);
 
   // Cleanup
-  for (int trav = 0; trav < argc; ++trav) 
+  for (int trav = 0; trav < argc; ++trav)
     delete argv[trav];
   delete argv;
 
-  CallbackSendInstructionCacheRequest* sir = 
+  CallbackSendInstructionCacheRequest* sir =
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendInstructionCacheRequest);
-  CallbackSendDataCacheRequest* sdr = 
-#ifdef USE_VAULTSIM_HMC  
-    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t>(this, &macsimComponent::sendDataCacheRequest);
+  CallbackSendDataCacheRequest* sdr =
+#ifdef USE_VAULTSIM_HMC
+    new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int,uint32_t,uint64_t>(this, &macsimComponent::sendDataCacheRequest);
 #else
     new Callback<macsimComponent,void,int,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendDataCacheRequest);
 #endif
@@ -220,15 +218,15 @@ void macsimComponent::setup()
     new Callback<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeInstructionCacheRespQ);
   CallbackStrobeDataCacheRespQ* sdrq =
     new Callback<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeDataCacheRespQ);
-  
+
   if (m_ptx_core) {
-    CallbackSendConstCacheRequest* scr = 
+    CallbackSendConstCacheRequest* scr =
       new Callback<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendConstCacheRequest);
-    CallbackSendTextureCacheRequest* str = 
+    CallbackSendTextureCacheRequest* str =
       new Callback<macsimComponent,void,int,uint64_t,uint64_t,int>(this, &macsimComponent::sendTextureCacheRequest);
-    CallbackStrobeConstCacheRespQ* scrq = 
+    CallbackStrobeConstCacheRespQ* scrq =
       new Callback<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeConstCacheRespQ);
-    CallbackStrobeTextureCacheRespQ* strq = 
+    CallbackStrobeTextureCacheRespQ* strq =
       new Callback<macsimComponent,bool,int,uint64_t>(this, &macsimComponent::strobeTextureCacheRespQ);
 
     m_macsim->registerCallback(sir, sdr, scr, str, sirq, sdrq, scrq, strq);
@@ -237,16 +235,16 @@ void macsimComponent::setup()
   }
 
   if (m_cube_connected) {
-    CallbackSendCubeRequest* scr = 
+    CallbackSendCubeRequest* scr =
       new Callback<macsimComponent,void,uint64_t,uint64_t,int,int>(this, &macsimComponent::sendCubeRequest);
-    CallbackStrobeCubeRespQ* scrq = 
+    CallbackStrobeCubeRespQ* scrq =
       new Callback<macsimComponent,bool,uint64_t>(this, &macsimComponent::strobeCubeRespQ);
 
     m_macsim->registerCallback(scr, scrq);
   }
 }
 
-void macsimComponent::finish() 
+void macsimComponent::finish()
 {
   MSC_DEBUG("------- Finishing simulation -------\n");
   m_macsim->finalize();
@@ -255,11 +253,11 @@ void macsimComponent::finish()
 /*******************************************************
  *  ticReceived
  *    return value
- *      true  : indicates the component finished; 
+ *      true  : indicates the component finished;
  *              no more clock events to the component
  *      false : component not done yet
  *******************************************************/
-bool macsimComponent::ticReceived(Cycle_t) 
+bool macsimComponent::ticReceived(Cycle_t)
 {
   ++m_cycle;
 
@@ -284,18 +282,18 @@ bool macsimComponent::ticReceived(Cycle_t)
   // Run a cycle of the simulator
   m_sim_running = m_macsim->run_a_cycle();
 
-  // Debugging 
+  // Debugging
   if (m_cycle % 100000 == 0) {
     for (unsigned int l = 0 ; l < m_num_link; ++l) {
       if (m_ptx_core) {
-        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu) C$: (%lu, %lu), T$: (%lu, %lu)\n", l, 
-          m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l], 
+        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu) C$: (%lu, %lu), T$: (%lu, %lu)\n", l,
+          m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l],
           m_data_cache_request_counters[l], m_data_cache_response_counters[l],
           m_const_cache_request_counters[l], m_const_cache_response_counters[l],
           m_texture_cache_request_counters[l], m_texture_cache_response_counters[l]);
       } else {
-        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l, 
-          m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l], 
+        MSC_DEBUG("Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu)\n", l,
+          m_instruction_cache_request_counters[l], m_instruction_cache_response_counters[l],
           m_data_cache_request_counters[l], m_data_cache_response_counters[l]);
       }
     }
@@ -307,7 +305,7 @@ bool macsimComponent::ticReceived(Cycle_t)
   }
   // Let SST know that this component is done and could be terminated
   else {
-    if (m_operation_mode == SLAVE) {
+    if (m_operation_mode == OperationMode::SLAVE) {
       // Send a report event to another SST component upon completion
       MacSimEvent *event = new MacSimEvent(FINISHED);
       m_ipc_link->send(event);
@@ -325,15 +323,15 @@ bool macsimComponent::ticReceived(Cycle_t)
 ////////////////////////////////////////
 void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key, uint64_t addr, int size)
 {
-#ifndef USE_VAULTSIM_HMC   
+#ifndef USE_VAULTSIM_HMC
   SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size);
 #else
-  SimpleMem::Request *req = new SimpleMemHMCExtension::HMCRequest(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
-#endif  
+  SimpleMem::Request *req = new SimpleMem::Request(SimpleMem::Request::Read, addr & (m_mem_size-1), size, 0, HMC_NONE);
+#endif
   m_instruction_cache_links[core_id]->sendRequest(req);
   m_instruction_cache_request_counters[core_id]++;
   m_instruction_cache_requests[core_id].insert(make_pair(req->id, key));
-  
+
   if (m_debug_all || m_debug_addr == addr) {
     MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 ", size = %d\n", core_id, addr & 0x3FFFFFFF, addr, size);
   }
@@ -342,7 +340,7 @@ void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key, uin
 bool macsimComponent::strobeInstructionCacheRespQ(int core_id, uint64_t key)
 {
   auto I = m_instruction_cache_responses[core_id].find(key);
-  if (I == m_instruction_cache_responses[core_id].end()) 
+  if (I == m_instruction_cache_responses[core_id].end())
     return false;
   else {
     m_instruction_cache_responses[core_id].erase(I);
@@ -361,14 +359,14 @@ void macsimComponent::handleInstructionCacheEvent(Interfaces::SimpleMem::Request
     } else {
       if (m_debug_all || m_debug_addr == req->addr) {
         MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 "\n", l, req->addr);
-      }     
+      }
       m_instruction_cache_responses[l].insert(i->second);
       m_instruction_cache_response_counters[l]++;
       m_instruction_cache_requests[l].erase(i);
       break;
     }
   }
-  
+
   delete req;
 }
 
@@ -393,7 +391,7 @@ inline bool isStore(Mem_Type type)
 void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type)
 {
   bool doWrite = isStore((Mem_Type)type);
-  SimpleMem::Request *req = 
+  SimpleMem::Request *req =
     new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size);
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
@@ -403,23 +401,21 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
   }
 }
 #else
-void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type,uint8_t hmc_type=0,uint64_t trans_id=0)
+void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t addr, int size, int type, uint32_t hmc_type=0, uint64_t hmc_trans=0)
 {
   bool doWrite = isStore((Mem_Type)type);
   unsigned flag = 0;
-  if ( (hmc_type & 0b10000000) != 0) { 
+  if ( (hmc_type & 0x0080) != 0) {
     flag = SimpleMem::Request::F_NONCACHEABLE;
     hmc_type = hmc_type & 0b01111111;
   }
-  SimpleMem::Request *req = 
-    new SimpleMemHMCExtension::HMCRequest(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type, trans_id);
-  //if (hmc_type!=0) cout<<"HMC: "<<(unsigned)hmc_type<<"\t trans: "<<trans_id
-  //    <<" isStore: "<<doWrite<<endl;
+  SimpleMem::Request *req =
+    new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & (m_mem_size-1), size, flag, hmc_type);
   m_data_cache_links[core_id]->sendRequest(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
   if (m_debug_all || m_debug_addr == addr) {
-    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n", 
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64 "), %s, size = %d\n",
       core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read", size);
   }
 }
@@ -428,7 +424,7 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key, uint64_t a
 bool macsimComponent::strobeDataCacheRespQ(int core_id, uint64_t key)
 {
   auto I = m_data_cache_responses[core_id].find(key);
-  if (I == m_data_cache_responses[core_id].end()) 
+  if (I == m_data_cache_responses[core_id].end())
     return false;
   else {
     m_data_cache_responses[core_id].erase(I);
@@ -454,12 +450,7 @@ void macsimComponent::handleDataCacheEvent(Interfaces::SimpleMem::Request *req)
       break;
     }
   }
-#ifdef USE_VAULTSIM_HMC
-  SimpleMemHMCExtension::HMCRequest *req2 = static_cast<SimpleMemHMCExtension::HMCRequest *>(req);
-  delete req2;
-#else  
   delete req;
-#endif  
 }
 
 ////////////////////////////////////////
@@ -495,7 +486,7 @@ void macsimComponent::handleConstCacheEvent(Interfaces::SimpleMem::Request *req)
 {
   for (unsigned int l = 0; l < m_num_link; ++l) {
     auto i = m_const_cache_requests[l].find(req->id);
-    if (m_const_cache_requests[l].end() == i) { // No matching request      
+    if (m_const_cache_requests[l].end() == i) { // No matching request
       continue;
     } else {
       if (m_debug_all || m_debug_addr == req->addr) {
@@ -507,7 +498,7 @@ void macsimComponent::handleConstCacheEvent(Interfaces::SimpleMem::Request *req)
       break;
     }
   }
-  
+
   delete req;
 }
 
@@ -541,7 +532,7 @@ void macsimComponent::handleTextureCacheEvent(Interfaces::SimpleMem::Request *re
 {
   for (unsigned int l = 0; l < m_num_link; ++l) {
     auto i = m_texture_cache_requests[l].find(req->id);
-    if (m_texture_cache_requests[l].end() == i) { // No matching request      
+    if (m_texture_cache_requests[l].end() == i) { // No matching request
       continue;
     } else {
       if (m_debug_all || m_debug_addr == req->addr) {
@@ -553,7 +544,7 @@ void macsimComponent::handleTextureCacheEvent(Interfaces::SimpleMem::Request *re
       break;
     }
   }
-  
+
   delete req;
 }
 
@@ -565,11 +556,11 @@ void macsimComponent::handleTextureCacheEvent(Interfaces::SimpleMem::Request *re
 void macsimComponent::sendCubeRequest(uint64_t key, uint64_t addr, int size, int type)
 {
   bool doWrite = isStore((Mem_Type)type);
-  SimpleMem::Request *req = 
+  SimpleMem::Request *req =
     new SimpleMem::Request(doWrite ? SimpleMem::Request::Write : SimpleMem::Request::Read, addr & 0x3FFFFFFF, size);
   m_cube_link->sendRequest(req);
   if (m_debug_all || m_debug_addr == addr) {
-    MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64 "), %s %s, size = %d\n", 
+    MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64 "), %s %s, size = %d\n",
       addr & 0x3FFFFFFF, addr, (type == -1) ? "instruction" : "data",  doWrite ? "write" : "read", size);
   }
   m_cube_requests.insert(make_pair(req->id, key));
@@ -578,7 +569,7 @@ void macsimComponent::sendCubeRequest(uint64_t key, uint64_t addr, int size, int
 bool macsimComponent::strobeCubeRespQ(uint64_t key)
 {
   auto I = m_cube_responses.find(key);
-  if (I == m_cube_responses.end()) 
+  if (I == m_cube_responses.end())
     return false;
   else {
     m_cube_responses.erase(I);

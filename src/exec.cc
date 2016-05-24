@@ -742,7 +742,7 @@ void exec_c::run_a_cycle(void)
             //Cache Hit: +ALU delay +one L1 hit
           if (mem_delay < 150)
           {
-            STAT_CORE_EVENT(m_core_id, HMC_ADD_OVERHEAD_COUNT); 
+            STAT_CORE_EVENT(m_core_id, HMC_ADD_OVERHEAD_COUNT);
             uop->m_done_cycle += *KNOB(KNOB_HMC_TEST_OVERHEAD);
           }
         }
@@ -804,18 +804,18 @@ int exec_c::access_data_cache(uop_c* uop)
 
   //core_c *core = m_simBase->m_core_pointers[m_core_id];
 #ifdef USE_VAULTSIM_HMC
-    uint8_t hmc_type = uop->m_hmc_inst;
+    uint32_t hmc_type = uop->m_hmc_inst;
     //if (hmc_type!=0) HMC_EVENT_COUNT(m_core_id, hmc_type);
     if (*KNOB(KNOB_DEBUG_HMC)) {
       if (hmc_type!=0) {
 	// cout<<"-HMC- "<<uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<endl;
 	DEBUG_HMC_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu unique_num:%llu pc:%llx va:%llx hmc_type:%d trans_id:%d\n",
-		       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, uop->m_pc, uop->m_vaddr, (int)hmc_type, (int)uop->m_hmc_trans_id);
+		       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, uop->m_pc, uop->m_vaddr, hmc_type, (int)uop->m_hmc_trans_id);
       }
     }
     // mark highest bit if enabled cache bypass
     if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
-        hmc_type = hmc_type | 0b10000000;
+        hmc_type = hmc_type | 0x0080;
     uint64_t trans_id = uop->m_hmc_trans_id;
     if (! *KNOB(KNOB_ENABLE_HMC_TRANS)) trans_id = 0;
 

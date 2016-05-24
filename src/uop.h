@@ -1,28 +1,28 @@
 /*
 Copyright (c) <2012>, <Georgia Institute of Technology> All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted 
+Redistribution and use in source and binary forms, with or without modification, are permitted
 provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions 
+Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
 
-Redistributions in binary form must reproduce the above copyright notice, this list of 
-conditions and the following disclaimer in the documentation and/or other materials provided 
+Redistributions in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or other materials provided
 with the distribution.
 
-Neither the name of the <Georgia Institue of Technology> nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior 
+Neither the name of the <Georgia Institue of Technology> nor the names of its contributors
+may be used to endorse or promote products derived from this software without specific prior
 written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -113,8 +113,8 @@ typedef enum Uop_Type_enum {
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,
   UOP_GPU_ABS64,
-  UOP_GPU_ADD, 
-  UOP_GPU_ADD64, 
+  UOP_GPU_ADD,
+  UOP_GPU_ADD64,
 	UOP_GPU_ADDC,
 	UOP_GPU_AND,
 	UOP_GPU_AND64,
@@ -253,8 +253,8 @@ typedef enum Uop_Type_enum {
 
   UOP_GPU_FABS,
   UOP_GPU_FABS64,
-  UOP_GPU_FADD, 
-  UOP_GPU_FADD64, 
+  UOP_GPU_FADD,
+  UOP_GPU_FADD64,
 	UOP_GPU_FADDC,
 	UOP_GPU_FAND,
 	UOP_GPU_FAND64,
@@ -411,13 +411,13 @@ typedef enum Mem_Type_enum {
   MEM_SWPREF_T0,
   MEM_SWPREF_T1,
   MEM_SWPREF_T2,
-  MEM_LD_LM,                    //!< local memory access in PTX 
-  MEM_LD_SM,                    //!< shared memory access in PTX 
-  MEM_LD_GM,                    //!< global memory access in PTX 
-  MEM_ST_LM,                    //!< local memory access in PTX 
-  MEM_ST_SM,                    //!< shared memory access in PTX 
-  MEM_ST_GM,                    //!< global memory access in PTX 
-  MEM_LD_CM,                    //!< load from constant memory in PTX 
+  MEM_LD_LM,                    //!< local memory access in PTX
+  MEM_LD_SM,                    //!< shared memory access in PTX
+  MEM_LD_GM,                    //!< global memory access in PTX
+  MEM_ST_LM,                    //!< local memory access in PTX
+  MEM_ST_SM,                    //!< shared memory access in PTX
+  MEM_ST_GM,                    //!< global memory access in PTX
+  MEM_LD_CM,                    //!< load from constant memory in PTX
   MEM_LD_TM,                    //!< load from texture memory in PTX
   MEM_LD_PM,                    //!< load from parameter memory in PTX
   NUM_MEM_TYPES,
@@ -428,7 +428,7 @@ typedef enum Bar_Type_enum {
   NOT_BAR       = 0x0,          //!< not a barrier-causing instruction
   BAR_FETCH     = 0x1,          //!< causes fetch to halt until a redirect occurs
   BAR_ISSUE     = 0x2,          //!< causes issue to serialize around the instruction
-  PTX_BLOCK_BAR = 0x3,          //!< synchronizations with a block 
+  PTX_BLOCK_BAR = 0x3,          //!< synchronizations with a block
   ACQ_BAR       = 0x4,          //!< Acquire barrier, not used
   REL_BAR       = 0x5,          //!< Release barrier
 } Bar_Type;
@@ -514,7 +514,7 @@ class  uop_info_c
     bool  m_originally_mispred; /**< branch was originally mispredicted */
     bool  m_originally_misfetch; /**< branch was originally misfetched */
     bool  m_btb_miss;           /**< target is not known at prediction time */
-    bool  m_btb_miss_resolved;  /**< btb miss is handled */ 
+    bool  m_btb_miss_resolved;  /**< btb miss is handled */
     bool  m_no_target;          /**< no target for this branch at prediction time */
     bool  m_ibp_miss;           /**< indirect branch miss */
     bool  m_icmiss;             /**< instruction cache miss */
@@ -534,7 +534,7 @@ class recovery_info_c
 {
   public:
     /**
-     * Constructor 
+     * Constructor
      */
     recovery_info_c() {}
 
@@ -580,7 +580,7 @@ class uop_c
      * Allocate (set)
      */
     void allocate();
-    
+
     static const char *g_mem_type_name[NUM_MEM_TYPES]; /**< uop memory type string */
     static const char *g_uop_state_name[NUM_OP_STATES]; /**< uop state string */
     static const char *g_cf_type_name[NUM_CF_TYPES]; /**< branch type string */
@@ -647,7 +647,7 @@ class uop_c
     uop_c           **m_child_uops; /**< children uops */
     uop_c            *m_parent_uop; /**< parent uop */
     uns64             m_pending_child_uops; /**< pending child uops vector */
-    mem_req_s *       m_req; /**< pointer to memory request */ 
+    mem_req_s *       m_req; /**< pointer to memory request */
     bool              m_uncoalesced_flag; /**< uncoalesced flag */
     Counter           m_mem_start_cycle; /**< mem start cycle */
     bool              m_req_sb; /**< need store buffer */
@@ -659,7 +659,7 @@ class uop_c
     bool              m_skip_llc; /**< skip last level cache */
     uint16_t          m_mem_version; /**< version number for load/store */
 
-    // hmc info 
+    // hmc info
     // changed by Lifeng
     HMC_Type m_hmc_inst;  /**< hmc type of current uop*/
     uint64_t m_hmc_trans_id;
@@ -670,4 +670,3 @@ class uop_c
 };
 
 #endif  // UOP_H_INCLUDED
-

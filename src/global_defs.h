@@ -1,28 +1,28 @@
 /*
 Copyright (c) <2012>, <Georgia Institute of Technology> All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted 
+Redistribution and use in source and binary forms, with or without modification, are permitted
 provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions 
+Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
 
-Redistributions in binary form must reproduce the above copyright notice, this list of 
-conditions and the following disclaimer in the documentation and/or other materials provided 
+Redistributions in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or other materials provided
 with the distribution.
 
-Neither the name of the <Georgia Institue of Technology> nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior 
+Neither the name of the <Georgia Institue of Technology> nor the names of its contributors
+may be used to endorse or promote products derived from this software without specific prior
 written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -148,7 +148,7 @@ typedef struct thread_s thread_s;
 typedef struct Hash_Table_struct Hash_Table;
 typedef struct pref_info_s pref_info_s;
 typedef struct HWP_Struct HWP;
-typedef struct gpu_allocq_entry_s gpu_allocq_entry_s; 
+typedef struct gpu_allocq_entry_s gpu_allocq_entry_s;
 typedef struct thread_stat_s thread_stat_s;
 
 
@@ -157,9 +157,9 @@ typedef struct thread_stat_s thread_stat_s;
 // Function declarations
 
 
-void init_block_schedule_info(void); 
+void init_block_schedule_info(void);
 void terminate_process(process_s*);
-void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);  
+void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,17 +172,17 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 #define MAX_GPU_CACHE_LEVEL GPU_CACHE_LAST
 #define MAX_GPU_FENCE_LEVEL GPU_FENCE_LAST
 
-#define MAX_PUP 256 
+#define MAX_PUP 256
 //per core
 #define MAX_NUM_THREADS 3000
-#define MAX_NUM_BLOCKS 64 
+#define MAX_NUM_BLOCKS 64
 // across all the cores
 #define MAX_NUM_TOTAL_BLOCKS 16384
 #define MAX_NUM_CORES 128
 // #define NUM_REG_IDS 1024
-#define NUM_REG_IDS 1600 
+#define NUM_REG_IDS 1600
 #define NUM_INT_REGS 32
-#define MAX_UOP_SRC_DEPS 10 // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009 
+#define MAX_UOP_SRC_DEPS 10 // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009
 #define MAX_DRAM_BANKS 32
 #define MAX_SRCS    9
 #define MAX_DESTS   6
@@ -220,7 +220,7 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 #include "callback.h"
 typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendInstructionCacheRequest;
 #ifdef USE_VAULTSIM_HMC
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint8_t,uint64_t> CallbackSendDataCacheRequest;
+typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint32_t,uint64_t> CallbackSendDataCacheRequest;
 #else
 typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int> CallbackSendDataCacheRequest;
 #endif
