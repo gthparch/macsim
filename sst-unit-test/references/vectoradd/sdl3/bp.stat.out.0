@@ -1,0 +1,288 @@
+BP_MISPRED_STALL_CORE_0                                         0                             0
+
+BP_RESOLVED_CORE_0                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_0                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_0                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_0                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_0                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_0                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_0                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_0                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_0                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_1                                         0                             0
+
+BP_RESOLVED_CORE_1                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_1                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_1                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_1                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_1                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_1                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_1                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_1                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_1                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_2                                         0                             0
+
+BP_RESOLVED_CORE_2                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_2                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_2                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_2                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_2                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_2                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_2                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_2                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_2                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_3                                         0                             0
+
+BP_RESOLVED_CORE_3                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_3                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_3                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_3                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_3                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_3                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_3                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_3                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_3                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_4                                         0                             0
+
+BP_RESOLVED_CORE_4                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_4                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_4                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_4                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_4                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_4                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_4                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_4                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_4                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_5                                         0                             0
+
+BP_RESOLVED_CORE_5                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_5                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_5                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_5                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_5                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_5                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_5                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_5                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_5                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_6                                         0                             0
+
+BP_RESOLVED_CORE_6                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_6                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_6                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_6                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_6                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_6                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_6                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_6                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_6                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_7                                         0                             0
+
+BP_RESOLVED_CORE_7                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_7                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_7                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_7                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_7                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_7                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_7                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_7                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_7                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_8                                         0                             0
+
+BP_RESOLVED_CORE_8                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_8                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_8                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_8                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_8                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_8                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_8                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_8                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_8                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_9                                         0                             0
+
+BP_RESOLVED_CORE_9                                              0                             0
+
+BP_REDIRECT_RESOLVED_CORE_9                                     0                             0
+
+PERFECT_TARGET_PRED_CORE_9                                      0                             0
+
+BP_ON_PATH_CORRECT_CORE_9                                      16                           100%
+BP_ON_PATH_MISPREDICT_CORE_9                                    0                             0%
+BP_ON_PATH_MISFETCH_CORE_9                                      0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_9                                      0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_9                                   0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_9                                     0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_10                                        0                             0
+
+BP_RESOLVED_CORE_10                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_10                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_10                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_10                                     16                           100%
+BP_ON_PATH_MISPREDICT_CORE_10                                   0                             0%
+BP_ON_PATH_MISFETCH_CORE_10                                     0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_10                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_10                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_10                                    0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_11                                        0                             0
+
+BP_RESOLVED_CORE_11                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_11                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_11                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_11                                     16                           100%
+BP_ON_PATH_MISPREDICT_CORE_11                                   0                             0%
+BP_ON_PATH_MISFETCH_CORE_11                                     0                             0%
+                                                               16                           100%
+
+BP_OFF_PATH_CORRECT_CORE_11                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_11                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_11                                    0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_12                                        0                             0
+
+BP_RESOLVED_CORE_12                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_12                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_12                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_12                                      0                          NaN 
+BP_ON_PATH_MISPREDICT_CORE_12                                   0                          NaN 
+BP_ON_PATH_MISFETCH_CORE_12                                     0                          NaN 
+                                                                0                           100%
+
+BP_OFF_PATH_CORRECT_CORE_12                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_12                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_12                                    0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_13                                        0                             0
+
+BP_RESOLVED_CORE_13                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_13                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_13                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_13                                      0                          NaN 
+BP_ON_PATH_MISPREDICT_CORE_13                                   0                          NaN 
+BP_ON_PATH_MISFETCH_CORE_13                                     0                          NaN 
+                                                                0                           100%
+
+BP_OFF_PATH_CORRECT_CORE_13                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_13                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_13                                    0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_14                                        0                             0
+
+BP_RESOLVED_CORE_14                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_14                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_14                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_14                                      0                          NaN 
+BP_ON_PATH_MISPREDICT_CORE_14                                   0                          NaN 
+BP_ON_PATH_MISFETCH_CORE_14                                     0                          NaN 
+                                                                0                           100%
+
+BP_OFF_PATH_CORRECT_CORE_14                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_14                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_14                                    0                          NaN 
+                                                                0                           100%
+
+BP_MISPRED_STALL_CORE_15                                        0                             0
+
+BP_RESOLVED_CORE_15                                             0                             0
+
+BP_REDIRECT_RESOLVED_CORE_15                                    0                             0
+
+PERFECT_TARGET_PRED_CORE_15                                     0                             0
+
+BP_ON_PATH_CORRECT_CORE_15                                      0                          NaN 
+BP_ON_PATH_MISPREDICT_CORE_15                                   0                          NaN 
+BP_ON_PATH_MISFETCH_CORE_15                                     0                          NaN 
+                                                                0                           100%
+
+BP_OFF_PATH_CORRECT_CORE_15                                     0                          NaN 
+BP_OFF_PATH_MISPREDICT_CORE_15                                  0                          NaN 
+BP_OFF_PATH_MISFETCH_CORE_15                                    0                          NaN 
+                                                                0                           100%
+

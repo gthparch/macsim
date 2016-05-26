@@ -10,11 +10,11 @@ num_sim_large_cores 0
 
 # Clock
 # from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
-clock_cpu 3.2
-clock_gpu 1.6
-clock_l3  1.6
-clock_noc 1.6
-clock_mc  0.8
+clock_cpu 4.0
+clock_gpu 4.0
+clock_l3  4.0
+clock_noc 4.0
+clock_mc  4.0
 
 
 # Small Core Configuration
@@ -24,14 +24,14 @@ fetch_latency 5
 alloc_latency 5
 rob_size 1024
 schedule ooo
-isched_rate 4 
-msched_rate 2 
-fsched_rate 2 
+isched_rate 4
+msched_rate 2
+fsched_rate 2
 bp_hist_length 14
 max_block_per_core 4
 fetch_policy rr
 mt_no_fetch_br 1
-fetch_only_load_ready 0 
+fetch_only_load_ready 0
 schedule_ratio 2
 fetch_ratio 2
 gpu_sched 1
@@ -67,7 +67,7 @@ l3_num_set 128
 l3_line_size 128
 l3_assoc 8
 l3_num_bank 4
-l3_latency 10 
+l3_latency 10
 
 
 # DRAM
@@ -120,4 +120,3 @@ debug_trace_read 0
 debug_sim_thread_schedule 0
 debug_cache_lib 0
 debug_bp_dir 0
-
