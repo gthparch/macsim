@@ -26,7 +26,7 @@ There are two paths to using ocelot for trace generation:
 - Now you should be able to see your nfs home
 - This is a barebones ubuntu installation. So it won't have many packages that you are used to. You'll have to install them yourself using apt-get. 
 - ocelot is located at /usr/local/src/gpuocelot, and it has already been installed. You can link your application to it directly.
-- **Important: Root inside the privileged container has total access to the host too. Use it with caution. For development, use the user you created and use sudo for system commands.** 
+- **Important: Root inside the privileged container has total access to the host too. Use it with caution. For development, use the user you created and use sudo for system commands. It should be possible to launch the container in unpriveleged mode, but it probably needs some SELinux changes, at least on RHEL. On Ubunutu, the unpriviledged mode might just work out of the box.** 
 - The docker image is updated whenever someone pushes changes to our fork of gpuocelot on github. You'll have to do a docker pull to get the latest image when that happens. 
 - gpuocelot needs gcc/g++ 4.6 for compilation. However, gpu applications that link against ocelot have better compatibility with gcc/g++ 4.4. 
 - When you drop into the docker container, the default gcc/g++ version is set to 4.4 since the assumption is that you are using this container to generate traces. If you want to modify and recompile ocelot itself, you should change it to 4.6 first by calling "update-alternatives --set gcc "/usr/bin/gcc-4.6" && update-alternatives --set g++ "/usr/bin/g++-4.6" as the root user. Change it back to 4.4 before you compile your applications. 
