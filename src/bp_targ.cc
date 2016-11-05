@@ -70,10 +70,11 @@ Addr bp_targ_c::pred (uop_c *uop)
   Addr* return_addr_ptr = NULL;
   bool perfect_pred = false; 
   
-  perfect_pred = (m_simBase->m_knobs->KNOB_PERFECT_BTB); 
+  perfect_pred = *KNOB(KNOB_PERFECT_BTB); 
 
   if (perfect_pred) { 
-    return_addr = uop->m_npc; 
+    // return_addr = uop->m_npc;  // bug: perfect BTB return is target addr 
+		return_addr  = uop->m_target_addr; 
     STAT_CORE_EVENT(m_core_id, PERFECT_TARGET_PRED); 
   }
   else { 
@@ -87,6 +88,11 @@ Addr bp_targ_c::pred (uop_c *uop)
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
   uop->m_uop_info.m_btb_set = set; 
 
+	DEBUG("BTB pred  pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
+      "btb_line:0x%llx set:%d tag:0x%llx \n",
+      uop->m_pc, uop->m_target_addr, uop->m_uop_num,
+			 m_core_id, uop->m_thread_id, uop->m_cf_type, (return_addr_ptr) ? (Addr)(*return_addr_ptr) : -1, 
+      set, tag);
   return return_addr; 
 }
 
@@ -113,6 +119,11 @@ void bp_targ_c::update (uop_c *uop)
         false); 
     insert_btb = true; 
   }
+  DEBUG("BEFORE---Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
+      "btb_line:0x%llx set:%d tag:0x%llx insert_btb:%d\n",
+      uop->m_pc, uop->m_target_addr, uop->m_uop_num,
+      m_core_id, uop->m_thread_id, uop->m_cf_type, (btb_line) ? (Addr)(*btb_line) : -1, 
+      set, tag, insert_btb);
 
   *btb_line = uop->m_target_addr; 
 

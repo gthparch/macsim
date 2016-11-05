@@ -227,7 +227,7 @@ void frontend_c::run_a_cycle(void)
     // get thread id to fetch
     int fetch_thread = fetch();
 
-    DEBUG_CORE(m_core_id, "m_core_id:%d frontend fetch thread is:%d \n", m_core_id, fetch_thread);
+    //DEBUG_CORE(m_core_id, "m_core_id:%d frontend fetch thread is:%d \n", m_core_id, fetch_thread);
 
     // nothing to fetch
     if (fetch_thread == -1) {
@@ -241,8 +241,8 @@ void frontend_c::run_a_cycle(void)
 
     // in case of double fetch, stop fetching if second thread is not available
     if (prev_fetched_tid == fetch_thread) {
-      DEBUG_CORE(m_core_id, "same thread id m_core_id:%d tid:%d prev_tid:%d\n",
-          m_core_id, fetch_thread, prev_fetched_tid);
+     // DEBUG_CORE(m_core_id, "same thread id m_core_id:%d tid:%d prev_tid:%d\n",
+          // m_core_id, fetch_thread, prev_fetched_tid);
       break;
     }
 
@@ -297,7 +297,7 @@ void frontend_c::run_a_cycle(void)
             fetch_data->m_fe_mode = FRONTEND_MODE_IFETCH;
           }
           else {
-            DEBUG_CORE(m_core_id, "fetch stalled m_core_id:%d tid:%d\n", m_core_id, fetch_thread);
+            // DEBUG_CORE(m_core_id, "fetch stalled m_core_id:%d tid:%d\n", m_core_id, fetch_thread);
           }
           break;
 
@@ -507,6 +507,8 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
         if (new_uop->m_cf_type) {
           // btb prediction 
           bool btb_miss = btb_access(new_uop); 
+					
+					new_uop->m_uop_info.m_btb_miss = btb_miss; 
 
           // branch prediction 
           br_mispred = predict_bpu(new_uop);
@@ -518,7 +520,8 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
           // However, just to get some stats, we allow bp accesses. 
           // This might be changed in future 
 
-          if (btb_miss & !br_mispred)
+          // if (btb_miss & !br_mispred)
+					if (btb_miss)
             STAT_CORE_EVENT(m_core_id, BP_ON_PATH_MISFETCH+(new_uop->m_off_path)*3);
 
 
@@ -757,10 +760,7 @@ int frontend_c::predict_bpu(uop_c *uop)
     case CF_BR:
       // 100 % accurate
     case CF_CBR:
-      if (*KNOB(KNOB_ENABLE_BTB))
-        pred_dir = (m_bp_data->m_bp_targ_pred)->pred(uop);
-      else
-        pred_dir = (m_bp_data->m_bp)->pred(uop);
+			pred_dir = (m_bp_data->m_bp)->pred(uop);
       mispredicted = (pred_dir != uop->m_dir);
       POWER_CORE_EVENT(m_core_id, POWER_BR_PRED_R);
       break;
@@ -787,6 +787,8 @@ int frontend_c::predict_bpu(uop_c *uop)
       break;
   }
 
+	if (uop->m_uop_info.m_btb_miss == true) 
+		mispredicted = true; // overwrite branch misprediction outcome 
 
   if (*m_simBase->m_knobs->KNOB_USE_BRANCH_PREDICTION) {
     // do nothing
@@ -823,8 +825,9 @@ bool frontend_c::btb_access(uop_c *uop)
 
   bool btb_miss = false; 
   Addr pred_targ_addr = m_bp_data->m_bp_targ_pred->pred(uop);
-  if (pred_targ_addr != uop->m_npc) 
-    btb_miss = true; 
+	//  if (pred_targ_addr != uop->m_npc) 
+	if (pred_targ_addr != uop->m_target_addr) // please check target addr   
+    btb_miss = true;   // here BTB miss means BTB misprediction 
 
   uop->m_uop_info.m_btb_miss = btb_miss; 
 
@@ -854,9 +857,9 @@ int frontend_c::fetch_rr(void)
   int try_again = 1;
   int fetch_id = -1;
 
-  DEBUG_CORE(m_core_id, "m_core_id:%d m_running_thread_num:%d m_fetching_thread_num:%d "
-      "m_unique_scheduled_thread_num:%d \n",m_core_id, m_running_thread_num,
-      m_fetching_thread_num, m_unique_scheduled_thread_num);
+  // DEBUG_CORE(m_core_id, "m_core_id:%d m_running_thread_num:%d m_fetching_thread_num:%d "
+    //  "m_unique_scheduled_thread_num:%d \n",m_core_id, m_running_thread_num,
+     // m_fetching_thread_num, m_unique_scheduled_thread_num);
 
   int max_try = m_unique_scheduled_thread_num - m_last_terminated_tid;
 
@@ -930,7 +933,7 @@ int frontend_c::fetch_rr(void)
   if (try_again > max_try) 
     fetch_id = -1;
 
-  DEBUG_CORE(m_core_id, "m_core_id:%d try_agin:%d tid:%d\n", m_core_id, try_again, fetch_id);
+  // DEBUG_CORE(m_core_id, "m_core_id:%d try_agin:%d tid:%d\n", m_core_id, try_again, fetch_id);
 
   return fetch_id;
 }
