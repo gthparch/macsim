@@ -93,7 +93,7 @@ typedef enum IGPU_OPCODE_ENUM_ {
   IGPU_INS_LAST, // To mark the end of the list of instructions
 } IGPU_OPCODE;
 
-static const char* igpu_opcode_names[IGPU_INS_ENDING] =  {
+static const char* igpu_opcode_names[IGPU_INS_LAST] =  {
   "IGPU_INS_INVALID",
   "IGPU_INS_3DNOW",
   "IGPU_INS_AES",
