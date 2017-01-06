@@ -53,7 +53,7 @@ void igpu_decoder_c::init_pin_convert()
   m_int_uop_table[IGPU_INS_ROTATE]         = UOP_SHIFT;
   m_int_uop_table[IGPU_INS_SEGOP]          = UOP_IADD;
   m_int_uop_table[IGPU_INS_SEMAPHORE]      = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT
+  m_int_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT;
   m_int_uop_table[IGPU_INS_SSE]            = UOP_FADD;
   m_int_uop_table[IGPU_INS_STRINGOP]       = UOP_IADD;
   m_int_uop_table[IGPU_INS_STTNI]          = UOP_IADD;
@@ -119,9 +119,9 @@ void igpu_decoder_c::init_pin_convert()
   m_fp_uop_table[IGPU_INS_RDWRFSGS]       = UOP_IADD;
   m_fp_uop_table[IGPU_INS_RET]            = UOP_FADD;
   m_fp_uop_table[IGPU_INS_ROTATE]         = UOP_SHIFT;
-  m_fp_uop_table[IGPU_INS_SEGOP]          = UOP_ADD;
-  m_fp_uop_table[IGPU_INS_SEMAPHORE]      = UOP_ADD;
-  m_fp_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT
+  m_fp_uop_table[IGPU_INS_SEGOP]          = UOP_FADD;
+  m_fp_uop_table[IGPU_INS_SEMAPHORE]      = UOP_FADD;
+  m_fp_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT;
   m_fp_uop_table[IGPU_INS_SSE]            = UOP_FADD;
   m_fp_uop_table[IGPU_INS_STRINGOP]       = UOP_FADD;
   m_fp_uop_table[IGPU_INS_STTNI]          = UOP_FADD;
