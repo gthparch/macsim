@@ -383,7 +383,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     ASSERTM(0, "error reading from file:%s", appl.c_str());
 
   int trace_ver = -1;
-  if (trace_type != "x86" && trace_type != "a64") {
+  if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -510,7 +510,7 @@ void process_manager_c::setup_process(process_s* process)
 
   
   int trace_ver = -1;
-  if (trace_type != "x86" && trace_type != "a64") {
+  if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -785,6 +785,9 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
     } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
       trace_info->m_prev_trace_info = new trace_info_a64_s;
       trace_info->m_next_trace_info = new trace_info_a64_s;
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+      trace_info->m_prev_trace_info = new trace_info_igpu_s;
+      trace_info->m_next_trace_info = new trace_info_igpu_s;
     } else {
       ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
@@ -990,6 +993,11 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
       trace_info_a64_s *temp = static_cast<trace_info_a64_s*>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_a64_s*>(trace_info->m_next_trace_info);
+      delete temp;
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+      trace_info_igpu_s *temp = static_cast<trace_info_igpu_s*>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_igpu_s*>(trace_info->m_next_trace_info);
       delete temp;
     } else {
       ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());

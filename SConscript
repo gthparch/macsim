@@ -269,6 +269,7 @@ macsim_src = [
   'src/trace_read_cpu.cc',
   'src/trace_read_gpu.cc',
   'src/trace_read_a64.cc',
+  'src/trace_read_igpu.cc',
   'src/page_mapping.cc',
   'src/dyfr.cc',
   'src/hmc_process.cc',

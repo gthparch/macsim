@@ -59,6 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "trace_read_cpu.h"
 #include "trace_read_a64.h"
+#include "trace_read_igpu.h"
 #include "trace_read_gpu.h"
 
 #ifdef USING_QSIM
@@ -758,6 +759,8 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c* simBase)
     m_cpu_decoder = new cpu_decoder_c(simBase, m_dprint_output);
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64")
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
+  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
+    m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
   }

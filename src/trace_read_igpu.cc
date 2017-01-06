@@ -175,7 +175,6 @@ inst_info_s* igpu_decoder_c::get_inst_info(thread_s *thread_trace_info, int core
   return info;
 }
 
-// TODO
 inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_s **trace_uop, 
                                                     int core_id, int sim_thread_id)
 {
@@ -258,7 +257,7 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
         }
       }
 
-      // trace_uop[0]->m_mem_size = 4; // TODO: CHECK LATER
+      trace_uop[0]->m_mem_size = 4;
       trace_uop[0]->m_cf_type = NOT_CF;
       trace_uop[0]->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
       trace_uop[0]->m_bar_type = NOT_BAR;
@@ -367,49 +366,14 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
     /// 3. Instruction has a branch operation
     ///
     if (pi->m_cf_type) {
-      assert(num_uop == 0);
       trace_uop_s* cur_trace_uop = trace_uop[num_uop++];
 
       if (inst_has_ld_uop)
         tmp_reg_needed = true;
    
       cur_trace_uop->m_mem_type      = NOT_MEM;
-      // TODO
-      switch (pi->m_opcode) {
-      case IGPU_INS_B:
-      case IGPU_INS_BR:
-        cur_trace_uop->m_cf_type   = CF_BR;
-        break;
-
-      case IGPU_INS_CBNZ:
-      case IGPU_INS_CBZ:
-      case IGPU_INS_TBNZ:
-      case IGPU_INS_TBZ:
-        cur_trace_uop->m_cf_type   = CF_CBR;
-        break;
-
-      case IGPU_INS_BL:
-      case IGPU_INS_BLR:
-        cur_trace_uop->m_cf_type   = CF_CALL;
-        break;
-
-      case IGPU_INS_BRK:
-      case IGPU_INS_HLT:
-      case IGPU_INS_HVC:
-      case IGPU_INS_SMC:
-      case IGPU_INS_SVC:
-        cur_trace_uop->m_cf_type   = CF_IBR;
-        break;
-
-        /* not currently mapped
-           cur_trace_uop->m_cf_type   = CF_ICALL;
-           cur_trace_uop->m_cf_type   = CF_ICO;
-        */
-      case IGPU_INS_RET:
-      case IGPU_INS_ERET:
-        cur_trace_uop->m_cf_type   = CF_RET;
-        break;
-      }
+      cur_trace_uop->m_cf_type       = (Cf_Type)((pi->m_cf_type >= PIN_CF_SYS) ? 
+          CF_ICO : pi->m_cf_type);
       cur_trace_uop->m_op_type       = UOP_CF;
       cur_trace_uop->m_bar_type      = NOT_BAR;
       cur_trace_uop->m_num_src_regs  = pi->m_num_read_regs;
@@ -420,20 +384,12 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       cur_trace_uop->m_inst_size     = pi->m_size;
     }
 
-    // Full Fence instruction
-    if (num_uop == 0 && (pi->m_opcode == IGPU_INS_DMB ||
-                         pi->m_opcode == IGPU_INS_DSB))
-    {
+    // Fence instruction: m_opcode == MISC && actually_taken == 1
+    if (num_uop == 0 && pi->m_opcode == IGPU_INS_MISC && pi->m_ld_vaddr2 == 1) {
       trace_uop[0]->m_opcode        = pi->m_opcode;
       trace_uop[0]->m_mem_type      = NOT_MEM;
       trace_uop[0]->m_cf_type       = NOT_CF;
-      if (pi->m_st_vaddr == IGPU_BARRIER_ISHLD ||
-          pi->m_st_vaddr == IGPU_BARRIER_OSHLD ||
-          pi->m_st_vaddr == IGPU_BARRIER_LD)
-        trace_uop[0]->m_op_type       = UOP_LFENCE;
-      else
-        trace_uop[0]->m_op_type       = UOP_FULL_FENCE;
-
+      trace_uop[0]->m_op_type       = UOP_FULL_FENCE;
       trace_uop[0]->m_bar_type      = NOT_BAR;
       trace_uop[0]->m_num_dest_regs = 0;
       trace_uop[0]->m_num_src_regs  = 0;
@@ -450,9 +406,7 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       trace_uop[0]->m_opcode        = pi->m_opcode;
       trace_uop[0]->m_mem_type      = NOT_MEM;
       trace_uop[0]->m_cf_type       = NOT_CF;
-      trace_uop[0]->m_op_type       = (Uop_Type)((pi->m_is_fp) ?
-                                                  m_fp_uop_table[pi->m_opcode] :
-                                                  m_int_uop_table[pi->m_opcode]);
+      trace_uop[0]->m_op_type       = UOP_NOP;
       trace_uop[0]->m_bar_type      = NOT_BAR;
       trace_uop[0]->m_num_dest_regs = 0;
       trace_uop[0]->m_num_src_regs  = 0;
