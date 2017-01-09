@@ -13,141 +13,151 @@
 
 void igpu_decoder_c::init_pin_convert()
 {
-  m_int_uop_table[IGPU_INS_INVALID]        = UOP_INV;
-  m_int_uop_table[IGPU_INS_3DNOW]          = UOP_IADD;
-  m_int_uop_table[IGPU_INS_AES]            = UOP_IMUL;
-  m_int_uop_table[IGPU_INS_AVX]            = UOP_FADD;
-  m_int_uop_table[IGPU_INS_AVX2]           = UOP_FADD;
-  m_int_uop_table[IGPU_INS_AVX2GATHER]     = UOP_FADD;
-  m_int_uop_table[IGPU_INS_BDW]            = UOP_FADD;
-  m_int_uop_table[IGPU_INS_BINARY]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_BITBYTE]        = UOP_BYTE;
-  m_int_uop_table[IGPU_INS_BMI1]           = UOP_BYTE;
-  m_int_uop_table[IGPU_INS_BMI2]           = UOP_BYTE;
-  m_int_uop_table[IGPU_INS_BROADCAST]      = UOP_IADD;
-  m_int_uop_table[IGPU_INS_CALL]           = UOP_IADD;
-  m_int_uop_table[IGPU_INS_CMOV]           = UOP_CMOV;
-  m_int_uop_table[IGPU_INS_COND_BR]        = UOP_IADD;
-  m_int_uop_table[IGPU_INS_CONVERT]        = UOP_IADD;
-  m_int_uop_table[IGPU_INS_DATAXFER]       = UOP_IADD;
-  m_int_uop_table[IGPU_INS_DECIMAL]        = UOP_IADD;
-  m_int_uop_table[IGPU_INS_FCMOV]          = UOP_FADD;
-  m_int_uop_table[IGPU_INS_FLAGOP]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_FMA4]           = UOP_IADD;
-  m_int_uop_table[IGPU_INS_INTERRUPT]      = UOP_IADD;
-  m_int_uop_table[IGPU_INS_IO]             = UOP_IADD;
-  m_int_uop_table[IGPU_INS_IOSTRINGOP]     = UOP_IMUL;
-  m_int_uop_table[IGPU_INS_LOGICAL]        = UOP_LOGIC;
-  m_int_uop_table[IGPU_INS_LZCNT]          = UOP_LOGIC;
-  m_int_uop_table[IGPU_INS_MISC]           = UOP_IADD;
-  m_int_uop_table[IGPU_INS_MMX]            = UOP_FADD;
-  m_int_uop_table[IGPU_INS_NOP]            = UOP_NOP;
-  m_int_uop_table[IGPU_INS_PCLMULQDQ]      = UOP_IMUL;
-  m_int_uop_table[IGPU_INS_POP]            = UOP_IADD;
-  m_int_uop_table[IGPU_INS_PREFETCH]       = UOP_IADD;
-  m_int_uop_table[IGPU_INS_PUSH]           = UOP_IADD;
-  m_int_uop_table[IGPU_INS_RDRAND]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_RDSEED]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_RDWRFSGS]       = UOP_IADD;
-  m_int_uop_table[IGPU_INS_RET]            = UOP_IADD;
-  m_int_uop_table[IGPU_INS_ROTATE]         = UOP_SHIFT;
-  m_int_uop_table[IGPU_INS_SEGOP]          = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SEMAPHORE]      = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT;
-  m_int_uop_table[IGPU_INS_SSE]            = UOP_FADD;
-  m_int_uop_table[IGPU_INS_STRINGOP]       = UOP_IADD;
-  m_int_uop_table[IGPU_INS_STTNI]          = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SYSCALL]        = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SYSRET]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_SYSTEM]         = UOP_IADD;
-  m_int_uop_table[IGPU_INS_TBM]            = UOP_IADD;
-  m_int_uop_table[IGPU_INS_UNCOND_BR]      = UOP_IADD;
-  m_int_uop_table[IGPU_INS_VFMA]           = UOP_IADD;
-  m_int_uop_table[IGPU_INS_VTX]            = UOP_IADD;
-  m_int_uop_table[IGPU_INS_WIDENOP]        = UOP_NOP;
-  m_int_uop_table[IGPU_INS_X87_ALU]        = UOP_FADD;
-  m_int_uop_table[IGPU_INS_XOP]            = UOP_IADD; // new
-  m_int_uop_table[IGPU_INS_XSAVE]          = UOP_IMUL;
-  m_int_uop_table[IGPU_INS_XSAVEOPT]       = UOP_IMUL;
-	m_int_uop_table[IGPU_INS_TR_MUL]         = UOP_IMUL;            
-  m_int_uop_table[IGPU_INS_TR_DIV]         = UOP_IMUL;
-  m_int_uop_table[IGPU_INS_TR_FMUL]        = UOP_FMUL;
-  m_int_uop_table[IGPU_INS_TR_FDIV]        = UOP_FDIV;
-  m_int_uop_table[IGPU_INS_TR_NOP]         = UOP_NOP;
-  m_int_uop_table[IGPU_INS_PREFETCH_NTA]   = UOP_IADD;
-  m_int_uop_table[IGPU_INS_PREFETCH_T0]    = UOP_IADD;
-  m_int_uop_table[IGPU_INS_PREFETCH_T1]    = UOP_IADD;
-  m_int_uop_table[IGPU_INS_PREFETCH_T2]    = UOP_IADD;
-  m_int_uop_table[IGPU_INS_GPU_EN]         = UOP_IADD; // new
-  m_int_uop_table[IGPU_INS_CPU_MEM_EXT_OP] = UOP_IADD; // new
+  m_int_uop_table[GED_OPCODE_ILLEGAL] = UOP_INV;
+  m_int_uop_table[GED_OPCODE_MOV] = UOP_IMEM;
+  m_int_uop_table[GED_OPCODE_SEL] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MOVI] = UOP_IMEM;
+  m_int_uop_table[GED_OPCODE_NOT] = UOP_LOGIC;
+  m_int_uop_table[GED_OPCODE_AND] = UOP_LOGIC;
+  m_int_uop_table[GED_OPCODE_OR] = UOP_LOGIC;
+  m_int_uop_table[GED_OPCODE_XOR] = UOP_LOGIC;
+  m_int_uop_table[GED_OPCODE_SHR] = UOP_SHIFT;
+  m_int_uop_table[GED_OPCODE_SHL] = UOP_SHIFT;
+  m_int_uop_table[GED_OPCODE_ASR] = UOP_SHIFT;
+  m_int_uop_table[GED_OPCODE_CMP] = UOP_ICMP;
+  m_int_uop_table[GED_OPCODE_CMPN] = UOP_ICMP;
+  m_int_uop_table[GED_OPCODE_CSEL] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_F32TO16] = UOP_FCVT;
+  m_int_uop_table[GED_OPCODE_F16TO32] = UOP_FCVT;
+  m_int_uop_table[GED_OPCODE_BFREV] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_BFE] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_BFI1] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_BFI2] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_JMPI] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_BRD] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_IF] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_BRC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_ELSE] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_ENDIF] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_WHILE] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_BREAK] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_CONT] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_HALT] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_CALL] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_RET] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_WAIT] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SEND] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SENDC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MATH] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_ADD] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MUL] = UOP_IMUL;
+  m_int_uop_table[GED_OPCODE_AVG] = UOP_IMUL;
+  m_int_uop_table[GED_OPCODE_FRC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_RNDU] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_RNDD] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_RNDE] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_RNDZ] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MAC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MACH] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_LZD] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_FBH] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_FBL] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_CBIT] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_ADDC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SUBB] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SAD2] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SADA2] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_DP4] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_DPH] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_DP3] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_DP2] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_LINE] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_PLN] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MAD] = UOP_IMUL;
+  m_int_uop_table[GED_OPCODE_LRP] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_NOP] = UOP_NOP;
+  m_int_uop_table[GED_OPCODE_DIM] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_CALLA] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SMOV] = UOP_IMEM;
+  m_int_uop_table[GED_OPCODE_GOTO] = UOP_CF;
+  m_int_uop_table[GED_OPCODE_JOIN] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MADM] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SENDS] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SENDSC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_INVALID] = UOP_INV;
 
-  m_fp_uop_table[IGPU_INS_INVALID]        = UOP_INV;
-  m_fp_uop_table[IGPU_INS_3DNOW]          = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_AES]            = UOP_FMUL;
-  m_fp_uop_table[IGPU_INS_AVX]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_AVX2]           = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_AVX2GATHER]     = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_BDW]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_BINARY]         = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_BITBYTE]        = UOP_BYTE;
-  m_fp_uop_table[IGPU_INS_BMI1]           = UOP_BYTE;
-  m_fp_uop_table[IGPU_INS_BMI2]           = UOP_BYTE;
-  m_fp_uop_table[IGPU_INS_BROADCAST]      = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_CALL]           = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_CMOV]           = UOP_CMOV;
-  m_fp_uop_table[IGPU_INS_COND_BR]        = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_CONVERT]        = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_DATAXFER]       = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_DECIMAL]        = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_FCMOV]          = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_FLAGOP]         = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_FMA4]           = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_INTERRUPT]      = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_IO]             = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_IOSTRINGOP]     = UOP_FMUL;
-  m_fp_uop_table[IGPU_INS_LOGICAL]        = UOP_LOGIC;
-  m_fp_uop_table[IGPU_INS_LZCNT]          = UOP_LOGIC;
-  m_fp_uop_table[IGPU_INS_MISC]           = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_MMX]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_NOP]            = UOP_NOP;
-  m_fp_uop_table[IGPU_INS_PCLMULQDQ]      = UOP_FMUL;
-  m_fp_uop_table[IGPU_INS_POP]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_PREFETCH]       = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_PUSH]           = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_RDRAND]         = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_RDSEED]         = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_RDWRFSGS]       = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_RET]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_ROTATE]         = UOP_SHIFT;
-  m_fp_uop_table[IGPU_INS_SEGOP]          = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_SEMAPHORE]      = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_SHIFT]          = UOP_SHIFT;
-  m_fp_uop_table[IGPU_INS_SSE]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_STRINGOP]       = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_STTNI]          = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_SYSCALL]        = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_SYSRET]         = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_SYSTEM]         = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_TBM]            = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_UNCOND_BR]      = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_VFMA]           = UOP_IADD;
-  m_fp_uop_table[IGPU_INS_VTX]            = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_WIDENOP]        = UOP_NOP;
-  m_fp_uop_table[IGPU_INS_X87_ALU]        = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_XOP]            = UOP_FADD; // new
-  m_fp_uop_table[IGPU_INS_XSAVE]          = UOP_FMUL;
-  m_fp_uop_table[IGPU_INS_XSAVEOPT]       = UOP_FMUL;
-	m_fp_uop_table[IGPU_INS_TR_MUL]         = UOP_IMUL;            
-  m_fp_uop_table[IGPU_INS_TR_DIV]         = UOP_IMUL;
-  m_fp_uop_table[IGPU_INS_TR_FMUL]        = UOP_FMUL;
-  m_fp_uop_table[IGPU_INS_TR_FDIV]        = UOP_FDIV;
-  m_fp_uop_table[IGPU_INS_TR_NOP]         = UOP_NOP;
-  m_fp_uop_table[IGPU_INS_PREFETCH_NTA]   = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_PREFETCH_T0]    = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_PREFETCH_T1]    = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_PREFETCH_T2]    = UOP_FADD;
-  m_fp_uop_table[IGPU_INS_GPU_EN]         = UOP_FADD; // new
-  m_fp_uop_table[IGPU_INS_CPU_MEM_EXT_OP] = UOP_FADD; // new
+  m_fp_uop_table[GED_OPCODE_ILLEGAL] = UOP_INV;
+  m_fp_uop_table[GED_OPCODE_MOV] = UOP_IMEM;
+  m_fp_uop_table[GED_OPCODE_SEL] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MOVI] = UOP_IMEM;
+  m_fp_uop_table[GED_OPCODE_NOT] = UOP_LOGIC;
+  m_fp_uop_table[GED_OPCODE_AND] = UOP_LOGIC;
+  m_fp_uop_table[GED_OPCODE_OR] = UOP_LOGIC;
+  m_fp_uop_table[GED_OPCODE_XOR] = UOP_LOGIC;
+  m_fp_uop_table[GED_OPCODE_SHR] = UOP_SHIFT;
+  m_fp_uop_table[GED_OPCODE_SHL] = UOP_SHIFT;
+  m_fp_uop_table[GED_OPCODE_ASR] = UOP_SHIFT;
+  m_fp_uop_table[GED_OPCODE_CMP] = UOP_ICMP;
+  m_fp_uop_table[GED_OPCODE_CMPN] = UOP_ICMP;
+  m_fp_uop_table[GED_OPCODE_CSEL] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_F32TO16] = UOP_FCVT;
+  m_fp_uop_table[GED_OPCODE_F16TO32] = UOP_FCVT;
+  m_fp_uop_table[GED_OPCODE_BFREV] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_BFE] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_BFI1] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_BFI2] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_JMPI] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_BRD] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_IF] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_BRC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_ELSE] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_ENDIF] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_WHILE] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_BREAK] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_CONT] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_HALT] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_CALL] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_RET] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_WAIT] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SEND] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SENDC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MATH] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_ADD] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MUL] = UOP_IMUL;
+  m_fp_uop_table[GED_OPCODE_AVG] = UOP_IMUL;
+  m_fp_uop_table[GED_OPCODE_FRC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_RNDU] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_RNDD] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_RNDE] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_RNDZ] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MAC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MACH] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_LZD] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_FBH] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_FBL] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_CBIT] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_ADDC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SUBB] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SAD2] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SADA2] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_DP4] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_DPH] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_DP3] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_DP2] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_LINE] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_PLN] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MAD] = UOP_IMUL;
+  m_fp_uop_table[GED_OPCODE_LRP] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_NOP] = UOP_NOP;
+  m_fp_uop_table[GED_OPCODE_DIM] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_CALLA] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SMOV] = UOP_IMEM;
+  m_fp_uop_table[GED_OPCODE_GOTO] = UOP_CF;
+  m_fp_uop_table[GED_OPCODE_JOIN] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MADM] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SENDS] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_SENDSC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_INVALID] = UOP_INV;
 }
 
 inst_info_s* igpu_decoder_c::get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id)
@@ -205,7 +215,7 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
   bool inst_has_ld_uop = false;
   int  ii, jj, kk;
 
-  ASSERT(pi->m_opcode != IGPU_INS_INVALID);
+  ASSERT(pi->m_opcode != GED_OPCODE_INVALID);
   if (new_entry) {
     // Since we found a new instruction, we need to decode this instruction and store all
     // uops to the hash table
@@ -226,36 +236,36 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       num_uop = 1;
       
       // set memory type
-      switch (pi->m_opcode) {
-        case IGPU_INS_PREFETCH:
-          trace_uop[0]->m_mem_type = MEM_PF;
-          break;
-        default:
-          trace_uop[0]->m_mem_type = MEM_LD;
-          break;
-      }
+      //switch (pi->m_opcode) {
+        //case IGPU_INS_PREFETCH:
+          //trace_uop[0]->m_mem_type = MEM_PF;
+          //break;
+        //default:
+          //trace_uop[0]->m_mem_type = MEM_LD;
+          //break;
+      //}
       
       // prefetch instruction
-      if (pi->m_opcode == IGPU_INS_PREFETCH 
-          || (pi->m_opcode >= IGPU_INS_PREFETCH_NTA && pi->m_opcode <= IGPU_INS_PREFETCH_T2)) {
-        switch (pi->m_opcode) {
-          case IGPU_INS_PREFETCH_NTA:
-            trace_uop[0]->m_mem_type = MEM_SWPREF_NTA;
-            break;
+      //if (pi->m_opcode == IGPU_INS_PREFETCH 
+          //|| (pi->m_opcode >= IGPU_INS_PREFETCH_NTA && pi->m_opcode <= IGPU_INS_PREFETCH_T2)) {
+        //switch (pi->m_opcode) {
+          //case IGPU_INS_PREFETCH_NTA:
+            //trace_uop[0]->m_mem_type = MEM_SWPREF_NTA;
+            //break;
 
-          case IGPU_INS_PREFETCH_T0:
-            trace_uop[0]->m_mem_type = MEM_SWPREF_T0;
-            break;
+          //case IGPU_INS_PREFETCH_T0:
+            //trace_uop[0]->m_mem_type = MEM_SWPREF_T0;
+            //break;
 
-          case IGPU_INS_PREFETCH_T1:
-            trace_uop[0]->m_mem_type = MEM_SWPREF_T1;
-            break;
+          //case IGPU_INS_PREFETCH_T1:
+            //trace_uop[0]->m_mem_type = MEM_SWPREF_T1;
+            //break;
 
-          case IGPU_INS_PREFETCH_T2:
-            trace_uop[0]->m_mem_type = MEM_SWPREF_T2;
-            break;
-        }
-      }
+          //case IGPU_INS_PREFETCH_T2:
+            //trace_uop[0]->m_mem_type = MEM_SWPREF_T2;
+            //break;
+        //}
+      //}
 
       trace_uop[0]->m_mem_size = 4;
       trace_uop[0]->m_cf_type = NOT_CF;
@@ -263,10 +273,10 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       trace_uop[0]->m_bar_type = NOT_BAR;
       trace_uop[0]->m_num_src_regs = pi->m_num_read_regs;
       
-      if (pi->m_opcode == XED_CATEGORY_DATAXFER)
-        trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
-      else
-        trace_uop[0]->m_num_dest_regs = 0;
+      //if (pi->m_opcode == XED_CATEGORY_DATAXFER)
+        //trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
+      //else
+        //trace_uop[0]->m_num_dest_regs = 0;
       
       trace_uop[0]->m_pin_2nd_mem = 0;
       trace_uop[0]->m_eom = 0;
@@ -385,19 +395,19 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
     }
 
     // Fence instruction: m_opcode == MISC && actually_taken == 1
-    if (num_uop == 0 && pi->m_opcode == IGPU_INS_MISC && pi->m_ld_vaddr2 == 1) {
-      trace_uop[0]->m_opcode        = pi->m_opcode;
-      trace_uop[0]->m_mem_type      = NOT_MEM;
-      trace_uop[0]->m_cf_type       = NOT_CF;
-      trace_uop[0]->m_op_type       = UOP_FULL_FENCE;
-      trace_uop[0]->m_bar_type      = NOT_BAR;
-      trace_uop[0]->m_num_dest_regs = 0;
-      trace_uop[0]->m_num_src_regs  = 0;
-      trace_uop[0]->m_pin_2nd_mem   = 0;
-      trace_uop[0]->m_eom           = 1;
-      trace_uop[0]->m_inst_size     = pi->m_size;
-      ++num_uop;
-    }
+    //if (num_uop == 0 && pi->m_opcode == IGPU_INS_MISC && pi->m_ld_vaddr2 == 1) {
+      //trace_uop[0]->m_opcode        = pi->m_opcode;
+      //trace_uop[0]->m_mem_type      = NOT_MEM;
+      //trace_uop[0]->m_cf_type       = NOT_CF;
+      //trace_uop[0]->m_op_type       = UOP_FULL_FENCE;
+      //trace_uop[0]->m_bar_type      = NOT_BAR;
+      //trace_uop[0]->m_num_dest_regs = 0;
+      //trace_uop[0]->m_num_src_regs  = 0;
+      //trace_uop[0]->m_pin_2nd_mem   = 0;
+      //trace_uop[0]->m_eom           = 1;
+      //trace_uop[0]->m_inst_size     = pi->m_size;
+      //++num_uop;
+    //}
 
     ///
     /// Non-memory, non-branch instruction
