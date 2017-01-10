@@ -4,6 +4,8 @@
 #include "debug_macros.h"
 #include "utils.h"
 #include "all_knobs.h"
+#include "statistics.h"
+#include "statsEnums.h"
 
 #define DEBUG(args...)   _DEBUG(*KNOB(KNOB_DEBUG_TRACE_READ), ## args)
 #define DEBUG_CORE(m_core_id, args...)                            \
@@ -563,6 +565,8 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
   // set eom flag and next pc address for the last uop of this instruction
   trace_uop[dyn_uop_counter-1]->m_eom = 1;
   trace_uop[dyn_uop_counter-1]->m_npc = pi->m_instruction_next_addr;
+  
+  STAT_CORE_EVENT(core_id, OP_CAT_GED_ILLEGAL + (pi->m_opcode));
 
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
