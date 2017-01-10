@@ -18,6 +18,7 @@ class igpu_decoder_c : public cpu_decoder_c
         int core_id, int sim_thread_id);
     void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, 
         Addr rep_offset, int core_id);
+    bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id);
     inst_info_s* get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id);
     void dprint_inst(void *t_info, int core_id, int thread_id);
 };

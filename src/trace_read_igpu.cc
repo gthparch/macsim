@@ -162,6 +162,248 @@ void igpu_decoder_c::init_pin_convert()
   m_fp_uop_table[GED_OPCODE_INVALID] = UOP_INV;
 }
 
+bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id)
+{
+  ASSERT(uop);
+
+  trace_uop_s *trace_uop;
+  int num_uop  = 0;
+  core_c* core = m_simBase->m_core_pointers[core_id];
+  inst_info_s *info;
+
+  // fetch ended : no uop to fetch
+  if (core->m_fetch_ended[sim_thread_id]) 
+    return false;
+
+  bool read_success = true;
+  thread_s* thread_trace_info = core->get_trace_info(sim_thread_id);
+
+  if (thread_trace_info->m_thread_init) {
+    thread_trace_info->m_thread_init = false;
+  }
+
+  ///
+  /// BOM (beginning of macro) : need to get a next instruction
+  ///
+  if (thread_trace_info->m_bom) {
+    bool inst_read; // indicate new instruction has been read from a trace file
+    
+    if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
+      // read next instruction
+      read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, 
+          sim_thread_id, &inst_read);
+    }
+    else {
+      inst_read = false;
+      if (!core->get_trace_info(sim_thread_id)->m_trace_ended) { 
+        core->get_trace_info(sim_thread_id)->m_trace_ended = true;
+      }
+    }
+
+    ///
+    /// Trace read failed
+    ///
+    if (!read_success) 
+      return false;
+
+    info = get_inst_info(thread_trace_info, core_id, sim_thread_id);
+
+    // read a new instruction, so update stats
+    if (inst_read) { 
+      ++core->m_inst_fetched[sim_thread_id];
+      DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%llu\n", core_id, sim_thread_id, 
+          (Counter)(thread_trace_info->m_temp_inst_count + 1));
+
+      if (core->m_inst_fetched[sim_thread_id] > core->m_max_inst_fetched) 
+        core->m_max_inst_fetched = core->m_inst_fetched[sim_thread_id];
+    }
+
+    trace_uop = thread_trace_info->m_trace_uop_array[0];
+    num_uop   = info->m_trace_info.m_num_uop;
+    ASSERT(info->m_trace_info.m_num_uop > 0);
+
+    thread_trace_info->m_num_sending_uop = 1;
+    thread_trace_info->m_eom             = thread_trace_info->m_trace_uop_array[0]->m_eom;
+    thread_trace_info->m_bom             = false;
+
+    uop->m_isitBOM = true;
+    POWER_CORE_EVENT(core_id, POWER_INST_DECODER_R);
+    POWER_CORE_EVENT(core_id, POWER_OPERAND_DECODER_R);
+  } // END EOM
+  // read remaining uops from the same instruction
+  else { 
+    trace_uop                = 
+      thread_trace_info->m_trace_uop_array[thread_trace_info->m_num_sending_uop];
+    info                     = trace_uop->m_info;
+    thread_trace_info->m_eom = trace_uop->m_eom;
+    info->m_trace_info.m_bom = 0; // because of repeat instructions ....
+    uop->m_isitBOM           = false;
+    ++thread_trace_info->m_num_sending_uop;
+  }
+
+  // uop number is specific to the core
+  uop->m_unique_num = core->inc_and_get_unique_uop_num();
+
+  // set end of macro flag
+  if (thread_trace_info->m_eom) {
+    uop->m_isitEOM           = true; // mark for current uop
+    thread_trace_info->m_bom = true; // mark for next instruction
+  }
+  else {
+    uop->m_isitEOM           = false;
+    thread_trace_info->m_bom = false;
+  }
+
+  if (core->get_trace_info(sim_thread_id)->m_trace_ended && uop->m_isitEOM) {
+    --core->m_fetching_thread_num;
+    core->m_fetch_ended[sim_thread_id] = true;
+    uop->m_last_uop                    = true;
+    DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%lld uop_num:%lld fetched:%lld last uop\n",
+        core_id, sim_thread_id, uop->m_inst_num, uop->m_uop_num, core->m_inst_fetched[sim_thread_id]);
+  }
+
+  ///
+  /// Set up actual uop data structure
+  ///
+  uop->m_opcode      = trace_uop->m_opcode;
+  uop->m_uop_type    = info->m_table_info->m_op_type;
+  uop->m_cf_type     = info->m_table_info->m_cf_type;
+  uop->m_mem_type    = info->m_table_info->m_mem_type;
+  ASSERT(uop->m_mem_type >= 0 && uop->m_mem_type < NUM_MEM_TYPES);
+  uop->m_bar_type    = trace_uop->m_bar_type;
+  uop->m_npc         = trace_uop->m_npc;
+  uop->m_active_mask = trace_uop->m_active_mask;
+    
+  if (uop->m_cf_type) { 
+    uop->m_taken_mask      = trace_uop->m_taken_mask;
+    uop->m_reconverge_addr = trace_uop->m_reconverge_addr;
+    uop->m_target_addr     = trace_uop->m_target;
+  }
+
+  if (uop->m_opcode == GPU_EN) {
+    m_simBase->m_gpu_paused = false;	
+  }
+
+  // address translation
+  if (trace_uop->m_va == 0) {
+    uop->m_vaddr = 0;
+  } 
+  else {
+    // since we can have 64-bit address space and each trace has 32-bit address,
+    // using extra bits to differentiate address space of each application
+    uop->m_vaddr = trace_uop->m_va + m_simBase->m_memory->base_addr(core_id,
+        (unsigned long)UINT_MAX * 
+        (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
+
+    // virtual-to-physical translation 
+    // physical page is allocated at this point for the time being
+    if (m_enable_physical_mapping)
+      uop->m_vaddr = m_page_mapper->translate(uop->m_vaddr);
+  }
+
+  uop->m_mem_size = trace_uop->m_mem_size;
+  uop->m_dir      = trace_uop->m_actual_taken;
+  uop->m_pc       = info->m_addr;
+  uop->m_core_id  = core_id;
+
+  if (uop->m_mem_type != NOT_MEM) {
+    int temp_num_req = (uop->m_mem_size + *KNOB(KNOB_MAX_TRANSACTION_SIZE) - 1) / 
+      *KNOB(KNOB_MAX_TRANSACTION_SIZE);
+
+    ASSERTM(temp_num_req > 0, "pc:%llx vaddr:%llx opcode:%d size:%d max:%d num:%d type:%d num:%d\n", 
+        uop->m_pc, uop->m_vaddr, uop->m_opcode, uop->m_mem_size, 
+        (int)*KNOB(KNOB_MAX_TRANSACTION_SIZE), temp_num_req, uop->m_mem_type, 
+        trace_uop->m_info->m_trace_info.m_num_uop);
+  }
+
+  // we found first uop of an instruction, so add instruction count
+  if (uop->m_isitBOM) 
+    ++thread_trace_info->m_temp_inst_count;
+
+  uop->m_inst_num  = thread_trace_info->m_temp_inst_count;
+  uop->m_num_srcs  = trace_uop->m_num_src_regs;
+  uop->m_num_dests = trace_uop->m_num_dest_regs;
+
+  ASSERTM(uop->m_num_dests < MAX_DST_NUM, "uop->num_dests=%d MAX_DST_NUM=%d\n", 
+      uop->m_num_dests, MAX_DST_NUM);
+
+  DEBUG_CORE(uop->m_core_id, "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_sending_uop:%d "
+      "pc:0x%llx dir:%d \n", uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests, 
+      thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
+
+  // filling the src_info, dest_info
+  if (uop->m_num_srcs < MAX_SRCS) {
+    for (int index=0; index < uop->m_num_srcs; ++index) {
+      uop->m_src_info[index] = trace_uop->m_srcs[index].m_id;
+      //DEBUG("uop_num:%lld src_info[%d]:%d\n", uop->uop_num, index, uop->src_info[index]);
+    }
+  } 
+  else {
+    ASSERTM(uop->m_num_srcs < MAX_SRCS, "src_num:%d MAX_SRC:%d", uop->m_num_srcs, MAX_SRCS);
+  }
+
+  for (int index = 0; index < uop->m_num_dests; ++index) {
+    uop->m_dest_info[index] = trace_uop->m_dests[index].m_id;
+    ASSERT(trace_uop->m_dests[index].m_reg < NUM_REG_IDS);
+  }
+
+  uop->m_uop_num          = (thread_trace_info->m_temp_uop_count++);
+  uop->m_thread_id        = sim_thread_id;
+  uop->m_block_id         = ((core)->get_trace_info(sim_thread_id))->m_block_id; 
+  uop->m_orig_block_id    = ((core)->get_trace_info(sim_thread_id))->m_orig_block_id;
+  uop->m_unique_thread_id = ((core)->get_trace_info(sim_thread_id))->m_unique_thread_id;
+  uop->m_orig_thread_id   = ((core)->get_trace_info(sim_thread_id))->m_orig_thread_id;
+  
+  DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
+      uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+    
+  // for a parent memory uop, read child uops from the trace  
+  if (uop->m_mem_type != NOT_MEM) {
+    if (trace_uop->m_is_parent && trace_uop->m_num_children > 0) {
+      uop->m_child_uops = new uop_c * [trace_uop->m_num_children];
+      uop->m_num_child_uops = trace_uop->m_num_children;
+      uop->m_num_child_uops_done = 0;
+      if (uop->m_num_child_uops != 64)
+        uop->m_pending_child_uops  = N_BIT_MASK(uop->m_num_child_uops);
+      else
+        uop->m_pending_child_uops  = N_BIT_MASK_64;
+        
+      uop->m_vaddr = 0;
+      uop->m_mem_size = 0;
+
+      // read child uops from the trace
+      uop_c *child_mem_uop = NULL;
+      for (int i = 0; i < trace_uop->m_num_children; ++i) {
+        bool dummy;
+        read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, sim_thread_id, &dummy);
+        if (!read_success) 
+          return false;
+          
+        child_mem_uop = core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
+        child_mem_uop->allocate();
+        ASSERT(child_mem_uop); 
+        
+        memcpy(child_mem_uop, uop, sizeof(uop_c));
+        child_mem_uop->m_parent_uop = uop;
+        if (trace_uop->m_mem_type == MEM_LD) {
+          child_mem_uop->m_vaddr = thread_trace_info->m_prev_trace_info->m_ld_vaddr1;
+          child_mem_uop->m_mem_size = thread_trace_info->m_prev_trace_info->m_mem_read_size;
+        } else {
+          child_mem_uop->m_vaddr = thread_trace_info->m_prev_trace_info->m_st_vaddr;
+          child_mem_uop->m_mem_size = thread_trace_info->m_prev_trace_info->m_mem_write_size;
+        }
+        child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
+        child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
+        
+        // Copy next instruction to current instruction field
+        memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, sizeof(trace_info_igpu_s));
+      }
+    }
+  }
+
+  return read_success;
+}
+
 inst_info_s* igpu_decoder_c::get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id)
 {
   trace_info_igpu_s trace_info;
@@ -247,6 +489,8 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
           //break;
       //}
       
+      trace_uop[0]->m_mem_type = MEM_LD;
+      
       // prefetch instruction
       //if (pi->m_opcode == IGPU_INS_PREFETCH 
           //|| (pi->m_opcode >= IGPU_INS_PREFETCH_NTA && pi->m_opcode <= IGPU_INS_PREFETCH_T2)) {
@@ -274,6 +518,13 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       trace_uop[0]->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
       trace_uop[0]->m_bar_type = NOT_BAR;
       trace_uop[0]->m_num_src_regs = pi->m_num_read_regs;
+      
+      // m_is_fp = true is used to indicate a child uop
+      // m_branch_target is used to indicate the number of child uops a parent uop has
+      if (pi->m_is_fp == false) {
+        trace_uop[0]->m_is_parent = true;
+        trace_uop[0]->m_num_children = pi->m_branch_target;
+      }
       
       //if (pi->m_opcode == XED_CATEGORY_DATAXFER)
         //trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
