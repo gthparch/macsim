@@ -259,6 +259,9 @@ typedef struct trace_uop_s {
   int          m_rep_uop_num;   /**< repeated uop number */
   bool         m_eom;           /**< end of macro */
   bool         m_alu_uop;       /**< alu uop */ 
+  // GED
+  bool         m_is_parent;     /**< parent uop */
+  uint32_t     m_num_children;  /**< number of children */
   // GPU simulation
   uint32_t     m_active_mask;   /**< active mask */
   uint32_t     m_taken_mask;    /**< branch taken mask */
