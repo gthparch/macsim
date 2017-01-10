@@ -1,5 +1,7 @@
 #include "trace_read_igpu.h"
 #include "process_manager.h"
+#include "frontend.h"
+#include "memory.h"
 #include "assert_macros.h"
 #include "debug_macros.h"
 #include "utils.h"
@@ -378,7 +380,9 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
         read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, sim_thread_id, &dummy);
         if (!read_success) 
           return false;
-          
+
+        trace_info_igpu_s* ti = static_cast<trace_info_igpu_s*>(thread_trace_info->m_prev_trace_info);
+
         child_mem_uop = core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
         child_mem_uop->allocate();
         ASSERT(child_mem_uop); 
@@ -386,11 +390,11 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
         memcpy(child_mem_uop, uop, sizeof(uop_c));
         child_mem_uop->m_parent_uop = uop;
         if (trace_uop->m_mem_type == MEM_LD) {
-          child_mem_uop->m_vaddr = thread_trace_info->m_prev_trace_info->m_ld_vaddr1;
-          child_mem_uop->m_mem_size = thread_trace_info->m_prev_trace_info->m_mem_read_size;
+          child_mem_uop->m_vaddr = ti->m_ld_vaddr1;
+          child_mem_uop->m_mem_size = ti->m_mem_read_size;
         } else {
-          child_mem_uop->m_vaddr = thread_trace_info->m_prev_trace_info->m_st_vaddr;
-          child_mem_uop->m_mem_size = thread_trace_info->m_prev_trace_info->m_mem_write_size;
+          child_mem_uop->m_vaddr = ti->m_st_vaddr;
+          child_mem_uop->m_mem_size = ti->m_mem_write_size;
         }
         child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
         child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
