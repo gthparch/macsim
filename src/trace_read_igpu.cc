@@ -396,8 +396,10 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
           child_mem_uop->m_vaddr = ti->m_st_vaddr;
           child_mem_uop->m_mem_size = ti->m_mem_write_size;
         }
-        child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
+        child_mem_uop->m_uop_num = (thread_trace_info->m_temp_uop_count++);
         child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
+
+        uop->m_child_uops[i] = child_mem_uop;
         
         // Copy next instruction to current instruction field
         memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, sizeof(trace_info_igpu_s));
@@ -880,7 +882,7 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
  
   *m_dprint_output << "*** begin of the data strcture *** " << endl;
   *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
-  *m_dprint_output << "uop_opcode " <<igpu_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
+  *m_dprint_output << "uop_opcode " << g_tr_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
   *m_dprint_output << "num_read_regs: " << hex <<  (uint32_t) t_info->m_num_read_regs << endl;
   *m_dprint_output << "num_dest_regs: " << hex << (uint32_t) t_info->m_num_dest_regs << endl;
   *m_dprint_output << "has_immediate: " << hex << (uint32_t) t_info->m_has_immediate << endl;
@@ -899,5 +901,79 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
   *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
   *m_dprint_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
   *m_dprint_output << "*** end of the data strcture *** " << endl << endl;
-
 }
+
+const char* igpu_decoder_c::g_tr_opcode_names[GED_OPCODE_LAST] = {
+  "GED_OPCODE_ILLEGAL",
+  "GED_OPCODE_MOV",
+  "GED_OPCODE_SEL",
+  "GED_OPCODE_MOVI",
+  "GED_OPCODE_NOT",
+  "GED_OPCODE_AND",
+  "GED_OPCODE_OR",
+  "GED_OPCODE_XOR",
+  "GED_OPCODE_SHR",
+  "GED_OPCODE_SHL",
+  "GED_OPCODE_ASR",
+  "GED_OPCODE_CMP",
+  "GED_OPCODE_CMPN",
+  "GED_OPCODE_CSEL",
+  "GED_OPCODE_F32TO16",
+  "GED_OPCODE_F16TO32",
+  "GED_OPCODE_BFREV",
+  "GED_OPCODE_BFE",
+  "GED_OPCODE_BFI1",
+  "GED_OPCODE_BFI2",
+  "GED_OPCODE_JMPI",
+  "GED_OPCODE_BRD",
+  "GED_OPCODE_IF",
+  "GED_OPCODE_BRC",
+  "GED_OPCODE_ELSE",
+  "GED_OPCODE_ENDIF",
+  "GED_OPCODE_WHILE",
+  "GED_OPCODE_BREAK",
+  "GED_OPCODE_CONT",
+  "GED_OPCODE_HALT",
+  "GED_OPCODE_CALL",
+  "GED_OPCODE_RET",
+  "GED_OPCODE_WAIT",
+  "GED_OPCODE_SEND",
+  "GED_OPCODE_SENDC",
+  "GED_OPCODE_MATH",
+  "GED_OPCODE_ADD",
+  "GED_OPCODE_MUL",
+  "GED_OPCODE_AVG",
+  "GED_OPCODE_FRC",
+  "GED_OPCODE_RNDU",
+  "GED_OPCODE_RNDD",
+  "GED_OPCODE_RNDE",
+  "GED_OPCODE_RNDZ",
+  "GED_OPCODE_MAC",
+  "GED_OPCODE_MACH",
+  "GED_OPCODE_LZD",
+  "GED_OPCODE_FBH",
+  "GED_OPCODE_FBL",
+  "GED_OPCODE_CBIT",
+  "GED_OPCODE_ADDC",
+  "GED_OPCODE_SUBB",
+  "GED_OPCODE_SAD2",
+  "GED_OPCODE_SADA2",
+  "GED_OPCODE_DP4",
+  "GED_OPCODE_DPH",
+  "GED_OPCODE_DP3",
+  "GED_OPCODE_DP2",
+  "GED_OPCODE_LINE",
+  "GED_OPCODE_PLN",
+  "GED_OPCODE_MAD",
+  "GED_OPCODE_LRP",
+  "GED_OPCODE_NOP",
+  "GED_OPCODE_DIM",
+  "GED_OPCODE_CALLA",
+  "GED_OPCODE_SMOV",
+  "GED_OPCODE_GOTO",
+  "GED_OPCODE_JOIN",
+  "GED_OPCODE_MADM",
+  "GED_OPCODE_SENDS",
+  "GED_OPCODE_SENDSC",
+  "GED_OPCODE_INVALID"
+};

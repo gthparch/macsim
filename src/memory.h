@@ -306,6 +306,7 @@ class dcu_c
     int       m_banks; /**< number of cache banks */
     int       m_latency; /**< cache access latency */
     bool      m_ptx_sim; /**< gpu cache */
+    bool      m_igpu_sim; /**< intel gpu cache */
     queue_c*  m_in_queue; /**< input queue */
     queue_c*  m_wb_queue; /**< write-back queue */
     queue_c*  m_fill_queue; /**< fill queue */
