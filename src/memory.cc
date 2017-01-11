@@ -1534,7 +1534,7 @@ bool dcu_c::done(mem_req_s* req)
     DEBUG_CORE(req->m_core_id, "req_id:%d uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
-    if (m_ptx_sim) {
+    if (m_ptx_sim || m_igpu_sim) {
       if (uop->m_parent_uop) {
         uop_c* puop = uop->m_parent_uop;
         ++puop->m_num_child_uops_done;
@@ -1566,7 +1566,7 @@ bool dcu_c::write_done(mem_req_s* req)
   uop_c* uop = req->m_uop;
   uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
   uop->m_state = OS_SCHEDULED;
-  if (m_ptx_sim) {
+  if (m_ptx_sim || m_igpu_sim) {
     if (uop->m_parent_uop) {
       uop_c* puop = uop->m_parent_uop;
       ++puop->m_num_child_uops_done;
