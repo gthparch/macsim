@@ -67,14 +67,17 @@ dram_c* fcfs_controller(macsim_c* simBase)
   return fcfs;
 }
 
-
 dram_c* frfcfs_controller(macsim_c* simBase)
 {
   dram_c* frfcfs = new dc_frfcfs_c(simBase);
   return frfcfs;
 }
 
-
+dram_c* simple_controller(macsim_c* simBase)
+{
+  dram_c* sc = new dram_simple_ctrl_c(simBase);
+  return sc;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -925,3 +928,104 @@ drb_entry_s* dc_frfcfs_c::schedule(list<drb_entry_s*>* buffer)
 
 
 
+dram_simple_ctrl_c::dram_simple_ctrl_c(macsim_c* simBase) : dram_c(simBase)
+{
+  m_latency = *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+  m_output_buffer = new list<mem_req_s*>;
+
+  m_cycle = 0;
+}
+
+dram_simple_ctrl_c::~dram_simple_ctrl_c()
+{
+  delete m_output_buffer;
+}
+
+void dram_simple_ctrl_c::init(int id)
+{
+  m_id = id;
+}
+
+void dram_simple_ctrl_c::run_a_cycle(bool pll_lock)
+{
+  if (pll_lock) {
+    ++m_cycle;
+    return;
+  }
+
+  send();
+  receive();
+  ++m_cycle;
+}
+
+void dram_simple_ctrl_c::send(void)
+{
+  bool req_type_checked[2];
+  req_type_checked[0] = false;
+  req_type_checked[1] = false;
+  
+  bool req_type_allowed[2];
+  req_type_allowed[0] = true;
+  req_type_allowed[1] = true;
+
+  int max_iter = 1;
+  if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
+    max_iter = 2;
+
+  vector<mem_req_s*> temp_list;
+
+  // when virtual channels are partitioned for CPU and GPU requests,
+  // we need to check individual buffer entries
+  // if not, sequential search would be good enough
+  for (int ii = 0; ii < max_iter; ++ii) {
+    req_type_allowed[0] = !req_type_checked[0];
+    req_type_allowed[1] = !req_type_checked[1];
+    // check both CPU and GPU requests
+    if (req_type_checked[0] == true && req_type_checked[1] == true)
+      break;
+
+    for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+      mem_req_s* req = (*I);
+      if (req->m_rdy_cycle > m_cycle) break;
+      if (req_type_allowed[req->m_ptx] == false) continue;
+
+      req_type_checked[req->m_ptx] = true;
+      req->m_msg_type = NOC_FILL;
+
+      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
+
+      if (!insert_packet) {
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
+            m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
+        break;
+      }
+
+      temp_list.push_back(req);
+      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && *KNOB(KNOB_ENABLE_NEW_NOC)) {
+        m_simBase->m_bug_detector->allocate_noc(req);
+      }
+    }
+  }
+
+  for (auto I = temp_list.begin(), E = temp_list.end(); I != E; ++I) {
+    m_output_buffer->remove((*I));
+  }
+}
+
+void dram_simple_ctrl_c::receive(void)
+{
+  // check router queue every cycle
+  mem_req_s* req = NETWORK->receive(MEM_MC, m_id);
+  if (!req)
+    return;
+
+  req->m_rdy_cycle = m_cycle + m_latency;
+  m_output_buffer->push_back(req);
+  NETWORK->receive_pop(MEM_MC, m_id);
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE))
+    m_simBase->m_bug_detector->deallocate_noc(req);
+}
+
+void dram_simple_ctrl_c::print_req(void)
+{
+}
