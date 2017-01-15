@@ -828,7 +828,7 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
-  DEBUG("%s: read: %d write: %d\n", igpu_opcode_names[pi->m_opcode], pi->m_num_read_regs, pi->m_num_dest_regs);
+  DEBUG("%s: read: %d write: %d\n", g_tr_opcode_names[pi->m_opcode], pi->m_num_read_regs, pi->m_num_dest_regs);
 
   return first_info;
 }
