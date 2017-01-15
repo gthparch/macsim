@@ -960,50 +960,26 @@ void dram_simple_ctrl_c::run_a_cycle(bool pll_lock)
 
 void dram_simple_ctrl_c::send(void)
 {
-  bool req_type_checked[2];
-  req_type_checked[0] = false;
-  req_type_checked[1] = false;
-  
-  bool req_type_allowed[2];
-  req_type_allowed[0] = true;
-  req_type_allowed[1] = true;
-
-  int max_iter = 1;
-  if (*KNOB(KNOB_ENABLE_NOC_VC_PARTITION))
-    max_iter = 2;
-
   vector<mem_req_s*> temp_list;
 
-  // when virtual channels are partitioned for CPU and GPU requests,
-  // we need to check individual buffer entries
-  // if not, sequential search would be good enough
-  for (int ii = 0; ii < max_iter; ++ii) {
-    req_type_allowed[0] = !req_type_checked[0];
-    req_type_allowed[1] = !req_type_checked[1];
-    // check both CPU and GPU requests
-    if (req_type_checked[0] == true && req_type_checked[1] == true)
+  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+    mem_req_s* req = (*I);
+
+    if (req->m_rdy_cycle > m_cycle) 
       break;
 
-    for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
-      mem_req_s* req = (*I);
-      if (req->m_rdy_cycle > m_cycle) break;
-      if (req_type_allowed[req->m_ptx] == false) continue;
+    req->m_msg_type = NOC_FILL;
+    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
 
-      req_type_checked[req->m_ptx] = true;
-      req->m_msg_type = NOC_FILL;
+    if (!insert_packet) {
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
+          m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
+      break;
+    }
 
-      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
-
-      if (!insert_packet) {
-        DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
-            m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
-        break;
-      }
-
-      temp_list.push_back(req);
-      if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && *KNOB(KNOB_ENABLE_NEW_NOC)) {
-        m_simBase->m_bug_detector->allocate_noc(req);
-      }
+    temp_list.push_back(req);
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && *KNOB(KNOB_ENABLE_NEW_NOC)) {
+      m_simBase->m_bug_detector->allocate_noc(req);
     }
   }
 
@@ -1021,7 +997,9 @@ void dram_simple_ctrl_c::receive(void)
 
   req->m_rdy_cycle = m_cycle + m_latency;
   m_output_buffer->push_back(req);
+
   NETWORK->receive_pop(MEM_MC, m_id);
+
   if (*KNOB(KNOB_BUG_DETECTOR_ENABLE))
     m_simBase->m_bug_detector->deallocate_noc(req);
 }
