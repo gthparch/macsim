@@ -146,6 +146,7 @@ const char *uop_c::g_uop_type_name[NUM_UOP_TYPES] = {
   "UOP_LD",
   "UOP_ST",
   "UOP_SSE",
+  "UOP_SIMD",
 
   "UOP_GPU_ABS",
   "UOP_GPU_ABS64",
