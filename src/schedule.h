@@ -196,6 +196,7 @@ class schedule_c
     Unit_Type       m_unit_type; /**< core type */
     frontend_c*     m_frontend; /**< frontend pointer */
     Counter         m_cur_core_cycle; /**< current core cycle */
+    Counter         m_last_sched_cycle; /**< last sched cycle */
     uns16           m_knob_width; /**< width */
     int             m_num_in_sched; /**< number of uops in scheduler */
     bool            m_schedule_running; /**< enabled scheduler */

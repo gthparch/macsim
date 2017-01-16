@@ -216,46 +216,59 @@ POSSIBILITY OF SUCH DAMAGE.
   int int_sched_rate = 0; \
   int mem_sched_rate = 0; \
   int fp_sched_rate  = 0; \
+  int simd_sched_rate  = 0; \
   switch (m_unit_type) { \
     case UNIT_SMALL: \
       int_sched_rate  = *m_simBase->m_knobs->KNOB_ISCHED_RATE; \
       mem_sched_rate  = *m_simBase->m_knobs->KNOB_MSCHED_RATE; \
       fp_sched_rate   = *m_simBase->m_knobs->KNOB_FSCHED_RATE; \
+      simd_sched_rate = *m_simBase->m_knobs->KNOB_SSCHED_RATE; \
       m_dcache_cycles = *m_simBase->m_knobs->KNOB_L1_SMALL_LATENCY; \
       m_ptx_sim       = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx" ? true : false; \
+      m_igpu_sim      = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu" ? true : false; \
       break; \
     \
     case UNIT_MEDIUM: \
       int_sched_rate  = *m_simBase->m_knobs->KNOB_ISCHED_MEDIUM_RATE; \
       mem_sched_rate  = *m_simBase->m_knobs->KNOB_MSCHED_MEDIUM_RATE; \
       fp_sched_rate   = *m_simBase->m_knobs->KNOB_FSCHED_MEDIUM_RATE; \
+      simd_sched_rate = *m_simBase->m_knobs->KNOB_SSCHED_MEDIUM_RATE; \
       m_dcache_cycles = *m_simBase->m_knobs->KNOB_L1_MEDIUM_LATENCY; \
       m_ptx_sim       = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx" ? true : false; \
+      m_igpu_sim      = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu" ? true : false; \
       break; \
     \
     case UNIT_LARGE: \
-      int_sched_rate = *m_simBase->m_knobs->KNOB_ISCHED_LARGE_RATE; \
-      mem_sched_rate = *m_simBase->m_knobs->KNOB_MSCHED_LARGE_RATE; \
-      fp_sched_rate  = *m_simBase->m_knobs->KNOB_FSCHED_LARGE_RATE; \
+      int_sched_rate   = *m_simBase->m_knobs->KNOB_ISCHED_LARGE_RATE; \
+      mem_sched_rate   = *m_simBase->m_knobs->KNOB_MSCHED_LARGE_RATE; \
+      fp_sched_rate    = *m_simBase->m_knobs->KNOB_FSCHED_LARGE_RATE; \
+      simd_sched_rate  = *m_simBase->m_knobs->KNOB_SSCHED_LARGE_RATE; \
       m_dcache_cycles  = *m_simBase->m_knobs->KNOB_L1_LARGE_LATENCY; \
       m_ptx_sim        = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx" ? true : false; \
+      m_igpu_sim       = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "igpu" ? true : false; \
       break; \
   } \
   m_max_port[gen_ALLOCQ] = int_sched_rate; \
   m_max_port[mem_ALLOCQ] = mem_sched_rate; \
-  m_max_port[fp_ALLOCQ]  = fp_sched_rate;
+  m_max_port[fp_ALLOCQ] = fp_sched_rate; \
+  m_max_port[simd_ALLOCQ] = simd_sched_rate;
   
 
 #define SCHED_CONFIG() \
   uns16 int_sched_size = 0; \
   uns16 mem_sched_size = 0; \
-  uns16 fp_sched_size  = 0; \
+  uns16 fp_sched_size = 0; \
+  uns16 simd_sched_size = 0; \
   uns16 int_sched_rate = 0; \
   uns16 mem_sched_rate = 0; \
-  uns16 fp_sched_rate  = 0; \
+  uns16 fp_sched_rate = 0; \
+  uns16 simd_sched_rate = 0; \
   \
   switch (m_unit_type) { \
     case UNIT_SMALL: \
@@ -263,9 +276,11 @@ POSSIBILITY OF SUCH DAMAGE.
       int_sched_size        = *m_simBase->m_knobs->KNOB_ISCHED_SIZE; \
       mem_sched_size        = *m_simBase->m_knobs->KNOB_MSCHED_SIZE; \
       fp_sched_size         = *m_simBase->m_knobs->KNOB_FSCHED_SIZE; \
+      simd_sched_size       = *m_simBase->m_knobs->KNOB_SSCHED_SIZE; \
       int_sched_rate        = *m_simBase->m_knobs->KNOB_ISCHED_RATE; \
       mem_sched_rate        = *m_simBase->m_knobs->KNOB_MSCHED_RATE; \
       fp_sched_rate         = *m_simBase->m_knobs->KNOB_FSCHED_RATE; \
+      simd_sched_rate       = *m_simBase->m_knobs->KNOB_SSCHED_RATE; \
       m_knob_sched_to_width = *m_simBase->m_knobs->KNOB_SCHED_TO_WIDTH; \
       break; \
     \
@@ -274,9 +289,11 @@ POSSIBILITY OF SUCH DAMAGE.
       int_sched_size        = *m_simBase->m_knobs->KNOB_ISCHED_MEDIUM_SIZE; \
       mem_sched_size        = *m_simBase->m_knobs->KNOB_MSCHED_MEDIUM_SIZE; \
       fp_sched_size         = *m_simBase->m_knobs->KNOB_FSCHED_MEDIUM_SIZE; \
+      simd_sched_size       = *m_simBase->m_knobs->KNOB_SSCHED_MEDIUM_SIZE; \
       int_sched_rate        = *m_simBase->m_knobs->KNOB_ISCHED_MEDIUM_RATE; \
       mem_sched_rate        = *m_simBase->m_knobs->KNOB_MSCHED_MEDIUM_RATE; \
       fp_sched_rate         = *m_simBase->m_knobs->KNOB_FSCHED_MEDIUM_RATE; \
+      simd_sched_rate       = *m_simBase->m_knobs->KNOB_SSCHED_MEDIUM_RATE; \
       m_knob_sched_to_width = *m_simBase->m_knobs->KNOB_SCHED_TO_MEDIUM_WIDTH; \
       break; \
     \
@@ -285,23 +302,28 @@ POSSIBILITY OF SUCH DAMAGE.
       int_sched_size        = *m_simBase->m_knobs->KNOB_ISCHED_LARGE_SIZE; \
       mem_sched_size        = *m_simBase->m_knobs->KNOB_MSCHED_LARGE_SIZE; \
       fp_sched_size         = *m_simBase->m_knobs->KNOB_FSCHED_LARGE_SIZE; \
+      simd_sched_size       = *m_simBase->m_knobs->KNOB_SSCHED_LARGE_SIZE; \
       int_sched_rate        = *m_simBase->m_knobs->KNOB_ISCHED_LARGE_RATE; \
       mem_sched_rate        = *m_simBase->m_knobs->KNOB_MSCHED_LARGE_RATE; \
       fp_sched_rate         = *m_simBase->m_knobs->KNOB_FSCHED_LARGE_RATE; \
+      simd_sched_rate       = *m_simBase->m_knobs->KNOB_SSCHED_LARGE_RATE; \
       m_knob_sched_to_width = *m_simBase->m_knobs->KNOB_SCHED_TO_LARGE_WIDTH; \
       break; \
   } \
   \
   m_sched_size[gen_ALLOCQ] = int_sched_size; \
   m_sched_size[mem_ALLOCQ] = mem_sched_size; \
-  m_sched_size[fp_ALLOCQ]  = fp_sched_size; \
+  m_sched_size[fp_ALLOCQ] = fp_sched_size; \
+  m_sched_size[simd_ALLOCQ] = simd_sched_size; \
   m_sched_rate[gen_ALLOCQ] = int_sched_rate; \
   m_sched_rate[mem_ALLOCQ] = mem_sched_rate; \
-  m_sched_rate[fp_ALLOCQ]  = fp_sched_rate; \
+  m_sched_rate[fp_ALLOCQ] = fp_sched_rate; \
+  m_sched_rate[simd_ALLOCQ] = simd_sched_rate; \
   \
   m_num_per_sched[gen_ALLOCQ] = 0; \
   m_num_per_sched[mem_ALLOCQ] = 0; \
-  m_num_per_sched[fp_ALLOCQ]  = 0;
+  m_num_per_sched[fp_ALLOCQ] = 0; \
+  m_num_per_sched[simd_ALLOCQ] = 0;
 
 
 #define FRONTEND_CONFIG() \
@@ -362,6 +384,7 @@ POSSIBILITY OF SUCH DAMAGE.
   uns giaq_size; \
   uns miaq_size; \
   uns fq_size; \
+  uns siaq_size; \
   string m_knob_schedule = ""; \
   uns m_knob_fetch_latency; \
   uns m_knob_alloc_latency; \
@@ -375,6 +398,7 @@ POSSIBILITY OF SUCH DAMAGE.
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_SIZE; \
+      siaq_size              = *m_simBase->m_knobs->KNOB_SIAQ_SIZE; \
       m_max_threads_per_core = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_CORE; \
       m_core_type            = static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE); \
       m_knob_schedule        = static_cast<string>(*m_simBase->m_knobs->KNOB_SCHEDULE); \
@@ -392,6 +416,7 @@ POSSIBILITY OF SUCH DAMAGE.
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_MEDIUM_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_MEDIUM_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_MEDIUM_SIZE; \
+      siaq_size              = *m_simBase->m_knobs->KNOB_SIAQ_MEDIUM_SIZE; \
       m_max_threads_per_core = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_MEDIUM_CORE; \
       m_core_type            = static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE); \
       m_knob_schedule        = static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_SCHEDULE); \
@@ -409,6 +434,7 @@ POSSIBILITY OF SUCH DAMAGE.
       giaq_size              = *m_simBase->m_knobs->KNOB_GIAQ_LARGE_SIZE; \
       miaq_size              = *m_simBase->m_knobs->KNOB_MIAQ_LARGE_SIZE; \
       fq_size                = *m_simBase->m_knobs->KNOB_FQ_LARGE_SIZE; \
+      siaq_size              = *m_simBase->m_knobs->KNOB_SIAQ_LARGE_SIZE; \
       m_max_threads_per_core = *m_simBase->m_knobs->KNOB_MAX_THREADS_PER_LARGE_CORE; \
       m_core_type            = static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE); \
       m_knob_schedule        = static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_SCHEDULE); \

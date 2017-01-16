@@ -108,6 +108,10 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 #include "../def/uoplatency_ptx580.def"
 };
 
+static Uop_LatencyBinding_Init uop_latencybinding_init_igpu[] = {
+#define DEFUOP(A, B) {A, # A, B},
+#include "../def/uoplatency_igpu.def"
+};
 
 // exec_c constructor
 exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT()
@@ -127,6 +131,15 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
     for (int ii = 0; ii < latency_array_size; ++ii) {
       m_latency[uop_latencybinding_init_ptx[ii].uop_type_s] =
         uop_latencybinding_init_ptx[ii].m_latency;
+    }
+  }
+  else if (m_igpu_sim) {
+    int latency_array_size = (sizeof uop_latencybinding_init_igpu /
+        sizeof (uop_latencybinding_init_igpu[0]));
+
+    for (int ii = 0; ii < latency_array_size; ++ii) {
+      m_latency[uop_latencybinding_init_igpu[ii].uop_type_s] =
+        uop_latencybinding_init_igpu[ii].m_latency;
     }
   }
   else {

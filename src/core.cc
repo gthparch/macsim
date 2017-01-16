@@ -198,7 +198,8 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   int q_iaq_size[max_ALLOCQ];
   q_iaq_size[gen_ALLOCQ] = giaq_size;
   q_iaq_size[mem_ALLOCQ] = miaq_size;
-  q_iaq_size[fp_ALLOCQ]  = fq_size;
+  q_iaq_size[fp_ALLOCQ] = fq_size;
+  q_iaq_size[simd_ALLOCQ] = siaq_size;
 
   sstr.clear();
   if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {

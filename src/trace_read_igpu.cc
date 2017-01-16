@@ -50,8 +50,8 @@ void igpu_decoder_c::init_pin_convert()
   m_int_uop_table[GED_OPCODE_CALL] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_RET] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_WAIT] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_SEND] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_SENDC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_SEND] = UOP_IMEM;
+  m_int_uop_table[GED_OPCODE_SENDC] = UOP_IMEM;
   m_int_uop_table[GED_OPCODE_MATH] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_ADD] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_MUL] = UOP_IMUL;
@@ -77,7 +77,7 @@ void igpu_decoder_c::init_pin_convert()
   m_int_uop_table[GED_OPCODE_DP2] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_LINE] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_PLN] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_MAD] = UOP_IMUL;
+  m_int_uop_table[GED_OPCODE_MAD] = UOP_SIMD;
   m_int_uop_table[GED_OPCODE_LRP] = UOP_IADD;
   m_int_uop_table[GED_OPCODE_NOP] = UOP_NOP;
   m_int_uop_table[GED_OPCODE_DIM] = UOP_IADD;
@@ -85,9 +85,9 @@ void igpu_decoder_c::init_pin_convert()
   m_int_uop_table[GED_OPCODE_SMOV] = UOP_IMEM;
   m_int_uop_table[GED_OPCODE_GOTO] = UOP_CF;
   m_int_uop_table[GED_OPCODE_JOIN] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_MADM] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_SENDS] = UOP_IADD;
-  m_int_uop_table[GED_OPCODE_SENDSC] = UOP_IADD;
+  m_int_uop_table[GED_OPCODE_MADM] = UOP_SIMD;
+  m_int_uop_table[GED_OPCODE_SENDS] = UOP_IMEM;
+  m_int_uop_table[GED_OPCODE_SENDSC] = UOP_IMEM;
   m_int_uop_table[GED_OPCODE_INVALID] = UOP_INV;
 
   m_fp_uop_table[GED_OPCODE_ILLEGAL] = UOP_INV;
@@ -150,7 +150,7 @@ void igpu_decoder_c::init_pin_convert()
   m_fp_uop_table[GED_OPCODE_DP2] = UOP_IADD;
   m_fp_uop_table[GED_OPCODE_LINE] = UOP_IADD;
   m_fp_uop_table[GED_OPCODE_PLN] = UOP_IADD;
-  m_fp_uop_table[GED_OPCODE_MAD] = UOP_IMUL;
+  m_fp_uop_table[GED_OPCODE_MAD] = UOP_SIMD;
   m_fp_uop_table[GED_OPCODE_LRP] = UOP_IADD;
   m_fp_uop_table[GED_OPCODE_NOP] = UOP_NOP;
   m_fp_uop_table[GED_OPCODE_DIM] = UOP_IADD;
@@ -158,9 +158,9 @@ void igpu_decoder_c::init_pin_convert()
   m_fp_uop_table[GED_OPCODE_SMOV] = UOP_IMEM;
   m_fp_uop_table[GED_OPCODE_GOTO] = UOP_CF;
   m_fp_uop_table[GED_OPCODE_JOIN] = UOP_IADD;
-  m_fp_uop_table[GED_OPCODE_MADM] = UOP_IADD;
-  m_fp_uop_table[GED_OPCODE_SENDS] = UOP_IADD;
-  m_fp_uop_table[GED_OPCODE_SENDSC] = UOP_IADD;
+  m_fp_uop_table[GED_OPCODE_MADM] = UOP_SIMD;
+  m_fp_uop_table[GED_OPCODE_SENDS] = UOP_IMEM;
+  m_fp_uop_table[GED_OPCODE_SENDSC] = UOP_IMEM;
   m_fp_uop_table[GED_OPCODE_INVALID] = UOP_INV;
 }
 

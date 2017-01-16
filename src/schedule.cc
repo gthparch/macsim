@@ -79,6 +79,7 @@ schedule_c::schedule_c(exec_c* exec, int core_id, Unit_Type unit_type, frontend_
   SCHED_CONFIG();
 
   std::fill_n(m_schedule_list, MAX_SCHED_SIZE, - 1); 
+  m_last_sched_cycle = 0;
 }
 
 
@@ -195,6 +196,10 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
       cur_uop->m_uop_num, cur_uop->m_inst_num, cur_uop->m_vaddr, cur_uop->m_allocq_num, cur_uop->m_mem_type, 
       (cur_uop->m_last_dep_exec? *(cur_uop->m_last_dep_exec) : 0), cur_uop->m_done_cycle);
 
+  DEBUG_CORE(m_core_id, "m_core_id:%d m_last_sched_cycle:%llu m_cur_core_cycle:%llu\n", m_core_id, m_last_sched_cycle, m_cur_core_cycle); 
+  //if (m_exec->igpu_sim() && (m_last_sched_cycle == m_cur_core_cycle - 1))
+    //return false;
+
   // Return if sources are not ready 
   if (!bogus && 
       !(cur_uop->m_srcs_rdy) && 
@@ -252,6 +257,7 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
     return false;
   }
 
+  m_last_sched_cycle = m_cur_core_cycle;
 
   // Generate Stat events
   STAT_EVENT(DISPATCHED_INST);
@@ -288,15 +294,19 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
       ASSERT(m_num_per_sched[fp_ALLOCQ] > 0);
       --m_num_per_sched[fp_ALLOCQ]; 
       break;
+    case simd_ALLOCQ : 
+      ASSERT(m_num_per_sched[simd_ALLOCQ] > 0);
+      --m_num_per_sched[simd_ALLOCQ]; 
+      break;
     default:
      printf("unknown allocq\n");
       exit(EXIT_FAILURE);
   }
 
   DEBUG_CORE(m_core_id, "cycle_m_count:%lld m_core_id:%d thread_id:%d uop_num:%lld inst_num:%lld entry:%d allocq:%d "
-      "m_num_in_sched:%d m_num_per_sched[general]:%d m_num_per_sched[mem]:%d m_num_per_sched[fp]:%d done_cycle:%lld\n",
+      "m_num_in_sched:%d m_num_per_sched[general]:%d m_num_per_sched[mem]:%d m_num_per_sched[fp]:%d m_num_per_sched[simd]:%d done_cycle:%lld\n",
       m_cur_core_cycle, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, entry, cur_uop->m_allocq_num, 
-      m_num_in_sched, m_num_per_sched[gen_ALLOCQ], m_num_per_sched[mem_ALLOCQ], m_num_per_sched[fp_ALLOCQ], cur_uop->m_done_cycle);
+      m_num_in_sched, m_num_per_sched[gen_ALLOCQ], m_num_per_sched[mem_ALLOCQ], m_num_per_sched[fp_ALLOCQ], m_num_per_sched[simd_ALLOCQ], cur_uop->m_done_cycle);
 
   return true;
 }

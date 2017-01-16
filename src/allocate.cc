@@ -122,11 +122,12 @@ void allocate_c::run_a_cycle(void)
     // -------------------------------------
     // check resource requirement
     // -------------------------------------
-    int req_rob     = 1;        // require rob entries
-    int req_sb      = 0;        // require store buffer entries
-    int req_lb      = 0;        // require load buffer entries
-    int req_int_reg = 0;        // require integer register
-    int req_fp_reg  = 0;        // require fp register
+    int req_rob      = 1;        // require rob entries
+    int req_sb       = 0;        // require store buffer entries
+    int req_lb       = 0;        // require load buffer entries
+    int req_int_reg  = 0;        // require integer register
+    int req_fp_reg   = 0;        // require fp register
+    int req_simd_reg = 0;        // require simd register
     int q_type      = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
 
     if (uop->m_mem_type == MEM_LD) // load queue
@@ -140,7 +141,6 @@ void allocate_c::run_a_cycle(void)
     else if (uop->m_uop_type == UOP_FCVT || uop->m_uop_type == UOP_FADD) // fp register
       req_fp_reg = 1;
 
-
     // single allocation queue
     if (m_num_queues == 1) {
       q_type = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
@@ -149,6 +149,8 @@ void allocate_c::run_a_cycle(void)
     else { 
       if (req_fp_reg) 
         q_type = *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX;
+      else if (uop->m_uop_type == UOP_SIMD)
+        q_type = *m_simBase->m_knobs->KNOB_SIMD_ALLOCQ_INDEX;
       else if (req_sb || req_lb) 
         q_type = *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX;
       else 
@@ -207,7 +209,8 @@ void allocate_c::run_a_cycle(void)
     // insert an uop into reorder buffer
     // -------------------------------------
     uop->m_allocq_num = (q_type == *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX) ? gen_ALLOCQ :
-                         (q_type == *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX) ? mem_ALLOCQ : fp_ALLOCQ;
+                         (q_type == *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX) ? mem_ALLOCQ : 
+                         (q_type == *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX) ? fp_ALLOCQ : simd_ALLOCQ;
     m_rob->push(uop);
 
     POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
