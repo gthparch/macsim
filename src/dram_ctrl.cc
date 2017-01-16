@@ -997,6 +997,7 @@ void dram_simple_ctrl_c::receive(void)
 
   req->m_rdy_cycle = m_cycle + m_latency;
   m_output_buffer->push_back(req);
+  STAT_EVENT(TOTAL_DRAM);
 
   NETWORK->receive_pop(MEM_MC, m_id);
 
