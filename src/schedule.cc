@@ -197,8 +197,10 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
       (cur_uop->m_last_dep_exec? *(cur_uop->m_last_dep_exec) : 0), cur_uop->m_done_cycle);
 
   DEBUG_CORE(m_core_id, "m_core_id:%d m_last_sched_cycle:%llu m_cur_core_cycle:%llu\n", m_core_id, m_last_sched_cycle, m_cur_core_cycle); 
-  //if (m_exec->igpu_sim() && (m_last_sched_cycle == m_cur_core_cycle - 1))
-    //return false;
+  if (m_exec->igpu_sim() && (cur_uop->m_uop_type == UOP_SIMD) && (m_last_sched_cycle == m_cur_core_cycle - 1)) {
+    *sched_fail_reason = SCHED_FAIL_NO_AVAILABLE_SIMD_UNIT;
+    return false;
+  }
 
   // Return if sources are not ready 
   if (!bogus && 
@@ -257,7 +259,8 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason)
     return false;
   }
 
-  m_last_sched_cycle = m_cur_core_cycle;
+  if (cur_uop->m_uop_type == UOP_SIMD)
+    m_last_sched_cycle = m_cur_core_cycle;
 
   // Generate Stat events
   STAT_EVENT(DISPATCHED_INST);
