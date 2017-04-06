@@ -525,12 +525,13 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       trace_uop[0]->m_bar_type = NOT_BAR;
       trace_uop[0]->m_num_src_regs = pi->m_num_read_regs;
       
+			/*
       // m_is_fp = true is used to indicate a child uop
       // m_branch_target is used to indicate the number of child uops a parent uop has
       if (pi->m_is_fp == false) {
         trace_uop[0]->m_is_parent = true;
         trace_uop[0]->m_num_children = pi->m_branch_target;
-      }
+				}*/
       
       //if (pi->m_opcode == XED_CATEGORY_DATAXFER)
         //trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
@@ -810,6 +811,12 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
 
     ASSERT(num_uop > 0);
   }
+
+	if ((pi->m_is_fp == false) &&  ((pi->m_num_ld) > 0 || (pi->m_has_st==1)) && (pi->m_branch_target > 0) ) {
+		/* only the first uop can be a parent uop */ 
+		trace_uop[0]->m_is_parent = true;
+		trace_uop[0]->m_num_children = pi->m_branch_target;
+	}
 
   /////////////////////////////////////////////////////////////////////////////////////////////
   // end of instruction decoding
