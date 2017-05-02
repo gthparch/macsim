@@ -4,11 +4,12 @@ num_sim_small_cores 0
 num_sim_medium_cores 0
 num_sim_large_cores 24
 core_type ptx
-large_core_type x86
+large_core_type igpu
 sim_cycle_count 0
 max_insts 500000000
 heartbeat_interval 1000000
-forward_progress_limit 50000
+forward_progress_limit 10000
+core_thread_sched balanced
 
 # Clock
 clock_cpu 1.15
@@ -23,7 +24,7 @@ mt_no_fetch_br 1
 one_cycle_exec 0
 
 # Large Core Configuration
-large_width 4
+large_width 2
 large_core_fetch_latency 5
 large_core_alloc_latency 10
 isched_large_rate 4
@@ -65,7 +66,8 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 8
 dram_rowbuffer_size 2048
-dram_scheduling_policy FRFCFS
+dram_scheduling_policy SIMPLE
+dram_additional_latency 100
 
 # ETC
 bug_detector_enable 1
