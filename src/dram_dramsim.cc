@@ -69,14 +69,14 @@ dram_dramsim_c::dram_dramsim_c(macsim_c* simBase)
   m_tmp_output_buffer = new list<mem_req_s*>;
   m_pending_request = new list<mem_req_s*>;
   m_dramsim = getMemorySystemInstance(
-  "/home/common/DRAMSim2/ini/DDR4_ramulator_2133P_8Gb_x8.ini", 
+      "/home/common/DRAMSim2/ini/DDR4_ramulator_2133P_8Gb_x8.ini", 
       // "/home/common/DRAMSim2/ini/DDR3_micron_64M_8B_x4_sg15.ini.igpu",
 //      "src/DRAMSim2/ini/DDR1_micron_16M_8b_x8_sg3E.ini", 
-  "/home/common/DRAMSim2/system.ini.igpu", 
-  "..", 
-  "resultsfilename", 
-  // 16384);
-  65536);
+      "/home/common/DRAMSim2/system.ini.igpu", 
+      "..", 
+      "resultsfilename", 
+      // 16384);
+      65536);
 
   // this only makes sense when MC frequency is the same as that of CPU
   m_dramsim->setCPUClockSpeed(*KNOB(KNOB_CLOCK_MC)*1e9);
