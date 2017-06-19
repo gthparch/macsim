@@ -187,6 +187,7 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
   ///
   /// BOM (beginning of macro) : need to get a next instruction
   ///
+read_again:
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
     
@@ -209,6 +210,18 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
       return false;
 
     info = get_inst_info(thread_trace_info, core_id, sim_thread_id);
+
+	  STAT_CORE_EVENT(core_id, PARENT_UOP); 
+    // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
+    // check whether uop has an address 0 and mem type load 
+ /*
+		if ((info->m_table_info->m_mem_type != NOT_MEM) && info->m_addr == 0)
+			printf("memotype NOTMEM and va 0 \n"); 
+  
+      */
+      
+
+
 
     // read a new instruction, so update stats
     if (inst_read) { 
@@ -329,9 +342,9 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
   ASSERTM(uop->m_num_dests < MAX_DST_NUM, "uop->num_dests=%d MAX_DST_NUM=%d\n", 
       uop->m_num_dests, MAX_DST_NUM);
 
-  DEBUG_CORE(uop->m_core_id, "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_sending_uop:%d "
-      "pc:0x%llx dir:%d \n", uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests, 
-      thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
+  DEBUG_CORE(uop->m_core_id, "thread_id:%d uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_sending_uop:%d "
+      "pc:0x%llx dir:%d BOM:%d \n", sim_thread_id, uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests, 
+      thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir, uop->m_isitBOM);
 
   // filling the src_info, dest_info
   if (uop->m_num_srcs < MAX_SRCS) {
@@ -362,6 +375,10 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
   // for a parent memory uop, read child uops from the trace  
   if (uop->m_mem_type != NOT_MEM) {
     if (trace_uop->m_is_parent && trace_uop->m_num_children > 0) {
+			// STAT_CORE_EVENT(core_id, PARENT_UOP); 
+      // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
+			DEBUG_CORE(uop->m_core_id, "new parent_uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
+									 uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
       uop->m_child_uops = new uop_c * [trace_uop->m_num_children];
       uop->m_num_child_uops = trace_uop->m_num_children;
       uop->m_num_child_uops_done = 0;
@@ -380,6 +397,8 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
         read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, sim_thread_id, &dummy);
         if (!read_success) 
           return false;
+				STAT_CORE_EVENT(core_id, CHILD_UOP_READ); 
+        // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
 
         trace_info_igpu_s* ti = static_cast<trace_info_igpu_s*>(thread_trace_info->m_prev_trace_info);
 
@@ -401,6 +420,8 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
 
         uop->m_child_uops[i] = child_mem_uop;
         
+				DEBUG_CORE(uop->m_core_id, "new %dth-child_uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
+									 i, child_mem_uop->m_uop_num, child_mem_uop->m_inst_num, child_mem_uop->m_thread_id, child_mem_uop->m_unique_num);
         // Copy next instruction to current instruction field
         memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, sizeof(trace_info_igpu_s));
       }
@@ -899,11 +920,11 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
   *m_dprint_output << "mem_read_size: " << hex << (uint32_t) t_info->m_mem_read_size << endl;
   *m_dprint_output << "mem_write_size: " << hex << (uint32_t) t_info->m_mem_write_size << endl;
   *m_dprint_output << "is_fp: " << (uint32_t) t_info->m_is_fp << endl;
-  *m_dprint_output << "ld_vaddr1: " << hex << (uint32_t) t_info->m_ld_vaddr1 << endl;
-  *m_dprint_output << "ld_vaddr2: " << hex << (uint32_t) t_info->m_ld_vaddr2 << endl;
-  *m_dprint_output << "st_vaddr: " << hex << (uint32_t) t_info->m_st_vaddr << endl;
-  *m_dprint_output << "instruction_addr: " << hex << (uint32_t)t_info->m_instruction_addr << endl;
-  *m_dprint_output << "branch_target: " << hex << (uint32_t)t_info->m_branch_target << endl;
+  *m_dprint_output << "ld_vaddr1: " << hex << (uint64_t) t_info->m_ld_vaddr1 << endl;
+  *m_dprint_output << "ld_vaddr2: " << hex << (uint64_t) t_info->m_ld_vaddr2 << endl;
+  *m_dprint_output << "st_vaddr: " << hex << (uint64_t) t_info->m_st_vaddr << endl;
+  *m_dprint_output << "instruction_addr: " << hex << (uint64_t)t_info->m_instruction_addr << endl;
+  *m_dprint_output << "branch_target: " << hex << (uint64_t)t_info->m_branch_target << endl;
   *m_dprint_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
   *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
   *m_dprint_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
