@@ -187,7 +187,6 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
   ///
   /// BOM (beginning of macro) : need to get a next instruction
   ///
-read_again:
   if (thread_trace_info->m_bom) {
     bool inst_read; // indicate new instruction has been read from a trace file
     
@@ -213,12 +212,6 @@ read_again:
 
 	  STAT_CORE_EVENT(core_id, PARENT_UOP); 
     // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
-    // check whether uop has an address 0 and mem type load 
- /*
-		if ((info->m_table_info->m_mem_type != NOT_MEM) && info->m_addr == 0)
-			printf("memotype NOTMEM and va 0 \n"); 
-  
-      */
       
 
 
@@ -375,8 +368,6 @@ read_again:
   // for a parent memory uop, read child uops from the trace  
   if (uop->m_mem_type != NOT_MEM) {
     if (trace_uop->m_is_parent && trace_uop->m_num_children > 0) {
-			// STAT_CORE_EVENT(core_id, PARENT_UOP); 
-      // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
 			DEBUG_CORE(uop->m_core_id, "new parent_uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
 									 uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
       uop->m_child_uops = new uop_c * [trace_uop->m_num_children];
@@ -398,7 +389,6 @@ read_again:
         if (!read_success) 
           return false;
 				STAT_CORE_EVENT(core_id, CHILD_UOP_READ); 
-        // STAT_CORE_EVENT(core_id, TRACE_READ_COUNT);
 
         trace_info_igpu_s* ti = static_cast<trace_info_igpu_s*>(thread_trace_info->m_prev_trace_info);
 
