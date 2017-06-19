@@ -42,21 +42,21 @@ icache_large_line_size 64
 icache_large_cycles 14
 
 # L3-D
-l1_large_num_set 1024 # 960 KB
-l1_large_assoc 15
+l1_large_num_set 512 # 512 KB
+l1_large_assoc 16
 l1_large_line_size 64
-l1_large_latency 14
+l1_large_latency 138
 l1_large_bypass 0
 
 # Memory
-memory_type l2_decoupled_network
+memory_type igpu_network
 
 # LLC
 num_l3 1
 l3_num_set 8192
-l3_assoc 16
+l3_assoc 32
 l3_line_size 64
-l3_latency 30
+l3_latency 242
 
 # DRAM
 dram_bus_width 4

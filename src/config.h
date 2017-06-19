@@ -137,6 +137,18 @@ POSSIBILITY OF SUCH DAMAGE.
         m_num_read_port = *KNOB(KNOB_L2_READ_PORTS); \
         m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS); \
       } \
+      else if (level == MEM_L2L3) { \
+        m_num_set   = *m_simBase->m_knobs->KNOB_L1_LARGE_NUM_SET; \
+        m_assoc     = *m_simBase->m_knobs->KNOB_L1_LARGE_ASSOC; \
+        m_line_size = *m_simBase->m_knobs->KNOB_L1_LARGE_LINE_SIZE; \
+        m_banks     = *m_simBase->m_knobs->KNOB_L1_LARGE_NUM_BANK; \
+        m_latency   = *m_simBase->m_knobs->KNOB_L1_LARGE_LATENCY; \
+        m_bypass    = *m_simBase->m_knobs->KNOB_L1_LARGE_BYPASS; \
+        m_ptx_sim   =  m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "ptx" ? true : false; \
+        m_igpu_sim  =  m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "igpu" ? true : false; \
+        m_num_read_port = *KNOB(KNOB_L1_READ_PORTS); \
+        m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS); \
+      } \
       else if (level == MEM_L3) { \
         m_num_set   = *m_simBase->m_knobs->KNOB_L3_NUM_SET; \
         m_assoc     = *m_simBase->m_knobs->KNOB_L3_ASSOC; \
