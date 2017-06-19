@@ -182,6 +182,7 @@ void macsim_c::register_functions(void)
   mem_factory_c::get()->register_class("no_cache", default_mem);
   mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
   mem_factory_c::get()->register_class("l2_decoupled_local", default_mem);
+  mem_factory_c::get()->register_class("igpu_network", default_mem);
 
   dram_factory_c::get()->register_class("FCFS", fcfs_controller);
   dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);

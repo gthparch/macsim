@@ -528,6 +528,7 @@ class memory_c
   protected:
     dcu_c** m_l1_cache; /**< L1 caches */
     dcu_c** m_l2_cache; /**< L2 caches */
+    dcu_c** m_l2l3_cache;
     dcu_c** m_l3_cache; /**< L3 caches */
     list<mem_req_s*>* m_mshr; /**< mshr entry per L1 cache */
     list<mem_req_s*>* m_mshr_free_list; /**< mshr entry free list */
@@ -700,6 +701,30 @@ class l2_decoupled_local_c : public memory_c
      */
     ~l2_decoupled_local_c();
   
+  private:
+    /**
+     * Set the level of each cache level
+     */
+    void set_cache_id(mem_req_s* req);
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief 2-Level, L2 & L3 are accessed via NoC (no L1, L2) (Intel GPU)
+///////////////////////////////////////////////////////////////////////////////////////////////
+class igpu_network_c : public memory_c
+{
+  public:
+    /**
+     * constructor
+     */
+    igpu_network_c(macsim_c* simBase);
+
+    /**
+     * Destructor
+     */
+    ~igpu_network_c();
+
   private:
     /**
      * Set the level of each cache level
