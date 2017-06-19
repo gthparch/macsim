@@ -62,6 +62,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 /* please check trace_read.cc */ 
+DEF_STAT( PARENT_UOP,                COUNT,       NO_RATIO,  PER_CORE)
+DEF_STAT( CHILD_UOP_READ,                 COUNT,       NO_RATIO,  PER_CORE)
+
 
 DEF_STAT (OP_CAT_XED_CATEGORY_INVALID             , DIST,  NO_RATIO, PER_CORE)
 DEF_STAT (OP_CAT_XED_CATEGORY_3DNOW               , COUNT, NO_RATIO, PER_CORE)
