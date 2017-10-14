@@ -6,9 +6,9 @@ num_sim_large_cores 24
 core_type ptx
 large_core_type igpu
 sim_cycle_count 0
-max_insts 500000000
+max_insts 3000000
 heartbeat_interval 1000000
-forward_progress_limit 10000
+forward_progress_limit 1000000
 core_thread_sched balanced
 
 # Clock
@@ -45,7 +45,7 @@ icache_large_cycles 14
 l1_large_num_set 512 # 512 KB
 l1_large_assoc 16
 l1_large_line_size 64
-l1_large_latency 138
+l1_large_latency 110
 l1_large_bypass 0
 
 # Memory
@@ -56,7 +56,7 @@ num_l3 1
 l3_num_set 8192
 l3_assoc 32
 l3_line_size 64
-l3_latency 242
+l3_latency 100
 
 # DRAM
 dram_bus_width 4
@@ -66,8 +66,8 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 8
 dram_rowbuffer_size 2048
-dram_scheduling_policy SIMPLE
-dram_additional_latency 100
+dram_scheduling_policy DRAMSIM
+dram_additional_latency 95
 
 # ETC
 bug_detector_enable 1
@@ -88,3 +88,5 @@ debug_trace_read 0
 debug_sim_thread_schedule 0
 debug_cache_lib 0
 debug_bp_dir 0
+debug_print_trace 0 
+debug_noc 0 
