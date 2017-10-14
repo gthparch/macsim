@@ -1767,7 +1767,12 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
 
   // find a matching request
-  mem_req_s* matching_req = search_req(core_id, addr, size);
+  mem_req_s* matching_req = NULL;
+  for (int i = 0; i < *KNOB(KNOB_NUM_SIM_CORES); ++i) {
+    matching_req = search_req(i, addr, size);
+    if (matching_req != NULL)
+      break;
+  }
 
   if (type == MRT_IFETCH) { 
     POWER_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_R_TAG); 
