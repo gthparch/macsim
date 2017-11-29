@@ -70,6 +70,7 @@ flags['dram']  = Config.get('Library', 'dram', '0')
 flags['power'] = Config.get('Library', 'power', '0')
 flags['iris']  = Config.get('Library', 'iris', '0')
 flags['qsim']  = Config.get('Library', 'qsim', '0')
+flags['ramulator']  = Config.get('Library', 'ramulator', '0')
 flags['debug'] = Config.get('Build', 'debug', '0')
 flags['gprof'] = Config.get('Build', 'gprof', '0')
 flags['val']   = Config.get('Build_Extra', 'val', '0')
@@ -83,6 +84,7 @@ flags['iris']  = ARGUMENTS.get('iris', flags['iris'])
 flags['dram']  = ARGUMENTS.get('dram', flags['dram'])
 flags['val']   = ARGUMENTS.get('val', flags['val'])
 flags['qsim']  = ARGUMENTS.get('qsim', flags['qsim'])
+flags['ramulator']  = ARGUMENTS.get('ramulator', flags['ramulator'])
 
 
 ## Checkout DRAMSim2 copy
@@ -90,6 +92,10 @@ if flags['dram'] == '1':
   if not os.path.exists('src/DRAMSim2'):
     os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
 
+## Checkout Ramulator copy
+if flags['ramulator'] == '1':
+  if not os.path.exists('src/ramulator'):
+    os.system('git clone https://github.com/CMU-SAFARI/ramulator.git src/ramulator')
 
 ## Create stat/knobs
 SConscript('scripts/SConscript')
