@@ -292,6 +292,7 @@ if flags['dram'] == '1':
   libraries.append('dramsim')
   env['CPPDEFINES'].append('DRAMSIM')
   env['CPPPATH'] += ['#src/DRAMSim2']
+  env['LIBPATH'] += [Dir('.')]
 
 if flags['iris'] == '1':
   libraries.append('iris')
