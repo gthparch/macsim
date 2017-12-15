@@ -28,81 +28,71 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : dram.h 
+ * File         : dram_ramulator.h 
  * Author       : HPArch Research Group
- * Date         : 2/18/2013
- * SVN          : $Id: dram.h 867 2009-11-05 02:28:12Z kacear $:
- * Description  : Memory controller
+ * Date         : 11/28/2017
+ * Description  : Ramulator interface
  *********************************************************************************************/
 
+#ifndef __RAMULATOR_HH__
+#define __RAMULATOR_HH__
 
-#ifndef DRAM_H
-#define DRAM_H
+#ifdef RAMULATOR
 
+#include <deque>
+#include <map>
+#include <tuple>
 
-#include "macsim.h"
+#include "ramulator_wrapper.h"
+#include "ramulator/src/Config.h"
 
+#include "dram.h"
+#include "memreq_info.h"
+#include "network.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Memory controller base class
-///////////////////////////////////////////////////////////////////////////////////////////////
-class dram_c
-{
-  public:
-    /**
-     * Constructor
-     */
-    dram_c(macsim_c* simBase);
+class dram_ramulator_c : public dram_c {
+private:
+	unsigned int requestsInFlight;
+  std::map<long, std::deque<mem_req_s*>> reads;
+  std::map<long, std::deque<mem_req_s*>> writes;
+  std::deque<mem_req_s*> resp_queue;
 
-    /**
-     * Destructor
-     */
-    virtual ~dram_c() = 0;
+  ramulator::Config configs;
+  ramulator::RamulatorWrapper *wrapper;
+  std::function<void(ramulator::Request &)> read_cb_func;
+  std::function<void(ramulator::Request &)> write_cb_func;
 
-    /**
-     * Print all requests in the DRAM request buffer
-     */
-    virtual void print_req(void) = 0; 
+  // Default Constructor
+  dram_ramulator_c(); // do not implement
 
-    /**
-     * Initialize MC
-     */
-    virtual void init(int id) = 0; 
+  // Send a packet to NOC
+  void send(void);
 
-    /**
-     * Tick a cycle
-     */
-    virtual void run_a_cycle(bool) = 0;
+  // Receive a packet from NOC
+  void receive(void);
 
-  protected:
-    /**
-     * Send a packet to NOC
-     */
-    virtual void send(void) = 0;
+  // Read callback function
+  void readComplete(ramulator::Request &ramu_req);
 
-    /**
-     * Receive a packet from NOC
-     */
-    virtual void receive(void) = 0;
+  // Write callback function
+  void writeComplete(ramulator::Request &ramu_req);
 
-  private:
-    dram_c(); // do not implement
+public:
+  // Constructor
+  dram_ramulator_c(macsim_c *simBase);
 
-  protected:
-    macsim_c* m_simBase; /**< simulation base class */
-    Counter m_cycle; /**< dram clock cycle */
-    int m_id; /**< MC id */
+  // Destructor
+  ~dram_ramulator_c();
+
+  // Initialize MC
+	void init(int);
+
+  // Print all requests in DRB
+  void print_req(void);
+
+  // Tick a cycle
+  void run_a_cycle(bool);
 };
 
-
-// wrapper function to allocate a dram scheduler
-dram_c* fcfs_controller(macsim_c* simBase);
-dram_c* frfcfs_controller(macsim_c* simBase);
-dram_c* dramsim_controller(macsim_c* simBase);
-dram_c* ramulator_controller(macsim_c* simBase);
-#ifdef USING_SST
-dram_c* vaultsim_controller(macsim_c* simBase);
-#endif
-
-
-#endif
+#endif // RAMULATOR
+#endif // __RAMULATOR_HH__

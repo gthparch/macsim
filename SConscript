@@ -185,6 +185,38 @@ if flags['dram'] == '1':
 
 
 #########################################################################################
+# Ramulator
+#########################################################################################
+ramulator_srcs = [
+  'src/ramulator_wrapper.cc',
+  'src/dram_ramulator.cc',
+  'src/ramulator/src/Config.cpp',
+  'src/ramulator/src/Controller.cpp',
+  'src/ramulator/src/DDR3.cpp',
+  'src/ramulator/src/DDR4.cpp',
+  'src/ramulator/src/GDDR5.cpp',
+  'src/ramulator/src/Gem5Wrapper.cpp',
+  'src/ramulator/src/HBM.cpp',
+  'src/ramulator/src/LPDDR3.cpp',
+  'src/ramulator/src/LPDDR4.cpp',
+  'src/ramulator/src/MemoryFactory.cpp',
+  'src/ramulator/src/SALP.cpp',
+  'src/ramulator/src/WideIO.cpp',
+  'src/ramulator/src/WideIO2.cpp',
+  'src/ramulator/src/TLDRAM.cpp',
+  'src/ramulator/src/ALDRAM.cpp',
+  'src/ramulator/src/StatType.cpp',
+]
+
+if flags['ramulator'] == '1':
+  env['CPPFLAGS'] += '-Wno-missing-field-initializers '
+  env['CPPFLAGS'] += '-Wno-unused-variable '
+  env['CPPFLAGS'] += '-Wno-reorder '
+  env['CPPPATH'] += ['#src/ramulator']
+  env['LIBPATH'] += [Dir('.')]
+  env.Library('ramulator', ramulator_srcs, CPPDEFINES=['RAMULATOR'])
+
+#########################################################################################
 # MACSIM
 #########################################################################################
 macsim_src = [
@@ -273,7 +305,8 @@ if flags['iris'] == '1':
 if flags['qsim'] == '1':
   libraries += ['xed', 'qsim', 'capstone', 'pthread', 'dl']
 
-
+if flags['ramulator'] == '1':
+  libraries.append('ramulator')
 
 env.Program(
     'macsim',
