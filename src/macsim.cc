@@ -188,6 +188,9 @@ void macsim_c::register_functions(void)
 #ifdef RAMULATOR
   dram_factory_c::get()->register_class("RAMULATOR", ramulator_controller);
 #endif
+#ifdef DRAMSIM
+  dram_factory_c::get()->register_class("DRAMSIM", dramsim_controller);
+#endif
 #ifdef USING_SST
   dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
 #endif
