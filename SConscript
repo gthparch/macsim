@@ -257,6 +257,7 @@ macsim_src = [
   'src/schedule_io.cc',
   'src/schedule_ooo.cc',
   'src/schedule_smc.cc',
+  'src/schedule_igpu.cc',
   'src/statistics.cc',
   'src/sw_managed_cache.cc',
   'src/trace_read.cc',
