@@ -383,7 +383,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid)
     ASSERTM(0, "error reading from file:%s", appl.c_str());
 
   int trace_ver = -1;
-  if (trace_type != "x86" && trace_type != "a64") {
+  if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -508,9 +508,10 @@ void process_manager_c::setup_process(process_s* process)
   if (!(trace_config_file >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
-  
+  printf("trace:%s is opended \n", trace_info_file_name.c_str()); 
+
   int trace_ver = -1;
-  if (trace_type != "x86" && trace_type != "a64") {
+  if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14 ) {
       ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
     }
@@ -785,6 +786,9 @@ thread_s *process_manager_c::create_thread(process_s* process, int tid, bool mai
     } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
       trace_info->m_prev_trace_info = new trace_info_a64_s;
       trace_info->m_next_trace_info = new trace_info_a64_s;
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+      trace_info->m_prev_trace_info = new trace_info_igpu_s;
+      trace_info->m_next_trace_info = new trace_info_igpu_s;
     } else {
       ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
@@ -991,6 +995,11 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
       delete temp;
       temp = static_cast<trace_info_a64_s*>(trace_info->m_next_trace_info);
       delete temp;
+    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+      trace_info_igpu_s *temp = static_cast<trace_info_igpu_s*>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_igpu_s*>(trace_info->m_next_trace_info);
+      delete temp;
     } else {
       ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
@@ -1079,58 +1088,184 @@ thread_trace_info_node_s *process_manager_c::fetch_block(int block_id)
   return front;
 } 
 
+int process_manager_c::get_next_low_occupancy_core(std::string core_type){
+
+    int least_occupied_core = -1;
+    int min_occupancy = INT_MAX;
+
+    for (int core_id = 0; 
+            core_id < *KNOB(KNOB_NUM_SIM_CORES); 
+            ++core_id){
+        core_c* core = m_simBase->m_core_pointers[core_id];
+
+        if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 &&
+                core->get_core_type() != "ptx" && 
+                (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
+                 core_id > *KNOB(KNOB_CORE_ENABLE_END))){
+            continue;
+        }
+
+        if ((core->m_running_thread_num < core->get_max_threads_per_core()) &&
+                (core->m_running_thread_num < min_occupancy) &&
+                core->get_core_type() == core_type){
+            least_occupied_core = core_id;
+            min_occupancy = core->m_running_thread_num;
+        }
+    }
+    return least_occupied_core;
+}
+
+int process_manager_c::get_next_available_core(std::string core_type){
+
+    int result = -1;
+    for (int core_id = 0; 
+            core_id < *KNOB(KNOB_NUM_SIM_CORES); 
+            ++core_id){
+        core_c* core = m_simBase->m_core_pointers[core_id];
+
+        if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 &&
+                core->get_core_type() != "ptx" && 
+                (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
+                 core_id > *KNOB(KNOB_CORE_ENABLE_END))){
+            continue;
+        }
+
+        if (core->m_running_thread_num < core->get_max_threads_per_core() &&
+                core->get_core_type() == core_type){
+            result = core_id;
+            break;
+        }
+    }
+    return result;
+}
 
 // schedule a thread
 // assigns a new thread/block to a core if the number of live threads/blocks
 // on the core are fewer than the maximum allowed
+// Order can be greedy or balanced
 void process_manager_c::sim_thread_schedule(bool initial)
 {
-  thread_trace_info_node_s* trace_to_run;
+    std::string sched = KNOB(KNOB_CORE_THREAD_SCHED)->getValue();
+    int (process_manager_c::*get_next_core)(std::string core_type);
 
-  // assign the fetched thread to that core's active queue
-  for (int core_id = 0; core_id < *KNOB(KNOB_NUM_SIM_CORES); ++core_id)  {
-    core_c* core = m_simBase->m_core_pointers[core_id];
+    if(sched == "greedy"){
+        get_next_core = &process_manager_c::get_next_available_core;
+    }else if (sched == "balanced"){
+        get_next_core = &process_manager_c::get_next_low_occupancy_core;
+    }else{
+        fprintf(m_simBase->g_mystderr, "ERROR: Invalid value '%s' "
+                "for KNOB_CORE_THREAD_SCHED\n"
+                "Valid values are 'greedy' and 'balanced'\n",sched.c_str());
+        exit(1);
+    }
 
-    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 &&
-        core->get_core_type() != "ptx" &&
-        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) || core_id > *KNOB(KNOB_CORE_ENABLE_END))) 
-        continue;
+    // Split the total cores into types
+    // For each core type, we follow the core_thread_sched knob
+    // We do this only for non-ptx cores.
+    // ptx continues to do whatever it was doing earlier
+    // -pgera 03-20-2017
 
-    if (core->m_running_thread_num < core->get_max_threads_per_core()) {
-      // schedule a thread to x86 core
-      if (core->get_core_type() != "ptx") {
-        // fetch a new thread
-        trace_to_run = fetch_thread();
-        if (trace_to_run != NULL) {
-          // create a new thread
-          trace_to_run->m_trace_info_ptr = create_thread(trace_to_run->m_process, 
-              trace_to_run->m_tid, trace_to_run->m_main);
+    std::set<std::string> core_type_set;
+    for (int core_id = 0; 
+            core_id < *KNOB(KNOB_NUM_SIM_CORES); 
+            ++core_id){
+        core_c* core = m_simBase->m_core_pointers[core_id];
+        core_type_set.insert(core->get_core_type());
+    }
 
-          // unique thread num of a core
-          int unique_scheduled_thread_num = core->m_unique_scheduled_thread_num;          
-          trace_to_run->m_trace_info_ptr->m_thread_id = unique_scheduled_thread_num; 
+    // Iterate over core types
+    for (std::set<std::string>::const_iterator itr = core_type_set.begin();
+            itr != core_type_set.end();
+            itr ++ ){
 
-          // add a new application to the core
-          core->add_application(unique_scheduled_thread_num, trace_to_run->m_process);
-           
-          // add a new thread trace information
-          core->create_trace_info(unique_scheduled_thread_num, trace_to_run->m_trace_info_ptr); 
+        std::string core_type = *itr;
 
-          DEBUG("schedule: core %d will run thread id %d unique_thread_id:%d \n", 
-              core_id, trace_to_run->m_trace_info_ptr->m_thread_id, 
-              trace_to_run->m_trace_info_ptr->m_unique_thread_id);
-
-          // set flag for the simulation
-          m_simBase->m_core_end_trace[core_id] = false;
-          m_simBase->m_sim_end[core_id]        = false;
-          m_simBase->m_core_started[core_id]   = true; 
-
-          // release the node entry
-          m_simBase->m_trace_node_pool->release_entry(trace_to_run);
+        if(core_type == "ptx"){
+            continue;
         }
-      }
-      // GPU simulation
-      else if (core->get_core_type() == "ptx") { 
+
+        // Get a core of this type
+        // Follow the knob policy (greedy or balanced)
+
+        int core_id = (this->*get_next_core)(core_type);
+
+        // Keep getting cores while there is work to be done 
+        while ( core_id >= 0 ){
+
+            thread_trace_info_node_s* trace_to_run;
+            core_c* core = m_simBase->m_core_pointers[core_id];
+
+            // fetch a new thread
+            trace_to_run = fetch_thread();
+            if (trace_to_run != NULL) {
+                // create a new thread
+                trace_to_run->m_trace_info_ptr = 
+                    create_thread(trace_to_run->m_process, 
+                            trace_to_run->m_tid, 
+                            trace_to_run->m_main);
+
+                // unique thread num of a core
+                int unique_scheduled_thread_num = 
+                    core->m_unique_scheduled_thread_num;          
+                trace_to_run->m_trace_info_ptr->m_thread_id = 
+                    unique_scheduled_thread_num; 
+
+                // add a new application to the core
+                core->add_application(unique_scheduled_thread_num, 
+                        trace_to_run->m_process);
+
+                // add a new thread trace information
+                core->create_trace_info(unique_scheduled_thread_num, 
+                        trace_to_run->m_trace_info_ptr); 
+
+                thread_s* m_trace_info_ptr = 
+                    trace_to_run->m_trace_info_ptr;
+                int m_thread_id = m_trace_info_ptr->m_thread_id;
+                int m_unique_thread_id = 
+                    m_trace_info_ptr->m_unique_thread_id;
+
+                DEBUG("schedule: core %d"
+                        "will run thread id %d"
+                        "unique_thread_id:%d\n", 
+                        core_id, 
+                        m_thread_id, 
+                        m_unique_thread_id);
+
+                // set flag for the simulation
+                m_simBase->m_core_end_trace[core_id] = false;
+                m_simBase->m_sim_end[core_id]        = false;
+                m_simBase->m_core_started[core_id]   = true; 
+
+                // release the node entry
+                m_simBase->m_trace_node_pool->release_entry(trace_to_run);
+            }else{
+                // Done with this core_type
+                // Get out of this loop
+                break;
+            }
+
+            // Get the next core of this type
+            core_id = (this->*get_next_core)(core_type);
+
+        } // End of work for this core type
+
+    } // End of work for all non-ptx core types
+
+
+    // NVIDIA GPU
+    for (int core_id = 0; 
+            core_id < *KNOB(KNOB_NUM_SIM_CORES); 
+            ++core_id){
+
+        thread_trace_info_node_s* trace_to_run;
+        core_c* core = m_simBase->m_core_pointers[core_id];
+
+        std::string core_type = core->get_core_type();
+        
+        if(core_type != "ptx"){
+            continue;
+        }
+
         // get currently fetching id
         int prev_fetching_block_id = core->m_fetching_block_id;
 
@@ -1138,70 +1273,93 @@ void process_manager_c::sim_thread_schedule(bool initial)
         int block_id = sim_schedule_thread_block(core_id, initial); 
 
         // no thread to schedule
-        if (block_id == -1) 
-          continue;
+        if (block_id == -1){
+            continue;
+        }
 
         // find a new thread
         trace_to_run = fetch_block(block_id);
 
-        // try to schedule as many threads as possible in the same block
+        // try to schedule as many threads as possible in the 
+        // same block
         while (trace_to_run != NULL) { 
-          //create a new thread
-          trace_to_run->m_trace_info_ptr = create_thread(trace_to_run->m_process, 
-              trace_to_run->m_tid, trace_to_run->m_main);
+            //create a new thread
+            trace_to_run->m_trace_info_ptr = 
+                create_thread(
+                        trace_to_run->m_process, 
+                        trace_to_run->m_tid, 
+                        trace_to_run->m_main);
 
-          // increment dispatched thread number of a block
-          ++m_simBase->m_block_schedule_info[block_id]->m_dispatched_thread_num;
+            // increment dispatched thread number of a block
+            block_schedule_info_s* bs_info_s_ptr =
+                m_simBase->m_block_schedule_info[block_id];
+            ++ bs_info_s_ptr->m_dispatched_thread_num;
 
-          // unique thread num of a core
-          int unique_scheduled_thread_num = core->m_unique_scheduled_thread_num;
-          trace_to_run->m_trace_info_ptr->m_thread_id = unique_scheduled_thread_num; 
+            // unique thread num of a core
+            int unique_scheduled_thread_num = 
+                core->m_unique_scheduled_thread_num;
 
-          // add a new application to the core
-          core->add_application(unique_scheduled_thread_num, trace_to_run->m_process);
+            thread_s*  m_trace_info_ptr = 
+                trace_to_run->m_trace_info_ptr ;
 
-          // add a new thread trace information
-          core->create_trace_info(unique_scheduled_thread_num, trace_to_run->m_trace_info_ptr); 
+            m_trace_info_ptr->m_thread_id = 
+                unique_scheduled_thread_num; 
 
+            // add a new application to the core
+            core->add_application(
+                    unique_scheduled_thread_num, 
+                    trace_to_run->m_process);
 
-          //m_simBase->m_trace_reader->pre_read_trace(trace_to_run->m_trace_info_ptr);
-          
-          // set flag for the simulation
-          m_simBase->m_core_end_trace[core_id] = false;
-          m_simBase->m_sim_end[core_id]        = false;
-          m_simBase->m_core_started[core_id]   = true; 
+            // add a new thread trace information
+            core->create_trace_info(
+                    unique_scheduled_thread_num, 
+                    trace_to_run->m_trace_info_ptr); 
 
-          // for thread start end cycles
-          uint32_t unique_thread_id = trace_to_run->m_trace_info_ptr->m_unique_thread_id;
-          uint32_t process_id       = trace_to_run->m_trace_info_ptr->m_process->m_process_id;
-          ASSERT(unique_thread_id < m_simBase->m_all_threads);
-          
-          thread_stat_s* thread_stat = &m_simBase->m_thread_stats[process_id][unique_thread_id]; 
+            //m_simBase->m_trace_reader->pre_read_trace(
+            //m_trace_info_ptr);
 
-          thread_stat->m_unique_thread_id   = unique_thread_id; 
-          thread_stat->m_block_id           = block_id;	   
-          thread_stat->m_thread_sched_cycle = core->get_cycle_count();
+            // set flag for the simulation
+            m_simBase->m_core_end_trace[core_id] = false;
+            m_simBase->m_sim_end[core_id]        = false;
+            m_simBase->m_core_started[core_id]   = true; 
 
-          if (core->m_running_thread_num == core->get_max_threads_per_core()) 
-            break;
-          
-          // release the node entry
-          m_simBase->m_trace_node_pool->release_entry(trace_to_run);
+            // for thread start end cycles
+            uint32_t unique_thread_id = 
+                m_trace_info_ptr->m_unique_thread_id;
+            uint32_t process_id = 
+                m_trace_info_ptr->m_process->m_process_id;
+            ASSERT(unique_thread_id < m_simBase->m_all_threads);
 
-          // try to schedule other threads in the same block
-          prev_fetching_block_id = core->m_fetching_block_id;
-          block_id = sim_schedule_thread_block(core_id, initial);
-          if (block_id == -1) 
-            break;
+            thread_stat_s* thread_stat = 
+                &m_simBase->
+                m_thread_stats[process_id][unique_thread_id]; 
 
-          // fetch a new thread
-          trace_to_run = fetch_block(block_id);
+            thread_stat->m_unique_thread_id = unique_thread_id; 
+            thread_stat->m_block_id = block_id;	   
+
+            thread_stat->m_thread_sched_cycle = 
+                core->get_cycle_count();
+
+            if (core->m_running_thread_num == 
+                    core->get_max_threads_per_core()){
+                break;
+            }
+
+            // release the node entry
+            m_simBase->m_trace_node_pool->release_entry(trace_to_run);
+
+            // try to schedule other threads in the same block
+            prev_fetching_block_id = core->m_fetching_block_id;
+            block_id = sim_schedule_thread_block(core_id, initial);
+            if (block_id == -1){
+                break;
+            }
+
+            // fetch a new thread
+            trace_to_run = fetch_block(block_id);
         }
-      }
-    }
-  }
+    } // End of work for this core type (ptx)
 }
-
 
 // assign a new block to the core
 // get the block id of the warp to be next assigned to the core

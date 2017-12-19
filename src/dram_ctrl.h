@@ -323,4 +323,53 @@ class dc_frfcfs_c : public dram_ctrl_c
 };
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief simple (fixed latency) dram scheduling
+///////////////////////////////////////////////////////////////////////////////////////////////
+class dram_simple_ctrl_c : public dram_c
+{
+  public:
+    /**
+     * Constructor.
+     *  \param simBase - Pointer to base simulation class for perf/stat counters
+     */
+    dram_simple_ctrl_c(macsim_c* simBase);
+
+    /**
+     * virtual destructor.
+     */
+    virtual ~dram_simple_ctrl_c();
+    
+    /**
+     * Initialize a dram controller with network id and controller id.
+     */
+    void init(int id);
+
+    /**
+     * Tick a cycle.
+     */
+    void run_a_cycle(bool);
+
+    /**
+     * Print all requests in the DRAM request buffer
+     */
+    void print_req(void); 
+    
+  protected:
+    /**
+     * Send a packet to the NoC
+     */
+    void send(void);
+
+    /**
+     * Receive a packet from the NoC
+     */
+    void receive(void);
+
+  private:
+    int m_latency; 
+    list<mem_req_s*>* m_output_buffer; /**< output buffer */
+};
+
+
 #endif

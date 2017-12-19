@@ -348,6 +348,19 @@ class process_manager_c
     int terminate_thread(int core_id, thread_s *trace_info, int thread_id, int block_id);
 
     /**
+     * Return next available with lowest no. of running threads
+     * Break ties lexicographically
+     * Return -1 if no core available
+     */
+    int get_next_low_occupancy_core(std::string core_type);
+
+    /**
+     * Return the first available core where we can run a thread 
+     * Return -1 if no core available
+     */
+    int get_next_available_core(std::string core_type);
+
+    /**
      * Schedule a new thread
      * @param initial - set true for initial assignment to cores (PTX)
      */

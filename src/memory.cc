@@ -192,6 +192,9 @@ memory_c *default_mem(macsim_c* m_simBase)
   else if (policy == "l2_decoupled_local") {
     new_mem = new l2_decoupled_local_c(m_simBase);
   }
+  else if (policy == "igpu_network") {
+    new_mem = new igpu_network_c(m_simBase);
+  }
   else {
     ASSERT(0);
   }
@@ -354,6 +357,9 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
 
   // clock cycle
   m_cycle = 0;
+
+  m_cache = NULL;
+  m_port = NULL;
 }
 
 
@@ -363,11 +369,16 @@ dcu_c::~dcu_c()
   if (m_disable)
     return ;
   
-  delete m_cache;
+  if (m_cache)
+    delete m_cache;
   
-  for (int ii = 0; ii < m_banks; ++ii) 
-    delete m_port[ii];
-  delete[] m_port;
+  if (m_port) {
+    for (int ii = 0; ii < m_banks; ++ii) 
+      if (m_port[ii])
+        delete m_port[ii];
+
+    delete[] m_port;
+  }
 }
 
 
@@ -1534,7 +1545,7 @@ bool dcu_c::done(mem_req_s* req)
     DEBUG_CORE(req->m_core_id, "req_id:%d uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
-    if (m_ptx_sim) {
+    if (m_ptx_sim || m_igpu_sim) {
       if (uop->m_parent_uop) {
         uop_c* puop = uop->m_parent_uop;
         ++puop->m_num_child_uops_done;
@@ -1566,7 +1577,7 @@ bool dcu_c::write_done(mem_req_s* req)
   uop_c* uop = req->m_uop;
   uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
   uop->m_state = OS_SCHEDULED;
-  if (m_ptx_sim) {
+  if (m_ptx_sim || m_igpu_sim) {
     if (uop->m_parent_uop) {
       uop_c* puop = uop->m_parent_uop;
       ++puop->m_num_child_uops_done;
@@ -1756,7 +1767,12 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
 
   // find a matching request
-  mem_req_s* matching_req = search_req(core_id, addr, size);
+  mem_req_s* matching_req = NULL;
+  for (int i = 0; i < *KNOB(KNOB_NUM_SIM_CORES); ++i) {
+    matching_req = search_req(i, addr, size);
+    if (matching_req != NULL)
+      break;
+  }
 
   if (type == MRT_IFETCH) { 
     POWER_CORE_EVENT(core_id, POWER_ICACHE_MISS_BUF_R_TAG); 
@@ -2127,6 +2143,7 @@ void memory_c::run_a_cycle_uncore(bool pll_lock)
   int index = m_cycle % m_num_l3;
   for (int ii = index; ii < index + m_num_l3; ++ii) {
     m_l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
+    m_l2l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
   }
 }
 
@@ -2526,6 +2543,64 @@ void l2_decoupled_local_c::set_cache_id(mem_req_s* req)
 {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
+  req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
+  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+igpu_network_c::igpu_network_c(macsim_c* simBase) : memory_c(simBase)
+{
+  m_l2l3_cache = new dcu_c*[m_num_l3]; 
+
+  int num_large_core = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
+  int num_medium_core = *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
+  int num_small_core = *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES;
+
+  int id = num_large_core + num_medium_core + num_small_core + m_num_core;
+  for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
+    m_l2l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L2L3, this, id, m_l3_cache, m_l2_cache, simBase);
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii) {
+    delete m_l3_cache[ii];
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
+    m_l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L3, this, id, NULL, m_l2l3_cache, simBase);
+  }
+
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    m_l1_cache[ii]->init(ii, -1, false, false, true,  true, false);
+    m_l2_cache[ii]->init(-1, ii, true,  true,  true,  true, true);
+  }
+
+  // m_l2l3_cache is used as L3 cache for Intel GPU
+  // m_l3_cache is used as LLC that is shared with CPU
+  
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
+  for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
+    m_l2l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+    m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+  }
+  
+  NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_mc);
+}
+
+
+igpu_network_c::~igpu_network_c()
+{
+}
+
+
+void igpu_network_c::set_cache_id(mem_req_s* req)
+{
+  req->m_cache_id[MEM_L1] = req->m_core_id;
+  req->m_cache_id[MEM_L2] = req->m_core_id;
+  req->m_cache_id[MEM_L2L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }

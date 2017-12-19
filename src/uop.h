@@ -54,6 +54,7 @@ typedef enum Iaq_Type_enum{
   gen_ALLOCQ = 0,
   mem_ALLOCQ,
   fp_ALLOCQ,
+  simd_ALLOCQ,
   max_ALLOCQ
 } ALLOCQ_Type;
 
@@ -109,6 +110,9 @@ typedef enum Uop_Type_enum {
 
   // MMX instructions
   UOP_SSE,
+
+  // SIMD instructions for Intel GPU
+  UOP_SIMD,
 
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,

@@ -50,8 +50,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define CPU_ROUTER 0
 #define GPU_ROUTER 1
-#define L3_ROUTER 2
-#define MC_ROUTER 3
+#define L2L3_ROUTER 2
+#define L3_ROUTER 3
+#define MC_ROUTER 4
 
 #define LOCAL 0
 #define LEFT  1

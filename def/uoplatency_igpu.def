@@ -27,8 +27,44 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+    /*
+     * The arguments to DEFUOP(opcode, latency) are as follows:
+     *  opcode  - opcode name
+     *  latency - opcode latency
+     */
 
-DEF_STAT( TRACE_READ_COUNT,          COUNT,        , NO_RATIO, PER_CORE)
+DEFUOP( UOP_INV,     1) 
+DEFUOP( UOP_INV,     1)
+DEFUOP( UOP_NOP,     1)
+DEFUOP( UOP_CF,      1)
+DEFUOP( UOP_CMOV,    1)
+DEFUOP( UOP_LDA,     1)
+DEFUOP( UOP_IMEM,    1)
+DEFUOP( UOP_LD,      1)
+DEFUOP( UOP_ST,      1)
+DEFUOP( UOP_IADD,    1)
+DEFUOP( UOP_IMUL,    2)
+DEFUOP( UOP_ICMP,    1)
+DEFUOP( UOP_LOGIC,   1)
+DEFUOP( UOP_SHIFT,   1)
+DEFUOP( UOP_BYTE,    1)
+DEFUOP( UOP_MM,      1)
 
+DEFUOP( UOP_FMEM,    1)
 
+DEFUOP( UOP_LFENCE,     100)
+DEFUOP( UOP_FULL_FENCE, 100)
+DEFUOP( UOP_ACQ_FENCE,  100)
+DEFUOP( UOP_REL_FENCE,  100)
 
+DEFUOP( UOP_FCF,     1)
+DEFUOP( UOP_FCVT,    2)
+DEFUOP( UOP_FADD,    2)
+DEFUOP( UOP_FMUL,    2)
+DEFUOP( UOP_FDIV,    8)
+DEFUOP( UOP_FCMP,    2)
+DEFUOP( UOP_FBIT,    2)
+DEFUOP( UOP_FCMOV,   1)
+
+DEFUOP( UOP_SSE,     1)
+DEFUOP( UOP_SIMD,    16)

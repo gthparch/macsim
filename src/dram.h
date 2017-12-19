@@ -98,6 +98,7 @@ class dram_c
 // wrapper function to allocate a dram scheduler
 dram_c* fcfs_controller(macsim_c* simBase);
 dram_c* frfcfs_controller(macsim_c* simBase);
+dram_c* simple_controller(macsim_c* simBase);
 dram_c* dramsim_controller(macsim_c* simBase);
 dram_c* ramulator_controller(macsim_c* simBase);
 #ifdef USING_SST

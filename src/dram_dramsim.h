@@ -110,6 +110,7 @@ class dram_dramsim_c : public dram_c
 
   private:
     list<mem_req_s*>* m_output_buffer; /**< output buffer */
+    list<mem_req_s*>* m_tmp_output_buffer; /**< output buffer */
     list<mem_req_s*>* m_pending_request; /**< pending request */
     DRAMSim::MultiChannelMemorySystem* m_dramsim; /**< dramsim2 instance */
 };
