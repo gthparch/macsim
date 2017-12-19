@@ -212,6 +212,7 @@ if flags['ramulator'] == '1':
   env['CPPFLAGS'] += ' -Wno-missing-field-initializers '
   env['CPPFLAGS'] += ' -Wno-unused-variable '
   env['CPPFLAGS'] += ' -Wno-reorder '
+  env['CPPDEFINES'] += ['RAMULATOR']
   env['CPPPATH'] += ['#src/ramulator']
   env['LIBPATH'] += [Dir('.')]
   env.Library('ramulator', ramulator_srcs, CPPDEFINES=['RAMULATOR'])
