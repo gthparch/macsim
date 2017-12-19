@@ -110,7 +110,7 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERF
 
   RETIRE_CONFIG();
 
-  if (m_knob_ptx_sim)
+  if (m_knob_ptx_sim || m_knob_igpu_sim)
     m_knob_width = 1000;
 }
 
@@ -145,6 +145,10 @@ void retire_c::run_a_cycle()
     // GPU : many retireable uops from multiple threads. Get entire retireable uops
     uop_list = m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);
   }
+  else if (m_knob_igpu_sim) {
+    // GPU : many retireable uops from multiple threads. Get entire retireable uops
+    uop_list = m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);
+  }
 
 
   // retire instructions : all micro-ops within an inst. need to be retired for an inst.
@@ -156,6 +160,19 @@ void retire_c::run_a_cycle()
 
     // retirement logic for GPU
     if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+      // GPU : many retireable uops from multiple threads. Get entire retireable uops
+      if (uop_list_index == uop_list->size()) {
+        uop_list->clear();
+        break;
+      }
+
+      cur_uop = uop_list->at(uop_list_index++);
+
+      rob = m_gpu_rob->get_thread_rob(cur_uop->m_thread_id);
+      rob->pop();
+    }
+    // retirement logic for Intel GPU
+    else if (m_knob_igpu_sim) {
       // GPU : many retireable uops from multiple threads. Get entire retireable uops
       if (uop_list_index == uop_list->size()) {
         uop_list->clear();

@@ -210,16 +210,22 @@ POSSIBILITY OF SUCH DAMAGE.
       m_knob_width   = *m_simBase->m_knobs->KNOB_WIDTH; \
       m_knob_ptx_sim = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx" ? true : false; \
+      m_knob_igpu_sim = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu" ? true : false; \
       break; \
     case UNIT_MEDIUM: \
       m_knob_width   = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH; \
       m_knob_ptx_sim = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx" ? true : false; \
+      m_knob_igpu_sim = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu" ? true : false; \
       break; \
     case UNIT_LARGE: \
       m_knob_width   = *m_simBase->m_knobs->KNOB_LARGE_WIDTH; \
       m_knob_ptx_sim = \
         static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx" ? true : false; \
+      m_knob_igpu_sim = \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "igpu" ? true : false; \
       break; \
   }
 
