@@ -3,8 +3,6 @@
 
 * Please use release tab to get the tagged version of the source code! 
 
-#### Use intel_gpu branch for Intel GPU model
-
 ## Introduction
 
 * MacSim is a heterogeneous architecture timing model simulator that is
@@ -33,6 +31,8 @@
   B. Lakshminarayana, Hyesoon Kim, William Song, Sudhakar Yalamanchili, Wonyong
   Sung, from Transactions on Design Automation of Electronic Systems (TODAES)
   Vol. 19, No. 3.
+* We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
+* If you're interested in the Intel's integrated GPU model in MacSim, please refer to [intel_gpu](https://github.com/gthparch/macsim/tree/intel_gpu) branch.
 
  
 ## Documentation
