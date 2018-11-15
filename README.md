@@ -34,7 +34,7 @@
 * We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
 * If you're interested in the Intel's integrated GPU model in MacSim, please refer to [intel_gpu](https://github.com/gthparch/macsim/tree/intel_gpu) branch.
 
- 
+
 ## Documentation
 
 Please see [MacSim documentation file](http://macsim.googlecode.com/files/macsim.pdf) for more detailed descriptions.
@@ -67,3 +67,9 @@ If you have a question, feel free to send an email to macsim-dev@googlegroups.co
 * We had a tutorial in HPCA-2012. Please visit [here](http://comparch.gatech.edu/hparch/OcelotMacsim_tutorial.html) for the slides.
 * We had a tutorial in ISCA-2012, Please visit [here](http://comparch.gatech.edu/hparch/isca12_gt.html) for the slides.
 
+
+## SST+MacSim
+
+* Here are two example configurations of SST+MacSim.
+  * A multi-socket system with cache coherence model: ![](http://comparch.gatech.edu/hparch/images/sst+macsim_conf_1.png)
+  * A CPU+GPU heterogeneous system with shared memory: ![](http://comparch.gatech.edu/hparch/images/sst+macsim_conf_2.png)
