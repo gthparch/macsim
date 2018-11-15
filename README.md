@@ -3,6 +3,7 @@
 
 * Please use release tab to get the tagged version of the source code! 
 
+#### Use intel_gpu branch for Intel GPU model
 
 ## Introduction
 
