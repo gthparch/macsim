@@ -8,6 +8,8 @@
 * We've characterised the performance of Intel GEN GPUs with MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
 * We're currently working on a flexible memory hierarchy that can be applicable for both Intel GEN GPUs and NVIDIA GPUs.
 
+## Intel GEN GPU Architecture
+* Intel GEN9 GPU Architecture: ![](http://comparch.gatech.edu/hparch/images/intel_gen9_arch.png)
 
 ## Documentation
 
