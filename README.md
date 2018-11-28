@@ -7,12 +7,12 @@
 
 * MacSim is a heterogeneous architecture timing model simulator that is
   developed from Georgia Institute of Technology.
-* It simulates x86, ARM64 and NVIDIA PTX instructions and can be configured as
+* It simulates x86, ARM64, NVIDIA PTX and Intel GPU instructions and can be configured as
   either a trace driven or execution-drive cycle level simulator. It models
   detailed mico-architectural behaviors, including pipeline stages,
   multi-threading, and memory systems.
 * MacSim is capable of simulating a variety of architectures, such as Intel's
-  Sandy Bridge and NVIDIA's Fermi. It can simulate homogeneous ISA multicore
+  Sandy Bridge, Skylake (both CPUs and GPUs) and NVIDIA's Fermi. It can simulate homogeneous ISA multicore
   simulations as well as heterogeneous ISA multicore simulations. It also
   supports asymmetric multicore configurations (small cores + medium cores + big
   cores) and SMT or MT architectures as well.
@@ -20,9 +20,11 @@
   on McPAT) are connected.
 * MacSim is also one of the components of SST, so muiltiple MacSim simulatore
   can run concurrently.
-
+* The project has been supported by Intel, NSF, Sandia National Lab.
 
 ## Note
+
+* If you're interested in the Intel's integrated GPU model in MacSim, please refer to [intel_gpu](https://github.com/gthparch/macsim/tree/intel_gpu) branch.
 
 * We've developed a power model for GPU architecture using McPAT. Please refer
   to the following paper for more detailed
@@ -32,7 +34,7 @@
   Sung, from Transactions on Design Automation of Electronic Systems (TODAES)
   Vol. 19, No. 3.
 * We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
-* If you're interested in the Intel's integrated GPU model in MacSim, please refer to [intel_gpu](https://github.com/gthparch/macsim/tree/intel_gpu) branch.
+
 
 
 ## Documentation
