@@ -10,7 +10,7 @@
 
 === Build steps ===
 
-  ./build.py
+  ./build.py --dramsim
 
 
 === Build options ===
@@ -27,5 +27,4 @@
 === Build outcome ===
 
   bin/macsim
-
 
