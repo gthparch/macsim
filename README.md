@@ -21,9 +21,14 @@ Please see [MacSim documentation file](http://macsim.googlecode.com/files/macsim
 * You can download the latest copy from our git repository.
 
 ```
-  git clone https://github.com/gthparch/macsim/tree/intel_gpu
-```
+git clone -b intel_gpu https://github.com/gthparch/macsim.git
 
+download traces 
+/macsim/tools/download_trace_files.py
+```
+## build 
+  ./build.py --dramsim 
+  (please see /macsim/INSTALL)
 
 ## People
 
