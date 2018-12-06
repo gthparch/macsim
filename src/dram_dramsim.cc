@@ -73,7 +73,8 @@ dram_dramsim_c::dram_dramsim_c(macsim_c* simBase)
       "../tools/DDR4_ramulator_2133P_8Gb_x8.ini", 
       // "/home/common/DRAMSim2/ini/DDR3_micron_64M_8B_x4_sg15.ini.igpu",
 //      "src/DRAMSim2/ini/DDR1_micron_16M_8b_x8_sg3E.ini", 
-      "/home/common/DRAMSim2/system.ini.igpu", 
+//      "/home/common/DRAMSim2/system.ini.igpu", 
+      "../tools/system.ini.igpu", 
       "..", 
       "resultsfilename", 
       // 16384);
