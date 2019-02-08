@@ -223,7 +223,7 @@ param<USE_NEW_COALESCING, use_new_coalescing, bool, false>
 param<ENABLE_PHYSICAL_MAPPING, enable_physical_mapping, bool, false>
 param<PAGE_SIZE, page_size, long, 4096>
 param<REGION_SIZE, region_size, long, 1048576>
-param<MEMORY_SIZE, memory_size, long, 8589934592>
+param<MEMORY_SIZE, memory_size, long, 4294967296>
 
 /* FCFS or REGION_FCFS */
 param<PAGE_MAPPING_POLICY, page_mapping_policy, string, REGION_FCFS> 
