@@ -53,15 +53,15 @@ if sys.platform != "darwin" and flags.get('qsim') != '1':
 
 ## DEBUG build
 if flags['debug'] == '1':
-  env['CPPFLAGS'] = '-g -std=c++11 %s' % warn_flags
+  env['CPPFLAGS'] = '-g -std=c++14 %s' % warn_flags
 ## GPROF build
 elif flags['gprof'] == '1':
-  env['CPPFLAGS'] = '-pg -std=c++11 %s' % warn_flags
+  env['CPPFLAGS'] = '-pg -std=c++14 %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
   env['LINKFLAGS'].append('-pg')
 ## OPT build
 else:
-  env['CPPFLAGS'] = '-O3 -std=c++11 -funroll-loops %s' % warn_flags
+  env['CPPFLAGS'] = '-O3 -std=c++14 -funroll-loops %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
 
 if flags['val'] == '1':
@@ -278,7 +278,8 @@ macsim_src = [
   'src/trace_gen_a64.cc',
   'src/trace_gen_x86.cc',
   'src/cs_disas.cc',
-  'src/resource.cc'
+  'src/resource.cc',
+  'src/mmu.cc'
 ]
 
 

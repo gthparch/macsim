@@ -120,6 +120,7 @@ class ProcessorStatistics;
 class CoreStatistics;
 class cache_partition_framework_c;
 class dyfr_c;
+class MMU;
 
 
 template <class T> class pqueue_c;

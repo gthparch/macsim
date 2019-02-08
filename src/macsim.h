@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <sstream>
 #include <sys/time.h>
+#include <memory>
 
 #include "global_defs.h"
 #include "global_types.h"
@@ -295,6 +296,7 @@ class macsim_c
     int m_termination_count;
 
     dyfr_c* m_dyfr; /**< dynamic frequency class> */
+    unique_ptr<MMU> m_MMU; /**< memory management unit> */
 
 	private:
 		macsim_c* m_simBase; /**< self-reference for macro usage */

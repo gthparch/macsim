@@ -11,12 +11,13 @@ import sys
 import ConfigParser
 
 
-## Check c++11 support
-def CheckCPP11():
+## Check c++14 support
+def CheckCPP14():
   def SimpleCall(context):
-    cpp11_test = '''
+    cpp14_test = '''
     #include <vector>
     #include <iostream>
+    #include <memory>
   
     using namespace std;
 
@@ -28,17 +29,20 @@ def CheckCPP11():
         sum += (*itr);
       }
       cout << sum;
+
+      unique_ptr<int> test_int = make_unique<int>(2347);
+      cout << *test_int;
     }
     '''
-    context.Message('Checking for c++11 conformance...')
-    context.env.AppendUnique(CXXFLAGS=['-std=c++11'])
-    result = context.TryCompile(cpp11_test, '.cpp')
+    context.Message('Checking for c++14 conformance...')
+    context.env.AppendUnique(CXXFLAGS=['-std=c++14'])
+    result = context.TryCompile(cpp14_test, '.cpp')
     context.Result(result)
     return result
   return SimpleCall
 
 
-## Check c++11 support
+## Check c++14 support
 def pre_compile_check():
   ## Environment
   env = Environment()
@@ -48,10 +52,10 @@ def pre_compile_check():
     if key in custom_vars:
       env[key] = val
 
-  conf = Configure(env, custom_tests = {'CheckCPP11' : CheckCPP11()})
+  conf = Configure(env, custom_tests = {'CheckCPP14' : CheckCPP14()})
 
-  if not conf.CheckCPP11():
-    print('Error: Your compiler does not support c++11. Exit now...')
+  if not conf.CheckCPP14():
+    print('Error: Your compiler does not support c++14. Exit now...')
     os.system('cat config.log')
     sys.exit()
 

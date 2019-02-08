@@ -51,6 +51,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "uop.h"
 #include "factory_class.h"
 #include "bug_detector.h"
+#include "mmu.h"
 
 #include "config.h"
 
@@ -489,11 +490,15 @@ int dcu_c::access(uop_c* uop)
   ASSERT(m_level == MEM_L1);
   DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id, uop->m_uop_num);
 
+  bool success = m_simBase->m_MMU->translate(uop);
+  if (!success)
+    return -1; // treat a TLB miss as a longer latency cache miss
+
   uop->m_state = OS_DCACHE_BEGIN;
 
   dcache_data_s* line = NULL;
 
-  Addr vaddr     = uop->m_vaddr;
+  Addr vaddr     = uop->m_paddr;
   Mem_Type type  = uop->m_mem_type;
   Addr line_addr = base_addr(vaddr);
   int bank       = BANK(vaddr, m_banks, 256);

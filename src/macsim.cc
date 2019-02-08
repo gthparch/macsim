@@ -65,6 +65,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "factory_class.h"
 #include "dram.h"
 #include "dyfr.h"
+#include "mmu.h"
 
 #include "all_knobs.h"
 #include "all_stats.h"
@@ -761,6 +762,9 @@ void macsim_c::initialize(int argc, char** argv)
   // initialize clocks
   init_clock_domain();
 
+  // initialize MMU
+  m_MMU = make_unique<MMU>();
+  m_MMU->initialize(m_simBase);
 
   // open traces
   string trace_name_list = static_cast<string>(*KNOB(KNOB_TRACE_NAME_FILE));
@@ -902,6 +906,12 @@ int macsim_c::run_a_cycle()
   if (m_simulation_cycle > 10000000 && m_simulation_cycle % dyfr_sample_period == 0) {
     m_dyfr->update();
   }
+
+  // handle page faults
+  m_MMU->handle_page_faults();
+
+  // run memory management unit
+  m_MMU->run_a_cycle(pll_locked);
 
 #ifndef USING_SST
   // interconnection
