@@ -126,6 +126,7 @@ public:
   ~MMU() {}
 
   void initialize(macsim_c *simBase);
+  void finalize();
   void run_a_cycle(bool);
 
   bool translate(uop_c *cur_uop);
@@ -178,6 +179,8 @@ private:
   Counter m_batch_processing_start_cycle;
   Counter m_batch_processing_transfer_start_cycle;
   Counter m_batch_processing_next_event_cycle;
+
+  set<Addr> m_unique_pages;
 };
 
 #endif //MMU_H_INCLUDED

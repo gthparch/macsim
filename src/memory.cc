@@ -1610,6 +1610,11 @@ bool dcu_c::write_done(mem_req_s* req)
   return true;
 }
 
+void dcu_c::invalidate(Addr addr)
+{
+  m_cache->invalidate_cache_line(addr);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1727,6 +1732,8 @@ memory_c::memory_c(macsim_c* simBase)
   else {
     assert(0);
   }
+
+  m_page_size = *m_simBase->m_knobs->KNOB_PAGE_SIZE;
 }
 
 
@@ -2306,6 +2313,10 @@ void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_
   }
 }
 
+void memory_c::invalidate(Addr page_addr)
+{
+}
+
 #if 0
 void memory_c::handle_coherence()
 {
@@ -2608,6 +2619,25 @@ void igpu_network_c::set_cache_id(mem_req_s* req)
   req->m_cache_id[MEM_L2L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+}
+
+
+void igpu_network_c::invalidate(Addr page_addr)
+{
+  Addr addr = page_addr;
+  Addr end_addr = page_addr + m_page_size;
+
+  for (int ii = 0; ii < m_num_l3; ++ii) {
+    int line_size = m_l2l3_cache[ii]->line_size();
+    for (; addr < end_addr; addr += line_size)
+      m_l2l3_cache[ii]->invalidate(addr);
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii) {
+    int line_size = m_l3_cache[ii]->line_size();
+    for (; addr < end_addr; addr += line_size)
+      m_l3_cache[ii]->invalidate(addr);
+  }
 }
 
 

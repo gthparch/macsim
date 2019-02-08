@@ -28,7 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /**********************************************************************************************
- * File         : mmu.h
+ * File         : mmu.cc
  * Author       : HPArch Research Group
  * Date         : 1/30/2019
  * Description  : Memory Management Unit
@@ -123,6 +123,11 @@ void MMU::initialize(macsim_c *simBase)
   m_fault_buffer_size = m_simBase->m_knobs->KNOB_FAULT_BUFFER_SIZE->getValue();
 }
 
+void MMU::finalize()
+{
+  STAT_EVENT_N(NUM_PHYSICAL_PAGES, m_unique_pages.size());
+}
+
 bool MMU::translate(uop_c *cur_uop)
 {
   if (cur_uop->m_translated)
@@ -131,6 +136,9 @@ bool MMU::translate(uop_c *cur_uop)
   Addr addr = cur_uop->m_vaddr;
   Addr page_number = get_page_number(addr);
   Addr page_offset = get_page_offset(addr);
+
+  // for statistics
+  m_unique_pages.emplace(page_number);
 
   cur_uop->m_state = OS_TRANS_BEGIN;
   
@@ -321,8 +329,11 @@ bool MMU::do_batch_processing()
       assert(it != m_page_table.end());
       uint64_t victim_frame = it->second.frame_number;
       m_page_table.erase(victim_page);
-      m_TLB->invalidate(victim_page);      
-      //TODO: invalidate cache lines of this page
+      m_TLB->invalidate(victim_page);
+
+      // invalidate cache lines of this page
+      Addr frame_addr = victim_frame << m_offset_bits;
+      m_simBase->m_memory->invalidate(frame_addr);
 
       m_free_pages[victim_frame] = true;
       ++m_free_pages_remaining;
@@ -418,7 +429,10 @@ bool MMU::do_batch_processing()
       uint64_t victim_frame = it->second.frame_number;
       m_page_table.erase(victim_page);
       m_TLB->invalidate(victim_page);      
-      //TODO: invalidate cache lines of this page
+      
+      // invalidate cache lines of this page
+      Addr frame_addr = victim_frame << m_offset_bits;
+      m_simBase->m_memory->invalidate(frame_addr);
 
       m_free_pages[victim_frame] = true;
       ++m_free_pages_remaining;

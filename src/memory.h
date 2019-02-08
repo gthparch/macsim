@@ -257,6 +257,11 @@ class dcu_c
      */
     void receive_packet(void);
 
+    /**
+     * Invalidate cache lines of the given page
+     */
+    void invalidate(Addr page_addr);
+
   private:
     /**
      * data cache default constructor
@@ -475,6 +480,11 @@ class memory_c
      * Handle coherence traffic (currently empty, will support coherence soon)
      */
     void handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache);
+
+    /**
+     * Invalidate cache lines of the given page
+     */
+    virtual void invalidate(Addr page_addr);
     
 
   public:
@@ -524,7 +534,6 @@ class memory_c
     void flush_prefetch(int core_id);
 
 
-
   protected:
     dcu_c** m_l1_cache; /**< L1 caches */
     dcu_c** m_l2_cache; /**< L2 caches */
@@ -543,6 +552,7 @@ class memory_c
     int m_l3_interleave_factor; /**< mask bit for L3 id */
     int m_dram_interleave_factor; /**< mask bit for dram id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+    long m_page_size;
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
@@ -730,5 +740,10 @@ class igpu_network_c : public memory_c
      * Set the level of each cache level
      */
     void set_cache_id(mem_req_s* req);
+
+    /**
+     * Invalidate cache lines of the given page
+     */
+    void invalidate(Addr page_addr);
 };
 #endif

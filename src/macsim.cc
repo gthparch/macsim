@@ -1046,6 +1046,8 @@ int macsim_c::run_a_cycle()
 // =======================================
 void macsim_c::finalize()
 {
+  m_MMU->finalize();
+
   // deallocate memory
   deallocate_memory();
 
