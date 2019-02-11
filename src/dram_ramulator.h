@@ -50,48 +50,49 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "memreq_info.h"
 #include "network.h"
 
-class dram_ramulator_c : public dram_c {
-private:
-	unsigned int requestsInFlight;
-  std::map<long, std::deque<mem_req_s*>> reads;
-  std::map<long, std::deque<mem_req_s*>> writes;
-  std::deque<mem_req_s*> resp_queue;
+class dram_ramulator_c : public dram_c
+{
+  private:
+    unsigned int requestsInFlight;
+    std::map<long, std::deque<mem_req_s*>> reads;
+    std::map<long, std::deque<mem_req_s*>> writes;
+    std::deque<mem_req_s*> resp_queue;
 
-  ramulator::Config configs;
-  ramulator::RamulatorWrapper *wrapper;
-  std::function<void(ramulator::Request &)> read_cb_func;
-  std::function<void(ramulator::Request &)> write_cb_func;
+    ramulator::Config configs;
+    ramulator::RamulatorWrapper *wrapper;
+    std::function<void(ramulator::Request &)> read_cb_func;
+    std::function<void(ramulator::Request &)> write_cb_func;
 
-  // Default Constructor
-  dram_ramulator_c(); // do not implement
+    // Default Constructor
+    dram_ramulator_c(); // do not implement
 
-  // Send a packet to NOC
-  void send(void);
+    // Send a packet to NOC
+    void send(void);
 
-  // Receive a packet from NOC
-  void receive(void);
+    // Receive a packet from NOC
+    void receive(void);
 
-  // Read callback function
-  void readComplete(ramulator::Request &ramu_req);
+    // Read callback function
+    void readComplete(ramulator::Request &ramu_req);
 
-  // Write callback function
-  void writeComplete(ramulator::Request &ramu_req);
+    // Write callback function
+    void writeComplete(ramulator::Request &ramu_req);
 
-public:
-  // Constructor
-  dram_ramulator_c(macsim_c *simBase);
+  public:
+    // Constructor
+    dram_ramulator_c(macsim_c *simBase);
 
-  // Destructor
-  ~dram_ramulator_c();
+    // Destructor
+    ~dram_ramulator_c();
 
-  // Initialize MC
-	void init(int);
+    // Initialize MC
+    void init(int);
 
-  // Print all requests in DRB
-  void print_req(void);
+    // Print all requests in DRB
+    void print_req(void);
 
-  // Tick a cycle
-  void run_a_cycle(bool);
+    // Tick a cycle
+    void run_a_cycle(bool);
 };
 
 #endif // RAMULATOR

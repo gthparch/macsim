@@ -62,28 +62,26 @@ using namespace DRAMSim;
  * Fix .ini file and output directories
  */
 
-dram_dramsim_c::dram_dramsim_c(macsim_c* simBase)
-  : dram_c(simBase)
+dram_dramsim_c::dram_dramsim_c(macsim_c *simBase) : dram_c(simBase)
 {
-  m_output_buffer = new list<mem_req_s*>;
-  m_tmp_output_buffer = new list<mem_req_s*>;
-  m_pending_request = new list<mem_req_s*>;
+  m_output_buffer = new list<mem_req_s *>;
+  m_tmp_output_buffer = new list<mem_req_s *>;
+  m_pending_request = new list<mem_req_s *>;
   m_dramsim = getMemorySystemInstance(
-      "tools/DDR4_ramulator_2133P_8Gb_x8.ini", 
-      "tools/system.ini.igpu", 
-      "..", 
-      "resultsfilename", 
+      "tools/DDR4_ramulator_2133P_8Gb_x8.ini",
+      "tools/system.ini.igpu",
+      "..",
+      "resultsfilename",
       65536);
 
   // this only makes sense when MC frequency is the same as that of CPU
-  m_dramsim->setCPUClockSpeed(*KNOB(KNOB_CLOCK_MC)*1e9);
+  m_dramsim->setCPUClockSpeed(*KNOB(KNOB_CLOCK_MC) * 1e9);
 
-	TransactionCompleteCB *read_cb = new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::read_callback);
-	TransactionCompleteCB *write_cb = new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::write_callback);
+  TransactionCompleteCB *read_cb = new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::read_callback);
+  TransactionCompleteCB *write_cb = new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::write_callback);
 
   m_dramsim->RegisterCallbacks(read_cb, write_cb, NULL);
 }
-
 
 dram_dramsim_c::~dram_dramsim_c()
 {
@@ -92,7 +90,6 @@ dram_dramsim_c::~dram_dramsim_c()
   delete m_pending_request;
   delete m_dramsim;
 }
-
 
 void dram_dramsim_c::print_req(void)
 {
@@ -103,7 +100,6 @@ void dram_dramsim_c::init(int id)
   m_id = id;
 }
 
-
 void dram_dramsim_c::run_a_cycle(bool temp)
 {
   send();
@@ -111,7 +107,6 @@ void dram_dramsim_c::run_a_cycle(bool temp)
   receive();
   ++m_cycle;
 }
-
 
 void dram_dramsim_c::read_callback(unsigned id, uint64_t address, uint64_t clock_cycle)
 {

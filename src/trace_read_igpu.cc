@@ -302,11 +302,6 @@ bool igpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_threa
     uop->m_vaddr = trace_uop->m_va + m_simBase->m_memory->base_addr(core_id,
         (unsigned long)UINT_MAX * 
         (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
-
-    // virtual-to-physical translation 
-    // physical page is allocated at this point for the time being
-    if (m_enable_physical_mapping)
-      uop->m_vaddr = m_page_mapper->translate(uop->m_vaddr);
   }
 
   uop->m_mem_size = trace_uop->m_mem_size;

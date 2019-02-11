@@ -58,7 +58,8 @@ dram_ramulator_c::dram_ramulator_c(macsim_c *simBase) :
     requestsInFlight(0), 
     wrapper(NULL),
     read_cb_func(std::bind(&dram_ramulator_c::readComplete, this, std::placeholders::_1)), 
-    write_cb_func(std::bind(&dram_ramulator_c::writeComplete, this, std::placeholders::_1)) {
+    write_cb_func(std::bind(&dram_ramulator_c::writeComplete, this, std::placeholders::_1))
+{
   std::string config_file(*KNOB(KNOB_RAMULATOR_CONFIG_FILE));
   configs.parse(config_file);
   configs.set_core_num(*KNOB(KNOB_NUM_SIM_CORES));
@@ -66,26 +67,31 @@ dram_ramulator_c::dram_ramulator_c(macsim_c *simBase) :
   wrapper = new ramulator::RamulatorWrapper(configs, *KNOB(KNOB_RAMULATOR_CACHELINE_SIZE));
 }
 
-dram_ramulator_c::~dram_ramulator_c() { 
+dram_ramulator_c::~dram_ramulator_c()
+{ 
   wrapper->finish();
   delete wrapper; 
 }
 
-void dram_ramulator_c::init(int id) {
+void dram_ramulator_c::init(int id)
+{
   m_id = id;
 }
 
-void dram_ramulator_c::print_req(void) {
+void dram_ramulator_c::print_req(void)
+{
 }
 
-void dram_ramulator_c::run_a_cycle(bool lock) {
+void dram_ramulator_c::run_a_cycle(bool lock)
+{
   send();
   wrapper->tick();
   receive();
   ++m_cycle;
 }
 
-void dram_ramulator_c::readComplete(ramulator::Request &ramu_req) {
+void dram_ramulator_c::readComplete(ramulator::Request &ramu_req)
+{
   DEBUG("Read to 0x%lx completed.\n", ramu_req.addr);
   auto &req_q = reads.find(ramu_req.addr)->second;
   mem_req_s *req = req_q.front();
@@ -100,7 +106,8 @@ void dram_ramulator_c::readComplete(ramulator::Request &ramu_req) {
   resp_queue.push_back(req);
 }
 
-void dram_ramulator_c::writeComplete(ramulator::Request &ramu_req) {
+void dram_ramulator_c::writeComplete(ramulator::Request &ramu_req)
+{
   DEBUG("Write to 0x%lx completed.\n", ramu_req.addr);
   auto &req_q = writes.find(ramu_req.addr)->second;
   mem_req_s *req = req_q.front();
@@ -116,7 +123,8 @@ void dram_ramulator_c::writeComplete(ramulator::Request &ramu_req) {
   MEMORY->free_req(req->m_core_id, req);
 }
 
-void dram_ramulator_c::send(void) {
+void dram_ramulator_c::send(void)
+{
   if (resp_queue.empty()) return;
 
   for (auto i = resp_queue.begin(); i != resp_queue.end(); ++i) {
@@ -136,7 +144,8 @@ void dram_ramulator_c::send(void) {
   }
 }
 
-void dram_ramulator_c::receive(void) {
+void dram_ramulator_c::receive(void)
+{
   mem_req_s *req = NETWORK->receive(MEM_MC, m_id);
   if (!req) return;
 
@@ -182,7 +191,8 @@ void dram_ramulator_c::receive(void) {
 ////////////////////////////////////////////////////////////////////////////////
 // wrapper functions to allocate dram controller object
 
-dram_c* ramulator_controller(macsim_c* simBase) {
+dram_c* ramulator_controller(macsim_c* simBase)
+{
   return new dram_ramulator_c(simBase);
 }
 

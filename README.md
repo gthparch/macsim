@@ -27,7 +27,7 @@ download traces
 /macsim/tools/download_trace_files.py
 ```
 ## build 
-  ./build.py --dramsim 
+  ./build.py --ramulator 
   (please see /macsim/INSTALL)
 
 ## People

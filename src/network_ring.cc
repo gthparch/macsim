@@ -100,7 +100,7 @@ void network_ring_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
 
   CREATE_ROUTER(m_num_cpu, CPU_ROUTER, MEM_L2, 0);
   CREATE_ROUTER(m_num_gpu, GPU_ROUTER, MEM_L2, m_num_cpu);
-  CREATE_ROUTER(m_num_l3,  L2L3_ROUTER, MEM_L2L3, 0);
+  CREATE_ROUTER(*m_simBase->m_knobs->KNOB_NUM_L2L3,  L2L3_ROUTER, MEM_L2L3, 0);
   CREATE_ROUTER(m_num_l3,  L3_ROUTER, MEM_L3, 0);
   CREATE_ROUTER(m_num_mc,  MC_ROUTER, MEM_MC, 0);
   

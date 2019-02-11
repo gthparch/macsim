@@ -38,22 +38,18 @@ ssched_large_size 128
 bp_hist_length 16
 rob_large_size 512
 large_core_schedule ooo
+gpu_sched 1
 max_threads_per_large_core 7
 
 mem_mshr_size 9
 
-# L3-I
-icache_large_num_set 4096 # 768 KB
-icache_large_assoc 3
-icache_large_line_size 64
-icache_large_cycles 14
-
-# L3-D
-l1_large_num_set 512 # 512 KB
-l1_large_assoc 16
-l1_large_line_size 64
-l1_large_latency 100
-l1_large_bypass 0
+# L3 cache
+num_l2l3 1
+l2l3_large_num_set 512
+l2l3_large_assoc 16
+l2l3_large_line_size 64
+l2l3_large_latency 100
+l2l3_large_bypass 0
 
 # Memory
 memory_type igpu_network
@@ -73,8 +69,19 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 8
 dram_rowbuffer_size 2048
-dram_scheduling_policy DRAMSIM
-dram_additional_latency 95
+dram_additional_latency 0
+dram_scheduling_policy RAMULATOR
+ramulator_config_file ../src/ramulator/configs/DDR4-config.cfg
+ramulator_cacheline_size 64
+
+# Page Management
+page_size 4096
+memory_size 4294967296
+page_table_walk_latency 200
+page_fault_latency 500
+page_eviction_latency 500
+fault_buffer_size 256
+batch_processing_overhead 10000
 
 # ETC
 bug_detector_enable 1

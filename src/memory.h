@@ -537,22 +537,26 @@ class memory_c
   protected:
     dcu_c** m_l1_cache; /**< L1 caches */
     dcu_c** m_l2_cache; /**< L2 caches */
-    dcu_c** m_l2l3_cache;
+    dcu_c** m_l2l3_cache; /**< L2L3 caches for Intel GPU */
     dcu_c** m_l3_cache; /**< L3 caches */
     list<mem_req_s*>* m_mshr; /**< mshr entry per L1 cache */
     list<mem_req_s*>* m_mshr_free_list; /**< mshr entry free list */
     int m_num_core; /**< number of cores */
     int m_num_cpu;
     int m_num_gpu;
+    int m_num_l2l3; /**< number of l2l3 caches for Intel GPU */
     int m_num_l3; /**< number of l3 caches */
     int m_num_mc; /**< number of memory controllers */
     int m_noc_index_base[MEM_LAST]; /**< component id of each memory hierarchy */
     int m_noc_id_base[MEM_LAST]; /**< noc id base per level */
     Counter m_stop_prefetch; /**< when set, no prefetches will be inserted */
+    int m_l2l3_interleave_factor; /**< mask bit for L2L3 id */
     int m_l3_interleave_factor; /**< mask bit for L3 id */
     int m_dram_interleave_factor; /**< mask bit for dram id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
     long m_page_size;
+    bool m_igpu_sim; /**< intel gpu */
+
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
@@ -720,7 +724,7 @@ class l2_decoupled_local_c : public memory_c
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief 2-Level, L2 & L3 are accessed via NoC (no L1, L2) (Intel GPU)
+/// \brief 2-Level, L3 & LLC are accessed via NoC (no L1, L2) (Intel GPU)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class igpu_network_c : public memory_c
 {

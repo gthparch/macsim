@@ -368,7 +368,7 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c
 dcu_c::~dcu_c()
 {
   if (m_disable)
-    return ;
+    return;
   
   if (m_cache)
     delete m_cache;
@@ -490,9 +490,12 @@ int dcu_c::access(uop_c* uop)
   ASSERT(m_level == MEM_L1);
   DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id, uop->m_uop_num);
 
-  bool success = m_simBase->m_MMU->translate(uop);
-  if (!success)
-    return -1; // treat a TLB miss as a longer latency cache miss
+  if (*m_simBase->m_knobs->KNOB_ENABLE_PHYSICAL_MAPPING) {
+    bool success = m_simBase->m_MMU->translate(uop);
+    if (!success)
+      return -1; // treat a TLB miss as a longer latency cache miss
+  } else
+    uop->m_paddr = uop->m_vaddr;
 
   uop->m_state = OS_DCACHE_BEGIN;
 
@@ -1674,7 +1677,7 @@ memory_c::memory_c(macsim_c* simBase)
 
   // allocate caches
   m_l1_cache = new dcu_c*[m_num_core]; 
-  m_l2_cache = new dcu_c*[m_num_core]; 
+  m_l2_cache = new dcu_c*[m_num_core];
   m_l3_cache = new dcu_c*[m_num_l3]; 
 
   int id = 0;
@@ -1734,6 +1737,7 @@ memory_c::memory_c(macsim_c* simBase)
   }
 
   m_page_size = *m_simBase->m_knobs->KNOB_PAGE_SIZE;
+  m_igpu_sim = false;
 }
 
 
@@ -1779,6 +1783,7 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   }
 
   // find a matching request
+  // search other cores' MSHRs as well since only L1s have MSHRs
   mem_req_s* matching_req = NULL;
   for (int i = 0; i < *KNOB(KNOB_NUM_SIM_CORES); ++i) {
     matching_req = search_req(i, addr, size);
@@ -2153,9 +2158,13 @@ void memory_c::run_a_cycle_core(int core_id, bool pll_lock)
 void memory_c::run_a_cycle_uncore(bool pll_lock)
 {
   int index = m_cycle % m_num_l3;
-  for (int ii = index; ii < index + m_num_l3; ++ii) {
+  for (int ii = index; ii < index + m_num_l3; ++ii)
     m_l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
-    m_l2l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
+
+  if (m_igpu_sim) {
+    index = m_cycle % m_num_l2l3;
+    for (int ii = index; ii < index + m_num_l2l3; ++ii)
+      m_l2l3_cache[ii % m_num_l2l3]->run_a_cycle(pll_lock);
   }
 }
 
@@ -2569,22 +2578,24 @@ void l2_decoupled_local_c::set_cache_id(mem_req_s* req)
 
 igpu_network_c::igpu_network_c(macsim_c* simBase) : memory_c(simBase)
 {
-  m_l2l3_cache = new dcu_c*[m_num_l3]; 
+  m_igpu_sim = true;
+  m_num_l2l3 = *m_simBase->m_knobs->KNOB_NUM_L2L3;
+  m_l2l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L2L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L2L3_LINE_SIZE);
+  m_l2l3_interleave_factor = static_cast<int>(pow(2, m_l2l3_interleave_factor));
+
+  m_l2l3_cache = new dcu_c*[m_num_l2l3]; 
 
   int num_large_core = *m_simBase->m_knobs->KNOB_NUM_SIM_LARGE_CORES;
   int num_medium_core = *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
   int num_small_core = *m_simBase->m_knobs->KNOB_NUM_SIM_SMALL_CORES;
 
   int id = num_large_core + num_medium_core + num_small_core + m_num_core;
-  for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
+  for (int ii = 0; ii < m_num_l2l3; ++ii, ++id)
     m_l2l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L2L3, this, id, m_l3_cache, m_l2_cache, simBase);
-  }
 
-  for (int ii = 0; ii < m_num_l3; ++ii) {
-    delete m_l3_cache[ii];
-  }
-
+  // reconfigure L3 caches with L2L3 caches 
   for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
+    delete m_l3_cache[ii];
     m_l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L3, this, id, NULL, m_l2l3_cache, simBase);
   }
 
@@ -2596,12 +2607,14 @@ igpu_network_c::igpu_network_c(macsim_c* simBase) : memory_c(simBase)
 
   // m_l2l3_cache is used as L3 cache for Intel GPU
   // m_l3_cache is used as LLC that is shared with CPU
+
+  // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
+  for (int ii = 0; ii < m_num_l2l3; ++ii)
+    m_l2l3_cache[ii]->init(-1, -1, false, false, false, false, true);
   
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
-  for (int ii = 0; ii < m_num_l3; ++ii, ++id) {
-    m_l2l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+  for (int ii = 0; ii < m_num_l3; ++ii)
     m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
-  }
   
   NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_mc);
 }
@@ -2616,7 +2629,7 @@ void igpu_network_c::set_cache_id(mem_req_s* req)
 {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
-  req->m_cache_id[MEM_L2L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
+  req->m_cache_id[MEM_L2L3] = BANK(req->m_addr, m_num_l2l3, m_l2l3_interleave_factor);
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }

@@ -170,8 +170,6 @@ class exec_c
      */
     bool** get_bank_busy_array(void) { return &m_bank_busy; }
 
-    bool igpu_sim(void) { return m_igpu_sim; }
-
   private:
     /**
      *  \brief Use a execution port

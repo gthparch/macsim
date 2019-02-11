@@ -63,10 +63,12 @@ param<PERFECT_DCACHE, perfect_dcache, bool, false>
 
 param<L1_READ_PORTS, l1_read_ports, int, 4>
 param<L2_READ_PORTS, l2_read_ports, int, 2>
+param<L2L3_READ_PORTS, l2l3_read_ports, int, 1>
 param<L3_READ_PORTS, l3_read_ports, int, 1>
 
 param<L1_WRITE_PORTS, l1_write_ports, int, 4>
 param<L2_WRITE_PORTS, l2_write_ports, int, 2>
+param<L2L3_WRITE_PORTS, l2l3_write_ports, int, 1>
 param<L3_WRITE_PORTS, l3_write_ports, int, 1>
 
 param<L1_SMALL_NUM_SET,   l1_small_num_set,   int, 64>
@@ -107,6 +109,14 @@ param<L2_LARGE_LINE_SIZE, l2_large_line_size, int, 64>
 param<L2_LARGE_NUM_BANK,  l2_large_num_bank,  int, 8>
 param<L2_LARGE_LATENCY,   l2_large_latency,   int, 8>
 param<L2_LARGE_BYPASS,    l2_large_bypass,    bool, false>
+
+param<NUM_L2L3,               num_l2l3,               int, 1>
+param<L2L3_INTERLEAVE_FACTOR, l2l3_interleave_factor, int, 64>
+param<L2L3_NUM_SET,           l2l3_num_set,           int, 8192>
+param<L2L3_ASSOC,             l2l3_assoc,             int, 16>
+param<L2L3_LINE_SIZE,         l2l3_line_size,         int, 64>
+param<L2L3_NUM_BANK,          l2l3_num_bank,          int, 16>
+param<L2L3_LATENCY,           l2l3_latency,           int, 25>
 
 param<NUM_L3,       num_l3,       int, 1>
 param<L3_INTERLEAVE_FACTOR, l3_interleave_factor, int, 64>

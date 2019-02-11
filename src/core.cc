@@ -176,11 +176,11 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   if ((m_core_type == "ptx" || m_core_type == "igpu") && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
     m_rob     = NULL;
     m_gpu_rob = new smc_rob_c(m_unit_type, m_core_id, m_simBase);
-  }else {
+  }
+  else {
     m_rob     = new rob_c(type, m_simBase); 
     m_gpu_rob = NULL;
   }
-  
   
   // frontend queue
   m_q_frontend = new pqueue_c<int*>(*m_simBase->m_knobs->KNOB_FE_SIZE, 
@@ -251,7 +251,8 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   else if (m_core_type == "igpu" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
       m_schedule = new schedule_igpu_c (m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec, m_unit_type, 
               m_frontend, m_simBase);
-  }else {
+  }
+  else {
     if (m_knob_schedule == "ooo")
       m_schedule = new schedule_ooo_c (m_core_id, m_q_iaq, m_rob, m_exec, m_unit_type, 
           m_frontend, m_simBase);
