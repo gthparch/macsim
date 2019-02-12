@@ -54,6 +54,7 @@ typedef enum Iaq_Type_enum{
   gen_ALLOCQ = 0,
   mem_ALLOCQ,
   fp_ALLOCQ,
+  simd_ALLOCQ,
   max_ALLOCQ
 } ALLOCQ_Type;
 
@@ -109,6 +110,9 @@ typedef enum Uop_Type_enum {
 
   // MMX instructions
   UOP_SSE,
+
+  // SIMD instructions for Intel GPU
+  UOP_SIMD,
 
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,
@@ -455,6 +459,12 @@ typedef enum Uop_State_enum {
   OS_DCACHE_ACCESS,
   OS_DCACHE_MEM_ACCESS_DENIED,
   OS_EXEC_BEGIN,
+  OS_TRANS_BEGIN,
+  OS_TRANS_WALK_QUEUE,
+  OS_TRANS_RETRY_QUEUE,
+  OS_TRANS_FAULT_RETRY_QUEUE,
+  OS_TRANS_FAULT_BUFFER,
+  OS_TRANS_DONE,
   NUM_OP_STATES,
 } Uop_State;
 
@@ -615,6 +625,7 @@ class uop_c
     int               m_num_srcs; /**< number of src registers */
     int               m_num_dests; /**< number of dest registers */
     Addr              m_vaddr; /**< memory address */
+    Addr              m_paddr; /**< memory address */
     int               m_mem_size; /**< memory access size */
     uns8              m_dir; /**< branch direction */
     uns16             m_src_info[MAX_SRCS]; /**< src uop info */
@@ -658,6 +669,8 @@ class uop_c
     bool              m_bypass_llc; /**< bypass last level cache */
     bool              m_skip_llc; /**< skip last level cache */
     uint16_t          m_mem_version; /**< version number for load/store */
+
+    bool              m_translated;
 
     // hmc info
     // changed by Lifeng

@@ -1,13 +1,9 @@
 #Macsim [![Build Status](https://travis-ci.org/gthparch/macsim.svg?branch=master)](https://travis-ci.org/gthparch/macsim)
-#### Simulator for Heterogeneous Architecture
-
-* Please use release tab to get the tagged version of the source code! 
-
 ## Introduction
 
 * MacSim is a heterogeneous architecture timing model simulator that is
   developed from Georgia Institute of Technology.
-* It simulates x86, ARM64, NVIDIA PTX and Intel GPU instructions and can be configured as
+* It simulates x86, ARM64, NVIDIA PTX and Intel GEN GPU instructions and can be configured as
   either a trace driven or execution-drive cycle level simulator. It models
   detailed mico-architectural behaviors, including pipeline stages,
   multi-threading, and memory systems.
@@ -35,7 +31,8 @@
   Vol. 19, No. 3.
 * We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
 
-
+## Intel GEN GPU Architecture
+* Intel GEN9 GPU Architecture: ![](http://comparch.gatech.edu/hparch/images/intel_gen9_arch.png)
 
 ## Documentation
 
@@ -44,13 +41,17 @@ Please see [MacSim documentation file](http://macsim.googlecode.com/files/macsim
 
 ## Download
 
-* You can download tagged versions from [the Releases header item](https://github.com/gthparch/macsim/releases) of this repository.
-* or you can download the latest copy from our git repository.
+* You can download the latest copy from our git repository.
 
 ```
-  git clone https://github.com/gthparch/macsim
-```
+git clone -b intel_gpu https://github.com/gthparch/macsim.git
 
+download traces 
+/macsim/tools/download_trace_files.py
+```
+## build 
+  ./build.py --ramulator 
+  (please see /macsim/INSTALL)
 
 ## People
 

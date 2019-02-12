@@ -11,7 +11,7 @@ num_sim_large_cores 0
 # Clock
 clock_cpu 1.2
 clock_gpu 1.2
-clock_l3  1
+clock_llc 1
 clock_noc 1
 clock_mc  1.6
 
@@ -49,13 +49,13 @@ shared_mem_size 16384
 byte_level_access 0
 
 
-# L3 Cache
-num_l3 4
-l3_num_set 384
-l3_line_size 64
-l3_assoc 8
-l3_num_bank 4
-l3_latency 10 
+# LLC Cache
+num_llc 4
+llc_num_set 384
+llc_line_size 64
+llc_assoc 8
+llc_num_bank 4
+llc_latency 10 
 
 
 # DRAM

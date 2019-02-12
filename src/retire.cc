@@ -110,7 +110,7 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase) : RETIRE_INTERF
 
   RETIRE_CONFIG();
 
-  if (m_knob_ptx_sim)
+  if (m_knob_ptx_sim || m_knob_igpu_sim)
     m_knob_width = 1000;
 }
 
@@ -136,17 +136,13 @@ void retire_c::run_a_cycle()
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
   core_c *core = m_simBase->m_core_pointers[m_core_id];
 
-
-  //Ramyad: based on document gpu_sched knob should be removed
-  //gpu_sched 1 use GPU scheduler for GPU cores \todo{this knob should be removed!, it is unnecessary now}
   vector<uop_c*>* uop_list = NULL;
   unsigned int uop_list_index = 0;
-  if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_knob_ptx_sim || m_knob_igpu_sim) {
     // GPU : many retireable uops from multiple threads. Get entire retireable uops
     uop_list = m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);
   }
-
-
+  
   // retire instructions : all micro-ops within an inst. need to be retired for an inst.
   for (int count = 0; count < m_knob_width; ++count) {
     uop_c* cur_uop;
@@ -155,7 +151,7 @@ void retire_c::run_a_cycle()
     // we need to handle retirement for x86 and ptx separately
 
     // retirement logic for GPU
-    if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+    if (m_knob_ptx_sim || m_knob_igpu_sim) {
       // GPU : many retireable uops from multiple threads. Get entire retireable uops
       if (uop_list_index == uop_list->size()) {
         uop_list->clear();

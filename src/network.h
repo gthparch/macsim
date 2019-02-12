@@ -51,7 +51,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CPU_ROUTER 0
 #define GPU_ROUTER 1
 #define L3_ROUTER 2
-#define MC_ROUTER 3
+#define LLC_ROUTER 3
+#define MC_ROUTER 4
 
 #define LOCAL 0
 #define LEFT  1
@@ -322,7 +323,7 @@ class network_c
     network_c();
 
   public:
-    virtual void init(int num_cpu, int num_gpu, int num_l3, int num_mc) = 0;
+    virtual void init(int num_cpu, int num_gpu, int num_l3, int num_llc, int num_mc) = 0;
 
     virtual bool send(mem_req_s* req, int src_level, int src_id,
         int dst_level, int dst_id);
@@ -344,6 +345,7 @@ class network_c
     int m_num_cpu;
     int m_num_gpu;
     int m_num_l3;
+    int m_num_llc;
     int m_num_mc;
 
     pool_c<flit_c>* m_flit_pool; /**< flit data structure pool */

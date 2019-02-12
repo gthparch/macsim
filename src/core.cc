@@ -98,6 +98,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "schedule_ooo.h"
 #include "schedule_io.h"
 #include "schedule_smc.h"
+#include "schedule_igpu.h"
 #include "debug_macros.h"
 
 #include "all_knobs.h"
@@ -172,7 +173,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     m_rob     = NULL;
     m_gpu_rob = new smc_rob_c(m_unit_type, m_core_id, m_simBase);
   }
@@ -180,13 +181,13 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
     m_rob     = new rob_c(type, m_simBase); 
     m_gpu_rob = NULL;
   }
-
+  
   // frontend queue
   m_q_frontend = new pqueue_c<int*>(*m_simBase->m_knobs->KNOB_FE_SIZE, 
       (m_knob_fetch_latency + m_knob_alloc_latency), "q_frontend", m_simBase); 
 
   // allocation queue
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     m_q_iaq     = NULL;
     m_gpu_q_iaq = new pqueue_c<gpu_allocq_entry_s>* [max_ALLOCQ]; 
   }
@@ -198,10 +199,11 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   int q_iaq_size[max_ALLOCQ];
   q_iaq_size[gen_ALLOCQ] = giaq_size;
   q_iaq_size[mem_ALLOCQ] = miaq_size;
-  q_iaq_size[fp_ALLOCQ]  = fq_size;
+  q_iaq_size[fp_ALLOCQ] = fq_size;
+  q_iaq_size[simd_ALLOCQ] = siaq_size;
 
   sstr.clear();
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     for (int i = 0; i < max_ALLOCQ; ++i) {
       sstr << "q_iaq" << i;
       sstr >> name;
@@ -227,7 +229,7 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   m_frontend = fetch_factory_c::get()->allocate_frontend(FRONTEND_INTERFACE_ARGS(), m_simBase);
   
   // allocation stage
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     m_allocate = NULL;
     m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq, m_uop_pool, 
 																				m_gpu_rob, m_unit_type, max_ALLOCQ, m_resource, m_simBase);
@@ -242,9 +244,13 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
   m_exec = new exec_c (EXEC_INTERFACE_ARGS(), m_simBase);
 
   // instruction scheduler
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx") {
     m_schedule = new schedule_smc_c (m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec, m_unit_type, 
         m_frontend, m_simBase);
+  }
+  else if (m_core_type == "igpu") {
+      m_schedule = new schedule_igpu_c (m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec, m_unit_type, 
+              m_frontend, m_simBase);
   }
   else {
     if (m_knob_schedule == "ooo")
@@ -254,7 +260,8 @@ core_c::core_c (int c_id, macsim_c* simBase, Unit_Type type)
       m_schedule = new schedule_io_c (m_core_id, m_q_iaq, m_rob, m_exec, m_unit_type, 
           m_frontend, m_simBase);
     else {   
-      throw std::string() + "unrecognized schedule class " + m_knob_schedule;
+        std::cerr <<"ERROR: unrecognized schedule class: " << m_knob_schedule << "\n";
+        exit(1);
     }   
   }
 
@@ -306,7 +313,7 @@ core_c::~core_c()
   delete m_q_frontend;
   delete m_frontend;
   delete m_uop_pool;
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     delete m_gpu_rob;
     delete m_gpu_allocate;
     for (int i = 0; i < max_ALLOCQ; ++i) {
@@ -421,7 +428,7 @@ void core_c::advance_queues(void)
   m_q_frontend->advance();
 
   // advance allocation queue
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) {
+  if (m_core_type == "ptx" || m_core_type == "igpu") {
     for (int i = 0; i < max_ALLOCQ; ++i) {
       m_gpu_q_iaq[i]->advance();
     }
@@ -635,7 +642,7 @@ void core_c::allocate_thread_data(int tid)
   m_retire->allocate_retire_data(tid);
 
   // allocate scheduler queue and rob for GPU simulation
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) 
+  if (m_core_type == "ptx" || m_core_type == "igpu") 
     m_gpu_rob->reserve_rob(tid);
 }
 
@@ -670,7 +677,7 @@ void core_c::deallocate_thread_data(int tid)
     m_last_terminated_tid = ++t_id;
   }
 
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_GPU_SCHED) 
+  if (m_core_type == "ptx" || m_core_type == "igpu") 
     m_gpu_rob->free_rob(tid);
 
   // check forward progress

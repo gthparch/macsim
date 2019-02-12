@@ -11,7 +11,7 @@ num_sim_large_cores 0
 # Clock
 clock_cpu 1.3
 clock_gpu 1.3
-clock_l3  1
+clock_llc 1
 clock_noc 1
 clock_mc  1.1
 
@@ -48,8 +48,8 @@ perfect_dcache 0
 pref_train_inst_once 0
 
 
-# L3
-num_l3 30
+# LLC
+num_llc 30
 
 
 # DRAM

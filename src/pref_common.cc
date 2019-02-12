@@ -1554,7 +1554,7 @@ void hwp_common_c::train(int level, int tid, Addr line_addr, Addr load_PC, uop_c
       pref_l1_miss(tid, line_addr, load_PC, uop);
     }
   }
-  else if (level == MEM_L3) {
+  else if (level == MEM_LLC) {
     if (hit) {
       pref_l2_hit(tid, line_addr, load_PC, uop);
     }

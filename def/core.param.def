@@ -34,22 +34,25 @@ param<FE_SIZE, 						fe_size, 						uns32, 	256>
 param<SCHED_CLOCK, 					sched_clock, 					uns32, 	1>
 param<ALLOC_TO_EXEC_LATENCY, 		alloc_to_exec_latency, 			uns32, 	1>
 
-param<GIAQ_SIZE, 					giaq_size, 						uns32, 	32>
-param<MIAQ_SIZE, 					miaq_size, 						uns32, 	16>
-param<FQ_SIZE, 						fq_size, 						uns32, 	32>
+param<GIAQ_SIZE, giaq_size, uns32, 32>
+param<MIAQ_SIZE, miaq_size, uns32, 16>
+param<FQ_SIZE,   fq_size,   uns32, 32>
+param<SIAQ_SIZE, siaq_size, uns32, 32>
 
-param<GIAQ_MEDIUM_SIZE, 			giaq_medium_size, 				uns32, 	KNOB_GIAQ_SIZE>
-param<MIAQ_MEDIUM_SIZE, 			miaq_medium_size, 				uns32, 	KNOB_MIAQ_SIZE>
-param<FQ_MEDIUM_SIZE, 				fq_medium_size, 				uns32, 	KNOB_FQ_SIZE>
+param<GIAQ_MEDIUM_SIZE, giaq_medium_size, uns32, KNOB_GIAQ_SIZE>
+param<MIAQ_MEDIUM_SIZE, miaq_medium_size, uns32, KNOB_MIAQ_SIZE>
+param<FQ_MEDIUM_SIZE,   fq_medium_size,   uns32, KNOB_FQ_SIZE>
+param<SIAQ_MEDIUM_SIZE, siaq_medium_size, uns32, KNOB_SIAQ_SIZE>
 
-param<GIAQ_LARGE_SIZE, 				giaq_large_size, 				uns32, 	KNOB_GIAQ_SIZE>
-param<MIAQ_LARGE_SIZE, 				miaq_large_size, 				uns32, 	KNOB_MIAQ_SIZE>
-param<FQ_LARGE_SIZE, 				fq_large_size, 					uns32, 	KNOB_FQ_SIZE>
+param<GIAQ_LARGE_SIZE, giaq_large_size, uns32, KNOB_GIAQ_SIZE>
+param<MIAQ_LARGE_SIZE, miaq_large_size, uns32, KNOB_MIAQ_SIZE>
+param<FQ_LARGE_SIZE,   fq_large_size,   uns32, KNOB_FQ_SIZE>
+param<SIAQ_LARGE_SIZE, siaq_large_size, uns32, KNOB_SIAQ_SIZE>
 
-
-param<GEN_ALLOCQ_INDEX,               	giaq_index,             		int,    0>
-param<MEM_ALLOCQ_INDEX,               	miaq_index,             		int,    1>
-param<FLOAT_ALLOCQ_INDEX,               	fiaq_index,             		int,    2>
+param<GEN_ALLOCQ_INDEX,   giaq_index, int, 0>
+param<MEM_ALLOCQ_INDEX,   miaq_index, int, 1>
+param<FLOAT_ALLOCQ_INDEX, fiaq_index, int, 2>
+param<SIMD_ALLOCQ_INDEX,  siaq_index, int, 3>
 
 param<ONE_CYCLE_EXEC,           	one_cycle_exec,         		bool,   0>
 
@@ -169,9 +172,9 @@ param<FPU_CDB_DUTY_CYCLE, fpu_cdb_duty_cycle, float, 0.3>
 param<ICACHE_THROUGHPUT, icache_throughput, int, 8>
 param<DCACHE_THROUGHPUT, dcache_throughput, int, 3>
 param<L2_THROUGHPUT, l2_throughput, int, 8> 
-param<L3_THROUGHPUT, l3_throughput, int, 16>
+param<LLC_THROUGHPUT, llc_throughput, int, 16>
 param<L2_CLOCKRATE, l2_clockrate, float, 3.4>
-param<L3_CLOCKRATE, l3_clockrate, float, 0.85>
+param<LLC_CLOCKRATE, llc_clockrate, float, 0.85>
 param<DRAM_CLOCKRATE, dram_clockrate, float, 0.2>
 param<IS_GPU, is_gpu, int, 0> 
 param<GPU_WIDTH, gpu_width, int, 32> 
@@ -190,3 +193,4 @@ param<WB_SIZE, wb_size, int, 32>
 param<WB_FIFO, wb_fifo, bool, 0>
 param<QSIM_STATE, qsim_state, string, 'state.1'>
 param<QSIM_BENCH, qsim_bench, string, "">
+param<CORE_THREAD_SCHED, core_thread_sched, string, greedy>

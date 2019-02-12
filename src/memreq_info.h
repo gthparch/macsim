@@ -58,6 +58,7 @@ enum MEMORY_TYPE {
   MEM_L1 = 1,
   MEM_L2,
   MEM_L3,
+  MEM_LLC,
   MEM_MC,
   MEM_LAST,
 };

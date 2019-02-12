@@ -2,23 +2,23 @@
 Interval
 ####################################################################################################
 Cumulative:         Cycles:                  20000     Instructions:                  1200
-POWER_L3CACHE_LINEFILL_BUF_R                                    0                             0
+POWER_LLC_LINEFILL_BUF_R                                    0                             0
 
-POWER_L3CACHE_LINEFILL_BUF_W                                    0                             0
+POWER_LLC_LINEFILL_BUF_W                                    0                             0
 
-POWER_L3CACHE_LINEFILL_BUF_R_TAG                                0                             0
+POWER_LLC_LINEFILL_BUF_R_TAG                                0                             0
 
-POWER_L3CACHE_WB_BUF_R                                          0                             0
+POWER_LLC_WB_BUF_R                                          0                             0
 
-POWER_L3CACHE_WB_BUF_W                                          0                             0
+POWER_LLC_WB_BUF_W                                          0                             0
 
-POWER_L3CACHE_WB_BUF_R_TAG                                      0                             0
+POWER_LLC_WB_BUF_R_TAG                                      0                             0
 
-POWER_L3CACHE_R                                                 0                             0
+POWER_LLC_R                                                 0                             0
 
-POWER_L3CACHE_W                                                 0                             0
+POWER_LLC_W                                                 0                             0
 
-POWER_L3CACHE_R_TAG                                             0                             0
+POWER_LLC_R_TAG                                             0                             0
 
 POWER_MC_R                                                      0                             0
 

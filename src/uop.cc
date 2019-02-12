@@ -88,6 +88,12 @@ const char *uop_c::g_uop_state_name[NUM_OP_STATES] = {
   "OS_DCACHE_ACCESS",
   "OS_DCACHE_MEM_ACCESS_DENIED",
   "OS_EXEC_BEGIN",
+  "OS_TRANS_BEGIN",
+  "OS_TRANS_WALK_QUEUE",
+  "OS_TRANS_RETRY_QUEUE",
+  "OS_TRANS_FAULT_RETRY_QUEUE",
+  "OS_TRANS_FAULT_BUFFER",
+  "OS_TRANS_DONE",
 };
 
 
@@ -146,6 +152,7 @@ const char *uop_c::g_uop_type_name[NUM_UOP_TYPES] = {
   "UOP_LD",
   "UOP_ST",
   "UOP_SSE",
+  "UOP_SIMD",
 
   "UOP_GPU_ABS",
   "UOP_GPU_ABS64",
@@ -488,6 +495,8 @@ void uop_c::init()
   m_hmc_inst                          = HMC_NONE;
   m_hmc_trans_id                      = 0;
   m_dep_on_hmc_inst                   = false;
+
+  m_translated = false;
 }
 
 

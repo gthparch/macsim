@@ -90,6 +90,7 @@ class readonly_cache_c;
 class sw_managed_cache_c;
 class dram_c;
 class dram_ctrl_c;
+class dram_simple_ctrl_c;
 class icache_data_c;
 class frontend_s;
 class thread_s;
@@ -119,6 +120,7 @@ class ProcessorStatistics;
 class CoreStatistics;
 class cache_partition_framework_c;
 class dyfr_c;
+class MMU;
 
 
 template <class T> class pqueue_c;

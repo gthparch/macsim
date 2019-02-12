@@ -11,12 +11,13 @@ import sys
 import ConfigParser
 
 
-## Check c++11 support
-def CheckCPP11():
+## Check c++14 support
+def CheckCPP14():
   def SimpleCall(context):
-    cpp11_test = '''
+    cpp14_test = '''
     #include <vector>
     #include <iostream>
+    #include <memory>
   
     using namespace std;
 
@@ -28,17 +29,20 @@ def CheckCPP11():
         sum += (*itr);
       }
       cout << sum;
+
+      unique_ptr<int> test_int = make_unique<int>(2347);
+      cout << *test_int;
     }
     '''
-    context.Message('Checking for c++11 conformance...')
-    context.env.AppendUnique(CXXFLAGS=['-std=c++11'])
-    result = context.TryCompile(cpp11_test, '.cpp')
+    context.Message('Checking for c++14 conformance...')
+    context.env.AppendUnique(CXXFLAGS=['-std=c++14'])
+    result = context.TryCompile(cpp14_test, '.cpp')
     context.Result(result)
     return result
   return SimpleCall
 
 
-## Check c++11 support
+## Check c++14 support
 def pre_compile_check():
   ## Environment
   env = Environment()
@@ -48,10 +52,10 @@ def pre_compile_check():
     if key in custom_vars:
       env[key] = val
 
-  conf = Configure(env, custom_tests = {'CheckCPP11' : CheckCPP11()})
+  conf = Configure(env, custom_tests = {'CheckCPP14' : CheckCPP14()})
 
-  if not conf.CheckCPP11():
-    print('Error: Your compiler does not support c++11. Exit now...')
+  if not conf.CheckCPP14():
+    print('Error: Your compiler does not support c++14. Exit now...')
     os.system('cat config.log')
     sys.exit()
 
@@ -66,23 +70,24 @@ flags = {}
 ## Configuration from file
 Config = ConfigParser.ConfigParser()
 Config.read('macsim.config')
-flags['dram']  = Config.get('Library', 'dram', '0')
-flags['power'] = Config.get('Library', 'power', '0')
-flags['iris']  = Config.get('Library', 'iris', '0')
-flags['qsim']  = Config.get('Library', 'qsim', '0')
-flags['debug'] = Config.get('Build', 'debug', '0')
-flags['gprof'] = Config.get('Build', 'gprof', '0')
-flags['val']   = Config.get('Build_Extra', 'val', '0')
-
+flags['dram']       = Config.get('Library', 'dram', '0')
+flags['power']      = Config.get('Library', 'power', '0')
+flags['iris']       = Config.get('Library', 'iris', '0')
+flags['qsim']       = Config.get('Library', 'qsim', '0')
+flags['debug']      = Config.get('Build', 'debug', '0')
+flags['gprof']      = Config.get('Build', 'gprof', '0')
+flags['val']        = Config.get('Build_Extra', 'val', '0')
+flags['ramulator']  = Config.get('Library', 'ramulator', '0')
 
 ## Configuration from commandline
-flags['debug'] = ARGUMENTS.get('debug', flags['debug'])
-flags['gprof'] = ARGUMENTS.get('gprof', flags['gprof'])
-flags['power'] = ARGUMENTS.get('power', flags['power'])
-flags['iris']  = ARGUMENTS.get('iris', flags['iris'])
-flags['dram']  = ARGUMENTS.get('dram', flags['dram'])
-flags['val']   = ARGUMENTS.get('val', flags['val'])
-flags['qsim']  = ARGUMENTS.get('qsim', flags['qsim'])
+flags['debug']      = ARGUMENTS.get('debug', flags['debug'])
+flags['gprof']      = ARGUMENTS.get('gprof', flags['gprof'])
+flags['power']      = ARGUMENTS.get('power', flags['power'])
+flags['iris']       = ARGUMENTS.get('iris', flags['iris'])
+flags['dram']       = ARGUMENTS.get('dram', flags['dram'])
+flags['val']        = ARGUMENTS.get('val', flags['val'])
+flags['qsim']       = ARGUMENTS.get('qsim', flags['qsim'])
+flags['ramulator']  = ARGUMENTS.get('ramulator', flags['ramulator'])
 
 
 ## Checkout DRAMSim2 copy
@@ -90,6 +95,10 @@ if flags['dram'] == '1':
   if not os.path.exists('src/DRAMSim2'):
     os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
 
+## Checkout Ramulator copy
+if flags['ramulator'] == '1':
+  if not os.path.exists('src/ramulator'):
+    os.system('git clone https://github.com/CMU-SAFARI/ramulator.git src/ramulator')
 
 ## Create stat/knobs
 SConscript('scripts/SConscript')

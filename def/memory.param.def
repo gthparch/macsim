@@ -64,10 +64,12 @@ param<PERFECT_DCACHE, perfect_dcache, bool, false>
 param<L1_READ_PORTS, l1_read_ports, int, 4>
 param<L2_READ_PORTS, l2_read_ports, int, 2>
 param<L3_READ_PORTS, l3_read_ports, int, 1>
+param<LLC_READ_PORTS, llc_read_ports, int, 1>
 
 param<L1_WRITE_PORTS, l1_write_ports, int, 4>
 param<L2_WRITE_PORTS, l2_write_ports, int, 2>
 param<L3_WRITE_PORTS, l3_write_ports, int, 1>
+param<LLC_WRITE_PORTS, llc_write_ports, int, 1>
 
 param<L1_SMALL_NUM_SET,   l1_small_num_set,   int, 64>
 param<L1_SMALL_ASSOC,     l1_small_assoc,     int, 8>
@@ -108,13 +110,21 @@ param<L2_LARGE_NUM_BANK,  l2_large_num_bank,  int, 8>
 param<L2_LARGE_LATENCY,   l2_large_latency,   int, 8>
 param<L2_LARGE_BYPASS,    l2_large_bypass,    bool, false>
 
-param<NUM_L3,       num_l3,       int, 1>
+param<NUM_L3,               num_l3,               int, 1>
 param<L3_INTERLEAVE_FACTOR, l3_interleave_factor, int, 64>
-param<L3_NUM_SET,   l3_num_set,      int, 8192>
-param<L3_ASSOC,     l3_assoc,     int, 16>
-param<L3_LINE_SIZE, l3_line_size, int, 64>
-param<L3_NUM_BANK,  l3_num_bank,  int, 16>
-param<L3_LATENCY,   l3_latency,   int, 25>
+param<L3_NUM_SET,           l3_num_set,           int, 8192>
+param<L3_ASSOC,             l3_assoc,             int, 16>
+param<L3_LINE_SIZE,         l3_line_size,         int, 64>
+param<L3_NUM_BANK,          l3_num_bank,          int, 16>
+param<L3_LATENCY,           l3_latency,           int, 25>
+
+param<NUM_LLC,               num_llc,               int, 1>
+param<LLC_INTERLEAVE_FACTOR, llc_interleave_factor, int, 64>
+param<LLC_NUM_SET,           llc_num_set,           int, 8192>
+param<LLC_ASSOC,             llc_assoc,             int, 16>
+param<LLC_LINE_SIZE,         llc_line_size,         int, 64>
+param<LLC_NUM_BANK,          llc_num_bank,          int, 16>
+param<LLC_LATENCY,           llc_latency,           int, 25>
 
 param<DCACHE_INFINITE_PORT, dcache_infinite_port, bool, false>
 
@@ -140,7 +150,7 @@ param<DRAM_ADDITIONAL_LATENCY, dram_additional_latency, int, 0>
 
 
 /* Memory */
-param<MEMORY_TYPE, memory_type, string, l3_cn>
+param<MEMORY_TYPE, memory_type, string, llc_cn>
 param<MEM_MSHR_SIZE, mem_mshr_size, int, 128>
 param<MEM_QUEUE_SIZE, mem_queue_size, int, 128>
 
@@ -211,7 +221,7 @@ param<STORE_BUF_SIZE, store_buf_size, int, 12>
 
 param<USE_INCOMING_TID_CID_FOR_WB, use_incoming_tid_cid_for_wb, bool, false>
 
-/* L3 and DRAM interleaving */
+/* LLC and DRAM interleaving */
 param<DEFAULT_INTERLEAVING, default_interleaving, bool, true>
 param<NEW_INTERLEAVING_SAME_GRANULARITY, new_interleaving_same_granularity, bool, false>
 param<NEW_INTERLEAVING_DIFF_GRANULARITY, new_interleaving_diff_granularity, bool, false>
@@ -221,8 +231,9 @@ param<USE_NEW_COALESCING, use_new_coalescing, bool, false>
 
 /* Page Mapping */
 param<ENABLE_PHYSICAL_MAPPING, enable_physical_mapping, bool, false>
-param<PAGE_SIZE, page_size, int, 4096>
-param<REGION_SIZE, region_size, int, 1048576>
+param<PAGE_SIZE, page_size, long, 4096>
+param<REGION_SIZE, region_size, long, 1048576>
+param<MEMORY_SIZE, memory_size, long, 4294967296>
 
 /* FCFS or REGION_FCFS */
 param<PAGE_MAPPING_POLICY, page_mapping_policy, string, REGION_FCFS> 
@@ -230,3 +241,12 @@ param<PAGE_MAPPING_POLICY, page_mapping_policy, string, REGION_FCFS>
 /* SST */
 param<USE_MEMHIERARCHY, use_memhierarchy, bool, false>
 param<USE_VAULTSIM_LINK, use_vaultsim_link, bool, false>
+
+param<TLB_NUM_ENTRY, tlb_num_entry, long, 2048>
+
+param<PAGE_TABLE_WALK_LATENCY, page_table_walk_latency, long, 200>
+param<PAGE_FAULT_LATENCY, page_fault_latency, long, 1000>
+param<PAGE_EVICTION_LATENCY, page_eviction_latency, long, 1000>
+param<BATCH_PROCESSING_OVERHEAD, batch_processing_overhead, long, 50000>
+
+param<FAULT_BUFFER_SIZE, fault_buffer_size, long, 512>

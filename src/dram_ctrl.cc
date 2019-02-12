@@ -67,14 +67,17 @@ dram_c* fcfs_controller(macsim_c* simBase)
   return fcfs;
 }
 
-
 dram_c* frfcfs_controller(macsim_c* simBase)
 {
   dram_c* frfcfs = new dc_frfcfs_c(simBase);
   return frfcfs;
 }
 
-
+dram_c* simple_controller(macsim_c* simBase)
+{
+  dram_c* sc = new dram_simple_ctrl_c(simBase);
+  return sc;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -222,7 +225,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
     m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
     m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(512);
   }
   else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY || 
       *m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_SAME_GRANULARITY) {
@@ -240,7 +243,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
 
     m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_L3) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + 5;
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_LLC) + log2_int(*m_simBase->m_knobs->KNOB_LLC_NUM_SET) + 5;
   }
 
   m_cycle = 0;
@@ -623,7 +626,7 @@ void dram_ctrl_c::send(void)
       req_type_checked[req->m_ptx] = true;
       req->m_msg_type = NOC_FILL;
 
-      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
+      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
       if (!insert_packet) {
         DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
@@ -925,3 +928,83 @@ drb_entry_s* dc_frfcfs_c::schedule(list<drb_entry_s*>* buffer)
 
 
 
+dram_simple_ctrl_c::dram_simple_ctrl_c(macsim_c* simBase) : dram_c(simBase)
+{
+  m_latency = *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+  m_output_buffer = new list<mem_req_s*>;
+
+  m_cycle = 0;
+}
+
+dram_simple_ctrl_c::~dram_simple_ctrl_c()
+{
+  delete m_output_buffer;
+}
+
+void dram_simple_ctrl_c::init(int id)
+{
+  m_id = id;
+}
+
+void dram_simple_ctrl_c::run_a_cycle(bool pll_lock)
+{
+  if (pll_lock) {
+    ++m_cycle;
+    return;
+  }
+
+  send();
+  receive();
+  ++m_cycle;
+}
+
+void dram_simple_ctrl_c::send(void)
+{
+  vector<mem_req_s*> temp_list;
+
+  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+    mem_req_s* req = (*I);
+
+    if (req->m_rdy_cycle > m_cycle) 
+      break;
+
+    req->m_msg_type = NOC_FILL;
+    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
+
+    if (!insert_packet) {
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
+          m_id, req->m_id, req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
+      break;
+    }
+
+    temp_list.push_back(req);
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && *KNOB(KNOB_ENABLE_NEW_NOC)) {
+      m_simBase->m_bug_detector->allocate_noc(req);
+    }
+  }
+
+  for (auto I = temp_list.begin(), E = temp_list.end(); I != E; ++I) {
+    m_output_buffer->remove((*I));
+  }
+}
+
+void dram_simple_ctrl_c::receive(void)
+{
+  // check router queue every cycle
+  mem_req_s* req = NETWORK->receive(MEM_MC, m_id);
+  if (!req)
+    return;
+
+  req->m_rdy_cycle = m_cycle + m_latency;
+  m_output_buffer->push_back(req);
+  STAT_EVENT(TOTAL_DRAM);
+
+  NETWORK->receive_pop(MEM_MC, m_id);
+
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE))
+    m_simBase->m_bug_detector->deallocate_noc(req);
+}
+
+void dram_simple_ctrl_c::print_req(void)
+{
+}

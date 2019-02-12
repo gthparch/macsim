@@ -257,6 +257,11 @@ class dcu_c
      */
     void receive_packet(void);
 
+    /**
+     * Invalidate cache lines of the given page
+     */
+    void invalidate(Addr page_addr);
+
   private:
     /**
      * data cache default constructor
@@ -286,7 +291,7 @@ class dcu_c
   private:
     int       m_id; /**< cache id */
     int       m_noc_id; /**< cache network id */
-    int       m_level; /**< cache level (L1, L2, L3, or memory controller) */
+    int       m_level; /**< cache level (L1, L2, LLC, or memory controller) */
     bool      m_disable; /**< disabled */
     bool      m_bypass; /**< bypass cache */
     cache_c*  m_cache; /**< cache structure */
@@ -306,6 +311,7 @@ class dcu_c
     int       m_banks; /**< number of cache banks */
     int       m_latency; /**< cache access latency */
     bool      m_ptx_sim; /**< gpu cache */
+    bool      m_igpu_sim; /**< intel gpu cache */
     queue_c*  m_in_queue; /**< input queue */
     queue_c*  m_wb_queue; /**< write-back queue */
     queue_c*  m_fill_queue; /**< fill queue */
@@ -399,7 +405,7 @@ class memory_c
     void run_a_cycle_core(int, bool);
 
     /**
-     * Tick a cycle for L3 cache
+     * Tick a cycle for LLC cache
      */
     void run_a_cycle_uncore(bool);
 
@@ -474,6 +480,11 @@ class memory_c
      * Handle coherence traffic (currently empty, will support coherence soon)
      */
     void handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache);
+
+    /**
+     * Invalidate cache lines of the given page
+     */
+    virtual void invalidate(Addr page_addr);
     
 
   public:
@@ -523,24 +534,29 @@ class memory_c
     void flush_prefetch(int core_id);
 
 
-
   protected:
     dcu_c** m_l1_cache; /**< L1 caches */
     dcu_c** m_l2_cache; /**< L2 caches */
     dcu_c** m_l3_cache; /**< L3 caches */
+    dcu_c** m_llc_cache; /**< LLC caches */
     list<mem_req_s*>* m_mshr; /**< mshr entry per L1 cache */
     list<mem_req_s*>* m_mshr_free_list; /**< mshr entry free list */
     int m_num_core; /**< number of cores */
     int m_num_cpu;
     int m_num_gpu;
-    int m_num_l3; /**< number of l3 caches */
+    int m_num_l3; /**< number of L3 caches */
+    int m_num_llc; /**< number of LLC caches */
     int m_num_mc; /**< number of memory controllers */
     int m_noc_index_base[MEM_LAST]; /**< component id of each memory hierarchy */
     int m_noc_id_base[MEM_LAST]; /**< noc id base per level */
     Counter m_stop_prefetch; /**< when set, no prefetches will be inserted */
     int m_l3_interleave_factor; /**< mask bit for L3 id */
+    int m_llc_interleave_factor; /**< mask bit for LLC id */
     int m_dram_interleave_factor; /**< mask bit for dram id */
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
+    long m_page_size;
+    bool m_igpu_sim; /**< intel gpu */
+
 
     // cache coherence
     unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
@@ -570,7 +586,7 @@ class memory_c
 
 /*
  * coupled cache : when access between two caches, no need to communicate via network router
- *                 if ids are matched. (L2[3] to L3[3] : direct, L2[3] to L3[5] : via noc
+ *                 if ids are matched. (L2[3] to LLC[3] : direct, L2[3] to LLC[5] : via noc
  * local cache : even though ids are not matched, there is command link to all caches
  */     
 
@@ -579,36 +595,36 @@ class memory_c
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief 3-Level, Coupled architecture (Intel Sandy Bridge)
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class l3_coupled_network_c : public memory_c
+class llc_coupled_network_c : public memory_c
 {
   public:
     /**
      * constructor
      */
-    l3_coupled_network_c(macsim_c* simBase);
+    llc_coupled_network_c(macsim_c* simBase);
 
     /**
      * Destructor
      */
-    ~l3_coupled_network_c();
+    ~llc_coupled_network_c();
 };
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief 3-Level, Decoupled architecture (2D topology)
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class l3_decoupled_network_c : public memory_c
+class llc_decoupled_network_c : public memory_c
 {
   public:
     /**
      * Constructor
      */
-    l3_decoupled_network_c(macsim_c* simBase);
+    llc_decoupled_network_c(macsim_c* simBase);
 
     /**
      * Destructor
      */
-    ~l3_decoupled_network_c();
+    ~llc_decoupled_network_c();
 };
 
 
@@ -704,5 +720,34 @@ class l2_decoupled_local_c : public memory_c
      * Set the level of each cache level
      */
     void set_cache_id(mem_req_s* req);
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief 2-Level, L3 & LLC are accessed via NoC (no L1, L2) (Intel GPU)
+///////////////////////////////////////////////////////////////////////////////////////////////
+class igpu_network_c : public memory_c
+{
+  public:
+    /**
+     * constructor
+     */
+    igpu_network_c(macsim_c* simBase);
+
+    /**
+     * Destructor
+     */
+    ~igpu_network_c();
+
+  private:
+    /**
+     * Set the level of each cache level
+     */
+    void set_cache_id(mem_req_s* req);
+
+    /**
+     * Invalidate cache lines of the given page
+     */
+    void invalidate(Addr page_addr);
 };
 #endif

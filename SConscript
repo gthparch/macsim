@@ -53,15 +53,15 @@ if sys.platform != "darwin" and flags.get('qsim') != '1':
 
 ## DEBUG build
 if flags['debug'] == '1':
-  env['CPPFLAGS'] = '-g -std=c++11 %s' % warn_flags
+  env['CPPFLAGS'] = '-g -std=c++14 %s' % warn_flags
 ## GPROF build
 elif flags['gprof'] == '1':
-  env['CPPFLAGS'] = '-pg -std=c++11 %s' % warn_flags
+  env['CPPFLAGS'] = '-pg -std=c++14 %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
   env['LINKFLAGS'].append('-pg')
 ## OPT build
 else:
-  env['CPPFLAGS'] = '-O3 -std=c++11 -funroll-loops %s' % warn_flags
+  env['CPPFLAGS'] = '-O3 -std=c++14 -funroll-loops %s' % warn_flags
   env['CPPDEFINES'].append('NO_DEBUG')
 
 if flags['val'] == '1':
@@ -185,6 +185,39 @@ if flags['dram'] == '1':
 
 
 #########################################################################################
+# Ramulator
+#########################################################################################
+ramulator_srcs = [
+  'src/ramulator_wrapper.cc',
+  'src/dram_ramulator.cc',
+  'src/ramulator/src/Config.cpp',
+  'src/ramulator/src/Controller.cpp',
+  'src/ramulator/src/DDR3.cpp',
+  'src/ramulator/src/DDR4.cpp',
+  'src/ramulator/src/GDDR5.cpp',
+  'src/ramulator/src/Gem5Wrapper.cpp',
+  'src/ramulator/src/HBM.cpp',
+  'src/ramulator/src/LPDDR3.cpp',
+  'src/ramulator/src/LPDDR4.cpp',
+  'src/ramulator/src/MemoryFactory.cpp',
+  'src/ramulator/src/SALP.cpp',
+  'src/ramulator/src/WideIO.cpp',
+  'src/ramulator/src/WideIO2.cpp',
+  'src/ramulator/src/TLDRAM.cpp',
+  'src/ramulator/src/ALDRAM.cpp',
+  'src/ramulator/src/StatType.cpp',
+]
+
+if flags['ramulator'] == '1':
+  env['CPPFLAGS'] += ' -Wno-missing-field-initializers '
+  env['CPPFLAGS'] += ' -Wno-unused-variable '
+  env['CPPFLAGS'] += ' -Wno-reorder '
+  env['CPPDEFINES'] += ['RAMULATOR']
+  env['CPPPATH'] += ['#src/ramulator']
+  env['LIBPATH'] += [Dir('.')]
+  env.Library('ramulator', ramulator_srcs, CPPDEFINES=['RAMULATOR'])
+
+#########################################################################################
 # MACSIM
 #########################################################################################
 macsim_src = [
@@ -225,6 +258,7 @@ macsim_src = [
   'src/schedule_io.cc',
   'src/schedule_ooo.cc',
   'src/schedule_smc.cc',
+  'src/schedule_igpu.cc',
   'src/statistics.cc',
   'src/sw_managed_cache.cc',
   'src/trace_read.cc',
@@ -237,13 +271,15 @@ macsim_src = [
   'src/trace_read_cpu.cc',
   'src/trace_read_gpu.cc',
   'src/trace_read_a64.cc',
+  'src/trace_read_igpu.cc',
   'src/page_mapping.cc',
   'src/dyfr.cc',
   'src/hmc_process.cc',
   'src/trace_gen_a64.cc',
   'src/trace_gen_x86.cc',
   'src/cs_disas.cc',
-  'src/resource.cc'
+  'src/resource.cc',
+  'src/mmu.cc'
 ]
 
 
@@ -260,6 +296,7 @@ if flags['dram'] == '1':
   libraries.append('dramsim')
   env['CPPDEFINES'].append('DRAMSIM')
   env['CPPPATH'] += ['#src/DRAMSim2']
+  env['LIBPATH'] += [Dir('.')]
 
 if flags['iris'] == '1':
   libraries.append('iris')
@@ -273,7 +310,8 @@ if flags['iris'] == '1':
 if flags['qsim'] == '1':
   libraries += ['xed', 'qsim', 'capstone', 'pthread', 'dl']
 
-
+if flags['ramulator'] == '1':
+  libraries.append('ramulator')
 
 env.Program(
     'macsim',
