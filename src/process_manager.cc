@@ -863,6 +863,9 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
 
   ASSERT(core->m_running_thread_num); 
 
+  // final heartbeat for the thread
+  core->final_heartbeat(thread_id);
+
   int  block_id = trace_info->m_block_id; 
   --core->m_running_thread_num;
 
@@ -872,9 +875,6 @@ int process_manager_c::terminate_thread(int core_id, thread_s* trace_info, int t
 
   // Mark thread terminated
   core->m_thread_finished[thread_id] = 1; 
-
-  // final heartbeat for the thread
-  core->final_heartbeat(thread_id);
 
   // deallocate data structures
   core->deallocate_thread_data(thread_id);

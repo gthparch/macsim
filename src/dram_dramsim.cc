@@ -185,7 +185,7 @@ void dram_dramsim_c::send(void)
   for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
     mem_req_s* req = (*I);
     req->m_msg_type = NOC_FILL;
-    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
+    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
     
     if (!insert_packet) {
       DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 

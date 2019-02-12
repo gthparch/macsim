@@ -12,7 +12,7 @@ num_sim_large_cores 0
 # from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
 clock_cpu 1.2
 clock_gpu 1.6
-clock_l3  1.6
+clock_llc 1.6
 clock_noc 1.6
 clock_mc  2.1
 
@@ -61,13 +61,13 @@ l1_small_assoc 6
 #l1_small_num_set 32
 #l1_small_assoc 4
 
-# L3 Cache
-num_l3 6
-l3_num_set 128
-l3_line_size 128
-l3_assoc 8
-l3_num_bank 4
-l3_latency 10 
+# LLC Cache
+num_llc 6
+llc_num_set 128
+llc_line_size 128
+llc_assoc 8
+llc_num_bank 4
+llc_latency 10 
 
 
 # DRAM

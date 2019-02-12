@@ -111,7 +111,7 @@ memory. It is good to note these points about this figure:
 
 
 \begin{itemize} 
-  \item There are three levels (L1, L2, and L3) of caches in the
+  \item There are three levels (L1, L2, and LLC) of caches in the
 	\SIM , the L2 cache can be disabled if needed.
 
   \item All the caches and memory controllers can be connected via an
@@ -123,13 +123,13 @@ memory. It is good to note these points about this figure:
   \item The local router within a cache structure is enabled only when
 	necessary.
 
-  \item L3 cache is unified (shared by all cores), but sub banked. In
+  \item LLC cache is unified (shared by all cores), but sub banked. In
     other words, address regions are statically partitioned and each
     tile is responsible for sub regions. Each cache tile has multiple
     banks as well.
    
-  \item Each L3 tile could be coupled with its own L2 to reduce network
-	  traffic. This is controlled by knob \Verb+memory_type   l3_[de]coupled_network+.
+  \item Each LLC tile could be coupled with its own L2 to reduce network
+	  traffic. This is controlled by knob \Verb+memory_type   llc_[de]coupled_network+.
 	  For more setting for this knob look at \ref{sec:types_memory}.
 
 \end{itemize}
@@ -186,7 +186,7 @@ Following variables is used in \SIM for cache initialization:
   the cache is disabled. When a request is inserted into the input queue of a
   disabled cache, the request will be directly inserted into the output queue
   of the cache. This feature has been used for modeling 2-level cache
-  hierarchies. As Figure~\ref{fig:level2cache} shows, L1 and L3 caches are
+  hierarchies. As Figure~\ref{fig:level2cache} shows, L1 and LLC caches are
   active, but L2 cache is disabled. However, since the L1 cache does not have a
   router, it needs to use the router of the L2 cache. Therefore,
   \textsf{has\_router} must be set to \textit{true} for the L2 cache.
@@ -214,11 +214,11 @@ included.
 		{
 		\item Intel Core~\cite{core2duo} microarchitecture has two-level of
 		caches. The last-level cache might be tiled, but if the L2 cache
-		tries to access the closest the L3 tile, it does not have to access
+		tries to access the closest the LLC tile, it does not have to access
 		through the interconnection. All communications will be made through
-		the direct link. However, if the L2 cache accesses the remote L3
+		the direct link. However, if the L2 cache accesses the remote LLC
 		tile, it goes through the interconnection. Note that the number of
-		cores (L1 and L2 caches) and the number of the L3 tiles must be the
+		cores (L1 and L2 caches) and the number of the LLC tiles must be the
 		same.
 
 		\smallskip
@@ -228,28 +228,28 @@ included.
 		\smallskip
 		 }
 
-\item \textbf{l3\_coupled\_network}: Intel Nehalem~\cite{nehalem} and Sandy
+\item \textbf{llc\_coupled\_network}: Intel Nehalem~\cite{nehalem} and Sandy
     Bridge~\cite{sandybridge} microarchitectures have three-levels of
-    caches. The last-level cache is tiled and to access the closest L3
+    caches. The last-level cache is tiled and to access the closest LLC
     tile, a L2 cache does not have to go through the interconnection,
-    it can access the L3 tile directly. However, if a L2 cache
-    accesses a remote L3 tile, it goes through the interconnection.
+    it can access the LLC tile directly. However, if a L2 cache
+    accesses a remote LLC tile, it goes through the interconnection.
     Note that the number of cores (L1 and L2 caches) and the number of
-    the L3 tiles must be the same in this configuration.
+    the LLC tiles must be the same in this configuration.
 
 \begin{Verbatim}
-// class l3_coupled_network_c
+// class llc_coupled_network_c
 for (int ii = 0; ii < m_num_core; ++ii) {
   // next_id, prev_id, done, coupled_up, coupled_down, disable, router
   m_l1_cache[ii]->init(ii, -1, false, false, TRUE, false, false);
   m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE, false, TRUE);
-  m_l3_cache[ii]->init(-1, ii, false, TRUE,  false,false, TRUE);
+  m_llc_cache[ii]->init(-1, ii, false, TRUE,  false,false, TRUE);
 }
 \end{Verbatim}
 
   \item \textbf{no\_cache}: NVIDIA G80~\cite{g80} architecture does not have
   hardware-managed caches. Thus, all three levels are connected each
-  other and disabled. Only the L3 cache has a router to access the DRAM.
+  other and disabled. Only the LLC cache has a router to access the DRAM.
 
   \begin{Verbatim}
   // class no_cache_c
@@ -257,13 +257,13 @@ for (int ii = 0; ii < m_num_core; ++ii) {
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
     m_l1_cache[ii]->init(ii, -1, false, false, TRUE,  TRUE, false);
     m_l2_cache[ii]->init(ii, ii, true,  TRUE,  TRUE,  TRUE, false);
-    m_l3_cache[ii]->init(-1, ii, false, TRUE,  false, TRUE, TRUE);
+    m_llc_cache[ii]->init(-1, ii, false, TRUE,  false, TRUE, TRUE);
   }
   \end{Verbatim}
 
   \item \textbf{l2\_decoupled\_network}: NVIDIA Fermi~\cite{fermi} architecture has private L1 caches and a
   unified L2 cache shared by all cores. The L1 and L2 caches are linked. The L2
-  cache is been disabled, but has its router enabled. The L3 is not linked with
+  cache is been disabled, but has its router enabled. The LLC is not linked with
   others (it is connected via the interconnect), but it is enabled and has a
   router.
 
@@ -275,30 +275,30 @@ for (int ii = 0; ii < m_num_core; ++ii) {
     m_l2_cache[ii]->init(-1, ii, true,  TRUE,  false, true,  true);
   }
 
-  for (int ii = 0; ii < m_num_l3; ++ii) {
+  for (int ii = 0; ii < m_num_llc; ++ii) {
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
-    m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+    m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
   }
   \end{Verbatim}
   
-  \item \textbf{l3\_decoupled\_network} In a general 2-D Topology (Mesh, Torus), 
+  \item \textbf{llc\_decoupled\_network} In a general 2-D Topology (Mesh, Torus), 
   it is assumed that each core has private L1 and L2 caches, but access to 
-  the L3 cache must be through the interconnection network. The L1 and L2 caches 
-  are both enabled and linked, but only the L2 cache has a router. The L3 cache is not linked
+  the LLC cache must be through the interconnection network. The L1 and L2 caches 
+  are both enabled and linked, but only the L2 cache has a router. The LLC cache is not linked
   with other caches and the communication is made through the interconnection
   network.
 
   \begin{Verbatim}
-  // class l3_decoupled_network_c
+  // class llc_decoupled_network_c
   // next_id, prev_id, done, coupled_up, coupled_down, disable, router
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, TRUE,  false, false);
     m_l2_cache[ii]->init(-1, ii, true,  TRUE,  false, false, TRUE);
   }
 
-  for (int ii = 0; ii < m_num_l3; ++ii) {
+  for (int ii = 0; ii < m_num_llc; ++ii) {
     // next_id, prev_id, done, coupled_up, coupled_down, disable, router
-    m_l3_cache[ii]->init(-1, -1, false, false, false, false, TRUE);
+    m_llc_cache[ii]->init(-1, -1, false, false, false, false, TRUE);
   }
   \end{Verbatim}
 \end{itemize}

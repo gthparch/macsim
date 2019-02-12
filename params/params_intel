@@ -14,7 +14,7 @@ core_thread_sched balanced
 # Clock
 clock_cpu 1.15
 clock_gpu 1.15
-clock_l3  1.15
+clock_llc 1.15
 clock_noc 1.15
 clock_mc  1.15
 
@@ -37,29 +37,26 @@ fsched_large_size 96
 ssched_large_size 128
 bp_hist_length 16
 rob_large_size 512
-large_core_schedule ooo
-gpu_sched 1
 max_threads_per_large_core 7
 
 mem_mshr_size 9
 
 # L3 cache
-num_l2l3 1
-l2l3_large_num_set 512
-l2l3_large_assoc 16
-l2l3_large_line_size 64
-l2l3_large_latency 100
-l2l3_large_bypass 0
+num_l3 1
+l3_num_set 512
+l3_assoc 16
+l3_line_size 64
+l3_latency 100
 
 # Memory
 memory_type igpu_network
 
 # LLC
-num_l3 1
-l3_num_set 8192
-l3_assoc 32
-l3_line_size 64
-l3_latency 100
+num_llc 1
+llc_num_set 8192
+llc_assoc 32
+llc_line_size 64
+llc_latency 100
 
 # DRAM
 dram_bus_width 4
@@ -75,6 +72,7 @@ ramulator_config_file ../src/ramulator/configs/DDR4-config.cfg
 ramulator_cacheline_size 64
 
 # Page Management
+enable_physical_mapping 1
 page_size 4096
 memory_size 4294967296
 page_table_walk_latency 200

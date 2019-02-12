@@ -12,7 +12,7 @@ num_sim_large_cores 0
 # Clock
 clock_cpu 1.5
 clock_gpu 1.5
-clock_l3  1
+clock_llc 1
 clock_noc 1
 clock_mc  0.9
 
@@ -50,9 +50,9 @@ icache_assoc 8
 dram_merge_requests 1
 
 
-# L3 Cache
-num_l3 14
-l3_latency 1
+# LLC Cache
+num_llc 14
+llc_latency 1
 
 
 # DRAM

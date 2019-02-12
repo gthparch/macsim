@@ -383,12 +383,12 @@ The cache can be configured using the following knobs:
  \Verb+l{1,2}_{small, medium, large}_num_bank+ & \Verb+// number of banks+ \\
  \Verb+l{1,2}_{small, medium, large}_latency + & \Verb+// cache latency+ \\
  \Verb+l{1,2}_{small, medium, large}_bypass + & \Verb+// cache bypass (if set, always miss)+ \\
- \Verb+num_l3 + & \Verb+// number of l3 cache tiles+ \\
- \Verb+l3_num_Set + & \Verb+// number of l3 cache sets+ \\
- \Verb+l3_assoc + & \Verb+// l3 associativity+ \\
- \Verb+l3_line_size+ & \Verb+// l3 line size+ \\
- \Verb+l3_num_bank+ & \Verb+// l3 number of banks+ \\
- \Verb+l3_latency + & \Verb+// l3 latency+ \\
+ \Verb+num_llc + & \Verb+// number of llc cache tiles+ \\
+ \Verb+llc_num_set + & \Verb+// number of llc cache sets+ \\
+ \Verb+llc_assoc + & \Verb+// llc associativity+ \\
+ \Verb+llc_line_size+ & \Verb+// llc line size+ \\
+ \Verb+llc_num_bank+ & \Verb+// llc number of banks+ \\
+ \Verb+llc_latency + & \Verb+// llc latency+ \\
  \Verb+l{1,2,3}_{read,write}_port + & \Verb+// the number of read / write port+ \\
  \Verb+icache_num_set 8 + & \Verb+// 4KB I-cache number of set+ \\
  \Verb+icache_assoc   8 /+ & \Verb+/ I cache set associativity + \\
@@ -398,7 +398,7 @@ The cache can be configured using the following knobs:
 \noindent The effective cache size can be calculated using Equation~\ref{eq:cachesize}.
 \begin{equation}
 \label{eq:cachesize}
-cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (l3 only, otherwise 1)
+cache\_size = num\_set \times assoc \times line\_size \times num\_tiles (llc only, otherwise 1)
 \end{equation}
 
 

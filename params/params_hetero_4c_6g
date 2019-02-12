@@ -15,7 +15,7 @@ forward_progress_limit 500000
 # Clock
 clock_cpu 3
 clock_gpu 1.5
-clock_l3  1
+clock_llc 1
 clock_noc 1
 clock_mc  1.6 
 
@@ -87,18 +87,18 @@ perfect_dcache 0
 enable_cache_coherence 0
 dram_merge_requests 1
 mem_ooo_stores 0
-memory_type l3_decoupled_network
+memory_type llc_decoupled_network
 byte_level_access 0
 infinite_port 0
 
 
-# L3 Cache
-num_l3 4
-l3_num_set 1024
-l3_line_size 64
-l3_assoc 32
-l3_num_bank 8
-l3_latency 30 
+# LLC Cache
+num_llc 4
+llc_num_set 1024
+llc_line_size 64
+llc_assoc 32
+llc_num_bank 8
+llc_latency 30 
 pref_framework_on 1
 enable_pref_small_core 0
 

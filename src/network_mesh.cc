@@ -90,17 +90,19 @@ void network_mesh_c::run_a_cycle(bool pll_lock)
   }
 
 
-void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
+void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_llc, int num_mc)
 {
   m_num_router = 0;
   m_num_cpu = num_cpu;
   m_num_gpu = num_gpu;
   m_num_l3  = num_l3;
+  m_num_llc = num_llc;
   m_num_mc  = num_mc;
 
   CREATE_ROUTER(m_num_cpu, CPU_ROUTER, MEM_L2, 0);
-  CREATE_ROUTER(m_num_l3,  L3_ROUTER, MEM_L3, 0);
-  CREATE_ROUTER(m_num_mc,  MC_ROUTER, MEM_MC, 0);
+  CREATE_ROUTER(m_num_l3, L3_ROUTER, MEM_L3, 0);
+  CREATE_ROUTER(m_num_llc, LLC_ROUTER, MEM_LLC, 0);
+  CREATE_ROUTER(m_num_mc, MC_ROUTER, MEM_MC, 0);
   CREATE_ROUTER(m_num_gpu, GPU_ROUTER, MEM_L2, m_num_cpu);
   
   int width = sqrt(m_num_router);
@@ -115,7 +117,7 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
   }
   
   report("TOTAL_ROUTER:" << m_num_router << " CPU:" << m_num_cpu << " GPU:" << m_num_gpu
-      << " L3:" << m_num_l3 << " MC:" << m_num_mc);
+      << " L3:" << m_num_l3 << " LLC:" << m_num_llc << " MC:" << m_num_mc);
 
   for (int ii = 0; ii < m_num_router; ++ii) {
     m_router[ii]->init(m_num_router, &g_total_packet, m_flit_pool, m_credit_pool);
@@ -142,7 +144,7 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_mc)
   }
 
   int start_index = num_large_core + num_small_core;
-  int end_index = start_index + *KNOB(KNOB_NUM_L3); 
+  int end_index = start_index + *KNOB(KNOB_NUM_LLC); 
   for (int ii = start_index; ii < end_index; ++ii) {
     mapping[count++] = ii;
   }

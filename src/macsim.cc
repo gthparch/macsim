@@ -177,8 +177,8 @@ void macsim_c::init_knobs(int argc, char** argv)
 // =======================================
 void macsim_c::register_functions(void)
 {
-  mem_factory_c::get()->register_class("l3_coupled_network", default_mem);
-  mem_factory_c::get()->register_class("l3_decoupled_network", default_mem); 
+  mem_factory_c::get()->register_class("llc_coupled_network", default_mem);
+  mem_factory_c::get()->register_class("llc_decoupled_network", default_mem); 
   mem_factory_c::get()->register_class("l2_coupled_local", default_mem); 
   mem_factory_c::get()->register_class("no_cache", default_mem);
   mem_factory_c::get()->register_class("l2_decoupled_network", default_mem);
@@ -776,13 +776,13 @@ void macsim_c::initialize(int argc, char** argv)
 
 
 // =======================================
-// To maintain different clock frequency for CPU, GPU, NOC, L3, MC
+// To maintain different clock frequency for CPU, GPU, NOC, LLC, MC
 // =======================================
 void macsim_c::init_clock_domain(void)
 {
   CLOCK_CPU = 0;
   CLOCK_GPU = 1;
-  CLOCK_L3  = m_num_sim_cores;
+  CLOCK_LLC = m_num_sim_cores;
   CLOCK_NOC = m_num_sim_cores + 1;
   CLOCK_MC  = m_num_sim_cores + 2;
 
@@ -790,7 +790,7 @@ void macsim_c::init_clock_domain(void)
   float domain_f[5];
   domain_f[0] = *KNOB(KNOB_CLOCK_CPU);
   domain_f[1] = *KNOB(KNOB_CLOCK_GPU);
-  domain_f[2] = *KNOB(KNOB_CLOCK_L3);
+  domain_f[2] = *KNOB(KNOB_CLOCK_LLC);
   domain_f[3] = *KNOB(KNOB_CLOCK_NOC);
   domain_f[4] = *KNOB(KNOB_CLOCK_MC);
 
@@ -836,7 +836,7 @@ void macsim_c::init_clock_domain(void)
     m_domain_next[ii]  = 0;
   }
   
-  // L3, NOC, MC
+  // LLC, NOC, MC
   for (int ii = 0; ii < 3; ++ii) {
     m_domain_freq[ii+m_num_sim_cores]  = static_cast<int>(domain_f[ii+2]);
     m_domain_count[ii+m_num_sim_cores] = 0;
@@ -851,7 +851,7 @@ void macsim_c::init_clock_domain(void)
   report("Clock LCM           : " << m_clock_lcm);
   report("CPU clock frequency : " << *KNOB(KNOB_CLOCK_CPU) << " GHz");
   report("GPU clock frequency : " << *KNOB(KNOB_CLOCK_GPU) << " GHz");
-  report("L3  clock frequency : " << *KNOB(KNOB_CLOCK_L3)  << " GHz");
+  report("LLC clock frequency : " << *KNOB(KNOB_CLOCK_LLC)  << " GHz");
   report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz");
   report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz");
 }
@@ -926,9 +926,9 @@ int macsim_c::run_a_cycle()
   }
 
   // run memory system
-  if (m_clock_internal == m_domain_next[CLOCK_L3]) {
+  if (m_clock_internal == m_domain_next[CLOCK_LLC]) {
     m_memory->run_a_cycle(pll_locked);
-    GET_NEXT_CYCLE(CLOCK_L3);
+    GET_NEXT_CYCLE(CLOCK_LLC);
   }
   
   // run dram controllers
@@ -1076,7 +1076,7 @@ void macsim_c::change_frequency_core(int id, int freq)
 
 // =======================================
 // Change frequency of other units core
-// 0: l3, 1: noc, 2: mc
+// 0: llc, 1: noc, 2: mc
 // =======================================
 void macsim_c::change_frequency_uncore(int type, int freq)
 {
@@ -1123,7 +1123,7 @@ int macsim_c::get_current_frequency_core(int core_id)
 
 // =======================================
 // Returns a unit current frequency
-// 0: l3, 1: noc, 2: mc
+// 0: llc, 1: noc, 2: mc
 // =======================================
 int macsim_c::get_current_frequency_uncore(int type)
 {

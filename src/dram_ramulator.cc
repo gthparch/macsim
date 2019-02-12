@@ -130,7 +130,7 @@ void dram_ramulator_c::send(void)
   for (auto i = resp_queue.begin(); i != resp_queue.end(); ++i) {
     mem_req_s *req = *i;
     req->m_msg_type = NOC_FILL;
-    if (NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3])) {
+    if (NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC])) {
       DEBUG("Response to 0x%llx sent. req:%d\n", req->m_addr, req->m_id);
       resp_queue.pop_front();
 

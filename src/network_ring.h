@@ -109,7 +109,7 @@ class network_ring_c : public network_c
      * Initialize interconnection network
      */
     
-    void init(int num_cpu, int num_gpu, int num_l3, int num_mc);
+    void init(int num_cpu, int num_gpu, int num_l3, int num_llc, int num_mc);
 
     /**
      * Print all router information

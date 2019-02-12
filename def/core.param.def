@@ -172,9 +172,9 @@ param<FPU_CDB_DUTY_CYCLE, fpu_cdb_duty_cycle, float, 0.3>
 param<ICACHE_THROUGHPUT, icache_throughput, int, 8>
 param<DCACHE_THROUGHPUT, dcache_throughput, int, 3>
 param<L2_THROUGHPUT, l2_throughput, int, 8> 
-param<L3_THROUGHPUT, l3_throughput, int, 16>
+param<LLC_THROUGHPUT, llc_throughput, int, 16>
 param<L2_CLOCKRATE, l2_clockrate, float, 3.4>
-param<L3_CLOCKRATE, l3_clockrate, float, 0.85>
+param<LLC_CLOCKRATE, llc_clockrate, float, 0.85>
 param<DRAM_CLOCKRATE, dram_clockrate, float, 0.2>
 param<IS_GPU, is_gpu, int, 0> 
 param<GPU_WIDTH, gpu_width, int, 32> 

@@ -129,7 +129,7 @@ class macsim_c
 		void init_memory(void);
 
     /**
-     * Initialize clock domain for different components (CPU, GPU, L3, NOC, MC)
+     * Initialize clock domain for different components (CPU, GPU, LLC, NOC, MC)
      */
     void init_clock_domain(void);
 
@@ -164,8 +164,8 @@ class macsim_c
         void change_frequency_core(int id, int freq);
 
     /**
-     * Change frequency of other units (L3, NoC, MC)
-     * {0:l3, 1:noc, 2:mc}
+     * Change frequency of other units (LLC, NoC, MC)
+     * {0:llc, 1:noc, 2:mc}
      */
         void change_frequency_uncore(int type, int freq);
 
@@ -182,7 +182,7 @@ class macsim_c
 
     /**
      * Returns a unit current frequency
-     * {0:l3, 1:noc, 2:mc}
+     * {0:llc, 1:noc, 2:mc}
      */
         int get_current_frequency_uncore(int type);
 
@@ -303,7 +303,7 @@ class macsim_c
 
     int m_num_sim_cores;
 
-    int CLOCK_L3;
+    int CLOCK_LLC;
     int CLOCK_NOC;
     int CLOCK_MC;
     int CLOCK_CPU;

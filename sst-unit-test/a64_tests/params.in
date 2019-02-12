@@ -13,7 +13,7 @@ num_sim_large_cores 4
 # from device query for gtx580  - gpu clock - 1.66 GHz, mem clock - 2100 MHz
 clock_cpu 1.2
 clock_gpu 1.6
-clock_l3  1.6
+clock_llc 1.6
 clock_noc 1.6
 clock_mc  2.1
 

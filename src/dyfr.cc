@@ -113,7 +113,7 @@ void dyfr_c::update(void)
     return;
 
   // This function is call every KNOB_DYFR_SAMPLE_PERIOD to upadate 
-  // dynamic frequencies of cores, l3, NoC and Memory Controllers
+  // dynamic frequencies of cores, llc, NoC and Memory Controllers
   //
   // You could define your own monitors variable in dyfr.h and update
   // them on any event. For this, you need to include dyfr.h in the file
@@ -126,12 +126,12 @@ void dyfr_c::update(void)
   //          return the current frequency of a core 
   //    * m_simBase->get_current_frequency_uncore(type);
   //          return the current frequency of a unit
-  //          types: 0: l3, 1: noc, 2: mc 
+  //          types: 0: llc, 1: noc, 2: mc 
   //    * m_simBase->change_frequency_core(id, freq);
   //          change the frequecy of a core based on its id
   //    * m_simBase->change_frequency_uncore(type, freq);
   //          change the frequency of the whole unit based on it type
-  //          types: 0: l3, 1: noc, 2: mc
+  //          types: 0: llc, 1: noc, 2: mc
   //
   // After changing the frequency, MacSim will insert new frequency conifgs
   // in a queue and with fixed latency will apply in to the system.

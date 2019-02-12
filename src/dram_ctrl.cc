@@ -225,7 +225,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
     m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
     m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(512);
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(512);
   }
   else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY || 
       *m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_SAME_GRANULARITY) {
@@ -243,7 +243,7 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase)
 
     m_bid_mask  = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_L3) + log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + 5;
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_LLC) + log2_int(*m_simBase->m_knobs->KNOB_LLC_NUM_SET) + 5;
   }
 
   m_cycle = 0;
@@ -626,7 +626,7 @@ void dram_ctrl_c::send(void)
       req_type_checked[req->m_ptx] = true;
       req->m_msg_type = NOC_FILL;
 
-      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
+      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
       if (!insert_packet) {
         DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 
@@ -969,7 +969,7 @@ void dram_simple_ctrl_c::send(void)
       break;
 
     req->m_msg_type = NOC_FILL;
-    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_L3, req->m_cache_id[MEM_L3]);
+    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
     if (!insert_packet) {
       DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", 

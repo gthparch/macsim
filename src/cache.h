@@ -51,7 +51,7 @@ typedef enum Cache_Type_enum
   CACHE_DL1,
   CACHE_IL2,
   CACHE_DL2,
-  CACHE_DL3, 
+  CACHE_DLLC, 
   CACHE_CONST,
   CACHE_TEXTURE,
   CACHE_SW_MANAGED,
