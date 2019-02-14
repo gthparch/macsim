@@ -222,7 +222,7 @@ void MMU::run_a_cycle(bool pll_lock)
   if (!m_fault_retry_queue.empty()) {
     list<uop_c*> m_fault_retry_queue_processing;
     std::move(m_fault_retry_queue.begin(), m_fault_retry_queue.end(), std::back_inserter(m_fault_retry_queue_processing));
-    assert(m_fault_retry_queue.empty());
+    m_fault_retry_queue.clear();
 
     for (auto &&uop : m_fault_retry_queue_processing)
       do_page_table_walks(uop, false);
