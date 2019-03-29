@@ -1,10 +1,22 @@
 #!/bin/sh
 # Download PIN since XED comes bundled with PIN 
 
-XED=xed2-intel64
-PIN=pin-2.12-56759-gcc.4.4.7-linux
+arch=$(uname -m)
+TARGET_ARCH=""
+if [ $arch = "i686" ]
+then
+  TARGET_ARCH="ia32"
+else
+        if [ $arch = "x86_64" ]
+        then
+                TARGET_ARCH="intel64"
+        fi
+fi
+
+XED=xed-$TARGET_ARCH
+PIN=pin-2.14-71313-gcc.4.4.7-linux
 PIN_ARCHIVE=$PIN.tar.gz
-PIN_URL=http://download-software.intel.com/sites/landingpage/pintool/downloads/$PIN_ARCHIVE
+PIN_URL=https://software.intel.com/sites/landingpage/pintool/downloads/$PIN_ARCHIVE
 
 UNPACK="tar -xzf"
 
