@@ -26,7 +26,7 @@
 #POSSIBILITY OF SUCH DAMAGE.
 #
 
-XED ?= ./xed2-intel64
+XED ?= ./xed-intel64
 QSIM_PREFIX ?= /usr/local
 DISTORM ?= ./distorm3-3
 DISTORM_VERSION ?= 3
