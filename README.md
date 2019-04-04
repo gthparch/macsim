@@ -36,7 +36,7 @@
 
 ## Documentation
 
-Please see [MacSim documentation file](http://macsim.googlecode.com/files/macsim.pdf) for more detailed descriptions.
+Please see [MacSim documentation file](https://github.com/gthparch/macsim/blob/master/doc/macsim.pdf) for more detailed descriptions.
 
 
 ## Download
