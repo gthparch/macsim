@@ -79,6 +79,34 @@ typedef struct trace_info_s {
   virtual ~trace_info_s();
 } trace_info_s;
 
+#ifdef PIN_3_7_TRACE  
+typedef struct trace_info_cpu_s {
+	uint8_t  m_num_read_regs;     /**< num read registers */
+  uint8_t  m_num_dest_regs;     /**< num dest registers */
+  uint16_t  m_src[MAX_SRC_NUM];  /**< src register id */ // 16 bits  pin 3.7 
+  uint16_t  m_dst[MAX_DST_NUM];  /**< dest register id */ // 16 bits pin 3.7 
+  uint8_t  m_cf_type;           /**< branch type */
+  bool     m_has_immediate;     /**< has immediate field */
+  uint8_t  m_opcode;            /**< opcode */
+  bool     m_has_st;            /**< has store operation */ 
+  bool     m_is_fp;             /**< fp operation */
+  bool     m_write_flg;         /**< write flag */
+  uint8_t  m_num_ld;            /**< number of load operations */
+  uint8_t  m_size;              /**< instruction size */
+  // dynamic information
+  uint64_t m_ld_vaddr1;         /**< load address 1 */
+  uint64_t m_ld_vaddr2;         /**< load address 2 */
+  uint64_t m_st_vaddr;          /**< store address */
+  uint64_t m_instruction_addr;  /**< pc address */
+  uint64_t m_branch_target;     /**< branch target address */
+  uint8_t  m_mem_read_size;     /**< memory read size */
+  uint8_t  m_mem_write_size;    /**< memory write size */
+  bool     m_rep_dir;           /**< repetition direction */
+  bool     m_actually_taken;    /**< branch actually taken */
+  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+}trace_info_cpu_s;
+
+#else 
 typedef struct trace_info_cpu_s {
   uint8_t  m_num_read_regs;     /**< num read registers */
   uint8_t  m_num_dest_regs;     /**< num dest registers */
@@ -104,6 +132,7 @@ typedef struct trace_info_cpu_s {
   bool     m_actually_taken;    /**< branch actually taken */
   uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_cpu_s;
+#endif 
 
 typedef struct trace_info_a64_s {
   uint8_t  m_num_read_regs;     /**< num read registers */
@@ -275,6 +304,121 @@ typedef struct trace_uop_s {
 } trace_uop_s; 
 
 
+
+#ifdef PIN_3_7_TRACE
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief Enumerator ID for temp register
+///
+/// Currently, we have 330 registers, so temp register will be 167.
+///////////////////////////////////////////////////////////////////////////////////////////////
+typedef enum TR_TEMP_TEMP_ENUM_ {
+  TR_REG_TMP0 = 331
+} TR_TEMP_TEMP_ENUM;
+
+
+typedef enum CPU_OPCODE_ENUM_ {
+	  XED_CATEGORY_INVALID,
+  XED_CATEGORY_3DNOW,
+  XED_CATEGORY_ADOX_ADCX,
+  XED_CATEGORY_AES,
+  XED_CATEGORY_AVX,
+  XED_CATEGORY_AVX2,
+  XED_CATEGORY_AVX2GATHER,
+  XED_CATEGORY_AVX512,
+  XED_CATEGORY_AVX512_4FMAPS,
+  XED_CATEGORY_AVX512_4VNNIW,
+  XED_CATEGORY_AVX512_BITALG,
+  XED_CATEGORY_AVX512_VBMI,
+  XED_CATEGORY_BINARY,
+  XED_CATEGORY_BITBYTE,
+  XED_CATEGORY_BLEND,
+  XED_CATEGORY_BMI1,
+  XED_CATEGORY_BMI2,
+  XED_CATEGORY_BROADCAST,
+  XED_CATEGORY_CALL,
+  XED_CATEGORY_CET,
+  XED_CATEGORY_CLFLUSHOPT,
+  XED_CATEGORY_CLWB,
+  XED_CATEGORY_CLZERO,
+  XED_CATEGORY_CMOV,
+  XED_CATEGORY_COMPRESS,
+  XED_CATEGORY_COND_BR,
+  XED_CATEGORY_CONFLICT,
+  XED_CATEGORY_CONVERT,
+  XED_CATEGORY_DATAXFER,
+  XED_CATEGORY_DECIMAL,
+  XED_CATEGORY_EXPAND,
+  XED_CATEGORY_FCMOV,
+  XED_CATEGORY_FLAGOP,
+  XED_CATEGORY_FMA4,
+  XED_CATEGORY_GATHER,
+  XED_CATEGORY_GFNI,
+  XED_CATEGORY_IFMA,
+  XED_CATEGORY_INTERRUPT,
+  XED_CATEGORY_IO,
+  XED_CATEGORY_IOSTRINGOP,
+  XED_CATEGORY_KMASK,
+  XED_CATEGORY_LOGICAL,
+  XED_CATEGORY_LOGICAL_FP,
+  XED_CATEGORY_LZCNT,
+  XED_CATEGORY_MISC,
+  XED_CATEGORY_MMX,
+  XED_CATEGORY_MPX,
+  XED_CATEGORY_NOP,
+  XED_CATEGORY_PCLMULQDQ,
+  XED_CATEGORY_PCONFIG,
+  XED_CATEGORY_PKU,
+  XED_CATEGORY_POP,
+  XED_CATEGORY_PREFETCH,
+  XED_CATEGORY_PREFETCHWT1,
+  XED_CATEGORY_PT,
+  XED_CATEGORY_PUSH,
+  XED_CATEGORY_RDPID,
+  XED_CATEGORY_RDRAND,
+  XED_CATEGORY_RDSEED,
+  XED_CATEGORY_RDWRFSGS,
+  XED_CATEGORY_RET,
+  XED_CATEGORY_ROTATE,
+  XED_CATEGORY_SCATTER,
+  XED_CATEGORY_SEGOP,
+  XED_CATEGORY_SEMAPHORE,
+  XED_CATEGORY_SETCC,
+  XED_CATEGORY_SGX,
+  XED_CATEGORY_SHA,
+  XED_CATEGORY_SHIFT,
+  XED_CATEGORY_SMAP,
+  XED_CATEGORY_SSE,
+  XED_CATEGORY_STRINGOP,
+  XED_CATEGORY_STTNI,
+  XED_CATEGORY_SYSCALL,
+  XED_CATEGORY_SYSRET,
+  XED_CATEGORY_SYSTEM,
+  XED_CATEGORY_TBM,
+  XED_CATEGORY_UNCOND_BR,
+  XED_CATEGORY_VAES,
+  XED_CATEGORY_VBMI2,
+  XED_CATEGORY_VFMA,
+  XED_CATEGORY_VPCLMULQDQ,
+  XED_CATEGORY_VTX,
+  XED_CATEGORY_WIDENOP,
+  XED_CATEGORY_X87_ALU,
+  XED_CATEGORY_XOP,
+  XED_CATEGORY_XSAVE,
+  XED_CATEGORY_XSAVEOPT,
+  TR_MUL,
+  TR_DIV,
+  TR_FMUL,
+  TR_FDIV,
+  TR_NOP,
+  PREFETCH_NTA,
+  PREFETCH_T0,
+  PREFETCH_T1,
+  PREFETCH_T2,
+  GPU_EN,
+  CPU_OPCODE_LAST,
+} CPU_OPCODE_ENUM;
+
+#else 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Enumerator ID for temp register
 ///
@@ -355,6 +499,7 @@ typedef enum CPU_OPCODE_ENUM_ {
   CPU_OPCODE_LAST,
 } CPU_OPCODE_ENUM;
 
+#endif 
 
 
 // identical to enum in PTX trace generator
