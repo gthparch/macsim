@@ -212,12 +212,12 @@ void macsim_pin_convert(void)
 void initialize_sim(void)
 {
 //  extract_register();
-//  extract_category();
-//  extract_opcode(); // useless
-//  macsim_opcode();
-//  macsim_opcode_enum();
+ // extract_category();
+  // extract_opcode(); // useless
+  macsim_opcode();
+  macsim_opcode_enum();
   macsim_reg();
-//  macsim_pin_convert();
+  // macsim_pin_convert();
 }
 
 
