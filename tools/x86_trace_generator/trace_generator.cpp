@@ -42,8 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <queue>
 #include <list>
-
-#include "../../src/hmc_types.h"
+#include "control_manager.H"
 
 /*
  * 1. all function of which name start with a capatal letter is used by PIN
@@ -130,7 +129,6 @@ map<ADDRINT, Inst_info*> g_inst_storage[MAX_THREADS];
 PIN_LOCK g_lock;
 UINT64 g_inst_count[MAX_THREADS]={0};
 INT64 g_start_inst_count[MAX_THREADS] = {0};
-INT64 g_end_inst_count[MAX_THREADS] = {-1};
 map<THREADID, THREADID> threadMap;
 THREADID main_thread_id;
 Thread_info thread_info[MAX_THREADS];
@@ -141,7 +139,8 @@ UINT32 thread_count = 0;
 UINT32 ThreadArrivalCount = 0;
 unsigned int g_inst_print_count[MAX_THREADS];
 unsigned int func_count = 0;
-CONTROL control;
+// CONTROL control;
+using namespace CONTROLLER;
 bool g_enable_thread_instrument[MAX_THREADS];
 bool g_enable_instrument = false;
 
@@ -173,10 +172,7 @@ bool sim_begin[MAX_THREADS]={false};
 bool sim_end[MAX_THREADS]={false};
 bool thread_flushed[MAX_THREADS]={false};
 Knob(bool, Knob_manual_simpoint, "manual", "0", "start/stop trace generation at manually added SIM_BEGIN()/SIM_END function call");
-
-unsigned sim_end_threads = 0;
-bool finished = false;
-
+ 
 // variables for HMC 2.0 atomic instruction simulations
 // should be disabled in normal cases
 typedef struct hmc_info_t
@@ -202,19 +198,21 @@ void Initialize(void);
 void sanity_check(void);
 
 
+LOCALVAR CONTROL_MANAGER control;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Handler(CONTROL_EVENT ev, void * v, CONTEXT * ctxt, void * ip, THREADID tid)
+LOCALFUN VOID Handler(EVENT_TYPE ev, void * v, CONTEXT * ctxt, void * ip, THREADID tid, bool bast)
 {
   switch (ev) {
-    case CONTROL_START: {
+    case EVENT_START: {
       cerr << "-> Trace Generation Starts at icount " << g_inst_count[tid] << endl;
       g_enable_instrument = 1;
       PIN_RemoveInstrumentation();
       break;
     }
-    case CONTROL_STOP: {
+    case EVENT_STOP: {
       cerr << "-> Trace Generation Done at icount " << g_inst_count[tid] << endl;
       g_enable_instrument = 0;
       PIN_RemoveInstrumentation();
@@ -252,7 +250,7 @@ void IncrementNumInstruction(THREADID threadid)
 
   if (Knob_max.Value() != 0 && Knob_max.Value() > g_inst_count[tid]) {
     g_enable_thread_instrument[tid] = false;
-    GetLock(&g_lock, tid+1);
+    PIN_GetLock(&g_lock, tid+1);
     ThreadArrivalCount++;
     cout << "-> Thread " << tid << " reachea at max instrunction count " << g_inst_count[tid] << endl;
     thread_end();
@@ -263,7 +261,7 @@ void IncrementNumInstruction(THREADID threadid)
       finish();
       exit(0);
     }
-    ReleaseLock(&g_lock);
+    PIN_ReleaseLock(&g_lock);
   }
 }
 
@@ -483,31 +481,8 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
          && sim_end[tid] == false
          && g_inst_count[tid] >= Knob_max.Value() + g_start_inst_count[tid])
   {
-      GetLock(&g_lock, tid+1);
-      cout<<"Thread "<<tid<<" reach max inst: "<<g_inst_count[tid]<<endl;
       sim_end[tid]=true;
-      g_enable_thread_instrument[tid]=false;
-      PIN_RemoveInstrumentation();
-      sim_end_threads++;
-      g_end_inst_count[tid] = g_inst_count[tid];
-      if (!thread_flushed[tid])
-          thread_end();
-      ReleaseLock(&g_lock);
-  
-      if (sim_end_threads >= thread_count)
-      {
-          //finish();
-          //PIN_RemoveInstrumentation();
-          GetLock(&g_lock, tid+1);
-          finish();
-          finished=true;
-          exit(0);
-          ReleaseLock(&g_lock);
-
-          //exit(0);
-      }
-  } 
-#if 0
+  }
   if (tid==0 && sim_end[tid]==true
           && g_enable_thread_instrument[tid]==true)
   {
@@ -532,7 +507,7 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
   }
   if (sim_end[tid]==true && g_enable_thread_instrument[tid]==false)
   {
-      //thread_flushed[tid] = true;
+      thread_flushed[tid] = true;
       thread_end();
   }
   if (tid==0 && sim_end[tid]==true && thread_flushed[tid]==true)
@@ -548,29 +523,28 @@ VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
         exit(0);
       }
   }
-#endif
-  GetLock(&g_lock, tid+1);
+    
+  PIN_GetLock(&g_lock, tid+1);
 
   if (g_inst_count[tid] >= last_count[tid] + 5000000) {
     cout << tid << ": " << g_inst_count[tid] << endl;
     last_count[tid] = g_inst_count[tid];
   }
 
+  PIN_ReleaseLock(&g_lock);
 
   // Added by Lifeng
   if (manual_simpoint == true && g_enable_thread_instrument[tid] == false
           && sim_begin[tid] == true && sim_end[tid]==false)
   {
     if (g_inst_count[tid] >= Knob_skip.Value() + g_start_inst_count[tid])
-    { 
-
+    {  
         cout << "-> Thread " << tid << " starts instrumentation at " << g_inst_count[tid] << endl;
         g_start_inst_count[tid] = g_inst_count[tid];
         g_enable_thread_instrument[tid] = true;
-        PIN_RemoveInstrumentation(); 
+  
     }
   }
-  ReleaseLock(&g_lock);
 #if 0
   if (Knob_skip.Value() > 0 && g_inst_count[tid] >= Knob_skip.Value()) {
     if (g_start_inst_count[tid] == -1) {
@@ -678,7 +652,7 @@ void instrument(INS ins)
     assert(info->num_read_regs < MAX_SRC_NUM);
     
     set<LEVEL_BASE::REG>::iterator begin(src_regs.begin()), end(src_regs.end());
-    uint8_t *ptr = info->src;
+    uint16_t *ptr = info->src;
     while (begin != end) {
       if (*begin >= LEVEL_BASE::REG_PIN_EDI && *begin <= LEVEL_BASE::REG_LAST) {
         cerr << "PIN LEVEL_BASE::REGISTER!! : " << *begin << endl;
@@ -702,7 +676,7 @@ void instrument(INS ins)
     info->num_dest_regs=dst_regs.size();
     assert(info->num_dest_regs < MAX_DST_NUM);
     set<LEVEL_BASE::REG>::iterator begin(dst_regs.begin()), end(dst_regs.end());
-    uint8_t *ptr = info->dst;
+    uint16_t *ptr = info->dst;
     while (begin != end) {
       if (*begin >= LEVEL_BASE::REG_PIN_EDI && *begin <= LEVEL_BASE::REG_LAST) {
         cerr << "PIN LEVEL_BASE::REGISTER!! : " << *begin << endl;
@@ -969,12 +943,12 @@ void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
       trace_info->debug_stream = debug_stream;
 
     assert(threadid < MAX_THREADS);
-    GetLock(&g_lock, threadid+1);
+    PIN_GetLock(&g_lock, threadid+1);
     if (thread_count == 0)
       main_thread_id = threadid;
 
     thread_count++;
-    ReleaseLock(&g_lock);
+    PIN_ReleaseLock(&g_lock);
     trace_info_array[threadid] = trace_info;
 
     thread_info[threadid].thread_id = threadid;
@@ -1042,11 +1016,8 @@ void thread_end(THREADID threadid)
   delete trace_info;
   trace_info_array[threadid] = NULL;
 
-  //sim_end[threadid]=true;
+  sim_end[threadid]=true;
   thread_flushed[threadid]=true;
-
-  if (g_end_inst_count[threadid] < 0) 
-      g_end_inst_count[threadid] = g_inst_count[threadid];
 }
 
 
@@ -1068,8 +1039,6 @@ void Fini(INT32 code, void *v)
 
 void finish(void)
 {
-    if (finished) return;
-
     if (Knob_enable_hmc.Value())
     {
         string fn = Knob_trace_name.Value() + ".HMCinfo";
@@ -1106,7 +1075,7 @@ void finish(void)
   /**< Final print to standard output */
   for (unsigned ii = 0; ii < thread_count; ++ii) {
     cout << "-> tid " << thread_info[ii].thread_id << " inst count " << g_inst_count[ii]
-      << "  instrumented inst# "<< g_end_inst_count[ii] - g_start_inst_count[ii]
+      << "  instrumented inst# "<< g_inst_count[ii] - g_start_inst_count[ii]
       << " (from " << thread_info[ii].inst_count << ")\n";
   }
   cout << "-> Final icount: " << g_inst_count[0] << endl;
@@ -1133,7 +1102,7 @@ void initialize(void)
   }
 
   // Initialize Lock
-  InitLock(&g_lock);
+  PIN_InitLock(&g_lock);
 
   // Thread ID mapping due to icc compiler (TODO:more explanation)
   if (Knob_compiler.Value() == "icc") {
@@ -1189,9 +1158,8 @@ void sanity_check(void)
 void write_inst_to_file(ofstream* file, Inst_info *t_info)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
-  //if (tid == 100000 || !g_enable_thread_instrument[tid] || g_inst_print_count[tid] > Knob_dump_max.Value())
-    if (tid == 100000 || g_inst_print_count[tid] > Knob_dump_max.Value())
-        return ;
+  if (tid == 100000 || !g_enable_thread_instrument[tid] || g_inst_print_count[tid] > Knob_dump_max.Value())
+    return ;
 
   g_inst_print_count[tid]++;
 
@@ -1235,7 +1203,7 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
 void dprint_inst(ADDRINT iaddr, string *disassemble_info, THREADID threadid) 
 {
   THREADID tid = threadMap[threadid];
-  if (tid == 100000)
+  if (tid == 100000 || !g_enable_thread_instrument[tid])
     return ;
 
   Inst_info *t_info = NULL;
@@ -1288,10 +1256,8 @@ VOID RtnBegin(ADDRINT ret)
 
     // enable corresponding thread's instrumentation
     THREADID tid = threadMap[PIN_ThreadId()];
-    GetLock(&g_lock, tid+1);
     cout<<"Thread "<<tid<<" sim begin"<<endl;
     sim_begin[tid] = true;
-    ReleaseLock(&g_lock);
 }
 VOID RtnEnd(ADDRINT arg)
 {
@@ -1302,31 +1268,10 @@ VOID RtnEnd(ADDRINT arg)
     if (g_enable_thread_instrument[tid]==false) return;
     if (sim_end[tid]) return;
 
-    GetLock(&g_lock, tid+1);
-    cout<<"Thread "<<tid<<" sim end at "<<g_inst_count[tid]<<endl;
+    cout<<"Thread "<<tid<<" sim end"<<endl;
     sim_end[tid]=true;
-    sim_end_threads++;
-    g_enable_thread_instrument[tid] = false;
-    PIN_RemoveInstrumentation();
-    g_end_inst_count[tid] = g_inst_count[tid];
-    if (!thread_flushed[tid])
-        thread_end();
-    ReleaseLock(&g_lock);
-
-    if (sim_end_threads >= thread_count)
-    {
-      GetLock(&g_lock, tid+1);
-      finish();
-      finished=true;
-      exit(0);
-      ReleaseLock(&g_lock);
-
-      //exit(0);
-    } 
 }
 
-/* OLD HMC Inst definition
-   switch to use hmc_types.h in src/
 string HMC_Inst[]=
 {
 "HMC_CAS_greater_16B",
@@ -1336,10 +1281,10 @@ string HMC_Inst[]=
 "HMC_ADD_16B",
 ""//last element must be empty
 };
-*/
 
 
-VOID RtnHMC(ADDRINT hmctype, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
+
+VOID RtnHMC(CHAR * name, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
 {
     THREADID tid = threadMap[PIN_ThreadId()];
     ADDRINT pc = last_call_pc;
@@ -1350,7 +1295,7 @@ VOID RtnHMC(ADDRINT hmctype, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
         return;
 
     hmc_info_t tmp;
-    tmp.name = hmc_type_c::HMC_Type2String((HMC_Type)hmctype);
+    tmp.name = name;
     tmp.caller_pc = pc;
     tmp.func_pc = func;
     tmp.ret_pc = ret;
@@ -1362,8 +1307,6 @@ VOID RtnHMC(ADDRINT hmctype, ADDRINT func, ADDRINT ret, ADDRINT target_addr)
 }
 VOID Image(IMG img, VOID *v)
 {
-    THREADID tid = threadMap[PIN_ThreadId()];
-
     RTN rtn = RTN_FindByName(img, "SIM_BEGIN");
     if (RTN_Valid(rtn))
     {
@@ -1384,17 +1327,17 @@ VOID Image(IMG img, VOID *v)
     // HMC atomic functions
     if (!Knob_enable_hmc.Value()) return;
 
-    if (tid != 0) return;
     RTN hmc_rtn;
-    for (unsigned i=1;i<(unsigned)NUM_HMC_TYPES;i++)
+    unsigned i=0;
+    while (!HMC_Inst[i].empty())
     {
-        string name = hmc_type_c::HMC_Type2String((HMC_Type)i);
+        string name = HMC_Inst[i]; i++;
         hmc_rtn = RTN_FindByName(img, name.c_str());
         if (RTN_Valid(hmc_rtn))
         {
             RTN_Open(hmc_rtn);
             RTN_InsertCall(hmc_rtn, IPOINT_BEFORE, (AFUNPTR)RtnHMC,
-                    IARG_ADDRINT, (size_t)i,
+                    IARG_ADDRINT, name.c_str(),
                     IARG_ADDRINT, RTN_Funptr(hmc_rtn),
                     IARG_RETURN_IP, 
                     IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
@@ -1402,34 +1345,6 @@ VOID Image(IMG img, VOID *v)
             RTN_Close(hmc_rtn);
         }
 
-    }
-    for (SEC sec = IMG_SecHead(img); SEC_Valid(sec); sec = SEC_Next(sec))
-    {
-        for (RTN rtn = SEC_RtnHead(sec); RTN_Valid(rtn); rtn = RTN_Next(rtn))
-        {
-            string demangle_str = PIN_UndecorateSymbolName(RTN_Name(rtn),UNDECORATION_NAME_ONLY);
-            bool found = false;
-            unsigned i;
-            for (i=1;i<(unsigned)NUM_HMC_TYPES;i++)
-            {
-                if (hmc_type_c::HMC_Type2String((HMC_Type)i)==demangle_str)   
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (found)
-            {
-                RTN_Open(rtn);
-                RTN_InsertCall(rtn, IPOINT_BEFORE, (AFUNPTR)RtnHMC,
-                        IARG_ADDRINT, (size_t)i,
-                        IARG_ADDRINT, RTN_Funptr(rtn),
-                        IARG_RETURN_IP, 
-                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
-                        IARG_END);
-                RTN_Close(rtn);
-            }
-        }
     }
 }
 
@@ -1450,6 +1365,9 @@ int main(int argc, char *argv[])
   initialize();
   sanity_check();
 
+	control.RegisterHandler(Handler, 0, FALSE);
+	control.Activate();
+
   detach_inst = Knob_detach_inst.Value();
   print_inst = Knob_print_inst.Value();
 
@@ -1467,7 +1385,7 @@ int main(int argc, char *argv[])
   // before every instruction to dprint_inst
   INS_AddInstrumentFunction(Instruction, 0);
   // 3. Summery of Trace Generation
-  control.CheckKnobs(Handler, 0);
+//  control.CheckKnobs(Handler, 0);
 
   PIN_AddDetachFunction(Detach, 0);
   PIN_AddFiniFunction(Fini, 0);
