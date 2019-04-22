@@ -279,7 +279,8 @@ macsim_src = [
   'src/trace_gen_x86.cc',
   'src/cs_disas.cc',
   'src/resource.cc',
-  'src/mmu.cc'
+  'src/mmu.cc',
+  'src/tlb.cc'
 ]
 
 

@@ -927,6 +927,8 @@ drb_entry_s* dc_frfcfs_c::schedule(list<drb_entry_s*>* buffer)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 
 dram_simple_ctrl_c::dram_simple_ctrl_c(macsim_c* simBase) : dram_c(simBase)
 {

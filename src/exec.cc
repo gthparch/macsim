@@ -241,6 +241,9 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
 
   Mem_Type type = uop->m_mem_type;
 
+  // set scheduling cycle
+  if (uop->m_sched_cycle == 0)
+    uop->m_sched_cycle = m_cur_core_cycle;
 
   // -------------------------------------
   // execute memory instructions
@@ -351,6 +354,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
         // get the next child uop for the current parent uop
         int next_set_bit = get_next_set_bit64(uop->m_pending_child_uops, 0);
 
+        DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu num_child_uops:%d\n",
+                   m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_num_child_uops);
+        uop->m_num_page_table_walks = 0;
+
         // executing children uops
         while (-1 != next_set_bit) {
           // -------------------------------------
@@ -437,6 +444,9 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop)
               DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu miss\n",
                   m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_child_uops[next_set_bit]->m_uop_num);
             }
+          } else {
+            DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu child_uop_num:%llu fail\n",
+                       m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_child_uops[next_set_bit]->m_uop_num);
           }
 
           // find next uop to execute

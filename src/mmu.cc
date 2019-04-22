@@ -53,6 +53,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
+#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MMU, ##args)
+#define DEBUG_CORE(m_core_id, args...)                        \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) { \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MMU, ##args);      \
+  }
+
 void MMU::ReplacementUnit::update(Addr page_number)
 {
   auto it = m_table.find(page_number);
@@ -103,13 +109,17 @@ void MMU::initialize(macsim_c *simBase)
   m_simBase = simBase;
   
   m_page_size = m_simBase->m_knobs->KNOB_PAGE_SIZE->getValue();
-  m_memory_size = m_simBase->m_knobs->KNOB_MEMORY_SIZE->getValue();
   m_offset_bits = (long)log2(m_page_size);
-  m_free_pages_remaining = m_memory_size >> m_offset_bits;
-  m_free_pages.resize(m_free_pages_remaining, true); // true: page is free
   
-  m_replacement_unit = make_unique<ReplacementUnit>(m_free_pages_remaining);
-  m_TLB = make_unique<TLB>(m_simBase->m_knobs->KNOB_TLB_NUM_ENTRY->getValue(), m_page_size);
+  m_memory_size = m_simBase->m_knobs->KNOB_MEMORY_SIZE->getValue();
+  
+  m_free_frames_remaining = m_memory_size >> m_offset_bits;
+  m_free_frames.resize(m_free_frames_remaining, true); // true: page is free
+  
+  m_frame_to_allocate = 0;
+  
+  m_replacement_unit = make_unique<ReplacementUnit>(m_simBase, m_free_frames_remaining);
+  m_TLB = make_unique<TLB>(m_simBase, m_simBase->m_knobs->KNOB_TLB_NUM_ENTRY->getValue(), m_page_size);
 
   m_walk_latency = m_simBase->m_knobs->KNOB_PAGE_TABLE_WALK_LATENCY->getValue();
   m_fault_latency = m_simBase->m_knobs->KNOB_PAGE_FAULT_LATENCY->getValue();
@@ -125,7 +135,7 @@ void MMU::initialize(macsim_c *simBase)
 
 void MMU::finalize()
 {
-  STAT_EVENT_N(NUM_PHYSICAL_PAGES, m_unique_pages.size());
+  STAT_EVENT_N(UNIQUE_PAGE, m_unique_pages.size());
 }
 
 bool MMU::translate(uop_c *cur_uop)
@@ -137,9 +147,6 @@ bool MMU::translate(uop_c *cur_uop)
   Addr page_number = get_page_number(addr);
   Addr page_offset = get_page_offset(addr);
 
-  // for statistics
-  m_unique_pages.emplace(page_number);
-
   cur_uop->m_state = OS_TRANS_BEGIN;
   
   Addr frame_number = -1;
@@ -149,8 +156,14 @@ bool MMU::translate(uop_c *cur_uop)
     cur_uop->m_paddr = (frame_number << m_offset_bits) | page_offset;
     cur_uop->m_state = OS_TRANS_DONE;
     cur_uop->m_translated = true;
+
+    DEBUG("TLB hit at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+          m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num, cur_uop->m_uop_num);
     return true;
   }
+
+  DEBUG("TLB miss at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+        m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num, cur_uop->m_uop_num);
 
   // TLB miss occurs
   // Put this request into page table walk queue so that it can be handled later in time
@@ -166,6 +179,8 @@ bool MMU::translate(uop_c *cur_uop)
   }
 
   cur_uop->m_state = OS_TRANS_WALK_QUEUE;
+  if (cur_uop->m_parent_uop)
+    ++cur_uop->m_parent_uop->m_num_page_table_walks;
   return false;
 }
 
@@ -180,37 +195,42 @@ void MMU::run_a_cycle(bool pll_lock)
   if (!m_retry_queue.empty()) {
     for (auto it = m_retry_queue.begin(); it != m_retry_queue.end(); /* do nothing */) {
       uop_c* uop = *it;
+      DEBUG("retry at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+            m_cycle, uop->m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
+      
       int latency = m_simBase->m_memory->access(uop);
       if (0 != latency) { // successful execution
         if (latency > 0) { // cache hit
-          int max_latency = std::max(latency, static_cast<int>(*m_simBase->m_knobs->KNOB_EXEC_RETIRE_LATENCY));
-          uop->m_exec_cycle = m_cycle;
-          uop->m_done_cycle = m_cycle + max_latency;
-          uop->m_state = OS_SCHEDULED;
+          DEBUG("cache hit at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+                m_cycle, uop->m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
 
-          if (1 /* m_ptx_sim */) {
-            if (uop->m_parent_uop) {
-              uop_c *puop = uop->m_parent_uop;
-              ++puop->m_num_child_uops_done;
-              if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
-                if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-                  m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready(
-                      puop->m_thread_id, puop->m_uop_num);
-                }
-
-                puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
-                puop->m_state = OS_SCHEDULED;
-              }
-            } else {
+          if (uop->m_parent_uop) {
+            uop_c *puop = uop->m_parent_uop;
+            ++puop->m_num_child_uops_done;
+            if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
               if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-                m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready(
-                    uop->m_thread_id, uop->m_uop_num);
+                m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready(
+                    puop->m_thread_id, puop->m_uop_num);
               }
+
+              puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
+              puop->m_state = OS_SCHEDULED;
+            }
+          } else {
+            if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+              m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready(
+                  uop->m_thread_id, uop->m_uop_num);
             }
           }
+        } else { // TLB miss or cache miss
+          if (uop->m_translated)
+            DEBUG("cache miss at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+                  m_cycle, uop->m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
         }
 
         it = m_retry_queue.erase(it);
+        DEBUG("retry success at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+              m_cycle, uop->m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
       } else {
         ++it; // for some reason dcache access is not successful.
               // retry later
@@ -218,14 +238,15 @@ void MMU::run_a_cycle(bool pll_lock)
     }
   }
 
-  // retry page faults
-  if (!m_fault_retry_queue.empty()) {
+  // retry page faults once a new batch processing begins
+  // i.e., right after the fault buffer drains
+  if (m_fault_buffer.empty() && !m_fault_retry_queue.empty()) {
     list<uop_c*> m_fault_retry_queue_processing;
     std::move(m_fault_retry_queue.begin(), m_fault_retry_queue.end(), std::back_inserter(m_fault_retry_queue_processing));
     m_fault_retry_queue.clear();
 
     for (auto &&uop : m_fault_retry_queue_processing)
-      do_page_table_walks(uop, false);
+      do_page_table_walks(uop);
     
     m_fault_retry_queue_processing.clear();
   }
@@ -236,11 +257,8 @@ void MMU::run_a_cycle(bool pll_lock)
       auto &page_list = it->second;
       for (auto &&p : page_list) {
         auto &uop_list = m_walk_queue_page[p];
-        bool update = true;
-        for (auto &&uop : uop_list) {
-          do_page_table_walks(uop, update);
-          update = false;
-        }
+        for (auto &&uop : uop_list)
+          do_page_table_walks(uop);
         m_walk_queue_page.erase(p);
       }
       it = m_walk_queue_cycle.erase(it);
@@ -251,7 +269,7 @@ void MMU::run_a_cycle(bool pll_lock)
   ++m_cycle;
 }
 
-void MMU::do_page_table_walks(uop_c *cur_uop, bool update)
+void MMU::do_page_table_walks(uop_c *cur_uop)
 {
   Addr addr = cur_uop->m_vaddr;
   Addr page_number = get_page_number(addr);
@@ -264,27 +282,56 @@ void MMU::do_page_table_walks(uop_c *cur_uop, bool update)
     cur_uop->m_state = OS_TRANS_RETRY_QUEUE;
     cur_uop->m_translated = true;
     
-    // update TLB and replacement policy once for all merged requests
-    if (update) {
-      assert(m_TLB->lookup(addr) == false);
+    if (cur_uop->m_parent_uop && cur_uop->m_parent_uop->m_num_page_table_walks)
+      --cur_uop->m_parent_uop->m_num_page_table_walks;
+    
+    if (!m_TLB->lookup(addr))
       m_TLB->insert(addr, frame_number);
-      m_replacement_unit->update(page_number);
-    }
+    m_TLB->update(addr);
+
+    m_replacement_unit->update(page_number);
+
+    STAT_EVENT(PAGETABLE_HIT);
+
+    DEBUG("page table hit at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+          m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num, cur_uop->m_uop_num);
 
     // insert uops into retry queue
     m_retry_queue.emplace_back(cur_uop);
   } else { // page fault
-    // try page table walks later since fault buffer is full
-    if (!m_fault_buffer.count(page_number) && m_fault_buffer_size <= m_fault_buffer.size()) {
-      cur_uop->m_state = OS_TRANS_FAULT_RETRY_QUEUE;
-      m_fault_retry_queue.emplace_back(cur_uop);
-      return;
+    STAT_EVENT(PAGETABLE_MISS);
+    
+    core_c *core = m_simBase->m_core_pointers[cur_uop->m_core_id];
+    if (cur_uop->m_parent_uop) {
+      core->m_per_thread_fault_parent_uops.emplace(cur_uop->m_thread_id, unordered_set<Counter>());
+      auto it = core->m_per_thread_fault_parent_uops[cur_uop->m_thread_id].find(cur_uop->m_parent_uop->m_uop_num);
+      if (it == core->m_per_thread_fault_parent_uops[cur_uop->m_thread_id].end()) {
+        // try page table walks later since fault buffer is full
+        if (!m_fault_buffer.count(page_number) && m_fault_buffer_size <= m_fault_buffer.size()) {
+          cur_uop->m_state = OS_TRANS_FAULT_RETRY_QUEUE;
+          m_fault_retry_queue.emplace_back(cur_uop);
+          return;
+        }
+      }
     }
 
     // put fault request into fault buffer
     m_fault_buffer.emplace(page_number);
     m_fault_uops.emplace(page_number, list<uop_c *>());
     m_fault_uops[page_number].emplace_back(cur_uop);
+    
+    if (cur_uop->m_parent_uop) {
+      --cur_uop->m_parent_uop->m_num_page_table_walks;
+      if (cur_uop->m_parent_uop->m_num_page_table_walks)
+        core->m_per_thread_fault_parent_uops[cur_uop->m_thread_id].emplace(cur_uop->m_parent_uop->m_uop_num);
+      else {
+        core->m_per_thread_fault_parent_uops[cur_uop->m_thread_id].erase(cur_uop->m_parent_uop->m_uop_num);
+        core->m_per_thread_fault_parent_uops.erase(cur_uop->m_thread_id);
+      }
+    }
+
+    DEBUG("page fault at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu, page_number:%llx\n",
+          m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num, cur_uop->m_uop_num, page_number);
 
     cur_uop->m_state = OS_TRANS_FAULT_BUFFER;
   }
@@ -309,16 +356,13 @@ void MMU::handle_page_faults()
 
 bool MMU::do_batch_processing()
 {
-  // pick a random page to assign
-  static uint64_t page_to_read = 0;
-
   // time between batch processing initialization and first transfer
   if (m_cycle < m_batch_processing_transfer_start_cycle)
     return false;
 
   // preparation for the first transfer after overhead
   if (!m_batch_processing_first_transfer_started) {
-    if (m_free_pages_remaining > 0)
+    if (m_free_frames_remaining > 0)
       m_batch_processing_next_event_cycle = m_cycle + m_fault_latency;
     else {
       m_batch_processing_next_event_cycle = m_cycle + m_eviction_latency + m_fault_latency;
@@ -327,7 +371,7 @@ bool MMU::do_batch_processing()
       Addr victim_page = m_replacement_unit->getVictim();
       auto it = m_page_table.find(victim_page);
       assert(it != m_page_table.end());
-      uint64_t victim_frame = it->second.frame_number;
+      Addr victim_frame = it->second.frame_number;
       m_page_table.erase(victim_page);
       m_TLB->invalidate(victim_page);
 
@@ -335,10 +379,12 @@ bool MMU::do_batch_processing()
       Addr frame_addr = victim_frame << m_offset_bits;
       m_simBase->m_memory->invalidate(frame_addr);
 
-      m_free_pages[victim_frame] = true;
-      ++m_free_pages_remaining;
+      m_free_frames[victim_frame] = true;
+      ++m_free_frames_remaining;
 
-      page_to_read = victim_frame; // for faster simulation
+      m_frame_to_allocate = victim_frame; // for faster simulation
+      
+       STAT_EVENT(EVICTION);
     }
 
     m_batch_processing_first_transfer_started = true;
@@ -352,46 +398,55 @@ bool MMU::do_batch_processing()
     return false;
 
   // on m_batch_processing_next_event_cycle, a free page is gauranteed
-  assert(m_free_pages_remaining > 0);
+  assert(m_free_frames_remaining > 0);
 
   // if this randomly picked page was already assigned
-  if (!m_free_pages[page_to_read]) {
+  if (!m_free_frames[m_frame_to_allocate]) {
     // iterate through the list until a free page is found
-    uint64_t starting_page_of_search = page_to_read;
+    Addr starting_page_of_search = m_frame_to_allocate;
     do {
-      ++page_to_read;
-      page_to_read %= m_free_pages.size();
-    } while ((page_to_read != starting_page_of_search) && (!m_free_pages[page_to_read]));
+      ++m_frame_to_allocate;
+      m_frame_to_allocate %= m_free_frames.size();
+    } while ((m_frame_to_allocate != starting_page_of_search) && (!m_free_frames[m_frame_to_allocate]));
   }
 
-  assert(m_free_pages[page_to_read]);
+  assert(m_free_frames[m_frame_to_allocate]);
 
   // allocate a new page
   Addr page_number = m_fault_buffer_processing.front();
   m_fault_buffer_processing.pop_front();
-  Addr frame_number = page_to_read;
+  Addr frame_number = m_frame_to_allocate;
+
+  DEBUG("fault resolved page_number:%llx at %llu\n", page_number, m_cycle);
 
   // allocate an entry in the page table
   m_page_table.emplace(piecewise_construct, forward_as_tuple(page_number), forward_as_tuple(frame_number));
+  
+  // update replacement unit
   m_replacement_unit->insert(page_number);
 
-  m_free_pages[frame_number] = false;
-  --m_free_pages_remaining;
+  m_free_frames[frame_number] = false;
+  --m_free_frames_remaining;
 
   // insert uops that tried to access this page into retry queue
   {
     auto it = m_fault_uops_processing.find(page_number);
-    if (it != m_fault_uops_processing.end()) { // demand requests
-      auto&& uop_list = it->second;
-      for (auto&& uop : uop_list) {
-        uop->m_state = OS_TRANS_RETRY_QUEUE;
-        m_retry_queue.emplace_back(uop);
-      }
+    assert(it != m_fault_uops_processing.end());
+    auto&& uop_list = it->second;
+    for (auto&& uop : uop_list) {
+      uop->m_state = OS_TRANS_RETRY_QUEUE;
+      m_retry_queue.emplace_back(uop);
+    }
 
-      uop_list.clear();
-      m_fault_uops_processing.erase(page_number);
-    } else { // prefetch requests
-      // do nothing
+    uop_list.clear();
+    m_fault_uops_processing.erase(page_number);
+    
+    // reallocation stats
+    {
+      size_t old = m_unique_pages.size();
+      m_unique_pages.emplace(page_number);
+      if (m_unique_pages.size() == old)
+        STAT_EVENT(REALLOCATION);
     }
   }
 
@@ -417,7 +472,7 @@ bool MMU::do_batch_processing()
 
   if (!m_fault_buffer_processing.empty()) {
     // evict a page if page is full
-    if (m_free_pages_remaining > 0)
+    if (m_free_frames_remaining > 0)
       m_batch_processing_next_event_cycle = m_cycle + m_fault_latency;
     else {
       m_batch_processing_next_event_cycle = m_cycle + m_eviction_latency + m_fault_latency;
@@ -426,7 +481,7 @@ bool MMU::do_batch_processing()
       Addr victim_page = m_replacement_unit->getVictim();
       auto it = m_page_table.find(victim_page);
       assert(it != m_page_table.end());
-      uint64_t victim_frame = it->second.frame_number;
+      Addr victim_frame = it->second.frame_number;
       m_page_table.erase(victim_page);
       m_TLB->invalidate(victim_page);      
       
@@ -434,10 +489,12 @@ bool MMU::do_batch_processing()
       Addr frame_addr = victim_frame << m_offset_bits;
       m_simBase->m_memory->invalidate(frame_addr);
 
-      m_free_pages[victim_frame] = true;
-      ++m_free_pages_remaining;
+      m_free_frames[victim_frame] = true;
+      ++m_free_frames_remaining;
 
-      page_to_read = victim_frame; // for faster simulation
+      m_frame_to_allocate = victim_frame; // for faster simulation
+      
+       STAT_EVENT(EVICTION);
     }
 
     return false;
@@ -453,6 +510,7 @@ bool MMU::do_batch_processing()
   m_batch_processing_transfer_start_cycle = -1;
   m_batch_processing_next_event_cycle = -1;
 
+  DEBUG("batch processing ends at %llu\n", m_cycle);
   return true;
 }
 
@@ -461,6 +519,7 @@ void MMU::begin_batch_processing()
   assert(m_batch_processing == false);
   
   std::move(m_fault_buffer.begin(), m_fault_buffer.end(), std::back_inserter(m_fault_buffer_processing));
+  m_fault_buffer_processing.sort();
   m_fault_uops_processing = m_fault_uops;
   
   m_fault_buffer.clear();
@@ -470,5 +529,9 @@ void MMU::begin_batch_processing()
   m_batch_processing_first_transfer_started = false;
   m_batch_processing_start_cycle = m_cycle;
   m_batch_processing_transfer_start_cycle = m_cycle + m_batch_processing_overhead;
+  
   m_batch_processing_next_event_cycle = -1;
+  
+  DEBUG("batch processing begins at %llu fault buffer size %zu\n",
+        m_cycle, m_fault_buffer_processing.size());
 }

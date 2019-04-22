@@ -343,6 +343,13 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE*
   // execute current uop
   // -------------------------------------
   if (!m_exec->exec(thread_id, entry, cur_uop)) {
+    if (cur_uop->m_mem_type == MEM_LD_SM || cur_uop->m_mem_type == MEM_ST_SM)
+      *sched_fail_reason = SCHED_FAIL_NO_AVAILABLE_PORTS;
+    else if (cur_uop->m_mem_type == MEM_LD_CM || cur_uop->m_mem_type == MEM_LD_TM)
+      *sched_fail_reason = SCHED_FAIL_NO_MEM_REQ_SLOTS;
+    else // other (global, texture, local) memory access
+      *sched_fail_reason = SCHED_FAIL_MEM_MANAGEMENT;
+
     // uop could not execute
     DEBUG("core_id:%d thread_id:%d uop_num:%lld just cannot be executed\n", 
           m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num); 
@@ -513,7 +520,7 @@ void schedule_smc_c::run_a_cycle(void)
       }
       else {
         STAT_CORE_EVENT(m_core_id, 
-            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 5));
+            SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 6));
       }
     }
     else if (ii == m_first_schlist) {

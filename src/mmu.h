@@ -40,10 +40,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <utility>
 #include <tuple>
 #include <set>
+#include <unordered_set>
 
 #include "macsim.h"
 #include "uop.h"
@@ -63,9 +65,9 @@ private:
   class ReplacementUnit
   {
   public:
-    ReplacementUnit(long max_entries)
+    ReplacementUnit(macsim_c *simBase, long max_entries)
+        : m_simBase(simBase), m_max_entries(max_entries)
     {
-      m_max_entries = max_entries;
       m_entries = new Entry[m_max_entries];
       for (long i = 0; i < m_max_entries; ++i)
         m_free_entries.push_back(m_entries + i);
@@ -112,13 +114,14 @@ private:
       node->next->prev = node;
     }
 
-    map<Addr, Entry *> m_table;
+    unordered_map<Addr, Entry *> m_table;
     vector<Entry *> m_free_entries;
     Entry *m_head;
     Entry *m_tail;
     Entry *m_entries;
 
     long m_max_entries;
+    macsim_c* m_simBase;
   };
 
 public:
@@ -133,7 +136,7 @@ public:
   void handle_page_faults();
 
 private:
-  void do_page_table_walks(uop_c *cur_uop, bool update);
+  void do_page_table_walks(uop_c *cur_uop);
   
   void begin_batch_processing();
   bool do_batch_processing();
@@ -144,12 +147,14 @@ private:
   macsim_c* m_simBase;
   Counter m_cycle;
 
-  map<Addr, PageDescriptor> m_page_table;
+  Addr m_frame_to_allocate;
+
+  unordered_map<Addr, PageDescriptor> m_page_table;
   long m_page_size;
   long m_memory_size;
   long m_offset_bits;
-  long m_free_pages_remaining;
-  vector<bool> m_free_pages;
+  long m_free_frames_remaining;
+  vector<bool> m_free_frames;
 
   unique_ptr<TLB> m_TLB;
   unique_ptr<ReplacementUnit> m_replacement_unit;
@@ -158,20 +163,20 @@ private:
   long m_fault_latency;
   long m_eviction_latency;
 
-  map<Counter, list<Addr> > m_walk_queue_cycle; // indexed by cycle
-                                                // e.g., cycle t - page A, B, C
-  map<Addr, list<uop_c*> > m_walk_queue_page;   // indexed by page number
-                                                // e.g., page A - uop 1, 2
-                                                // e.g., page B - uop 3, 4, 5, 6
+  map<Counter, list<Addr>> m_walk_queue_cycle;          // indexed by cycle
+                                                        // e.g., cycle t - page A, B, C
+  unordered_map<Addr, list<uop_c *>> m_walk_queue_page; // indexed by page number
+                                                        // e.g., page A - uop 1, 2
+                                                        // e.g., page B - uop 3, 4, 5, 6
 
   list<uop_c*> m_retry_queue;
   list<uop_c*> m_fault_retry_queue;
 
   long m_fault_buffer_size;
-  set<Addr> m_fault_buffer;
-  map<Addr, list<uop_c*>> m_fault_uops;
+  unordered_set<Addr> m_fault_buffer;
+  unordered_map<Addr, list<uop_c *>> m_fault_uops;
   list<Addr> m_fault_buffer_processing;
-  map<Addr, list<uop_c*>> m_fault_uops_processing;
+  unordered_map<Addr, list<uop_c *>> m_fault_uops_processing;
   
   bool m_batch_processing;
   bool m_batch_processing_first_transfer_started;
@@ -180,7 +185,7 @@ private:
   Counter m_batch_processing_transfer_start_cycle;
   Counter m_batch_processing_next_event_cycle;
 
-  set<Addr> m_unique_pages;
+  unordered_set<Addr> m_unique_pages;
 };
 
 #endif //MMU_H_INCLUDED

@@ -107,6 +107,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 #define DEBUG(args...)   _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ## args)
+#define DEBUG_CORE(m_core_id, args...)       \
+  if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {     \
+    _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ## args);  \
+  }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

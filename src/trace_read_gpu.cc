@@ -225,7 +225,7 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
   (*m_dprint_output) << "reconv_inst_addr/mem_addr: " << hex << inst_info->m_reconv_inst_addr << dec << endl; 
   (*m_dprint_output) << "br_taken_mask: " << hex << inst_info->m_br_taken_mask << dec << endl; 
 
-  (*m_dprint_output) << "mem_addr/reconv_inst_addr: " << hex << inst_info->m_mem_addr << endl; 
+  (*m_dprint_output) << "mem_addr/reconv_inst_addr: " << hex << inst_info->m_mem_addr << dec << endl; 
   (*m_dprint_output) << "mem_access_size/barrier_id: " << (uint32_t)inst_info->m_mem_access_size << endl; 
   if (inst_info->m_opcode == GPU_MEMBAR_CTA || inst_info->m_opcode == GPU_MEMBAR_GL ||
       inst_info->m_opcode == GPU_MEMBAR_SYS) {
