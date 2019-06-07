@@ -32,17 +32,18 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <assert.h>
 #include <zlib.h>
-#include "pin.H"
-#include "trace_generator.h"
-#include "../InstLib/time_warp.H"
-#include "../InstLib/instlib.H"
 #include <fstream>
 #include <stdio.h>
 #include <sstream>
 #include <cmath>
 #include <queue>
 #include <list>
+
+#include "pin.H"
+#include "../InstLib/time_warp.H"
+#include "../InstLib/instlib.H"
 #include "control_manager.H"
+#include "trace_generator.h"
 
 /*
  * 1. all function of which name start with a capatal letter is used by PIN
@@ -1133,7 +1134,7 @@ void sanity_check(void)
   // ----------------------------------------
   for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
     if (tr_opcode_names[ii] != CATEGORY_StringShort(ii)) {
-      cout << ii << " " << tr_opcode_names[ii] << " " << CATEGORY_StringShort(ii) << "\n";
+      cout << ii << " " << tr_opcode_names[ii] << " should be  " << CATEGORY_StringShort(ii) << "\n";
       cout << "-> Changes in XED_CATEGORY!\n";
       exit(0);
     }

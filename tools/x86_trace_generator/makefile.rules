@@ -44,7 +44,10 @@ OBJECT_ROOTS :=
 DLL_ROOTS :=
 
 # This defines any static libraries (archives), that need to be built.
-LIB_ROOTS += lz
+#TOOL_CXXFLAGS += -I/usr/include
+#TOOL_LPATHS += -L/usr/lib/x86_64-linux-gnu
+# TOOL_LIBS += -lz
+TOOL_LIBS += ../../../extras/xed-intel64/lib/libzlib.a
 
 ###### Define the sanity subset ######
 
@@ -76,4 +79,7 @@ SANITY_SUBSET := $(TEST_TOOL_ROOTS) $(TEST_ROOTS)
 ###### Special tools' build rules ######
 
 $(OBJDIR)insmix$(PINTOOL_SUFFIX): $(OBJDIR)insmix$(OBJ_SUFFIX) $(CONTROLLERLIB)
-	$(LINKER) $(TOOL_LDFLAGS) $(LINK_EXE)$@ $^ $(TOOL_LPATHS) $(TOOL_LIBS)
+	$(LINKER) $(LINK_EXE)$@ $^ $(TOOL_LPATHS) $(TOOL_LIBS) $(TOOL_LDFLAGS) 
+
+$(OBJDIR)trace_generator$(PINTOOL_SUFFIX): $(OBJDIR)trace_generator$(OBJ_SUFFIX) $(CONTROLLERLIB)
+	$(LINKER) $(LINK_EXE)$@ $^ $(TOOL_LPATHS) $(TOOL_LIBS) $(TOOL_LDFLAGS) 
