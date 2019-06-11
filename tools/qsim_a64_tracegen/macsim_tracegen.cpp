@@ -13,6 +13,7 @@
 #include <thread>
 
 #include <qsim.h>
+#include <qsim-load.h>
 #include <stdio.h>
 #include <capstone.h>
 #include <zlib.h>
@@ -456,13 +457,18 @@ int main(int argc, char** argv) {
     {"help",  no_argument, NULL, 'h'},
     {"ncpu", required_argument, NULL, 'n'},
     {"max_inst", required_argument, NULL, 'm'},
-    {"state", required_argument, NULL, 's'}
+    {"state", required_argument, NULL, 's'},
+    {"benchmark", required_argument, NULL, 'b'}
   };
 
   int c = 0;
   char *state_file = NULL;
-  while((c = getopt_long(argc, argv, "hn:m:", long_options, NULL)) != -1) {
+  char *benchmark_file = NULL;
+  while((c = getopt_long(argc, argv, "hn:m:b:", long_options, NULL)) != -1) {
     switch(c) {
+      case 'b':
+        benchmark_file = strdup(optarg);
+        break;
       case 'n':
         n_cpus = atoi(optarg);
         break;
@@ -471,11 +477,12 @@ int main(int argc, char** argv) {
         break;
       case 's':
         state_file = strdup(optarg);
+        break;
       case 'h':
       case '?':
       default:
         std::cout << "Usage: " << argv[0] << " --ncpu(-n) <num_cpus> --max_inst(-m)" <<
-          "  <num_inst(M)> --state <state_file>" << std::endl;
+          "  <num_inst(M)> --state <state_file> --benchmark(-b) <benchmark_file>"<< std::endl;
         exit(0);
     }
   }
@@ -493,6 +500,13 @@ int main(int argc, char** argv) {
 
   // Attach a TraceWriter if a trace file is given.
   TraceWriter tw(osd, max_inst_n);
+
+  if(benchmark_file) {
+    Qsim::load_file(osd, benchmark_file);
+    std::string bench(benchmark_file);
+    std::string ofname = bench.substr(0, bench.find(".tar")) + ".out";
+    std::ofstream out(ofname);
+  }
 
   // If this OSDomain was created from a saved state, the app start callback was
   // received prior to the state being saved.
