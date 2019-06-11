@@ -80,10 +80,27 @@ foreach $file (@files) {
 	$temp = $file;
 	$temp =~ s/^\.\///;
 
+  # filename should be either inst.stat.def (without version number) or inst.v1.0.stat.def (with version number)
+  # if filename does not have any version number, process the file.
+  # if filename has version number, process the file only if the version number matches given version number.
+  #
+  $version_args = $ARGV[0];
+  my @tokens = split /\./, $temp;
+  my $first_char = substr($tokens[3], 0, 1);
+  if ($first_char eq 'v') {
+    $version_major = substr($tokens[3], 1);
+    $version_minor = $tokens[4];
+    $version_full  = $version_major . '.' . $version_minor;
+    if ($version_full ne $version_args) {
+      next;
+    }
+  }
+
 	$CurrentDefFile = $temp;
   $distributionActive = 0;
   $isPerCoreDistActive = 0;
 
+  print "processing file: $file\n";
 	processFile($file);
 }
 

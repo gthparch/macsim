@@ -7,6 +7,8 @@
 
 import os
 
+# Build option
+Import('flags')
 
 ## clean option
 if GetOption('clean'):
@@ -14,5 +16,8 @@ if GetOption('clean'):
 ## otherwise generate stats/knobs
 else:
   os.system('perl knobgen.pl')
-  os.system('perl statgen.pl')
+  if flags['pin_3_7_trace'] == '1':
+    os.system('perl statgen.pl 1.1')
+  else:
+    os.system('perl statgen.pl 1.0')
 
