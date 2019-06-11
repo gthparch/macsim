@@ -215,7 +215,7 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id)
     m_tg->read_trace(core_id, (void *)(thread_trace_info->m_prev_trace_info), m_trace_size);
 #endif
 
-    if (*KNOB(KNOB_DEBUG_TRACE_READ)) {
+    if (*KNOB(KNOB_DEBUG_TRACE_READ) || *KNOB(KNOB_DEBUG_PRINT_TRACE)) {
       dprint_inst(thread_trace_info->m_prev_trace_info, core_id, sim_thread_id);
     }
   }
@@ -284,7 +284,7 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
         thread_trace_info->m_buffer_exhausted = true;
       }
 
-      if (*KNOB(KNOB_DEBUG_TRACE_READ))
+			//   if (*KNOB(KNOB_DEBUG_TRACE_READ)) // FIXME Hyesoon: Jun 20 2019 
         dprint_inst(trace_info, core_id, sim_thread_id);
 
       ///
@@ -1042,7 +1042,6 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "PREFETCH_T0",
   "PREFETCH_T1",
   "PREFETCH_T2",
-  "GPU_EN",
   "CPU_OPCODE_LAST",
 };
 

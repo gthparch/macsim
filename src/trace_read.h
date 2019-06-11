@@ -53,7 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define MAX_TR_REG 300 // REG_LAST = 298
+#define MAX_TR_REG 300 // REG_LAST = 298 // need to check!!! 
 //#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define REP_MOV_MEM_SIZE_MAX 4
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
@@ -79,34 +79,6 @@ typedef struct trace_info_s {
   virtual ~trace_info_s();
 } trace_info_s;
 
-#ifdef PIN_3_7_TRACE  
-typedef struct trace_info_cpu_s {
-	uint8_t  m_num_read_regs;     /**< num read registers */
-  uint8_t  m_num_dest_regs;     /**< num dest registers */
-  uint16_t  m_src[MAX_SRC_NUM];  /**< src register id */ // 16 bits  pin 3.7 
-  uint16_t  m_dst[MAX_DST_NUM];  /**< dest register id */ // 16 bits pin 3.7 
-  uint8_t  m_cf_type;           /**< branch type */
-  bool     m_has_immediate;     /**< has immediate field */
-  uint8_t  m_opcode;            /**< opcode */
-  bool     m_has_st;            /**< has store operation */ 
-  bool     m_is_fp;             /**< fp operation */
-  bool     m_write_flg;         /**< write flag */
-  uint8_t  m_num_ld;            /**< number of load operations */
-  uint8_t  m_size;              /**< instruction size */
-  // dynamic information
-  uint64_t m_ld_vaddr1;         /**< load address 1 */
-  uint64_t m_ld_vaddr2;         /**< load address 2 */
-  uint64_t m_st_vaddr;          /**< store address */
-  uint64_t m_instruction_addr;  /**< pc address */
-  uint64_t m_branch_target;     /**< branch target address */
-  uint8_t  m_mem_read_size;     /**< memory read size */
-  uint8_t  m_mem_write_size;    /**< memory write size */
-  bool     m_rep_dir;           /**< repetition direction */
-  bool     m_actually_taken;    /**< branch actually taken */
-  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
-}trace_info_cpu_s;
-
-#else 
 typedef struct trace_info_cpu_s {
   uint8_t  m_num_read_regs;     /**< num read registers */
   uint8_t  m_num_dest_regs;     /**< num dest registers */
@@ -132,7 +104,6 @@ typedef struct trace_info_cpu_s {
   bool     m_actually_taken;    /**< branch actually taken */
   uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_cpu_s;
-#endif 
 
 typedef struct trace_info_a64_s {
   uint8_t  m_num_read_regs;     /**< num read registers */
@@ -310,9 +281,11 @@ typedef struct trace_uop_s {
 /// \brief Enumerator ID for temp register
 ///
 /// Currently, we have 330 registers, so temp register will be 167.
+/// we truncated the trace register id so it will use up to all 255. however temp reg id is inserted after the trace file is read
+// so it can be greater than 8 bits 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 typedef enum TR_TEMP_TEMP_ENUM_ {
-  TR_REG_TMP0 = 331
+  TR_REG_TMP0 =256  
 } TR_TEMP_TEMP_ENUM;
 
 
@@ -414,7 +387,6 @@ typedef enum CPU_OPCODE_ENUM_ {
   PREFETCH_T0,
   PREFETCH_T1,
   PREFETCH_T2,
-  GPU_EN,
   CPU_OPCODE_LAST,
 } CPU_OPCODE_ENUM;
 
