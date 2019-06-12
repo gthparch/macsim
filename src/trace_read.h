@@ -280,9 +280,9 @@ typedef struct trace_uop_s {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Enumerator ID for temp register
 ///
-/// Currently, we have 330 registers, so temp register will be 167.
+/// Currently, Pin 3.7 has 330 registers but we only store up to 255 register numbers. 
 /// we truncated the trace register id so it will use up to all 255. however temp reg id is inserted after the trace file is read
-// so it can be greater than 8 bits 
+// so it can be greater than 8 bits  data type is uns16. please check inst_info.h 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 typedef enum TR_TEMP_TEMP_ENUM_ {
   TR_REG_TMP0 =256  

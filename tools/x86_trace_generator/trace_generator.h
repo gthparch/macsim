@@ -76,8 +76,8 @@ struct Thread_info
 struct Inst_info {
   uint8_t  num_read_regs;       // 3-bits
   uint8_t  num_dest_regs;       // 3-bits
-  uint16_t  src[MAX_SRC_NUM];    // incresed in 2019 version // 6-bits * 4
-  uint16_t  dst[MAX_DST_NUM];    // increased in 2019 version  6-bits * 4
+  uint8_t  src[MAX_SRC_NUM];    // incresed in 2019 version // 6-bits * 4 // back to 8 
+  uint8_t  dst[MAX_DST_NUM];    // increased in 2019 version  6-bits * 4 // back to 8 
   uint8_t  cf_type;             // 4 bits
   bool     has_immediate;       // 1bits
   uint8_t  opcode;              // 6 bits

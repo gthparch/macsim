@@ -449,7 +449,6 @@ void write_inst(ADDRINT iaddr, THREADID threadid)
   }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Trace Instrumentation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,8 +592,9 @@ void instrument(INS ins)
   if (!g_enable_thread_instrument[tid])
     return;
   
-  set<LEVEL_BASE::REG> src_regs;
-  set<LEVEL_BASE::REG> dst_regs;
+	set<LEVEL_BASE::REG> src_regs;
+	set<LEVEL_BASE::REG> dst_regs;
+	
   const ADDRINT iaddr = INS_Address(ins);
   Inst_info *info = new Inst_info;
   memset(info,0,sizeof(*info));
@@ -613,7 +613,7 @@ void instrument(INS ins)
     // ----------------------------------------
     if (INS_OperandIsReg(ins, ii)) {
       reg = INS_OperandReg(ins, ii);
-
+			
       if (INS_OperandRead(ins,ii)) {
         src_regs.insert(reg);
       }
@@ -653,7 +653,8 @@ void instrument(INS ins)
     assert(info->num_read_regs < MAX_SRC_NUM);
     
     set<LEVEL_BASE::REG>::iterator begin(src_regs.begin()), end(src_regs.end());
-    uint16_t *ptr = info->src;
+		
+    uint8_t *ptr = info->src;
     while (begin != end) {
       if (*begin >= LEVEL_BASE::REG_PIN_EDI && *begin <= LEVEL_BASE::REG_LAST) {
         cerr << "PIN LEVEL_BASE::REGISTER!! : " << *begin << endl;
@@ -663,7 +664,11 @@ void instrument(INS ins)
       if (LEVEL_BASE::REG_is_fr(*begin))
         info->is_fp = TRUE;
 
-      *ptr = REG_FullRegName(*begin);
+			uint16_t tmp = static_cast<uint16_t>(REG_FullRegName(*begin));
+			if (tmp > 256) tmp  = tmp%128+128;
+			*ptr = (uint8_t) tmp; 
+											
+      // *ptr = REG_FullRegName(*begin);
       ++ptr;
       ++begin;
     }
@@ -677,7 +682,7 @@ void instrument(INS ins)
     info->num_dest_regs=dst_regs.size();
     assert(info->num_dest_regs < MAX_DST_NUM);
     set<LEVEL_BASE::REG>::iterator begin(dst_regs.begin()), end(dst_regs.end());
-    uint16_t *ptr = info->dst;
+    uint8_t *ptr = info->dst;
     while (begin != end) {
       if (*begin >= LEVEL_BASE::REG_PIN_EDI && *begin <= LEVEL_BASE::REG_LAST) {
         cerr << "PIN LEVEL_BASE::REGISTER!! : " << *begin << endl;
@@ -690,7 +695,12 @@ void instrument(INS ins)
       if (LEVEL_BASE::REG_is_fr(*begin))
         info->is_fp = 1;
 
-      *ptr = REG_FullRegName(*begin);
+
+			uint16_t tmp = static_cast<uint16_t>(REG_FullRegName(*begin));
+			if (tmp > 256) tmp  = tmp%128+128;
+			*ptr = (uint8_t) tmp; 
+											
+      // *ptr = REG_FullRegName(*begin);
       ++ptr;
       ++begin;
     }
@@ -1166,34 +1176,35 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
 
 
   (*file) << "*** begin of the data strcture *** " <<endl;
+	(*file) << "t_info->uop_opcode_num " << (uint32_t) t_info->opcode  << endl;
   (*file) << "t_info->uop_opcode " <<tr_opcode_names[(uint32_t) t_info->opcode]  << endl;
-  (*file) << "t_info->num_read_regs: " << hex <<  (uint32_t) t_info->num_read_regs << endl;
-  (*file) << "t_info->num_dest_regs: " << hex << (uint32_t) t_info->num_dest_regs << endl;
+  (*file) << "t_info->num_read_regs: " << dec <<  (uint32_t) t_info->num_read_regs << endl;
+  (*file) << "t_info->num_dest_regs: " << dec << (uint32_t) t_info->num_dest_regs << endl;
   for (UINT32 ii = 0; ii < 4; ++ii) {
     if (t_info->src[ii] != 0) {
-      (*file) << "t_info->src" << ii << ": " << LEVEL_BASE::REG_StringShort(static_cast<LEVEL_BASE::REG>(t_info->src[ii])) << endl;
+      (*file) << "t_info->src" << ii << ": " << dec << (static_cast<LEVEL_BASE::REG>(t_info->src[ii])) << " : " << LEVEL_BASE::REG_StringShort(static_cast<LEVEL_BASE::REG>(t_info->src[ii])) << endl;
     }
   }
   for (UINT32 ii = 0; ii < 4; ++ii) {
     if (t_info->dst[ii] != 0) {
-      (*file) << "t_info->dst" << ii << ": " << hex << LEVEL_BASE::REG_StringShort(static_cast<LEVEL_BASE::REG>(t_info->dst[ii])) << endl;
+      (*file) << "t_info->dst" << ii << ": " << dec << (static_cast<LEVEL_BASE::REG>(t_info->dst[ii])) << " : " << LEVEL_BASE::REG_StringShort(static_cast<LEVEL_BASE::REG>(t_info->dst[ii])) << endl;
     }
   }
-  (*file) << "t_info->cf_type: " << hex << tr_cf_names[(uint32_t) t_info->cf_type] << endl;
-  (*file) << "t_info->has_immediate: " << hex << (uint32_t) t_info->has_immediate << endl;
+  (*file) << "t_info->cf_type: " << dec << tr_cf_names[(uint32_t) t_info->cf_type] << endl;
+  (*file) << "t_info->has_immediate: " << dec << (uint32_t) t_info->has_immediate << endl;
   (*file) << "t_info->r_dir:" << (uint32_t) t_info->rep_dir << endl;
-  (*file) << "t_info->has_st: " << hex << (uint32_t) t_info->has_st << endl;
-  (*file) << "t_info->num_ld: " << hex << (uint32_t) t_info->num_ld << endl;
-  (*file) << "t_info->mem_read_size: " << hex << (uint32_t) t_info->mem_read_size << endl;
-  (*file) << "t_info->mem_write_size: " << hex << (uint32_t) t_info->mem_write_size << endl;
+  (*file) << "t_info->has_st: " << dec << (uint32_t) t_info->has_st << endl;
+  (*file) << "t_info->num_ld: " << dec << (uint32_t) t_info->num_ld << endl;
+  (*file) << "t_info->mem_read_size: " << dec << (uint32_t) t_info->mem_read_size << endl;
+  (*file) << "t_info->mem_write_size: " << dec << (uint32_t) t_info->mem_write_size << endl;
   (*file) << "t_info->is_fp: " << (uint32_t) t_info->is_fp << endl;
   (*file) << "t_info->ld_vaddr1: " << hex << (uint64_t) t_info->ld_vaddr1 << endl;
   (*file) << "t_info->ld_vaddr2: " << hex << (uint64_t) t_info->ld_vaddr2 << endl;
   (*file) << "t_info->st_vaddr: " << hex << (uint64_t) t_info->st_vaddr << endl;
   (*file) << "t_info->instruction_addr: " << hex << (uint64_t) t_info->instruction_addr << endl;
   (*file) << "t_info->branch_target: " << hex << (uint64_t) t_info->branch_target << endl;
-  (*file) << "t_info->actually_taken: " << hex << (uint32_t) t_info->actually_taken << endl;
-  (*file) << "t_info->write_flg: " << hex << (uint32_t) t_info->write_flg << endl;
+  (*file) << "t_info->actually_taken: " << dec << (uint32_t) t_info->actually_taken << endl;
+  (*file) << "t_info->write_flg: " << dec << (uint32_t) t_info->write_flg << endl;
   (*file) << "*** end of the data strcture *** " << endl << endl;
 }
 

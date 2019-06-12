@@ -284,7 +284,7 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
         thread_trace_info->m_buffer_exhausted = true;
       }
 
-			//   if (*KNOB(KNOB_DEBUG_TRACE_READ)) // FIXME Hyesoon: Jun 20 2019 
+			if (*KNOB(KNOB_DEBUG_TRACE_READ) || *KNOB(KNOB_DEBUG_PRINT_TRACE)) 
         dprint_inst(trace_info, core_id, sim_thread_id);
 
       ///
