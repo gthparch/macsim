@@ -1,10 +1,10 @@
 # Simulation Configuration
-num_sim_cores 24
+num_sim_cores 1
 num_sim_small_cores 0
 num_sim_medium_cores 0
-num_sim_large_cores 24
-core_type ptx
-large_core_type igpu
+num_sim_large_cores 1
+core_type x86 
+large_core_type x86 
 sim_cycle_count 0
 max_insts 3000000
 heartbeat_interval 1000000
@@ -14,7 +14,6 @@ core_thread_sched balanced
 # Clock
 clock_cpu 1.15
 clock_gpu 1.15
-clock_l3  1.15
 clock_noc 1.15
 clock_mc  1.15
 

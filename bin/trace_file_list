@@ -1,2 +1,3 @@
 1
-../sst-unit-test/traces/cachesize_1/trace.txt
+/home/common/intel_cpu_pin/pin-3.7-97619-g0d0c92f4f-gcc-linux/source/tools/x86_trace_generator/trace.txt
+/home/hyesoon/programs/macsim/tools/qsim_a64_tracegen/trace.txt
