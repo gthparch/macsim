@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <sys/time.h>
-
+#include "annotations.h"
 
 #define ITER   20000
 #define MAX_N 128*1024*1024
@@ -190,20 +190,24 @@ int main(){
   //cout << "Warmup. Lvl#Test of " << double(4*KB)/KB <<  " KB Array using " << 256 << " Byte stride took " << CacheNumLevelsTest(4*KB, 256) * 1000000 << " ns\n";
   //cout << "Warmup. Lvl#Test of " << double(8*KB)/KB <<  " KB Array using " << 256 << " Byte stride took " << CacheNumLevelsTest(8*KB, 256) * 1000000 << " ns\n";
   //no need to warm up for millions of time
-  /*
-  for(int a = 0; a < 15; a++) {
+  SIM_BEGIN(1); 
+  for(int a = 4; a < 5; a++) {
+        cout << "Lvl#Test of " << double(ArrSize[a])/KB <<  " KB Array using " << b << " Byte stride took " << CacheNumLevelsTest(ArrSize[a], b) * 1000000 << " ns\n";
+  }
+  SIM_END(1); 
+  for(int a = 5; a < 7; a++) {
         cout << "Lvl#Test of " << double(ArrSize[a])/KB <<  " KB Array using " << b << " Byte stride took " << CacheNumLevelsTest(ArrSize[a], b) * 1000000 << " ns\n";
   }
   
-  */
-  
-  
 
+  
+  
+/*
   cout << "\nStarting MemoryTimingTest" << "\n";
   cout << "Warmup. " << double(128*MB)/KB <<  " KB Array using " << 256 << " Byte stride took " << MemoryTimingTest(128*MB, 256) * 1000000 << " ns\n";
   
   cout << "MemoryTimingTest of " << double(128*MB)/KB <<  " KB Array using " << 3 * MB + (256+32) * KB<< " Byte stride took " << MemoryTimingTest(128* MB, 3 * MB + (256+32)* KB) * 1000000 << " ns\n";
-
+*/
 
   // Add your code here, and comment above
 
