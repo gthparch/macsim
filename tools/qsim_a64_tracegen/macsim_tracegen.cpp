@@ -354,7 +354,7 @@ bool InstHandler::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs reg
 class TraceWriter {
   public:
     TraceWriter(OSDomain &osd, unsigned long max_inst) :
-      osd(osd), finished(false)
+      osd(osd), finished(false), single_trace(true)
     { 
       osd.set_app_start_cb(this, &TraceWriter::app_start_cb);
       trace_file_count = 0;
@@ -408,20 +408,24 @@ class TraceWriter {
       inst_handle[0].closeDebugFile();
 
       delete [] inst_handle;
+
+      if (single_trace)
+	exit(0);
+
       return 0;
     }
 
     void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
         enum inst_type t)
     {
-      if (!curr_inst_n)
+      if (!curr_inst_n) {
         return;
+      }
 
       inst_handle[c].processInst((unsigned char*)b, l);
 
       --curr_inst_n;
       if (!curr_inst_n) {
-
         app_end_cb(0);
       }
 
@@ -438,7 +442,7 @@ class TraceWriter {
 
   private:
     OSDomain &osd;
-    bool finished;
+    bool finished, single_trace;
     int  trace_file_count;
     InstHandler *inst_handle;
     unsigned long max_inst_n;
@@ -503,10 +507,6 @@ int main(int argc, char** argv) {
 
   if (benchmark_file) {
     Qsim::load_file(osd, benchmark_file);
-    std::string bench(benchmark_file);
-    std::string ofname = bench.substr(0, bench.find(".tar")) + ".out";
-    std::ofstream out(ofname);
-    tw.app_start_cb(0);
   }
 
   // If this OSDomain was created from a saved state, the app start callback was
@@ -516,14 +516,13 @@ int main(int argc, char** argv) {
   osd.connect_console(std::cout);
 
   // The main loop: run until 'finished' is true.
-  uint64_t inst_per_iter = 1000000000;
-  int inst_run = inst_per_iter;
-  while (!(inst_per_iter - inst_run)) {
-    inst_run = 0;
-    inst_run = osd.run(inst_per_iter);
+  uint64_t inst_per_iter = 10000;
+  while (1) {
+    osd.run(inst_per_iter);
     //osd.timer_interrupt();
   }
 
+  printf("instructions are done\n");
   delete osd_p;
 
   return 0;
