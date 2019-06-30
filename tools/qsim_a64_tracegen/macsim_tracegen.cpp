@@ -464,7 +464,7 @@ int main(int argc, char** argv) {
   int c = 0;
   char *state_file = NULL;
   char *benchmark_file = NULL;
-  while((c = getopt_long(argc, argv, "hn:m:b:", long_options, NULL)) != -1) {
+  while((c = getopt_long(argc, argv, "hn:m:b:s:", long_options, NULL)) != -1) {
     switch(c) {
       case 'b':
         benchmark_file = strdup(optarg);
@@ -482,7 +482,7 @@ int main(int argc, char** argv) {
       case '?':
       default:
         std::cout << "Usage: " << argv[0] << " --ncpu(-n) <num_cpus> --max_inst(-m)" <<
-          "  <num_inst(M)> --state <state_file> --benchmark(-b) <benchmark_file>"<< std::endl;
+          "  <num_inst(M)> --state(-s) <state_file> --benchmark(-b) <benchmark_file>"<< std::endl;
         exit(0);
     }
   }
@@ -501,11 +501,12 @@ int main(int argc, char** argv) {
   // Attach a TraceWriter if a trace file is given.
   TraceWriter tw(osd, max_inst_n);
 
-  if(benchmark_file) {
+  if (benchmark_file) {
     Qsim::load_file(osd, benchmark_file);
     std::string bench(benchmark_file);
     std::string ofname = bench.substr(0, bench.find(".tar")) + ".out";
     std::ofstream out(ofname);
+    tw.app_start_cb(0);
   }
 
   // If this OSDomain was created from a saved state, the app start callback was
@@ -514,13 +515,13 @@ int main(int argc, char** argv) {
 
   osd.connect_console(std::cout);
 
-  //tw.app_start_cb(0);
   // The main loop: run until 'finished' is true.
   uint64_t inst_per_iter = 1000000000;
   int inst_run = inst_per_iter;
   while (!(inst_per_iter - inst_run)) {
+    inst_run = 0;
     inst_run = osd.run(inst_per_iter);
-    osd.timer_interrupt();
+    //osd.timer_interrupt();
   }
 
   delete osd_p;
