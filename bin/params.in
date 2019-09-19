@@ -73,7 +73,7 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 8
 dram_rowbuffer_size 2048
-dram_scheduling_policy DRAMSIM
+dram_scheduling_policy FRFCFS
 dram_additional_latency 95
 
 # ETC
