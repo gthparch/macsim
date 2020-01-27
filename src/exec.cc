@@ -731,7 +731,7 @@ void exec_c::run_a_cycle(void)
 
     if (responseArrived) {
       DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
-      if (m_ptx_sim) {
+      if (m_ptx_sim || m_igpu_sim) {
         if (uop->m_parent_uop) {
           uop_c* puop = uop->m_parent_uop;
           ++puop->m_num_child_uops_done;

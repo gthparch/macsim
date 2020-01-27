@@ -14,7 +14,7 @@ comp_cpu0 = sst.Component("cpu0", "macsimComponent.macsimComponent")
 comp_cpu0.addParams({
      "trace_file" : "trace_file_list",
      "mem_size" : 4*GB,
-     "command_line" :"--clock_cpu=4.0 --clock_cpu=4.0 --clock_l3=4.0 --clock_noc=4.0 --clock_mc=4.0 " + \
+     "command_line" :"--clock_cpu=4.0 --clock_cpu=4.0 --clock_llc=4.0 --clock_noc=4.0 --clock_mc=4.0 " + \
                      "--use_memhierarchy=1 --perfect_icache=1 " + \
                      "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 " + \
                      "--core_type=x86",

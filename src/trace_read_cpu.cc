@@ -1119,11 +1119,15 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     uop->m_vaddr = 0;
   } 
   else {
+#ifndef USING_SST
     // since we can have 64-bit address space and each trace has 32-bit address,
     // using extra bits to differentiate address space of each application
-    uop->m_vaddr = trace_uop->m_va + m_simBase->m_memory->base_addr(core_id,
-        (unsigned long)UINT_MAX * 
-        (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
+    uop->m_vaddr = trace_uop->m_va + m_simBase->m_memory->base_addr(core_id, (unsigned long)UINT_MAX * (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
+#else
+    Addr addr = (unsigned long)UINT_MAX * (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul;
+    Addr line_size = 64;
+    uop->m_vaddr = trace_uop->m_va + (addr & -line_size);
+#endif
 
     // virtual-to-physical translation 
     // physical page is allocated at this point for the time being

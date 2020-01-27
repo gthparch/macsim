@@ -253,8 +253,10 @@ void macsim_c::init_memory(void)
     m_dram_controller[ii]->init(ii);
   }
 
+#ifndef USING_SST
   // initialize memory
   m_memory->init();
+#endif
 
   // bug detector
   if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
@@ -587,8 +589,11 @@ void macsim_c::deallocate_memory(void)
   delete m_trace_node_pool;
   delete m_uop_pool;
   delete m_invalid_uop;
+
+#ifndef USING_SST
   delete m_memory;
   delete m_network;
+#endif
 
   for (int ii = 0; ii < m_num_mc; ++ii) {
     delete m_dram_controller[ii];
