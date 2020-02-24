@@ -14,7 +14,7 @@ core_thread_sched balanced
 # Clock
 clock_cpu 1.15
 clock_gpu 1.15
-clock_l3  1.15
+#clock_l3  1.15
 clock_noc 1.15
 clock_mc  1.15
 
