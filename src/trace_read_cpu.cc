@@ -1250,7 +1250,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
  */
 
 
-#ifdef PIN_3_7_TRACE
+#ifdef PIN_3_11_TRACE
 
 void cpu_decoder_c::init_pin_convert(void)
 {
@@ -1265,7 +1265,8 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_AVX512_4FMAPS] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_AVX512_4VNNIW] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_FADD; // new 
-  m_int_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new 
+  m_int_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new
+  m_int_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_BINARY] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_BITBYTE] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_BLEND] = UOP_IADD; // new 
@@ -1273,8 +1274,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_BMI2] = UOP_BYTE;
   m_int_uop_table[XED_CATEGORY_BROADCAST] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_CALL] = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_CET] = UOP_IADD; // new 
-  m_int_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_IADD; // new 
+  m_int_uop_table[XED_CATEGORY_CET] = UOP_IADD; // new
+	m_int_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_IADD; // new
+	m_int_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_CLWB] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_CLZERO] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_CMOV] = UOP_CMOV;
@@ -1284,6 +1286,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_CONVERT] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_DATAXFER] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_DECIMAL] = UOP_IADD;
+	m_int_uop_table[XED_CATEGORY_ENQCMD] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_EXPAND] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_FCMOV] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_FLAGOP] = UOP_IADD;
@@ -1300,6 +1303,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
   m_int_uop_table[XED_CATEGORY_MISC] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_MMX] = UOP_FADD;
+  m_int_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_MPX] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
   m_int_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_IMUL;
@@ -1310,7 +1314,8 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_PT] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_PUSH] = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD; // new 
+  m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD; // new
+	m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_RDRAND] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_RDSEED] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_RDWRFSGS] = UOP_IADD;
@@ -1335,8 +1340,10 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_VAES] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_VBMI2] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_VFMA] = UOP_IADD;
+	m_int_uop_table[XED_CATEGORY_PADLOCK] = UOP_IMUL; // new 
   m_int_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_IMUL; // new 
   m_int_uop_table[XED_CATEGORY_VTX] = UOP_IADD;
+	m_int_uop_table[XED_CATEGORY_WAITPKG] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_WIDENOP] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_X87_ALU] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_XOP] = UOP_IADD; // new 
@@ -1364,7 +1371,8 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_AVX512_4FMAPS] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_AVX512_4VNNIW] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_FADD; // new 
-  m_fp_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new 
+  m_fp_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new
+	m_fp_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_BINARY] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_BITBYTE] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_BLEND] = UOP_FADD; // new 
@@ -1372,8 +1380,9 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_BMI2] = UOP_BYTE;
   m_fp_uop_table[XED_CATEGORY_BROADCAST] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_CALL] = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_CET] = UOP_FADD; // new 
-  m_fp_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_FADD; // new 
+  m_fp_uop_table[XED_CATEGORY_CET] = UOP_FADD; // new
+	m_fp_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_FADD; // new 
+  m_fp_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_FADD; // new
   m_fp_uop_table[XED_CATEGORY_CLWB] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_CLZERO] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_CMOV] = UOP_CMOV;
@@ -1383,6 +1392,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_CONVERT] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_DATAXFER] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_DECIMAL] = UOP_FADD;
+	m_fp_uop_table[XED_CATEGORY_ENQCMD] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_EXPAND] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_FCMOV] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_FLAGOP] = UOP_FADD;
@@ -1399,6 +1409,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
   m_fp_uop_table[XED_CATEGORY_MISC] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_MMX] = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_MPX] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
   m_fp_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_FMUL;
@@ -1409,7 +1420,8 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_PT] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_PUSH] = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD; // new 
+  m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD; // new
+	m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_RDRAND] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_RDSEED] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_RDWRFSGS] = UOP_FADD;
@@ -1434,8 +1446,10 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_VAES] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_VBMI2] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_VFMA] = UOP_FADD;
+	m_fp_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_FMUL; // new 
   m_fp_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_FMUL; // new 
-  m_fp_uop_table[XED_CATEGORY_VTX] = UOP_FADD;
+  m_fp_uop_table[XED_CATEGORY_VTX] = UOP_FADD;	
+  m_fp_uop_table[XED_CATEGORY_WAITPKG] = UOP_FADD;  // new 
   m_fp_uop_table[XED_CATEGORY_WIDENOP] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_X87_ALU] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_XOP] = UOP_FADD; // new 
@@ -1592,7 +1606,7 @@ void cpu_decoder_c::init_pin_convert(void)
 
 #endif
 
-#ifdef PIN_3_7_TRACE
+#ifdef PIN_3_11_TRACE
 // 
 const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
 	"*invalid*", /* 0*/ 
@@ -2025,50 +2039,84 @@ const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
 #endif 
 
 
-#ifdef PIN_3_7_TRACE
+#ifdef PIN_3_11_TRACE
 
 const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
-  "INVALID",
+	  "INVALID",
   "3DNOW",
+ "ADOX_ADCX",
   "AES",
   "AVX",
   "AVX2",
   "AVX2GATHER",
-  "BDW",
+  "AVX512",
+  "AVX512_4FMAPS",
+  "AVX512_4VNNIW",
+  "AVX512_BITALG",
+  "AVX512_VBMI",
+  "AVX512_VP2INTERSECT",
   "BINARY",
   "BITBYTE",
+  "BLEND",
   "BMI1",
   "BMI2",
   "BROADCAST",
   "CALL",
+  "CET",
+  "CLDEMOTE",
+  "CLFLUSHOPT",
+  "CLWB",
+  "CLZERO",
   "CMOV",
+  "COMPRESS",
   "COND_BR",
+  "CONFLICT",
   "CONVERT",
   "DATAXFER",
   "DECIMAL",
+  "ENQCMD",
+  "EXPAND",
   "FCMOV",
   "FLAGOP",
   "FMA4",
+  "GATHER",
+  "GFNI",
+  "IFMA",
   "INTERRUPT",
   "IO",
   "IOSTRINGOP",
+  "KMASK",
   "LOGICAL",
+  "LOGICAL_FP",
   "LZCNT",
   "MISC",
   "MMX",
+  "MOVDIR",
+  "MPX",
   "NOP",
   "PCLMULQDQ",
+  "PCONFIG",
+  "PKU",
   "POP",
   "PREFETCH",
+  "PREFETCHWT1",
+  "PT",
   "PUSH",
+  "RDPID",
+  "RDPRU",
   "RDRAND",
   "RDSEED",
   "RDWRFSGS",
   "RET",
   "ROTATE",
+  "SCATTER",
   "SEGOP",
   "SEMAPHORE",
+  "SETCC",
+  "SGX",
+  "SHA",
   "SHIFT",
+  "SMAP",
   "SSE",
   "STRINGOP",
   "STTNI",
@@ -2077,8 +2125,13 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "SYSTEM",
   "TBM",
   "UNCOND_BR",
+  "VAES",
+  "VBMI2",
   "VFMA",
+  "VIA_PADLOCK",
+  "VPCLMULQDQ",
   "VTX",
+  "WAITPKG",
   "WIDENOP",
   "X87_ALU",
   "XOP",

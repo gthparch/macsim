@@ -160,8 +160,8 @@ string tr_cf_names[15] = {
   "CF_ICBR"
 };
 
-string tr_opcode_names[97] = {
-  "INVALID",
+string tr_opcode_names[106] = {
+	  "INVALID",
   "3DNOW",
   "ADOX_ADCX",
   "AES",
@@ -173,6 +173,7 @@ string tr_opcode_names[97] = {
   "AVX512_4VNNIW",
   "AVX512_BITALG",
   "AVX512_VBMI",
+  "AVX512_VP2INTERSECT",
   "BINARY",
   "BITBYTE",
   "BLEND",
@@ -181,6 +182,7 @@ string tr_opcode_names[97] = {
   "BROADCAST",
   "CALL",
   "CET",
+  "CLDEMOTE",
   "CLFLUSHOPT",
   "CLWB",
   "CLZERO",
@@ -191,6 +193,7 @@ string tr_opcode_names[97] = {
   "CONVERT",
   "DATAXFER",
   "DECIMAL",
+  "ENQCMD",
   "EXPAND",
   "FCMOV",
   "FLAGOP",
@@ -207,6 +210,7 @@ string tr_opcode_names[97] = {
   "LZCNT",
   "MISC",
   "MMX",
+  "MOVDIR",
   "MPX",
   "NOP",
   "PCLMULQDQ",
@@ -218,6 +222,7 @@ string tr_opcode_names[97] = {
   "PT",
   "PUSH",
   "RDPID",
+  "RDPRU",
   "RDRAND",
   "RDSEED",
   "RDWRFSGS",
@@ -242,77 +247,10 @@ string tr_opcode_names[97] = {
   "VAES",
   "VBMI2",
   "VFMA",
+  "VIA_PADLOCK",
   "VPCLMULQDQ",
   "VTX",
-  "WIDENOP",
-  "X87_ALU",
-  "XOP",
-  "XSAVE",
-  "XSAVEOPT",
-  "TR_MUL",
-  "TR_DIV",
-  "TR_FMUL",
-  "TR_FDIV",
-  "TR_NOP",
-  "PREFETCH_NTA",
-  "PREFETCH_T0",
-  "PREFETCH_T1",
-  "PREFETCH_T2",
-};
-
-/*
-string tr_opcode_names[66] = {
-  "INVALID",
-  "3DNOW",
-  "AES",
-  "AVX",
-  "AVX2", // new
-  "AVX2GATHER", // new
-  "BDW", // new
-  "BINARY",
-  "BITBYTE",
-  "BMI1", // new
-  "BMI2", // new
-  "BROADCAST",
-  "CALL",
-  "CMOV",
-  "COND_BR",
-  "CONVERT",
-  "DATAXFER",
-  "DECIMAL",
-  "FCMOV",
-  "FLAGOP",
-  "FMA4", // new
-  "INTERRUPT",
-  "IO",
-  "IOSTRINGOP",
-  "LOGICAL",
-  "LZCNT", // new
-  "MISC",
-  "MMX",
-  "NOP",
-  "PCLMULQDQ",
-  "POP",
-  "PREFETCH",
-  "PUSH",
-  "RDRAND", // new
-  "RDSEED", // new
-  "RDWRFSGS", // new
-  "RET",
-  "ROTATE",
-  "SEGOP",
-  "SEMAPHORE",
-  "SHIFT",
-  "SSE",
-  "STRINGOP",
-  "STTNI",
-  "SYSCALL",
-  "SYSRET",
-  "SYSTEM",
-  "TBM", // new
-  "UNCOND_BR",
-  "VFMA", // new
-  "VTX",
+  "WAITPKG",
   "WIDENOP",
   "X87_ALU",
   "XOP",
@@ -328,8 +266,9 @@ string tr_opcode_names[66] = {
   "PREFETCH_T1",
   "PREFETCH_T2",
   "GPU_EN",
-};
-*/
+  "CPU_OPCODE_LAST",
+ };
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /// Function forward declaration

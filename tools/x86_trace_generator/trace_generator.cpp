@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 
 #include "pin.H"
-#include "../InstLib/time_warp.H"
+//#include "../InstLib/time_warp.H"
 #include "../InstLib/instlib.H"
 #include "control_manager.H"
 #include "trace_generator.h"
@@ -52,9 +52,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 using namespace INSTLIB;
 
-#if defined(TARGET_IA32) || defined(TARGET_IA32E)
-TIME_WARP tw;
-#endif
+//#if defined(TARGET_IA32) || defined(TARGET_IA32E)
+//TIME_WARP tw;
+//#endif
 
 #if defined(TARGET_LINUX)
 #define PINLINUX
@@ -783,34 +783,39 @@ void instrument(INS ins)
   // ----------------------------------------
   // Branch instruction - set branch type
   // ----------------------------------------
-  if (INS_IsIndirectBranchOrCall(ins) && !INS_IsRet(ins) && !INS_IsInterrupt(ins)) {
-    /**< Indirect branch */
-    if (INS_Category(ins)  == XED_CATEGORY_UNCOND_BR)
-      info->cf_type = CF_IBR;
-    else if (INS_Category(ins)  == XED_CATEGORY_COND_BR)
-      info->cf_type = CF_ICBR;
-    else if (INS_Category(ins) == XED_CATEGORY_CALL)
-      info->cf_type = CF_ICALL;
-  } 
-  else if(INS_IsDirectBranchOrCall(ins) && !INS_IsInterrupt(ins)) {
-    /**< Direct branch */
-    if (INS_Category(ins) == XED_CATEGORY_UNCOND_BR)
-      info->cf_type = CF_BR;
-    else if (INS_Category(ins)  == XED_CATEGORY_COND_BR)
-      info->cf_type = CF_CBR;
-    else if (INS_Category(ins) == XED_CATEGORY_CALL)
-      info->cf_type = CF_CALL;
-    info->branch_target = INS_DirectBranchOrCallTargetAddress(ins);
-  } 
-  else if (INS_IsRet(ins)) { 
-    info->cf_type = CF_RET;
-  } 
-  else if (INS_IsInterrupt(ins)) {
-    info->cf_type = CF_ICO;
-  }
-  else {
-    info->cf_type = NOT_CF;
-  }
+  // if (INS_IsIndirectBranchOrCall(ins) && !INS_IsRet(ins) && !INS_IsInterrupt(ins)) {
+	if (INS_IsControlFlow(ins)){ 
+		if (INS_IsIndirectControlFlow(ins) && !INS_IsRet(ins) && !INS_IsInterrupt(ins)) {
+			/**< Indirect branch */
+			if (INS_Category(ins)  == XED_CATEGORY_UNCOND_BR)
+				info->cf_type = CF_IBR;
+			else if (INS_Category(ins)  == XED_CATEGORY_COND_BR)
+				info->cf_type = CF_ICBR;
+			else if (INS_Category(ins) == XED_CATEGORY_CALL)
+				info->cf_type = CF_ICALL;
+		} 
+		// else if(INS_IsDirectBranchOrCall(ins) && !INS_IsInterrupt(ins)) {
+		else if(INS_IsDirectControlFlow(ins) && !INS_IsInterrupt(ins)) {
+			/**< Direct branch */
+			if (INS_Category(ins) == XED_CATEGORY_UNCOND_BR)
+				info->cf_type = CF_BR;
+			else if (INS_Category(ins)  == XED_CATEGORY_COND_BR)
+				info->cf_type = CF_CBR;
+			else if (INS_Category(ins) == XED_CATEGORY_CALL)
+				info->cf_type = CF_CALL;
+			// info->branch_target = INS_DirectBranchOrCallTargetAddress(ins);
+			info->branch_target = INS_DirectControlFlowTargetAddress(ins);
+		} 
+		else if (INS_IsRet(ins)) { 
+			info->cf_type = CF_RET;
+		} 
+		else if (INS_IsInterrupt(ins)) {
+			info->cf_type = CF_ICO;
+		}
+		else {
+			info->cf_type = NOT_CF;
+		}
+	}
 
 
   // ----------------------------------------
@@ -864,7 +869,8 @@ void instrument(INS ins)
   // ----------------------------------------
   // Branch instruction
   // ----------------------------------------
-  if (info->cf_type) {
+	if (INS_IsControlFlow(ins)){ 
+		//if (info->cf_type) {
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)get_target, IARG_BRANCH_TARGET_ADDR, IARG_BRANCH_TAKEN, IARG_THREAD_ID, IARG_END);
   }
 
@@ -1143,11 +1149,13 @@ void sanity_check(void)
   // check whether there has been changes in the pin XED enumerators
   // ----------------------------------------
   for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+	
     if (tr_opcode_names[ii] != CATEGORY_StringShort(ii)) {
       cout << ii << " " << tr_opcode_names[ii] << " should be  " << CATEGORY_StringShort(ii) << "\n";
       cout << "-> Changes in XED_CATEGORY!\n";
       exit(0);
     }
+		// cout << ii << " " << tr_opcode_names[ii] << " match  " << CATEGORY_StringShort(ii) << "\n";
   }
 
 
