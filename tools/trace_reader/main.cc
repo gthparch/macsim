@@ -49,6 +49,8 @@ do {                                                              \
   }                                                               \
 } while (0)
 
+#define PIN_3_7_TRACE 
+
 all_knobs_c* g_knobs;
 
 int read_trace(string trace_path, int truncate_size)
