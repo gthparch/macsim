@@ -9,6 +9,13 @@ How to generate x86 traces
   2. Otherwise - Fix trace generator module based on your needs. Then,
      pin -t trace_generator.so -- $BIN $ARGS
 
+     [1] Install Pin  (https://software.intel.com/content/www/us/en/develop/articles/pin-a-dynamic-binary-instrumentation-tool.html) 
+     [2] go to macsim/tools/x86_trace_generator directory 
+     [3] set up $PIN_ROOT the root directory of pin  and copy libzilb.a in  
+     [4] make 
+     [5] pin -t obj-intel64/trace_generator.so - $BIN $ARGS 
+
+
 
 Note
 
