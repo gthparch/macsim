@@ -1,6 +1,8 @@
 #include <sys/time.h>
 
 #include <stdint.h>
+#include <string.h>
+#include <algorithm>
 
 #include <sst_config.h>
 #include <sst/core/simulation.h>
@@ -176,22 +178,22 @@ void macsimComponent::init(unsigned int phase)
   }
 }
 
-#include <boost/tokenizer.hpp>
-int countTokens(string command_line)
-{
-  int count = 0;
-  boost::char_separator<char> sep(" ");
-  boost::tokenizer<boost::char_separator<char>> tokens(command_line, sep);
-  for (auto I = tokens.begin(), E = tokens.end(); I != E; ++I) ++count;
-  return count;
-}
-
 void macsimComponent::setup()
 {
   MSC_DEBUG("------- Setting up -------\n");
 
+  // Tokenize command line
+  vector<string> tokens;
+  auto cl = strdup(m_command_line.c_str());
+  auto token = strtok(cl, " ");
+  while (token != nullptr) {
+    tokens.push_back(token);
+    token = strtok(nullptr, " ");
+  }
+  free(cl);
+
   // Build arguments
-  char** argv = new char*[1+3+countTokens(m_command_line)];
+  char** argv = new char*[1 + 3 + tokens.size()];
 
   int argc = 0;
   argv[argc] = new char[                     4 ]; strcpy(argv[argc],                "sst"); argc++;
@@ -199,12 +201,9 @@ void macsimComponent::setup()
   argv[argc] = new char[ m_trace_file.size()+1 ]; strcpy(argv[argc], m_trace_file.c_str()); argc++;
   argv[argc] = new char[ m_output_dir.size()+1 ]; strcpy(argv[argc], m_output_dir.c_str()); argc++;
 
-  boost::char_separator<char> sep(" ");
-  boost::tokenizer<boost::char_separator<char>> tokens(m_command_line, sep);
-  for (auto I = tokens.begin(), E = tokens.end(); I != E; ++I) {
-    string command = *I;
-    argv[argc] = new char[ command.size()+1 ]; strcpy(argv[argc], command.c_str()); argc++;
-  }
+  for_each(tokens.begin(), tokens.end(), [&argc, &argv] (string const &token) {
+    argv[argc] = new char[ token.size()+1 ]; strcpy(argv[argc], token.c_str()); argc++;
+  });
 
   // Pass paramaters to simulator if applicable
   m_macsim->initialize(argc, argv);
