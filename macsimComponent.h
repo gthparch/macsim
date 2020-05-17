@@ -66,7 +66,7 @@ private:
     macsimComponent(const macsimComponent&);   // do not implement
     void operator=(const macsimComponent&); // do not implement
 
-    void configureLinks(SST::Params& params);
+    void configureLinks(SST::Params& params, TimeConverter* tc);
 
     virtual bool ticReceived(Cycle_t);
     void handleInstructionCacheEvent(SimpleMem::Request *req);
