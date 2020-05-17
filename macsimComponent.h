@@ -28,7 +28,7 @@ class macsimComponent : public SST::Component
 {
 public:
     /* SST ELI */
-    SST_ELI_REGISTER_COMPONENT(macsimComponent, "macsimComponent", "MacSim Simulator", SST_ELI_ELEMENT_VERSION(1,0,0), "A Heterogeneous Architecture Simulator", COMPONENT_CATEGORY_PROCESSOR)
+    SST_ELI_REGISTER_COMPONENT(macsimComponent, "macsimComponent", "macsimComponent", SST_ELI_ELEMENT_VERSION(1,0,0), "A Heterogeneous Architecture Simulator", COMPONENT_CATEGORY_PROCESSOR)
     SST_ELI_DOCUMENT_PARAMS(
         {"param_file", "params.in", NULL},
         {"trace_file", "trace_file_list", NULL},
