@@ -51,10 +51,6 @@ public:
         {"core%(core_id)d-ccache", "Ports connected to const cache (only for GPU core)", {}},
         {"core%(core_id)d-tcache", "Ports connected to texture cache (only for GPU core)", {}})
 
-    SST_ELI_DOCUMENT_STATISTICS()
-
-    SST_ELI_DOCUMENT_SUBCOMPONENT_SLOTS()
-
 public:
     macsimComponent(SST::ComponentId_t id, SST::Params& params);
     void init(unsigned int phase);

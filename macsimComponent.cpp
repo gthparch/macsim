@@ -315,8 +315,7 @@ bool macsimComponent::ticReceived(Cycle_t)
   else {
     if (m_operation_mode == OperationMode::SLAVE) {
       // Send a report event to another SST component upon completion
-      MacSimEvent *event = new MacSimEvent(FINISHED);
-      m_ipc_link->send(event);
+      m_ipc_link->send(new MacSimEvent(FINISHED));
     }
 
     primaryComponentOKToEndSim();
