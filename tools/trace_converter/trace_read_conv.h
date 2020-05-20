@@ -52,8 +52,10 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define MAX_TR_REG 300 // REG_LAST = 298 // need to check!!! 
-//#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
+// #define MAX_TR_REG 300 // REG_LAST = 298 // need to check!!! 
+#define MAX_TR_REG 330 // REG_LAST = 298 // need to check!!! 
+// #define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
+// #define MAX_TR_OPCDE_NAME_PIN212 GPU_OPCODE_LAST_212 
 #define REP_MOV_MEM_SIZE_MAX 4
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
 #define MAX_SRC_NUM 9
@@ -288,6 +290,13 @@ typedef enum TR_TEMP_TEMP_ENUM_ {
 } TR_TEMP_TEMP_ENUM;
 
 
+
+
+
+
+
+
+
 typedef enum CPU_OPCODE_ENUM_ {
 	XED_CATEGORY_INVALID,
   XED_CATEGORY_3DNOW,
@@ -388,8 +397,6 @@ typedef enum CPU_OPCODE_ENUM_ {
   PREFETCH_T2,
   CPU_OPCODE_LAST,
 } CPU_OPCODE_ENUM;
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Enumerator ID for temp register
 ///

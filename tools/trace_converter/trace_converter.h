@@ -27,8 +27,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef TRACE_CONVTER_H
-#define TRACE_CONVTER_H
+#ifndef TRACE_CONVERTER_H
+#define TRACE_CONVERTER_H
 
 #include "trace_read_conv.h"
 #include "global_types.h"
@@ -60,6 +60,7 @@ class trace_reader_c
     void inst_event(trace_info_a64_s* inst);
 #else 
     void inst_event(trace_info_cpu_s* inst);
+    void inst_convert(trace_info_cpu_s *inst);
 #endif 
 
     virtual void print();
@@ -67,6 +68,12 @@ class trace_reader_c
 
     void init();
     static trace_reader_c Singleton;
+
+    static char * tr_opcode_names_pin212[MAX_TR_OPCODE];
+    static char * tr_opcode_names_pin311[MAX_TR_OPCODE];
+
+    static char * tr_reg_names_pin212[MAX_TR_REG]; 
+    static char * tr_reg_names_pin311[MAX_TR_REG]; 
 
   protected:
     std::vector<trace_reader_c*> m_tracer;
@@ -88,6 +95,7 @@ class reuse_distance_c : public trace_reader_c
 #endif 
     void print();
     void reset();
+
 
   private:
     int m_self_counter;

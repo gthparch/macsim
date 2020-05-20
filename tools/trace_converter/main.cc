@@ -129,10 +129,19 @@ int read_trace(string trace_path, int truncate_size)
 	trace_info_a64_s trace_info; 
 #else 
 	trace_info_cpu_s trace_info;
+  trace_info_cpu_s new_trace; 
 #endif
 
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
-        trace_reader_c::Singleton.inst_event(&trace_info);
+        
+        std::cout<<   +(trace_info.m_opcode) << " ";
+        std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin212[trace_info.m_opcode] << "--> ";
+        trace_reader_c::Singleton.inst_convert(&trace_info); //TRACE_CONVERT 
+        std::cout<<  +(trace_info.m_opcode) << " ";
+        std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin311[trace_info.m_opcode] << std::endl;
+        
+        trace_reader_c::Singleton.inst_event(&trace_info);  
+        gzwrite(gzwtrace,&trace_info, TRACE_SIZE); 
 
 #if defined (GPU_TRACE) 
 	if (trace_info.m_is_load >=1) 
@@ -145,7 +154,7 @@ int read_trace(string trace_path, int truncate_size)
       } 
 
       /* generate multiple files of traces */ 
-      gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
+      // gzwrite(gzwtrace,trace_buffer,(byte_read * TRACE_SIZE)); 
       cur_file_inst_count  += byte_read; 
 
       if (truncate_size != 0 ) { 
