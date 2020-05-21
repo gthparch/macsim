@@ -27,6 +27,31 @@ enum OperationMode { MASTER, SLAVE }; // mode
 class macsimComponent : public SST::Component
 {
 public:
+    /* SST ELI */
+    SST_ELI_REGISTER_COMPONENT(macsimComponent, "macsimComponent", "macsimComponent", SST_ELI_ELEMENT_VERSION(1,0,0), "A Heterogeneous Architecture Simulator", COMPONENT_CATEGORY_PROCESSOR)
+    SST_ELI_DOCUMENT_PARAMS(
+        {"param_file", "params.in", NULL},
+        {"trace_file", "trace_file_list", NULL},
+        {"output_dir", "output (stats, params.out, etc.) directory", NULL},
+        {"command_line", "specify knobs, if any", NULL},
+        {"cube_connected", "Depricated", "0"},
+        {"operation_mode", "0: Master, 1: Slave", "0"},
+        {"frequency", "clock frequency", "1GHz"},
+        {"mem_size", "memory size in bytes. E.g., 1073741824 (=1024*1024*1024) for 1GB", "1073741824"},
+        {"ptx_core", "1: GPU core, 0: CPU core", "0"},
+        {"num_link", "this should match to the number of cores and/or L1 caches", "1"},
+        {"debug", "0:No debugging, 1:stdout, 2:stderr, 3:file", "0"},
+        {"debug_level", "debugging level: 0 to 9", "8"},
+        {"debug_addr", "address (in decimal) to be debugged, if not specified or specified as -1, debug output for all addresses will be printed", "-1"})
+
+    SST_ELI_DOCUMENT_PORTS(
+        {"ipc_link", "Port for Inter Processor Communication", {}},
+        {"core%(core_id)d-icache", "Ports connected to instruction cache", {}},
+        {"core%(core_id)d-dcache", "Ports connected to data cache", {}},
+        {"core%(core_id)d-ccache", "Ports connected to const cache (only for GPU core)", {}},
+        {"core%(core_id)d-tcache", "Ports connected to texture cache (only for GPU core)", {}})
+
+public:
     macsimComponent(SST::ComponentId_t id, SST::Params& params);
     void init(unsigned int phase);
     void setup();
@@ -37,7 +62,7 @@ private:
     macsimComponent(const macsimComponent&);   // do not implement
     void operator=(const macsimComponent&); // do not implement
 
-    void configureLinks(SST::Params& params);
+    void configureLinks(SST::Params& params, TimeConverter* tc);
 
     virtual bool ticReceived(Cycle_t);
     void handleInstructionCacheEvent(SimpleMem::Request *req);
