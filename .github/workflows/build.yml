@@ -1,0 +1,19 @@
+name: build CI
+
+on:
+  push:
+    branches: [ * ]
+  pull_request:
+    branches: [ * ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: default build
+      run: ./build.py
+    - name: build with dramsim
+      run: ./build.py --dramsim
