@@ -10,14 +10,20 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+
     - name: install scons
       run: sudo apt install scons
-    - name: default build
+    
+    - name: default opt build
       run: ./build.py
-    - name: build with dramsim
+    - name: default debug build
+      run: ./build.py -d
+    
+    - name: opt build with dramsim
       run: ./build.py --dramsim
+    - name: debug build with dramsim
+      run: ./build.py -d --dramsim
