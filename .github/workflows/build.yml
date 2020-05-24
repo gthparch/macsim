@@ -15,6 +15,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: install scons
+      run: sudo apt install scons
     - name: default build
       run: ./build.py
     - name: build with dramsim
