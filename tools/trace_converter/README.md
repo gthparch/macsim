@@ -1,10 +1,13 @@
 Build:
 
-Run scons to build the trace reader. You can specify an argument for the
-architecture of the trace reader you want to build. The default architecture is
+Run scons to build the trace converter. You can specify an argument for the
+architecture of the trace converter you want to build. The default architecture is
 x86. The other options are *gpu*, *a64*.
 
 $ scons arch=gpu
+
+Clean:
+$ scons --clean
 
 Running:
 
@@ -15,7 +18,7 @@ Arguments
 
 Example:
 ```sh
-trace_reader ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
+trace_converter ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
 ```
 sliced traces are:
 

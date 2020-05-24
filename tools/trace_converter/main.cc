@@ -134,11 +134,11 @@ int read_trace(string trace_path, int truncate_size)
 
         memcpy(&trace_info, &trace_buffer[jj*TRACE_SIZE], TRACE_SIZE);
         
-        std::cout<<   +(trace_info.m_opcode) << " ";
-        std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin212[trace_info.m_opcode] << "--> ";
+        //std::cout<<   +(trace_info.m_opcode) << " ";
+        //std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin212[trace_info.m_opcode] << "--> ";
         trace_reader_c::Singleton.inst_convert(&trace_info); //TRACE_CONVERT 
-        std::cout<<  +(trace_info.m_opcode) << " ";
-        std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin311[trace_info.m_opcode] << std::endl;
+        //std::cout<<  +(trace_info.m_opcode) << " ";
+        //std::cout<<trace_reader_c::Singleton.tr_opcode_names_pin311[trace_info.m_opcode] << std::endl;
         
         trace_reader_c::Singleton.inst_event(&trace_info);  
         gzwrite(gzwtrace,&trace_info, TRACE_SIZE); 
