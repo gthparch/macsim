@@ -750,7 +750,6 @@ const char* trace_read_c::g_tr_reg_names[MAX_TR_REG] = {
 };
 
 #else 
-
 const char* trace_read_c::g_tr_reg_names[MAX_TR_REG] = {
   "*invalid*",
   "*none*",
@@ -938,13 +937,12 @@ const char* trace_read_c::g_tr_reg_names[MAX_TR_REG] = {
   "r_status_flags",
   "rdf",
 };
-
 #endif 
 
 
 #ifdef PIN_3_7_TRACE
 
-const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+const char* trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "INVALID",
   "3DNOW",
   "ADOX_ADCX",

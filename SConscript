@@ -73,6 +73,9 @@ if flags['qsim'] == '1':
   env['CPPPATH']    += [os.environ['XED_HOME'] + "/include"]
   env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib", os.environ['XED_HOME'] + "/lib"]
 
+if flags['pin_3_7_trace'] == '1':
+  env['CPPDEFINES'] += ['PIN_3_7_TRACE']
+
 #########################################################################################
 # IRIS
 #########################################################################################
