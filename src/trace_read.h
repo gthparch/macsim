@@ -53,7 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define MAX_TR_REG 300 // REG_LAST = 298 // need to check!!! 
+#define MAX_TR_REG 320 // REG_LAST = 298 // need to check!!! 
 //#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define REP_MOV_MEM_SIZE_MAX 4
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
@@ -387,6 +387,7 @@ typedef enum CPU_OPCODE_ENUM_ {
   PREFETCH_T0,
   PREFETCH_T1,
   PREFETCH_T2,
+  GPU_EN, //added this
   CPU_OPCODE_LAST,
 } CPU_OPCODE_ENUM;
 
