@@ -1183,7 +1183,7 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
   g_inst_print_count[tid]++;
 
 
-  (*file) << "*** begin of the data strcture *** " <<endl;
+  (*file) << "*** begin of the data structure *** " <<endl;
 	(*file) << "t_info->uop_opcode_num " << (uint32_t) t_info->opcode  << endl;
   (*file) << "t_info->uop_opcode " <<tr_opcode_names[(uint32_t) t_info->opcode]  << endl;
   (*file) << "t_info->num_read_regs: " << dec <<  (uint32_t) t_info->num_read_regs << endl;
@@ -1213,7 +1213,7 @@ void write_inst_to_file(ofstream* file, Inst_info *t_info)
   (*file) << "t_info->branch_target: " << hex << (uint64_t) t_info->branch_target << endl;
   (*file) << "t_info->actually_taken: " << dec << (uint32_t) t_info->actually_taken << endl;
   (*file) << "t_info->write_flg: " << dec << (uint32_t) t_info->write_flg << endl;
-  (*file) << "*** end of the data strcture *** " << endl << endl;
+  (*file) << "*** end of the data structure *** " << endl << endl;
 }
 
 

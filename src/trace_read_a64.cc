@@ -1519,7 +1519,7 @@ void a64_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
 
   trace_info_a64_s *t_info = static_cast<trace_info_a64_s *>(trace_info);
  
-  *m_dprint_output << "*** begin of the data strcture *** " << endl;
+  *m_dprint_output << "*** begin of the data structure *** " << endl;
   *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
   *m_dprint_output << "uop_opcode " <<a64_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
   *m_dprint_output << "num_read_regs: " << hex <<  (uint32_t) t_info->m_num_read_regs << endl;
@@ -1541,14 +1541,14 @@ void a64_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
   *m_dprint_output << "mem_read_size: " << hex << (uint32_t) t_info->m_mem_read_size << endl;
   *m_dprint_output << "mem_write_size: " << hex << (uint32_t) t_info->m_mem_write_size << endl;
   *m_dprint_output << "is_fp: " << (uint32_t) t_info->m_is_fp << endl;
-  *m_dprint_output << "ld_vaddr1: " << hex << (uint32_t) t_info->m_ld_vaddr1 << endl;
-  *m_dprint_output << "ld_vaddr2: " << hex << (uint32_t) t_info->m_ld_vaddr2 << endl;
-  *m_dprint_output << "st_vaddr: " << hex << (uint32_t) t_info->m_st_vaddr << endl;
-  *m_dprint_output << "instruction_addr: " << hex << (uint32_t)t_info->m_instruction_addr << endl;
-  *m_dprint_output << "branch_target: " << hex << (uint32_t)t_info->m_branch_target << endl;
+  *m_dprint_output << "ld_vaddr1: " << hex << (uint64_t) t_info->m_ld_vaddr1 << endl;
+  *m_dprint_output << "ld_vaddr2: " << hex << (uint64_t) t_info->m_ld_vaddr2 << endl;
+  *m_dprint_output << "st_vaddr: " << hex << (uint64_t) t_info->m_st_vaddr << endl;
+  *m_dprint_output << "instruction_addr: " << hex << (uint64_t)t_info->m_instruction_addr << endl;
+  *m_dprint_output << "branch_target: " << hex << (uint64_t)t_info->m_branch_target << endl;
   *m_dprint_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
   *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
-  *m_dprint_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
-  *m_dprint_output << "*** end of the data strcture *** " << endl << endl;
+  *m_dprint_output << "size: " << hex << (uint64_t) t_info->m_size << endl;
+  *m_dprint_output << "*** end of the data structure *** " << endl << endl;
 
 }
