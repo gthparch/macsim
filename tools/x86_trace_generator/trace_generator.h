@@ -147,7 +147,7 @@ enum CF_TYPE_enum {
 } CF_TYPE;
 
 
-string tr_cf_names[15] = {
+string tr_cf_names[10] = {
   "NOT_CF",   // not a control flow instruction
   "CF_BR",    // an unconditional branch
   "CF_CBR",   // a conditional branch
