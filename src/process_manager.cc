@@ -508,7 +508,7 @@ void process_manager_c::setup_process(process_s* process)
   if (!(trace_config_file >> trace_type)) 
     ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
-  printf("trace:%s is opended \n", trace_info_file_name.c_str()); 
+  printf("trace:%s is opened \n", trace_info_file_name.c_str()); 
 
   int trace_ver = -1;
   if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
