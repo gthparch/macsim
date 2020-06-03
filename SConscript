@@ -328,7 +328,7 @@ env.Program(
 #########################################################################################
 if GetOption('clean'):
   os.system('rm -f ../bin/macsim')
-  os.system('rm -f ../bin/NULL')
-  os.system('rm -rf ../bin/*.out')
-  os.system('rm -rf ../bin/*.out.*')
-  os.system('rm -rf ../bin/*.log')
+  # os.system('rm -f ../bin/NULL')
+  # os.system('rm -rf ../bin/*.out')
+  # os.system('rm -rf ../bin/*.out.*')
+  # os.system('rm -rf ../bin/*.log')
