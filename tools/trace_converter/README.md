@@ -1,3 +1,7 @@
+Note:
+
+This tool is only for converting old PIN traces to new PIN 3.13 Traces
+
 Build:
 
 Run scons to build the trace converter. You can specify an argument for the
@@ -18,14 +22,14 @@ Arguments
 
 Example:
 ```sh
-trace_converter ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
+trace_converter ../../sst-unit-test/traces/x86/mergesort.txt 1000
 ```
-sliced traces are:
+sliced and converted traces are:
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s0_0.raw
+../../sst-unit-test/traces/x86/mergesort_s0_0.raw
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s1_0.raw
+../../sst-unit-test/traces/x86/mergesort_s1_0.raw
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s2_0.raw
+../../sst-unit-test/traces/x86/mergesort_s2_0.raw
 
 etc. 
