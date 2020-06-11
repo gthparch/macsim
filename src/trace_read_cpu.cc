@@ -1250,7 +1250,6 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
  */
 
 
-#ifdef PIN_3_7_TRACE
 
 void cpu_decoder_c::init_pin_convert(void)
 {
@@ -1266,7 +1265,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_AVX512_4VNNIW] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new
-  //m_int_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
+  m_int_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_BINARY] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_BITBYTE] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_BLEND] = UOP_IADD; // new 
@@ -1275,7 +1274,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_BROADCAST] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_CALL] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_CET] = UOP_IADD; // new
-	//m_int_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_IADD; // new
+	m_int_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_IADD; // new
 	m_int_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_CLWB] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_CLZERO] = UOP_IADD; // new 
@@ -1286,7 +1285,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_CONVERT] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_DATAXFER] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_DECIMAL] = UOP_IADD;
-	//m_int_uop_table[XED_CATEGORY_ENQCMD] = UOP_IADD;
+	m_int_uop_table[XED_CATEGORY_ENQCMD] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_EXPAND] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_FCMOV] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_FLAGOP] = UOP_IADD;
@@ -1303,7 +1302,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
   m_int_uop_table[XED_CATEGORY_MISC] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_MMX] = UOP_FADD;
-  //m_int_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD;
+  m_int_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_MPX] = UOP_FADD; // new 
   m_int_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
   m_int_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_IMUL;
@@ -1315,7 +1314,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_PT] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_PUSH] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD; // new
-	//m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD; // new 
+	m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_RDRAND] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_RDSEED] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_RDWRFSGS] = UOP_IADD;
@@ -1340,10 +1339,10 @@ void cpu_decoder_c::init_pin_convert(void)
   m_int_uop_table[XED_CATEGORY_VAES] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_VBMI2] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_VFMA] = UOP_IADD;
-	//m_int_uop_table[XED_CATEGORY_PADLOCK] = UOP_IMUL; // new 
+	m_int_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_IMUL; // new 
   m_int_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_IMUL; // new 
   m_int_uop_table[XED_CATEGORY_VTX] = UOP_IADD;
-	//m_int_uop_table[XED_CATEGORY_WAITPKG] = UOP_IADD; // new 
+	m_int_uop_table[XED_CATEGORY_WAITPKG] = UOP_IADD; // new 
   m_int_uop_table[XED_CATEGORY_WIDENOP] = UOP_IADD;
   m_int_uop_table[XED_CATEGORY_X87_ALU] = UOP_FADD;
   m_int_uop_table[XED_CATEGORY_XOP] = UOP_IADD; // new 
@@ -1372,7 +1371,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_AVX512_4VNNIW] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD; // new
-	//m_fp_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
+	m_fp_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_BINARY] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_BITBYTE] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_BLEND] = UOP_FADD; // new 
@@ -1381,7 +1380,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_BROADCAST] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_CALL] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_CET] = UOP_FADD; // new
-	//m_fp_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_FADD; // new 
+	m_fp_uop_table[XED_CATEGORY_CLDEMOTE] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_CLFLUSHOPT] = UOP_FADD; // new
   m_fp_uop_table[XED_CATEGORY_CLWB] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_CLZERO] = UOP_FADD; // new 
@@ -1392,7 +1391,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_CONVERT] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_DATAXFER] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_DECIMAL] = UOP_FADD;
-	//m_fp_uop_table[XED_CATEGORY_ENQCMD] = UOP_FADD; // new 
+	m_fp_uop_table[XED_CATEGORY_ENQCMD] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_EXPAND] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_FCMOV] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_FLAGOP] = UOP_FADD;
@@ -1409,7 +1408,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
   m_fp_uop_table[XED_CATEGORY_MISC] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_MMX] = UOP_FADD;
-  //m_fp_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD; // new 
+  m_fp_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_MPX] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
   m_fp_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_FMUL;
@@ -1421,7 +1420,7 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_PT] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_PUSH] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD; // new
-	//m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD; // new 
+	m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_RDRAND] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_RDSEED] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_RDWRFSGS] = UOP_FADD;
@@ -1446,10 +1445,10 @@ void cpu_decoder_c::init_pin_convert(void)
   m_fp_uop_table[XED_CATEGORY_VAES] = UOP_FADD; // new 
   m_fp_uop_table[XED_CATEGORY_VBMI2] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_VFMA] = UOP_FADD;
-	//m_fp_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_FMUL; // new 
+	m_fp_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_FMUL; // new 
   m_fp_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_FMUL; // new 
   m_fp_uop_table[XED_CATEGORY_VTX] = UOP_FADD;	
-  //m_fp_uop_table[XED_CATEGORY_WAITPKG] = UOP_FADD;  // new 
+  m_fp_uop_table[XED_CATEGORY_WAITPKG] = UOP_FADD;  // new 
   m_fp_uop_table[XED_CATEGORY_WIDENOP] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_X87_ALU] = UOP_FADD;
   m_fp_uop_table[XED_CATEGORY_XOP] = UOP_FADD; // new 
@@ -1468,146 +1467,147 @@ void cpu_decoder_c::init_pin_convert(void)
 
 }
 
-#else
 
-void cpu_decoder_c::init_pin_convert(void)
-{
-  m_int_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
-  m_int_uop_table[XED_CATEGORY_3DNOW]       = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_AES]         = UOP_IMUL;
-  m_int_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
-  m_int_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
-  m_int_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
-  m_int_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
-  m_int_uop_table[XED_CATEGORY_BINARY]      = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
-  m_int_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
-  m_int_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
-  m_int_uop_table[XED_CATEGORY_BROADCAST]   = UOP_IADD; // tocheck
-  m_int_uop_table[XED_CATEGORY_CALL]        = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
-  m_int_uop_table[XED_CATEGORY_COND_BR]     = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_CONVERT]     = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_DATAXFER]    = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_DECIMAL]     = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
-  m_int_uop_table[XED_CATEGORY_FLAGOP]      = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_IO]          = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_IMUL;
-  m_int_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
-  m_int_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
-  m_int_uop_table[XED_CATEGORY_MISC]        = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
-  m_int_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
-  m_int_uop_table[XED_CATEGORY_PCLMULQDQ]   = UOP_IMUL;
-  m_int_uop_table[XED_CATEGORY_POP]         = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_PREFETCH]    = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_PUSH]        = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_RET]         = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
-  m_int_uop_table[XED_CATEGORY_SEGOP]       = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_SEMAPHORE]   = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_SHIFT]       = UOP_SHIFT;
-  m_int_uop_table[XED_CATEGORY_SSE]         = UOP_FADD;
-  m_int_uop_table[XED_CATEGORY_STRINGOP]    = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_STTNI]       = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_SYSCALL]     = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_SYSRET]      = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_SYSTEM]      = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
-  m_int_uop_table[XED_CATEGORY_VTX]         = UOP_IADD;
-  m_int_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
-  m_int_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
-  m_int_uop_table[XED_CATEGORY_XSAVE]       = UOP_IMUL;
-  m_int_uop_table[XED_CATEGORY_XSAVEOPT]    = UOP_IMUL;
-  m_int_uop_table[TR_MUL]                   = UOP_IMUL;
-  m_int_uop_table[TR_DIV]                   = UOP_IMUL;
-  m_int_uop_table[TR_FMUL]                  = UOP_FMUL;
-  m_int_uop_table[TR_FDIV]                  = UOP_FDIV;
-  m_int_uop_table[TR_NOP]                   = UOP_NOP;
-  m_int_uop_table[PREFETCH_NTA]             = UOP_IADD;
-  m_int_uop_table[PREFETCH_T0]              = UOP_IADD;
-  m_int_uop_table[PREFETCH_T1]              = UOP_IADD;
-  m_int_uop_table[PREFETCH_T2]              = UOP_IADD;
+/*
+* The following pin_convert is from older PIN. It has been commented out.
+* It can be safely deleted
+*/
+// void cpu_decoder_c::init_pin_convert(void)
+// {
+//   m_int_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
+//   m_int_uop_table[XED_CATEGORY_3DNOW]       = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_AES]         = UOP_IMUL;
+//   m_int_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
+//   m_int_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
+//   m_int_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
+//   m_int_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
+//   m_int_uop_table[XED_CATEGORY_BINARY]      = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
+//   m_int_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
+//   m_int_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
+//   m_int_uop_table[XED_CATEGORY_BROADCAST]   = UOP_IADD; // tocheck
+//   m_int_uop_table[XED_CATEGORY_CALL]        = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
+//   m_int_uop_table[XED_CATEGORY_COND_BR]     = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_CONVERT]     = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_DATAXFER]    = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_DECIMAL]     = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
+//   m_int_uop_table[XED_CATEGORY_FLAGOP]      = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_IO]          = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_IMUL;
+//   m_int_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
+//   m_int_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
+//   m_int_uop_table[XED_CATEGORY_MISC]        = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
+//   m_int_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
+//   m_int_uop_table[XED_CATEGORY_PCLMULQDQ]   = UOP_IMUL;
+//   m_int_uop_table[XED_CATEGORY_POP]         = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_PREFETCH]    = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_PUSH]        = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_RET]         = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
+//   m_int_uop_table[XED_CATEGORY_SEGOP]       = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_SEMAPHORE]   = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_SHIFT]       = UOP_SHIFT;
+//   m_int_uop_table[XED_CATEGORY_SSE]         = UOP_FADD;
+//   m_int_uop_table[XED_CATEGORY_STRINGOP]    = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_STTNI]       = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_SYSCALL]     = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_SYSRET]      = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_SYSTEM]      = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
+//   m_int_uop_table[XED_CATEGORY_VTX]         = UOP_IADD;
+//   m_int_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
+//   m_int_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
+//   m_int_uop_table[XED_CATEGORY_XSAVE]       = UOP_IMUL;
+//   m_int_uop_table[XED_CATEGORY_XSAVEOPT]    = UOP_IMUL;
+//   m_int_uop_table[TR_MUL]                   = UOP_IMUL;
+//   m_int_uop_table[TR_DIV]                   = UOP_IMUL;
+//   m_int_uop_table[TR_FMUL]                  = UOP_FMUL;
+//   m_int_uop_table[TR_FDIV]                  = UOP_FDIV;
+//   m_int_uop_table[TR_NOP]                   = UOP_NOP;
+//   m_int_uop_table[PREFETCH_NTA]             = UOP_IADD;
+//   m_int_uop_table[PREFETCH_T0]              = UOP_IADD;
+//   m_int_uop_table[PREFETCH_T1]              = UOP_IADD;
+//   m_int_uop_table[PREFETCH_T2]              = UOP_IADD;
 
 
-  m_fp_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
-  m_fp_uop_table[XED_CATEGORY_3DNOW]       = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_AES]         = UOP_FMUL;
-  m_fp_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
-  m_fp_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
-  m_fp_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
-  m_fp_uop_table[XED_CATEGORY_BINARY]      = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
-  m_fp_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
-  m_fp_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
-  m_fp_uop_table[XED_CATEGORY_BROADCAST]   = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_CALL]        = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
-  m_fp_uop_table[XED_CATEGORY_COND_BR]     = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_CONVERT]     = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_DATAXFER]    = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_DECIMAL]     = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_FLAGOP]      = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_IO]          = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_FMUL;
-  m_fp_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
-  m_fp_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
-  m_fp_uop_table[XED_CATEGORY_MISC]        = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
-  m_fp_uop_table[XED_CATEGORY_PCLMULQDQ]   = UOP_FMUL;
-  m_fp_uop_table[XED_CATEGORY_POP]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_PREFETCH]    = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_PUSH]        = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_RET]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
-  m_fp_uop_table[XED_CATEGORY_SEGOP]       = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_SEMAPHORE]   = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_SHIFT]       = UOP_SHIFT;
-  m_fp_uop_table[XED_CATEGORY_SSE]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_STRINGOP]    = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_STTNI]       = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_SYSCALL]     = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_SYSRET]      = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_SYSTEM]      = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
-  m_fp_uop_table[XED_CATEGORY_VTX]         = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
-  m_fp_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
-  m_fp_uop_table[XED_CATEGORY_XSAVE]       = UOP_FMUL;
-  m_fp_uop_table[XED_CATEGORY_XSAVEOPT]    = UOP_FMUL;
-  m_fp_uop_table[TR_MUL]                   = UOP_IMUL;
-  m_fp_uop_table[TR_DIV]                   = UOP_IMUL;
-  m_fp_uop_table[TR_FMUL]                  = UOP_FMUL;
-  m_fp_uop_table[TR_FDIV]                  = UOP_FDIV;
-  m_fp_uop_table[TR_NOP]                   = UOP_NOP;
-  m_fp_uop_table[PREFETCH_NTA]             = UOP_FADD;
-  m_fp_uop_table[PREFETCH_T0]              = UOP_FADD;
-  m_fp_uop_table[PREFETCH_T1]              = UOP_FADD;
-  m_fp_uop_table[PREFETCH_T2]              = UOP_FADD;
-}
+//   m_fp_uop_table[XED_CATEGORY_INVALID]     = UOP_INV;
+//   m_fp_uop_table[XED_CATEGORY_3DNOW]       = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_AES]         = UOP_FMUL;
+//   m_fp_uop_table[XED_CATEGORY_AVX]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_AVX2]        = UOP_FADD; // new
+//   m_fp_uop_table[XED_CATEGORY_AVX2GATHER]  = UOP_FADD; // new
+//   m_fp_uop_table[XED_CATEGORY_BDW]         = UOP_FADD; // new
+//   m_fp_uop_table[XED_CATEGORY_BINARY]      = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_BITBYTE]     = UOP_BYTE;
+//   m_fp_uop_table[XED_CATEGORY_BMI1]        = UOP_BYTE; // new
+//   m_fp_uop_table[XED_CATEGORY_BMI2]        = UOP_BYTE; // new
+//   m_fp_uop_table[XED_CATEGORY_BROADCAST]   = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_CALL]        = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_CMOV]        = UOP_CMOV;
+//   m_fp_uop_table[XED_CATEGORY_COND_BR]     = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_CONVERT]     = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_DATAXFER]    = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_DECIMAL]     = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_FCMOV]       = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_FLAGOP]      = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_FMA4]        = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_INTERRUPT]   = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_IO]          = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_IOSTRINGOP]  = UOP_FMUL;
+//   m_fp_uop_table[XED_CATEGORY_LOGICAL]     = UOP_LOGIC;
+//   m_fp_uop_table[XED_CATEGORY_LZCNT]       = UOP_LOGIC; // new
+//   m_fp_uop_table[XED_CATEGORY_MISC]        = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_MMX]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_NOP]         = UOP_NOP;
+//   m_fp_uop_table[XED_CATEGORY_PCLMULQDQ]   = UOP_FMUL;
+//   m_fp_uop_table[XED_CATEGORY_POP]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_PREFETCH]    = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_PUSH]        = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_RDRAND]      = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_RDSEED]      = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_RDWRFSGS]    = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_RET]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_ROTATE]      = UOP_SHIFT;
+//   m_fp_uop_table[XED_CATEGORY_SEGOP]       = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_SEMAPHORE]   = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_SHIFT]       = UOP_SHIFT;
+//   m_fp_uop_table[XED_CATEGORY_SSE]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_STRINGOP]    = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_STTNI]       = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_SYSCALL]     = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_SYSRET]      = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_SYSTEM]      = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_TBM]         = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_UNCOND_BR]   = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_VFMA]        = UOP_IADD; // new
+//   m_fp_uop_table[XED_CATEGORY_VTX]         = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_WIDENOP]     = UOP_NOP;
+//   m_fp_uop_table[XED_CATEGORY_X87_ALU]     = UOP_FADD;
+//   m_fp_uop_table[XED_CATEGORY_XSAVE]       = UOP_FMUL;
+//   m_fp_uop_table[XED_CATEGORY_XSAVEOPT]    = UOP_FMUL;
+//   m_fp_uop_table[TR_MUL]                   = UOP_IMUL;
+//   m_fp_uop_table[TR_DIV]                   = UOP_IMUL;
+//   m_fp_uop_table[TR_FMUL]                  = UOP_FMUL;
+//   m_fp_uop_table[TR_FDIV]                  = UOP_FDIV;
+//   m_fp_uop_table[TR_NOP]                   = UOP_NOP;
+//   m_fp_uop_table[PREFETCH_NTA]             = UOP_FADD;
+//   m_fp_uop_table[PREFETCH_T0]              = UOP_FADD;
+//   m_fp_uop_table[PREFETCH_T1]              = UOP_FADD;
+//   m_fp_uop_table[PREFETCH_T2]              = UOP_FADD;
+// }
 
-#endif
 
-#ifdef PIN_3_7_TRACE
-// 
+//
 const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
 	"*invalid*", /* 0*/ 
    "*none*",
@@ -1845,206 +1845,292 @@ const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
    "tr5",
    "tr6",
    "tr7",
+   "r_status_flags",
+   "rdf",
+   "seg_gs_base",
+   "seg_fs_base",
+   "inst_g0",
+   "inst_g1",
+   "inst_g2",
+   "inst_g3",
+   "inst_g4",
+   "inst_g5",
+   "inst_g6",
+   "inst_g7",
+   "inst_g8",
+   "inst_g9",
+   "inst_g10",
+   "inst_g11",
+   "inst_g12",
+   "inst_g13",
+   "inst_g14",
+   "inst_g15",
+   "inst_g16",
+   "inst_g17",
+   "inst_g18",
+   "inst_g19",
+   "inst_g20",
+   "inst_g21",
+   "inst_g22",
+   "inst_g23",
+   "inst_g24",
+   "inst_g25",
+   "inst_g26",
+   "inst_g27",
+   "inst_g28",
+   "inst_g29",
+   "buf_base0",
+   "buf_base1",
+   "buf_base2",
+   "buf_base3",
+   "buf_base4",
+   "buf_base5",
+   "buf_base6",
+   "buf_base7",
+   "buf_base8",
+   "buf_base9",
+   "buf_end0",
+   "buf_end1",
+   "buf_end2",
+   "buf_end3",
+   "buf_end4",
+   "buf_end5",
+   "buf_end6",
+   "buf_end7",
+   "buf_end8",
+   "buf_end9",
+   "inst_g0d",
+   "inst_g1d",
+   "inst_g2d",
+   "inst_g3d",
+   "inst_g4d",
+   "inst_g5d",
+   "inst_g6d",
+   "inst_g7d",
+   "inst_g8d",
+   "inst_g9d",
+   "inst_g10d",
+   "inst_g11d",
+   "inst_g12d",
+   "inst_g13d",
+   "inst_g14d",
+   "inst_g15d",
+   "inst_g16d",
+   "inst_g17d",
+   "inst_g18d",
+   "inst_g19d",
+   "inst_g20d",
+   "inst_g21d",
+   "inst_g22d",
+   "inst_g23d",
+   "inst_g24d",
+   "inst_g25d",
+   "inst_g26d",
+   "inst_g27d",
+   "inst_g28d",
+   "inst_g29d",
+   "x87",
 };
 
-#else
-const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
-  "*invalid*",
-  "*none*",
-  "*imm8*",
-  "*imm*",
-  "*imm32*",
-  "*mem*",
-  "*mem*",
-  "*mem*",
-  "*off*",
-  "*off*",
-  "*off*",
-  "*modx*",
-  "rdi",
-  "rsi",
-  "rbp",
-  "rsp",
-  "rbx",
-  "rdx",
-  "rcx",
-  "rax",
-  "r8",
-  "r9",
-  "r10",
-  "r11",
-  "r12",
-  "r13",
-  "r14",
-  "r15",
-  "cs",
-  "ss",
-  "ds",
-  "es",
-  "fs",
-  "gs",
-  "rflags",
-  "rip",
-  "al",
-  "ah",
-  "ax",
-  "cl",
-  "ch",
-  "cx",
-  "dl",
-  "dh",
-  "dx",
-  "bl",
-  "bh",
-  "bx",
-  "bp",
-  "si",
-  "di",
-  "sp",
-  "flags",
-  "ip",
-  "edi",
-  "dil",
-  "esi",
-  "sil",
-  "ebp",
-  "bpl",
-  "esp",
-  "spl",
-  "ebx",
-  "edx",
-  "ecx",
-  "eax",
-  "eflags",
-  "eip",
-  "r8b",
-  "r8w",
-  "r8d",
-  "r9b",
-  "r9w",
-  "r9d",
-  "r10b",
-  "r10w",
-  "r10d",
-  "r11b",
-  "r11w",
-  "r11d",
-  "r12b",
-  "r12w",
-  "r12d",
-  "r13b",
-  "r13w",
-  "r13d",
-  "r14b",
-  "r14w",
-  "r14d",
-  "r15b",
-  "r15w",
-  "r15d",
-  "mm0",
-  "mm1",
-  "mm2",
-  "mm3",
-  "mm4",
-  "mm5",
-  "mm6",
-  "mm7",
-  "emm0",
-  "emm1",
-  "emm2",
-  "emm3",
-  "emm4",
-  "emm5",
-  "emm6",
-  "emm7",
-  "mxt",
-  "x87", // new
-  "xmm0",
-  "xmm1",
-  "xmm2",
-  "xmm3",
-  "xmm4",
-  "xmm5",
-  "xmm6",
-  "xmm7",
-  "xmm8",
-  "xmm9",
-  "xmm10",
-  "xmm11",
-  "xmm12",
-  "xmm13",
-  "xmm14",
-  "xmm15",
-  "ymm0",
-  "ymm1",
-  "ymm2",
-  "ymm3",
-  "ymm4",
-  "ymm5",
-  "ymm6",
-  "ymm7",
-  "ymm8",
-  "ymm9",
-  "ymm10",
-  "ymm11",
-  "ymm12",
-  "ymm13",
-  "ymm14",
-  "ymm15",
-  "mxcsr",
-  "mxcsrmask",
-  "orig_rax",
-  "dr0",
-  "dr1",
-  "dr2",
-  "dr3",
-  "dr4",
-  "dr5",
-  "dr6",
-  "dr7",
-  "cr0",
-  "cr1",
-  "cr2",
-  "cr3",
-  "cr4",
-  "tssr",
-  "ldtr",
-  "tr0",
-  "tr1",
-  "tr2",
-  "tr3",
-  "tr4",
-  "tr5",
-  "fpcw",
-  "fpsw",
-  "fptag",
-  "fpip_off",
-  "fpip_sel",
-  "fpopcode",
-  "fpdp_off",
-  "fpdp_sel",
-  "fptag_full",
-  "st0",
-  "st1",
-  "st2",
-  "st3",
-  "st4",
-  "st5",
-  "st6",
-  "st7",
-  "r_status_flags",
-  "rdf",
-};
+/*
+* The following reg names are from older PIN. they have been commented out.
+* they can be safely deleted.
+*/
+// const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
+//   "*invalid*",
+//   "*none*",
+//   "*imm8*",
+//   "*imm*",
+//   "*imm32*",
+//   "*mem*",
+//   "*mem*",
+//   "*mem*",
+//   "*off*",
+//   "*off*",
+//   "*off*",
+//   "*modx*",
+//   "rdi",
+//   "rsi",
+//   "rbp",
+//   "rsp",
+//   "rbx",
+//   "rdx",
+//   "rcx",
+//   "rax",
+//   "r8",
+//   "r9",
+//   "r10",
+//   "r11",
+//   "r12",
+//   "r13",
+//   "r14",
+//   "r15",
+//   "cs",
+//   "ss",
+//   "ds",
+//   "es",
+//   "fs",
+//   "gs",
+//   "rflags",
+//   "rip",
+//   "al",
+//   "ah",
+//   "ax",
+//   "cl",
+//   "ch",
+//   "cx",
+//   "dl",
+//   "dh",
+//   "dx",
+//   "bl",
+//   "bh",
+//   "bx",
+//   "bp",
+//   "si",
+//   "di",
+//   "sp",
+//   "flags",
+//   "ip",
+//   "edi",
+//   "dil",
+//   "esi",
+//   "sil",
+//   "ebp",
+//   "bpl",
+//   "esp",
+//   "spl",
+//   "ebx",
+//   "edx",
+//   "ecx",
+//   "eax",
+//   "eflags",
+//   "eip",
+//   "r8b",
+//   "r8w",
+//   "r8d",
+//   "r9b",
+//   "r9w",
+//   "r9d",
+//   "r10b",
+//   "r10w",
+//   "r10d",
+//   "r11b",
+//   "r11w",
+//   "r11d",
+//   "r12b",
+//   "r12w",
+//   "r12d",
+//   "r13b",
+//   "r13w",
+//   "r13d",
+//   "r14b",
+//   "r14w",
+//   "r14d",
+//   "r15b",
+//   "r15w",
+//   "r15d",
+//   "mm0",
+//   "mm1",
+//   "mm2",
+//   "mm3",
+//   "mm4",
+//   "mm5",
+//   "mm6",
+//   "mm7",
+//   "emm0",
+//   "emm1",
+//   "emm2",
+//   "emm3",
+//   "emm4",
+//   "emm5",
+//   "emm6",
+//   "emm7",
+//   "mxt",
+//   "x87", // new
+//   "xmm0",
+//   "xmm1",
+//   "xmm2",
+//   "xmm3",
+//   "xmm4",
+//   "xmm5",
+//   "xmm6",
+//   "xmm7",
+//   "xmm8",
+//   "xmm9",
+//   "xmm10",
+//   "xmm11",
+//   "xmm12",
+//   "xmm13",
+//   "xmm14",
+//   "xmm15",
+//   "ymm0",
+//   "ymm1",
+//   "ymm2",
+//   "ymm3",
+//   "ymm4",
+//   "ymm5",
+//   "ymm6",
+//   "ymm7",
+//   "ymm8",
+//   "ymm9",
+//   "ymm10",
+//   "ymm11",
+//   "ymm12",
+//   "ymm13",
+//   "ymm14",
+//   "ymm15",
+//   "mxcsr",
+//   "mxcsrmask",
+//   "orig_rax",
+//   "dr0",
+//   "dr1",
+//   "dr2",
+//   "dr3",
+//   "dr4",
+//   "dr5",
+//   "dr6",
+//   "dr7",
+//   "cr0",
+//   "cr1",
+//   "cr2",
+//   "cr3",
+//   "cr4",
+//   "tssr",
+//   "ldtr",
+//   "tr0",
+//   "tr1",
+//   "tr2",
+//   "tr3",
+//   "tr4",
+//   "tr5",
+//   "fpcw",
+//   "fpsw",
+//   "fptag",
+//   "fpip_off",
+//   "fpip_sel",
+//   "fpopcode",
+//   "fpdp_off",
+//   "fpdp_sel",
+//   "fptag_full",
+//   "st0",
+//   "st1",
+//   "st2",
+//   "st3",
+//   "st4",
+//   "st5",
+//   "st6",
+//   "st7",
+//   "r_status_flags",
+//   "rdf",
+// };
 
-#endif 
 
 
-#ifdef PIN_3_7_TRACE
 
 const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
-	  "INVALID",
+  "INVALID",
   "3DNOW",
- "ADOX_ADCX",
+  "ADOX_ADCX",
   "AES",
   "AVX",
   "AVX2",
@@ -2147,110 +2233,113 @@ const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "PREFETCH_T1",
   "PREFETCH_T2",
   "GPU_EN",
+  "CPU_OPCODE_LAST",
 };
 
-#else
-const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
-	  "INVALID",
-  "3DNOW",
-  "ADOX_ADCX",
-  "AES",
-  "AVX",
-  "AVX2",
-  "AVX2GATHER",
-  "AVX512",
-  "AVX512_4FMAPS",
-  "AVX512_4VNNIW",
-  "AVX512_BITALG",
-  "AVX512_VBMI",
-  "BINARY",
-  "BITBYTE",
-  "BLEND",
-  "BMI1",
-  "BMI2",
-  "BROADCAST",
-  "CALL",
-  "CET",
-  "CLFLUSHOPT",
-  "CLWB",
-  "CLZERO",
-  "CMOV",
-  "COMPRESS",
-  "COND_BR",
-  "CONFLICT",
-  "CONVERT",
-  "DATAXFER",
-  "DECIMAL",
-  "EXPAND",
-  "FCMOV",
-  "FLAGOP",
-  "FMA4",
-  "GATHER",
-  "GFNI",
-  "IFMA",
-  "INTERRUPT",
-  "IO",
-  "IOSTRINGOP",
-  "KMASK",
-  "LOGICAL",
-  "LOGICAL_FP",
-  "LZCNT",
-  "MISC",
-  "MMX",
-  "MPX",
-  "NOP",
-  "PCLMULQDQ",
-  "PCONFIG",
-  "PKU",
-  "POP",
-  "PREFETCH",
-  "PREFETCHWT1",
-  "PT",
-  "PUSH",
-  "RDPID",
-  "RDRAND",
-  "RDSEED",
-  "RDWRFSGS",
-  "RET",
-  "ROTATE",
-  "SCATTER",
-  "SEGOP",
-  "SEMAPHORE",
-  "SETCC",
-  "SGX",
-  "SHA",
-  "SHIFT",
-  "SMAP",
-  "SSE",
-  "STRINGOP",
-  "STTNI",
-  "SYSCALL",
-  "SYSRET",
-  "SYSTEM",
-  "TBM",
-  "UNCOND_BR",
-  "VAES",
-  "VBMI2",
-  "VFMA",
-  "VPCLMULQDQ",
-  "VTX",
-  "WIDENOP",
-  "X87_ALU",
-  "XOP",
-  "XSAVE",
-  "XSAVEOPT",
-  "TR_MUL",
-  "TR_DIV",
-  "TR_FMUL",
-  "TR_FDIV",
-  "TR_NOP",
-  "PREFETCH_NTA",
-  "PREFETCH_T0",
-  "PREFETCH_T1",
-  "PREFETCH_T2",
-};
+/*
+* The following opcode names are from older PIN. They have been commented out.
+* They can safely be deleted.
+*/
+// const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+// 	  "INVALID",
+//   "3DNOW",
+//   "ADOX_ADCX",
+//   "AES",
+//   "AVX",
+//   "AVX2",
+//   "AVX2GATHER",
+//   "AVX512",
+//   "AVX512_4FMAPS",
+//   "AVX512_4VNNIW",
+//   "AVX512_BITALG",
+//   "AVX512_VBMI",
+//   "BINARY",
+//   "BITBYTE",
+//   "BLEND",
+//   "BMI1",
+//   "BMI2",
+//   "BROADCAST",
+//   "CALL",
+//   "CET",
+//   "CLFLUSHOPT",
+//   "CLWB",
+//   "CLZERO",
+//   "CMOV",
+//   "COMPRESS",
+//   "COND_BR",
+//   "CONFLICT",
+//   "CONVERT",
+//   "DATAXFER",
+//   "DECIMAL",
+//   "EXPAND",
+//   "FCMOV",
+//   "FLAGOP",
+//   "FMA4",
+//   "GATHER",
+//   "GFNI",
+//   "IFMA",
+//   "INTERRUPT",
+//   "IO",
+//   "IOSTRINGOP",
+//   "KMASK",
+//   "LOGICAL",
+//   "LOGICAL_FP",
+//   "LZCNT",
+//   "MISC",
+//   "MMX",
+//   "MPX",
+//   "NOP",
+//   "PCLMULQDQ",
+//   "PCONFIG",
+//   "PKU",
+//   "POP",
+//   "PREFETCH",
+//   "PREFETCHWT1",
+//   "PT",
+//   "PUSH",
+//   "RDPID",
+//   "RDRAND",
+//   "RDSEED",
+//   "RDWRFSGS",
+//   "RET",
+//   "ROTATE",
+//   "SCATTER",
+//   "SEGOP",
+//   "SEMAPHORE",
+//   "SETCC",
+//   "SGX",
+//   "SHA",
+//   "SHIFT",
+//   "SMAP",
+//   "SSE",
+//   "STRINGOP",
+//   "STTNI",
+//   "SYSCALL",
+//   "SYSRET",
+//   "SYSTEM",
+//   "TBM",
+//   "UNCOND_BR",
+//   "VAES",
+//   "VBMI2",
+//   "VFMA",
+//   "VPCLMULQDQ",
+//   "VTX",
+//   "WIDENOP",
+//   "X87_ALU",
+//   "XOP",
+//   "XSAVE",
+//   "XSAVEOPT",
+//   "TR_MUL",
+//   "TR_DIV",
+//   "TR_FMUL",
+//   "TR_FDIV",
+//   "TR_NOP",
+//   "PREFETCH_NTA",
+//   "PREFETCH_T0",
+//   "PREFETCH_T1",
+//   "PREFETCH_T2",
+// };
 
-#endif
 
 
 const char* cpu_decoder_c::g_tr_cf_names[10] = {
