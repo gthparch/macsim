@@ -16,9 +16,12 @@ Arguments
 - second argument: # number of instructions per sliced traces  (if the second
   argument is not specified, it will just write the original trace size)
 
+Results
+- The new generated trace(s) will be stored in the same location as the source trace.
+
 Example:
 ```sh
-trace_converter ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
+./trace_converter ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
 ```
 sliced traces are:
 
