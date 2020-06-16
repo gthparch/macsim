@@ -15,14 +15,14 @@ Arguments
 
 Example:
 ```sh
-trace_reader ../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1.txt 1000
+trace_reader ../../sst-unit-test/traces/x86/mergesort.txt 1000
 ```
 sliced traces are:
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s0_0.raw
+../../sst-unit-test/traces/x86/mergesort_s0_0.raw
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s1_0.raw
+../../sst-unit-test/traces/x86/mergesort_s1_0.raw
 
-../../sst-unit-test/traces/x86_sep2013/x86/spec2006/trace_simpoint/xalancbmk/pin_traces/xalancbmk.1_s2_0.raw
+../../sst-unit-test/traces/x86/mergesort_s2_0.raw
 
 etc. 
