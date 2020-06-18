@@ -1,5 +1,5 @@
 # Use the official image as a parent image.
-FROM jwilso/sstalphacontainer:latest
+FROM jwilso/sstalphacontainer:10.0.0_alpha
 
 # Set the working directory.
 #WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ FROM jwilso/sstalphacontainer:latest
 #EXPOSE 8080
 
 # Run the specified command within the container.
-CMD [ "echo", "Hello World from Docker!" ]
+CMD echo "Hello World from inside SST Docker!!"
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 #COPY . .
