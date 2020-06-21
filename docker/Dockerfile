@@ -1,5 +1,5 @@
 # Use the official image as a parent image.
-FROM jwilso/sstalphacontainer:10.0.0_alpha
+FROM ubuntu:18.04
 
 # Set the working directory.
 #WORKDIR /usr/src/app
@@ -8,8 +8,15 @@ FROM jwilso/sstalphacontainer:10.0.0_alpha
 #COPY package.json .
 
 # Run the command inside your image filesystem.
-#RUN npm install
+RUN mkdir -p /home/Macsim_in_docker &&\
+    cd /home/Macsim_in_docker &&\
+    apt-get update && apt-get install -y git &&\
+    git clone -b pin-3.7 https://github.com/gthparch/macsim source &&\
+    apt-get install -y python && apt-get install -y python3
 
+RUN apt-get install -y python-pip &&\
+    python -m pip install scons &&\
+    apt-get install -y libz-dev
 # Inform Docker that the container is listening on the specified port at runtime.
 #EXPOSE 8080
 
