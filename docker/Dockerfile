@@ -8,10 +8,9 @@ FROM ubuntu:18.04
 #COPY package.json .
 
 # Run the command inside your image filesystem.
-RUN mkdir -p /home/Macsim_in_docker &&\
-    cd /home/Macsim_in_docker &&\
+RUN cd /home &&\
     apt-get update && apt-get install -y git &&\
-    git clone -b pin-3.7 https://github.com/gthparch/macsim source &&\
+    git clone https://github.com/gthparch/macsim MacSim_in_docker &&\
     apt-get install -y python && apt-get install -y python3
 
 RUN apt-get install -y python-pip &&\
@@ -21,7 +20,7 @@ RUN apt-get install -y python-pip &&\
 #EXPOSE 8080
 
 # Run the specified command within the container.
-CMD echo "Hello World from inside SST Docker!!!"
+CMD bash
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 #COPY . .
