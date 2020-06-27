@@ -2,10 +2,10 @@
 FROM ubuntu:18.04
 
 # Set the working directory.
-#WORKDIR /usr/src/app
+#WORKDIR /usr/local/common
 
 # Copy the file from your host to your current location.
-#COPY package.json .
+COPY pin-3.13-98189-g60a6ef199-gcc-linux /usr/local/pin-3.13-98189-g60a6ef199-gcc-linux
 
 # Run the command inside your image filesystem.
 RUN cd /home &&\
@@ -16,6 +16,12 @@ RUN cd /home &&\
 RUN apt-get install -y python-pip &&\
     python -m pip install scons &&\
     apt-get install -y libz-dev
+
+RUN echo 'export PIN_HOME=/usr/local/pin-3.13-98189-g60a6ef199-gcc-linux' >> ~/.bashrc
+RUN echo 'export PATH=$PIN_HOME:$PATH' >> ~/.bashrc
+RUN echo 'export PIN_ROOT=$PIN_HOME' >> ~/.bashrc
+
+RUN chmod u=rxw -R /usr/local/pin-3.13-98189-g60a6ef199-gcc-linux
 # Inform Docker that the container is listening on the specified port at runtime.
 #EXPOSE 8080
 
