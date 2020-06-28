@@ -49,7 +49,7 @@ do {                                                              \
   }                                                               \
 } while (0)
 
-#define PIN_3_7_TRACE 
+#define PIN_3_13_TRACE 
 
 all_knobs_c* g_knobs;
 

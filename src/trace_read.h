@@ -280,12 +280,12 @@ typedef struct trace_uop_s {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Enumerator ID for temp register
 ///
-/// Currently, Pin 3.7 has 330 registers but we only store up to 255 register numbers. 
+/// Currently, Pin 3.13 has 330 registers but we only store up to 255 register numbers. 
 /// we truncated the trace register id so it will use up to all 255. however temp reg id is inserted after the trace file is read
 // so it can be greater than 8 bits  data type is uns16. please check inst_info.h 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 typedef enum TR_TEMP_TEMP_ENUM_ {
-  TR_REG_TMP0 =256  
+  TR_REG_TMP0 = 256  
 } TR_TEMP_TEMP_ENUM;
 
 
@@ -397,92 +397,6 @@ typedef enum CPU_OPCODE_ENUM_ {
   GPU_EN,
   CPU_OPCODE_LAST,
 } CPU_OPCODE_ENUM;
-
-
-/*
-* The below enumerator is for older PIN versions, it has been commented out.
-* It can be safely deleted
-*/
-// ///////////////////////////////////////////////////////////////////////////////////////////////
-// /// \brief Enumerator ID for temp register
-// ///
-// /// Currently, we have 166 registers, so temp register will be 167.
-// ///////////////////////////////////////////////////////////////////////////////////////////////
-// typedef enum TR_TEMP_TEMP_ENUM_ {
-//   TR_REG_TMP0 = 167
-// } TR_TEMP_TEMP_ENUM;
-
-
-// typedef enum CPU_OPCODE_ENUM_ {
-//   XED_CATEGORY_INVALID,
-//   XED_CATEGORY_3DNOW,
-//   XED_CATEGORY_AES,
-//   XED_CATEGORY_AVX,
-//   XED_CATEGORY_AVX2, // new
-//   XED_CATEGORY_AVX2GATHER, // new
-//   XED_CATEGORY_BDW, // new
-//   XED_CATEGORY_BINARY,
-//   XED_CATEGORY_BITBYTE,
-//   XED_CATEGORY_BMI1, // new
-//   XED_CATEGORY_BMI2, // new
-//   XED_CATEGORY_BROADCAST,
-//   XED_CATEGORY_CALL,
-//   XED_CATEGORY_CMOV,
-//   XED_CATEGORY_COND_BR,
-//   XED_CATEGORY_CONVERT,
-//   XED_CATEGORY_DATAXFER,
-//   XED_CATEGORY_DECIMAL,
-//   XED_CATEGORY_FCMOV,
-//   XED_CATEGORY_FLAGOP,
-//   XED_CATEGORY_FMA4, // new
-//   XED_CATEGORY_INTERRUPT,
-//   XED_CATEGORY_IO,
-//   XED_CATEGORY_IOSTRINGOP,
-//   XED_CATEGORY_LOGICAL,
-//   XED_CATEGORY_LZCNT, // new
-//   XED_CATEGORY_MISC,
-//   XED_CATEGORY_MMX,
-//   XED_CATEGORY_NOP,
-//   XED_CATEGORY_PCLMULQDQ,
-//   XED_CATEGORY_POP,
-//   XED_CATEGORY_PREFETCH,
-//   XED_CATEGORY_PUSH,
-//   XED_CATEGORY_RDRAND, // new
-//   XED_CATEGORY_RDSEED, // new
-//   XED_CATEGORY_RDWRFSGS, // new
-//   XED_CATEGORY_RET,
-//   XED_CATEGORY_ROTATE,
-//   XED_CATEGORY_SEGOP,
-//   XED_CATEGORY_SEMAPHORE,
-//   XED_CATEGORY_SHIFT,
-//   XED_CATEGORY_SSE,
-//   XED_CATEGORY_STRINGOP,
-//   XED_CATEGORY_STTNI,
-//   XED_CATEGORY_SYSCALL,
-//   XED_CATEGORY_SYSRET,
-//   XED_CATEGORY_SYSTEM,
-//   XED_CATEGORY_TBM, // new
-//   XED_CATEGORY_UNCOND_BR,
-//   XED_CATEGORY_VFMA, // new
-//   XED_CATEGORY_VTX,
-//   XED_CATEGORY_WIDENOP,
-//   XED_CATEGORY_X87_ALU,
-//   XED_CATEGORY_XOP,
-//   XED_CATEGORY_XSAVE,
-//   XED_CATEGORY_XSAVEOPT,
-//   TR_MUL,
-//   TR_DIV,
-//   TR_FMUL,
-//   TR_FDIV,
-//   TR_NOP,
-//   PREFETCH_NTA,
-//   PREFETCH_T0,
-//   PREFETCH_T1,
-//   PREFETCH_T2,
-//   GPU_EN,
-//   CPU_OPCODE_LAST,
-// } CPU_OPCODE_ENUM;
-
 
 
 // identical to enum in PTX trace generator
