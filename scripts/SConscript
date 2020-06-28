@@ -16,7 +16,7 @@ if GetOption('clean'):
 ## otherwise generate stats/knobs
 else:
   os.system('perl knobgen.pl')
-  if flags['pin_3_7_trace'] == '1':
+  if flags['pin_3_13_trace'] == '1':
     os.system('perl statgen.pl 1.1')
   else:
     os.system('perl statgen.pl 1.0')
