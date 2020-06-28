@@ -26,7 +26,6 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED O
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 // ============================================================================
 // Author: Jaekyu Lee (kacear@gmail.com)
 // Date: November 3, 2011
@@ -37,20 +36,19 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "pin.H"
 #include <map>
 
-
 INT32 usage()
 {
   std::cerr << KNOB_BASE::StringKnobSummary() << std::endl;
   return -1;
 }
-  
 
 void extract_register(void)
 {
 
   std::cout << "const char *trace_read_c::g_tr_reg_names[MAX_TR_REG] = {\n";
   std::map<LEVEL_BASE::REG, bool> full_set;
-  for (int ii = 0; ii < REG_PIN_BASE; ++ii) {
+  for (int ii = 0; ii < REG_PIN_BASE; ++ii)
+  {
     full_set[REG_FullRegName(static_cast<LEVEL_BASE::REG>(ii))] = true;
     std::cout << "   \"" << REG_StringShort(REG_FullRegName(static_cast<LEVEL_BASE::REG>(ii))) << "\",\n";
   }
@@ -62,14 +60,14 @@ void extract_register(void)
 void extract_category(void)
 {
 
-
   int num_opcodes = XED_CATEGORY_LAST + 10;
   std::cout << "\n";
   std::cout << "string tr_opcode_names[" << num_opcodes << "] = {\n";
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii)
+  {
     std::cout << "  \"" << CATEGORY_StringShort(ii) << "\",\n";
   }
-  std::cout << "  \"TR_MUL\",\n"; 
+  std::cout << "  \"TR_MUL\",\n";
   std::cout << "  \"TR_DIV\",\n";
   std::cout << "  \"TR_FMUL\",\n";
   std::cout << "  \"TR_FDIV\",\n";
@@ -82,26 +80,24 @@ void extract_category(void)
   std::cout << "};\n";
 }
 
-
 void extract_opcode(void)
 {
 
-  for (int ii = 0; ii < XED_ICLASS_LAST; ++ii) {
-//    if (OPCODE_StringShort(ii).find("NOP") != string::npos)
+  for (int ii = 0; ii < XED_ICLASS_LAST; ++ii)
+  {
     std::cout << OPCODE_StringShort(ii) << "\n";
   }
 }
 
-
 void macsim_opcode_enum(void)
 {
-  
 
   std::cout << "typedef enum CPU_OPCODE_ENUM_ {\n";
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii)
+  {
     std::cout << "  XED_CATEGORY_" << CATEGORY_StringShort(ii) << ",\n";
   }
-  std::cout << "  TR_MUL,\n"; 
+  std::cout << "  TR_MUL,\n";
   std::cout << "  TR_DIV,\n";
   std::cout << "  TR_FMUL,\n";
   std::cout << "  TR_FDIV,\n";
@@ -115,15 +111,15 @@ void macsim_opcode_enum(void)
   std::cout << "} CPU_OPCODE_ENUM;\n";
 }
 
-
 void macsim_opcode(void)
 {
 
   std::cout << "const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {\n";
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii)
+  {
     std::cout << "  \"" << CATEGORY_StringShort(ii) << "\",\n";
   }
-  std::cout << "  \"TR_MUL\",\n"; 
+  std::cout << "  \"TR_MUL\",\n";
   std::cout << "  \"TR_DIV\",\n";
   std::cout << "  \"TR_FMUL\",\n";
   std::cout << "  \"TR_FDIV\",\n";
@@ -137,29 +133,29 @@ void macsim_opcode(void)
   std::cout << "};\n";
 }
 
-
 void macsim_reg(void)
 {
-
   std::cout << "const char* trace_read_c::g_tr_reg_names[MAX_TR_REG] = {\n";
-  for (int ii = 0; ii < REG_PIN_BASE; ++ii) {
+  for (int ii = 0; ii < REG_PIN_BASE; ++ii)
+  {
     std::cout << "   \"" << REG_StringShort(static_cast<LEVEL_BASE::REG>(ii)) << "\",\n";
   }
   std::cout << "};\n";
 }
 
-
 void macsim_pin_convert(void)
 {
 
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii)
+  {
     std::cout << "  m_int_uop_table[XED_CATEGORY_" << CATEGORY_StringShort(ii) << "]";
-    for (unsigned int jj = 0; jj < 12 - CATEGORY_StringShort(ii).size(); ++jj) {
+    for (unsigned int jj = 0; jj < 12 - CATEGORY_StringShort(ii).size(); ++jj)
+    {
       std::cout << " ";
     }
     std::cout << "= UOP_;\n";
   }
-  std::cout << "  m_int_uop_table[TR_MUL]                   = UOP_IMUL;\n"; 
+  std::cout << "  m_int_uop_table[TR_MUL]                   = UOP_IMUL;\n";
   std::cout << "  m_int_uop_table[TR_DIV]                   = UOP_IMUL;\n";
   std::cout << "  m_int_uop_table[TR_FMUL]                  = UOP_FMUL;\n";
   std::cout << "  m_int_uop_table[TR_FDIV]                  = UOP_FDIV;\n";
@@ -183,15 +179,16 @@ void macsim_pin_convert(void)
 
   std::cout << "\n";
 
-  
-  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii) {
+  for (int ii = 0; ii < XED_CATEGORY_LAST; ++ii)
+  {
     std::cout << "  m_fp_uop_table[XED_CATEGORY_" << CATEGORY_StringShort(ii) << "]";
-    for (unsigned int jj = 0; jj < 12 - CATEGORY_StringShort(ii).size(); ++jj) {
+    for (unsigned int jj = 0; jj < 12 - CATEGORY_StringShort(ii).size(); ++jj)
+    {
       std::cout << " ";
     }
     std::cout << "= UOP_;\n";
   }
-  std::cout << "  m_fp_uop_table[TR_MUL]                   = UOP_IMUL;\n"; 
+  std::cout << "  m_fp_uop_table[TR_MUL]                   = UOP_IMUL;\n";
   std::cout << "  m_fp_uop_table[TR_DIV]                   = UOP_IDIV;\n";
   std::cout << "  m_fp_uop_table[TR_FMUL]                  = UOP_FMUL;\n";
   std::cout << "  m_fp_uop_table[TR_FDIV]                  = UOP_FDIV;\n";
@@ -214,26 +211,19 @@ void macsim_pin_convert(void)
   std::cout << "  m_fp_uop_table[TR_MEM_LD_PM]             = UOP_FADD;\n";
 }
 
-
 // ====================================
 // Initialize the simulation
 // ====================================
 void initialize_sim(void)
 {
-//  extract_register();
- // extract_category();
-  // extract_opcode(); // useless
   macsim_opcode();
   macsim_opcode_enum();
   macsim_reg();
-  // macsim_pin_convert();
 }
-
 
 void finalize_sim(void)
 {
 }
-
 
 // ====================================
 // BBL instrumentation : inst. count
@@ -241,7 +231,6 @@ void finalize_sim(void)
 VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
 {
 }
-
 
 // ====================================
 // Trace instrumentation routine for faster instruction counting
@@ -256,7 +245,6 @@ VOID INST_trace(TRACE trace, VOID *v)
 #endif
 }
 
-
 // ====================================
 // Instruction instrumentation routine
 // ====================================
@@ -264,23 +252,19 @@ VOID INST_instruction(INS ins, VOID *v)
 {
 }
 
-
 VOID INST_fini(INT32 code, VOID *v)
 {
 }
 
-
-VOID INST_tstart(THREADID tid, CONTEXT* ctxt, INT32 flags, VOID* v)
+VOID INST_tstart(THREADID tid, CONTEXT *ctxt, INT32 flags, VOID *v)
 {
 }
 
-
-VOID INST_tfini(THREADID tid, const CONTEXT* ctxt, INT32 code, VOID* v)
+VOID INST_tfini(THREADID tid, const CONTEXT *ctxt, INT32 code, VOID *v)
 {
 }
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   if (PIN_Init(argc, argv))
     return usage();
