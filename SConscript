@@ -2,6 +2,7 @@
 
 #########################################################################################
 # Author      : Jaekyu Lee (jq.lee17@gmail.com)
+# Last Modified : Summer 2020
 # Description : Scons top-level
 #########################################################################################
 
@@ -73,10 +74,6 @@ if flags['qsim'] == '1':
   env['CPPPATH']    += [os.environ['XED_HOME'] + "/include"]
   env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib", os.environ['XED_HOME'] + "/lib"]
 
-#if flags['pin_3_7_trace'] == '1':
-  #env['CPPDEFINES'] += ['PIN_3_7_TRACE']
-  #commented out the above code because by default MacSim should use the latest PIN version
-  #At time of writing, the latest PIN version is PIN 3.13
 
 #########################################################################################
 # IRIS
@@ -181,7 +178,7 @@ DRAMSIM2_srcs = [
   'src/DRAMSim2/SimulatorObject.cpp',
   'src/DRAMSim2/Transaction.cpp',
 ]
-#"""
+
 
 
 
@@ -330,7 +327,4 @@ env.Program(
 #########################################################################################
 if GetOption('clean'):
   os.system('rm -f ../bin/macsim')
-  # os.system('rm -f ../bin/NULL')
-  # os.system('rm -rf ../bin/*.out')
-  # os.system('rm -rf ../bin/*.out.*')
-  # os.system('rm -rf ../bin/*.log')
+
