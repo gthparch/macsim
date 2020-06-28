@@ -69,7 +69,7 @@ struct Thread_info
   uint64_t inst_count; /**< Instruction count */
 };
 
-// new version april-2019
+
 /**
  * Instruction Information
  */
