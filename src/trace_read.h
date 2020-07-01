@@ -53,7 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define MAX_TR_REG 321 // REG_LAST = 298 // need to check!!! 
+#define MAX_TR_REG 321
 //#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define REP_MOV_MEM_SIZE_MAX 4
 #define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP)*4))
