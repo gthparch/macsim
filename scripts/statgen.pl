@@ -228,7 +228,7 @@ sub processFile
 
 
 	### Sanitize
-	my $newText;
+	my $newText = "";
 
 	foreach $textLine (@theWholeText) {
 		$newText = $newText . $textLine;

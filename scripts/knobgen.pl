@@ -86,7 +86,7 @@ sub parseFile
   close(PARAMFILE);
 
   ### SANITIZE TEXT ###
-  my $newText;
+  my $newText = "";
 
   foreach $textLine (@theWholeText) {
     $newText = $newText . $textLine;
