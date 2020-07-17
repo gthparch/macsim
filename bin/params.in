@@ -3,7 +3,6 @@ num_sim_cores 1
 num_sim_small_cores 0
 num_sim_medium_cores 0
 num_sim_large_cores 1
-core_type x86 
 large_core_type x86 
 sim_cycle_count 0
 max_insts 3000000
