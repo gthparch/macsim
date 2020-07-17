@@ -1916,7 +1916,6 @@ const char* cpu_decoder_c::g_tr_cf_names[10] = {
   "CF_ICBR"
 };
 
-// divide instruction should be included and separated 
 const char *cpu_decoder_c::g_optype_names[37] = {
   "OP_INV",       // invalid opcode
   "OP_SPEC",      // something weird (rpcc)
