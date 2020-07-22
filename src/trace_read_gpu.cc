@@ -200,7 +200,7 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
     return ;
   trace_info_gpu_s *inst_info = static_cast<trace_info_gpu_s *>(trace_info);
  
-  (*m_dprint_output) << "*** begin of the data strcture *** " << endl;
+  (*m_dprint_output) << "*** begin of the data structure *** " << endl;
   (*m_dprint_output) << "core_id:" << core_id << " thread_id:" << thread_id << endl;
   (*m_dprint_output) << "opcode: " << g_tr_opcode_names[inst_info->m_opcode] << endl;
   (*m_dprint_output) << "num_read_regs: " << (uint32_t)inst_info->m_num_read_regs << endl;
@@ -247,7 +247,7 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
     (*m_dprint_output) << "fence_level/addr_space: " << g_fence_level_names[0] << endl; 
   }
 
-  (*m_dprint_output) << "*** end of the data strcture *** " << endl << endl;
+  (*m_dprint_output) << "*** end of the data structure *** " << endl << endl;
 }
 
 

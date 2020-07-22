@@ -903,7 +903,7 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
 
   trace_info_igpu_s *t_info = static_cast<trace_info_igpu_s *>(trace_info);
  
-  *m_dprint_output << "*** begin of the data strcture *** " << endl;
+  *m_dprint_output << "*** begin of the data structure *** " << endl;
   *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
   *m_dprint_output << "uop_opcode " << g_tr_opcode_names[(uint32_t) t_info->m_opcode]  << endl;
   *m_dprint_output << "num_read_regs: " << hex <<  (uint32_t) t_info->m_num_read_regs << endl;
@@ -922,8 +922,8 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id)
   *m_dprint_output << "branch_target: " << hex << (uint64_t)t_info->m_branch_target << endl;
   *m_dprint_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
   *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
-  *m_dprint_output << "size: " << hex << (uint32_t) t_info->m_size << endl;
-  *m_dprint_output << "*** end of the data strcture *** " << endl << endl;
+  *m_dprint_output << "size: " << hex << (uint64_t) t_info->m_size << endl;
+  *m_dprint_output << "*** end of the data structure *** " << endl << endl;
 }
 
 const char* igpu_decoder_c::g_tr_opcode_names[GED_OPCODE_LAST] = {

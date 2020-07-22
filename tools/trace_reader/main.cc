@@ -49,6 +49,8 @@ do {                                                              \
   }                                                               \
 } while (0)
 
+#define PIN_3_13_TRACE 
+
 all_knobs_c* g_knobs;
 
 int read_trace(string trace_path, int truncate_size)
@@ -188,9 +190,9 @@ int main(int argc, char* argv[])
 {
   KnobsContainer* knob_container = new KnobsContainer();
   g_knobs = knob_container->getAllKnobs();
-  knob_container->applyParamFile("params.in");
+  // knob_container->applyParamFile("params.in");
   char* pInvalidArgument = NULL;
-  knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
+  // knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
   int truncate_size = 0; 
 
   register_trace_reader();

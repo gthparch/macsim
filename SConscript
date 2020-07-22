@@ -2,6 +2,7 @@
 
 #########################################################################################
 # Author      : Jaekyu Lee (jq.lee17@gmail.com)
+# Last Modified : Summer 2020
 # Description : Scons top-level
 #########################################################################################
 
@@ -72,6 +73,7 @@ if flags['qsim'] == '1':
   env['CPPPATH']    += [os.environ['QSIM_PREFIX'] + "/include", '#src/rwqueue']
   env['CPPPATH']    += [os.environ['XED_HOME'] + "/include"]
   env['LIBPATH']    += [os.environ['QSIM_PREFIX'] + "/lib", os.environ['XED_HOME'] + "/lib"]
+
 
 #########################################################################################
 # IRIS
@@ -176,7 +178,7 @@ DRAMSIM2_srcs = [
   'src/DRAMSim2/SimulatorObject.cpp',
   'src/DRAMSim2/Transaction.cpp',
 ]
-#"""
+
 
 
 

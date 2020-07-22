@@ -70,24 +70,26 @@ flags = {}
 ## Configuration from file
 Config = ConfigParser.ConfigParser()
 Config.read('macsim.config')
-flags['dram']       = Config.get('Library', 'dram', '0')
-flags['power']      = Config.get('Library', 'power', '0')
-flags['iris']       = Config.get('Library', 'iris', '0')
-flags['qsim']       = Config.get('Library', 'qsim', '0')
-flags['debug']      = Config.get('Build', 'debug', '0')
-flags['gprof']      = Config.get('Build', 'gprof', '0')
-flags['val']        = Config.get('Build_Extra', 'val', '0')
-flags['ramulator']  = Config.get('Library', 'ramulator', '0')
+flags['dram']          = Config.get('Library', 'dram', '0')
+flags['power']         = Config.get('Library', 'power', '0')
+flags['iris']          = Config.get('Library', 'iris', '0')
+flags['qsim']          = Config.get('Library', 'qsim', '0')
+flags['debug']         = Config.get('Build', 'debug', '0')
+flags['gprof']         = Config.get('Build', 'gprof', '0')
+flags['pin_3_13_trace'] = Config.get('Build', 'pin_3_13_trace', '0')
+flags['val']           = Config.get('Build_Extra', 'val', '0')
+flags['ramulator']     = Config.get('Library', 'ramulator', '0')
 
 ## Configuration from commandline
-flags['debug']      = ARGUMENTS.get('debug', flags['debug'])
-flags['gprof']      = ARGUMENTS.get('gprof', flags['gprof'])
-flags['power']      = ARGUMENTS.get('power', flags['power'])
-flags['iris']       = ARGUMENTS.get('iris', flags['iris'])
-flags['dram']       = ARGUMENTS.get('dram', flags['dram'])
-flags['val']        = ARGUMENTS.get('val', flags['val'])
-flags['qsim']       = ARGUMENTS.get('qsim', flags['qsim'])
-flags['ramulator']  = ARGUMENTS.get('ramulator', flags['ramulator'])
+flags['debug']         = ARGUMENTS.get('debug', flags['debug'])
+flags['gprof']         = ARGUMENTS.get('gprof', flags['gprof'])
+flags['pin_3_13_trace'] = ARGUMENTS.get('pin_3_13_trace', flags['pin_3_13_trace'])
+flags['power']         = ARGUMENTS.get('power', flags['power'])
+flags['iris']          = ARGUMENTS.get('iris', flags['iris'])
+flags['dram']          = ARGUMENTS.get('dram', flags['dram'])
+flags['val']           = ARGUMENTS.get('val', flags['val'])
+flags['qsim']          = ARGUMENTS.get('qsim', flags['qsim'])
+flags['ramulator']     = ARGUMENTS.get('ramulator', flags['ramulator'])
 
 
 ## Checkout DRAMSim2 copy
@@ -101,7 +103,7 @@ if flags['ramulator'] == '1':
     os.system('git clone https://github.com/CMU-SAFARI/ramulator.git src/ramulator')
 
 ## Create stat/knobs
-SConscript('scripts/SConscript')
+SConscript('scripts/SConscript', exports='flags')
 
 
 ## debug build

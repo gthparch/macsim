@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+#########################################################################################
+# Author      : Jaekyu Lee (jq.lee17@gmail.com)
+# Description : Scons top-level
+#########################################################################################
+
+import os
+
+
+#########################################################################################
+# FLAGS
+#########################################################################################
+
+## include directories
+header_dirs = '-I ../../src'
+
+
+## compiler warning flags
+warn_flags = [
+  '-Werror',
+  '-Wunused-function',
+  '-Wreturn-type',
+  '-Wpointer-arith',
+  '-Wno-write-strings'
+]
+warn_flags = ' '.join(warn_flags)
+
+env = Environment()
+env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s -DNO_DEBUG -TRACE_FORMAT=1' % (warn_flags, header_dirs)
+env['LIBS'] = 'z'
+arch = ARGUMENTS.get('arch', 'x86')
+if arch == 'gpu':
+  env['CPPDEFINES'] = 'GPU_TRACE'
+elif arch == 'a64':
+  env['CPPDEFINES'] = 'ARM64_TRACE'
+else:
+  env['CPPDEFINES'] = 'X86_TRACE'
+
+
+#########################################################################################
+# libstdc++ library static linking
+#########################################################################################
+#static_libcpp = Command('libstdc++.a',None,Action('ln -s `g++ -print-file-name=libstdc++.a` $TARGET'))
+
+#########################################################################################
+# Script
+#########################################################################################
+if not GetOption('clean'):
+  os.system('perl knobgen.pl')
+
+#########################################################################################
+# TRACE READER
+#########################################################################################
+reader_srcs = [
+  'main.cc',
+  'all_knobs.cc',
+  '../../src/knob.cc',
+  'trace_converter.cc'
+]
+
+
+env.Program(
+    'trace_converter',
+    reader_srcs,
+#    LIBS=[static_libcpp],
+    LIBPATH=['.', '/usr/lib', '/usr/local/lib'] 
+)
