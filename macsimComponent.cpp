@@ -1,10 +1,10 @@
 #include <sys/time.h>
 
 #include <stdint.h>
+#include <string.h>
+#include <algorithm>
 
 #include <sst_config.h>
-#include <sst/core/serialization/element.h>
-#include <sst/core/element.h>
 #include <sst/core/simulation.h>
 #include <sst/core/params.h>
 
@@ -56,21 +56,25 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 
   m_command_line = params.find<string>("command_line", found);
 
+  m_clock_freq = params.find<string>("frequency", found);
+  TimeConverter* tc = registerClock(m_clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+
   m_ptx_core = params.find<bool>("ptx_core", 0);
   m_num_link = params.find<uint32_t>("num_link", 1);
-  configureLinks(params);
+  configureLinks(params, tc);
 
   m_cube_connected = params.find<bool>("cube_connected", 0);
   if (m_cube_connected) {
-    m_cube_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!m_cube_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
-    m_cube_link->initialize("cube_link", new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleCubeEvent));
+    m_cube_link = loadUserSubComponent<Interfaces::SimpleMem>("cube_link", ComponentInfo::SHARE_NONE, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleCubeEvent));
+    if (!m_cube_link) {
+        Params interfaceParams;
+        interfaceParams.insert("port", "cube_link");
+        m_cube_link = loadAnonymousSubComponent<Interfaces::SimpleMem>("memHierarchy.memInterface", "cube_link", 0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
+                interfaceParams, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleCubeEvent));
+    }
   } else {
     m_cube_link = NULL;
   }
-
-  m_clock_freq = params.find<string>("frequency", found);
-  registerClock(m_clock_freq, new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
   m_mem_size = params.find<uint64_t>("mem_size", 1*1024*1024*1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
@@ -98,44 +102,50 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params) : Component(i
 
 macsimComponent::macsimComponent() : Component(-1) {}  //for serialization only
 
-void macsimComponent::configureLinks(SST::Params& params)
+void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc)
 {
   for (unsigned int l = 0 ; l < m_num_link; ++l) {
-    Interfaces::SimpleMem *icache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!icache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
-    Interfaces::SimpleMem *dcache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-    if (!dcache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
-
-    std::ostringstream icache_link_name;
-    icache_link_name << "core" << l << "-icache";
-    icache_link->initialize(icache_link_name.str(), new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleInstructionCacheEvent));
+    auto icache_link = loadUserSubComponent<Interfaces::SimpleMem>("core"+std::to_string(l)+"-icache", ComponentInfo::SHARE_NONE, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleInstructionCacheEvent));
+    if (!icache_link) {
+        Params interfaceParams;
+        interfaceParams.insert("port", "core"+std::to_string(l)+"-icache");
+        icache_link = loadAnonymousSubComponent<Interfaces::SimpleMem>("memHierarchy.memInterface", "core"+std::to_string(l)+"-icache", 0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
+                interfaceParams, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleInstructionCacheEvent));
+    }
     m_instruction_cache_links.push_back(icache_link);
     m_instruction_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
 
-    std::ostringstream dcache_link_name;
-    dcache_link_name << "core" << l << "-dcache";
-    dcache_link->initialize(dcache_link_name.str(), new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleDataCacheEvent));
+    auto dcache_link = loadUserSubComponent<Interfaces::SimpleMem>("core"+std::to_string(l)+"-dcache", ComponentInfo::SHARE_NONE, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleDataCacheEvent));
+    if (!dcache_link) {
+        Params interfaceParams;
+        interfaceParams.insert("port", "core"+std::to_string(l)+"-dcache");
+        dcache_link = loadAnonymousSubComponent<Interfaces::SimpleMem>("memHierarchy.memInterface", "core"+std::to_string(l)+"-dcache", 0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
+                interfaceParams, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleDataCacheEvent));
+    }
     m_data_cache_links.push_back(dcache_link);
     m_data_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_data_cache_responses.push_back(std::set<uint64_t>());
 
     if (m_ptx_core) {
-      Interfaces::SimpleMem *ccache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-      if (!ccache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
-      Interfaces::SimpleMem *tcache_link = dynamic_cast<Interfaces::SimpleMem*>(loadModuleWithComponent("memHierarchy.memInterface", this, params));
-      if (!tcache_link) m_dbg->fatal(CALL_INFO, -1, "Unable to load Module as memory\n");
-
-      std::ostringstream ccache_link_name;
-      ccache_link_name << "core" << l << "-ccache";
-      ccache_link->initialize(ccache_link_name.str(), new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleConstCacheEvent));
+      auto ccache_link = loadUserSubComponent<Interfaces::SimpleMem>("core"+std::to_string(l)+"-ccache", ComponentInfo::SHARE_NONE, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleConstCacheEvent));
+      if (!ccache_link) {
+          Params interfaceParams;
+          interfaceParams.insert("port", "core"+std::to_string(l)+"-ccache");
+          ccache_link = loadAnonymousSubComponent<Interfaces::SimpleMem>("memHierarchy.memInterface", "core"+std::to_string(l)+"-ccache", 0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
+                  interfaceParams, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleConstCacheEvent));
+      }
       m_const_cache_links.push_back(ccache_link);
       m_const_cache_requests.push_back(std::map<uint64_t, uint64_t>());
       m_const_cache_responses.push_back(std::set<uint64_t>());
 
-      std::ostringstream tcache_link_name;
-      tcache_link_name << "core" << l << "-tcache";
-      tcache_link->initialize(tcache_link_name.str(), new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleTextureCacheEvent));
+      auto tcache_link = loadUserSubComponent<Interfaces::SimpleMem>("core"+std::to_string(l)+"-tcache", ComponentInfo::SHARE_NONE, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleTextureCacheEvent));
+      if (!tcache_link) {
+          Params interfaceParams;
+          interfaceParams.insert("port", "core"+std::to_string(l)+"-tcache");
+          tcache_link = loadAnonymousSubComponent<Interfaces::SimpleMem>("memHierarchy.memInterface", "core"+std::to_string(l)+"-tcache", 0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
+                  interfaceParams, tc, new Interfaces::SimpleMem::Handler<macsimComponent>(this, &macsimComponent::handleTextureCacheEvent));
+      }
       m_texture_cache_links.push_back(tcache_link);
       m_texture_cache_requests.push_back(std::map<uint64_t, uint64_t>());
       m_texture_cache_responses.push_back(std::set<uint64_t>());
@@ -159,31 +169,31 @@ void macsimComponent::init(unsigned int phase)
 {
   if (!phase) {
     for (unsigned int l = 0 ; l < m_num_link; ++l) {
-      m_instruction_cache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
-      m_data_cache_links[l]->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
+      m_instruction_cache_links[l]->init(phase);
+      m_data_cache_links[l]->init(phase);
     }
 
     if (m_cube_connected)
-      m_cube_link->sendInitData(new Interfaces::StringEvent("SST::MemHierarchy::MemEvent"));
+      m_cube_link->init(phase);
   }
-}
-
-#include <boost/tokenizer.hpp>
-int countTokens(string command_line)
-{
-  int count = 0;
-  boost::char_separator<char> sep(" ");
-  boost::tokenizer<boost::char_separator<char>> tokens(command_line, sep);
-  for (auto I = tokens.begin(), E = tokens.end(); I != E; ++I) ++count;
-  return count;
 }
 
 void macsimComponent::setup()
 {
   MSC_DEBUG("------- Setting up -------\n");
 
+  // Tokenize command line
+  vector<string> tokens;
+  auto cl = strdup(m_command_line.c_str());
+  auto token = strtok(cl, " ");
+  while (token != nullptr) {
+    tokens.push_back(token);
+    token = strtok(nullptr, " ");
+  }
+  free(cl);
+
   // Build arguments
-  char** argv = new char*[1+3+countTokens(m_command_line)];
+  char** argv = new char*[1 + 3 + tokens.size()];
 
   int argc = 0;
   argv[argc] = new char[                     4 ]; strcpy(argv[argc],                "sst"); argc++;
@@ -191,12 +201,9 @@ void macsimComponent::setup()
   argv[argc] = new char[ m_trace_file.size()+1 ]; strcpy(argv[argc], m_trace_file.c_str()); argc++;
   argv[argc] = new char[ m_output_dir.size()+1 ]; strcpy(argv[argc], m_output_dir.c_str()); argc++;
 
-  boost::char_separator<char> sep(" ");
-  boost::tokenizer<boost::char_separator<char>> tokens(m_command_line, sep);
-  for (auto I = tokens.begin(), E = tokens.end(); I != E; ++I) {
-    string command = *I;
-    argv[argc] = new char[ command.size()+1 ]; strcpy(argv[argc], command.c_str()); argc++;
-  }
+  for_each(tokens.begin(), tokens.end(), [&argc, &argv] (string const &token) {
+    argv[argc] = new char[ token.size()+1 ]; strcpy(argv[argc], token.c_str()); argc++;
+  });
 
   // Pass paramaters to simulator if applicable
   m_macsim->initialize(argc, argv);
@@ -307,8 +314,7 @@ bool macsimComponent::ticReceived(Cycle_t)
   else {
     if (m_operation_mode == OperationMode::SLAVE) {
       // Send a report event to another SST component upon completion
-      MacSimEvent *event = new MacSimEvent(FINISHED);
-      m_ipc_link->send(event);
+      m_ipc_link->send(new MacSimEvent(FINISHED));
     }
 
     primaryComponentOKToEndSim();

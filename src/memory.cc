@@ -509,12 +509,14 @@ int dcu_c::access(uop_c* uop)
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank + 64;
+    uop->m_state = OS_DCACHE_PORT_UNAVAILABLE;
     return 0;
   }
   else if (IsLoad(type) && !m_port[bank]->get_read_port(m_cycle - 1)) {
     // port busy
     STAT_EVENT(CACHE_BANK_BUSY);
     uop->m_dcache_bank_id = bank;
+    uop->m_state = OS_DCACHE_PORT_UNAVAILABLE;
     return 0;
   }
   DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", 
@@ -747,6 +749,8 @@ bool dcu_c::insert(mem_req_s* req)
     DEBUG_CORE(req->m_core_id, "L%d[%d] (->in_queue) req:%d type:%s\n", 
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
     return true;
+  } else {
+    m_retry_queue.emplace_back(req);
   }
 
   return false;
@@ -763,6 +767,15 @@ void dcu_c::run_a_cycle(bool pll_lock)
     return ;
   }
 
+  if (!m_retry_queue.empty()) {
+    for (auto it = m_retry_queue.begin(); it != m_retry_queue.end(); /* do nothing */) {
+      if (m_in_queue->push(*it))
+        it = m_retry_queue.erase(it);
+      else
+        ++it;
+    }
+  }
+
   process_wb_queue();
   process_fill_queue();
   process_out_queue();
@@ -773,8 +786,6 @@ void dcu_c::run_a_cycle(bool pll_lock)
 
   ++m_cycle;
 }
-
-
 
 // Main cache access function
 // process requests in the input queue
@@ -1551,7 +1562,7 @@ bool dcu_c::done(mem_req_s* req)
 
   if (req->m_uop) {
     uop_c* uop = req->m_uop;
-    DEBUG_CORE(req->m_core_id, "req_id:%d uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_uop_num, req->m_in_global);
+    DEBUG_CORE(req->m_core_id, "req_id:%d inst:%lld uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_inst_num, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
     if (m_ptx_sim || m_igpu_sim) {
@@ -2559,6 +2570,29 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req)
     req->m_cache_id[MEM_MC] = (req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc;
 }
 
+void l2_decoupled_network_c::invalidate(Addr page_addr)
+{
+  Addr addr = page_addr;
+  Addr end_addr = page_addr + m_page_size;
+
+  int line_size = -1;
+  for (int ii = 0; ii < m_num_core; ++ii) {
+    line_size = m_l1_cache[ii]->line_size();
+    for (; addr < end_addr; addr += line_size)
+      m_l1_cache[ii]->invalidate(addr);
+    
+    line_size = m_l2_cache[ii]->line_size();
+    for (; addr < end_addr; addr += line_size)
+      m_l2_cache[ii]->invalidate(addr);
+  }
+
+  for (int ii = 0; ii < m_num_l3; ++ii) { 
+    line_size = m_l3_cache[ii]->line_size();
+    for (; addr < end_addr; addr += line_size)
+      m_l3_cache[ii]->invalidate(addr);
+  }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2641,7 +2675,7 @@ void igpu_network_c::invalidate(Addr page_addr)
   Addr addr = page_addr;
   Addr end_addr = page_addr + m_page_size;
 
-  for (int ii = 0; ii < m_num_llc; ++ii) {
+  for (int ii = 0; ii < m_num_l3; ++ii) {
     int line_size = m_l3_cache[ii]->line_size();
     for (; addr < end_addr; addr += line_size)
       m_l3_cache[ii]->invalidate(addr);

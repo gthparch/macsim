@@ -72,6 +72,7 @@ const char *uop_c::g_mem_type_name[NUM_MEM_TYPES] = {
 
 // uop state string
 const char *uop_c::g_uop_state_name[NUM_OP_STATES] = {
+  "OS_INVALID",
   "OS_FETCHED",
   "OS_ISSUED",
   "OS_SCHEDULED",
@@ -86,6 +87,7 @@ const char *uop_c::g_uop_state_name[NUM_OP_STATES] = {
   "OS_DCACHE_BEGIN",
   "OS_DCACHE_HIT",
   "OS_DCACHE_ACCESS",
+  "OS_DCACHE_PORT_UNAVAILABLE",
   "OS_DCACHE_MEM_ACCESS_DENIED",
   "OS_EXEC_BEGIN",
   "OS_TRANS_BEGIN",
@@ -491,6 +493,7 @@ void uop_c::init()
   m_skip_llc                          = false;
   m_in_scheduler                      = false;
   m_mem_version                       = 0;
+  m_state                             = OS_INVALID;
 
   m_hmc_inst                          = HMC_NONE;
   m_hmc_trans_id                      = 0;

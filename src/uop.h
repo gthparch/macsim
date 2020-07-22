@@ -443,6 +443,7 @@ typedef enum Bar_Type_enum {
  * this make sure you update the op_state_names array in debug_print.c
  */
 typedef enum Uop_State_enum {
+  OS_INVALID,
   OS_FETCHED,                   //!< uop has been   fetched, awaiting issue
   OS_ISSUED,                    //!< uop has been    issued, waiting for its sources
   OS_SCHEDULED,                 //!< uop has been scheduled, awaiting complection
@@ -457,6 +458,7 @@ typedef enum Uop_State_enum {
   OS_DCACHE_BEGIN,
   OS_DCACHE_HIT,
   OS_DCACHE_ACCESS,
+  OS_DCACHE_PORT_UNAVAILABLE,
   OS_DCACHE_MEM_ACCESS_DENIED,
   OS_EXEC_BEGIN,
   OS_TRANS_BEGIN,
@@ -671,6 +673,7 @@ class uop_c
     uint16_t          m_mem_version; /**< version number for load/store */
 
     bool              m_translated;
+    int               m_num_page_table_walks;
 
     // hmc info
     // changed by Lifeng

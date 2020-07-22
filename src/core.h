@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "macsim.h"
 #include "global_defs.h"
@@ -332,6 +333,8 @@ class core_c
     int m_num_thread_reach_end; /**< number of total terminated threads */
     int m_fetching_block_id;    /**< currently fetching block id */
     int m_running_thread_num;   /**< number of currently running threads */
+
+    unordered_map<int, unordered_set<Counter>> m_per_thread_fault_parent_uops;
 
     // current core stats per thread
     unordered_map<int, bool> m_fetch_ended; /**< fetch ended */

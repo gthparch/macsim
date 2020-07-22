@@ -50,8 +50,8 @@ class PageMapper
 
   protected:
     macsim_c* m_simBase;                            //!< macsim base class for simulation globals
-    std::map<uint64_t, uint64_t> m_page_table;      //!< page table (virtual page && physical page)
-    uint32_t m_page_size;                           //!< page size (4KB default)
+    map<uint64_t, uint64_t> m_page_table;     //!< page table (virtual page && physical page)
+    uint64_t m_page_size;                     //!< page size (4KB default)
     uint64_t m_physical_tag;                        //!< physical page/region number allocated to a new virtual page/region
 
     PageMapper(macsim_c* simBase, uint32_t page_size, uint64_t physical_tag)
@@ -88,7 +88,7 @@ class RegionBasedFCFSPageMapper : public PageMapper
 
   private:
     std::map<uint64_t, uint64_t> m_region_table;    //!< region mapping table
-    uint32_t m_region_size;                         //!< region size 
+    uint64_t m_region_size;                         //!< region size 
 };
 
 #endif //!PAGE_MAPPING_H_INCLUDED
