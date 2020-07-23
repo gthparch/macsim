@@ -343,11 +343,10 @@ void frontend_c::run_a_cycle(void)
               (m_cur_core_cycle - fetch_data->m_sync_wait_start + 1);
           }
         }
-        status = m_sync_info->hash_table_access_delete(block_id);
 
-        if (!status) {
+        status = m_sync_info->hash_table_access_delete(block_id);
+        if (!status)
           printf("sync info not found!!!!!\n");
-        }
       }
     }
   }
@@ -474,12 +473,11 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid, frontend_s* fetch_dat
         // FIXME (jaekyu, 10-4-2011)
         // make it member variable somehow
         // debugging purpose
-				if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE) {
-	        m_simBase->m_bug_detector->allocate(new_uop);
-	        for (int ii = 0; ii < new_uop->m_num_child_uops; ++ii) {
-	          m_simBase->m_bug_detector->allocate(new_uop->m_child_uops[ii]);
-	        }
-				}
+        if (*m_simBase->m_knobs->KNOB_BUG_DETECTOR_ENABLE) {
+          m_simBase->m_bug_detector->allocate(new_uop);
+          for (int ii = 0; ii < new_uop->m_num_child_uops; ++ii)
+            m_simBase->m_bug_detector->allocate(new_uop->m_child_uops[ii]);
+        }
 
         ++m_core->m_ops_to_be_dispatched[tid];
         m_core->m_last_fetch_cycle[tid] = m_core->get_cycle_count();

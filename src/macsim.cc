@@ -253,8 +253,10 @@ void macsim_c::init_memory(void)
     m_dram_controller[ii]->init(ii);
   }
 
+#ifndef USING_SST
   // initialize memory
   m_memory->init();
+#endif
 
   // bug detector
   if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
@@ -587,8 +589,11 @@ void macsim_c::deallocate_memory(void)
   delete m_trace_node_pool;
   delete m_uop_pool;
   delete m_invalid_uop;
+
+#ifndef USING_SST
   delete m_memory;
   delete m_network;
+#endif
 
   for (int ii = 0; ii < m_num_mc; ++ii) {
     delete m_dram_controller[ii];
@@ -710,9 +715,6 @@ void macsim_c::initialize(int argc, char** argv)
 	printf("%s ", argv[i]);
   printf("\n");
 
-  // initialize knobs
-  init_knobs(argc, argv);
-
   // initialize stats
   m_coreStatsTemplate = new CoreStatistics(m_simBase);
   m_ProcessorStats = new ProcessorStatistics(m_simBase);
@@ -720,6 +722,8 @@ void macsim_c::initialize(int argc, char** argv)
   m_allStats = new all_stats_c(m_ProcessorStats);
   m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
 
+  // initialize knobs
+  init_knobs(argc, argv);
 
   m_num_sim_cores = *KNOB(KNOB_NUM_SIM_CORES);
 
@@ -962,6 +966,10 @@ int macsim_c::run_a_cycle()
     core->inc_core_cycle_count();
     m_core_cycle[ii]++;
 
+#ifndef USING_SST
+    m_memory->run_a_cycle_core(ii, pll_locked);
+#endif
+
     // core ended or not started    
     if (m_sim_end[ii] || !m_core_started[ii]) {
       continue;
@@ -977,11 +985,6 @@ int macsim_c::run_a_cycle()
     // active core : running a cycle and update stats
     if (!m_sim_end[ii])  {
       // run a cycle
-
-#ifndef USING_SST
-      m_memory->run_a_cycle_core(ii, pll_locked);
-#endif
-
       core->run_a_cycle(pll_locked);
 
       m_num_running_core++;

@@ -13,6 +13,7 @@
 #include <thread>
 
 #include <qsim.h>
+#include <qsim-load.h>
 #include <stdio.h>
 #include <capstone.h>
 #include <zlib.h>
@@ -352,13 +353,14 @@ bool InstHandler::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs reg
 
 class TraceWriter {
   public:
-    TraceWriter(OSDomain &osd, unsigned long max_inst) :
+  TraceWriter(OSDomain &osd, unsigned long max_inst, bool single_trace_arg = false) :
       osd(osd), finished(false)
     { 
       osd.set_app_start_cb(this, &TraceWriter::app_start_cb);
       trace_file_count = 0;
       finished = false;
       max_inst_n = max_inst;
+      single_trace = single_trace_arg;
     }
 
     ~TraceWriter()
@@ -376,6 +378,9 @@ class TraceWriter {
         osd.set_inst_cb(this, &TraceWriter::inst_cb);
         osd.set_mem_cb(this, &TraceWriter::mem_cb);
         osd.set_app_end_cb(this, &TraceWriter::app_end_cb);
+      } else if (single_trace) {
+	// next ROI will write to the same trace file
+	return 0;
       }
       inst_handle = new InstHandler[osd.get_n()];
       for (int i = 0; i < n_cpus; i++) {
@@ -397,6 +402,10 @@ class TraceWriter {
         return 0;
 
       std::cout << "App end cb called" << std::endl;
+
+      if (single_trace)
+	return 0;
+      
       finished = true;
 
       for (int i = 0; i < osd.get_n(); i++) {
@@ -407,20 +416,21 @@ class TraceWriter {
       inst_handle[0].closeDebugFile();
 
       delete [] inst_handle;
+
       return 0;
     }
 
     void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
         enum inst_type t)
     {
-      if (!curr_inst_n)
+      if (!curr_inst_n) {
         return;
+      }
 
       inst_handle[c].processInst((unsigned char*)b, l);
 
       --curr_inst_n;
       if (!curr_inst_n) {
-
         app_end_cb(0);
       }
 
@@ -437,7 +447,7 @@ class TraceWriter {
 
   private:
     OSDomain &osd;
-    bool finished;
+    bool finished, single_trace;
     int  trace_file_count;
     InstHandler *inst_handle;
     unsigned long max_inst_n;
@@ -456,13 +466,20 @@ int main(int argc, char** argv) {
     {"help",  no_argument, NULL, 'h'},
     {"ncpu", required_argument, NULL, 'n'},
     {"max_inst", required_argument, NULL, 'm'},
-    {"state", required_argument, NULL, 's'}
+    {"state", required_argument, NULL, 's'},
+    {"benchmark", required_argument, NULL, 'b'},
+    {"one_trace", no_argument, NULL, 'o'}
   };
 
   int c = 0;
   char *state_file = NULL;
-  while((c = getopt_long(argc, argv, "hn:m:", long_options, NULL)) != -1) {
+  char *benchmark_file = NULL;
+  bool single_trace = false;
+  while((c = getopt_long(argc, argv, "hn:m:b:s:o", long_options, NULL)) != -1) {
     switch(c) {
+      case 'b':
+        benchmark_file = strdup(optarg);
+        break;
       case 'n':
         n_cpus = atoi(optarg);
         break;
@@ -471,11 +488,15 @@ int main(int argc, char** argv) {
         break;
       case 's':
         state_file = strdup(optarg);
+        break;
+      case 'o':
+        single_trace = true;
+	break;
       case 'h':
       case '?':
       default:
         std::cout << "Usage: " << argv[0] << " --ncpu(-n) <num_cpus> --max_inst(-m)" <<
-          "  <num_inst(M)> --state <state_file>" << std::endl;
+          "  <num_inst(M)> --state(-s) <state_file> --benchmark(-b) <benchmark_file>"<< std::endl;
         exit(0);
     }
   }
@@ -485,14 +506,18 @@ int main(int argc, char** argv) {
   OSDomain *osd_p(NULL);
 
   if (!state_file)
-    osd_p = new OSDomain(n_cpus, qsim_prefix + "/../arm64_images/vmlinuz", "a64", QSIM_INTERACTIVE);
+    osd_p = new OSDomain(n_cpus, qsim_prefix + "/../arm64_images/vmlinuz", std::string("a64"), QSIM_INTERACTIVE);
   else
     osd_p = new OSDomain(n_cpus, state_file);
 
   OSDomain &osd(*osd_p);
 
   // Attach a TraceWriter if a trace file is given.
-  TraceWriter tw(osd, max_inst_n);
+  TraceWriter tw(osd, max_inst_n, single_trace);
+
+  if (benchmark_file) {
+    Qsim::load_file(osd, benchmark_file);
+  }
 
   // If this OSDomain was created from a saved state, the app start callback was
   // received prior to the state being saved.
@@ -500,15 +525,14 @@ int main(int argc, char** argv) {
 
   osd.connect_console(std::cout);
 
-  //tw.app_start_cb(0);
   // The main loop: run until 'finished' is true.
-  uint64_t inst_per_iter = 1000000000;
-  int inst_run = inst_per_iter;
-  while (!(inst_per_iter - inst_run)) {
-    inst_run = osd.run(inst_per_iter);
-    osd.timer_interrupt();
+  uint64_t inst_per_iter = 10000;
+  while (1) {
+    osd.run(inst_per_iter);
+    //osd.timer_interrupt();
   }
 
+  printf("instructions are done\n");
   delete osd_p;
 
   return 0;

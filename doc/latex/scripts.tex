@@ -1,0 +1,89 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{How to Use Scripts}
+\label{sec:use_scripts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this chapter, the usages of scripts in \textit{scripts} directory are introduced.
+Currently, the scripts are provided only for internal users.
+To use provided scripts easily, users can add macsim/internal/tools to \$PATH
+and set \$SIM\_RESULT\_DIR beforehand.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Launch a Job}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Verb+run_batch.py+ is used to launch a job. It will use
+\Verb+bench_comman.py+ and \Verb+trace_common.py+ in the same directory. 
+The usage of \Verb+run_batch.py+ is:
+
+\begin{Verbatim}
+<path_to_run_batch_script> -bin <path_to_binary> -param <path_to_param> -suite
+<benchmark_suite> -dir <result_dir> -cmd <extra_args>
+\end{Verbatim}
+
+\begin{itemize}
+  \item <path\_to\_run\_batch\_script>: path to \Verb+run_batch.py+ script
+
+        (e.g., /home/hkim606/sim/macsim/internal/tools/run\_batch.py).
+  \item <path\_to\_binary>: path to macsim binary (e.g., /home/hkim606/sim/macsim/bin/macsim).
+  \item <path\_to\_param>: path to params.in file (e.g., /home/hkim606/sim/macsim/bin/params.in).
+  \item <benchmark\_suite>: benchmark suite defined in \Verb+bench_common.py+
+        (e.g, rodinia31-ver14 for PTX, spec06 for x86)
+  \item <result\_dir>: \$SIM\_RESULT\_DIR/<result\_dir> will be created automatically by \Verb+run_batch.py+.
+  \item <extra\_args>: These will overwrite those defined in \Verb+params.in+ (e.g., 'max\_insts=1000 --sim\_cycle\_count=100000').
+        Note that first argument must begin without double dash.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Monitor Jobs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To kill all of your jobs, do
+
+\begin{Verbatim}
+myqstat.py -killall
+\end{Verbatim}
+
+Warning: if you have an administrator permission, above command will also kill other people's jobs. To avoid this, you can do below:
+
+\begin{Verbatim}
+myqstat.py | grep hyesoon | awk '\{print \$1\}' | xargs qdel
+\end{Verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How to Analyze Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After submitting jobs using \Verb+run_batch.py+, \Verb+get_data.py+ can be used to analyze results.
+Suppose a user submitted jobs using \Verb+run_batch.py+ for rodinia31-ver14 benchmark
+suite. The usage of \Verb+get_data.py+ is:
+
+\begin{enumerate}
+  \item Go to \$SIM\_RESULT\_DIR/<result\_dir> (e.g., ~/macsim\_results/sep9)
+  \item Use \Verb+get_data.py+ to analyze results.
+\end{enumerate}
+
+\begin{Verbatim}
+<path_to_get_data_script> -suite <benchmark_suite> -dir <result_dir> -stat <stat_to_compute> <extra_args>
+\end{Verbatim}
+
+\begin{itemize}
+  \item < path\_to\_get\_data\_script >: path to \Verb+get_data.py+ script
+
+        (e.g., /home/hkim606/sim/macsim/internal/tools/get\_data.py).
+  \item <benchmark\_suite>: benchmark suite defined in \Verb+bench_common.py+
+        (e.g, rodinia31-ver14 for PTX, spec06 for x86)
+  \item <stat\_to\_compute>: can be of various forms
+  \begin{itemize}
+    \item INST\_COUNT\_TOT
+    \item "ipc=INST\_COUNT\_TOT/CYC\_COUNT\_TOT"
+    \item etc.
+  \end{itemize}
+  \item <extra\_args>
+  \begin{itemize}
+    \item use -widenames to print full benchmark names.
+    \item use -prec to set precision (e,g., use 2 or 3 for IPC whereas for INST\_COUNT\_TOT use 0)
+    \item do get\_data.py --help for more details.
+  \end{itemize}
+\end{itemize}
+

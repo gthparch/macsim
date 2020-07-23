@@ -320,6 +320,8 @@ class dcu_c
     int       m_num_read_port; /**< number of read ports */
     int       m_num_write_port; /**< number of write ports */
 
+    list<mem_req_s*> m_retry_queue;
+
     memory_c* m_memory; /**< pointer to the memory system */
     macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 
@@ -690,6 +692,11 @@ class l2_decoupled_network_c : public memory_c
      * Destructor
      */
     ~l2_decoupled_network_c();
+  
+    /**
+     * Invalidate cache lines of the given page
+     */
+    void invalidate(Addr page_addr);
   
   private:
     /**

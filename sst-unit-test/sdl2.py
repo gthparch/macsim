@@ -7,22 +7,21 @@ GB = 1024*MB
 
 # Define SST Program Options:
 sst.setProgramOption("timebase", "1ps")
-sst.setProgramOption("stopAtCycle", "0 ns")
+sst.setProgramOption("stopAtCycle", "3 ms")
 
 # Define the SST Components:
 comp_cpu0 = sst.Component("cpu0", "macsimComponent.macsimComponent")
 comp_cpu0.addParams({
      "trace_file" : "trace_file_list",
      "mem_size" : 4*GB,
-     "command_line" :"--clock_cpu=4.0 --clock_cpu=4.0 --clock_l3=4.0 --clock_noc=4.0 --clock_mc=4.0 " + \
-                     "--use_memhierarchy=1 --perfect_icache=1 " + \
+     "command_line" :"--use_memhierarchy=1 --perfect_icache=1 " + \
                      "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 " + \
-                     "--core_type=x86",
-     "debug_level" : "0",
+                     "--core_type=igpu",
+     "debug_level" : "8",
      "num_link" : "1",
-     "frequency" : "4 Ghz",
+     "frequency" : "1.15 Ghz",
      "output_dir" : "results",
-     "debug" : "0",
+     "debug" : "1",
      "param_file" : "params.in"
 })
 comp_core0l1icache = sst.Component("core0l1icache", "memHierarchy.Cache")
@@ -30,11 +29,11 @@ comp_core0l1icache.addParams({
      "debug_level" : "8",
      "debug" : "0",
      "access_latency_cycles" : "1",
-     "cache_frequency" : "4 Ghz",
+     "cache_frequency" : "1.15 Ghz",
      "replacement_policy" : "lru",
      "coherence_protocol" : "MESI",
      "associativity" : "8",
-     "cache_line_size" : "128",
+     "cache_line_size" : "64",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -44,11 +43,11 @@ comp_core0l1dcache.addParams({
      "debug_level" : "8",
      "debug" : "0",
      "access_latency_cycles" : "3",
-     "cache_frequency" : "4 Ghz",
+     "cache_frequency" : "1.15 Ghz",
      "replacement_policy" : "lru",
      "coherence_protocol" : "MESI",
      "associativity" : "8",
-     "cache_line_size" : "128",
+     "cache_line_size" : "64",
      "L1" : "1",
      "cache_size" : "64 KB",
      "mshr_latency_cycles" : "0"
@@ -73,13 +72,13 @@ link_c0_dcache_bus.connect( (comp_core0l1dcache, "low_network_0", "10000ps"), (c
 comp_cpu0l2cache = sst.Component("cpu0l2cache", "memHierarchy.Cache")
 comp_cpu0l2cache.addParams({
      "debug_level" : "8",
-     "debug" : "0",
+     "debug" : "1",
      "access_latency_cycles" : "8",
-     "cache_frequency" : "4 Ghz",
+     "cache_frequency" : "1 Ghz",
      "replacement_policy" : "lru",
      "coherence_protocol" : "MESI",
      "associativity" : "8",
-     "cache_line_size" : "128",
+     "cache_line_size" : "64",
      "L1" : "0",
      "cache_size" : "512 KB",
      "mshr_latency_cycles" : "0"
@@ -87,9 +86,9 @@ comp_cpu0l2cache.addParams({
 
 comp_memory0 = sst.Component("memory0", "memHierarchy.MemController")
 comp_memory0.addParams({
-     "debug" : "0",
+     "debug" : "1",
      "coherence_protocol" : "MESI",
-     "backend.mem_size" : 4096,
+     "backend.mem_size" : "4096MiB",
      "clock" : "1 GHz",
      "access_time" : "97 ns",
      "rangeStart" : "0"
