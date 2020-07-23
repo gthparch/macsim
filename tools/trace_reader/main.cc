@@ -51,6 +51,8 @@ do {                                                              \
 
 #define PIN_3_13_TRACE 
 
+#define t_read_ver 1.3
+
 all_knobs_c* g_knobs;
 
 int read_trace(string trace_path, int truncate_size)
@@ -65,12 +67,17 @@ int read_trace(string trace_path, int truncate_size)
   }
   */
 
+  float gen_version;
   int num_thread;
   string type;
   int max_block_per_core;
   int inst_count = 0;
   int load_count = 0;
 
+  // determine what version of the trace generator this trace comes from
+  trace_file >> gen_version;
+  if (gen_version != t_read_ver) 
+    std::cout << "Trace reader and trace generator version mismatch; results may not be accurate.\n";
   // read number of threads and type of trace
   trace_file >> type >> num_thread ;
 
