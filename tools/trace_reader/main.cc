@@ -77,7 +77,8 @@ int read_trace(string trace_path, int truncate_size)
   // determine what version of the trace generator this trace comes from
   trace_file >> gen_version;
   if (gen_version != t_read_ver) 
-    std::cout << "Trace reader and trace generator version mismatch; results may not be accurate.\n";
+    std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; results may not be accurate.\n";
+  
   // read number of threads and type of trace
   trace_file >> type >> num_thread ;
 
