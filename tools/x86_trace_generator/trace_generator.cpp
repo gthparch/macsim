@@ -1099,7 +1099,7 @@ void finish(void)
     // thread_id thread_inst_start_count (relative to main thread)
     configFile << thread_info[ii].thread_id << " " << thread_info[ii].inst_count << endl;
   }
-  configFile << t_gen_ver << "\n";
+  configFile << t_gen_ver << endl;
   configFile.close();
 
   /**< Final print to standard output */
