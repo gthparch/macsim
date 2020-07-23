@@ -51,7 +51,7 @@ do {                                                              \
 
 #define PIN_3_13_TRACE 
 
-#define t_read_ver 1.3
+#define t_read_ver "1.3"
 
 all_knobs_c* g_knobs;
 
@@ -67,7 +67,7 @@ int read_trace(string trace_path, int truncate_size)
   }
   */
 
-  float gen_version;
+  string gen_version;
   int num_thread;
   string type;
   int max_block_per_core;
@@ -80,7 +80,8 @@ int read_trace(string trace_path, int truncate_size)
   // set up thread trace file name
   int * tid = new int[num_thread];
   int * start_inst_count = new int[num_thread];
-  for (int ii = 0; ii < num_thread; ii++) trace_file >> tid[ii] >> start_inst_count[ii];
+  for (int ii = 0; ii < num_thread; ii++) 
+    trace_file >> tid[ii] >> start_inst_count[ii];
 
   // determine what version of the trace generator this trace comes from
   trace_file >> gen_version;
