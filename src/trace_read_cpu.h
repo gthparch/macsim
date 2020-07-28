@@ -48,6 +48,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "process_manager.h"
 #include "hmc_process.h"
 
+
+typedef enum uop_latency_map{
+  LATENCY_DEFAULT = 0,
+  LATENCY_SKYLAKE,
+  LATENCY_SKYLAKE_X,
+  LATENCY_COFFEE_LAKE
+} latency_map;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
 ///
@@ -152,6 +160,7 @@ class cpu_decoder_c : public trace_read_c
     //changed by Lifeng
     //HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info, uint64_t hmc_vaddr, trace_info_cpu_s & ret_trace_info);
   private:
+    latency_map lat_map;                    //!< determine which map to use
     // page mapping support
     bool m_enable_physical_mapping;     //!< use physical mapping 
     PageMapper* m_page_mapper;          //!< page mapper
