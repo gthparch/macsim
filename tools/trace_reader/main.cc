@@ -51,6 +51,8 @@ do {                                                              \
 
 #define PIN_3_13_TRACE 
 
+#define t_read_ver "1.3"
+
 all_knobs_c* g_knobs;
 
 int read_trace(string trace_path, int truncate_size)
@@ -65,14 +67,26 @@ int read_trace(string trace_path, int truncate_size)
   }
   */
 
+  string gen_version;
   int num_thread;
   string type;
   int max_block_per_core;
   int inst_count = 0;
   int load_count = 0;
 
+  
   // read number of threads and type of trace
-  trace_file >> type >> num_thread ;
+  trace_file >> type >> num_thread;
+  // set up thread trace file name
+  int * tid = new int[num_thread];
+  int * start_inst_count = new int[num_thread];
+  for (int ii = 0; ii < num_thread; ii++) 
+    trace_file >> tid[ii] >> start_inst_count[ii];
+
+  // determine what version of the trace generator this trace comes from
+  trace_file >> gen_version;
+  if (gen_version != t_read_ver) 
+    std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; results may not be accurate.\n";
 
 #ifdef GPU_TRACE
     ASSERTM(type == "newptx", "GPU arch of trace reader being used for %s traces", type.c_str());
@@ -87,19 +101,15 @@ int read_trace(string trace_path, int truncate_size)
 
   // open each thread trace file
   for (int ii = 0; ii < num_thread; ++ii) {
-    int tid;
-    int start_inst_count;
     int cur_file_inst_count = 0; 
     int slice_file_num = 0; 
 
-    // set up thread trace file name
-    trace_file >> tid >> start_inst_count;
 
     stringstream sstr;
     stringstream wsstr;
 
-    sstr << base_filename << "_" << tid << ".raw";
-    wsstr << base_filename << "_s" << slice_file_num << "_" << tid << ".raw";
+    sstr << base_filename << "_" << tid[ii] << ".raw";
+    wsstr << base_filename << "_s" << slice_file_num << "_" << tid[ii] << ".raw";
     string thread_filename;
     sstr >> thread_filename;
     
@@ -174,6 +184,8 @@ int read_trace(string trace_path, int truncate_size)
     gzclose(gzwtrace);
 
   }
+  delete [] tid;
+  delete [] start_inst_count;
   cout << "> trace_path: " << trace_path << " inst_count: " << inst_count << " load_count:" << load_count << "\n";
 
   return inst_count;
