@@ -53,7 +53,8 @@ typedef enum uop_latency_map{
   LATENCY_DEFAULT = 0,
   LATENCY_SKYLAKE,
   LATENCY_SKYLAKE_X,
-  LATENCY_COFFEE_LAKE
+  LATENCY_COFFEE_LAKE,
+  NUM_LATENCY_MAPS
 } latency_map;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,9 +159,12 @@ class cpu_decoder_c : public trace_read_c
 
 
     //changed by Lifeng
+    //changed my Michael
     //HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info, uint64_t hmc_vaddr, trace_info_cpu_s & ret_trace_info);
   private:
+    // latency mapping
     latency_map lat_map;                    //!< determine which map to use
+    static const std::map<std::string, latency_map> string_to_latency_map;
     // page mapping support
     bool m_enable_physical_mapping;     //!< use physical mapping 
     PageMapper* m_page_mapper;          //!< page mapper
