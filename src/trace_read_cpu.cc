@@ -76,6 +76,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Latency map knob decoder
  * take the string from the knob and convert it into an enum
+ * - Michael
  */
 const std::map<std::string, latency_map> cpu_decoder_c::string_to_latency_map = {
   { "x86", LATENCY_DEFAULT },
@@ -92,8 +93,8 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
 {
   m_trace_size = CPU_TRACE_SIZE;
 
-  // latency mapping
-  if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)) == 1)
+  // latency mapping - Michael
+  if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
     lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
   else{
     cout << "UOP latency map " << *KNOB(KNOB_UOP_LATENCY_MAP) << " is not supported; defaulting to x86." << endl;
@@ -1275,6 +1276,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
 void cpu_decoder_c::init_pin_convert(void)
 {
+  // init conversion based on knob value; this is only how they will be mapped and is independent of the UOP latency values - Michael
   switch(lat_map){
     case LATENCY_SKYLAKE:
     case LATENCY_COFFEE_LAKE:
