@@ -97,8 +97,34 @@ struct Uop_LatencyBinding_Init
   int m_latency; /**< latency */
 };
 
+/**
+ * Latency map knob decoder
+ * take the string from the knob and convert it into an enum
+ * - Michael
+ */
+const std::map<std::string, latency_map> exec_c::string_to_latency_map = {
+  { "x86", LATENCY_DEFAULT },
+  { "skylake", LATENCY_SKYLAKE },
+  { "skylake_x", LATENCY_SKYLAKE_X },
+  { "coffee_lake", LATENCY_COFFEE_LAKE}
+};
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_x86[] = {
+#define DEFUOP(A, B) {A, # A, B},
+#include "../def/uoplatency_x86.def"
+};
+
+static Uop_LatencyBinding_Init uop_latencybinding_init_x86_skylake[] = {
+#define DEFUOP(A, B) {A, # A, B},
+#include "../def/uoplatency_x86.def"
+};
+
+static Uop_LatencyBinding_Init uop_latencybinding_init_x86_skylake_x[] = {
+#define DEFUOP(A, B) {A, # A, B},
+#include "../def/uoplatency_x86.def"
+};
+
+static Uop_LatencyBinding_Init uop_latencybinding_init_x86_coffee_lake[] = {
 #define DEFUOP(A, B) {A, # A, B},
 #include "../def/uoplatency_x86.def"
 };
@@ -143,12 +169,49 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
     }
   }
   else {
-    int latency_array_size = (sizeof uop_latencybinding_init_x86 /
-        sizeof (uop_latencybinding_init_x86[0]));
+    latency_map lat_map;
+    // determine which mapping to use
+    if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
+      lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
+    else
+      lat_map = LATENCY_DEFAULT;
+    int latency_array_size = 0;
+    switch (lat_map){
+      case LATENCY_SKYLAKE:
+        latency_array_size = (sizeof uop_latencybinding_init_x86_skylake /
+            sizeof (uop_latencybinding_init_x86_skylake[0]));
 
-    for (int ii = 0; ii < latency_array_size; ++ii) {
-      m_latency[uop_latencybinding_init_x86[ii].uop_type_s] =
-        uop_latencybinding_init_x86[ii].m_latency;
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86_skylake[ii].uop_type_s] =
+            uop_latencybinding_init_x86_skylake[ii].m_latency;
+        }
+        break;
+      case LATENCY_SKYLAKE_X:
+        latency_array_size = (sizeof uop_latencybinding_init_x86_skylake_x /
+            sizeof (uop_latencybinding_init_x86_skylake_x[0]));
+
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86_skylake_x[ii].uop_type_s] =
+            uop_latencybinding_init_x86_skylake_x[ii].m_latency;
+        }
+        break;
+      case LATENCY_COFFEE_LAKE:
+        latency_array_size = (sizeof uop_latencybinding_init_x86_coffee_lake /
+            sizeof (uop_latencybinding_init_x86_coffee_lake[0]));
+
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86_coffee_lake[ii].uop_type_s] =
+            uop_latencybinding_init_x86_coffee_lake[ii].m_latency;
+        }
+        break;
+      default:
+        latency_array_size = (sizeof uop_latencybinding_init_x86 /
+            sizeof (uop_latencybinding_init_x86[0]));
+
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86[ii].uop_type_s] =
+            uop_latencybinding_init_x86[ii].m_latency;
+        }
     }
   }
 

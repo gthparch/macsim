@@ -218,6 +218,9 @@ class exec_c
     
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
+    // latency mapping data
+    static const std::map<std::string, latency_map> string_to_latency_map;
+
 #ifdef USING_SST
     uint64_t m_unique_request_id;
     std::map<uint64_t, uop_c*> m_uop_buffer;

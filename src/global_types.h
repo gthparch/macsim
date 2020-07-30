@@ -76,4 +76,12 @@ typedef enum _Unit_Type_enum
   UNIT_LARGE /**< large core */
 } Unit_Type;
 
+typedef enum uop_latency_map{ // enum for x86 latency maps - Michael 
+  LATENCY_DEFAULT = 0, 
+  LATENCY_SKYLAKE, 
+  LATENCY_SKYLAKE_X, 
+  LATENCY_COFFEE_LAKE,
+  NUM_LATENCY_MAPS
+} latency_map;
+
 #endif 

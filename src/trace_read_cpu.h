@@ -49,13 +49,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "hmc_process.h"
 
 
-typedef enum uop_latency_map{
-  LATENCY_DEFAULT = 0,
-  LATENCY_SKYLAKE,
-  LATENCY_SKYLAKE_X,
-  LATENCY_COFFEE_LAKE,
-  NUM_LATENCY_MAPS
-} latency_map;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
