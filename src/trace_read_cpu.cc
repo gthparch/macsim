@@ -73,17 +73,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Latency map knob decoder
- * take the string from the knob and convert it into an enum
- * - Michael
- */
-const std::map<std::string, latency_map> cpu_decoder_c::string_to_latency_map = {
-  { "x86", LATENCY_DEFAULT },
-  { "skylake", LATENCY_SKYLAKE },
-  { "skylake_x", LATENCY_SKYLAKE_X },
-  { "coffee_lake", LATENCY_COFFEE_LAKE}
-};
 
 /**
  * Constructor
@@ -93,12 +82,8 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
 {
   m_trace_size = CPU_TRACE_SIZE;
 
-  // latency mapping - Michael
-  std::string latency_knob = *m_simBase->m_knobs->KNOB_UOP_LATENCY_MAP;
-  if(string_to_latency_map.count(latency_knob))
-    lat_map = string_to_latency_map.at(latency_knob);
-  else
-    lat_map = LATENCY_DEFAULT;
+  // latency mapping
+  lat_map = simBase->m_knobsContainer->getDecodedUOPLatencyKnob();
 
   // physical page mapping
   m_enable_physical_mapping = *KNOB(KNOB_ENABLE_PHYSICAL_MAPPING);

@@ -157,7 +157,6 @@ class cpu_decoder_c : public trace_read_c
   private:
     // latency mapping
     latency_map lat_map;                    //!< determine which map to use
-    static const std::map<std::string, latency_map> string_to_latency_map;
     // page mapping support
     bool m_enable_physical_mapping;     //!< use physical mapping 
     PageMapper* m_page_mapper;          //!< page mapper

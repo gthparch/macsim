@@ -97,17 +97,6 @@ struct Uop_LatencyBinding_Init
   int m_latency; /**< latency */
 };
 
-/**
- * Latency map knob decoder
- * take the string from the knob and convert it into an enum
- * - Michael
- */
-const std::map<std::string, latency_map> exec_c::string_to_latency_map = {
-  { "x86", LATENCY_DEFAULT },
-  { "skylake", LATENCY_SKYLAKE },
-  { "skylake_x", LATENCY_SKYLAKE_X },
-  { "coffee_lake", LATENCY_COFFEE_LAKE}
-};
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_x86[] = {
 #define DEFUOP(A, B) {A, # A, B},
@@ -169,15 +158,8 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
     }
   }
   else {
-    latency_map lat_map;
-    // determine which mapping to use
-    std::string latency_knob = *m_simBase->m_knobs->KNOB_UOP_LATENCY_MAP;
-    if(string_to_latency_map.count(latency_knob))
-      lat_map = string_to_latency_map.at(latency_knob);
-    else{
-      lat_map = LATENCY_DEFAULT;
-      cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
-    }
+    latency_map lat_map = m_simBase->m_knobsContainer->getDecodedUOPLatencyKnob();
+    
     int latency_array_size = 0;
     switch (lat_map){
       case LATENCY_SKYLAKE:
