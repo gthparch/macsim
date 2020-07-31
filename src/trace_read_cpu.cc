@@ -96,10 +96,8 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
   // latency mapping - Michael
   if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
     lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
-  else{
-    cout << "UOP latency map " << *KNOB(KNOB_UOP_LATENCY_MAP) << " is not supported; defaulting to x86." << endl;
+  else
     lat_map = LATENCY_DEFAULT;
-  }
 
   // physical page mapping
   m_enable_physical_mapping = *KNOB(KNOB_ENABLE_PHYSICAL_MAPPING);

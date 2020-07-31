@@ -173,11 +173,14 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
     // determine which mapping to use
     if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
       lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
-    else
+    else{
       lat_map = LATENCY_DEFAULT;
+      cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
+    }
     int latency_array_size = 0;
     switch (lat_map){
       case LATENCY_SKYLAKE:
+        report("UOP latency mapped to Skylake");
         latency_array_size = (sizeof uop_latencybinding_init_x86_skylake /
             sizeof (uop_latencybinding_init_x86_skylake[0]));
 
@@ -187,6 +190,7 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
         }
         break;
       case LATENCY_SKYLAKE_X:
+        report("UOP latency mapped to Skylake X");
         latency_array_size = (sizeof uop_latencybinding_init_x86_skylake_x /
             sizeof (uop_latencybinding_init_x86_skylake_x[0]));
 
@@ -196,6 +200,7 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
         }
         break;
       case LATENCY_COFFEE_LAKE:
+        report("UOP latency mapped to Coffee Lake");
         latency_array_size = (sizeof uop_latencybinding_init_x86_coffee_lake /
             sizeof (uop_latencybinding_init_x86_coffee_lake[0]));
 
@@ -205,6 +210,7 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
         }
         break;
       default:
+        report("UOP latency mapped to Sandy Bridge");
         latency_array_size = (sizeof uop_latencybinding_init_x86 /
             sizeof (uop_latencybinding_init_x86[0]));
 
