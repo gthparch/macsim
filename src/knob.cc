@@ -194,13 +194,13 @@ void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)
   }
 
   // determine which UOP mapping to use
-    std::string latency_knob = *m_allKnobs->KNOB_UOP_LATENCY_MAP;
-    if(string_to_latency_map.count(latency_knob))
-      uop_latency_knob = string_to_latency_map.at(latency_knob);
-    else{
-      uop_latency_knob = LATENCY_DEFAULT;
-      cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
-    }
+  std::string latency_knob = *m_allKnobs->KNOB_UOP_LATENCY_MAP;
+  if(string_to_latency_map.count(latency_knob))
+    uop_latency_knob = string_to_latency_map.at(latency_knob);
+  else{
+    uop_latency_knob = LATENCY_DEFAULT;
+    cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
+  }
 }
 
 
