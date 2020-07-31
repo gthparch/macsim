@@ -94,8 +94,9 @@ cpu_decoder_c::cpu_decoder_c(macsim_c* simBase, ofstream* m_dprint_output)
   m_trace_size = CPU_TRACE_SIZE;
 
   // latency mapping - Michael
-  if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
-    lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
+  std::string latency_knob = *m_simBase->m_knobs->KNOB_UOP_LATENCY_MAP;
+  if(string_to_latency_map.count(latency_knob))
+    lat_map = string_to_latency_map.at(latency_knob);
   else
     lat_map = LATENCY_DEFAULT;
 

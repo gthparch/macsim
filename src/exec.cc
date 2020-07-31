@@ -116,17 +116,17 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_x86[] = {
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_x86_skylake[] = {
 #define DEFUOP(A, B) {A, # A, B},
-#include "../def/uoplatency_x86.def"
+#include "../def/uoplatency_x86_skylake.def"
 };
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_x86_skylake_x[] = {
 #define DEFUOP(A, B) {A, # A, B},
-#include "../def/uoplatency_x86.def"
+#include "../def/uoplatency_x86_skylake_x.def"
 };
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_x86_coffee_lake[] = {
 #define DEFUOP(A, B) {A, # A, B},
-#include "../def/uoplatency_x86.def"
+#include "../def/uoplatency_x86_coffee_lake.def"
 };
 
 static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
@@ -171,8 +171,9 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase): EXEC_INTERFACE_INIT(
   else {
     latency_map lat_map;
     // determine which mapping to use
-    if(string_to_latency_map.count(*KNOB(KNOB_UOP_LATENCY_MAP)))
-      lat_map = string_to_latency_map.at(*KNOB(KNOB_UOP_LATENCY_MAP));
+    std::string latency_knob = *m_simBase->m_knobs->KNOB_UOP_LATENCY_MAP;
+    if(string_to_latency_map.count(latency_knob))
+      lat_map = string_to_latency_map.at(latency_knob);
     else{
       lat_map = LATENCY_DEFAULT;
       cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
