@@ -53,6 +53,7 @@ DEFUOP( UOP_MM,      1)
 
 DEFUOP( UOP_VSTR,    3)
 DEFUOP( UOP_VADD,    1)
+DEFUOP( UOP_VFADD,   1) // not used in coffee lake
 DEFUOP( UOP_AES,     4)
 DEFUOP( UOP_PCLMUL,  7)
 DEFUOP( UOP_X87,     3)
