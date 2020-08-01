@@ -1092,6 +1092,7 @@ void finish(void)
   ofstream configFile;
 
   configFile.open(config_file_name.c_str());
+  configFile << t_gen_ver << endl;
   configFile << "x86\n";
   configFile << thread_count << endl;
   for (unsigned int ii = 0; ii < thread_count; ++ii)
@@ -1099,7 +1100,7 @@ void finish(void)
     // thread_id thread_inst_start_count (relative to main thread)
     configFile << thread_info[ii].thread_id << " " << thread_info[ii].inst_count << endl;
   }
-  configFile << t_gen_ver << endl;
+  
   configFile.close();
 
   /**< Final print to standard output */
