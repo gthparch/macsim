@@ -74,13 +74,11 @@ int read_trace(string trace_path, int truncate_size)
   int inst_count = 0;
   int load_count = 0;
 
-  // determine what version of the trace generator this trace comes from
-  trace_file >> gen_version;
+  // read number of threads and type of trace
+  trace_file >> type >> gen_version >> num_thread;
+
   if (gen_version != t_read_ver) 
     std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; results may not be accurate.\n";
-  
-  // read number of threads and type of trace
-  trace_file >> type >> num_thread;
 
 #ifdef GPU_TRACE
     ASSERTM(type == "newptx", "GPU arch of trace reader being used for %s traces", type.c_str());

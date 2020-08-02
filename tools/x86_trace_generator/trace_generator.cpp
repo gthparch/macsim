@@ -1092,8 +1092,7 @@ void finish(void)
   ofstream configFile;
 
   configFile.open(config_file_name.c_str());
-  configFile << t_gen_ver << endl;
-  configFile << "x86\n";
+  configFile << "x86 " << t_gen_ver << endl;
   configFile << thread_count << endl;
   for (unsigned int ii = 0; ii < thread_count; ++ii)
   {
