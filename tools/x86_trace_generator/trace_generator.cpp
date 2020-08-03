@@ -60,6 +60,8 @@ using namespace INSTLIB;
 #define ctr_t UINT64
 #define uns UINT32
 
+#define t_gen_ver 1.3
+
 #define DUMMY_THREAD 100000
 
 #define THREAD_ENABLE_CHECK(tid)          \
@@ -1090,13 +1092,14 @@ void finish(void)
   ofstream configFile;
 
   configFile.open(config_file_name.c_str());
-  configFile << "x86\n";
+  configFile << "x86 " << t_gen_ver << endl;
   configFile << thread_count << endl;
   for (unsigned int ii = 0; ii < thread_count; ++ii)
   {
     // thread_id thread_inst_start_count (relative to main thread)
     configFile << thread_info[ii].thread_id << " " << thread_info[ii].inst_count << endl;
   }
+  
   configFile.close();
 
   /**< Final print to standard output */
