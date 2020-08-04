@@ -48,8 +48,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "process_manager.h"
 #include "hmc_process.h"
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
 ///
@@ -152,7 +150,7 @@ class cpu_decoder_c : public trace_read_c
 
 
     //changed by Lifeng
-    //changed my Michael
+    //changed by Michael
     //HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info, uint64_t hmc_vaddr, trace_info_cpu_s & ret_trace_info);
   private:
     // latency mapping
