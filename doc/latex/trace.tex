@@ -51,7 +51,7 @@ trace generator module has to be built. The command for doing so is:
 
 
 \begin{Verbatim}
-cd toos/x86_trace_generator
+cd tools/x86_trace_generator
 make
 \end{Verbatim}
 
@@ -89,13 +89,13 @@ xed_extractor.o  xed_extractor.so
 The trace generator generates two files (in case of a single threaded
 application) - Trace.txt and trace\_0.raw, in the current directory.
 Section~\ref{sec:traceformat} provides details of the generated files.
-It is also possibel to generate traces for a given code section.
+It is also possible to generate traces for a given code section.
 Users can add routine call SIM\_BEGIN(1) and SIM\_END(1) in the 
 source code to indicate the begin/end point. An example is shown as
 follows.
 
 \begin{Verbatim}
-pin -t trace\_generator.so -manual 1 -thread N -- $BIN $ARGS (enable user defined annotations) 
+pin -t trace_generator.so -manual 1 -thread N -- $BIN $ARGS (enable user defined annotations) 
 \end{Verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
