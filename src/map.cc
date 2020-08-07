@@ -82,6 +82,8 @@ map_data_c::map_data_c(macsim_c* simBase)
   /* initialize the memory dependence hash table */
   m_simBase = simBase;
   m_oracle_mem_hash = new hash_c<mem_map_entry_c>(simBase->m_mem_map_entry_pool);
+ 
+ 
 }
 
 
@@ -116,6 +118,10 @@ map_c::map_c(macsim_c* simBase)
 {
   m_simBase = simBase;
   m_core_map_data = new hash_c<map_data_c>("core_map_data"); 
+  static char memdep_filename[] = "memdep";
+  if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {
+    MEMDEP_OUT = file_tag_fopen(memdep_filename, "w", m_simBase);	
+  }
 }
 
 
@@ -225,6 +231,13 @@ void map_c::add_src_from_uop (uop_c *uop, uop_c *src_uop, Dep_Type type)
 // add memory dependence information
 void map_c::map_mem_dep(uop_c *uop)
 {
+
+  if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {
+    if (uop->m_cf_type==CF_CBR)
+      fprintf(MEMDEP_OUT, "br-pc:%lld dir:%d\n", uop->m_pc, uop->m_dir);
+
+  }
+     
   if (!*m_simBase->m_knobs->KNOB_MEM_OBEY_STORE_DEP) 
     return; 
 
@@ -288,7 +301,7 @@ void map_c::map_uop (uop_c *uop)
   ASSERT         (uop);
   read_reg_map   (uop);  /* set reg sources */ 
   read_store_map (uop);  /* set addr dependency on last store */ 
-  update_map     (uop);  /* update reg and last store maps */ 
+  update_map     (uop);  /* update reg and last store maps */  
 }
 
 
@@ -395,6 +408,10 @@ void map_c::update_store_hash (uop_c *uop)
   DEBUG_CORE(uop->m_core_id, "core_id:%d thread_id:%d store_mask:0x%x first_byte:%d uop_num:%llu vaddr:0x%llx\n", 
       uop->m_core_id, uop->m_thread_id, mem_map_p->m_store_mask, first_byte, uop->m_uop_num, 
       (mem_map_p->m_uop[first_byte])->m_vaddr); 
+
+  if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {    
+    fprintf(MEMDEP_OUT, "store-pc:%lld va:%llx\n", uop->m_pc, uop->m_vaddr);
+  }
 }
 
 
@@ -412,6 +429,9 @@ uop_c* map_c::add_store_deps(uop_c * uop)
   mem_map_p = (map_data->m_oracle_mem_hash)->hash_table_access(MEM_MAP_KEY(va, off_path));
 
   if (mem_map_p == NULL) {
+    if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {
+      fprintf(MEMDEP_OUT, "load-pc:%lld, load-addr:%llx no-dep\n", uop->m_pc,uop->m_vaddr);
+    }
     STAT_EVENT(LD_NO_FORWARD);
     return NULL;
   } 
@@ -460,6 +480,9 @@ uop_c* map_c::add_store_deps(uop_c * uop)
 
     if (first_byte == -1) {
       STAT_EVENT(LD_NO_FORWARD);
+      if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {
+        fprintf(MEMDEP_OUT, "load-pc:%lld, load-addr:%llx no-dep\n", uop->m_pc,uop->m_vaddr);
+      }
       return NULL;  /* No dependency found */
     }
   }
@@ -476,7 +499,9 @@ uop_c* map_c::add_store_deps(uop_c * uop)
     add_src_from_uop(uop, src_uop, MEM_DATA_DEP);
     STAT_EVENT(FORWARDED_LD);
   }
-
+  if (*m_simBase->m_knobs->KNOB_MEMDEP_PROF) {
+    fprintf(MEMDEP_OUT, "load-pc:%lld, load-addr:%llx dep-store:pc:%lld\n", src_uop->m_pc,src_uop->m_vaddr, uop->m_pc);
+  }
   return src_uop;
 }
 

@@ -97,11 +97,11 @@ class map_data_c
      */
     void initialize();
    
+   
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 
 };
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief register dependence mapping
@@ -192,7 +192,8 @@ class map_c
 
   public:
     hash_c<map_data_c>* m_core_map_data; /**< per thread dependence table */
-
+    FILE *MEMDEP_OUT; /**< memory dependency profile file */ 
+   
   private:
     macsim_c* m_simBase;         /**< macsim_c base class for simulation globals */
 

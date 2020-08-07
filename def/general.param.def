@@ -57,3 +57,5 @@ param<CLOCK_MC,  clock_mc,  float, 0.8>
 param<COMPUTE_CAPABILITY, compute_capability, float, 2.0>
 param<GPU_WARP_SIZE, gpu_warp_size, int, 32>
 param<TRACE_USES_64_BIT_ADDR, trace_uses_64_bit_addr, bool, true>
+
+param<MEMDEP_PROF, memdep_prof, bool, false> 
