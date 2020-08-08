@@ -80,11 +80,17 @@ typedef enum Uop_Type_enum {
   UOP_IMEM,                     //!< int memory instruction
   UOP_IADD,                     //!< integer add
   UOP_IMUL,                     //!< integer multiply
+  UOP_IDIV,                     //!< integer divide
   UOP_ICMP,                     //!< integer compare
   UOP_LOGIC,                    //!< logical
   UOP_SHIFT,                    //!< shift
   UOP_BYTE,                     //!< byte manipulation
   UOP_MM,                       //!< multimedia instructions
+
+  // vector instructions
+  UOP_VADD,                     //!< vector integer add
+  UOP_VSTR,                     //!< vector string operation
+  UOP_VFADD,                    //!< vector floating point add
 
   // fence instruction
   UOP_LFENCE,                   //!< load fence, TODO
@@ -113,6 +119,13 @@ typedef enum Uop_Type_enum {
 
   // SIMD instructions for Intel GPU
   UOP_SIMD,
+
+  // other instructions
+  UOP_AES,                      //!< AES enctyption
+  UOP_PCLMUL,                   //!< carryless multiplication
+  UOP_X87,                      //!< x87 ALU op
+  UOP_XSAVE,                    //!< XSAVE context switch
+  UOP_XSAVEOPT,                 //!< optimized XSAVE context switch
 
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,

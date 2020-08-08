@@ -92,6 +92,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define BLOCK_ID_SHIFT 16 
 #define THREAD_ID_MASK 0xFFF 
 #define BLOCK_ID_MOD 16384 
+#define t_gen_ver "1.3"
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SIM_THREAD_SCHEDULE, ## args)
 
@@ -528,6 +529,13 @@ void process_manager_c::setup_process(process_s* process)
     if (*m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE_SUPER > 0) {
       process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE_SUPER;
     }
+  }
+
+  if (trace_type == "x86") {
+    std::string gen_version;
+    trace_config_file >> gen_version;
+    if (gen_version != t_gen_ver)
+      std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; trace may not be read correctly." << std::endl;
   }
 
   // get thread count

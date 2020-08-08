@@ -133,11 +133,15 @@ const char *uop_c::g_uop_type_name[NUM_UOP_TYPES] = {
   "UOP_IMEM",
   "UOP_IADD",
   "UOP_IMUL",
+  "UOP_IDIV", // NEW
   "UOP_ICMP",
   "UOP_LOGIC",
   "UOP_SHIFT",
   "UOP_BYTE",
   "UOP_MM",
+  "UOP_VADD", // NEW
+  "UOP_VSTR", // NEW
+  "UOP_VFADD", // NEW
   "UOP_LFENCE",
   "UOP_FULL_FENCE",
   "UOP_ACQ_FENCE",
@@ -155,6 +159,11 @@ const char *uop_c::g_uop_type_name[NUM_UOP_TYPES] = {
   "UOP_ST",
   "UOP_SSE",
   "UOP_SIMD",
+  "UOP_AES", // NEW
+  "UOP_PCLMUL", // NEW
+  "UOP_X87", // NEW
+  "UOP_XSAVE", // NEW
+  "UOP_XSAVEOPT", // NEW
 
   "UOP_GPU_ABS",
   "UOP_GPU_ABS64",

@@ -20,6 +20,7 @@ clock_mc  1.15
 fetch_policy rr
 mt_no_fetch_br 1
 one_cycle_exec 0
+uop_latency_map x86
 
 # Large Core Configuration
 large_width 2
