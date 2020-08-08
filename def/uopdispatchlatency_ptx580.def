@@ -46,7 +46,6 @@ POSSIBILITY OF SUCH DAMAGE.
  //MAD24 Converted to multiple cycles, so setting dispatch latency to 2, what about other instructions?
 
 DEFUOP( UOP_INV,     1) 
-DEFUOP( UOP_INV,     1)
 DEFUOP( UOP_NOP,     1)
 DEFUOP( UOP_CF,      1)
 DEFUOP( UOP_CMOV,    1)

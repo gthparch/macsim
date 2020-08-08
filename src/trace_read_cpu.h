@@ -150,8 +150,11 @@ class cpu_decoder_c : public trace_read_c
 
 
     //changed by Lifeng
+    //changed by Michael
     //HMC_Type generate_hmc_inst(const hmc_inst_s & inst_info, uint64_t hmc_vaddr, trace_info_cpu_s & ret_trace_info);
   private:
+    // latency mapping
+    latency_map lat_map;                    //!< determine which map to use
     // page mapping support
     bool m_enable_physical_mapping;     //!< use physical mapping 
     PageMapper* m_page_mapper;          //!< page mapper

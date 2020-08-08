@@ -147,6 +147,18 @@ void KnobsContainer::updateKnob(string key, string value) {
 	adjustKnobValues();
 }
 
+/**
+ * Latency map knob decoder
+ * take the string from the knob and convert it into an enum
+ * - Michael
+ */
+static std::map<std::string, latency_map> string_to_latency_map = {
+  { "x86", LATENCY_DEFAULT },
+  { "skylake", LATENCY_SKYLAKE },
+  { "skylake_x", LATENCY_SKYLAKE_X },
+  { "coffee_lake", LATENCY_COFFEE_LAKE}
+};
+
 // apply new value to the knob
 void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)
 {
@@ -179,6 +191,15 @@ void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)
       pKnob->initFromString(m_theKnobs[pKnob->getParentName()]->getValueString());
     }
     ++knob_iter;
+  }
+
+  // determine which UOP mapping to use
+  std::string latency_knob = *m_allKnobs->KNOB_UOP_LATENCY_MAP;
+  if(string_to_latency_map.count(latency_knob))
+    uop_latency_knob = string_to_latency_map.at(latency_knob);
+  else{
+    uop_latency_knob = LATENCY_DEFAULT;
+    cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
   }
 }
 
@@ -219,6 +240,10 @@ bool KnobsContainer::applyComandLineArguments(int argc, char** argv, char** inva
   return true;
 }
 
+
+latency_map KnobsContainer::getDecodedUOPLatencyKnob(){
+  return uop_latency_knob;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
