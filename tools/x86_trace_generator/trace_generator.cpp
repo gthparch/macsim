@@ -789,7 +789,7 @@ void instrument(INS ins)
   // Branch instruction - set branch type
   // ----------------------------------------
   // if (INS_IsIndirectBranchOrCall(ins) && !INS_IsRet(ins) && !INS_IsInterrupt(ins)) {
-  if (INS_IsControlFlow(ins))
+  if (INS_IsControlFlow(ins) && !INS_IsXend(ins) && !INS_IsXbegin(ins))
   {
     if (INS_IsIndirectControlFlow(ins) && !INS_IsRet(ins) && !INS_IsInterrupt(ins))
     {
@@ -882,7 +882,7 @@ void instrument(INS ins)
   // ----------------------------------------
   // Branch instruction
   // ----------------------------------------
-  if (INS_IsControlFlow(ins))
+  if (INS_IsControlFlow(ins) && !INS_IsXend(ins) && !INS_IsXbegin(ins))
   {
     //if (info->cf_type) {
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)get_target, IARG_BRANCH_TARGET_ADDR, IARG_BRANCH_TAKEN, IARG_THREAD_ID, IARG_END);
