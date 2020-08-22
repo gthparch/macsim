@@ -79,32 +79,25 @@ typedef enum GED_OPCODE_ENUM_ {
   GED_OPCODE_F16TO32,
   GED_OPCODE_DIM,
   GED_OPCODE_INVALID,
-  GED_OPCODE_LAST // To mark the end of the list of instructions
+  GED_OPCODE_LAST  // To mark the end of the list of instructions
 } GED_OPCODE;
-
-
 
 class igpu_decoder_c : public cpu_decoder_c
 {
-  public:
-    igpu_decoder_c(macsim_c* simBase, ofstream* dprint_output)
-      : cpu_decoder_c(simBase, dprint_output) 
-    {
-      m_trace_size = sizeof(trace_info_igpu_s) - sizeof(uint64_t);
-    }
+public:
+  igpu_decoder_c(macsim_c *simBase, ofstream *dprint_output) : cpu_decoder_c(simBase, dprint_output) {
+    m_trace_size = sizeof(trace_info_igpu_s) - sizeof(uint64_t);
+  }
 
-    static const char* g_tr_opcode_names[GED_OPCODE_LAST]; /**< opcode name string */
+  static const char *g_tr_opcode_names[GED_OPCODE_LAST]; /**< opcode name string */
 
-  private:
-    void init_pin_convert();
-    inst_info_s* convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, 
-        int core_id, int sim_thread_id);
-    void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, 
-        Addr rep_offset, int core_id);
-    bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id);
-    inst_info_s* get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id);
-    void dprint_inst(void *t_info, int core_id, int thread_id);
+private:
+  void init_pin_convert();
+  inst_info_s *convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, int core_id, int sim_thread_id);
+  void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, Addr rep_offset, int core_id);
+  bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id);
+  inst_info_s *get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id);
+  void dprint_inst(void *t_info, int core_id, int thread_id);
 };
-
 
 #endif
