@@ -150,7 +150,8 @@ public:
   virtual bool inject_packet(mem_req_s* req);
   virtual mem_req_s* receive_req(int dir);
   virtual void pop_req(int dir);
-  virtual void init(int total_router, int* total_packet, pool_c<flit_c>* flit_pool, pool_c<credit_c>* credit_pool);
+  virtual void init(int total_router, int* total_packet,
+                    pool_c<flit_c>* flit_pool, pool_c<credit_c>* credit_pool);
   virtual void set_link(int dir, router_c* link);
   virtual int get_id(void);
   virtual void set_id(int id);
@@ -313,9 +314,11 @@ private:
   network_c();
 
 public:
-  virtual void init(int num_cpu, int num_gpu, int num_l3, int num_llc, int num_mc) = 0;
+  virtual void init(int num_cpu, int num_gpu, int num_l3, int num_llc,
+                    int num_mc) = 0;
 
-  virtual bool send(mem_req_s* req, int src_level, int src_id, int dst_level, int dst_id);
+  virtual bool send(mem_req_s* req, int src_level, int src_id, int dst_level,
+                    int dst_id);
 
   virtual mem_req_s* receive(int level, int id);
 

@@ -46,7 +46,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_defs.h"
 
 // wrapper function to allocate prefetcher objects
-void pref_factory(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *);
+void pref_factory(vector<pref_base_c *> &, hwp_common_c *, Unit_Type,
+                  macsim_c *);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief pref policy factory
@@ -68,12 +69,14 @@ public:
   /**
    * Register a new hardware prefetcher class
    */
-  void register_class(function<void(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *)>);
+  void register_class(function<void(vector<pref_base_c *> &, hwp_common_c *,
+                                    Unit_Type, macsim_c *)>);
 
   /**
    * Allocate hardware prefetchers which are registerd
    */
-  void allocate_pref(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *);
+  void allocate_pref(vector<pref_base_c *> &, hwp_common_c *, Unit_Type,
+                     macsim_c *);
 
   /**
    * Get singleton prefetch factory object
@@ -85,7 +88,9 @@ public:
 
 private:
   /** wrapper function table */
-  list<function<void(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *)> > m_func_table;
+  list<function<void(vector<pref_base_c *> &, hwp_common_c *, Unit_Type,
+                     macsim_c *)> >
+    m_func_table;
 };
 
 #endif

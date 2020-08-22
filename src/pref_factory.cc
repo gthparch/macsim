@@ -40,7 +40,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-void pref_factory(vector<pref_base_c *> &pref_table, hwp_common_c *hcc, Unit_Type type, macsim_c *simBase) {
+void pref_factory(vector<pref_base_c *> &pref_table, hwp_common_c *hcc,
+                  Unit_Type type, macsim_c *simBase) {
   pref_base_c *pref_stride = new pref_stride_c(hcc, type, simBase);
   pref_table.push_back(pref_stride);
 }
@@ -61,19 +62,22 @@ pref_factory_c::~pref_factory_c() {
 // Get pref_factory_c singleton entry
 // If it is not previously allocated, allocate it
 pref_factory_c *pref_factory_c::get() {
-  if (pref_factory_c::instance == NULL) pref_factory_c::instance = new pref_factory_c;
+  if (pref_factory_c::instance == NULL)
+    pref_factory_c::instance = new pref_factory_c;
 
   return instance;
 }
 
 // Register pref policy
 void pref_factory_c::register_class(
-  function<void(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *)> func) {
+  function<void(vector<pref_base_c *> &, hwp_common_c *, Unit_Type, macsim_c *)>
+    func) {
   m_func_table.push_back(func);
 }
 
 // Based on the policy, return appropriate constructor
-void pref_factory_c::allocate_pref(vector<pref_base_c *> &pref_table, hwp_common_c *hcc, Unit_Type type,
+void pref_factory_c::allocate_pref(vector<pref_base_c *> &pref_table,
+                                   hwp_common_c *hcc, Unit_Type type,
                                    macsim_c *simBase) {
   for (auto itr = m_func_table.begin(); itr != m_func_table.end(); ++itr) {
     (*itr)(pref_table, hcc, type, simBase);

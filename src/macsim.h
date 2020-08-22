@@ -196,7 +196,8 @@ public:
 public:
   uint64_t m_hmc_trans_id_gen;
   int m_num_active_threads; /**< number of active threads */
-  int m_num_waiting_dispatched_threads; /**< number of threads waiting for begin dispatched */
+  int
+    m_num_waiting_dispatched_threads; /**< number of threads waiting for begin dispatched */
   int m_total_num_application; /**< total number of applications */
   int m_process_count; /**< number of processes */
   int m_process_count_without_repeat; /**< number of processes without repeat */
@@ -248,15 +249,19 @@ public:
   // data structure pools (to reduce overhead of memory allocation)
   pool_c<thread_s> *m_thread_pool; /**<  thread data pool */
   pool_c<section_info_s> *m_section_pool; /**<  section data pool */
-  pool_c<mem_map_entry_c> *m_mem_map_entry_pool; /**<  memory dependence data pool */
+  pool_c<mem_map_entry_c>
+    *m_mem_map_entry_pool; /**<  memory dependence data pool */
   pool_c<heartbeat_s> *m_heartbeat_pool; /**<  heartbeat data pool */
-  pool_c<bp_recovery_info_c> *m_bp_recovery_info_pool; /**<  bp recovery information pool */
+  pool_c<bp_recovery_info_c>
+    *m_bp_recovery_info_pool; /**<  bp recovery information pool */
   pool_c<thread_trace_info_node_s> *m_trace_node_pool; /**<  trace node pool */
   pool_c<uop_c> *m_uop_pool; /**<  uop pool */
   uop_c *m_invalid_uop; /**<  invalide uop pointer (for uop pool maintenance) */
 
-  unordered_map<int, hash_c<inst_info_s> *> m_inst_info_hash; /**< decoded instruction map */
-  unordered_map<int, block_schedule_info_s *> m_block_schedule_info; /**< block schedule info */
+  unordered_map<int, hash_c<inst_info_s> *>
+    m_inst_info_hash; /**< decoded instruction map */
+  unordered_map<int, block_schedule_info_s *>
+    m_block_schedule_info; /**< block schedule info */
   unordered_map<int, process_s *> m_sim_processes; /**< process map */
   unordered_map<int, thread_stat_s *> m_thread_stats; /**< thread stat map */
 
@@ -269,7 +274,8 @@ public:
 #ifdef IRIS
   // IRIS
   vector<ManifoldProcessor *> m_macsim_terminals; /**< manifold terminals */
-  manifold::kernel::Clock *master_clock; /**< manifold clock - has to be global or static */
+  manifold::kernel::Clock
+    *master_clock; /**< manifold clock - has to be global or static */
   map<string, string> m_iris_params; /**< iris configurations */
   Topology *m_iris_network; /**< iris topology */
   Topology *tp; /**< topology */
@@ -327,12 +333,15 @@ public:
   CallbackStrobeTextureCacheRespQ *strobeTextureCacheRespQ;
   CallbackStrobeCubeRespQ *strobeCubeRespQ;
 
-  void registerCallback(CallbackSendInstructionCacheRequest *, CallbackSendDataCacheRequest *,
-                        CallbackSendConstCacheRequest *, CallbackSendTextureCacheRequest *,
-                        CallbackStrobeInstructionCacheRespQ *, CallbackStrobeDataCacheRespQ *,
-                        CallbackStrobeConstCacheRespQ *, CallbackStrobeTextureCacheRespQ *);
-  void registerCallback(CallbackSendInstructionCacheRequest *, CallbackSendDataCacheRequest *,
-                        CallbackStrobeInstructionCacheRespQ *, CallbackStrobeDataCacheRespQ *);
+  void registerCallback(
+    CallbackSendInstructionCacheRequest *, CallbackSendDataCacheRequest *,
+    CallbackSendConstCacheRequest *, CallbackSendTextureCacheRequest *,
+    CallbackStrobeInstructionCacheRespQ *, CallbackStrobeDataCacheRespQ *,
+    CallbackStrobeConstCacheRespQ *, CallbackStrobeTextureCacheRespQ *);
+  void registerCallback(CallbackSendInstructionCacheRequest *,
+                        CallbackSendDataCacheRequest *,
+                        CallbackStrobeInstructionCacheRespQ *,
+                        CallbackStrobeDataCacheRespQ *);
   void registerCallback(CallbackSendCubeRequest *, CallbackStrobeCubeRespQ *);
 
   void start() {

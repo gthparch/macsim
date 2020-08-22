@@ -44,9 +44,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "uop.h"
 #include "bug_detector.h"
 
-#define EXEC_INTERFACE_PARAMS()                                                                   \
-  int m_core_id, pqueue_c<int>**m_q_iaq, pqueue_c<gpu_allocq_entry_s>**m_gpu_q_iaq, rob_c *m_rob, \
-    smc_rob_c *m_gpu_rob, bp_data_c *m_bp_data, frontend_c *m_frontend, Unit_Type m_unit_type  // end macro
+#define EXEC_INTERFACE_PARAMS()                                         \
+  int m_core_id, pqueue_c<int> **m_q_iaq,                               \
+    pqueue_c<gpu_allocq_entry_s> **m_gpu_q_iaq, rob_c *m_rob,           \
+    smc_rob_c *m_gpu_rob, bp_data_c *m_bp_data, frontend_c *m_frontend, \
+    Unit_Type m_unit_type  // end macro
 
 #define EXEC_INTERFACE_DECL()                                      \
   int m_core_id; /**< core id */                                   \
@@ -57,14 +59,16 @@ POSSIBILITY OF SUCH DAMAGE.
   bp_data_c* m_bp_data; /**< branch prediction data */             \
   frontend_c* m_frontend; /**< frontend pointer */                 \
   Unit_Type m_unit_type; /**< unit type */                         \
-  // end macro
+// end macro
 
-#define EXEC_INTERFACE_ARGS() \
-  m_core_id, m_q_iaq, m_gpu_q_iaq, m_rob, m_gpu_rob, m_bp_data, m_frontend, m_unit_type  // end macro
+#define EXEC_INTERFACE_ARGS()                                               \
+  m_core_id, m_q_iaq, m_gpu_q_iaq, m_rob, m_gpu_rob, m_bp_data, m_frontend, \
+    m_unit_type  // end macro
 
-#define EXEC_INTERFACE_INIT()                                                                           \
-  m_core_id(m_core_id), m_q_iaq(m_q_iaq), m_gpu_q_iaq(m_gpu_q_iaq), m_rob(m_rob), m_gpu_rob(m_gpu_rob), \
-    m_bp_data(m_bp_data), m_frontend(m_frontend), m_unit_type(m_unit_type)  // end macro
+#define EXEC_INTERFACE_INIT()                                       \
+  m_core_id(m_core_id), m_q_iaq(m_q_iaq), m_gpu_q_iaq(m_gpu_q_iaq), \
+    m_rob(m_rob), m_gpu_rob(m_gpu_rob), m_bp_data(m_bp_data),       \
+    m_frontend(m_frontend), m_unit_type(m_unit_type)  // end macro
 
 #define EXEC_INTERFACE_CAST()     \
   static_cast<void>(m_core_id);   \

@@ -100,7 +100,8 @@ void rob_c::process_version(uop_c *uop) {
   }
 
   // increment last fence version for all fences
-  if (uop->m_uop_type == UOP_FULL_FENCE || uop->m_uop_type == UOP_ACQ_FENCE || uop->m_uop_type == UOP_REL_FENCE) {
+  if (uop->m_uop_type == UOP_FULL_FENCE || uop->m_uop_type == UOP_ACQ_FENCE ||
+      uop->m_uop_type == UOP_REL_FENCE) {
     m_last_fence_version++;
   }
 
@@ -145,7 +146,8 @@ void rob_c::update_orq(Counter lowest_age) {
 
 // called when a uop is retired
 void rob_c::update_root(uop_c *uop) {
-  if (uop->m_uop_type != UOP_FULL_FENCE && uop->m_uop_type != UOP_ACQ_FENCE) return;
+  if (uop->m_uop_type != UOP_FULL_FENCE && uop->m_uop_type != UOP_ACQ_FENCE)
+    return;
 
   if (m_orq.size() == 0) ASSERTM(0, "ORQ empty!!!\n");
 
@@ -157,11 +159,13 @@ void rob_c::update_root(uop_c *uop) {
 }
 
 bool rob_c::version_ordering_check(uop_c *uop) {
-  if (uop->m_mem_version == 0xFFFF && m_reset_uop_num < uop->m_uop_num && m_orq.front().version < uop->m_mem_version) {
+  if (uop->m_mem_version == 0xFFFF && m_reset_uop_num < uop->m_uop_num &&
+      m_orq.front().version < uop->m_mem_version) {
     fprintf(stderr, "Possible deadlock\n");
   }
 
-  if (m_orq.size() == 0 || m_orq.front().version >= uop->m_mem_version || m_reset_uop_num >= uop->m_uop_num)
+  if (m_orq.size() == 0 || m_orq.front().version >= uop->m_mem_version ||
+      m_reset_uop_num >= uop->m_uop_num)
     return false;
 
   return true;
@@ -174,7 +178,8 @@ void rob_c::print_version_info(void) {
   printf("\n");
 
   printf("m_root_fences: ");
-  for (auto it : m_root_fences) printf("(%p, %d) ", (void *)it.first, it.second);
+  for (auto it : m_root_fences)
+    printf("(%p, %d) ", (void *)it.first, it.second);
   printf("\n");
 }
 

@@ -135,7 +135,8 @@ uns log2_int(uns n) {
   return power;
 }
 
-FILE *file_tag_fopen(std::string path, char const *const mode, macsim_c *m_simBase) {
+FILE *file_tag_fopen(std::string path, char const *const mode,
+                     macsim_c *m_simBase) {
   FILE *file = NULL;
   string file_name;
   string file_tag = *KNOB(KNOB_FILE_TAG);

@@ -64,38 +64,41 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define ASSERT(cond)                                                                                 \
-  do {                                                                                               \
-    if (ENABLE_ASSERTIONS && !(cond)) {                                                              \
-      fflush(m_simBase->g_mystdout);                                                                 \
-      fprintf(m_simBase->g_mystderr, "\n");                                                          \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                                                 \
-      breakpoint(__FILE__, __LINE__);                                                                \
-      WRITE_STATUS("ASSERT");                                                                        \
-      exit(15);                                                                                      \
-    }                                                                                                \
+#define ASSERT(cond)                                                          \
+  do {                                                                        \
+    if (ENABLE_ASSERTIONS && !(cond)) {                                       \
+      fflush(m_simBase->g_mystdout);                                          \
+      fprintf(m_simBase->g_mystderr, "\n");                                   \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                          \
+      breakpoint(__FILE__, __LINE__);                                         \
+      WRITE_STATUS("ASSERT");                                                 \
+      exit(15);                                                               \
+    }                                                                         \
   } while (0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef NO_REPORT
-#define ASSERTM(cond, args...)                                                                       \
-  do {                                                                                               \
-    if (ENABLE_ASSERTIONS && !(cond)) {                                                              \
-      fflush(m_simBase->g_mystdout);                                                                 \
-      fprintf(m_simBase->g_mystderr, "\n");                                                          \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                                                 \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, ##args);                                                        \
-      breakpoint(__FILE__, __LINE__);                                                                \
-      WRITE_STATUS("ASSERT");                                                                        \
-      exit(15);                                                                                      \
-    }                                                                                                \
+#define ASSERTM(cond, args...)                                                \
+  do {                                                                        \
+    if (ENABLE_ASSERTIONS && !(cond)) {                                       \
+      fflush(m_simBase->g_mystdout);                                          \
+      fprintf(m_simBase->g_mystderr, "\n");                                   \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                          \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, ##args);                                 \
+      breakpoint(__FILE__, __LINE__);                                         \
+      WRITE_STATUS("ASSERT");                                                 \
+      exit(15);                                                               \
+    }                                                                         \
   } while (0)
 #else
 #define ASSERTM(cond, args...) assert(cond);
@@ -103,37 +106,40 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define ASSERTU(cond)                                                                                \
-  do {                                                                                               \
-    if (!(cond)) {                                                                                   \
-      fflush(m_simBase->g_mystdout);                                                                 \
-      fprintf(m_simBase->g_mystderr, "\n");                                                          \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                                                 \
-      breakpoint(__FILE__, __LINE__);                                                                \
-      WRITE_STATUS("ASSERT");                                                                        \
-      exit(15);                                                                                      \
-    }                                                                                                \
+#define ASSERTU(cond)                                                         \
+  do {                                                                        \
+    if (!(cond)) {                                                            \
+      fflush(m_simBase->g_mystdout);                                          \
+      fprintf(m_simBase->g_mystderr, "\n");                                   \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                          \
+      breakpoint(__FILE__, __LINE__);                                         \
+      WRITE_STATUS("ASSERT");                                                 \
+      exit(15);                                                               \
+    }                                                                         \
   } while (0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define ASSERTUM(cond, args...)                                                                      \
-  do {                                                                                               \
-    if (!(cond)) {                                                                                   \
-      fflush(m_simBase->g_mystdout);                                                                 \
-      fprintf(m_simBase->g_mystderr, "\n");                                                          \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                                                 \
-      fprintf(m_simBase->g_mystderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(m_simBase->g_mystderr, ##args);                                                        \
-      breakpoint(__FILE__, __LINE__);                                                                \
-      WRITE_STATUS("ASSERT");                                                                        \
-      exit(15);                                                                                      \
-    }                                                                                                \
+#define ASSERTUM(cond, args...)                                               \
+  do {                                                                        \
+    if (!(cond)) {                                                            \
+      fflush(m_simBase->g_mystdout);                                          \
+      fprintf(m_simBase->g_mystderr, "\n");                                   \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, "%s\n", #cond);                          \
+      fprintf(m_simBase->g_mystderr,                                          \
+              "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
+              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);  \
+      fprintf(m_simBase->g_mystderr, ##args);                                 \
+      breakpoint(__FILE__, __LINE__);                                         \
+      WRITE_STATUS("ASSERT");                                                 \
+      exit(15);                                                               \
+    }                                                                         \
   } while (0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

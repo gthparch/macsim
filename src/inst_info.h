@@ -100,7 +100,8 @@ class inst_info_s
 {
 public:
   Addr m_addr;  //!< address of the instruction
-  table_info_s *m_table_info;  //!< pointer into the table of static instruction information
+  table_info_s *
+    m_table_info;  //!< pointer into the table of static instruction information
   reg_info_s m_srcs[MAX_SRCS];  //!< source register information
   reg_info_s m_dests[MAX_DESTS];  //!< destination register information
   trace_info_sc_s m_trace_info;  //!< trace information

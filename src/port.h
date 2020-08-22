@@ -70,7 +70,8 @@ public:
    * @param writes_prevent_reads write port access will block read port access
    * @param simBase the pointer to the base simulation class
    */
-  port_c(string name, uns read, uns write, bool writes_prevent_reads, macsim_c* simBase);
+  port_c(string name, uns read, uns write, bool writes_prevent_reads,
+         macsim_c* simBase);
 
   /**
    * Initialize ports
@@ -97,7 +98,8 @@ private:
   uns m_read_ports_in_use; /**< number of currently using read ports */
   uns m_num_write_ports; /**< number of total write ports */
   uns m_write_ports_in_use; /**< number of currently using write ports */
-  bool m_writes_prevent_reads; /**< read port blocked due to write port access */
+  bool
+    m_writes_prevent_reads; /**< read port blocked due to write port access */
 
   macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };

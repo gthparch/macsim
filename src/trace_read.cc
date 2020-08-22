@@ -138,7 +138,8 @@ trace_read_c::trace_read_c(macsim_c *simBase, ofstream *dprint_output) {
     std::string qsim_prefix(getenv("QSIM_PREFIX"));
     int n_cpus = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
 
-    OSDomain *osd = new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
+    OSDomain *osd =
+      new OSDomain(n_cpus, KNOB(KNOB_QSIM_STATE)->getValue().c_str());
     string bench_name = KNOB(KNOB_QSIM_BENCH)->getValue();
     if (bench_name == "") {
       int num_apps;
@@ -193,9 +194,11 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id) {
   // will be read ahead to get next pc address
   if (core->m_running_thread_num) {
 #ifndef USING_QSIM
-    gzread(thread_trace_info->m_trace_file, thread_trace_info->m_prev_trace_info, m_trace_size);
+    gzread(thread_trace_info->m_trace_file,
+           thread_trace_info->m_prev_trace_info, m_trace_size);
 #else
-    m_tg->read_trace(core_id, (void *)(thread_trace_info->m_prev_trace_info), m_trace_size);
+    m_tg->read_trace(core_id, (void *)(thread_trace_info->m_prev_trace_info),
+                     m_trace_size);
 #endif
 
     if (*KNOB(KNOB_DEBUG_TRACE_READ) || *KNOB(KNOB_DEBUG_PRINT_TRACE)) {
@@ -211,7 +214,8 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id) {
  * @param inst_read - set true if instruction read successful
  * @see get_uops_from_traces
  */
-bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read) {
+bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id,
+                              bool *inst_read) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   int bytes_read;
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
@@ -229,9 +233,11 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, 
       if (thread_trace_info->m_buffer_index == 0) {
 #ifndef USING_QSIM
         thread_trace_info->m_buffer_index_max =
-          gzread(thread_trace_info->m_trace_file, thread_trace_info->m_buffer, m_trace_size * k_trace_buffer_size);
+          gzread(thread_trace_info->m_trace_file, thread_trace_info->m_buffer,
+                 m_trace_size * k_trace_buffer_size);
 #else
-        int uops_read = m_tg->read_trace(core_id, thread_trace_info->m_buffer, m_trace_size * k_trace_buffer_size);
+        int uops_read = m_tg->read_trace(core_id, thread_trace_info->m_buffer,
+                                         m_trace_size * k_trace_buffer_size);
 
         thread_trace_info->m_buffer_index_max = uops_read;
 #endif
@@ -245,11 +251,15 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, 
         */
       }
 
-      memcpy(trace_info, &(thread_trace_info->m_buffer[m_trace_size * thread_trace_info->m_buffer_index]),
+      memcpy(trace_info,
+             &(thread_trace_info
+                 ->m_buffer[m_trace_size * thread_trace_info->m_buffer_index]),
              m_trace_size);
-      thread_trace_info->m_buffer_index = (thread_trace_info->m_buffer_index + 1) % k_trace_buffer_size;
+      thread_trace_info->m_buffer_index =
+        (thread_trace_info->m_buffer_index + 1) % k_trace_buffer_size;
 
-      if (thread_trace_info->m_buffer_index >= thread_trace_info->m_buffer_index_max) {
+      if (thread_trace_info->m_buffer_index >=
+          thread_trace_info->m_buffer_index_max) {
         bytes_read = 0;
       } else
         bytes_read = m_trace_size;
@@ -273,12 +283,15 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, 
         int no_created_thread = process->m_no_of_threads_created;
 
         // create other threads which are not main-thread.
-        while ((process->m_no_of_threads_created < process->m_no_of_threads &&
-                thread_trace_info->m_inst_count == process->m_thread_start_info[no_created_thread].m_inst_count) ||
-               (process->m_no_of_threads_created < process->m_no_of_threads &&
-                process->m_thread_start_info[no_created_thread].m_inst_count == 0)) {
+        while (
+          (process->m_no_of_threads_created < process->m_no_of_threads &&
+           thread_trace_info->m_inst_count ==
+             process->m_thread_start_info[no_created_thread].m_inst_count) ||
+          (process->m_no_of_threads_created < process->m_no_of_threads &&
+           process->m_thread_start_info[no_created_thread].m_inst_count == 0)) {
           // create non-main threads here
-          m_simBase->m_process_manager->create_thread_node(process, process->m_no_of_threads_created++, false);
+          m_simBase->m_process_manager->create_thread_node(
+            process, process->m_no_of_threads_created++, false);
           m_simBase->m_process_manager->sim_thread_schedule(false);
         }
       }
@@ -294,7 +307,8 @@ bool trace_read_c::read_trace(int core_id, void *trace_info, int sim_thread_id, 
           if (!core->m_thread_finished[sim_thread_id]) {
             thread_trace_info->m_trace_ended = true;
 
-            DEBUG("trace ended core_id:%d thread_id:%d\n", core_id, sim_thread_id);
+            DEBUG("trace ended core_id:%d thread_id:%d\n", core_id,
+                  sim_thread_id);
           } else {
             return false;
           }
@@ -354,7 +368,8 @@ void trace_read_c::convert_info_uop(inst_info_s *info, trace_uop_s *trace_uop) {
  * @param t_uop - MacSim trace
  * @param info - instruction information in hash table
  */
-void trace_read_c::convert_t_uop_to_info(trace_uop_s *t_uop, inst_info_s *info) {
+void trace_read_c::convert_t_uop_to_info(trace_uop_s *t_uop,
+                                         inst_info_s *info) {
   info->m_table_info->m_op_type = t_uop->m_op_type;
   info->m_table_info->m_mem_type = t_uop->m_mem_type;
   info->m_table_info->m_cf_type = t_uop->m_cf_type;
@@ -369,8 +384,10 @@ void trace_read_c::convert_t_uop_to_info(trace_uop_s *t_uop, inst_info_s *info) 
   info->m_table_info->m_num_src_regs = t_uop->m_num_src_regs;
   info->m_table_info->m_num_dest_regs = t_uop->m_num_dest_regs;
 
-  ASSERTM(t_uop->m_num_dest_regs <= MAX_DESTS, "num_dest_regs:%d ", t_uop->m_num_dest_regs);
-  ASSERTM(t_uop->m_num_src_regs <= MAX_SRCS, "num_src_regs:%d  ", t_uop->m_num_src_regs);
+  ASSERTM(t_uop->m_num_dest_regs <= MAX_DESTS, "num_dest_regs:%d ",
+          t_uop->m_num_dest_regs);
+  ASSERTM(t_uop->m_num_src_regs <= MAX_SRCS, "num_src_regs:%d  ",
+          t_uop->m_num_src_regs);
 
   for (int ii = 0; ii < info->m_table_info->m_num_src_regs; ++ii) {
     info->m_srcs[ii].m_type = INT_REG;
@@ -608,15 +625,16 @@ const char *trace_read_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "CPU_OPCODE_LAST",
 };
 
-const char *trace_read_c::g_tr_cf_names[10] = {"NOT_CF",  // not a control flow instruction
-                                               "CF_BR",  // an unconditional branch
-                                               "CF_CBR",  // a conditional branch
-                                               "CF_CALL",  // a call
-                                               "CF_IBR",  // an indirect branch
-                                               "CF_ICALL",  // an indirect call
-                                               "CF_ICO",  // an indirect jump to co-routine
-                                               "CF_RET",  // a return
-                                               "CF_SYS",   "CF_ICBR"};
+const char *trace_read_c::g_tr_cf_names[10] = {
+  "NOT_CF",  // not a control flow instruction
+  "CF_BR",  // an unconditional branch
+  "CF_CBR",  // a conditional branch
+  "CF_CALL",  // a call
+  "CF_IBR",  // an indirect branch
+  "CF_ICALL",  // an indirect call
+  "CF_ICO",  // an indirect jump to co-routine
+  "CF_RET",  // a return
+  "CF_SYS",   "CF_ICBR"};
 
 const char *trace_read_c::g_optype_names[37] = {
   "OP_INV",  // invalid opcode
@@ -644,21 +662,23 @@ const char *trace_read_c::g_optype_names[37] = {
   "OP_FCMOV"  // floating point cond move
 };
 
-const char *trace_read_c::g_mem_type_names[20] = {"NOT_MEM",  // not a memory instruction
-                                                  "MEM_LD",  // a load instruction
-                                                  "MEM_ST",  // a store instruction
-                                                  "MEM_PF",  // a prefetch
-                                                  "MEM_WH",  // a write hint
-                                                  "MEM_EVICT",  // a cache block eviction hint
-                                                  "MEM_SWPREF_NTA", "MEM_SWPREF_T0", "MEM_SWPREF_T1", "MEM_SWPREF_T2",
-                                                  "MEM_LD_LM",      "MEM_LD_SM",     "MEM_LD_GM",     "MEM_ST_LM",
-                                                  "MEM_ST_SM",      "MEM_ST_GM",     "NUM_MEM_TYPES"};
+const char *trace_read_c::g_mem_type_names[20] = {
+  "NOT_MEM",  // not a memory instruction
+  "MEM_LD",  // a load instruction
+  "MEM_ST",  // a store instruction
+  "MEM_PF",  // a prefetch
+  "MEM_WH",  // a write hint
+  "MEM_EVICT",  // a cache block eviction hint
+  "MEM_SWPREF_NTA", "MEM_SWPREF_T0", "MEM_SWPREF_T1", "MEM_SWPREF_T2",
+  "MEM_LD_LM",      "MEM_LD_SM",     "MEM_LD_GM",     "MEM_ST_LM",
+  "MEM_ST_SM",      "MEM_ST_GM",     "NUM_MEM_TYPES"};
 
 trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
   m_simBase = simBase;
 
   // initialization
-  m_dprint_output = new ofstream(KNOB(KNOB_STATISTICS_OUT_DIRECTORY)->getValue() + "/trace_debug.out");
+  m_dprint_output = new ofstream(
+    KNOB(KNOB_STATISTICS_OUT_DIRECTORY)->getValue() + "/trace_debug.out");
 
   if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86")
     m_cpu_decoder = new cpu_decoder_c(simBase, m_dprint_output);
@@ -667,7 +687,8 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
     m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
   else {
-    ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
+    ASSERTM(0, "Wrong core type %s\n",
+            KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
   }
 
   m_cpu_decoder->init_pin_convert();
@@ -685,14 +706,17 @@ trace_reader_wrapper_c::~trace_reader_wrapper_c() {
   delete m_gpu_decoder;
 }
 
-void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id, bool gpu_sim) {
+void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id,
+                                         bool gpu_sim) {
   if (gpu_sim)
     m_gpu_decoder->setup_trace(core_id, sim_thread_id);
   else
     m_cpu_decoder->setup_trace(core_id, sim_thread_id);
 }
 
-bool trace_reader_wrapper_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id, bool gpu_sim) {
+bool trace_reader_wrapper_c::get_uops_from_traces(int core_id, uop_c *uop,
+                                                  int sim_thread_id,
+                                                  bool gpu_sim) {
   if (gpu_sim)
     return m_gpu_decoder->get_uops_from_traces(core_id, uop, sim_thread_id);
   else

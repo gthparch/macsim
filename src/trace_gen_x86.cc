@@ -43,8 +43,10 @@ enum CF_TYPE_enum {
 
 // Is floating point register
 inline bool XED_REG_is_fr(xed_reg_enum_t reg) {
-  return (xed_reg_class(reg) == XED_REG_CLASS_X87 || xed_reg_class(reg) == XED_REG_CLASS_XMM ||
-          xed_reg_class(reg) == XED_REG_CLASS_YMM || xed_reg_class(reg) == XED_REG_CLASS_MXCSR);
+  return (xed_reg_class(reg) == XED_REG_CLASS_X87 ||
+          xed_reg_class(reg) == XED_REG_CLASS_XMM ||
+          xed_reg_class(reg) == XED_REG_CLASS_YMM ||
+          xed_reg_class(reg) == XED_REG_CLASS_MXCSR);
 }
 
 // Merge 13,32 and 64 bit versions of registers into one macro.
@@ -155,7 +157,8 @@ InstHandler_x86::InstHandler_x86() {
   stop_gen = false;
 }
 
-trace_gen_x86::trace_gen_x86(macsim_c *simBase, OSDomain &osd) : trace_gen(simBase, osd) {
+trace_gen_x86::trace_gen_x86(macsim_c *simBase, OSDomain &osd)
+  : trace_gen(simBase, osd) {
   osd.set_app_start_cb(this, &trace_gen_x86::app_start_cb);
   set_gen_thread(new std::thread(&trace_gen_x86::gen_trace, this));
   inst_handle = NULL;
@@ -168,7 +171,8 @@ trace_gen_x86::trace_gen_x86(macsim_c *simBase, OSDomain &osd) : trace_gen(simBa
 /////////////////////////////////////////////////////////////////////////////////////////
 /// Instruction callback Function
 /////////////////////////////////////////////////////////////////////////////////////////
-void trace_gen_x86::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b, enum inst_type t) {
+void trace_gen_x86::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l,
+                            const uint8_t *b, enum inst_type t) {
   inst_handle[c].processInst((unsigned char *)b, v, l);
   inst_count++;
 
@@ -216,10 +220,12 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
       // add source and destination registers
       const xed_operand_t *op = xed_inst_operand(xi, ii);
       xed_operand_enum_t opname = xed_operand_name(op);
-      if (xed_operand_is_register(opname) || xed_operand_is_memory_addressing_register(opname)) {
+      if (xed_operand_is_register(opname) ||
+          xed_operand_is_memory_addressing_register(opname)) {
         xed_reg_enum_t reg = xed_decoded_inst_get_reg(&xedd, opname);
 
-        if ((xed_reg_class(reg) != XED_REG_CLASS_PSEUDO) && (xed_reg_class(reg) != XED_REG_CLASS_PSEUDOX87)) {
+        if ((xed_reg_class(reg) != XED_REG_CLASS_PSEUDO) &&
+            (xed_reg_class(reg) != XED_REG_CLASS_PSEUDOX87)) {
           if (xed_operand_read(op)) {
             src_regs.insert(reg);
           }
@@ -232,7 +238,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
 
     for (uint32_t ii = 0; ii < memops; ++ii) {
       // operand - Memory
-      if (xed_decoded_inst_mem_read(&xedd, ii) || xed_decoded_inst_mem_written(&xedd, ii)) {
+      if (xed_decoded_inst_mem_read(&xedd, ii) ||
+          xed_decoded_inst_mem_written(&xedd, ii)) {
         // Can have 2 loads per ins in some cases.(CMPS). This refers to
         // explicit loads in the instruction.
         if (xed_decoded_inst_mem_read(&xedd, ii)) {
@@ -276,7 +283,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
       op->m_num_read_regs = src_regs.size();
       assert(op->m_num_read_regs < MAX_SRC_NUM);
 
-      set<xed_reg_enum_t>::iterator begin(src_regs.begin()), end(src_regs.end());
+      set<xed_reg_enum_t>::iterator begin(src_regs.begin()),
+        end(src_regs.end());
       uint8_t *ptr = op->m_src;
 
       while (begin != end) {
@@ -295,7 +303,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
     if (!dst_regs.empty()) {
       op->m_num_dest_regs = dst_regs.size();
       assert(op->m_num_dest_regs < MAX_DST_NUM);
-      set<xed_reg_enum_t>::iterator begin(dst_regs.begin()), end(dst_regs.end());
+      set<xed_reg_enum_t>::iterator begin(dst_regs.begin()),
+        end(dst_regs.end());
       uint8_t *ptr = op->m_dst;
       while (begin != end) {
         if (xed_reg_class(*begin) == XED_REG_CLASS_FLAGS) op->m_write_flg = 1;
@@ -320,7 +329,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
     xed_category_enum_t inst_category = xed_decoded_inst_get_category(&xedd);
     string inst_iclass_str(xed_iclass_enum_t2str(inst_iclass));
 
-    if (inst_category == XED_CATEGORY_NOP || inst_category == XED_CATEGORY_WIDENOP) {
+    if (inst_category == XED_CATEGORY_NOP ||
+        inst_category == XED_CATEGORY_WIDENOP) {
       op->m_opcode = TR_NOP;
     } else if (inst_iclass_str.find("MUL") != string::npos) {
       if (inst_iclass == XED_ICLASS_IMUL || inst_iclass == XED_ICLASS_MUL) {
@@ -357,7 +367,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
     }
 
     // Branch instruction - set branch type
-    xed_uint_t disp_bits = xed_decoded_inst_get_branch_displacement_width(&xedd);
+    xed_uint_t disp_bits =
+      xed_decoded_inst_get_branch_displacement_width(&xedd);
     if (disp_bits) {
       // Direct branch
       xed_int32_t disp = xed_decoded_inst_get_branch_displacement(&xedd);
@@ -452,7 +463,8 @@ void InstHandler_x86::processInst(unsigned char *b, uint64_t v, uint8_t l) {
       child_op->m_opcode = CPU_MEM_EXT_OP;
       stream.enqueue(child_op);
     }
-    if (prev_op->m_num_ld || prev_op->m_has_st) assert(prev_op->m_mem_read_size || prev_op->m_mem_write_size);
+    if (prev_op->m_num_ld || prev_op->m_has_st)
+      assert(prev_op->m_mem_read_size || prev_op->m_mem_write_size);
     stream.enqueue(prev_op);
   }
 

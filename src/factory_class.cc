@@ -43,31 +43,32 @@ POSSIBILITY OF SUCH DAMAGE.
 /// replace with name and type
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define FACTORY_IMPLEMENTATION(name, type)                                                   \
-  name* name::instance = NULL;                                                               \
-                                                                                             \
-  name::name() {                                                                             \
-  }                                                                                          \
-                                                                                             \
-  name::~name() {                                                                            \
-  }                                                                                          \
-                                                                                             \
-  void name::register_class(string policy, function<type(macsim_c*)> func) {                 \
-    m_func_table[policy] = func;                                                             \
-  }                                                                                          \
-                                                                                             \
-  type name::allocate(string policy, macsim_c* m_simBase) {                                  \
-    ASSERT(!m_func_table.empty());                                                           \
-    ASSERTM(m_func_table.find(policy) != m_func_table.end(), "policy:%s\n", policy.c_str()); \
-                                                                                             \
-    type new_object = m_func_table[policy](m_simBase);                                       \
-    ASSERT(new_object);                                                                      \
-    return new_object;                                                                       \
-  }                                                                                          \
-  name* name::get() {                                                                        \
-    if (name::instance == NULL) name::instance = new name;                                   \
-                                                                                             \
-    return name::instance;                                                                   \
+#define FACTORY_IMPLEMENTATION(name, type)                                   \
+  name* name::instance = NULL;                                               \
+                                                                             \
+  name::name() {                                                             \
+  }                                                                          \
+                                                                             \
+  name::~name() {                                                            \
+  }                                                                          \
+                                                                             \
+  void name::register_class(string policy, function<type(macsim_c*)> func) { \
+    m_func_table[policy] = func;                                             \
+  }                                                                          \
+                                                                             \
+  type name::allocate(string policy, macsim_c* m_simBase) {                  \
+    ASSERT(!m_func_table.empty());                                           \
+    ASSERTM(m_func_table.find(policy) != m_func_table.end(), "policy:%s\n",  \
+            policy.c_str());                                                 \
+                                                                             \
+    type new_object = m_func_table[policy](m_simBase);                       \
+    ASSERT(new_object);                                                      \
+    return new_object;                                                       \
+  }                                                                          \
+  name* name::get() {                                                        \
+    if (name::instance == NULL) name::instance = new name;                   \
+                                                                             \
+    return name::instance;                                                   \
   }
 
 // declare implementations

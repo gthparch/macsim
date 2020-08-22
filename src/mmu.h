@@ -66,9 +66,11 @@ private:
   class ReplacementUnit
   {
   public:
-    ReplacementUnit(macsim_c *simBase, long max_entries) : m_simBase(simBase), m_max_entries(max_entries) {
+    ReplacementUnit(macsim_c *simBase, long max_entries)
+      : m_simBase(simBase), m_max_entries(max_entries) {
       m_entries = new Entry[m_max_entries];
-      for (long i = 0; i < m_max_entries; ++i) m_free_entries.push_back(m_entries + i);
+      for (long i = 0; i < m_max_entries; ++i)
+        m_free_entries.push_back(m_entries + i);
 
       m_head = new Entry;
       m_tail = new Entry;
@@ -164,10 +166,11 @@ private:
   long m_eviction_latency;
 
   map<Counter, list<Addr>> m_walk_queue_cycle;  // indexed by cycle
-                                                // e.g., cycle t - page A, B, C
-  unordered_map<Addr, list<uop_c *>> m_walk_queue_page;  // indexed by page number
-                                                         // e.g., page A - uop 1, 2
-                                                         // e.g., page B - uop 3, 4, 5, 6
+  // e.g., cycle t - page A, B, C
+  unordered_map<Addr, list<uop_c *>>
+    m_walk_queue_page;  // indexed by page number
+  // e.g., page A - uop 1, 2
+  // e.g., page B - uop 3, 4, 5, 6
 
   list<uop_c *> m_retry_queue;
   list<uop_c *> m_fault_retry_queue;

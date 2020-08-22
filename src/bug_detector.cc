@@ -133,7 +133,8 @@ void bug_detector_c::print(int core_id, int thread_id) {
     string core_type = core->get_core_type();
 
     unsigned int average_latency = 0;
-    if (m_latency_count[ii] > 0) average_latency = m_latency_sum[ii] / m_latency_count[ii];
+    if (m_latency_count[ii] > 0)
+      average_latency = m_latency_sum[ii] / m_latency_count[ii];
 
     out << "Current cycle:" << CYCLE << "\n";
     out << "Core id:" << core_id << "\n";
@@ -142,15 +143,18 @@ void bug_detector_c::print(int core_id, int thread_id) {
     out << "----------------------------------------------------------\n";
     out << "core " << ii << "\n";
     out << "average execution cycle: " << average_latency << "\n";
-    out << setw(10) << left << "INST_NUM" << setw(10) << left << "UOP_NUM" << setw(10) << left << "TID" << setw(15)
-        << left << "CYCLE" << setw(15) << left << "DELTA" << setw(25) << left << "STATE" << setw(25) << left << "OPCODE"
-        << setw(20) << left << "UOP_TYPE" << setw(20) << left << "MEM_TYPE" << setw(20) << left << "MEM_ADDR"
-        << setw(20) << left << "CF_TYPE" << setw(20) << left << "DEP_TYPE" << setw(6) << left << "CHILD" << setw(10)
-        << left << "PARENT"
+    out << setw(10) << left << "INST_NUM" << setw(10) << left << "UOP_NUM"
+        << setw(10) << left << "TID" << setw(15) << left << "CYCLE" << setw(15)
+        << left << "DELTA" << setw(25) << left << "STATE" << setw(25) << left
+        << "OPCODE" << setw(20) << left << "UOP_TYPE" << setw(20) << left
+        << "MEM_TYPE" << setw(20) << left << "MEM_ADDR" << setw(20) << left
+        << "CF_TYPE" << setw(20) << left << "DEP_TYPE" << setw(6) << left
+        << "CHILD" << setw(10) << left << "PARENT"
         << "\n";
 
     list<uop_c*> temp_list1;
-    for (auto I = m_uop_table[ii]->begin(), E = m_uop_table[ii]->end(); I != E; ++I) {
+    for (auto I = m_uop_table[ii]->begin(), E = m_uop_table[ii]->end(); I != E;
+         ++I) {
       temp_list1.push_back((*I).first);
     }
     temp_list1.sort(sort_uop);
@@ -160,17 +164,22 @@ void bug_detector_c::print(int core_id, int thread_id) {
 
       uop_c* uop = (*I);
       ASSERT(uop);
-      out << setw(10) << left << uop->m_inst_num << setw(10) << left << uop->m_uop_num << setw(10) << left
-          << uop->m_thread_id << setw(15) << left << (*m_uop_table[ii])[(*I)] << setw(15) << left
-          << CYCLE - (*m_uop_table[ii])[(*I)] << setw(25) << left << uop_c::g_uop_state_name[uop->m_state] << setw(25)
-          << left
-          << (core_type == "ptx" ? gpu_decoder_c::g_tr_opcode_names[uop->m_opcode]
-                                 : cpu_decoder_c::g_tr_opcode_names[uop->m_opcode])
-          << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type] << setw(20) << left
-          << uop_c::g_mem_type_name[uop->m_mem_type] << setw(20) << left << hex << uop->m_vaddr << dec << setw(20)
-          << left << uop_c::g_cf_type_name[uop->m_cf_type] << setw(20) << left
-          << uop_c::g_dep_type_name[uop->m_bar_type] << setw(6) << left << uop->m_num_child_uops << setw(10) << left
-          << (uop->m_parent_uop == NULL ? 0 : uop->m_parent_uop->m_uop_num) << endl;
+      out << setw(10) << left << uop->m_inst_num << setw(10) << left
+          << uop->m_uop_num << setw(10) << left << uop->m_thread_id << setw(15)
+          << left << (*m_uop_table[ii])[(*I)] << setw(15) << left
+          << CYCLE - (*m_uop_table[ii])[(*I)] << setw(25) << left
+          << uop_c::g_uop_state_name[uop->m_state] << setw(25) << left
+          << (core_type == "ptx"
+                ? gpu_decoder_c::g_tr_opcode_names[uop->m_opcode]
+                : cpu_decoder_c::g_tr_opcode_names[uop->m_opcode])
+          << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type]
+          << setw(20) << left << uop_c::g_mem_type_name[uop->m_mem_type]
+          << setw(20) << left << hex << uop->m_vaddr << dec << setw(20) << left
+          << uop_c::g_cf_type_name[uop->m_cf_type] << setw(20) << left
+          << uop_c::g_dep_type_name[uop->m_bar_type] << setw(6) << left
+          << uop->m_num_child_uops << setw(10) << left
+          << (uop->m_parent_uop == NULL ? 0 : uop->m_parent_uop->m_uop_num)
+          << endl;
     }
     out << "\n\n";
     temp_list1.clear();
@@ -205,7 +214,8 @@ void bug_detector_c::print_noc() {
   ofstream out("bug_detect_noc.out");
 
   list<pair<mem_req_s*, uint64_t> > result_list;
-  for (auto I = m_packet_table->begin(), E = m_packet_table->end(); I != E; ++I) {
+  for (auto I = m_packet_table->begin(), E = m_packet_table->end(); I != E;
+       ++I) {
     mem_req_s* req = (*I).first;
     uint64_t cycle = (*I).second;
     result_list.push_back(pair<mem_req_s*, uint64_t>(req, cycle));
@@ -213,14 +223,16 @@ void bug_detector_c::print_noc() {
   result_list.sort(sort_noc);
 
   out << "Current cycle:" << CYCLE << "\n";
-  out << left << setw(15) << "ID" << left << setw(15) << "CYCLE" << left << setw(15) << "DELTA" << left << setw(4)
-      << "SRC" << left << setw(4) << "DST"
+  out << left << setw(15) << "ID" << left << setw(15) << "CYCLE" << left
+      << setw(15) << "DELTA" << left << setw(4) << "SRC" << left << setw(4)
+      << "DST"
       << "\n";
   for (auto I = result_list.begin(), E = result_list.end(); I != E; ++I) {
     mem_req_s* req = (*I).first;
     uint64_t cycle = (*I).second;
-    out << left << setw(15) << req->m_id << left << setw(15) << cycle << left << setw(15) << CYCLE - cycle << left
-        << setw(4) << req->m_msg_src << left << setw(4) << req->m_msg_dst << "\n";
+    out << left << setw(15) << req->m_id << left << setw(15) << cycle << left
+        << setw(15) << CYCLE - cycle << left << setw(4) << req->m_msg_src
+        << left << setw(4) << req->m_msg_dst << "\n";
   }
 
   out.close();

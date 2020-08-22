@@ -70,8 +70,10 @@ public:
   Addr m_recovery_fetch_addr; /**< address to redirect the istream */
   Counter m_recovery_op_num; /**< op_num of op that caused recovery */
   Counter m_recovery_cf_type; /**< cf_type of op that caused recovery */
-  recovery_info_c* m_recovery_info; /**< information about the op causing the recovery */
-  Counter m_redirect_cycle; /**< cycle that begins a redirection (eg. btb miss) */
+  recovery_info_c*
+    m_recovery_info; /**< information about the op causing the recovery */
+  Counter
+    m_redirect_cycle; /**< cycle that begins a redirection (eg. btb miss) */
   Addr m_redirect_fetch_addr; /**< address to redirect to */
   Counter m_redirect_op_num; /**< op_num of op that caused redirect */
 };
@@ -154,9 +156,12 @@ public:
   bp_dir_base_c* m_bp; /**< branch predictor */
   bp_targ_c* m_bp_targ_pred; /**< BTB */
 
-  unordered_map<int, Counter> m_bp_recovery_cycle; /**< bp recovery cycle per thread */
-  unordered_map<int, Counter> m_bp_redirect_cycle; /**< bp recovery cycle per thread */
-  unordered_map<int, Counter> m_bp_cause_op; /**< misprediction caused uop per thread */
+  unordered_map<int, Counter>
+    m_bp_recovery_cycle; /**< bp recovery cycle per thread */
+  unordered_map<int, Counter>
+    m_bp_redirect_cycle; /**< bp recovery cycle per thread */
+  unordered_map<int, Counter>
+    m_bp_cause_op; /**< misprediction caused uop per thread */
 
   // FIXME : implement BTB
   // cache btb;

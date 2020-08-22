@@ -143,7 +143,8 @@ void macsim_c::init_knobs(int argc, char** argv) {
   m_knobsContainer->updateKnob("out", outputPath);
 
   char* pInvalidArgument = NULL;
-  if (!m_knobsContainer->applyComandLineArguments(argc - 3, argv + 3, &pInvalidArgument)) {
+  if (!m_knobsContainer->applyComandLineArguments(argc - 3, argv + 3,
+                                                  &pInvalidArgument)) {
   }
 #else
   // apply values from parameters file
@@ -151,7 +152,8 @@ void macsim_c::init_knobs(int argc, char** argv) {
 
   // apply the supplied command line switches
   char* pInvalidArgument = NULL;
-  if (!m_knobsContainer->applyComandLineArguments(argc, argv, &pInvalidArgument)) {
+  if (!m_knobsContainer->applyComandLineArguments(argc, argv,
+                                                  &pInvalidArgument)) {
   }
 #endif
 
@@ -204,8 +206,10 @@ void macsim_c::init_memory(void) {
   m_section_pool = new pool_c<section_info_s>(100, "section_pool");
   m_mem_map_entry_pool = new pool_c<mem_map_entry_c>(200, "mem_map_pool");
   m_heartbeat_pool = new pool_c<heartbeat_s>(10, "heartbeat_pool");
-  m_bp_recovery_info_pool = new pool_c<bp_recovery_info_c>(10, "bp_recovery_info_pool");
-  m_trace_node_pool = new pool_c<thread_trace_info_node_s>(10, "thread_node_pool");
+  m_bp_recovery_info_pool =
+    new pool_c<bp_recovery_info_c>(10, "bp_recovery_info_pool");
+  m_trace_node_pool =
+    new pool_c<thread_trace_info_node_s>(10, "thread_node_pool");
   m_uop_pool = new pool_c<uop_c>(1000, "uop_pool");
 
   m_block_id_mapper = new multi_key_map_c;
@@ -232,8 +236,8 @@ void macsim_c::init_memory(void) {
   m_num_mc = m_simBase->m_knobs->KNOB_DRAM_NUM_MC->getValue();
   m_dram_controller = new dram_c*[m_num_mc];
   for (int ii = 0; ii < m_num_mc; ++ii) {
-    m_dram_controller[ii] =
-      dram_factory_c::get()->allocate(m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
+    m_dram_controller[ii] = dram_factory_c::get()->allocate(
+      m_simBase->m_knobs->KNOB_DRAM_SCHEDULING_POLICY->getValue(), m_simBase);
     m_dram_controller[ii]->init(ii);
   }
 
@@ -270,8 +274,8 @@ void macsim_c::init_output_streams() {
 
     if (!g_mystderr) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, m_core0_inst_count,
-              m_simulation_cycle);
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__,
+              __LINE__, m_core0_inst_count, m_simulation_cycle);
       fprintf(stderr, "%s '%s'\n", "mystderr", stderr_file.c_str());
       breakpoint(__FILE__, __LINE__);
       exit(15);
@@ -283,8 +287,8 @@ void macsim_c::init_output_streams() {
 
     if (!g_mystdout) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, m_core0_inst_count,
-              m_simulation_cycle);
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__,
+              __LINE__, m_core0_inst_count, m_simulation_cycle);
 
       fprintf(stderr, "%s '%s'\n", "mystdout", stdout_file.c_str());
       breakpoint(__FILE__, __LINE__);
@@ -297,8 +301,8 @@ void macsim_c::init_output_streams() {
 
     if (!g_mystatus) {
       fprintf(stderr, "\n");
-      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__, __LINE__, m_core0_inst_count,
-              m_simulation_cycle);
+      fprintf(stderr, "%s:%d: ASSERT FAILED (I=%llu  C=%llu):  ", __FILE__,
+              __LINE__, m_core0_inst_count, m_simulation_cycle);
       fprintf(stderr, "%s '%s'\n", "mystatus", status_file.c_str());
       breakpoint(__FILE__, __LINE__);
       exit(15);
@@ -311,13 +315,16 @@ void macsim_c::init_output_streams() {
 // =======================================
 void macsim_c::init_cores(int num_max_core) {
   int num_large_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
-  int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
+  int num_large_medium_cores =
+    *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
-  report("initialize cores (" << num_large_cores << "/" << (num_large_medium_cores - num_large_cores) << "/"
-                              << *KNOB(KNOB_NUM_SIM_SMALL_CORES) << ")");
+  report("initialize cores (" << num_large_cores << "/"
+                              << (num_large_medium_cores - num_large_cores)
+                              << "/" << *KNOB(KNOB_NUM_SIM_SMALL_CORES) << ")");
 
   ASSERT(num_max_core ==
-         (*KNOB(KNOB_NUM_SIM_SMALL_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) + *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
+         (*KNOB(KNOB_NUM_SIM_SMALL_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES) +
+          *KNOB(KNOB_NUM_SIM_LARGE_CORES)));
 
   // based on the core type, add cores into type-specific core pools
 
@@ -337,12 +344,14 @@ void macsim_c::init_cores(int num_max_core) {
   // medium cores
   int total_core = num_large_cores;
   for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_MEDIUM_CORES); ++ii) {
-    m_core_pointers[ii + num_large_cores] = new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
+    m_core_pointers[ii + num_large_cores] =
+      new core_c(ii + num_large_cores, m_simBase, UNIT_MEDIUM);
     m_core_pointers[ii + num_large_cores]->init();
     m_core_pointers[ii + num_large_cores]->pref_init();
 
     // insert to the core type pool
-    if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx")
+    if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==
+        "ptx")
       m_ptx_core_pool.push(ii + total_core);
     else
       m_x86_core_pool.push(ii + total_core);
@@ -351,7 +360,8 @@ void macsim_c::init_cores(int num_max_core) {
   // small cores
   total_core += *m_simBase->m_knobs->KNOB_NUM_SIM_MEDIUM_CORES;
   for (int ii = 0; ii < *KNOB(KNOB_NUM_SIM_SMALL_CORES); ++ii) {
-    m_core_pointers[ii + num_large_medium_cores] = new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
+    m_core_pointers[ii + num_large_medium_cores] =
+      new core_c(ii + num_large_medium_cores, m_simBase, UNIT_SMALL);
     m_core_pointers[ii + num_large_medium_cores]->init();
     m_core_pointers[ii + num_large_medium_cores]->pref_init();
 
@@ -367,7 +377,8 @@ void macsim_c::init_cores(int num_max_core) {
 // =======================================
 // initialize IRIS parameters (with config file, preferrably)
 // =======================================
-void macsim_c::init_iris_config(map<string, string>& params)  // passed g_iris_params here
+void macsim_c::init_iris_config(
+  map<string, string>& params)  // passed g_iris_params here
 {
   params["topology"] = KNOB(KNOB_IRIS_TOPOLOGY)->getValue();
 
@@ -390,7 +401,8 @@ void macsim_c::init_iris_config(map<string, string>& params)  // passed g_iris_p
     params["no_ports"] = "5";  // check for torus
     params["rc_method"] = "XY_ROUTING_HETERO";
     params["mapping"] =
-      "0,1,2,5,6,7,8,9,10,13,14,15,16,17,18,21,22,23,24,25,26,29,30,31,32,33,34,37,38,39,40,41,42,45,46,47,48,49,50,53,"
+      "0,1,2,5,6,7,8,9,10,13,14,15,16,17,18,21,22,23,24,25,26,29,30,31,32,33,"
+      "34,37,38,39,40,41,42,45,46,47,48,49,50,53,"
       "54,55,56,57,58,61,62,63,11,12,19,20,27,28,35,36,43,44,51,52,3,4,59,60,";
     // original spinal order
     // "0,1,2,48,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,3,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66";
@@ -402,13 +414,16 @@ void macsim_c::init_iris_config(map<string, string>& params)  // passed g_iris_p
   // FIXME - always uses spinalMesh for testing
   if (0) {
     params["grid_size"] = KNOB(KNOB_IRIS_GRIDSIZE)->getValue();
-    params["no_ports"] = "5";  // 4 for north/south, 2 for west/east, 1 for interface
+    params["no_ports"] =
+      "5";  // 4 for north/south, 2 for west/east, 1 for interface
     params["mapping"] =
-      "0,1,2,60,61,3,4,5,6,7,8,48,49,9,10,11,12,13,14,50,51,15,16,17,18,19,20,52,53,21,22,23,24,25,26,54,55,27,28,29,"
+      "0,1,2,60,61,3,4,5,6,7,8,48,49,9,10,11,12,13,14,50,51,15,16,17,18,19,20,"
+      "52,53,21,22,23,24,25,26,54,55,27,28,29,"
       "30,31,32,56,57,33,34,35,36,37,38,58,59,39,40,41,42,43,44,62,63,45,46,47";
     //"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66";
     cout << "reading mesh topology in init iris config" << endl;
-    params["rc_method"] = "XY_ROUTING_HETERO";  // doesn't work in param file, might need to use quotes
+    params["rc_method"] =
+      "XY_ROUTING_HETERO";  // doesn't work in param file, might need to use quotes
   }
   params["no_vcs"] = KNOB(KNOB_IRIS_NUM_VC)->getValue();
   params["credits"] = KNOB(KNOB_IRIS_CREDIT)->getValue();
@@ -427,8 +442,10 @@ void macsim_c::init_iris_config(map<string, string>& params)  // passed g_iris_p
 #if FIXME
   // if (! key.compare("-iris:self_assign_dest_id"))
   //           params.insert(pair<string,string>("self_assign_dest_id",value));
-  if (!key.compare("-mc:resp_payload_len")) params.insert(pair<string, string>("resp_payload_len", value));
-  if (!key.compare("-mc:memory_latency")) params.insert(pair<string, string>("memory_latency", value));
+  if (!key.compare("-mc:resp_payload_len"))
+    params.insert(pair<string, string>("resp_payload_len", value));
+  if (!key.compare("-mc:memory_latency"))
+    params.insert(pair<string, string>("memory_latency", value));
 #endif
 }
 #endif
@@ -439,7 +456,8 @@ void macsim_c::init_iris_config(map<string, string>& params)  // passed g_iris_p
 // =======================================
 void macsim_c::init_network(void) {
 #ifdef IRIS
-  assert(*KNOB(KNOB_ENABLE_IRIS) == true && *KNOB(KNOB_ENABLE_NEW_NOC) == false);
+  assert(*KNOB(KNOB_ENABLE_IRIS) == true &&
+         *KNOB(KNOB_ENABLE_NEW_NOC) == false);
   init_iris_config(m_iris_params);
 
   map<std::string, std::string>::iterator it;
@@ -462,24 +480,31 @@ void macsim_c::init_network(void) {
 
   for (unsigned int i = 0; i < m_macsim_terminals.size(); i++) {
     // create component id
-    manifold::kernel::CompId_t interface_id = manifold::kernel::Component::Create<NInterface>(0, m_simBase);
-    manifold::kernel::CompId_t router_id = manifold::kernel::Component::Create<SimpleRouter>(0, m_simBase);
+    manifold::kernel::CompId_t interface_id =
+      manifold::kernel::Component::Create<NInterface>(0, m_simBase);
+    manifold::kernel::CompId_t router_id =
+      manifold::kernel::Component::Create<SimpleRouter>(0, m_simBase);
 
     // create component
-    NInterface* interface = manifold::kernel::Component::GetComponent<NInterface>(interface_id);
-    SimpleRouter* rr = manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
+    NInterface* interface =
+      manifold::kernel::Component::GetComponent<NInterface>(interface_id);
+    SimpleRouter* rr =
+      manifold::kernel::Component::GetComponent<SimpleRouter>(router_id);
 
     // set node id
     interface->node_id = i;
     rr->node_id = i;
 
     // register clock
-    manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick, &NInterface::tock);
-    manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick, &SimpleRouter::tock);
+    manifold::kernel::Clock::Register<NInterface>(interface, &NInterface::tick,
+                                                  &NInterface::tock);
+    manifold::kernel::Clock::Register<SimpleRouter>(rr, &SimpleRouter::tick,
+                                                    &SimpleRouter::tock);
 
     // push back
     m_iris_network->terminals.push_back(m_macsim_terminals[MAPI]);
-    m_iris_network->terminal_ids.push_back(m_macsim_terminals[MAPI]->GetComponentId());
+    m_iris_network->terminal_ids.push_back(
+      m_macsim_terminals[MAPI]->GetComponentId());
     m_iris_network->interfaces.push_back(interface);
     m_iris_network->interface_ids.push_back(interface_id);
     m_iris_network->routers.push_back(rr);
@@ -495,7 +520,8 @@ void macsim_c::init_network(void) {
   }
 
   // initialize router outports
-  for (unsigned int i = 0; i < m_macsim_terminals.size(); i++) m_iris_network->set_router_outports(i);
+  for (unsigned int i = 0; i < m_macsim_terminals.size(); i++)
+    m_iris_network->set_router_outports(i);
 
   m_iris_network->connect_interface_terminal();
   m_iris_network->connect_interface_routers();
@@ -569,7 +595,8 @@ void macsim_c::deallocate_memory(void) {
 
   // deallocate cores
   int num_large_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES);
-  int num_large_medium_cores = *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
+  int num_large_medium_cores =
+    *KNOB(KNOB_NUM_SIM_LARGE_CORES) + *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
   for (int ii = 0; ii < num_large_cores; ++ii) {
     delete m_core_pointers[ii];
     m_core_pointers[ii] = NULL;
@@ -595,10 +622,14 @@ void macsim_c::fini_sim(void) {
   // execution time calculation
   gettimeofday(&m_end_sim, NULL);
   REPORT("elapsed time:%.1f seconds\n",
-         ((m_end_sim.tv_sec - m_begin_sim.tv_sec) * 1000000 + m_end_sim.tv_usec - m_begin_sim.tv_usec) / 1000000.0);
+         ((m_end_sim.tv_sec - m_begin_sim.tv_sec) * 1000000 +
+          m_end_sim.tv_usec - m_begin_sim.tv_usec) /
+           1000000.0);
 
-  int second = static_cast<int>(
-    ((m_end_sim.tv_sec - m_begin_sim.tv_sec) * 1000000 + m_end_sim.tv_usec - m_begin_sim.tv_usec) / 1000000.0);
+  int second =
+    static_cast<int>(((m_end_sim.tv_sec - m_begin_sim.tv_sec) * 1000000 +
+                      m_end_sim.tv_usec - m_begin_sim.tv_usec) /
+                     1000000.0);
   STAT_EVENT_N(EXE_TIME, second);
 
 #ifdef IRIS
@@ -612,27 +643,34 @@ void macsim_c::fini_sim(void) {
     // mapping info
     irisTraceFile << ":Topology mapping:" << endl;
 
-    const char* message_class_type[] = {"INVALID", "PROC", "L1", "L2", "L3", "MC"};
+    const char* message_class_type[] = {"INVALID", "PROC", "L1",
+                                        "L2",      "L3",   "MC"};
     for (unsigned int i = 0; i < m_macsim_terminals.size(); i++) {
       int node_id = ((Ring*)m_iris_network)->mapping[i];
       int type = m_simBase->m_macsim_terminals.at(node_id)->mclass;
 
-      irisTraceFile << message_class_type[type] << "," << m_macsim_terminals[node_id]->ptx << "," << node_id << ",";
+      irisTraceFile << message_class_type[type] << ","
+                    << m_macsim_terminals[node_id]->ptx << "," << node_id
+                    << ",";
     }
     irisTraceFile << endl;
 
     // summary info
-    irisTraceFile << ":Per Node Summary: node id, total packets out, total flits in, total flits out, cycles: ib, sa, "
-                     "vca, st, average buffer size, average packet latency, average flit latency,  "
+    irisTraceFile << ":Per Node Summary: node id, total packets out, total "
+                     "flits in, total flits out, cycles: ib, sa, "
+                     "vca, st, average buffer size, average packet latency, "
+                     "average flit latency,  "
                   << endl;
     for (unsigned int i = 0; i < m_iris_network->routers.size(); i++) {
       irisTraceFile << m_iris_network->routers[i]->print_csv_stats();
     }
 
     // detailed, router/packet state vs time info
-    irisTraceFile << ":Detail info: clock cycle, req ID, mem state, msg type, current node, dst node, component "
-                     "(R=Router), input buffer port0.vc0, port0,vc1, port1,vc0, etc..."
-                  << endl;
+    irisTraceFile
+      << ":Detail info: clock cycle, req ID, mem state, msg type, current "
+         "node, dst node, component "
+         "(R=Router), input buffer port0.vc0, port0,vc1, port1,vc0, etc..."
+      << endl;
     irisTraceFile << m_simBase->network_trace.str();
   }
   irisTraceFile.close();
@@ -688,7 +726,8 @@ void macsim_c::initialize(int argc, char** argv) {
   init_sim();
 
 #ifdef IRIS
-  master_clock = new manifold::kernel::Clock(1);  // clock has to be global or static
+  master_clock =
+    new manifold::kernel::Clock(1);  // clock has to be global or static
 #endif
 
   // initialize cores
@@ -804,9 +843,10 @@ void macsim_c::init_clock_domain(void) {
   report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC) << " GHz");
 }
 
-#define GET_NEXT_CYCLE(domain) \
-  ++m_domain_count[domain];    \
-  m_domain_next[domain] = static_cast<int>(1.0 * m_clock_lcm * m_domain_count[domain] / m_domain_freq[domain]);
+#define GET_NEXT_CYCLE(domain)              \
+  ++m_domain_count[domain];                 \
+  m_domain_next[domain] = static_cast<int>( \
+    1.0 * m_clock_lcm * m_domain_count[domain] / m_domain_freq[domain]);
 
 // =======================================
 // Single cycle step of simulation state : returns running status
@@ -847,7 +887,8 @@ int macsim_c::run_a_cycle() {
 
   // update dyfr only after 1ms based on sampling period
   int dyfr_sample_period = *KNOB(KNOB_DYFR_SAMPLE_PERIOD);
-  if (m_simulation_cycle > 10000000 && m_simulation_cycle % dyfr_sample_period == 0) {
+  if (m_simulation_cycle > 10000000 &&
+      m_simulation_cycle % dyfr_sample_period == 0) {
     m_dyfr->update();
   }
 
@@ -862,7 +903,8 @@ int macsim_c::run_a_cycle() {
   if (m_clock_internal == m_domain_next[CLOCK_NOC]) {
 #ifdef IRIS
     manifold::kernel::Manifold::Run((double)m_simulation_cycle);  // IRIS
-    manifold::kernel::Manifold::Run((double)m_simulation_cycle);  // IRIS for half tick?
+    manifold::kernel::Manifold::Run(
+      (double)m_simulation_cycle);  // IRIS for half tick?
 #else
     m_network->run_a_cycle(pll_locked);
 #endif
@@ -915,7 +957,8 @@ int macsim_c::run_a_cycle() {
     }
 
     // check whether all ops in this core have been completed.
-    if (core->m_running_thread_num == 0 && (core->m_unique_scheduled_thread_num >= 1)) {
+    if (core->m_running_thread_num == 0 &&
+        (core->m_unique_scheduled_thread_num >= 1)) {
       if (m_num_waiting_dispatched_threads == 0) {
         m_sim_end[ii] = true;
       }
@@ -936,11 +979,13 @@ int macsim_c::run_a_cycle() {
     // checking for threads
     if (m_sim_end[ii] != true) {
       // when KNOB_MAX_INSTS is set, execute each thread for KNOB_MAX_INSTS instructions
-      if (*m_simBase->m_knobs->KNOB_MAX_INSTS && core->m_num_thread_reach_end == core->m_unique_scheduled_thread_num) {
+      if (*m_simBase->m_knobs->KNOB_MAX_INSTS &&
+          core->m_num_thread_reach_end == core->m_unique_scheduled_thread_num) {
         m_sim_end[ii] = true;
       }
       // when KNOB_SIM_CYCLE_COUNT is set, execute only KNOB_SIM_CYCLE_COUNT cycles
-      else if (*KNOB(KNOB_SIM_CYCLE_COUNT) && m_simulation_cycle >= *KNOB(KNOB_SIM_CYCLE_COUNT)) {
+      else if (*KNOB(KNOB_SIM_CYCLE_COUNT) &&
+               m_simulation_cycle >= *KNOB(KNOB_SIM_CYCLE_COUNT)) {
         m_sim_end[ii] = true;
       }
     }
@@ -1033,7 +1078,8 @@ void macsim_c::apply_new_frequency(void) {
   while (!m_freq_ready.empty()) {
     int id = m_freq_id.front();
     int freq = m_freq.front();
-    report("ID:" << id << " new frequency:" << freq << " (" << m_simulation_cycle << ") enforced "
+    report("ID:" << id << " new frequency:" << freq << " ("
+                 << m_simulation_cycle << ") enforced "
                  << m_freq_ready.front());
 
     m_freq_ready.pop();
@@ -1060,10 +1106,11 @@ int macsim_c::get_current_frequency_uncore(int type) {
 }
 
 #ifdef USING_SST
-void macsim_c::registerCallback(CallbackSendInstructionCacheRequest* sir, CallbackSendDataCacheRequest* sdr,
-                                CallbackSendConstCacheRequest* scr, CallbackSendTextureCacheRequest* str,
-                                CallbackStrobeInstructionCacheRespQ* sirq, CallbackStrobeDataCacheRespQ* sdrq,
-                                CallbackStrobeConstCacheRespQ* scrq, CallbackStrobeTextureCacheRespQ* strq) {
+void macsim_c::registerCallback(
+  CallbackSendInstructionCacheRequest* sir, CallbackSendDataCacheRequest* sdr,
+  CallbackSendConstCacheRequest* scr, CallbackSendTextureCacheRequest* str,
+  CallbackStrobeInstructionCacheRespQ* sirq, CallbackStrobeDataCacheRespQ* sdrq,
+  CallbackStrobeConstCacheRespQ* scrq, CallbackStrobeTextureCacheRespQ* strq) {
   sendInstructionCacheRequest = sir;
   sendDataCacheRequest = sdr;
   sendConstCacheRequest = scr;
@@ -1074,15 +1121,18 @@ void macsim_c::registerCallback(CallbackSendInstructionCacheRequest* sir, Callba
   strobeTextureCacheRespQ = strq;
 }
 
-void macsim_c::registerCallback(CallbackSendInstructionCacheRequest* sir, CallbackSendDataCacheRequest* sdr,
-                                CallbackStrobeInstructionCacheRespQ* sirq, CallbackStrobeDataCacheRespQ* sdrq) {
+void macsim_c::registerCallback(CallbackSendInstructionCacheRequest* sir,
+                                CallbackSendDataCacheRequest* sdr,
+                                CallbackStrobeInstructionCacheRespQ* sirq,
+                                CallbackStrobeDataCacheRespQ* sdrq) {
   sendInstructionCacheRequest = sir;
   sendDataCacheRequest = sdr;
   strobeInstructionCacheRespQ = sirq;
   strobeDataCacheRespQ = sdrq;
 }
 
-void macsim_c::registerCallback(CallbackSendCubeRequest* scr, CallbackStrobeCubeRespQ* scrq) {
+void macsim_c::registerCallback(CallbackSendCubeRequest* scr,
+                                CallbackStrobeCubeRespQ* scrq) {
   sendCubeRequest = scr;
   strobeCubeRespQ = scrq;
 }

@@ -71,7 +71,8 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Constructor
  */
-gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output) : trace_read_c(simBase, m_dprint_output) {
+gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
+  : trace_read_c(simBase, m_dprint_output) {
   m_trace_size = GPU_TRACE_SIZE;
 
   // map opcode type to uop type
@@ -94,7 +95,8 @@ gpu_decoder_c::~gpu_decoder_c() {
  * @param inst_read - indicate instruction read successful
  * @see get_uops_from_traces
  */
-bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id, bool *inst_read) {
+bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
+                               bool *inst_read) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   int bytes_read = -1;
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
@@ -102,10 +104,15 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id, boo
   trace_info_gpu_s *trace_info = static_cast<trace_info_gpu_s *>(t_info);
 
   if (!thread_trace_info->m_buffer_exhausted) {
-    memcpy(trace_info, &thread_trace_info->m_buffer[m_trace_size * thread_trace_info->m_buffer_index], m_trace_size);
-    thread_trace_info->m_buffer_index = (thread_trace_info->m_buffer_index + 1) % k_trace_buffer_size;
+    memcpy(trace_info,
+           &thread_trace_info
+              ->m_buffer[m_trace_size * thread_trace_info->m_buffer_index],
+           m_trace_size);
+    thread_trace_info->m_buffer_index =
+      (thread_trace_info->m_buffer_index + 1) % k_trace_buffer_size;
 
-    if (thread_trace_info->m_buffer_index >= thread_trace_info->m_buffer_index_max) {
+    if (thread_trace_info->m_buffer_index >=
+        thread_trace_info->m_buffer_index_max) {
       bytes_read = 0;
     } else {
       bytes_read = m_trace_size;
@@ -118,7 +125,8 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id, boo
   }
   // read one instruction each
   else {
-    bytes_read = gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
+    bytes_read =
+      gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
   }
 
   if (m_trace_size == bytes_read) {
@@ -142,7 +150,8 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id, boo
  * @param num_inst - number of instructions to rewind
  * @see peek_trace
  */
-bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id, int num_inst) {
+bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
+                                  int num_inst) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -158,7 +167,8 @@ bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id, int num_inst) 
   }
 
   // rewind trace file
-  off_t offset = gzseek(thread_trace_info->m_trace_file, -1 * num_inst * m_trace_size, SEEK_CUR);
+  off_t offset = gzseek(thread_trace_info->m_trace_file,
+                        -1 * num_inst * m_trace_size, SEEK_CUR);
 
   if (offset == -1) {
     return false;
@@ -177,48 +187,71 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
   trace_info_gpu_s *inst_info = static_cast<trace_info_gpu_s *>(trace_info);
 
   (*m_dprint_output) << "*** begin of the data structure *** " << endl;
-  (*m_dprint_output) << "core_id:" << core_id << " thread_id:" << thread_id << endl;
-  (*m_dprint_output) << "opcode: " << g_tr_opcode_names[inst_info->m_opcode] << endl;
-  (*m_dprint_output) << "num_read_regs: " << (uint32_t)inst_info->m_num_read_regs << endl;
-  (*m_dprint_output) << "num_dest_regs: " << (uint32_t)inst_info->m_num_dest_regs << endl;
+  (*m_dprint_output) << "core_id:" << core_id << " thread_id:" << thread_id
+                     << endl;
+  (*m_dprint_output) << "opcode: " << g_tr_opcode_names[inst_info->m_opcode]
+                     << endl;
+  (*m_dprint_output) << "num_read_regs: "
+                     << (uint32_t)inst_info->m_num_read_regs << endl;
+  (*m_dprint_output) << "num_dest_regs: "
+                     << (uint32_t)inst_info->m_num_dest_regs << endl;
 
   for (uint32_t ii = 0; ii < (uint32_t)inst_info->m_num_read_regs; ++ii)
-    (*m_dprint_output) << "src" << ii << ": " << (uint32_t)inst_info->m_src[ii] << endl;
+    (*m_dprint_output) << "src" << ii << ": " << (uint32_t)inst_info->m_src[ii]
+                       << endl;
 
   for (uint32_t ii = 0; ii < (uint32_t)inst_info->m_num_dest_regs; ++ii)
-    (*m_dprint_output) << "dst" << ii << ": " << (uint32_t)inst_info->m_dst[ii] << endl;
+    (*m_dprint_output) << "dst" << ii << ": " << (uint32_t)inst_info->m_dst[ii]
+                       << endl;
 
   (*m_dprint_output) << "is_fp: " << inst_info->m_is_fp << endl;
-  (*m_dprint_output) << "cf_type: " << g_tr_cf_names[inst_info->m_cf_type] << endl;
+  (*m_dprint_output) << "cf_type: " << g_tr_cf_names[inst_info->m_cf_type]
+                     << endl;
   (*m_dprint_output) << "is_load: " << inst_info->m_is_load << endl;
 
   (*m_dprint_output) << "inst_size: " << (uint32_t)inst_info->m_size << endl;
 
-  (*m_dprint_output) << "inst_addr: " << hex << inst_info->m_inst_addr << dec << endl;
-  (*m_dprint_output) << "active_mask: " << hex << inst_info->m_active_mask << dec << endl;
+  (*m_dprint_output) << "inst_addr: " << hex << inst_info->m_inst_addr << dec
+                     << endl;
+  (*m_dprint_output) << "active_mask: " << hex << inst_info->m_active_mask
+                     << dec << endl;
 
-  (*m_dprint_output) << "br_target_addr: " << hex << inst_info->m_br_target_addr << dec << endl;
-  (*m_dprint_output) << "reconv_inst_addr/mem_addr: " << hex << inst_info->m_reconv_inst_addr << dec << endl;
-  (*m_dprint_output) << "br_taken_mask: " << hex << inst_info->m_br_taken_mask << dec << endl;
+  (*m_dprint_output) << "br_target_addr: " << hex << inst_info->m_br_target_addr
+                     << dec << endl;
+  (*m_dprint_output) << "reconv_inst_addr/mem_addr: " << hex
+                     << inst_info->m_reconv_inst_addr << dec << endl;
+  (*m_dprint_output) << "br_taken_mask: " << hex << inst_info->m_br_taken_mask
+                     << dec << endl;
 
-  (*m_dprint_output) << "mem_addr/reconv_inst_addr: " << hex << inst_info->m_mem_addr << dec << endl;
-  (*m_dprint_output) << "mem_access_size/barrier_id: " << (uint32_t)inst_info->m_mem_access_size << endl;
-  if (inst_info->m_opcode == GPU_MEMBAR_CTA || inst_info->m_opcode == GPU_MEMBAR_GL ||
+  (*m_dprint_output) << "mem_addr/reconv_inst_addr: " << hex
+                     << inst_info->m_mem_addr << dec << endl;
+  (*m_dprint_output) << "mem_access_size/barrier_id: "
+                     << (uint32_t)inst_info->m_mem_access_size << endl;
+  if (inst_info->m_opcode == GPU_MEMBAR_CTA ||
+      inst_info->m_opcode == GPU_MEMBAR_GL ||
       inst_info->m_opcode == GPU_MEMBAR_SYS) {
-    (*m_dprint_output) << "addr_space/fence_level: " << g_addr_space_names[0] << endl;
+    (*m_dprint_output) << "addr_space/fence_level: " << g_addr_space_names[0]
+                       << endl;
   } else {
-    (*m_dprint_output) << "addr_space/fence_level: " << g_addr_space_names[inst_info->m_addr_space] << endl;
+    (*m_dprint_output) << "addr_space/fence_level: "
+                       << g_addr_space_names[inst_info->m_addr_space] << endl;
   }
-  (*m_dprint_output) << "cache_operator: " << g_cache_op_names[inst_info->m_cache_operator] << endl;
+  (*m_dprint_output) << "cache_operator: "
+                     << g_cache_op_names[inst_info->m_cache_operator] << endl;
 
-  (*m_dprint_output) << "barrier_id/mem_access_size: " << (uint32_t)inst_info->m_barrier_id << endl;
-  (*m_dprint_output) << "num_barrier_threads: " << (uint32_t)inst_info->m_num_barrier_threads << endl;
+  (*m_dprint_output) << "barrier_id/mem_access_size: "
+                     << (uint32_t)inst_info->m_barrier_id << endl;
+  (*m_dprint_output) << "num_barrier_threads: "
+                     << (uint32_t)inst_info->m_num_barrier_threads << endl;
 
-  (*m_dprint_output) << "cache_level: " << g_cache_level_names[inst_info->m_cache_level] << endl;
+  (*m_dprint_output) << "cache_level: "
+                     << g_cache_level_names[inst_info->m_cache_level] << endl;
   if (inst_info->m_level < GPU_FENCE_LAST) {
-    (*m_dprint_output) << "fence_level/addr_space: " << g_fence_level_names[inst_info->m_level] << endl;
+    (*m_dprint_output) << "fence_level/addr_space: "
+                       << g_fence_level_names[inst_info->m_level] << endl;
   } else {
-    (*m_dprint_output) << "fence_level/addr_space: " << g_fence_level_names[0] << endl;
+    (*m_dprint_output) << "fence_level/addr_space: " << g_fence_level_names[0]
+                       << endl;
   }
 
   (*m_dprint_output) << "*** end of the data structure *** " << endl << endl;
@@ -237,7 +270,8 @@ void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_gpu_s inst_info;
 
-  while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info, m_trace_size)) == m_trace_size) {
+  while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
+                              m_trace_size)) == m_trace_size) {
     // do something
   }
   gzrewind(trace_info->m_trace_file);
@@ -253,7 +287,8 @@ void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
  * @param rep_offset - repetition offet
  * @param core_id - core id
  */
-void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_uop_s *trace_uop, Addr rep_offset,
+void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
+                                    trace_uop_s *trace_uop, Addr rep_offset,
                                     int core_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_gpu_s *pi = static_cast<trace_info_gpu_s *>(trace_info);
@@ -272,19 +307,25 @@ void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_u
   else if (info->m_table_info->m_mem_type) {
     int amp_val = *KNOB(KNOB_MEM_SIZE_AMP);
 
-    if (info->m_table_info->m_mem_type == MEM_ST || info->m_table_info->m_mem_type == MEM_ST_LM ||
+    if (info->m_table_info->m_mem_type == MEM_ST ||
+        info->m_table_info->m_mem_type == MEM_ST_LM ||
         info->m_table_info->m_mem_type == MEM_ST_SM) {
       trace_uop->m_va = MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
-    } else if ((info->m_table_info->m_mem_type == MEM_LD) || (info->m_table_info->m_mem_type == MEM_LD_LM) ||
-               (info->m_table_info->m_mem_type == MEM_LD_SM) || (info->m_table_info->m_mem_type == MEM_LD_CM) ||
-               (info->m_table_info->m_mem_type == MEM_LD_TM) || (info->m_table_info->m_mem_type == MEM_LD_PM) ||
+    } else if ((info->m_table_info->m_mem_type == MEM_LD) ||
+               (info->m_table_info->m_mem_type == MEM_LD_LM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_SM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_CM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_TM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_PM) ||
                (info->m_table_info->m_mem_type == MEM_PF)) {
       if (info->m_trace_info.m_second_mem) {
-        assert(0);  // nbl - mar-19-2013: ptx instructions access only one memory location
+        assert(
+          0);  // nbl - mar-19-2013: ptx instructions access only one memory location
         // trace_uop->m_va = MIN2((pi->m_ld_vaddr2 + rep_offset)*amp_val, MAX_ADDR);
       } else
-        trace_uop->m_va = MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
+        trace_uop->m_va =
+          MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
 
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     }
@@ -303,7 +344,9 @@ void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_u
  * @param core_id - core id
  * @param sim_thread_id - thread id
  */
-inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_s **trace_uop, int core_id,
+inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
+                                                    trace_uop_s **trace_uop,
+                                                    int core_id,
                                                     int sim_thread_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_gpu_s *pi = static_cast<trace_info_gpu_s *>(trace_info);
@@ -408,9 +451,12 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
       write_dest_reg = 1;
 
-      if (trace_uop[0]->m_mem_type == MEM_LD || trace_uop[0]->m_mem_type == MEM_LD_LM ||
-          trace_uop[0]->m_mem_type == MEM_LD_SM || trace_uop[0]->m_mem_type == MEM_LD_CM ||
-          trace_uop[0]->m_mem_type == MEM_LD_TM || trace_uop[0]->m_mem_type == MEM_LD_PM) {
+      if (trace_uop[0]->m_mem_type == MEM_LD ||
+          trace_uop[0]->m_mem_type == MEM_LD_LM ||
+          trace_uop[0]->m_mem_type == MEM_LD_SM ||
+          trace_uop[0]->m_mem_type == MEM_LD_CM ||
+          trace_uop[0]->m_mem_type == MEM_LD_TM ||
+          trace_uop[0]->m_mem_type == MEM_LD_PM) {
         inst_has_ld_uop = true;
       }
     }  // HAS_LOAD
@@ -426,7 +472,8 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       cur_trace_uop->m_mem_type = NOT_MEM;
       cur_trace_uop->m_cf_type = NOT_CF;
       cur_trace_uop->m_op_type =
-        (Uop_Type)((pi->m_is_fp) ? m_fp_uop_table[pi->m_opcode] : m_int_uop_table[pi->m_opcode]);
+        (Uop_Type)((pi->m_is_fp) ? m_fp_uop_table[pi->m_opcode]
+                                 : m_int_uop_table[pi->m_opcode]);
       cur_trace_uop->m_bar_type = NOT_BAR;
       cur_trace_uop->m_num_src_regs = pi->m_num_read_regs;
       cur_trace_uop->m_num_dest_regs = pi->m_num_dest_regs;
@@ -440,7 +487,8 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
     ///
     /// 2. Instruction has a memory store operation
     ///
-    if (pi->m_opcode == GPU_MEM_ST_GM || pi->m_opcode == GPU_MEM_ST_LM || pi->m_opcode == GPU_MEM_ST_SM) {
+    if (pi->m_opcode == GPU_MEM_ST_GM || pi->m_opcode == GPU_MEM_ST_LM ||
+        pi->m_opcode == GPU_MEM_ST_SM) {
       trace_uop_s *cur_trace_uop = trace_uop[num_uop++];
       if (inst_has_ld_uop) tmp_reg_needed = true;
 
@@ -486,7 +534,8 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       if (inst_has_ld_uop) tmp_reg_needed = true;
 
       cur_trace_uop->m_mem_type = NOT_MEM;
-      cur_trace_uop->m_cf_type = (Cf_Type)((pi->m_cf_type >= PIN_CF_SYS) ? CF_ICO : pi->m_cf_type);
+      cur_trace_uop->m_cf_type =
+        (Cf_Type)((pi->m_cf_type >= PIN_CF_SYS) ? CF_ICO : pi->m_cf_type);
       cur_trace_uop->m_op_type = UOP_CF;
       cur_trace_uop->m_bar_type = NOT_BAR;
       cur_trace_uop->m_num_src_regs = pi->m_num_read_regs;
@@ -498,8 +547,10 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
     }
 
     ASSERTM((pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED) &&
-              (pi->m_opcode != GPU_MEMBAR_CTA && pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
-            "unsupported uop - %s", gpu_decoder_c::g_tr_opcode_names[pi->m_opcode]);
+              (pi->m_opcode != GPU_MEMBAR_CTA &&
+               pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
+            "unsupported uop - %s",
+            gpu_decoder_c::g_tr_opcode_names[pi->m_opcode]);
 
     ///
     /// Non-memory, non-branch instruction
@@ -535,14 +586,17 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
         info->m_trace_info.m_bom = false;
         info->m_trace_info.m_eom = false;
       }
-      ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n", core_id);
+      ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n",
+              core_id);
 
       trace_uop[ii]->m_addr = pi->m_inst_addr;
 
       DEBUG_CORE(core_id,
-                 "pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx num_src_regs:%d num_read_regs:%d "
+                 "pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx "
+                 "num_src_regs:%d num_read_regs:%d "
                  "pi:num_dst_regs:%d uop:num_dst_regs:%d \n",
-                 (Addr)(pi->m_inst_addr), ii, trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs, pi->m_num_read_regs,
+                 (Addr)(pi->m_inst_addr), ii, trace_uop[ii]->m_addr,
+                 trace_uop[ii]->m_num_src_regs, pi->m_num_read_regs,
                  pi->m_num_dest_regs, trace_uop[ii]->m_num_dest_regs);
 
       // set source register
@@ -553,8 +607,10 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       }
 
       // store or control flow has a dependency whoever the last one
-      if ((trace_uop[ii]->m_mem_type == MEM_ST) || (trace_uop[ii]->m_mem_type == MEM_ST_LM) ||
-          (trace_uop[ii]->m_mem_type == MEM_ST_SM) || (trace_uop[ii]->m_cf_type != NOT_CF)) {
+      if ((trace_uop[ii]->m_mem_type == MEM_ST) ||
+          (trace_uop[ii]->m_mem_type == MEM_ST_LM) ||
+          (trace_uop[ii]->m_mem_type == MEM_ST_SM) ||
+          (trace_uop[ii]->m_cf_type != NOT_CF)) {
         if (tmp_reg_needed && !inst_has_ALU_uop) {
           (trace_uop[ii])->m_srcs[jj].m_type = (Reg_Type)0;
           (trace_uop[ii])->m_srcs[jj].m_id = TR_REG_TMP0;
@@ -588,9 +644,12 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       }
 
       // add tmp register as a destination register
-      if (tmp_reg_needed && ((trace_uop[ii]->m_mem_type == MEM_LD) || (trace_uop[ii]->m_mem_type == MEM_LD_LM) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_SM) || (trace_uop[ii]->m_mem_type == MEM_LD_CM) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_TM) || (trace_uop[ii]->m_mem_type == MEM_LD_PM))) {
+      if (tmp_reg_needed && ((trace_uop[ii]->m_mem_type == MEM_LD) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_LM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_SM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_CM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_TM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_PM))) {
         (trace_uop[ii])->m_dests[jj].m_type = (Reg_Type)0;
         (trace_uop[ii])->m_dests[jj].m_id = TR_REG_TMP0;
         (trace_uop[ii])->m_dests[jj].m_reg = TR_REG_TMP0;
@@ -598,7 +657,8 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       }
 
       // the last uop
-      if (ii == (num_uop - 1) && trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
+      if (ii == (num_uop - 1) &&
+          trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
         if (pi->m_opcode == GPU_BAR_SYNC) {
           // only the last instruction will have bar type - this is in case of
           // CPU, in case of GPU there is always only one uop?
@@ -609,8 +669,9 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
 
-      DEBUG_CORE(core_id, "tuop: pc 0x%llx num_src_reg:%d num_dest_reg:%d \n", trace_uop[ii]->m_addr,
-                 trace_uop[ii]->m_num_src_regs, trace_uop[ii]->m_num_dest_regs);
+      DEBUG_CORE(core_id, "tuop: pc 0x%llx num_src_reg:%d num_dest_reg:%d \n",
+                 trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs,
+                 trace_uop[ii]->m_num_dest_regs);
 
       trace_uop[ii]->m_info = info;
 
@@ -675,7 +736,7 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
   STAT_CORE_EVENT(core_id, OP_CAT_GPU_INVALID + (pi->m_opcode));
 
-  // nbl - mar-19-2013, power events have to be fixed
+// nbl - mar-19-2013, power events have to be fixed
 #if NBL_MAR_19_2013_TBD
   if (pi->m_num_ld || pi->m_has_st) {
     POWER_CORE_EVENT(core_id, POWER_SEGMENT_REGISTER_W);
@@ -701,7 +762,8 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
  * @param uop - uop object to hold instruction information
  * @param sim_thread_id thread id
  */
-bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id) {
+bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
+                                         int sim_thread_id) {
   ASSERT(uop);
 
   trace_uop_s *trace_uop;
@@ -728,7 +790,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
     if (core->m_inst_fetched[sim_thread_id] < *KNOB(KNOB_MAX_INSTS)) {
       // read next instruction
-      read_success = read_trace(core_id, thread_trace_info->m_next_trace_info, sim_thread_id, &inst_read);
+      read_success = read_trace(core_id, thread_trace_info->m_next_trace_info,
+                                sim_thread_id, &inst_read);
     } else {
       inst_read = false;
       if (!core->get_trace_info(sim_thread_id)->m_trace_ended) {
@@ -737,17 +800,23 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     }
 
     // Copy current instruction to data structure
-    memcpy(&trace_info, thread_trace_info->m_prev_trace_info, sizeof(trace_info_gpu_s));
+    memcpy(&trace_info, thread_trace_info->m_prev_trace_info,
+           sizeof(trace_info_gpu_s));
 
     // Set next pc address
-    trace_info_gpu_s *next_trace_info = static_cast<trace_info_gpu_s *>(thread_trace_info->m_next_trace_info);
+    trace_info_gpu_s *next_trace_info =
+      static_cast<trace_info_gpu_s *>(thread_trace_info->m_next_trace_info);
     trace_info.m_next_inst_addr = next_trace_info->m_inst_addr;
 
     // Copy next instruction to current instruction field
-    memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, sizeof(trace_info_gpu_s));
+    memcpy(thread_trace_info->m_prev_trace_info,
+           thread_trace_info->m_next_trace_info, sizeof(trace_info_gpu_s));
 
-    DEBUG_CORE(core_id, "trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n", core_id,
-               sim_thread_id, (Addr)(trace_info.m_inst_addr), static_cast<int>(trace_info.m_opcode),
+    DEBUG_CORE(core_id,
+               "trace_read nm core_id:%d thread_id:%d pc:0x%llx opcode:%d "
+               "inst_count:%llu\n",
+               core_id, sim_thread_id, (Addr)(trace_info.m_inst_addr),
+               static_cast<int>(trace_info.m_opcode),
                (Counter)(thread_trace_info->m_temp_inst_count));
 
     ///
@@ -758,7 +827,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     // read a new instruction, so update stats
     if (inst_read) {
       ++core->m_inst_fetched[sim_thread_id];
-      DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%llu\n", core_id, sim_thread_id,
+      DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%llu\n", core_id,
+                 sim_thread_id,
                  (Counter)(thread_trace_info->m_temp_inst_count + 1));
       if (core->m_inst_fetched[sim_thread_id] > core->m_max_inst_fetched)
         core->m_max_inst_fetched = core->m_inst_fetched[sim_thread_id];
@@ -781,7 +851,9 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     }
 
     // So far we have raw instruction format, so we need to MacSim specific trace format
-    info = convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array, core_id, sim_thread_id);
+    info =
+      convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array,
+                              core_id, sim_thread_id);
 
     trace_uop = thread_trace_info->m_trace_uop_array[0];
     num_uop = info->m_trace_info.m_num_uop;
@@ -797,7 +869,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   }  // END EOM
   // read remaining uops from the same instruction
   else {
-    trace_uop = thread_trace_info->m_trace_uop_array[thread_trace_info->m_num_sending_uop];
+    trace_uop = thread_trace_info
+                  ->m_trace_uop_array[thread_trace_info->m_num_sending_uop];
     info = trace_uop->m_info;
     thread_trace_info->m_eom = trace_uop->m_eom;
     info->m_trace_info.m_bom = 0;  // because of repeat instructions ....
@@ -818,26 +891,32 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     --core->m_fetching_thread_num;
     core->m_fetch_ended[sim_thread_id] = true;
     uop->m_last_uop = true;
-    DEBUG_CORE(core_id, "core_id:%d thread_id:%d inst_num:%lld uop_num:%lld fetched:%lld last uop\n", core_id,
-               sim_thread_id, uop->m_inst_num, uop->m_uop_num, core->m_inst_fetched[sim_thread_id]);
+    DEBUG_CORE(core_id,
+               "core_id:%d thread_id:%d inst_num:%lld uop_num:%lld "
+               "fetched:%lld last uop\n",
+               core_id, sim_thread_id, uop->m_inst_num, uop->m_uop_num,
+               core->m_inst_fetched[sim_thread_id]);
   }
 
   /* BAR_FETCH */
-  if (trace_uop->m_bar_type == BAR_FETCH) {  // only last uop with have BAR_FETCH set
+  if (trace_uop->m_bar_type ==
+      BAR_FETCH) {  // only last uop with have BAR_FETCH set
     frontend_c *frontend = core->get_frontend();
     frontend_s *fetch_data = core->get_trace_info(sim_thread_id)->m_fetch_data;
 
     fetch_data->m_fetch_blocked = true;
 
     bool new_entry = false;
-    sync_thread_s *sync_info =
-      frontend->m_sync_info->hash_table_access_create(core->get_trace_info(sim_thread_id)->m_block_id, &new_entry);
+    sync_thread_s *sync_info = frontend->m_sync_info->hash_table_access_create(
+      core->get_trace_info(sim_thread_id)->m_block_id, &new_entry);
 
     // new synchronization information
     if (new_entry) {
       sync_info->m_block_id = core->get_trace_info(sim_thread_id)->m_block_id;
       sync_info->m_sync_count = 0;
-      sync_info->m_num_threads_in_block = m_simBase->m_block_schedule_info[sync_info->m_block_id]->m_total_thread_num;
+      sync_info->m_num_threads_in_block =
+        m_simBase->m_block_schedule_info[sync_info->m_block_id]
+          ->m_total_thread_num;
     }
 
     ++fetch_data->m_sync_count;
@@ -875,7 +954,10 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     uop->m_vaddr =
       trace_uop->m_va +
       m_simBase->m_memory->base_addr(
-        core_id, (unsigned long)UINT_MAX * (core->get_trace_info(sim_thread_id)->m_process->m_process_id) * 10ul);
+        core_id,
+        (unsigned long)UINT_MAX *
+          (core->get_trace_info(sim_thread_id)->m_process->m_process_id) *
+          10ul);
   }
 
   uop->m_mem_size = trace_uop->m_mem_size;
@@ -891,15 +973,18 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   uop->m_num_srcs = trace_uop->m_num_src_regs;
   uop->m_num_dests = trace_uop->m_num_dest_regs;
 
-  ASSERTM(uop->m_num_dests < MAX_DST_NUM, "uop->num_dests=%d MAX_DST_NUM=%d\n", uop->m_num_dests, MAX_DST_NUM);
+  ASSERTM(uop->m_num_dests < MAX_DST_NUM, "uop->num_dests=%d MAX_DST_NUM=%d\n",
+          uop->m_num_dests, MAX_DST_NUM);
 
   // uop number is specific to the core
   uop->m_unique_num = core->inc_and_get_unique_uop_num();
 
   DEBUG_CORE(uop->m_core_id,
-             "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  num_dsts:%d num_seing_uop:%d pc:0x%llx dir:%d \n",
-             uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs, uop->m_num_dests,
-             thread_trace_info->m_num_sending_uop, uop->m_pc, uop->m_dir);
+             "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  "
+             "num_dsts:%d num_seing_uop:%d pc:0x%llx dir:%d \n",
+             uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs,
+             uop->m_num_dests, thread_trace_info->m_num_sending_uop, uop->m_pc,
+             uop->m_dir);
 
   // filling the src_info, dest_info
   if (uop->m_num_srcs < MAX_SRCS) {
@@ -908,7 +993,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       // DEBUG("uop_num:%lld src_info[%d]:%d\n", uop->uop_num, index, uop->src_info[index]);
     }
   } else {
-    ASSERTM(uop->m_num_srcs < MAX_SRCS, "src_num:%d MAX_SRC:%d", uop->m_num_srcs, MAX_SRCS);
+    ASSERTM(uop->m_num_srcs < MAX_SRCS, "src_num:%d MAX_SRC:%d",
+            uop->m_num_srcs, MAX_SRCS);
   }
 
   for (int index = 0; index < uop->m_num_dests; ++index) {
@@ -919,9 +1005,12 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
   uop->m_uop_num = (thread_trace_info->m_temp_uop_count++);
   uop->m_thread_id = sim_thread_id;
   uop->m_block_id = ((core)->get_trace_info(sim_thread_id))->m_block_id;
-  uop->m_orig_block_id = ((core)->get_trace_info(sim_thread_id))->m_orig_block_id;
-  uop->m_unique_thread_id = ((core)->get_trace_info(sim_thread_id))->m_unique_thread_id;
-  uop->m_orig_thread_id = ((core)->get_trace_info(sim_thread_id))->m_orig_thread_id;
+  uop->m_orig_block_id =
+    ((core)->get_trace_info(sim_thread_id))->m_orig_block_id;
+  uop->m_unique_thread_id =
+    ((core)->get_trace_info(sim_thread_id))->m_unique_thread_id;
+  uop->m_orig_thread_id =
+    ((core)->get_trace_info(sim_thread_id))->m_orig_thread_id;
 
   ///
   /// GPU simulation : coalescing logic
@@ -938,7 +1027,9 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       for (int ii = 0;; ++ii) {
         ASSERT((index + 1) < MAX_PUP);
         if (thread_trace_info->m_trace_uop_array[++index]->m_mem_type) {
-          ASSERTM(0, "this condition is not handled in the code (and should never occur?)!");
+          ASSERTM(0,
+                  "this condition is not handled in the code (and should never "
+                  "occur?)!");
         }
         if (thread_trace_info->m_trace_uop_array[++index]->m_eom) {
           break;
@@ -961,32 +1052,38 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         case MEM_LD_SM:
         case MEM_ST_SM:
           if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr = core->get_shared_memory()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_shared_memory()->base_cache_line(uop->m_vaddr + uop->m_mem_size - 1);
+            line_addr =
+              core->get_shared_memory()->base_cache_line(uop->m_vaddr);
+            end_line_addr = core->get_shared_memory()->base_cache_line(
+              uop->m_vaddr + uop->m_mem_size - 1);
           }
           line_size = core->get_shared_memory()->cache_line_size();
           break;
-          // constant memory
+        // constant memory
         case MEM_LD_CM:
           if (uop->m_vaddr && uop->m_mem_size) {
             line_addr = core->get_const_cache()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_const_cache()->base_cache_line(uop->m_vaddr + uop->m_mem_size - 1);
+            end_line_addr = core->get_const_cache()->base_cache_line(
+              uop->m_vaddr + uop->m_mem_size - 1);
           }
           line_size = core->get_const_cache()->cache_line_size();
           break;
-          // texture memory
+        // texture memory
         case MEM_LD_TM:
           if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr = core->get_texture_cache()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_texture_cache()->base_cache_line(uop->m_vaddr + uop->m_mem_size - 1);
+            line_addr =
+              core->get_texture_cache()->base_cache_line(uop->m_vaddr);
+            end_line_addr = core->get_texture_cache()->base_cache_line(
+              uop->m_vaddr + uop->m_mem_size - 1);
           }
           line_size = core->get_texture_cache()->cache_line_size();
           break;
-          // global memory
+        // global memory
         default:
           if (uop->m_vaddr && uop->m_mem_size) {
             line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr);
-            end_line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr + uop->m_mem_size - 1);
+            end_line_addr = m_simBase->m_memory->base_addr(
+              core_id, uop->m_vaddr + uop->m_mem_size - 1);
           }
           line_size = m_simBase->m_memory->line_size(core_id);
           break;
@@ -994,8 +1091,10 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
       ASSERTM(ungetch_trace(core_id, sim_thread_id, 1), "mention why\n");
 
-      static set<Addr> seen_block_addr;  // to efficiently track seen cache blocks
-      static list<Addr> seen_block_list;  // to maintain the order of seen cache blocks - is it necessary?
+      static set<Addr>
+        seen_block_addr;  // to efficiently track seen cache blocks
+      static list<Addr>
+        seen_block_list;  // to maintain the order of seen cache blocks - is it necessary?
       static map<int, Addr> accessed_addr;
 
       seen_block_addr.clear();
@@ -1005,16 +1104,20 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       bool inst_read;
       Addr addr;
       int access_size = uop->m_mem_size;
-      ASSERTM(access_size, "access size cannot be zero %s tid %d core %d uop num %llu block id %d orig id %d\n",
-              gpu_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id, core_id, uop->m_uop_num, uop->m_block_id,
-              uop->m_orig_thread_id);
+      ASSERTM(access_size,
+              "access size cannot be zero %s tid %d core %d uop num %llu block "
+              "id %d orig id %d\n",
+              gpu_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
+              core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
 
       // even if a warp has fewer than 32 threads or even if fewer than
       // 32 threads are active, there will be 32 addresses, with bytes
       // corresponding to invalid/inactive threads set to zero
       // we have read 1 out of 32 addresses
       int read_addr = 1;
-      int addr_per_trace_inst = *KNOB(KNOB_TRACE_USES_64_BIT_ADDR) ? (m_trace_size / 8) : (m_trace_size / 4);
+      int addr_per_trace_inst = *KNOB(KNOB_TRACE_USES_64_BIT_ADDR)
+                                  ? (m_trace_size / 8)
+                                  : (m_trace_size / 4);
       // 32 instructions are guaranteed to be included
       // how does coalescing of stores happen? say multiple stores map to the same cache block,
       // but not all bytes of a cache block are written. how will the stores be communicated
@@ -1033,15 +1136,19 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
 
         if (last_inst) {
           if (!thread_trace_info->m_trace_ended) {
-            read_success = peek_trace(core_id, thread_trace_info->m_prev_trace_info, sim_thread_id, &inst_read);
+            read_success =
+              peek_trace(core_id, thread_trace_info->m_prev_trace_info,
+                         sim_thread_id, &inst_read);
             if (read_success) {
               if (inst_read) {
                 trace_info_gpu_s *prev_trace_info =
-                  static_cast<trace_info_gpu_s *>(thread_trace_info->m_prev_trace_info);
+                  static_cast<trace_info_gpu_s *>(
+                    thread_trace_info->m_prev_trace_info);
                 uop->m_npc = prev_trace_info->m_inst_addr;
               } else {
                 thread_trace_info->m_trace_ended = true;
-                DEBUG_CORE(core_id, "trace ended core_id:%d thread_id:%d\n", core_id, sim_thread_id);
+                DEBUG_CORE(core_id, "trace ended core_id:%d thread_id:%d\n",
+                           core_id, sim_thread_id);
               }
             } else {
               ASSERTM(0, "why?");
@@ -1051,17 +1158,22 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         }
 
         if (!((read_addr - 1) % addr_per_trace_inst)) {
-          read_success = peek_trace(core_id, &trace_info, sim_thread_id, &inst_read);
+          read_success =
+            peek_trace(core_id, &trace_info, sim_thread_id, &inst_read);
           if (!read_success || (read_success && !inst_read)) {
             ASSERTM(0, "reached end without reading all addresses");
           }
         }
 
         if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
-          memcpy(&addr, ((uint8_t *)&trace_info) + ((read_addr - 1) % addr_per_trace_inst) * 8, 8);
+          memcpy(&addr, ((uint8_t *)&trace_info) +
+                          ((read_addr - 1) % addr_per_trace_inst) * 8,
+                 8);
         } else {
           addr = 0;
-          memcpy(&addr, ((uint8_t *)&trace_info) + ((read_addr - 1) % addr_per_trace_inst) * 4, 4);
+          memcpy(&addr, ((uint8_t *)&trace_info) +
+                          ((read_addr - 1) % addr_per_trace_inst) * 4,
+                 4);
         }
 
         ++read_addr;
@@ -1078,20 +1190,24 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
             case MEM_LD_SM:
             case MEM_ST_SM:
               line_addr = core->get_shared_memory()->base_cache_line(addr);
-              end_line_addr = core->get_shared_memory()->base_cache_line(addr + access_size - 1);
+              end_line_addr = core->get_shared_memory()->base_cache_line(
+                addr + access_size - 1);
               break;
             case MEM_LD_CM:
               line_addr = core->get_const_cache()->base_cache_line(addr);
-              end_line_addr = core->get_const_cache()->base_cache_line(addr + access_size - 1);
+              end_line_addr = core->get_const_cache()->base_cache_line(
+                addr + access_size - 1);
               break;
             // texture cache
             case MEM_LD_TM:
               line_addr = core->get_texture_cache()->base_cache_line(addr);
-              end_line_addr = core->get_texture_cache()->base_cache_line(addr + access_size - 1);
+              end_line_addr = core->get_texture_cache()->base_cache_line(
+                addr + access_size - 1);
               break;
             default:
               line_addr = m_simBase->m_memory->base_addr(core_id, addr);
-              end_line_addr = m_simBase->m_memory->base_addr(core_id, addr + access_size - 1);
+              end_line_addr =
+                m_simBase->m_memory->base_addr(core_id, addr + access_size - 1);
               break;
           }
         } else {
@@ -1100,7 +1216,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
         }
       } while (1);
 
-      ASSERTM(seen_block_addr.size() == seen_block_list.size() && seen_block_addr.size(),
+      ASSERTM(seen_block_addr.size() == seen_block_list.size() &&
+                seen_block_addr.size(),
               "should be non-zero and equal");
 
       uop->m_child_uops = new uop_c *[seen_block_addr.size()];
@@ -1122,7 +1239,8 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
       while (itr != end) {
         Addr vaddr = *itr;
 
-        child_mem_uop = core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
+        child_mem_uop =
+          core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
         child_mem_uop->allocate();
         ASSERT(child_mem_uop);
 
@@ -1141,8 +1259,10 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop, int sim_thread
     }
   }
 
-  DEBUG_CORE(uop->m_core_id, "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n", uop->m_uop_num,
-             uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+  DEBUG_CORE(
+    uop->m_core_id,
+    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
+    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
 
   return read_success;
 }
@@ -1461,85 +1581,124 @@ void gpu_decoder_c::init_pin_convert(void) {
 }
 
 const char *gpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
-  "*invalid*", "*none*",   "*imm8*",   "*imm*",    "*imm32*",  "*mem*",      "*mem*",     "*mem*",
-  "*off*",     "*off*",    "*off*",    "*modx*",   "rdi",      "rsi",        "rbp",       "rsp",
-  "rbx",       "rdx",      "rcx",      "rax",      "r8",       "r9",         "r10",       "r11",
-  "r12",       "r13",      "r14",      "r15",      "cs",       "ss",         "ds",        "es",
-  "fs",        "gs",       "rflags",   "rip",      "al",       "ah",         "ax",        "cl",
-  "ch",        "cx",       "dl",       "dh",       "dx",       "bl",         "bh",        "bx",
-  "bp",        "si",       "di",       "sp",       "flags",    "ip",         "edi",       "dil",
-  "esi",       "sil",      "ebp",      "bpl",      "esp",      "spl",        "ebx",       "edx",
-  "ecx",       "eax",      "eflags",   "eip",      "r8b",      "r8w",        "r8d",       "r9b",
-  "r9w",       "r9d",      "r10b",     "r10w",     "r10d",     "r11b",       "r11w",      "r11d",
-  "r12b",      "r12w",     "r12d",     "r13b",     "r13w",     "r13d",       "r14b",      "r14w",
-  "r14d",      "r15b",     "r15w",     "r15d",     "mm0",      "mm1",        "mm2",       "mm3",
-  "mm4",       "mm5",      "mm6",      "mm7",      "emm0",     "emm1",       "emm2",      "emm3",
-  "emm4",      "emm5",     "emm6",     "emm7",     "mxt",      "xmm0",       "xmm1",      "xmm2",
-  "xmm3",      "xmm4",     "xmm5",     "xmm6",     "xmm7",     "xmm8",       "xmm9",      "xmm10",
-  "xmm11",     "xmm12",    "xmm13",    "xmm14",    "xmm15",    "ymm0",       "ymm1",      "ymm2",
-  "ymm3",      "ymm4",     "ymm5",     "ymm6",     "ymm7",     "ymm8",       "ymm9",      "ymm10",
-  "ymm11",     "ymm12",    "ymm13",    "ymm14",    "ymm15",    "mxcsr",      "mxcsrmask", "orig_rax",
-  "dr0",       "dr1",      "dr2",      "dr3",      "dr4",      "dr5",        "dr6",       "dr7",
-  "cr0",       "cr1",      "cr2",      "cr3",      "cr4",      "tssr",       "ldtr",      "tr0",
-  "tr1",       "tr2",      "tr3",      "tr4",      "tr5",      "fpcw",       "fpsw",      "fptag",
-  "fpip_off",  "fpip_sel", "fpopcode", "fpdp_off", "fpdp_sel", "fptag_full", "st0",       "st1",
-  "st2",       "st3",      "st4",      "st5",      "st6",      "st7",        "x87",       "r_status_flags",
+  "*invalid*", "*none*",     "*imm8*",    "*imm*",
+  "*imm32*",   "*mem*",      "*mem*",     "*mem*",
+  "*off*",     "*off*",      "*off*",     "*modx*",
+  "rdi",       "rsi",        "rbp",       "rsp",
+  "rbx",       "rdx",        "rcx",       "rax",
+  "r8",        "r9",         "r10",       "r11",
+  "r12",       "r13",        "r14",       "r15",
+  "cs",        "ss",         "ds",        "es",
+  "fs",        "gs",         "rflags",    "rip",
+  "al",        "ah",         "ax",        "cl",
+  "ch",        "cx",         "dl",        "dh",
+  "dx",        "bl",         "bh",        "bx",
+  "bp",        "si",         "di",        "sp",
+  "flags",     "ip",         "edi",       "dil",
+  "esi",       "sil",        "ebp",       "bpl",
+  "esp",       "spl",        "ebx",       "edx",
+  "ecx",       "eax",        "eflags",    "eip",
+  "r8b",       "r8w",        "r8d",       "r9b",
+  "r9w",       "r9d",        "r10b",      "r10w",
+  "r10d",      "r11b",       "r11w",      "r11d",
+  "r12b",      "r12w",       "r12d",      "r13b",
+  "r13w",      "r13d",       "r14b",      "r14w",
+  "r14d",      "r15b",       "r15w",      "r15d",
+  "mm0",       "mm1",        "mm2",       "mm3",
+  "mm4",       "mm5",        "mm6",       "mm7",
+  "emm0",      "emm1",       "emm2",      "emm3",
+  "emm4",      "emm5",       "emm6",      "emm7",
+  "mxt",       "xmm0",       "xmm1",      "xmm2",
+  "xmm3",      "xmm4",       "xmm5",      "xmm6",
+  "xmm7",      "xmm8",       "xmm9",      "xmm10",
+  "xmm11",     "xmm12",      "xmm13",     "xmm14",
+  "xmm15",     "ymm0",       "ymm1",      "ymm2",
+  "ymm3",      "ymm4",       "ymm5",      "ymm6",
+  "ymm7",      "ymm8",       "ymm9",      "ymm10",
+  "ymm11",     "ymm12",      "ymm13",     "ymm14",
+  "ymm15",     "mxcsr",      "mxcsrmask", "orig_rax",
+  "dr0",       "dr1",        "dr2",       "dr3",
+  "dr4",       "dr5",        "dr6",       "dr7",
+  "cr0",       "cr1",        "cr2",       "cr3",
+  "cr4",       "tssr",       "ldtr",      "tr0",
+  "tr1",       "tr2",        "tr3",       "tr4",
+  "tr5",       "fpcw",       "fpsw",      "fptag",
+  "fpip_off",  "fpip_sel",   "fpopcode",  "fpdp_off",
+  "fpdp_sel",  "fptag_full", "st0",       "st1",
+  "st2",       "st3",        "st4",       "st5",
+  "st6",       "st7",        "x87",       "r_status_flags",
   "rdf",
 };
 
 const char *gpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
-  "GPU_INVALID",      "GPU_ABS",          "GPU_ABS64",        "GPU_ADD",       "GPU_ADD64",      "GPU_ADDC",
-  "GPU_AND",          "GPU_AND64",        "GPU_ATOM_GM",      "GPU_ATOM_SM",   "GPU_ATOM64_GM",  "GPU_ATOM64_SM",
-  "GPU_BAR_ARRIVE",   "GPU_BAR_SYNC",     "GPU_BAR_RED",      "GPU_BFE",       "GPU_BFE64",      "GPU_BFI",
-  "GPU_BFI64",        "GPU_BFIND",        "GPU_BFIND64",      "GPU_BRA",       "GPU_BREV",       "GPU_BREV64",
-  "GPU_BRKPT",        "GPU_CALL",         "GPU_CLZ",          "GPU_CLZ64",     "GPU_CNOT",       "GPU_CNOT64",
-  "GPU_COPYSIGN",     "GPU_COPYSIGN64",   "GPU_COS",          "GPU_CVT",       "GPU_CVT64",      "GPU_CVTA",
-  "GPU_CVTA64",       "GPU_DIV",          "GPU_DIV64",        "GPU_EX2",       "GPU_EXIT",       "GPU_FMA",
-  "GPU_FMA64",        "GPU_ISSPACEP",     "GPU_LD",           "GPU_LD64",      "GPU_LDU",        "GPU_LDU64",
-  "GPU_LG2",          "GPU_MAD24",        "GPU_MAD",          "GPU_MAD64",     "GPU_MADC",       "GPU_MADC64",
-  "GPU_MAX",          "GPU_MAX64",        "GPU_MEMBAR_CTA",   "GPU_MEMBAR_GL", "GPU_MEMBAR_SYS", "GPU_MIN",
-  "GPU_MIN64",        "GPU_MOV",          "GPU_MOV64",        "GPU_MUL24",     "GPU_MUL",        "GPU_MUL64",
-  "GPU_NEG",          "GPU_NEG64",        "GPU_NOT",          "GPU_NOT64",     "GPU_OR",         "GPU_OR64",
-  "GPU_PMEVENT",      "GPU_POPC",         "GPU_POPC64",       "GPU_PREFETCH",  "GPU_PREFETCHU",  "GPU_PRMT",
-  "GPU_RCP",          "GPU_RCP64",        "GPU_RED_GM",       "GPU_RED_SM",    "GPU_RED64_GM",   "GPU_RED64_SM",
-  "GPU_REM",          "GPU_REM64",        "GPU_RET",          "GPU_RSQRT",     "GPU_RSQRT64",    "GPU_SAD",
-  "GPU_SAD64",        "GPU_SELP",         "GPU_SELP64",       "GPU_SET",       "GPU_SET64",      "GPU_SETP",
-  "GPU_SETP64",       "GPU_SHFL",         "GPU_SHFL64",       "GPU_SHL",       "GPU_SHL64",      "GPU_SHR",
-  "GPU_SHR64",        "GPU_SIN",          "GPU_SLCT",         "GPU_SLCT64",    "GPU_SQRT",       "GPU_SQRT64",
-  "GPU_ST",           "GPU_ST64",         "GPU_SUB",          "GPU_SUB64",     "GPU_SUBC",       "GPU_SULD",
-  "GPU_SULD64",       "GPU_SURED",        "GPU_SURED64",      "GPU_SUST",      "GPU_SUST64",     "GPU_SUQ",
-  "GPU_TESTP",        "GPU_TESTP64",      "GPU_TEX",          "GPU_TLD4",      "GPU_TXQ",        "GPU_TRAP",
-  "GPU_VABSDIFF",     "GPU_VADD",         "GPU_VMAD",         "GPU_VMAX",      "GPU_VMIN",       "GPU_VSET",
-  "GPU_VSHL",         "GPU_VSHR",         "GPU_VSUB",         "GPU_VOTE",      "GPU_XOR",        "GPU_XOR64",
-  "GPU_RECONVERGE",   "GPU_PHI",          "GPU_MEM_LD_GM",    "GPU_MEM_LD_LM", "GPU_MEM_LD_SM",  "GPU_MEM_LD_CM",
-  "GPU_MEM_LD_TM",    "GPU_MEM_LD_PM",    "GPU_MEM_LDU_GM",   "GPU_MEM_ST_GM", "GPU_MEM_ST_LM",  "GPU_MEM_ST_SM",
-  "GPU_DATA_XFER_GM", "GPU_DATA_XFER_LM", "GPU_DATA_XFER_SM",
+  "GPU_INVALID",      "GPU_ABS",       "GPU_ABS64",        "GPU_ADD",
+  "GPU_ADD64",        "GPU_ADDC",      "GPU_AND",          "GPU_AND64",
+  "GPU_ATOM_GM",      "GPU_ATOM_SM",   "GPU_ATOM64_GM",    "GPU_ATOM64_SM",
+  "GPU_BAR_ARRIVE",   "GPU_BAR_SYNC",  "GPU_BAR_RED",      "GPU_BFE",
+  "GPU_BFE64",        "GPU_BFI",       "GPU_BFI64",        "GPU_BFIND",
+  "GPU_BFIND64",      "GPU_BRA",       "GPU_BREV",         "GPU_BREV64",
+  "GPU_BRKPT",        "GPU_CALL",      "GPU_CLZ",          "GPU_CLZ64",
+  "GPU_CNOT",         "GPU_CNOT64",    "GPU_COPYSIGN",     "GPU_COPYSIGN64",
+  "GPU_COS",          "GPU_CVT",       "GPU_CVT64",        "GPU_CVTA",
+  "GPU_CVTA64",       "GPU_DIV",       "GPU_DIV64",        "GPU_EX2",
+  "GPU_EXIT",         "GPU_FMA",       "GPU_FMA64",        "GPU_ISSPACEP",
+  "GPU_LD",           "GPU_LD64",      "GPU_LDU",          "GPU_LDU64",
+  "GPU_LG2",          "GPU_MAD24",     "GPU_MAD",          "GPU_MAD64",
+  "GPU_MADC",         "GPU_MADC64",    "GPU_MAX",          "GPU_MAX64",
+  "GPU_MEMBAR_CTA",   "GPU_MEMBAR_GL", "GPU_MEMBAR_SYS",   "GPU_MIN",
+  "GPU_MIN64",        "GPU_MOV",       "GPU_MOV64",        "GPU_MUL24",
+  "GPU_MUL",          "GPU_MUL64",     "GPU_NEG",          "GPU_NEG64",
+  "GPU_NOT",          "GPU_NOT64",     "GPU_OR",           "GPU_OR64",
+  "GPU_PMEVENT",      "GPU_POPC",      "GPU_POPC64",       "GPU_PREFETCH",
+  "GPU_PREFETCHU",    "GPU_PRMT",      "GPU_RCP",          "GPU_RCP64",
+  "GPU_RED_GM",       "GPU_RED_SM",    "GPU_RED64_GM",     "GPU_RED64_SM",
+  "GPU_REM",          "GPU_REM64",     "GPU_RET",          "GPU_RSQRT",
+  "GPU_RSQRT64",      "GPU_SAD",       "GPU_SAD64",        "GPU_SELP",
+  "GPU_SELP64",       "GPU_SET",       "GPU_SET64",        "GPU_SETP",
+  "GPU_SETP64",       "GPU_SHFL",      "GPU_SHFL64",       "GPU_SHL",
+  "GPU_SHL64",        "GPU_SHR",       "GPU_SHR64",        "GPU_SIN",
+  "GPU_SLCT",         "GPU_SLCT64",    "GPU_SQRT",         "GPU_SQRT64",
+  "GPU_ST",           "GPU_ST64",      "GPU_SUB",          "GPU_SUB64",
+  "GPU_SUBC",         "GPU_SULD",      "GPU_SULD64",       "GPU_SURED",
+  "GPU_SURED64",      "GPU_SUST",      "GPU_SUST64",       "GPU_SUQ",
+  "GPU_TESTP",        "GPU_TESTP64",   "GPU_TEX",          "GPU_TLD4",
+  "GPU_TXQ",          "GPU_TRAP",      "GPU_VABSDIFF",     "GPU_VADD",
+  "GPU_VMAD",         "GPU_VMAX",      "GPU_VMIN",         "GPU_VSET",
+  "GPU_VSHL",         "GPU_VSHR",      "GPU_VSUB",         "GPU_VOTE",
+  "GPU_XOR",          "GPU_XOR64",     "GPU_RECONVERGE",   "GPU_PHI",
+  "GPU_MEM_LD_GM",    "GPU_MEM_LD_LM", "GPU_MEM_LD_SM",    "GPU_MEM_LD_CM",
+  "GPU_MEM_LD_TM",    "GPU_MEM_LD_PM", "GPU_MEM_LDU_GM",   "GPU_MEM_ST_GM",
+  "GPU_MEM_ST_LM",    "GPU_MEM_ST_SM", "GPU_DATA_XFER_GM", "GPU_DATA_XFER_LM",
+  "GPU_DATA_XFER_SM",
 };
 
-const char *gpu_decoder_c::g_tr_cf_names[10] = {"NOT_CF",  // not a control flow instruction
-                                                "CF_BR",  // an unconditional branch
-                                                "CF_CBR",  // a conditional branch
-                                                "CF_CALL",  // a call
-                                                "CF_IBR",  // an indirect branch
-                                                "CF_ICALL",  // an indirect call
-                                                "CF_ICO",  // an indirect jump to co-routine
-                                                "CF_RET",  // a return
-                                                "CF_SYS",   "CF_ICBR"};
+const char *gpu_decoder_c::g_tr_cf_names[10] = {
+  "NOT_CF",  // not a control flow instruction
+  "CF_BR",  // an unconditional branch
+  "CF_CBR",  // a conditional branch
+  "CF_CALL",  // a call
+  "CF_IBR",  // an indirect branch
+  "CF_ICALL",  // an indirect call
+  "CF_ICO",  // an indirect jump to co-routine
+  "CF_RET",  // a return
+  "CF_SYS",   "CF_ICBR"};
 
 const char *gpu_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
-  "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",  "GPU_ADDR_SP_GLOBAL",  "GPU_ADDR_SP_LOCAL",
-  "GPU_ADDR_SP_PARAM",   "GPU_ADDR_SP_SHARED", "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC",
+  "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",   "GPU_ADDR_SP_GLOBAL",
+  "GPU_ADDR_SP_LOCAL",   "GPU_ADDR_SP_PARAM",   "GPU_ADDR_SP_SHARED",
+  "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC",
 };
 
 const char *gpu_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
-  "GPU_CACHE_OP_INVALID", "GPU_CACHE_OP_CA", "GPU_CACHE_OP_CV", "GPU_CACHE_OP_CG",
-  "GPU_CACHE_OP_CS",      "GPU_CACHE_OP_WB", "GPU_CACHE_OP_WT"};
+  "GPU_CACHE_OP_INVALID", "GPU_CACHE_OP_CA", "GPU_CACHE_OP_CV",
+  "GPU_CACHE_OP_CG",      "GPU_CACHE_OP_CS", "GPU_CACHE_OP_WB",
+  "GPU_CACHE_OP_WT"};
 
-const char *gpu_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {"GPU_CACHE_INVALID", "GPU_CACHE_L1",
-                                                                       "GPU_CACHE_L2"};
+const char *gpu_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {
+  "GPU_CACHE_INVALID", "GPU_CACHE_L1", "GPU_CACHE_L2"};
 
-const char *gpu_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {"GPU_FENCE_INVALID", "GPU_FENCE_CTA",
-                                                                       "GPU_FENCE_GL", "GPU_FENCE_SYS"};
+const char *gpu_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {
+  "GPU_FENCE_INVALID", "GPU_FENCE_CTA", "GPU_FENCE_GL", "GPU_FENCE_SYS"};
 
 const char *gpu_decoder_c::g_optype_names[37] = {
   "OP_INV",  // invalid opcode
@@ -1567,12 +1726,13 @@ const char *gpu_decoder_c::g_optype_names[37] = {
   "OP_FCMOV"  // floating point cond move
 };
 
-const char *gpu_decoder_c::g_mem_type_names[20] = {"NOT_MEM",  // not a memory instruction
-                                                   "MEM_LD",  // a load instruction
-                                                   "MEM_ST",  // a store instruction
-                                                   "MEM_PF",  // a prefetch
-                                                   "MEM_WH",  // a write hint
-                                                   "MEM_EVICT",  // a cache block eviction hint
-                                                   "MEM_SWPREF_NTA", "MEM_SWPREF_T0", "MEM_SWPREF_T1", "MEM_SWPREF_T2",
-                                                   "MEM_LD_LM",      "MEM_LD_SM",     "MEM_LD_GM",     "MEM_ST_LM",
-                                                   "MEM_ST_SM",      "MEM_ST_GM",     "NUM_MEM_TYPES"};
+const char *gpu_decoder_c::g_mem_type_names[20] = {
+  "NOT_MEM",  // not a memory instruction
+  "MEM_LD",  // a load instruction
+  "MEM_ST",  // a store instruction
+  "MEM_PF",  // a prefetch
+  "MEM_WH",  // a write hint
+  "MEM_EVICT",  // a cache block eviction hint
+  "MEM_SWPREF_NTA", "MEM_SWPREF_T0", "MEM_SWPREF_T1", "MEM_SWPREF_T2",
+  "MEM_LD_LM",      "MEM_LD_SM",     "MEM_LD_GM",     "MEM_ST_LM",
+  "MEM_ST_SM",      "MEM_ST_GM",     "NUM_MEM_TYPES"};

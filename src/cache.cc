@@ -47,7 +47,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "all_knobs.h"
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_CACHE_LIB, ##args)
-#define DEBUG_MEM(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM_TRACE, ##args)
+#define DEBUG_MEM(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM_TRACE, ##args)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,9 +67,10 @@ cache_set_c::~cache_set_c() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // cache_c constructor
-cache_c::cache_c(string name, int num_set, int assoc, int line_size, int data_size, int bank_num, bool cache_by_pass,
-                 int core_id, Cache_Type cache_type_info, bool enable_partition, int num_tiles, int interleave_factor,
-                 macsim_c *simBase) {
+cache_c::cache_c(string name, int num_set, int assoc, int line_size,
+                 int data_size, int bank_num, bool cache_by_pass, int core_id,
+                 Cache_Type cache_type_info, bool enable_partition,
+                 int num_tiles, int interleave_factor, macsim_c *simBase) {
   m_simBase = simBase;
 
   DEBUG("Initializing cache called '%s'.\n", name.c_str());
@@ -160,11 +162,15 @@ void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
     if (m_tile_bits) {
       // 1 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of
       // two
-      mod_addr = ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) | (addr & m_interleave_mask);
+      mod_addr =
+        ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) |
+        (addr & m_interleave_mask);
     } else {
       // 2
       // this works even when m_num_tiles = 1
-      mod_addr = (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) | (addr & m_interleave_mask);
+      mod_addr =
+        (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) |
+        (addr & m_interleave_mask);
     }
     *tag = mod_addr >> m_shift_bits & m_tag_mask;
     *set = mod_addr >> m_shift_bits & m_set_mask;
@@ -178,7 +184,8 @@ void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
 }
 
 // access the cache
-void *cache_c::access_cache(Addr addr, Addr *line_addr, bool update_repl, int appl_id) {
+void *cache_c::access_cache(Addr addr, Addr *line_addr, bool update_repl,
+                            int appl_id) {
   // Check if cache by pass is set. If so return NULL.
   if (m_cache_by_pass) return NULL;
 
@@ -268,13 +275,16 @@ cache_entry_c *cache_c::find_replacement_line(int set, int appl_id) {
   }
 }
 
-cache_entry_c *cache_c::find_replacement_line_from_same_type(int set, int appl_id, bool gpuline) {
+cache_entry_c *cache_c::find_replacement_line_from_same_type(int set,
+                                                             int appl_id,
+                                                             bool gpuline) {
   int current_type_count;
   int current_type_max;
 
   if (gpuline) {
     current_type_count = m_set[set]->m_num_gpu_line;
-    current_type_max = m_assoc - *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
+    current_type_max =
+      m_assoc - *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
   } else {
     current_type_count = m_set[set]->m_num_cpu_line;
     current_type_max = *m_simBase->m_knobs->KNOB_HETERO_STATIC_CPU_PARTITION;
@@ -289,7 +299,8 @@ cache_entry_c *cache_c::find_replacement_line_from_same_type(int set, int appl_i
       break;
     }
 
-    if (line->m_valid && line->m_gpuline == gpuline && line->m_last_access_time < lru_time) {
+    if (line->m_valid && line->m_gpuline == gpuline &&
+        line->m_last_access_time < lru_time) {
       lru_index = ii;
       lru_time = line->m_last_access_time;
     }
@@ -298,17 +309,19 @@ cache_entry_c *cache_c::find_replacement_line_from_same_type(int set, int appl_i
   if (lru_index == -1) {
     for (int ii = 0; ii < m_assoc; ++ii) {
       cache_entry_c *line = &(m_set[set]->m_entry[ii]);
-      report("valid:" << line->m_valid << " gpu:" << line->m_gpuline << " lru:" << line->m_last_access_time);
+      report("valid:" << line->m_valid << " gpu:" << line->m_gpuline
+                      << " lru:" << line->m_last_access_time);
     }
-    ASSERTM(lru_index != -1, "assoc:%d count:%d max:%d gpu:%d\n", m_assoc, current_type_count, current_type_max,
-            gpuline);
+    ASSERTM(lru_index != -1, "assoc:%d count:%d max:%d gpu:%d\n", m_assoc,
+            current_type_count, current_type_max, gpuline);
   }
   return &(m_set[set]->m_entry[lru_index]);
 }
 
 // initialize a cache line
-void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr, int appl_id, bool gpuline, int set_id,
-                                    bool skip) {
+void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag,
+                                    Addr addr, int appl_id, bool gpuline,
+                                    int set_id, bool skip) {
   ins_line->m_valid = true;
   ins_line->m_tag = tag;
   ins_line->m_base = (addr & ~m_offset_mask);
@@ -329,12 +342,14 @@ void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr
   }
 }
 
-void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int appl_id, bool gpuline) {
+void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line,
+                            int appl_id, bool gpuline) {
   return insert_cache(addr, line_addr, updated_line, appl_id, gpuline, false);
 }
 
 // insert a cache line
-void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int appl_id, bool gpuline, bool skip) {
+void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line,
+                            int appl_id, bool gpuline, bool skip) {
   Addr tag;
   int set;
   cache_entry_c *ins_line;
@@ -345,7 +360,8 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
   find_tag_and_set(addr, &tag, &set);
 
   // Get the pointer to a line that should be replaced as per policy
-  if (*m_simBase->m_knobs->KNOB_HETERO_STATIC_CACHE_PARTITION && m_enable_partition) {
+  if (*m_simBase->m_knobs->KNOB_HETERO_STATIC_CACHE_PARTITION &&
+      m_enable_partition) {
     ins_line = find_replacement_line_from_same_type(set, appl_id, gpuline);
   } else {
     ins_line = find_replacement_line(set, appl_id);
@@ -354,7 +370,8 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
   // Populate the update_line variable if the present line was in use
   if (ins_line->m_valid) {
     *updated_line = ins_line->m_base;
-    update_set_on_replacement(tag, ins_line->m_appl_id, set, ins_line->m_gpuline);
+    update_set_on_replacement(tag, ins_line->m_appl_id, set,
+                              ins_line->m_gpuline);
   } else {
     *updated_line = 0;
   }
@@ -362,7 +379,8 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
   DEBUG(
     "Replacing (set %u, tag 0x%llx, base 0x%llx, up:0x%llx) in cache '%s' "
     "core_id:%d with base 0x%llx\n",
-    set, ins_line->m_tag, ins_line->m_base, (Addr)(*updated_line), m_name.c_str(), m_core_id, (Addr)(*line_addr));
+    set, ins_line->m_tag, ins_line->m_base, (Addr)(*updated_line),
+    m_name.c_str(), m_core_id, (Addr)(*line_addr));
 
   // Initialize the other fileds of the cache line
   initialize_cache_line(ins_line, tag, addr, appl_id, gpuline, set, skip);
@@ -373,7 +391,8 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line, int 
   return ins_line->m_data;
 }
 
-void cache_c::update_set_on_replacement(Addr tag, int appl_id, int set, bool gpuline) {
+void cache_c::update_set_on_replacement(Addr tag, int appl_id, int set,
+                                        bool gpuline) {
   if (gpuline) {
     --m_num_gpu_line;
     --m_set[set]->m_num_gpu_line;
@@ -445,11 +464,15 @@ int cache_c::get_bank_num(Addr addr) {
     if (m_tile_bits) {
       // 1 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of
       // two
-      mod_addr = ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) | (addr & m_interleave_mask);
+      mod_addr =
+        ((addr >> (m_interleave_bits + m_tile_bits)) << m_interleave_bits) |
+        (addr & m_interleave_mask);
     } else {
       // 2 - 1 does the same as 2, but in case of 2 we cannot use shift operator because m_num_tiles is not a power of
       // two this works even when m_num_tiles = 1
-      mod_addr = (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) | (addr & m_interleave_mask);
+      mod_addr =
+        (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) |
+        (addr & m_interleave_mask);
     }
     return mod_addr >> m_shift_bits & N_BIT_MASK(log2_int(m_bank_num));
   }
@@ -475,6 +498,7 @@ Counter cache_c::find_min_lru(int set) {
 void cache_c::print_info(int id) {
   if (*m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO > 0 &&
       ++m_insert_count % *m_simBase->m_knobs->KNOB_COLLECT_CACHE_INFO == 0) {
-    cout << "CACHE::L" << id << " cpu: " << m_num_cpu_line << " gpu: " << m_num_gpu_line << "\n";
+    cout << "CACHE::L" << id << " cpu: " << m_num_cpu_line
+         << " gpu: " << m_num_gpu_line << "\n";
   }
 }

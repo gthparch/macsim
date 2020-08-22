@@ -24,7 +24,8 @@ typedef enum HMC_Type_enum {
   HMC_COMP_equal = 17,
   HMC_hook = 18,
   HMC_unhook = 19,
-  HMC_CANDIDATE = 20,  // Not a HMC-op, it is showing if an instruction could be HMC in other scenarios
+  HMC_CANDIDATE =
+    20,  // Not a HMC-op, it is showing if an instruction could be HMC in other scenarios
   HMC_TRANS_BEG = 21,  // Transaction support
   HMC_TRANS_MID = 22,  // Transaction support
   HMC_TRANS_END = 23,  // Transaction support

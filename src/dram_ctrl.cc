@@ -89,8 +89,8 @@ int dram_ctrl_c::dram_req_priority[DRAM_REQ_PRIORITY_COUNT] = {
   0  // MAX_MEM_REQ_TYPE
 };
 
-const char* dram_ctrl_c::dram_state[DRAM_STATE_COUNT] = {"DRAM_INIT", "DRAM_CMD", "DRAM_CMD_WAIT", "DRAM_DATA",
-                                                         "DRAM_DATA_WAIT"};
+const char* dram_ctrl_c::dram_state[DRAM_STATE_COUNT] = {
+  "DRAM_INIT", "DRAM_CMD", "DRAM_CMD_WAIT", "DRAM_DATA", "DRAM_DATA_WAIT"};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -122,7 +122,8 @@ void drb_entry_s::reset() {
 }
 
 // set a drb entry.
-void drb_entry_s::set(mem_req_s* mem_req, uint64_t bid, uint64_t rid, uint64_t cid) {
+void drb_entry_s::set(mem_req_s* mem_req, uint64_t bid, uint64_t rid,
+                      uint64_t cid) {
   m_id = m_unique_id++;
   m_addr = mem_req->m_addr;
   m_bid = bid;
@@ -192,27 +193,32 @@ dram_ctrl_c::dram_ctrl_c(macsim_c* simBase) : dram_c(simBase) {
 
   // address parsing
   if (*m_simBase->m_knobs->KNOB_DEFAULT_INTERLEAVING) {
-    m_cid_mask = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
+    m_cid_mask =
+      N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
     m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
     m_bid_mask = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(512);
+    m_bid_xor_shift =
+      log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(512);
   } else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY ||
              *m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_SAME_GRANULARITY) {
-    m_cid_mask = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
+    m_cid_mask =
+      N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE));
 
     int mcid_shift;
     int num_mc = *m_simBase->m_knobs->KNOB_DRAM_NUM_MC;
     if ((num_mc & (num_mc - 1)) == 0) {  // if num_mc is a power of 2
       mcid_shift = log2_int(num_mc);
-      m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + mcid_shift;
+      m_bid_shift =
+        log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + mcid_shift;
     } else {
       m_bid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE);
     }
 
     m_bid_mask = N_BIT_MASK(log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS));
     m_rid_shift = log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_NUM_LLC) +
+    m_bid_xor_shift = log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE) +
+                      log2_int(*m_simBase->m_knobs->KNOB_NUM_LLC) +
                       log2_int(*m_simBase->m_knobs->KNOB_LLC_NUM_SET) + 5;
   }
 
@@ -279,8 +285,8 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req) {
     rid = addr;
   }
 
-  ASSERTM(rid >= 0, "addr:0x%llx cid:%llu bid:%llu rid:%llu type:%s\n", addr, cid, bid, rid,
-          mem_req_c::mem_req_type_name[mem_req->m_type]);
+  ASSERTM(rid >= 0, "addr:0x%llx cid:%llu bid:%llu rid:%llu type:%s\n", addr,
+          cid, bid, rid, mem_req_c::mem_req_type_name[mem_req->m_type]);
 
   // Permutation-based Interleaving
   if (*KNOB(KNOB_DRAM_BANK_XOR_INDEX)) {
@@ -305,7 +311,8 @@ bool dram_ctrl_c::insert_new_req(mem_req_s* mem_req) {
   ++m_total_req;
   mem_req->m_state = MEM_DRAM_START;
 
-  DEBUG("MC[%d] new_req:%d bid:%llu rid:%llu cid:%llu\n", m_id, mem_req->m_id, bid, rid, cid);
+  DEBUG("MC[%d] new_req:%d bid:%llu rid:%llu cid:%llu\n", m_id, mem_req->m_id,
+        bid, rid, cid);
 
   return true;
 }
@@ -328,7 +335,8 @@ void dram_ctrl_c::flush_prefetch(int bid) {
 }
 
 // insert a new request to dram request buffer (DRB)
-void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, uint64_t bid, uint64_t rid, uint64_t cid) {
+void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, uint64_t bid,
+                                    uint64_t rid, uint64_t cid) {
   drb_entry_s* new_entry = m_buffer_free_list[bid].front();
   m_buffer_free_list[bid].pop_front();
 
@@ -400,21 +408,25 @@ void dram_ctrl_c::print_req(void) {
   fprintf(fp, "\n");
   fprintf(fp, "Each bank\n");
   for (int ii = 0; ii < m_num_bank; ++ii) {
-    fprintf(fp,
-            "clist:%-10d scheduled:%llu size:%-5d state:%-15s bank_ready:%llu "
-            "data_ready:%llu data_avail:%llu time:%llu\n",
-            (m_current_list[ii] ? m_current_list[ii]->m_req->m_id : -1),
-            (m_current_list[ii] ? m_current_list[ii]->m_scheduled : 0), (int)m_buffer[ii].size(),
-            (m_current_list[ii] ? dram_state[m_current_list[ii]->m_state] : "NULL"), m_bank_ready[ii], m_data_ready[ii],
-            m_data_avail[ii], m_bank_timestamp[ii]);
+    fprintf(
+      fp,
+      "clist:%-10d scheduled:%llu size:%-5d state:%-15s bank_ready:%llu "
+      "data_ready:%llu data_avail:%llu time:%llu\n",
+      (m_current_list[ii] ? m_current_list[ii]->m_req->m_id : -1),
+      (m_current_list[ii] ? m_current_list[ii]->m_scheduled : 0),
+      (int)m_buffer[ii].size(),
+      (m_current_list[ii] ? dram_state[m_current_list[ii]->m_state] : "NULL"),
+      m_bank_ready[ii], m_data_ready[ii], m_data_avail[ii],
+      m_bank_timestamp[ii]);
   }
 
   // print all requests
   for (int ii = 0; ii < m_num_bank; ++ii) {
     fprintf(fp, "bank_id:%d\n", ii);
     for (auto I = m_buffer[ii].begin(), E = m_buffer[ii].end(); I != E; ++I) {
-      fprintf(fp, "req_id:%-10d state:%-15s time:%lld delta:%lld\n", (*I)->m_req->m_id, dram_state[(*I)->m_state],
-              (*I)->m_timestamp, m_cycle - (*I)->m_timestamp);
+      fprintf(fp, "req_id:%-10d state:%-15s time:%lld delta:%lld\n",
+              (*I)->m_req->m_id, dram_state[(*I)->m_state], (*I)->m_timestamp,
+              m_cycle - (*I)->m_timestamp);
     }
   }
 
@@ -444,22 +456,26 @@ void dram_ctrl_c::bank_schedule_complete(void) {
       // find same address entries
       if (*m_simBase->m_knobs->KNOB_DRAM_MERGE_REQUESTS) {
         list<drb_entry_s*> temp_list;
-        for (auto I = m_buffer[ii].begin(), E = m_buffer[ii].end(); I != E; ++I) {
+        for (auto I = m_buffer[ii].begin(), E = m_buffer[ii].end(); I != E;
+             ++I) {
           if ((*I)->m_addr == m_current_list[ii]->m_addr) {
             on_complete(*I);
             if ((*I)->m_req->m_type == MRT_WB) {
-              DEBUG("MC[%d] merged_req:%d addr:0x%llx type:%s done\n", m_id, (*I)->m_req->m_id, (*I)->m_req->m_addr,
+              DEBUG("MC[%d] merged_req:%d addr:0x%llx type:%s done\n", m_id,
+                    (*I)->m_req->m_id, (*I)->m_req->m_addr,
                     mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
               MEMORY->free_req((*I)->m_req->m_core_id, (*I)->m_req);
             } else {
               if (m_tmp_output_buffer) {
-                (*I)->m_req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+                (*I)->m_req->m_rdy_cycle =
+                  m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
                 m_tmp_output_buffer->push_back((*I)->m_req);
               } else {
                 m_output_buffer->push_back((*I)->m_req);
               }
               (*I)->m_req->m_state = MEM_DRAM_DONE;
-              DEBUG("MC[%d] merged_req:%d addr:0x%llx typs:%s done\n", m_id, (*I)->m_req->m_id, (*I)->m_req->m_addr,
+              DEBUG("MC[%d] merged_req:%d addr:0x%llx typs:%s done\n", m_id,
+                    (*I)->m_req->m_id, (*I)->m_req->m_addr,
                     mem_req_c::mem_req_type_name[(*I)->m_req->m_type]);
             }
             temp_list.push_back((*I));
@@ -484,21 +500,27 @@ void dram_ctrl_c::bank_schedule_complete(void) {
       on_complete(m_current_list[ii]);
       // wb request will be retired immediately
       if (m_current_list[ii]->m_req->m_type == MRT_WB) {
-        DEBUG("MC[%d] req:%d addr:0x%llx type:%s done\n", m_id, m_current_list[ii]->m_req->m_id,
-              m_current_list[ii]->m_req->m_addr, mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type]);
-        MEMORY->free_req(m_current_list[ii]->m_req->m_core_id, m_current_list[ii]->m_req);
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s done\n", m_id,
+              m_current_list[ii]->m_req->m_id,
+              m_current_list[ii]->m_req->m_addr,
+              mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type]);
+        MEMORY->free_req(m_current_list[ii]->m_req->m_core_id,
+                         m_current_list[ii]->m_req);
       }
       // otherwise, send back to interconnection network
       else {
         if (m_tmp_output_buffer) {
-          m_current_list[ii]->m_req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+          m_current_list[ii]->m_req->m_rdy_cycle =
+            m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
           m_tmp_output_buffer->push_back(m_current_list[ii]->m_req);
         } else {
           m_output_buffer->push_back(m_current_list[ii]->m_req);
         }
         m_current_list[ii]->m_req->m_state = MEM_DRAM_DONE;
-        DEBUG("MC[%d] req:%d addr:0x%llx type:%s bank:%d done\n", m_id, m_current_list[ii]->m_req->m_id,
-              m_current_list[ii]->m_req->m_addr, mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type], ii);
+        DEBUG(
+          "MC[%d] req:%d addr:0x%llx type:%s bank:%d done\n", m_id,
+          m_current_list[ii]->m_req->m_id, m_current_list[ii]->m_req->m_addr,
+          mem_req_c::mem_req_type_name[m_current_list[ii]->m_req->m_type], ii);
       }
 
       m_current_list[ii]->reset();
@@ -513,7 +535,9 @@ void dram_ctrl_c::bank_schedule_complete(void) {
 
 void dram_ctrl_c::delay_packet() {
   vector<mem_req_s*> temp_list;
-  for (auto itr = m_tmp_output_buffer->begin(), end = m_tmp_output_buffer->end(); itr != end; ++itr) {
+  for (auto itr = m_tmp_output_buffer->begin(),
+            end = m_tmp_output_buffer->end();
+       itr != end; ++itr) {
     mem_req_s* req = *itr;
     if (req->m_rdy_cycle <= m_cycle) {
       temp_list.push_back(req);
@@ -551,18 +575,20 @@ void dram_ctrl_c::send(void) {
     // check both CPU and GPU requests
     if (req_type_checked[0] == true && req_type_checked[1] == true) break;
 
-    for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+    for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E;
+         ++I) {
       mem_req_s* req = (*I);
       if (req_type_allowed[req->m_ptx] == false) continue;
 
       req_type_checked[req->m_ptx] = true;
       req->m_msg_type = NOC_FILL;
 
-      bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
+      bool insert_packet =
+        NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
       if (!insert_packet) {
-        DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id, req->m_addr,
-              mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id,
+              req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
         break;
       }
 
@@ -613,11 +639,14 @@ void dram_ctrl_c::bank_schedule_new(void) {
 
       POWER_EVENT(POWER_MC_R);
 
-      DEBUG("bank[%d] req:%d has been selected\n", ii, m_current_list[ii]->m_req->m_id);
+      DEBUG("bank[%d] req:%d has been selected\n", ii,
+            m_current_list[ii]->m_req->m_id);
     }
     // previous command is done. ready for next sequence of command.
-    else if (m_bank_ready[ii] <= m_cycle && m_current_list[ii]->m_state == DRAM_CMD_WAIT) {
-      ASSERT(m_current_list[ii]->m_state == DRAM_CMD_WAIT || m_current_list[ii]->m_state == DRAM_DATA);
+    else if (m_bank_ready[ii] <= m_cycle &&
+             m_current_list[ii]->m_state == DRAM_CMD_WAIT) {
+      ASSERT(m_current_list[ii]->m_state == DRAM_CMD_WAIT ||
+             m_current_list[ii]->m_state == DRAM_DATA);
       m_bank_ready[ii] = ULLONG_MAX;
       m_current_list[ii]->m_state = DRAM_CMD;
       m_bank_timestamp[ii] = m_cycle;
@@ -649,8 +678,11 @@ void dram_ctrl_c::channel_schedule_cmd(void) {
   for (int ii = 0; ii < m_num_channel; ++ii) {
     Counter oldest = ULLONG_MAX;
     int bank = -1;
-    for (int jj = ii * m_num_bank_per_channel; jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
-      if (m_current_list[jj] != NULL && m_current_list[jj]->m_state == DRAM_CMD && m_bank_timestamp[jj] < oldest) {
+    for (int jj = ii * m_num_bank_per_channel;
+         jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
+      if (m_current_list[jj] != NULL &&
+          m_current_list[jj]->m_state == DRAM_CMD &&
+          m_bank_timestamp[jj] < oldest) {
         oldest = m_bank_timestamp[jj];
         bank = jj;
       }
@@ -666,7 +698,8 @@ void dram_ctrl_c::channel_schedule_cmd(void) {
         m_data_avail[bank] = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_CMD_WAIT;
         STAT_EVENT(DRAM_ACTIVATE);
-        DEBUG("bank[%d] req:%d activate\n", bank, m_current_list[bank]->m_req->m_id);
+        DEBUG("bank[%d] req:%d activate\n", bank,
+              m_current_list[bank]->m_req->m_id);
       }
       // column access
       else if (m_current_list[bank]->m_rid == m_current_rid[bank]) {
@@ -674,7 +707,8 @@ void dram_ctrl_c::channel_schedule_cmd(void) {
         m_data_avail[bank] = m_bank_ready[bank];
         m_current_list[bank]->m_state = DRAM_DATA;
         STAT_EVENT(DRAM_COLUMN);
-        DEBUG("bank[%d] req:%d column\n", bank, m_current_list[bank]->m_req->m_id);
+        DEBUG("bank[%d] req:%d column\n", bank,
+              m_current_list[bank]->m_req->m_id);
       }
       // precharge
       else {
@@ -683,7 +717,8 @@ void dram_ctrl_c::channel_schedule_cmd(void) {
         m_data_avail[bank] = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_CMD_WAIT;
         STAT_EVENT(DRAM_PRECHARGE);
-        DEBUG("bank[%d] req:%d precharge\n", bank, m_current_list[bank]->m_req->m_id);
+        DEBUG("bank[%d] req:%d precharge\n", bank,
+              m_current_list[bank]->m_req->m_id);
       }
     }
   }
@@ -695,8 +730,11 @@ void dram_ctrl_c::channel_schedule_data(void) {
     // check whether the dram bandwidth has been saturated
     if (!avail_data_bus(ii)) {
       bool found = false;
-      for (int jj = ii * m_num_bank_per_channel; jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
-        if (m_current_list[jj] != NULL && m_current_list[jj]->m_state == DRAM_DATA && m_data_avail[jj] <= m_cycle) {
+      for (int jj = ii * m_num_bank_per_channel;
+           jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
+        if (m_current_list[jj] != NULL &&
+            m_current_list[jj]->m_state == DRAM_DATA &&
+            m_data_avail[jj] <= m_cycle) {
           found = true;
           break;
         }
@@ -710,9 +748,11 @@ void dram_ctrl_c::channel_schedule_data(void) {
     while (avail_data_bus(ii)) {
       Counter oldest = ULLONG_MAX;
       int bank = -1;
-      for (int jj = ii * m_num_bank_per_channel; jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
-        if (m_current_list[jj] != NULL && m_current_list[jj]->m_state == DRAM_DATA && m_data_avail[jj] <= m_cycle &&
-            m_bank_timestamp[jj] < oldest) {
+      for (int jj = ii * m_num_bank_per_channel;
+           jj < (ii + 1) * m_num_bank_per_channel; ++jj) {
+        if (m_current_list[jj] != NULL &&
+            m_current_list[jj]->m_state == DRAM_DATA &&
+            m_data_avail[jj] <= m_cycle && m_bank_timestamp[jj] < oldest) {
           oldest = m_bank_timestamp[jj];
           bank = jj;
         }
@@ -720,9 +760,11 @@ void dram_ctrl_c::channel_schedule_data(void) {
 
       if (bank != -1) {
         m_current_list[bank]->m_req->m_state = MEM_DRAM_DATA;
-        DEBUG("bank[%d] req:%d has acquired data bus\n", bank, m_current_list[bank]->m_req->m_id);
+        DEBUG("bank[%d] req:%d has acquired data bus\n", bank,
+              m_current_list[bank]->m_req->m_id);
         ASSERT(m_current_list[bank]->m_state == DRAM_DATA);
-        m_data_ready[bank] = acquire_data_bus(ii, m_current_list[bank]->m_size, m_current_list[bank]->m_req->m_ptx);
+        m_data_ready[bank] = acquire_data_bus(
+          ii, m_current_list[bank]->m_size, m_current_list[bank]->m_req->m_ptx);
         m_data_avail[bank] = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_DATA_WAIT;
       } else
@@ -739,7 +781,8 @@ bool dram_ctrl_c::avail_data_bus(int channel_id) {
 }
 
 // acquire data bus.
-Counter dram_ctrl_c::acquire_data_bus(int channel_id, int req_size, bool gpu_req) {
+Counter dram_ctrl_c::acquire_data_bus(int channel_id, int req_size,
+                                      bool gpu_req) {
   total_dram_bandwidth += req_size;
   STAT_EVENT_N(BANDWIDTH_TOT, req_size);
 
@@ -751,7 +794,8 @@ Counter dram_ctrl_c::acquire_data_bus(int channel_id, int req_size, bool gpu_req
     latency = m_cycle;
   } else {
     latency = m_cycle + (req_size - m_byte_avail[channel_id]) / m_bus_width + 1;
-    m_byte_avail[channel_id] = m_bus_width - (req_size - m_byte_avail[channel_id]) % m_bus_width;
+    m_byte_avail[channel_id] =
+      m_bus_width - (req_size - m_byte_avail[channel_id]) % m_bus_width;
   }
 
   m_dbus_ready[channel_id] = latency;
@@ -759,7 +803,8 @@ Counter dram_ctrl_c::acquire_data_bus(int channel_id, int req_size, bool gpu_req
   return latency;
 }
 
-void dram_ctrl_c::on_insert(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid) {
+void dram_ctrl_c::on_insert(mem_req_s* req, uint64_t bid, uint64_t rid,
+                            uint64_t cid) {
   // empty
 }
 
@@ -777,13 +822,16 @@ dc_frfcfs_c::sort_func::sort_func(dc_frfcfs_c* parent) {
   m_parent = parent;
 }
 
-bool dc_frfcfs_c::sort_func::operator()(const drb_entry_s* req_a, const drb_entry_s* req_b) {
+bool dc_frfcfs_c::sort_func::operator()(const drb_entry_s* req_a,
+                                        const drb_entry_s* req_b) {
   int bid = req_a->m_bid;
   int current_rid = m_parent->m_current_rid[bid];
 
-  if (req_a->m_req->m_type != MRT_DPRF && req_b->m_req->m_type == MRT_DPRF) return true;
+  if (req_a->m_req->m_type != MRT_DPRF && req_b->m_req->m_type == MRT_DPRF)
+    return true;
 
-  if (req_a->m_req->m_type == MRT_DPRF && req_b->m_req->m_type != MRT_DPRF) return false;
+  if (req_a->m_req->m_type == MRT_DPRF && req_b->m_req->m_type != MRT_DPRF)
+    return false;
 
   if (req_a->m_rid == current_rid && req_b->m_rid != current_rid) return true;
 
@@ -836,17 +884,19 @@ void dram_simple_ctrl_c::run_a_cycle(bool pll_lock) {
 void dram_simple_ctrl_c::send(void) {
   vector<mem_req_s*> temp_list;
 
-  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E;
+       ++I) {
     mem_req_s* req = (*I);
 
     if (req->m_rdy_cycle > m_cycle) break;
 
     req->m_msg_type = NOC_FILL;
-    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
+    bool insert_packet =
+      NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
     if (!insert_packet) {
-      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id, req->m_addr,
-            mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id,
+            req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
       break;
     }
 
@@ -872,7 +922,8 @@ void dram_simple_ctrl_c::receive(void) {
 
   NETWORK->receive_pop(MEM_MC, m_id);
 
-  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) m_simBase->m_bug_detector->deallocate_noc(req);
+  if (*KNOB(KNOB_BUG_DETECTOR_ENABLE))
+    m_simBase->m_bug_detector->deallocate_noc(req);
 }
 
 void dram_simple_ctrl_c::print_req(void) {

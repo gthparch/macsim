@@ -181,8 +181,10 @@ typedef struct mem_req_s {
 class mem_req_c
 {
 public:
-  static const char* mem_req_type_name[MAX_MEM_REQ_TYPE]; /**< memory request type string */
-  static const char* mem_state[MEM_STATE_MAX]; /**< memory request state string */
+  static const char*
+    mem_req_type_name[MAX_MEM_REQ_TYPE]; /**< memory request type string */
+  static const char*
+    mem_state[MEM_STATE_MAX]; /**< memory request state string */
 };
 
 #endif /* #ifndef MEMORY_H_INCLUDED  */

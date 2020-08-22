@@ -50,7 +50,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_PORT, ##args)
 
 // port_c constructor
-port_c::port_c(string name, uns read, uns write, bool writes_prevent_reads, macsim_c* simBase) {
+port_c::port_c(string name, uns read, uns write, bool writes_prevent_reads,
+               macsim_c* simBase) {
   m_simBase = simBase;
 
   DEBUG("Initializing ports called '%s'.\n", name.c_str());
@@ -66,7 +67,8 @@ port_c::port_c(string name, uns read, uns write, bool writes_prevent_reads, macs
 }
 
 // initialize port
-void port_c::init_port(string name, uns read, uns write, bool writes_prevent_reads) {
+void port_c::init_port(string name, uns read, uns write,
+                       bool writes_prevent_reads) {
   DEBUG("Initializing ports called '%s'.\n", name.c_str());
 
   m_name = name;
@@ -96,7 +98,8 @@ bool port_c::get_read_port(Counter cycle_count) {
   }
 
   if (m_write_ports_in_use && m_writes_prevent_reads) {
-    DEBUG("get_read_port failed (%d writes preventing reads)\n", m_write_ports_in_use);
+    DEBUG("get_read_port failed (%d writes preventing reads)\n",
+          m_write_ports_in_use);
     return false;
   }
 
@@ -113,12 +116,14 @@ bool port_c::get_write_port(Counter cycle_count) {
 
     m_write_last_cycle = cycle_count;
     m_write_ports_in_use = 1;
-    DEBUG("get_write_port successful cycle_count:%lld  ports in used:%d \n", cycle_count, m_write_ports_in_use);
+    DEBUG("get_write_port successful cycle_count:%lld  ports in used:%d \n",
+          cycle_count, m_write_ports_in_use);
     return true;
   }
 
   if (m_write_ports_in_use == m_num_write_ports) {
-    DEBUG("get_write_port failed (%d ports in use) cycle_count:%lld \n", m_write_ports_in_use, cycle_count);
+    DEBUG("get_write_port failed (%d ports in use) cycle_count:%lld \n",
+          m_write_ports_in_use, cycle_count);
     return false;
   }
 

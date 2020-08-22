@@ -5,7 +5,13 @@
 
 using namespace std;
 
-typedef enum fence_type { NOT_FENCE, FENCE_ACQUIRE, FENCE_RELEASE, FENCE_FULL, FENCE_NUM } fence_type;
+typedef enum fence_type {
+  NOT_FENCE,
+  FENCE_ACQUIRE,
+  FENCE_RELEASE,
+  FENCE_FULL,
+  FENCE_NUM
+} fence_type;
 
 class fence_list
 {
@@ -36,7 +42,8 @@ public:
    * Print all the stores fence entries, for debugging
    */
   void print_fence_entries(void) {
-    for (auto it = m_fence_list.begin(); it != m_fence_list.end(); ++it) cout << *it << endl;
+    for (auto it = m_fence_list.begin(); it != m_fence_list.end(); ++it)
+      cout << *it << endl;
 
     fflush(NULL);
   }
@@ -101,7 +108,9 @@ public:
    * Check if any fence is active. If it is present in the list it is active
    */
   bool is_fence_active() {
-    return !m_full_fence_list.is_list_empty() || !m_acq_fence_list.is_list_empty() || !m_rel_fence_list.is_list_empty();
+    return !m_full_fence_list.is_list_empty() ||
+           !m_acq_fence_list.is_list_empty() ||
+           !m_rel_fence_list.is_list_empty();
   }
 
   /*
@@ -144,7 +153,8 @@ public:
    * Check if all the fence lists are empty
    */
   bool is_list_empty(void) {
-    return m_full_fence_list.is_list_empty() && m_acq_fence_list.is_list_empty() && m_rel_fence_list.is_list_empty();
+    return m_full_fence_list.is_list_empty() &&
+           m_acq_fence_list.is_list_empty() && m_rel_fence_list.is_list_empty();
   }
 
   list<int>::const_iterator cbegin(fence_type ft) {

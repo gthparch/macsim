@@ -51,7 +51,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_TR_REG 321
 //#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
 #define REP_MOV_MEM_SIZE_MAX 4
-#define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP) * 4))
+#define REP_MOV_MEM_SIZE_MAX_NEW \
+  MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP) * 4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
 #define MAX_GPU_SRC_NUM 5
@@ -96,7 +97,8 @@ typedef struct trace_info_cpu_s {
   uint8_t m_mem_write_size; /**< memory write size */
   bool m_rep_dir; /**< repetition direction */
   bool m_actually_taken; /**< branch actually taken */
-  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+  uint64_t
+    m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_cpu_s;
 
 typedef struct trace_info_a64_s {
@@ -122,7 +124,8 @@ typedef struct trace_info_a64_s {
   uint8_t m_mem_write_size; /**< memory write size */
   bool m_rep_dir; /**< repetition direction */
   bool m_actually_taken; /**< branch actually taken */
-  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+  uint64_t
+    m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_a64_s;
 
 typedef struct trace_info_igpu_s {
@@ -148,7 +151,8 @@ typedef struct trace_info_igpu_s {
   uint8_t m_mem_write_size; /**< memory write size */
   bool m_rep_dir; /**< repetition direction */
   bool m_actually_taken; /**< branch actually taken */
-  uint64_t m_instruction_next_addr; /**< next pc address, not in raw trace format */
+  uint64_t
+    m_instruction_next_addr; /**< next pc address, not in raw trace format */
 } trace_info_igpu_s;
 
 // identical to structure in trace generator
@@ -215,7 +219,8 @@ typedef struct trace_info_gpu_s {
   };
   uint8_t m_cache_level;  // for prefetch?
   uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
-  uint64_t m_next_inst_addr;  // next pc address, not present in raw trace format
+  uint64_t
+    m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -685,7 +690,8 @@ public:
    * @param uop - uop object to hold instruction information
    * @param sim_thread_id thread id
    */
-  virtual bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id) = 0;
+  virtual bool get_uops_from_traces(int core_id, uop_c *uop,
+                                    int sim_thread_id) = 0;
 
   /**
    * GPU simulation : Read trace ahead to read synchronization information
@@ -709,7 +715,8 @@ public:
   virtual void init_pin_convert() = 0;
 
   static const char *g_tr_reg_names[MAX_TR_REG]; /**< register name string */
-  static const char *g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
+  static const char
+    *g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
   static const char *g_tr_cf_names[10]; /**< cf type string */
   static const char *g_optype_names[37]; /**< opcode type string */
   static const char *g_mem_type_names[20]; /**< memeory request type string */
@@ -722,7 +729,10 @@ protected:
    * @param core_id - core id
    * @param sim_thread_id - thread id
    */
-  virtual inst_info_s *convert_pinuop_to_t_uop(void *pi, trace_uop_s **trace_uop, int core_id, int sim_thread_id) = 0;
+  virtual inst_info_s *convert_pinuop_to_t_uop(void *pi,
+                                               trace_uop_s **trace_uop,
+                                               int core_id,
+                                               int sim_thread_id) = 0;
 
   /**
    * Convert MacSim trace to instruction information (hash table)
@@ -746,7 +756,9 @@ protected:
    * @param rep_offset - repetition offet
    * @param core_id - core id
    */
-  virtual void convert_dyn_uop(inst_info_s *info, void *pi, trace_uop_s *trace_uop, Addr rep_offset, int core_id) = 0;
+  virtual void convert_dyn_uop(inst_info_s *info, void *pi,
+                               trace_uop_s *trace_uop, Addr rep_offset,
+                               int core_id) = 0;
 
   /**
    * Dump out instruction information to the file. At most 50000 instructions will be printed
@@ -763,7 +775,8 @@ protected:
    * @param inst_read - set true if instruction read successful
    * @see get_uops_from_traces
    */
-  bool read_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read);
+  bool read_trace(int core_id, void *trace_info, int sim_thread_id,
+                  bool *inst_read);
 
   /**
    * After peeking trace, in case of failture, we need to rewind trace file.
@@ -784,12 +797,15 @@ protected:
    * @param inst_read - indicate instruction read successful
    * @see get_uops_from_traces
    */
-  virtual bool peek_trace(int core_id, void *trace_info, int sim_thread_id, bool *inst_read) = 0;
+  virtual bool peek_trace(int core_id, void *trace_info, int sim_thread_id,
+                          bool *inst_read) = 0;
 
 protected:
   static const int k_trace_buffer_size = 1000; /**< maximum buffer size */
-  int m_int_uop_table[MAX_TR_OPCODE]; /**< opcode to uop type mapping table (int) */
-  int m_fp_uop_table[MAX_TR_OPCODE]; /**< opcode to uop type mapping tabpe (fp) */
+  int m_int_uop_table
+    [MAX_TR_OPCODE]; /**< opcode to uop type mapping table (int) */
+  int
+    m_fp_uop_table[MAX_TR_OPCODE]; /**< opcode to uop type mapping tabpe (fp) */
 
   uint32_t m_dprint_count; /**< dumped instruction count */
   ofstream *m_dprint_output; /**< dump output file stream */
@@ -808,7 +824,8 @@ public:
   ~trace_reader_wrapper_c();
 
   void setup_trace(int core_id, int sim_thread_id, bool gpu_sim);
-  bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id, bool gpu_sim);
+  bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id,
+                            bool gpu_sim);
   void pre_read_trace(thread_s *trace_info);
 
 private:

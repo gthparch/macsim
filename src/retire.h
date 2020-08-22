@@ -45,9 +45,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_types.h"
 #include "debug_macros.h"
 
-#define RETIRE_INTERFACE_PARAMS()                                                                                \
-  int m_core_id, pqueue_c<int*>*m_q_frontend, pqueue_c<int>**m_q_iaq, pqueue_c<gpu_allocq_entry_s>**m_gpu_q_iaq, \
-    pool_c<uop_c>*m_uop_pool, rob_c *m_rob, resource_c *m_resource, smc_rob_c *m_gpu_rob,                        \
+#define RETIRE_INTERFACE_PARAMS()                                          \
+  int m_core_id, pqueue_c<int *> *m_q_frontend, pqueue_c<int> **m_q_iaq,   \
+    pqueue_c<gpu_allocq_entry_s> **m_gpu_q_iaq, pool_c<uop_c> *m_uop_pool, \
+    rob_c *m_rob, resource_c *m_resource, smc_rob_c *m_gpu_rob,            \
     Unit_Type m_unit_type  // end macro
 
 #define RETIRE_INTERFACE_DECL()                                    \
@@ -60,14 +61,16 @@ POSSIBILITY OF SUCH DAMAGE.
   resource_c* m_resource; /**< resource data structure */          \
   smc_rob_c* m_gpu_rob; /**< gpu reorder buffer */                 \
   Unit_Type m_unit_type; /**< unit type */                         \
-  // end macro
+// end macro
 
-#define RETIRE_INTERFACE_ARGS() \
-  m_core_id, m_q_frontend, m_q_iaq, m_gpu_q_iaq, m_uop_pool, m_rob, m_resource, m_gpu_rob, m_unit_type  // end macro
+#define RETIRE_INTERFACE_ARGS()                                     \
+  m_core_id, m_q_frontend, m_q_iaq, m_gpu_q_iaq, m_uop_pool, m_rob, \
+    m_resource, m_gpu_rob, m_unit_type  // end macro
 
-#define RETIRE_INTERFACE_INIT()                                                                 \
-  m_core_id(m_core_id), m_q_frontend(m_q_frontend), m_q_iaq(m_q_iaq), m_gpu_q_iaq(m_gpu_q_iaq), \
-    m_uop_pool(m_uop_pool), m_rob(m_rob), m_resource(m_resource), m_gpu_rob(m_gpu_rob),         \
+#define RETIRE_INTERFACE_INIT()                                       \
+  m_core_id(m_core_id), m_q_frontend(m_q_frontend), m_q_iaq(m_q_iaq), \
+    m_gpu_q_iaq(m_gpu_q_iaq), m_uop_pool(m_uop_pool), m_rob(m_rob),   \
+    m_resource(m_resource), m_gpu_rob(m_gpu_rob),                     \
     m_unit_type(m_unit_type)  // end macro
 
 #define RETIRE_INTERFACE_CAST()       \
@@ -80,7 +83,7 @@ POSSIBILITY OF SUCH DAMAGE.
   static_cast<void>(m_zL / resource); \
   static_cast<void>(m_gpu_rob);       \
   static_cast<void>(m_unit_type);     \
-  // end macro
+// end macro
 
 typedef vector<uop_c*> write_buffer_c;
 
@@ -217,13 +220,16 @@ private:
   uns16 m_knob_width; /**< pipeline width */
   bool m_knob_ptx_sim; /**< gpu simulation */
   bool m_knob_igpu_sim; /**< intel gpu simulation */
-  unordered_map<int, Counter> m_insts_retired; /**< number of retired inst. per thread */
-  unordered_map<int, Counter> m_uops_retired; /**< number of retired uop per thread */
+  unordered_map<int, Counter>
+    m_insts_retired; /**< number of retired inst. per thread */
+  unordered_map<int, Counter>
+    m_uops_retired; /**< number of retired uop per thread */
 
   write_buffer_c m_write_buffer;
   queue<int> m_orq;
 
-  int m_period_inst_count; /**< counter for periodic logging number of retired inst. */
+  int
+    m_period_inst_count; /**< counter for periodic logging number of retired inst. */
 
   macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };

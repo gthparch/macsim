@@ -8,7 +8,8 @@ using namespace moodycamel;
 using namespace Qsim;
 
 #define REP_MOV_MEM_SIZE_MAX 4
-#define REP_MOV_MEM_SIZE_MAX_NEW MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP) * 4))
+#define REP_MOV_MEM_SIZE_MAX_NEW \
+  MAX2(REP_MOV_MEM_SIZE_MAX, (*KNOB(KNOB_MEM_SIZE_AMP) * 4))
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
 
@@ -43,8 +44,8 @@ public:
   InstHandler_a64();
   ~InstHandler_a64();
 
-  bool populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs regs_write, uint8_t regs_read_count,
-                        uint8_t regs_write_count);
+  bool populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs regs_write,
+                        uint8_t regs_read_count, uint8_t regs_write_count);
 
   int read_trace(void *buffer, unsigned int len);
   uint64_t instq_size() {
@@ -74,7 +75,8 @@ public:
 
   void gen_trace(void);
   void count_fences(const uint8_t *b, uint8_t l);
-  void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b, enum inst_type t);
+  void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
+               enum inst_type t);
 
   ~trace_gen_a64() {
   }

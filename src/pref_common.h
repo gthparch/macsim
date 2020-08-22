@@ -50,7 +50,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define PREF_TRACKERS_NUM 16
 #define LOG2_DCACHE_LINE_SIZE log2_int(m_simBase->m_memory->line_size(core_id))
-#define LOG2_PREF_REGION_SIZE log2_int(*m_simBase->m_knobs->KNOB_PREF_REGION_SIZE)
+#define LOG2_PREF_REGION_SIZE \
+  log2_int(*m_simBase->m_knobs->KNOB_PREF_REGION_SIZE)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +92,8 @@ typedef struct pref_info_s {
   Counter curr_sent; /**< num of current period sent prefetches */
   Counter curr_late; /**< num of current period late prefetches */
   Counter hybrid_lastuseful; /**< used for Hybrid */
-  Counter hybrid_lastsent; /**< This helps maintain a better indication of recent history */
+  Counter
+    hybrid_lastsent; /**< This helps maintain a better indication of recent history */
   Addr trackers[PREF_TRACKERS_NUM]; /**< tracking information */
   bool trackers_used[PREF_TRACKERS_NUM]; /**< tracker used */
   int track_num; /**< number of tracks */
@@ -133,9 +135,11 @@ typedef enum HWP_Region_LineUseStatus_Enum {
 typedef struct pref_region_line_status_s {
   bool l2_hit; /**< Was this line a hit in the cache */
   bool l2_miss; /**< Was this line a miss in the cache */
-  uns16 pref_sent; /**< Bit vector indicating if the prefetcher sent pref before a load */
+  uns16
+    pref_sent; /**< Bit vector indicating if the prefetcher sent pref before a load */
   bool l2_evict; /**< Was this line evicted */
-  Counter cycle_evict; /**< When was it evicted - used only for prefetched lines */
+  Counter
+    cycle_evict; /**< When was it evicted - used only for prefetched lines */
   bool evict_onPF; /**< Line(Demand) evicted due to a Prefetch */
 
   /**
@@ -199,27 +203,32 @@ public:
   /**
    * Send a prefetch request to L2 request queue.
    */
-  bool pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id, Addr loadAddr);
+  bool pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
+                              Addr loadAddr);
 
   /**
    * Send a prefetch request to L2 request queue.
    */
-  bool pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id, Addr loadAddr, int tid);
+  bool pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
+                              Addr loadAddr, int tid);
 
   /**
    * Send a prefetch request to L2 request queue.
    */
-  bool pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id, bool Begin, bool End, Addr loadAddr);
+  bool pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id,
+                                  bool Begin, bool End, Addr loadAddr);
 
   /**
    * Send a prefetch request to L2 request queue.
    */
-  bool pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id, bool Begin, bool End, Addr loadAddr, int tid);
+  bool pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id,
+                                  bool Begin, bool End, Addr loadAddr, int tid);
 
   /**
    * Train hardware prefetchers.
    */
-  void train(int level, int tid, Addr line_addr, Addr load_PC, uop_c *uop, bool hit);
+  void train(int level, int tid, Addr line_addr, Addr load_PC, uop_c *uop,
+             bool hit);
 
   /**
    * Initialize prefetchers.
@@ -244,7 +253,8 @@ public:
   /**
    * L1 prefetch hit handler
    */
-  void pref_l1_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop);
+  void pref_l1_pref_hit(int tid, Addr line_addr, Addr load_PC,
+                        uns8 prefetcher_id, uop_c *uop);
 
   /**
    * L2 miss handler
@@ -269,13 +279,15 @@ public:
   /**
    * L2 prefetch hit handler
    */
-  void pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop);
+  void pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC,
+                        uns8 prefetcher_id, uop_c *uop);
 
   /**
    * L2 late prefetch hit handler. Late prefetch indicates that prefetch request is
    * begin serviced when a demand arrives.
    */
-  void pref_l2_pref_hit_late(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop);
+  void pref_l2_pref_hit_late(int tid, Addr line_addr, Addr load_PC,
+                             uns8 prefetcher_id, uop_c *uop);
 
   /**
    * Update prefetch queue
@@ -290,7 +302,8 @@ public:
   /**
    * Update prefetch region information
    */
-  void pref_update_regioninfo(Addr line_addr, bool l2_hit, bool l2_miss, bool evict_onPF, Counter cycle_evict,
+  void pref_update_regioninfo(Addr line_addr, bool l2_hit, bool l2_miss,
+                              bool evict_onPF, Counter cycle_evict,
                               uns8 prefetcher_id);
 
   /**
@@ -417,15 +430,18 @@ private:
   Counter m_region_sent; /**< number of region sent */
   Counter m_region_useful; /**< number of useful region */
   Counter m_curr_region_sent; /**< number of region sent in current period */
-  Counter m_curr_region_useful; /**< number of useful region in current period */
+  Counter
+    m_curr_region_useful; /**< number of useful region in current period */
   uns m_phase; /**< number of total phase counter */
   char *m_polbv_info; /**< pollution bit vector */
 
   // for hybrid prefetching
   uns8 m_default_prefetcher; /**< default (best of hybrid) prefetcher */
-  Counter m_last_update_time; /**< when did we update the default prefetcher last? */
+  Counter
+    m_last_update_time; /**< when did we update the default prefetcher last? */
 
-  unordered_map<int, Counter> m_last_inst_num; /**< train hardware pref once per inst. */
+  unordered_map<int, Counter>
+    m_last_inst_num; /**< train hardware pref once per inst. */
 
   FILE *PREF_TRACE_OUT; /**< prefetch trace output stream */
   FILE *PREF_ACC_OUT; /**< prefetch accuracy information output stream */

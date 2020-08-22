@@ -53,9 +53,10 @@ public:
   /**
    * Constructor to create a software managed cache
    */
-  sw_managed_cache_c(string name, int c_id, uns32 c_size, uns8 c_assoc, uns8 c_line_size, uns8 c_banks, uns8 c_cycles,
-                     bool by_pass, Cache_Type c_type, uns n_read_ports, uns n_write_ports, int c_data_size,
-                     macsim_c *simBase);
+  sw_managed_cache_c(string name, int c_id, uns32 c_size, uns8 c_assoc,
+                     uns8 c_line_size, uns8 c_banks, uns8 c_cycles,
+                     bool by_pass, Cache_Type c_type, uns n_read_ports,
+                     uns n_write_ports, int c_data_size, macsim_c *simBase);
 
   /*! \fn ~sw_managed_cache_c()
    *  \brief destructor for class sw_managed_cache_c

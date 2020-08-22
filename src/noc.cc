@@ -92,7 +92,8 @@ void noc_c::run_a_cycle() {
   list<noc_entry_s*> done_list;
   memory_c* memory = m_simBase->m_memory;
 
-  for (auto itr = m_cpu_entry_up->begin(); itr != m_cpu_entry_up->end(); ++itr) {
+  for (auto itr = m_cpu_entry_up->begin(); itr != m_cpu_entry_up->end();
+       ++itr) {
     if ((*itr)->m_rdy <= CYCLE) {
       done_list.push_back((*itr));
     } else
@@ -100,7 +101,8 @@ void noc_c::run_a_cycle() {
   }
 
   for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg,
+                        (*itr)->m_req)) {
       m_cpu_entry_up->remove((*itr));
       m_pool->release_entry((*itr));
     }
@@ -109,7 +111,8 @@ void noc_c::run_a_cycle() {
   done_list.clear();
 
   if (!*m_simBase->m_knobs->KNOB_HETERO_NOC_USE_SAME_QUEUE) {
-    for (auto itr = m_gpu_entry_up->begin(); itr != m_gpu_entry_up->end(); ++itr) {
+    for (auto itr = m_gpu_entry_up->begin(); itr != m_gpu_entry_up->end();
+         ++itr) {
       if ((*itr)->m_rdy <= CYCLE) {
         done_list.push_back((*itr));
       } else
@@ -117,7 +120,8 @@ void noc_c::run_a_cycle() {
     }
 
     for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg,
+                          (*itr)->m_req)) {
         m_gpu_entry_up->remove((*itr));
         m_pool->release_entry((*itr));
       }
@@ -126,7 +130,8 @@ void noc_c::run_a_cycle() {
     done_list.clear();
   }
 
-  for (auto itr = m_cpu_entry_down->begin(); itr != m_cpu_entry_down->end(); ++itr) {
+  for (auto itr = m_cpu_entry_down->begin(); itr != m_cpu_entry_down->end();
+       ++itr) {
     if ((*itr)->m_rdy <= CYCLE) {
       done_list.push_back((*itr));
     } else
@@ -134,7 +139,8 @@ void noc_c::run_a_cycle() {
   }
 
   for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+    if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg,
+                        (*itr)->m_req)) {
       m_cpu_entry_down->remove((*itr));
       m_pool->release_entry((*itr));
     }
@@ -143,7 +149,8 @@ void noc_c::run_a_cycle() {
   done_list.clear();
 
   if (!*m_simBase->m_knobs->KNOB_HETERO_NOC_USE_SAME_QUEUE) {
-    for (auto itr = m_gpu_entry_down->begin(); itr != m_gpu_entry_down->end(); ++itr) {
+    for (auto itr = m_gpu_entry_down->begin(); itr != m_gpu_entry_down->end();
+         ++itr) {
       if ((*itr)->m_rdy <= CYCLE) {
         done_list.push_back((*itr));
       } else
@@ -151,7 +158,8 @@ void noc_c::run_a_cycle() {
     }
 
     for (auto itr = done_list.begin(); itr != done_list.end(); ++itr) {
-      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg, (*itr)->m_req)) {
+      if (memory->receive((*itr)->m_src, (*itr)->m_dst, (*itr)->m_msg,
+                          (*itr)->m_req)) {
         m_gpu_entry_down->remove((*itr));
         m_pool->release_entry((*itr));
       }

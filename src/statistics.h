@@ -86,7 +86,8 @@ ofstream* getOutputStream(const string& filename);
 class AbstractStat;
 
 AbstractStat& getGlobalStat(long ID, ProcessorStatistics* m_ProcStat);
-AbstractStat& getCoreWideStat(int coreID, long statID, ProcessorStatistics* m_ProcStat);
+AbstractStat& getCoreWideStat(int coreID, long statID,
+                              ProcessorStatistics* m_ProcStat);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Statistics base class
@@ -99,7 +100,8 @@ public:
   /**
    * Constructor.
    */
-  AbstractStat(const string& str, const string& outputfilename, long ID, bool corewide = false, bool isTemplate = true)
+  AbstractStat(const string& str, const string& outputfilename, long ID,
+               bool corewide = false, bool isTemplate = true)
     : m_pRatioStat(NULL),
       m_count(0),
       m_total_count(0),
@@ -209,7 +211,9 @@ public:
     stream << setw(FILED1_LENGTH) << name;
 
     stream.setf(ios::right, ios::adjustfield);
-    stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH) << m_count << endl << endl;
+    stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH) << m_count
+           << endl
+           << endl;
   }
 
 protected:
@@ -234,7 +238,8 @@ public:
   /**
    * Constructor.
    */
-  COUNT_Stat(const string& str, const string& outputfilename, long ID) : AbstractStat(str, outputfilename, ID) {
+  COUNT_Stat(const string& str, const string& outputfilename, long ID)
+    : AbstractStat(str, outputfilename, ID) {
   }
 
   /**
@@ -270,9 +275,10 @@ public:
   /**
    * Constructor.
    */
-  DISTMember_Stat(const string& str, const string& outputfilename, long ID, long distID, bool coreWide = false,
-                  bool isTemplate = false)
-    : AbstractStat(str, outputfilename, ID, coreWide, isTemplate), m_parentDistroID(distID) {
+  DISTMember_Stat(const string& str, const string& outputfilename, long ID,
+                  long distID, bool coreWide = false, bool isTemplate = false)
+    : AbstractStat(str, outputfilename, ID, coreWide, isTemplate),
+      m_parentDistroID(distID) {
   }
 
   /**
@@ -299,7 +305,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    DISTMember_Stat* pStat = new DISTMember_Stat(m_name, m_fileName, m_ID, true, m_isTemplate);
+    DISTMember_Stat* pStat =
+      new DISTMember_Stat(m_name, m_fileName, m_ID, true, m_isTemplate);
     pStat->m_isTemplate = false;
     pStat->setCoreID(coreID);
     pStat->m_parentDistroID = m_parentDistroID;
@@ -319,7 +326,8 @@ public:
   /**
    * Constructor.
    */
-  DIST_Stat(const string& str, const string& outputfilename, long ID, ProcessorStatistics* procStat)
+  DIST_Stat(const string& str, const string& outputfilename, long ID,
+            ProcessorStatistics* procStat)
     : AbstractStat(str, outputfilename, ID) {
     m_ProcStat = procStat;
   }
@@ -338,7 +346,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    DIST_Stat* pClone = new DIST_Stat(this->m_name, this->m_fileName, this->m_ID, this->m_ProcStat);
+    DIST_Stat* pClone = new DIST_Stat(this->m_name, this->m_fileName,
+                                      this->m_ID, this->m_ProcStat);
 
     pClone->setCoreID(coreID);
     pClone->m_bCoreWide = true;
@@ -371,7 +380,8 @@ public:
   virtual void writeTo(ofstream& stream);
 
 private:
-  ProcessorStatistics* m_ProcStat; /**< reference to simulation-scoped processor stats */
+  ProcessorStatistics*
+    m_ProcStat; /**< reference to simulation-scoped processor stats */
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +393,8 @@ public:
   /**
    * Constructor
    */
-  PER_INST_Stat(const string& str, const string& outputfilename, long ID) : AbstractStat(str, outputfilename, ID) {
+  PER_INST_Stat(const string& str, const string& outputfilename, long ID)
+    : AbstractStat(str, outputfilename, ID) {
   }
 
   /**
@@ -396,7 +407,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    PER_INST_Stat* pStat = new PER_INST_Stat(this->m_name, this->m_fileName, this->m_ID);
+    PER_INST_Stat* pStat =
+      new PER_INST_Stat(this->m_name, this->m_fileName, this->m_ID);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -414,7 +426,9 @@ public:
     stream.setf(ios::left, ios::adjustfield);
     stream << setw(FILED1_LENGTH) << name;
     stream.setf(ios::right, ios::adjustfield);
-    stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH) << per_inst_value << endl << endl;
+    stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH)
+           << per_inst_value << endl
+           << endl;
   }
 
 private:
@@ -430,7 +444,8 @@ public:
   /**
    * Constructor.
    */
-  PER_CYCLE_Stat(const string& str, const string& outputfilename, long ID) : AbstractStat(str, outputfilename, ID) {
+  PER_CYCLE_Stat(const string& str, const string& outputfilename, long ID)
+    : AbstractStat(str, outputfilename, ID) {
   }
 
   /**
@@ -443,7 +458,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    PER_CYCLE_Stat* pStat = new PER_CYCLE_Stat(this->m_name, this->m_fileName, this->m_ID);
+    PER_CYCLE_Stat* pStat =
+      new PER_CYCLE_Stat(this->m_name, this->m_fileName, this->m_ID);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -463,7 +479,9 @@ public:
       stream.setf(ios::left, ios::adjustfield);
       stream << setw(FILED1_LENGTH) << name;
       stream.setf(ios::right, ios::adjustfield);
-      stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH) << per_cycle << endl << endl;
+      stream << setw(FILED2_LENGTH) << m_count << setw(FILED3_LENGTH)
+             << per_cycle << endl
+             << endl;
     }
   }
 
@@ -480,7 +498,8 @@ public:
   /**
    * Constructor.
    */
-  RATIO_Stat(const string& str, const string& outputfilename, long ID, long RatioID, ProcessorStatistics* procStat)
+  RATIO_Stat(const string& str, const string& outputfilename, long ID,
+             long RatioID, ProcessorStatistics* procStat)
     : AbstractStat(str, outputfilename, ID), m_RatioID(RatioID) {
     m_ProcStat = procStat;
   }
@@ -497,7 +516,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    RATIO_Stat* pStat = new RATIO_Stat(this->m_name, this->m_fileName, this->m_ID, m_RatioID, this->m_ProcStat);
+    RATIO_Stat* pStat = new RATIO_Stat(this->m_name, this->m_fileName,
+                                       this->m_ID, m_RatioID, this->m_ProcStat);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -552,7 +572,8 @@ public:
 private:
   long m_RatioID; /**< ratio id */
   float ratio; /**< ratio */
-  ProcessorStatistics* m_ProcStat; /**< reference to simulation-scoped processor stats */
+  ProcessorStatistics*
+    m_ProcStat; /**< reference to simulation-scoped processor stats */
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -564,8 +585,8 @@ public:
   /**
    * Constructor.
    */
-  PERCENT_Stat(const string& str, const string& outputfilename, long ID, long denominatorID,
-               ProcessorStatistics* procStat)
+  PERCENT_Stat(const string& str, const string& outputfilename, long ID,
+               long denominatorID, ProcessorStatistics* procStat)
     : AbstractStat(str, outputfilename, ID), m_denominatorID(denominatorID) {
     m_ProcStat = procStat;
   }
@@ -580,7 +601,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    PERCENT_Stat* pStat = new PERCENT_Stat(m_name, m_fileName, m_ID, m_denominatorID, m_ProcStat);
+    PERCENT_Stat* pStat =
+      new PERCENT_Stat(m_name, m_fileName, m_ID, m_denominatorID, m_ProcStat);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -596,7 +618,8 @@ public:
     string name = m_name;
     if (m_bCoreWide) {
       name.append(m_suffix);
-      AbstractStat& refStat = getCoreWideStat(m_coreID, m_denominatorID, m_ProcStat);
+      AbstractStat& refStat =
+        getCoreWideStat(m_coreID, m_denominatorID, m_ProcStat);
       refValue = refStat.getCount();
       refName = refStat.getName();
     } else {
@@ -630,7 +653,8 @@ private:
   long m_denominatorID; /**< stat id */
   float ratio; /**< ratio */
   float percent; /**< percent */
-  ProcessorStatistics* m_ProcStat; /**< reference to simulation-scoped processor stats */
+  ProcessorStatistics*
+    m_ProcStat; /**< reference to simulation-scoped processor stats */
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,7 +666,8 @@ public:
   /**
    * Constructor.
    */
-  PER_1000_INST_Stat(const string& str, const string& outputfilename, long ID) : AbstractStat(str, outputfilename, ID) {
+  PER_1000_INST_Stat(const string& str, const string& outputfilename, long ID)
+    : AbstractStat(str, outputfilename, ID) {
   }
 
   /**
@@ -655,7 +680,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    PER_1000_INST_Stat* pStat = new PER_1000_INST_Stat(m_name, m_fileName, m_ID);
+    PER_1000_INST_Stat* pStat =
+      new PER_1000_INST_Stat(m_name, m_fileName, m_ID);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -692,7 +718,8 @@ public:
   /**
    * Constructor.
    */
-  PER_1000_PRET_INST_Stat(const string& str, const string& outputfilename, long ID)
+  PER_1000_PRET_INST_Stat(const string& str, const string& outputfilename,
+                          long ID)
     : AbstractStat(str, outputfilename, ID) {
   }
 
@@ -706,7 +733,8 @@ public:
    * Clone a stat.
    */
   virtual AbstractStat* clone(unsigned int coreID) {
-    PER_1000_PRET_INST_Stat* pStat = new PER_1000_PRET_INST_Stat(m_name, m_fileName, m_ID);
+    PER_1000_PRET_INST_Stat* pStat =
+      new PER_1000_PRET_INST_Stat(m_name, m_fileName, m_ID);
     pStat->setCoreID(coreID);
     pStat->m_isTemplate = false;
     return pStat;
@@ -743,7 +771,8 @@ public:
   /**
    * Constructor.
    */
-  LINE_Stat(const string& str, const string& outputfilename, long ID) : AbstractStat(str, outputfilename, ID) {
+  LINE_Stat(const string& str, const string& outputfilename, long ID)
+    : AbstractStat(str, outputfilename, ID) {
   }
 
   /**
@@ -847,7 +876,8 @@ public:
   /**
    * Constructor.
    */
-  CoreStatistics(macsim_c* simBase, unsigned int coreID = 0, bool isTemplate = false)
+  CoreStatistics(macsim_c* simBase, unsigned int coreID = 0,
+                 bool isTemplate = false)
     : m_coreID(coreID), m_isTemplate(isTemplate) {
     m_simBase = simBase;
   }
@@ -909,7 +939,8 @@ public:
 
     while (dist_iter != dist_end) {
       AbstractStat* pStat = (*dist_iter);
-      DIST_Stat* pStatClone = static_cast<DIST_Stat*>(pStat->clone(cloneCoreID));
+      DIST_Stat* pStatClone =
+        static_cast<DIST_Stat*>(pStat->clone(cloneCoreID));
 
       pClone->addDistribution(pStatClone);
 
@@ -1028,17 +1059,23 @@ private:
 #define WATTCH_CORE_EVENT_N(coreID, UnitName, ComponentName, delta) \
   TheProcessorPowerModel.core(coreID)[E_##UnitName][E_##ComponentName] += delta;
 
-#define WATTCH_GLOBAL_EVENT(UnitName, ComponentName) TheProcessorPowerModel[E_##UnitName][E_##ComponentName]++;
+#define WATTCH_GLOBAL_EVENT(UnitName, ComponentName) \
+  TheProcessorPowerModel[E_##UnitName][E_##ComponentName]++;
 
 #define WATTCH_GLOBAL_EVENT_N(UnitName, ComponentName, delta) \
   TheProcessorPowerModel[E_##UnitName][E_##ComponentName] += delta;
 
-#define STAT_CORE_EVENT(coreID, Event) m_simBase->m_ProcessorStats->core(coreID)[Event - PER_CORE_STATS_ENUM_FIRST]++;
+#define STAT_CORE_EVENT(coreID, Event) \
+  m_simBase->m_ProcessorStats->core(   \
+    coreID)[Event - PER_CORE_STATS_ENUM_FIRST]++;
 
-#define STAT_CORE_EVENT_M(coreID, Event) m_simBase->m_ProcessorStats->core(coreID)[Event - PER_CORE_STATS_ENUM_FIRST]--;
+#define STAT_CORE_EVENT_M(coreID, Event) \
+  m_simBase->m_ProcessorStats->core(     \
+    coreID)[Event - PER_CORE_STATS_ENUM_FIRST]--;
 
 #define STAT_CORE_EVENT_N(coreID, Event, delta) \
-  m_simBase->m_ProcessorStats->core(coreID)[Event - PER_CORE_STATS_ENUM_FIRST] += delta;
+  m_simBase->m_ProcessorStats->core(            \
+    coreID)[Event - PER_CORE_STATS_ENUM_FIRST] += delta;
 
 // increment a stat
 #define STAT_EVENT(ID) (*m_simBase->m_ProcessorStats)[ID]++
@@ -1052,7 +1089,8 @@ private:
 // POWER EVENT
 #define POWER_CORE_EVENT(coreID, Event) STAT_CORE_EVENT(coreID, Event)
 #define POWER_CORE_EVENT_M(coreID, Event) STAT_CORE_EVENT_M(coreID, Event)
-#define POWER_CORE_EVENT_N(coreID, Event, delta) STAT_CORE_EVENT_N(coreID, Event, delta)
+#define POWER_CORE_EVENT_N(coreID, Event, delta) \
+  STAT_CORE_EVENT_N(coreID, Event, delta)
 #define POWER_EVENT(ID) STAT_EVENT(ID)
 #define POWER_EVENT_M(ID) STAT_EVENT_M(ID)
 #define POWER_EVENT_N(ID, delta) STAT_EVENT_N(ID, delta)

@@ -45,8 +45,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // uop memory type string
 const char *uop_c::g_mem_type_name[NUM_MEM_TYPES] = {
-  "NOT",   "LD",    "ST",    "PF",    "WH",    "EVICT", "SWPREF_NTA", "SWPREF_T0", "SWPREF_T1", "SWPREF_T2",
-  "LD_LM", "LD_SM", "LD_GM", "ST_LM", "ST_SM", "ST_GM", "LD_CM",      "LD_TM",     "LD_PM",
+  "NOT",   "LD",         "ST",        "PF",        "WH",
+  "EVICT", "SWPREF_NTA", "SWPREF_T0", "SWPREF_T1", "SWPREF_T2",
+  "LD_LM", "LD_SM",      "LD_GM",     "ST_LM",     "ST_SM",
+  "ST_GM", "LD_CM",      "LD_TM",     "LD_PM",
 };
 
 // uop state string
@@ -79,15 +81,13 @@ const char *uop_c::g_uop_state_name[NUM_OP_STATES] = {
 
 // branch type string
 const char *uop_c::g_cf_type_name[NUM_CF_TYPES] = {
-  "NOT_CF", "CF_BR", "CF_CBR", "CF_CALL", "CF_IBR", "CF_ICALL", "CF_ICO", "CF_RET", "CF_MITE",
+  "NOT_CF",   "CF_BR",  "CF_CBR", "CF_CALL", "CF_IBR",
+  "CF_ICALL", "CF_ICO", "CF_RET", "CF_MITE",
 };
 
 // uop dependence type string
 const char *uop_c::g_dep_type_name[NUM_DEP_TYPES] = {
-  "REG_DATA_DEP",
-  "MEM_ADDR_DEP",
-  "MEM_DATA_DEP",
-  "PREV_UOP_DEP",
+  "REG_DATA_DEP", "MEM_ADDR_DEP", "MEM_DATA_DEP", "PREV_UOP_DEP",
 };
 
 // uop type string
@@ -485,7 +485,8 @@ uop_c *uop_c::free() {
   m_valid = false;
 
   if ((m_mem_type == MEM_ST) || (m_mem_type == MEM_ST_LM)) {
-    delete_store_hash_entry_wrapper(m_simBase->m_core_pointers[m_core_id]->get_map(), this);
+    delete_store_hash_entry_wrapper(
+      m_simBase->m_core_pointers[m_core_id]->get_map(), this);
   }
   m_thread_id = -1;
   m_unique_thread_id = -1;

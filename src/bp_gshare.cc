@@ -46,9 +46,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_BP_DIR, ##args)
 
-#define PHT_INIT_VALUE ((0x1 << *KNOB(KNOB_PHT_CTR_BITS)) - 1) /* weakly taken */
-#define COOK_HIST_BITS(hist, len, untouched) ((uns32)(hist) >> (32 - (len) + (untouched)) << (untouched))
-#define COOK_ADDR_BITS(addr, len, shift) (((uns32)(addr) >> (shift)) & (N_BIT_MASK((len))))
+#define PHT_INIT_VALUE \
+  ((0x1 << *KNOB(KNOB_PHT_CTR_BITS)) - 1) /* weakly taken */
+#define COOK_HIST_BITS(hist, len, untouched) \
+  ((uns32)(hist) >> (32 - (len) + (untouched)) << (untouched))
+#define COOK_ADDR_BITS(addr, len, shift) \
+  (((uns32)(addr) >> (shift)) & (N_BIT_MASK((len))))
 #define SAT_INC(val, max) ((val) == (max) ? (max) : (val) + 1)
 #define SAT_DEC(val, min) ((val) == (min) ? (min) : (val)-1)
 
@@ -66,8 +69,10 @@ bp_gshare_c::bp_gshare_c(macsim_c *simBase) : bp_dir_base_c(simBase) {
 uns8 bp_gshare_c::pred(uop_c *uop) {
   Addr addr = uop->m_pc;
   uns32 hist = m_global_hist;
-  uns32 cooked_hist = COOK_HIST_BITS(hist, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 0);
-  uns32 cooked_addr = COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
+  uns32 cooked_hist =
+    COOK_HIST_BITS(hist, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 0);
+  uns32 cooked_addr =
+    COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
   uns32 pht_index = cooked_hist ^ cooked_addr;
   uns8 pht_entry = m_pht[pht_index];
   // uns8  pred        = ((pht_entry >> (*KNOB(KNOB_PHT_CTR_BITS)) - 1)) & 0x1;
@@ -78,8 +83,11 @@ uns8 bp_gshare_c::pred(uop_c *uop) {
   uop->m_recovery_info.m_global_hist = this->m_global_hist | uop->m_dir << 31;
   m_global_hist |= pred << 31;
 
-  DEBUG("Predicting core:%d thread_id:%d uop_num:%llu addr:0x%llx  index:%d  ent:%u pred:%d  dir:%d\n", uop->m_core_id,
-        uop->m_thread_id, uop->m_uop_num, addr, pht_index, pht_entry, pred, uop->m_dir);
+  DEBUG(
+    "Predicting core:%d thread_id:%d uop_num:%llu addr:0x%llx  index:%d  "
+    "ent:%u pred:%d  dir:%d\n",
+    uop->m_core_id, uop->m_thread_id, uop->m_uop_num, addr, pht_index,
+    pht_entry, pred, uop->m_dir);
 
   return pred;
 }
@@ -88,21 +96,28 @@ uns8 bp_gshare_c::pred(uop_c *uop) {
 void bp_gshare_c::update(uop_c *uop) {
   Addr addr = uop->m_pc;
   uns32 hist = uop->m_uop_info.m_pred_global_hist;
-  uns32 cooked_hist = COOK_HIST_BITS(hist, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 0);
-  uns32 cooked_addr = COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
+  uns32 cooked_hist =
+    COOK_HIST_BITS(hist, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 0);
+  uns32 cooked_addr =
+    COOK_ADDR_BITS(addr, *m_simBase->m_knobs->KNOB_BP_HIST_LENGTH, 2);
   uns32 pht_index = cooked_hist ^ cooked_addr;
   uns8 pht_entry = m_pht[pht_index];
 
-  DEBUG("Writing gshare PHT for  op_num:%llu  index:%d  dir:%d ent:%u max value is :%lld \n", uop->m_uop_num, pht_index,
-        uop->m_dir, m_pht[pht_index], N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
+  DEBUG(
+    "Writing gshare PHT for  op_num:%llu  index:%d  dir:%d ent:%u max value is "
+    ":%lld \n",
+    uop->m_uop_num, pht_index, uop->m_dir, m_pht[pht_index],
+    N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
 
   if (uop->m_dir) {
-    m_pht[pht_index] = SAT_INC(pht_entry, N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
+    m_pht[pht_index] =
+      SAT_INC(pht_entry, N_BIT_MASK(*m_simBase->m_knobs->KNOB_PHT_CTR_BITS));
   } else {
     m_pht[pht_index] = SAT_DEC(pht_entry, 0);
   }
 
-  DEBUG("Updating addr:0x%llx  index:%u  ent:%u  dir:%d\n", addr, pht_index, m_pht[pht_index], uop->m_dir);
+  DEBUG("Updating addr:0x%llx  index:%u  ent:%u  dir:%d\n", addr, pht_index,
+        m_pht[pht_index], uop->m_dir);
 }
 
 // recovery from branch-mis prediction

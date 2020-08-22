@@ -46,10 +46,12 @@ POSSIBILITY OF SUCH DAMAGE.
 // FIXME
 // icache tlb
 
-#define FRONTEND_INTERFACE_PARAMS()                                                                                \
-  int m_core_id, frontend_c *m_frontend, cache_c *m_icache, pqueue_c<int*>*m_q_frontend, pool_c<uop_c>*m_uop_pool, \
-    exec_c *m_exec, bp_data_c *m_bp_data, map_c *m_map, int &m_running_thread_num, int &m_fetching_thread_num,     \
-    int &m_unique_scheduled_thread_num, int &m_last_terminated_tid, Unit_Type m_unit_type  // end macro
+#define FRONTEND_INTERFACE_PARAMS()                                           \
+  int m_core_id, frontend_c *m_frontend, cache_c *m_icache,                   \
+    pqueue_c<int *> *m_q_frontend, pool_c<uop_c> *m_uop_pool, exec_c *m_exec, \
+    bp_data_c *m_bp_data, map_c *m_map, int &m_running_thread_num,            \
+    int &m_fetching_thread_num, int &m_unique_scheduled_thread_num,           \
+    int &m_last_terminated_tid, Unit_Type m_unit_type  // end macro
 
 #define FRONTEND_INTERFACE_DECL()                                          \
   int m_core_id; /**< core id */                                           \
@@ -65,17 +67,22 @@ POSSIBILITY OF SUCH DAMAGE.
   int& m_unique_scheduled_thread_num; /**< number of unique threads */     \
   int& m_last_terminated_tid; /**< lastly terminated thread id */          \
   Unit_Type m_unit_type; /**< unit type */                                 \
-  // end macro
+// end macro
 
-#define FRONTEND_INTERFACE_ARGS()                                                                            \
-  m_core_id, m_frontend, m_icache, m_q_frontend, m_uop_pool, m_exec, m_bp_data, m_map, m_running_thread_num, \
-    m_fetching_thread_num, m_unique_scheduled_thread_num, m_last_terminated_tid, m_unit_type  // end macro
+#define FRONTEND_INTERFACE_ARGS()                                    \
+  m_core_id, m_frontend, m_icache, m_q_frontend, m_uop_pool, m_exec, \
+    m_bp_data, m_map, m_running_thread_num, m_fetching_thread_num,   \
+    m_unique_scheduled_thread_num, m_last_terminated_tid,            \
+    m_unit_type  // end macro
 
-#define FRONTEND_INTERFACE_INIT()                                                                               \
-  m_core_id(m_core_id), m_frontend(m_frontend), m_icache(m_icache), m_q_frontend(m_q_frontend),                 \
-    m_uop_pool(m_uop_pool), m_exec(m_exec), m_bp_data(m_bp_data), m_map(m_map),                                 \
-    m_running_thread_num(m_running_thread_num), m_fetching_thread_num(m_fetching_thread_num),                   \
-    m_unique_scheduled_thread_num(m_unique_scheduled_thread_num), m_last_terminated_tid(m_last_terminated_tid), \
+#define FRONTEND_INTERFACE_INIT()                                       \
+  m_core_id(m_core_id), m_frontend(m_frontend), m_icache(m_icache),     \
+    m_q_frontend(m_q_frontend), m_uop_pool(m_uop_pool), m_exec(m_exec), \
+    m_bp_data(m_bp_data), m_map(m_map),                                 \
+    m_running_thread_num(m_running_thread_num),                         \
+    m_fetching_thread_num(m_fetching_thread_num),                       \
+    m_unique_scheduled_thread_num(m_unique_scheduled_thread_num),       \
+    m_last_terminated_tid(m_last_terminated_tid),                       \
     m_unit_type(m_unit_type)  // end macro
 
 #define FRONTEND_INTERFACE_CAST()                   \
@@ -101,9 +108,7 @@ frontend_c* fetch_factory(FRONTEND_INTERFACE_PARAMS(), macsim_c* simBase);
 /// \brief Instruction cache data
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class icache_data_c
-{
-  Addr m_addr; /**< cache line address */
-};
+{ Addr m_addr; /**< cache line address */ };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief reason for not being able to fetch
@@ -183,7 +188,8 @@ typedef struct frontend_s {
   mt_scheduler_s m_MT_scheduler; /**< MT scheduler */
   Counter m_prev_uop_num; /**< previous uop number */
   Counter m_prev_uop_thread_num; /**< previous thread id of the uop */
-  map<Counter, bool> m_load_waiting; /**< uop is waiting a load begin serviced */
+  map<Counter, bool>
+    m_load_waiting; /**< uop is waiting a load begin serviced */
   reconv_data_s m_reconv_data; /**< GPU : reconvergence data */
 
   /**
@@ -231,7 +237,8 @@ public:
    *  \param fetch_data - fetch data for the thread
    *  \return bool - True if successful
    */
-  bool access_icache(int sim_thread_id, Addr fetch_addr, frontend_s* fetch_data);
+  bool access_icache(int sim_thread_id, Addr fetch_addr,
+                     frontend_s* fetch_data);
 
   /*! \fn bool icache_fill_line (mem_req_s *req)
    *  \brief Function to insert in Instruction cache
@@ -378,7 +385,8 @@ protected:
    *  \return FRONTEND_MODE - Frontend fetch mode
    *  @see run_a_cycle
    */
-  FRONTEND_MODE process_ifetch(unsigned int sim_thread_id, frontend_s* fetch_data);
+  FRONTEND_MODE process_ifetch(unsigned int sim_thread_id,
+                               frontend_s* fetch_data);
 
   /**
    *  \brief Function to enqueue uop to fetch queue
@@ -412,8 +420,8 @@ protected:
 
   int (frontend_c::*MT_fetch_scheduler)(void); /**< current fetch scheduler */
 
-  // FIXME : implement itlb
-  // tlb_c            *m_itlb;
+// FIXME : implement itlb
+// tlb_c            *m_itlb;
 
 #ifdef USING_SST
   std::map<uint64_t, bool> m_fetch_buffer;

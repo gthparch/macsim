@@ -51,9 +51,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_BTB, ##args)
 
 bp_targ_c::bp_targ_c(uns core_id_arg, macsim_c *simBase) {
-  btb = new cache_c(
-    "btb", simBase->m_knobs->KNOB_BTB_ENTRIES->getValue() * 4, simBase->m_knobs->KNOB_BTB_ASSOC->getValue(), 4,
-    sizeof(Addr), simBase->m_knobs->KNOB_BTB_BANK_NUM->getValue(), false, core_id_arg, CACHE_BTB, false, 1, 0, simBase);
+  btb =
+    new cache_c("btb", simBase->m_knobs->KNOB_BTB_ENTRIES->getValue() * 4,
+                simBase->m_knobs->KNOB_BTB_ASSOC->getValue(), 4, sizeof(Addr),
+                simBase->m_knobs->KNOB_BTB_BANK_NUM->getValue(), false,
+                core_id_arg, CACHE_BTB, false, 1, 0, simBase);
 
   m_core_id = core_id_arg;
   m_simBase = simBase;
@@ -71,8 +73,10 @@ Addr bp_targ_c::pred(uop_c *uop) {
     return_addr = uop->m_target_addr;
     STAT_CORE_EVENT(m_core_id, PERFECT_TARGET_PRED);
   } else {
-    int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
-    return_addr_ptr = (Addr *)btb->access_cache(uop->m_pc, &line_addr, true, appl_id);
+    int appl_id =
+      m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
+    return_addr_ptr =
+      (Addr *)btb->access_cache(uop->m_pc, &line_addr, true, appl_id);
     return_addr = return_addr_ptr ? *return_addr_ptr : 0;
   }
 
@@ -82,10 +86,12 @@ Addr bp_targ_c::pred(uop_c *uop) {
   uop->m_uop_info.m_btb_set = set;
 
   DEBUG(
-    "BTB pred  pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
+    "BTB pred  pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d "
+    "cf_type:%d "
     "btb_line:0x%llx set:%d tag:0x%llx \n",
-    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id, uop->m_cf_type,
-    (return_addr_ptr) ? (Addr)(*return_addr_ptr) : -1, set, tag);
+    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id,
+    uop->m_cf_type, (return_addr_ptr) ? (Addr)(*return_addr_ptr) : -1, set,
+    tag);
   return return_addr;
 }
 
@@ -101,24 +107,29 @@ void bp_targ_c::update(uop_c *uop) {
   int set;
   btb->find_tag_and_set(uop->m_pc, &tag, &set);
 
-  int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
-  btb_line = (Addr *)btb->access_cache(fetch_addr, &btb_line_addr, false, appl_id);
+  int appl_id =
+    m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
+  btb_line =
+    (Addr *)btb->access_cache(fetch_addr, &btb_line_addr, false, appl_id);
 
   if (btb_line == NULL) {
-    btb_line = (Addr *)btb->insert_cache(fetch_addr, &btb_line_addr, &repl_line_addr, appl_id, false);
+    btb_line = (Addr *)btb->insert_cache(fetch_addr, &btb_line_addr,
+                                         &repl_line_addr, appl_id, false);
     insert_btb = true;
   }
   DEBUG(
-    "BEFORE---Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
+    "BEFORE---Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d "
+    "thread_id:%d cf_type:%d "
     "btb_line:0x%llx set:%d tag:0x%llx insert_btb:%d\n",
-    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id, uop->m_cf_type,
-    (btb_line) ? (Addr)(*btb_line) : -1, set, tag, insert_btb);
+    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id,
+    uop->m_cf_type, (btb_line) ? (Addr)(*btb_line) : -1, set, tag, insert_btb);
 
   *btb_line = uop->m_target_addr;
 
   DEBUG(
-    "Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d thread_id:%d cf_type:%d "
+    "Writing BTB pc:0x%llx target:0x%llx m_uop_num:%llu core_id:%d "
+    "thread_id:%d cf_type:%d "
     "btb_line:0x%llx set:%d tag:0x%llx insert_btb:%d\n",
-    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id, uop->m_cf_type,
-    (btb_line) ? (Addr)(*btb_line) : -1, set, tag, insert_btb);
+    uop->m_pc, uop->m_target_addr, uop->m_uop_num, m_core_id, uop->m_thread_id,
+    uop->m_cf_type, (btb_line) ? (Addr)(*btb_line) : -1, set, tag, insert_btb);
 }

@@ -48,7 +48,8 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 
 // Constructor
-FCFSPageMapper::FCFSPageMapper(macsim_c* simBase, uint32_t page_size) : PageMapper(simBase, page_size, 0) {
+FCFSPageMapper::FCFSPageMapper(macsim_c* simBase, uint32_t page_size)
+  : PageMapper(simBase, page_size, 0) {
   REPORT("## FCFS virtual to physical translation enabled");
 }
 
@@ -68,7 +69,8 @@ uint64_t FCFSPageMapper::translate(uint64_t virtual_address) {
 
   if (it == m_page_table.end()) {
     // did not find a matching entry. allocate a new ppn to this vpn
-    uint64_t physical_address = (m_physical_tag << (int)log2(m_page_size)) | offset;
+    uint64_t physical_address =
+      (m_physical_tag << (int)log2(m_page_size)) | offset;
     m_page_table[vpn] = m_physical_tag++;
 
     // increment the number of pages allocated
@@ -86,10 +88,13 @@ uint64_t FCFSPageMapper::translate(uint64_t virtual_address) {
 //////////////////////////////////////////////////////////////////////
 
 // Constructor
-RegionBasedFCFSPageMapper::RegionBasedFCFSPageMapper(macsim_c* simBase, uint32_t page_size, uint64_t region_size)
+RegionBasedFCFSPageMapper::RegionBasedFCFSPageMapper(macsim_c* simBase,
+                                                     uint32_t page_size,
+                                                     uint64_t region_size)
   : PageMapper(simBase, page_size, 0), m_region_size(region_size) {
   REPORT("## Region-based FCFS virtual to physical translation enabled");
-  ASSERTM(region_size >= page_size, "The page size should be smaller than the region size.\n");
+  ASSERTM(region_size >= page_size,
+          "The page size should be smaller than the region size.\n");
 }
 
 // Destructor
@@ -110,7 +115,8 @@ uint64_t RegionBasedFCFSPageMapper::translate(uint64_t virtual_address) {
 
   if (it == m_region_table.end()) {
     // did not find a matching entry. allocate a new region to this vpn
-    uint64_t physical_address = (m_physical_tag << (int)log2(m_region_size)) | offset;
+    uint64_t physical_address =
+      (m_physical_tag << (int)log2(m_region_size)) | offset;
     m_region_table[region] = m_physical_tag++;
 
     // maintain a separate page table for later use
@@ -124,7 +130,8 @@ uint64_t RegionBasedFCFSPageMapper::translate(uint64_t virtual_address) {
     // There already exists a physical region for this virtual region, so we can know the
     // physical address. But, the corresponding physical address may not be new one in this region.
     // We maintain the page table for later use.
-    uint64_t physical_address = (it->second << (int)log2(m_region_size)) | offset;
+    uint64_t physical_address =
+      (it->second << (int)log2(m_region_size)) | offset;
 
     it = m_page_table.find(vpn);
 

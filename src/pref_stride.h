@@ -40,7 +40,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "pref_common.h"
 #include "pref.h"
 
-#define STRIDE_REGION(x) (x >> (*m_simBase->m_knobs->KNOB_PREF_STRIDE_REGION_BITS))
+#define STRIDE_REGION(x) \
+  (x >> (*m_simBase->m_knobs->KNOB_PREF_STRIDE_REGION_BITS))
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief stride region information table entry

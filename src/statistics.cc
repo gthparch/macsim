@@ -56,7 +56,8 @@ ofstream* getOutputStream(const string& filename, macsim_c* m_simBase) {
   // stat name already encountered
   // check if the output stream is opened then do nothing
   // otherwise open the stream
-  map<string, ofstream*>::iterator iter = m_simBase->m_AllStatsOutputStreams.find(filename);
+  map<string, ofstream*>::iterator iter =
+    m_simBase->m_AllStatsOutputStreams.find(filename);
 
   ofstream* stream = NULL;
 
@@ -96,7 +97,8 @@ AbstractStat& getGlobalStat(long statID, ProcessorStatistics* m_ProcStat) {
 }
 
 // get core stats
-AbstractStat& getCoreWideStat(int coreID, long statID, ProcessorStatistics* m_ProcStat) {
+AbstractStat& getCoreWideStat(int coreID, long statID,
+                              ProcessorStatistics* m_ProcStat) {
   CoreStatistics& coreStats = m_ProcStat->core(coreID);
   AbstractStat& pStat = coreStats[statID - PER_CORE_STATS_ENUM_FIRST];
 
@@ -135,7 +137,8 @@ void DIST_Stat::writeTo(ofstream& stream) {
   while (iter != end) {
     memberID = (*iter);
     if (m_bCoreWide) {
-      AbstractStat& memberStat = getCoreWideStat(m_coreID, memberID, m_ProcStat);
+      AbstractStat& memberStat =
+        getCoreWideStat(m_coreID, memberID, m_ProcStat);
       m_total_count += memberStat.getCount();
     } else {
       AbstractStat& memberStat = getGlobalStat(memberID, m_ProcStat);
@@ -153,7 +156,8 @@ void DIST_Stat::writeTo(ofstream& stream) {
   while (iter != end) {
     memberID = (*iter);
     if (m_bCoreWide) {
-      AbstractStat& memberStat = getCoreWideStat(m_coreID, memberID, m_ProcStat);
+      AbstractStat& memberStat =
+        getCoreWideStat(m_coreID, memberID, m_ProcStat);
       count = memberStat.getCount();
       const string& name = memberStat.getName();
 
@@ -397,7 +401,8 @@ void ProcessorStatistics::setNumCores(unsigned int numCores) {
 
   // generate enough core power model objects
   for (unsigned int coreId = 0; coreId < numCores; ++coreId) {
-    CoreStatistics* pCoreModel = m_simBase->m_coreStatsTemplate->clone(coreId, m_simBase);
+    CoreStatistics* pCoreModel =
+      m_simBase->m_coreStatsTemplate->clone(coreId, m_simBase);
     m_allCoresStats.push_back(pCoreModel);
   }
 }

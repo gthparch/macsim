@@ -34,8 +34,10 @@ void InstHandler_a64::processInst(unsigned char *b, uint64_t v, uint8_t len) {
   int count = dis.decode(b, len, insn);
   if (count) {
     insn->address = v;
-    dis.get_regs_access(insn, regs_read, regs_write, &regs_read_count, &regs_write_count);
-    populateInstInfo(insn, regs_read, regs_write, regs_read_count, regs_write_count);
+    dis.get_regs_access(insn, regs_read, regs_write, &regs_read_count,
+                        &regs_write_count);
+    populateInstInfo(insn, regs_read, regs_write, regs_read_count,
+                     regs_write_count);
     dis.free_insn(insn, count);
   }
 }
@@ -92,7 +94,8 @@ int InstHandler_a64::read_trace(void *buffer, unsigned int len) {
   return i * sizeof(trace_info_a64_qsim_s);
 }
 
-void InstHandler_a64::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w) {
+void InstHandler_a64::populateMemInfo(uint64_t v, uint64_t p, uint8_t s,
+                                      int w) {
   trace_info_a64_qsim_s *op = prev_op;
 
   if (!op) return;
@@ -121,15 +124,18 @@ void InstHandler_a64::populateMemInfo(uint64_t v, uint64_t p, uint8_t s, int w) 
 #if DEBUG
   if (debug_file) {
     *debug_file << std::endl
-                << (w ? "Write: " : "Read: ") << "v: 0x" << std::hex << v << " p: 0x" << std::hex << p
-                << " s: " << std::dec << (int)s << " val: " << std::hex << *(uint32_t *)p;
+                << (w ? "Write: " : "Read: ") << "v: 0x" << std::hex << v
+                << " p: 0x" << std::hex << p << " s: " << std::dec << (int)s
+                << " val: " << std::hex << *(uint32_t *)p;
   }
 #endif /* DEBUG */
 
   return;
 }
 
-bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs regs_write, uint8_t regs_read_count,
+bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read,
+                                       cs_regs regs_write,
+                                       uint8_t regs_read_count,
                                        uint8_t regs_write_count) {
   cs_arm64 *arm64;
 
@@ -154,7 +160,8 @@ bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs
 
   op->m_has_immediate = 0;
   for (int op_idx = 0; op_idx < arm64->op_count; op_idx++) {
-    if (arm64->operands[op_idx].type == ARM64_OP_IMM || arm64->operands[op_idx].type == ARM64_OP_CIMM) {
+    if (arm64->operands[op_idx].type == ARM64_OP_IMM ||
+        arm64->operands[op_idx].type == ARM64_OP_CIMM) {
       op->m_has_immediate = 1;
       break;
     }
@@ -201,14 +208,17 @@ bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs
 
   // auxiliary information for prefetch and barrier instructions
   if (arm64->op_count) {
-    if (arm64->operands[0].type == ARM64_OP_PREFETCH) op->m_st_vaddr = arm64->operands[0].prefetch;
+    if (arm64->operands[0].type == ARM64_OP_PREFETCH)
+      op->m_st_vaddr = arm64->operands[0].prefetch;
 
-    if (arm64->operands[0].type == ARM64_OP_BARRIER) op->m_st_vaddr = arm64->operands[0].barrier;
+    if (arm64->operands[0].type == ARM64_OP_BARRIER)
+      op->m_st_vaddr = arm64->operands[0].barrier;
   }
 
   // populate prev inst dynamic information
   if (prev_op) {
-    if (op->m_instruction_addr == prev_op->m_branch_target) prev_op->m_actually_taken = 1;
+    if (op->m_instruction_addr == prev_op->m_branch_target)
+      prev_op->m_actually_taken = 1;
 
     // push prev op into the stream
     stream.enqueue(prev_op);
@@ -226,16 +236,21 @@ bool InstHandler_a64::populateInstInfo(cs_insn *insn, cs_regs regs_read, cs_regs
 #if DEBUG
   if (debug_file) {
     *debug_file << std::endl << std::endl;
-    *debug_file << "IsBranch: " << (int)op->m_cf_type << " Offset:   " << std::setw(8) << std::hex << offset
-                << " Target:  " << std::setw(8) << std::hex << op->m_branch_target << " ";
+    *debug_file << "IsBranch: " << (int)op->m_cf_type
+                << " Offset:   " << std::setw(8) << std::hex << offset
+                << " Target:  " << std::setw(8) << std::hex
+                << op->m_branch_target << " ";
     *debug_file << std::endl;
     *debug_file <<  // a64_opcode_names[insn->id] <<
-      ": " << std::hex << insn->address << ": " << insn->mnemonic << ": " << insn->op_str;
+      ": " << std::hex << insn->address << ": " << insn->mnemonic << ": "
+                << insn->op_str;
     *debug_file << std::endl;
     *debug_file << "Src: ";
-    for (int i = 0; i < op->m_num_read_regs; i++) *debug_file << std::dec << (int)op->m_src[i] << " ";
+    for (int i = 0; i < op->m_num_read_regs; i++)
+      *debug_file << std::dec << (int)op->m_src[i] << " ";
     *debug_file << std::endl << "Dst: ";
-    for (int i = 0; i < op->m_num_dest_regs; i++) *debug_file << std::dec << (int)op->m_dst[i] << " ";
+    for (int i = 0; i < op->m_num_dest_regs; i++)
+      *debug_file << std::dec << (int)op->m_dst[i] << " ";
     *debug_file << std::endl;
   } else {
     std::cout << "Writing to a null tracefile" << std::endl;
@@ -281,7 +296,8 @@ void trace_gen_a64::count_fences(const uint8_t *b, uint8_t l) {
   dis.free_insn(insn, count);
 }
 
-void trace_gen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b, enum inst_type t) {
+void trace_gen_a64::inst_cb(int c, uint64_t v, uint64_t p, uint8_t l,
+                            const uint8_t *b, enum inst_type t) {
   inst_handle[c].processInst((unsigned char *)b, v, l);
   inst_count++;
 

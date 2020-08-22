@@ -53,19 +53,22 @@ fetch_factory_c::~fetch_factory_c() {
 // Get fetch_factory_c singleton entry
 // If it is not previously allocated, allocate it
 fetch_factory_c *fetch_factory_c::get() {
-  if (fetch_factory_c::instance == NULL) fetch_factory_c::instance = new fetch_factory_c();
+  if (fetch_factory_c::instance == NULL)
+    fetch_factory_c::instance = new fetch_factory_c();
 
   return instance;
 }
 
 // Register fetch policy
-void fetch_factory_c::register_class(string policy,
-                                     function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)> func) {
+void fetch_factory_c::register_class(
+  string policy,
+  function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)> func) {
   m_func_table[policy] = func;
 }
 
 // Based on the policy, return appropriate constructor
-frontend_c *fetch_factory_c::allocate_frontend(FRONTEND_INTERFACE_PARAMS(), macsim_c *m_simBase) {
+frontend_c *fetch_factory_c::allocate_frontend(FRONTEND_INTERFACE_PARAMS(),
+                                               macsim_c *m_simBase) {
   // check function table is empty
   if (m_func_table.empty()) ASSERTM(0, "Fetch function not registered.\n");
 
@@ -78,7 +81,8 @@ frontend_c *fetch_factory_c::allocate_frontend(FRONTEND_INTERFACE_PARAMS(), macs
     fetch_factory_init = true;
     string policy = m_simBase->m_knobs->KNOB_FETCH_POLICY->getValue();
 
-    ASSERTM(m_func_table.find(policy) != m_func_table.end(), "Fetch function not found\n");
+    ASSERTM(m_func_table.find(policy) != m_func_table.end(),
+            "Fetch function not found\n");
     m_func = m_func_table[policy];
   }
 

@@ -52,10 +52,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "all_knobs.h"
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SCHEDULE_STAGE, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SCHEDULE_STAGE, ##args)
 
 // schedule_ooo_c constructor
-schedule_ooo_c::schedule_ooo_c(int core_id, pqueue_c<int>** alloc_q, rob_c* rob, exec_c* exec, Unit_Type unit_type,
+schedule_ooo_c::schedule_ooo_c(int core_id, pqueue_c<int>** alloc_q, rob_c* rob,
+                               exec_c* exec, Unit_Type unit_type,
                                frontend_c* frontend, macsim_c* simBase)
   : schedule_c(exec, core_id, unit_type, frontend, alloc_q, simBase) {
   m_rob = rob;
@@ -79,7 +81,8 @@ void schedule_ooo_c::run_a_cycle(void) {
 
   int count = 0;
   if (m_num_in_sched) {
-    for (int i = m_first_schlist_ptr; i != m_last_schlist_ptr; i = (i + 1) % MAX_SCHED_SIZE) {
+    for (int i = m_first_schlist_ptr; i != m_last_schlist_ptr;
+         i = (i + 1) % MAX_SCHED_SIZE) {
       if (m_schedule_list[i] != -1) {
         SCHED_FAIL_TYPE sched_fail_reason;
 
@@ -98,7 +101,8 @@ void schedule_ooo_c::run_a_cycle(void) {
         } else {
           // schedule has been failed for current uop
           // try to find next available one
-          STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 6));
+          STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS +
+                                       MIN2(sched_fail_reason, 6));
         }
       } else if (i == m_first_schlist_ptr) {
         m_first_schlist_ptr = (m_first_schlist_ptr + 1) % MAX_SCHED_SIZE;

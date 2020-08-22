@@ -48,8 +48,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // cout statement + file and line information
 #ifndef NO_REPORT
-#define report(x)                                                                 \
-  cout << __FILE__ << ":" << __LINE__ << ": (I=" << m_simBase->m_core0_inst_count \
+#define report(x)                                  \
+  cout << __FILE__ << ":" << __LINE__              \
+       << ": (I=" << m_simBase->m_core0_inst_count \
        << "  C=" << m_simBase->m_simulation_cycle << "):  " << x << "\n";
 #else
 #define report(x) \
@@ -58,12 +59,13 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef NO_REPORT
 // printf statement + file and line information
-#define REPORT(args...)                                                                                             \
-  do {                                                                                                              \
-    fprintf(m_simBase->g_mystdout, "%s:%u: (I=%llu  C=%llu):  ", __FILE__, __LINE__, m_simBase->m_core0_inst_count, \
-            m_simBase->m_simulation_cycle);                                                                         \
-    fprintf(GLOBAL_DEBUG_STREAM, ##args);                                                                           \
-    fflush(GLOBAL_DEBUG_STREAM);                                                                                    \
+#define REPORT(args...)                                                    \
+  do {                                                                     \
+    fprintf(m_simBase->g_mystdout, "%s:%u: (I=%llu  C=%llu):  ", __FILE__, \
+            __LINE__, m_simBase->m_core0_inst_count,                       \
+            m_simBase->m_simulation_cycle);                                \
+    fprintf(GLOBAL_DEBUG_STREAM, ##args);                                  \
+    fflush(GLOBAL_DEBUG_STREAM);                                           \
   } while (0)
 #else
 #define REPORT(args...) \
@@ -72,11 +74,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DEBUG_RANGE_COND                                                                                 \
-  (((*KNOB(KNOB_DEBUG_INST_START) && m_simBase->m_core0_inst_count >= *KNOB(KNOB_DEBUG_INST_START)) &&   \
-    (!*KNOB(KNOB_DEBUG_INST_STOP) || m_simBase->m_core0_inst_count <= *KNOB(KNOB_DEBUG_INST_STOP))) ||   \
-   ((*KNOB(KNOB_DEBUG_CYCLE_START) && m_simBase->m_simulation_cycle >= *KNOB(KNOB_DEBUG_CYCLE_START)) && \
-    (!*KNOB(KNOB_DEBUG_CYCLE_STOP) || m_simBase->m_simulation_cycle <= *KNOB(KNOB_DEBUG_CYCLE_STOP))))
+#define DEBUG_RANGE_COND                                                \
+  (((*KNOB(KNOB_DEBUG_INST_START) &&                                    \
+     m_simBase->m_core0_inst_count >= *KNOB(KNOB_DEBUG_INST_START)) &&  \
+    (!*KNOB(KNOB_DEBUG_INST_STOP) ||                                    \
+     m_simBase->m_core0_inst_count <= *KNOB(KNOB_DEBUG_INST_STOP))) ||  \
+   ((*KNOB(KNOB_DEBUG_CYCLE_START) &&                                   \
+     m_simBase->m_simulation_cycle >= *KNOB(KNOB_DEBUG_CYCLE_START)) && \
+    (!*KNOB(KNOB_DEBUG_CYCLE_STOP) ||                                   \
+     m_simBase->m_simulation_cycle <= *KNOB(KNOB_DEBUG_CYCLE_STOP))))
 
 #ifdef NO_DEBUG
 #define ENABLE_GLOBAL_DEBUG_PRINT false /* default false */
@@ -90,14 +96,16 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #if ENABLE_GLOBAL_DEBUG_PRINT
 //  original code (hyesoon 3.19.06)
-#define _DEBUG(debug_flag, args...)                                                                  \
-  do {                                                                                               \
-    if (debug_flag && DEBUG_RANGE_COND) {                                                            \
-      fprintf(GLOBAL_DEBUG_STREAM, "%s:%u: " #debug_flag " (I=%llu  C=%llu):  ", __FILE__, __LINE__, \
-              m_simBase->m_core0_inst_count, m_simBase->m_simulation_cycle);                         \
-      fprintf(GLOBAL_DEBUG_STREAM, ##args);                                                          \
-      fflush(GLOBAL_DEBUG_STREAM);                                                                   \
-    }                                                                                                \
+#define _DEBUG(debug_flag, args...)                                   \
+  do {                                                                \
+    if (debug_flag && DEBUG_RANGE_COND) {                             \
+      fprintf(GLOBAL_DEBUG_STREAM,                                    \
+              "%s:%u: " #debug_flag " (I=%llu  C=%llu):  ", __FILE__, \
+              __LINE__, m_simBase->m_core0_inst_count,                \
+              m_simBase->m_simulation_cycle);                         \
+      fprintf(GLOBAL_DEBUG_STREAM, ##args);                           \
+      fflush(GLOBAL_DEBUG_STREAM);                                    \
+    }                                                                 \
   } while (0)
 #else
 #define _DEBUG(debug_flag, args...) \

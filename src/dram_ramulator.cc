@@ -56,13 +56,16 @@ dram_ramulator_c::dram_ramulator_c(macsim_c *simBase)
   : dram_c(simBase),
     requestsInFlight(0),
     wrapper(NULL),
-    read_cb_func(std::bind(&dram_ramulator_c::readComplete, this, std::placeholders::_1)),
-    write_cb_func(std::bind(&dram_ramulator_c::writeComplete, this, std::placeholders::_1)) {
+    read_cb_func(
+      std::bind(&dram_ramulator_c::readComplete, this, std::placeholders::_1)),
+    write_cb_func(std::bind(&dram_ramulator_c::writeComplete, this,
+                            std::placeholders::_1)) {
   std::string config_file(*KNOB(KNOB_RAMULATOR_CONFIG_FILE));
   configs.parse(config_file);
   configs.set_core_num(*KNOB(KNOB_NUM_SIM_CORES));
 
-  wrapper = new ramulator::RamulatorWrapper(configs, *KNOB(KNOB_RAMULATOR_CACHELINE_SIZE));
+  wrapper = new ramulator::RamulatorWrapper(
+    configs, *KNOB(KNOB_RAMULATOR_CACHELINE_SIZE));
 }
 
 dram_ramulator_c::~dram_ramulator_c() {
@@ -140,7 +143,8 @@ void dram_ramulator_c::receive(void) {
   long addr = static_cast<long>(req->m_addr);
   bool accepted = true;
   if (req->m_type != MRT_WB) {
-    ramulator::Request ramu_req(addr, ramulator::Request::Type::READ, read_cb_func, req->m_core_id);
+    ramulator::Request ramu_req(addr, ramulator::Request::Type::READ,
+                                read_cb_func, req->m_core_id);
     accepted = wrapper->send(ramu_req);
     if (accepted) {
       reads[ramu_req.addr].push_back(req);
@@ -157,11 +161,13 @@ void dram_ramulator_c::receive(void) {
       DEBUG("Read to 0x%lx NOT accepted. req:%d\n", ramu_req.addr, req->m_id);
     }
   } else {
-    ramulator::Request ramu_req(addr, ramulator::Request::Type::WRITE, write_cb_func, req->m_core_id);
+    ramulator::Request ramu_req(addr, ramulator::Request::Type::WRITE,
+                                write_cb_func, req->m_core_id);
     accepted = wrapper->send(ramu_req);
     if (accepted) {
       writes[ramu_req.addr].push_back(req);
-      DEBUG("Write to 0x%lx accepted and served. req:%d\n", ramu_req.addr, req->m_id);
+      DEBUG("Write to 0x%lx accepted and served. req:%d\n", ramu_req.addr,
+            req->m_id);
 
       // added counter to track requests in flight
       ++requestsInFlight;

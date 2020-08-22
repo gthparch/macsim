@@ -79,7 +79,10 @@ public:
    * @param parentName parent knob (for ratio)
    */
   abstract_knob_c(string name, string value, string parentName)
-    : m_name(name), m_valueString(value), m_parentName(parentName), m_valueProvided(false) {
+    : m_name(name),
+      m_valueString(value),
+      m_parentName(parentName),
+      m_valueProvided(false) {
   }
 
   /**
@@ -253,7 +256,8 @@ public:
    * @param val knob value
    * @param parentName the name of parent knob
    */
-  KnobTemplate(const string& name, const string& val, const string& parentName = "")
+  KnobTemplate(const string& name, const string& val,
+               const string& parentName = "")
     : abstract_knob_c(name, "", parentName), m_value(val) {
   }
 
@@ -465,11 +469,14 @@ private:
   void applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap);
 
 private:
-  static const char MAGIC_COMMENTS = '#'; /**< enable comment in parameter file */
+  static const char MAGIC_COMMENTS =
+    '#'; /**< enable comment in parameter file */
   all_knobs_c* m_allKnobs; /**< the knobs for this component instance **/
   map<string, abstract_knob_c*, ltstr_s> m_theKnobs; /**< knob table */
-  map<string, string, ltstr_s> m_valuesFromFile; /**< knob values from the file */
-  map<string, string, ltstr_s> m_valuesFromCommandLineSwitches; /**< values from command */
+  map<string, string, ltstr_s>
+    m_valuesFromFile; /**< knob values from the file */
+  map<string, string, ltstr_s>
+    m_valuesFromCommandLineSwitches; /**< values from command */
   KnobEntryTokenizer m_theTokenizer; /**< tokenizer */
   latency_map uop_latency_knob;
 };

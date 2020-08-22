@@ -55,9 +55,11 @@ private:
   typedef ReturnT (ConsumerT::*PtrMember)(Params...);
 
 public:
-  Callback(ConsumerT* const object, PtrMember member) : object(object), member(member) {
+  Callback(ConsumerT* const object, PtrMember member)
+    : object(object), member(member) {
   }
-  Callback(const Callback<ConsumerT, ReturnT, Params...>& e) : object(e.object), member(e.member) {
+  Callback(const Callback<ConsumerT, ReturnT, Params...>& e)
+    : object(e.object), member(e.member) {
   }
   ReturnT operator()(Params... params) {
     return (const_cast<ConsumerT*>(object)->*member)(params...);

@@ -129,7 +129,8 @@ typedef struct section_info_s {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct thread_start_info_s {
   uint32_t m_thread_id; /**< thread id */
-  uint64_t m_inst_count; /**< this stores inst. count of the main thread when the thread
+  uint64_t
+    m_inst_count; /**< this stores inst. count of the main thread when the thread
                            is to be started */
 } thread_start_info_s;
 
@@ -211,7 +212,8 @@ typedef struct thread_s {
   list<section_info_s*> m_bar_sections; /**< barrier sections */
   list<section_info_s*> m_mem_sections; /**< memory sections */
   list<section_info_s*> m_mem_bar_sections; /**< memory barrier sections */
-  list<section_info_s*> m_mem_for_bar_sections; /**< memory for barrier sections */
+  list<section_info_s*>
+    m_mem_for_bar_sections; /**< memory for barrier sections */
 
   // changed by Lifeng
   trace_info_cpu_s cached_inst; /**< cached inst for resuming after hmc inst */
@@ -253,23 +255,28 @@ typedef struct process_s {
   unsigned int m_no_of_threads_terminated; /**< number of terminated threads */
   // m_core_list should remain a map, don't change it to unordered map, it is used
   // for RR assignment of blocks to cores
-  map<int, bool> m_core_list; /**< list of cores that this process is executed */
+  map<int, bool>
+    m_core_list; /**< list of cores that this process is executed */
   queue<int>* m_core_pool; /**< core pool pointer */
   bool m_ptx; /**< GPU application */
   int m_repeat; /**< application has been re-executed */
   vector<string> m_applications; /**< list of sub-applications */
-  vector<int> m_kernel_block_start_count; /**< block id start count for sub-appl. */
+  vector<int>
+    m_kernel_block_start_count; /**< block id start count for sub-appl. */
   string m_current_file_name_base; /**< current sub-appl.'s filename base */
   string m_kernel_config_name; /**< kernel config file name */
-  unsigned int m_current_vector_index; /**< current index to the sub-application */
+  unsigned int
+    m_current_vector_index; /**< current index to the sub-application */
   map<int, bool> m_block_list; /**< list of block currently running */
   uns64 m_inst_count_tot; /**< total instruction counts */
   int m_block_count; /**< total block counts */
 
   // changed by Lifeng
-  map<uint64_t, hmc_inst_s> m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
+  map<uint64_t, hmc_inst_s>
+    m_hmc_info; /**< hmc instructions info map (caller pc, ret pc)*/
   map<std::pair<uint64_t, uint64_t>, hmc_inst_s> m_hmc_info_ext;
-  set<uint64_t> m_hmc_fence_info; /**<set of hmc instructions with implicit fence */
+  set<uint64_t>
+    m_hmc_fence_info; /**<set of hmc instructions with implicit fence */
   map<uint64_t, hmc_inst_s> m_lock_info;
 } process_s;
 
@@ -333,7 +340,8 @@ public:
    * @param thread_id - thread id
    * @param block_id - block id
    */
-  int terminate_thread(int core_id, thread_s* trace_info, int thread_id, int block_id);
+  int terminate_thread(int core_id, thread_s* trace_info, int thread_id,
+                       int block_id);
 
   /**
    * Return next available with lowest no. of running threads
@@ -396,10 +404,12 @@ private:
 
 private:
   list<thread_trace_info_node_s*>* m_thread_queue; /**< thread queue */
-  unordered_map<int, list<thread_trace_info_node_s*>*>* m_block_queue; /**< block queue */
+  unordered_map<int, list<thread_trace_info_node_s*>*>*
+    m_block_queue; /**< block queue */
   pool_c<hash_c<inst_info_s> >* m_inst_hash_pool; /**< instruction hash pool */
 
-  unordered_map<int, Counter> m_appl_cyccount_info; /**< per application cycle count info */
+  unordered_map<int, Counter>
+    m_appl_cyccount_info; /**< per application cycle count info */
   macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };
 

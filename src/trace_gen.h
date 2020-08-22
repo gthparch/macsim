@@ -45,7 +45,8 @@ protected:
 class trace_gen
 {
 public:
-  trace_gen(macsim_c *simBase, OSDomain &osd) : osd(osd), finished(false), started(false), inst_count(0), nop_count(0) {
+  trace_gen(macsim_c *simBase, OSDomain &osd)
+    : osd(osd), finished(false), started(false), inst_count(0), nop_count(0) {
     trace_file_count = 0;
     finished = false;
 
@@ -65,7 +66,8 @@ public:
   virtual void gen_trace(void) = 0;
 
   virtual void count_fences(const uint8_t *b, uint8_t l) = 0;
-  virtual void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b, enum inst_type t) = 0;
+  virtual void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l,
+                       const uint8_t *b, enum inst_type t) = 0;
 
   virtual void mem_cb(int c, uint64_t v, uint64_t p, uint8_t s, int w) = 0;
 

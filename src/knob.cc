@@ -135,13 +135,15 @@ void KnobsContainer::updateKnob(string key, string value) {
  * take the string from the knob and convert it into an enum
  * - Michael
  */
-static std::map<std::string, latency_map> string_to_latency_map = {{"x86", LATENCY_DEFAULT},
-                                                                   {"skylake", LATENCY_SKYLAKE},
-                                                                   {"skylake_x", LATENCY_SKYLAKE_X},
-                                                                   {"coffee_lake", LATENCY_COFFEE_LAKE}};
+static std::map<std::string, latency_map> string_to_latency_map = {
+  {"x86", LATENCY_DEFAULT},
+  {"skylake", LATENCY_SKYLAKE},
+  {"skylake_x", LATENCY_SKYLAKE_X},
+  {"coffee_lake", LATENCY_COFFEE_LAKE}};
 
 // apply new value to the knob
-void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap) {
+void KnobsContainer::applyValuesToKnobs(
+  map<string, string, ltstr_s>& ValuesMap) {
   if (ValuesMap.size() == 0) {
     return;
   }
@@ -160,13 +162,16 @@ void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)
     ++iter;
   }
   // apply values to dependent knobs
-  map<string, abstract_knob_c*, ltstr_s>::iterator knob_iter = m_theKnobs.begin();
+  map<string, abstract_knob_c*, ltstr_s>::iterator knob_iter =
+    m_theKnobs.begin();
   map<string, abstract_knob_c*, ltstr_s>::iterator knob_end = m_theKnobs.end();
   while (knob_iter != knob_end) {
     pKnob = (abstract_knob_c*)(knob_iter->second);
-    if (!pKnob->getParentName().empty() && m_theKnobs[pKnob->getParentName()]->wasValueProvided() &&
+    if (!pKnob->getParentName().empty() &&
+        m_theKnobs[pKnob->getParentName()]->wasValueProvided() &&
         !pKnob->wasValueProvided()) {
-      pKnob->initFromString(m_theKnobs[pKnob->getParentName()]->getValueString());
+      pKnob->initFromString(
+        m_theKnobs[pKnob->getParentName()]->getValueString());
     }
     ++knob_iter;
   }
@@ -177,12 +182,15 @@ void KnobsContainer::applyValuesToKnobs(map<string, string, ltstr_s>& ValuesMap)
     uop_latency_knob = string_to_latency_map.at(latency_knob);
   else {
     uop_latency_knob = LATENCY_DEFAULT;
-    cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO SANDY BRIDGE X86." << endl;
+    cout << "!!WARNING!! GIVEN UOP LATENCY MAP NOT SUPPORTED; DEFAULTING TO "
+            "SANDY BRIDGE X86."
+         << endl;
   }
 }
 
 // apply new values from commandline argument
-bool KnobsContainer::applyComandLineArguments(int argc, char** argv, char** invalidParam) {
+bool KnobsContainer::applyComandLineArguments(int argc, char** argv,
+                                              char** invalidParam) {
   vector<string> tokens;
   for (int i = 1; i < argc; ++i) {
     char* pArg = argv[i];
@@ -204,11 +212,13 @@ bool KnobsContainer::applyComandLineArguments(int argc, char** argv, char** inva
       string knobName = tokens[0];
       string value = tokens[1];
       if (knobName.size() && value.size()) {
-        m_valuesFromCommandLineSwitches.insert(pair<string, string>(knobName, value));
+        m_valuesFromCommandLineSwitches.insert(
+          pair<string, string>(knobName, value));
       }
     } else {
       *invalidParam = pArg;
-      cout << "Invalid or incomplete argument  ' " << pArg << " ' has been ignored" << endl;
+      cout << "Invalid or incomplete argument  ' " << pArg
+           << " ' has been ignored" << endl;
     }
   }
   applyValuesToKnobs(m_valuesFromCommandLineSwitches);

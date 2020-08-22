@@ -191,9 +191,10 @@ cache_c* default_llc(macsim_c* m_simBase) {
     }
   }
 
-  cache_c* llc = new cache_c("llc_default", *KNOB(KNOB_LLC_NUM_SET), *KNOB(KNOB_LLC_ASSOC), *KNOB(KNOB_LLC_LINE_SIZE),
-                             sizeof(dcache_data_s), *KNOB(KNOB_LLC_NUM_BANK), false, 0, CACHE_DL1, false, num_tiles,
-                             interleaving, m_simBase);
+  cache_c* llc = new cache_c(
+    "llc_default", *KNOB(KNOB_LLC_NUM_SET), *KNOB(KNOB_LLC_ASSOC),
+    *KNOB(KNOB_LLC_LINE_SIZE), sizeof(dcache_data_s), *KNOB(KNOB_LLC_NUM_BANK),
+    false, 0, CACHE_DL1, false, num_tiles, interleaving, m_simBase);
   return llc;
 }
 
@@ -271,8 +272,8 @@ bool queue_c::full() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // data cache constructor.
-dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, dcu_c** next, dcu_c** prev,
-             macsim_c* simBase) {
+dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id,
+             dcu_c** next, dcu_c** prev, macsim_c* simBase) {
   m_simBase = simBase;
 
   CREATE_CACHE_CONFIGURATION();
@@ -314,8 +315,8 @@ dcu_c::~dcu_c() {
 }
 
 // initialize data cache.
-void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coupled_down, bool disable,
-                 bool has_router) {
+void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up,
+                 bool coupled_down, bool disable, bool has_router) {
   m_next_id = next_id;
   m_prev_id = prev_id;
   m_coupled_up = coupled_up;
@@ -330,14 +331,17 @@ void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up, bool coup
       m_cache = llc_factory_c::get()->allocate(llc_policy, m_simBase);
       m_cache->set_core_id(m_id);
     } else {
-      m_cache = new cache_c("dcache", m_num_set, m_assoc, m_line_size, sizeof(dcache_data_s), m_banks, false, m_id,
-                            CACHE_DL1, m_level == MEM_L3 ? true : false, 1, 0, m_simBase);
+      m_cache =
+        new cache_c("dcache", m_num_set, m_assoc, m_line_size,
+                    sizeof(dcache_data_s), m_banks, false, m_id, CACHE_DL1,
+                    m_level == MEM_L3 ? true : false, 1, 0, m_simBase);
     }
 
     // allocate port
     m_port = new port_c*[m_banks];
     for (int ii = 0; ii < m_banks; ++ii) {
-      m_port[ii] = new port_c("dcache_port", m_num_read_port, m_num_write_port, false, m_simBase);
+      m_port[ii] = new port_c("dcache_port", m_num_read_port, m_num_write_port,
+                              false, m_simBase);
     }
   } else {
     m_latency = 1;
@@ -374,14 +378,17 @@ bool dcu_c::get_read_port(int bank_id) {
 }
 
 // access the cache.
-dcache_data_s* dcu_c::access_cache(Addr addr, Addr* line_addr, bool update, int appl_id) {
-  return (dcache_data_s*)m_cache->access_cache(addr, line_addr, update, appl_id);
+dcache_data_s* dcu_c::access_cache(Addr addr, Addr* line_addr, bool update,
+                                   int appl_id) {
+  return (dcache_data_s*)m_cache->access_cache(addr, line_addr, update,
+                                               appl_id);
 }
 
 // search a prefetch request in input queue.
 mem_req_s* dcu_c::search_pref_in_queue() {
   mem_req_s* evict_req = NULL;
-  for (auto I = m_in_queue->m_entry.rbegin(), E = m_in_queue->m_entry.rend(); I != E; ++I) {
+  for (auto I = m_in_queue->m_entry.rbegin(), E = m_in_queue->m_entry.rend();
+       I != E; ++I) {
     if ((*I)->m_type == MRT_DPRF) {
       evict_req = (*I);
       break;
@@ -399,7 +406,8 @@ mem_req_s* dcu_c::search_pref_in_queue() {
 // If miss in the cache, it will go thru the memory system.
 int dcu_c::access(uop_c* uop) {
   ASSERT(m_level == MEM_L1);
-  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id, uop->m_uop_num);
+  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id,
+             uop->m_uop_num);
 
   if (*m_simBase->m_knobs->KNOB_ENABLE_PHYSICAL_MAPPING) {
     bool success = m_simBase->m_MMU->translate(uop);
@@ -434,8 +442,9 @@ int dcu_c::access(uop_c* uop) {
     uop->m_state = OS_DCACHE_PORT_UNAVAILABLE;
     return 0;
   }
-  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", m_level, m_id, uop->m_uop_num,
-             line_addr, bank);
+  DEBUG_CORE(uop->m_core_id,
+             "L%d[%d] uop_num:%llu addr:0x%llx port:%d acquired\n", m_level,
+             m_id, uop->m_uop_num, line_addr, bank);
 
   // -------------------------------------
   // DCACHE access
@@ -446,8 +455,10 @@ int dcu_c::access(uop_c* uop) {
   } else if (m_disable == true) {
     cache_hit = false;
   } else {
-    int appl_id = m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
-    line = (dcache_data_s*)m_cache->access_cache(vaddr, &line_addr, true, appl_id);
+    int appl_id =
+      m_simBase->m_core_pointers[uop->m_core_id]->get_appl_id(uop->m_thread_id);
+    line =
+      (dcache_data_s*)m_cache->access_cache(vaddr, &line_addr, true, appl_id);
     cache_hit = (line) ? true : false;
 
     if (m_level != MEM_LLC) {
@@ -469,7 +480,8 @@ int dcu_c::access(uop_c* uop) {
       POWER_EVENT(POWER_LLC_R);
     }
     STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
-    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level, m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level,
+               m_id, uop->m_uop_num);
     // stat
     uop->m_uop_info.m_dcmiss = false;
 
@@ -478,13 +490,15 @@ int dcu_c::access(uop_c* uop) {
     // -------------------------------------
     // hardware prefetcher training
     // -------------------------------------
-    m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(MEM_L1, uop->m_thread_id, line_addr, uop->m_pc, uop,
-                                                              true);
+    m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(
+      MEM_L1, uop->m_thread_id, line_addr, uop->m_pc, uop, true);
 
     if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
     }
 
-    if (this->m_ptx_sim && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && type == MEM_ST) {
+    if (this->m_ptx_sim &&
+        *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+        type == MEM_ST) {
       // evict global data on write hit in L1
       m_cache->invalidate_cache_line(vaddr);
 
@@ -502,9 +516,9 @@ int dcu_c::access(uop_c* uop) {
 
       function<bool(mem_req_s*)> done_func = dcache_write_ack_wrapper;
 
-      int result =
-        m_simBase->m_memory->new_mem_req(req_type, req_addr, req_size, cache_hit, true, m_latency, uop, done_func,
-                                         uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
+      int result = m_simBase->m_memory->new_mem_req(
+        req_type, req_addr, req_size, cache_hit, true, m_latency, uop,
+        done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
 
       if (!result) {
         uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
@@ -521,14 +535,15 @@ int dcu_c::access(uop_c* uop) {
   // -------------------------------------
   else {  // !cache_hit
     STAT_EVENT(L1_MISS_CPU + this->m_ptx_sim);
-    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level, m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level,
+               m_id, uop->m_uop_num);
 
     // -------------------------------------
     // hardware prefetcher training
     // -------------------------------------
     if (!m_disable) {
-      m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(MEM_L1, uop->m_thread_id, line_addr, uop->m_pc, uop,
-                                                                false);
+      m_simBase->m_core_pointers[uop->m_core_id]->train_hw_pref(
+        MEM_L1, uop->m_thread_id, line_addr, uop->m_pc, uop, false);
     }
 
     // stat
@@ -585,7 +600,8 @@ int dcu_c::access(uop_c* uop) {
     // Generate a new memory request (MSHR access)
     // -------------------------------------
     function<bool(mem_req_s*)> done_func = NULL;
-    if (this->m_ptx_sim && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+    if (this->m_ptx_sim &&
+        *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         (type == MEM_ST || type == MEM_ST_LM)) {
       done_func = dcache_write_ack_wrapper;
     } else {
@@ -593,9 +609,10 @@ int dcu_c::access(uop_c* uop) {
     }
 
     int result;
-    result = m_simBase->m_memory->new_mem_req(req_type, req_addr, req_size, cache_hit,
-                                              (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func,
-                                              uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
+    result = m_simBase->m_memory->new_mem_req(
+      req_type, req_addr, req_size, cache_hit,
+      (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func,
+      uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
 
     // -------------------------------------
     // MSHR full
@@ -622,11 +639,13 @@ bool dcu_c::fill(mem_req_s* req) {
     req->m_queue = m_fill_queue;
     req->m_state = MEM_FILL_NEW;
     req->m_rdy_cycle = m_cycle + 1;
-    DEBUG_CORE(req->m_core_id, "L%d[%d] (->fill_queue) req:%d type:%s\n", m_level, m_id, req->m_id,
+    DEBUG_CORE(req->m_core_id, "L%d[%d] (->fill_queue) req:%d type:%s\n",
+               m_level, m_id, req->m_id,
                mem_req_c::mem_req_type_name[req->m_type]);
 
     if (m_level != MEM_LLC) {
-      POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
+      POWER_CORE_EVENT(req->m_core_id,
+                       POWER_DCACHE_LINEFILL_BUF_W + m_level - MEM_L1);
     } else {
       POWER_EVENT(POWER_LLC_LINEFILL_BUF_W);
     }
@@ -634,7 +653,8 @@ bool dcu_c::fill(mem_req_s* req) {
   }
 
   if (req->m_type == MRT_WB)
-    DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s fill queue rejected\n", m_level, m_id, req->m_id,
+    DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s fill queue rejected\n",
+               m_level, m_id, req->m_id,
                mem_req_c::mem_req_type_name[req->m_type]);
 
   return false;
@@ -645,8 +665,8 @@ bool dcu_c::insert(mem_req_s* req) {
   if (m_in_queue->push(req)) {
     req->m_queue = m_in_queue;
     req->m_rdy_cycle = m_cycle + m_latency;
-    DEBUG_CORE(req->m_core_id, "L%d[%d] (->in_queue) req:%d type:%s\n", m_level, m_id, req->m_id,
-               mem_req_c::mem_req_type_name[req->m_type]);
+    DEBUG_CORE(req->m_core_id, "L%d[%d] (->in_queue) req:%d type:%s\n", m_level,
+               m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
     return true;
   } else {
     m_retry_queue.emplace_back(req);
@@ -665,7 +685,8 @@ void dcu_c::run_a_cycle(bool pll_lock) {
   }
 
   if (!m_retry_queue.empty()) {
-    for (auto it = m_retry_queue.begin(); it != m_retry_queue.end(); /* do nothing */) {
+    for (auto it = m_retry_queue.begin(); it != m_retry_queue.end();
+         /* do nothing */) {
       if (m_in_queue->push(*it))
         it = m_retry_queue.erase(it);
       else
@@ -692,7 +713,8 @@ void dcu_c::run_a_cycle(bool pll_lock) {
 void dcu_c::process_in_queue() {
   list<mem_req_s*> done_list;
   int count = 0;
-  for (auto I = m_in_queue->m_entry.begin(), E = m_in_queue->m_entry.end(); I != E; ++I) {
+  for (auto I = m_in_queue->m_entry.begin(), E = m_in_queue->m_entry.end();
+       I != E; ++I) {
     if (count == 4) break;
 
     mem_req_s* req = (*I);
@@ -721,8 +743,9 @@ void dcu_c::process_in_queue() {
       cache_hit = false;
     } else if (!m_disable) {
       // for wb request, do not update lru state in case of the hit
-      line = (dcache_data_s*)m_cache->access_cache(req->m_addr, &line_addr, req->m_type == MRT_WB ? false : true,
-                                                   req->m_appl_id);
+      line = (dcache_data_s*)m_cache->access_cache(
+        req->m_addr, &line_addr, req->m_type == MRT_WB ? false : true,
+        req->m_appl_id);
       cache_hit = (line) ? true : false;
 
       if (m_level != MEM_LLC) {
@@ -745,8 +768,9 @@ void dcu_c::process_in_queue() {
       // -------------------------------------
       // hardware prefetcher training
       // -------------------------------------
-      m_simBase->m_core_pointers[req->m_core_id]->train_hw_pref(m_level, req->m_thread_id, req->m_addr, req->m_pc,
-                                                                req->m_uop ? req->m_uop : NULL, true);
+      m_simBase->m_core_pointers[req->m_core_id]->train_hw_pref(
+        m_level, req->m_thread_id, req->m_addr, req->m_pc,
+        req->m_uop ? req->m_uop : NULL, true);
 
       STAT_EVENT(L1_HIT_CPU + (m_level - 1) * 4 + req->m_ptx);
 
@@ -767,18 +791,23 @@ void dcu_c::process_in_queue() {
       // If done_func is enabled in this level, need to call done_func to fill lower levels
       // -------------------------------------
       else if (m_done) {
-        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->done_func()) req:%d type:%s access hit\n", m_level, m_id,
-                   req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(
+          req->m_core_id,
+          "L%d[%d] (in_queue->done_func()) req:%d type:%s access hit\n",
+          m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         if (req->m_done_func && !req->m_done_func(req)) continue;
         req->m_done = true;
       }
       // -------------------------------------
       // Send a fill request to the upper level via direct path
       // -------------------------------------
-      else if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level - 1]) || !m_has_router) {
+      else if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level - 1]) ||
+               !m_has_router) {
         ASSERTM(m_level == MEM_LLC, "Level:%d\n", m_level);
-        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access hit\n", m_level, m_id,
-                   m_level - 1, req->m_cache_id[m_level - 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id,
+                   "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access hit\n",
+                   m_level, m_id, m_level - 1, req->m_cache_id[m_level - 1],
+                   req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         if (!m_prev[req->m_cache_id[m_level - 1]]->fill(req)) continue;
       }
       // LLC cache - decoupled
@@ -788,8 +817,10 @@ void dcu_c::process_in_queue() {
       // -------------------------------------
       else {
         if (!m_out_queue->push(req)) continue;
-        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n", m_level, m_id,
-                   req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id,
+                   "L%d[%d] (in_queue->out_queue) req:%d type:%s access hit\n",
+                   m_level, m_id, req->m_id,
+                   mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUT_FILL;
         req->m_rdy_cycle = m_cycle + 1;
       }
@@ -803,8 +834,9 @@ void dcu_c::process_in_queue() {
     else {
       // hardware prefetcher training
       if (!m_disable) {
-        m_simBase->m_core_pointers[req->m_core_id]->train_hw_pref(m_level, req->m_thread_id, req->m_addr, req->m_pc,
-                                                                  req->m_uop ? req->m_uop : NULL, false);
+        m_simBase->m_core_pointers[req->m_core_id]->train_hw_pref(
+          m_level, req->m_thread_id, req->m_addr, req->m_pc,
+          req->m_uop ? req->m_uop : NULL, false);
         // g_core_pointers[req->m_core_id]->m_hw_pref->train(m_level, req->m_thread_id,
         //    req->m_addr, req->m_pc, req->m_uop ? req->m_uop : NULL, false);
       }
@@ -817,13 +849,18 @@ void dcu_c::process_in_queue() {
       // If there is a direct link from current level and next lower level,
       // directly insert current request to the input queue of lower level
       // -------------------------------------
-      if ((m_coupled_down && m_next_id == req->m_cache_id[m_level + 1]) || !m_has_router) {
-        ASSERT(m_level != MEM_LLC);  // LLC is always connected to memory controllers via noc
+      if ((m_coupled_down && m_next_id == req->m_cache_id[m_level + 1]) ||
+          !m_has_router) {
+        ASSERT(
+          m_level !=
+          MEM_LLC);  // LLC is always connected to memory controllers via noc
         if (!m_next[req->m_cache_id[m_level + 1]]->insert(req)) {
           continue;
         }
-        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access miss\n", m_level, m_id,
-                   m_level + 1, req->m_cache_id[m_level + 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id,
+                   "L%d[%d] (in_queue->L%d[%d]) req:%d type:%s access miss\n",
+                   m_level, m_id, m_level + 1, req->m_cache_id[m_level + 1],
+                   req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       }
       // -------------------------------------
       // Because there is no direct link to the next level, send a request thru NoC
@@ -832,8 +869,10 @@ void dcu_c::process_in_queue() {
         if (!m_out_queue->push(req)) {
           continue;
         }
-        DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue->out_queue) req:%d type:%s access miss\n", m_level, m_id,
-                   req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+        DEBUG_CORE(req->m_core_id,
+                   "L%d[%d] (in_queue->out_queue) req:%d type:%s access miss\n",
+                   m_level, m_id, req->m_id,
+                   mem_req_c::mem_req_type_name[req->m_type]);
         req->m_state = MEM_OUTQUEUE_NEW;
         req->m_rdy_cycle = m_cycle + 1;
       }
@@ -850,10 +889,14 @@ void dcu_c::process_in_queue() {
     m_in_queue->pop((*I));
     if ((*I)->m_done == true) {
       mem_req_s* req = *I;
-      DEBUG_CORE(req->m_core_id, "L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n", m_level, m_id,
-                 req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_cycle - req->m_in);
+      DEBUG_CORE(
+        req->m_core_id,
+        "L%d[%d] (in_queue) req:%d type:%s has been completed lat:%lld\n",
+        m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type],
+        m_cycle - req->m_in);
 
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && req->m_type == MRT_DSTORE) {
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_type == MRT_DSTORE) {
         m_simBase->m_memory->free_write_req(req);
       } else {
         m_simBase->m_memory->free_req(req->m_core_id, req);
@@ -882,7 +925,8 @@ void dcu_c::receive_packet(void) {
       bool insert_done = false;
       if (req->m_msg_type == NOC_FILL || req->m_msg_type == NOC_ACK) {
         insert_done = fill(req);
-      } else if (req->m_msg_type == NOC_NEW || req->m_msg_type == NOC_NEW_WITH_DATA) {
+      } else if (req->m_msg_type == NOC_NEW ||
+                 req->m_msg_type == NOC_NEW_WITH_DATA) {
         insert_done = insert(req);
       } else {
         assert(0);
@@ -908,10 +952,12 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir) {
   req->m_msg_type = msg_type;
 
   bool packet_insert = false;
-  packet_insert = NETWORK->send(req, m_level, m_id, m_level + dir, req->m_cache_id[m_level + dir]);
+  packet_insert = NETWORK->send(req, m_level, m_id, m_level + dir,
+                                req->m_cache_id[m_level + dir]);
 
   if (packet_insert) {
-    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) && (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))) {
+    if (*KNOB(KNOB_BUG_DETECTOR_ENABLE) &&
+        (*KNOB(KNOB_ENABLE_IRIS) || *KNOB(KNOB_ENABLE_NEW_NOC))) {
       m_simBase->m_bug_detector->allocate_noc(req);
     }
 
@@ -928,7 +974,8 @@ bool dcu_c::send_packet(mem_req_s* req, int msg_type, int dir) {
 void dcu_c::process_out_queue() {
   list<mem_req_s*> done_list;
   int count = 0;
-  for (auto I = m_out_queue->m_entry.begin(), E = m_out_queue->m_entry.end(); I != E; ++I) {
+  for (auto I = m_out_queue->m_entry.begin(), E = m_out_queue->m_entry.end();
+       I != E; ++I) {
     if (count == 4) break;
 
     mem_req_s* req = (*I);
@@ -942,16 +989,18 @@ void dcu_c::process_out_queue() {
     // -------------------------------------
     if (req->m_state == MEM_OUTQUEUE_NEW) {
       int msg_type;
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && req->m_with_data &&
-          m_level != MEM_LLC) {
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_with_data && m_level != MEM_LLC) {
         // can change if to req->m_type == MRT_DSTORE
         msg_type = NOC_NEW_WITH_DATA;
       } else {
         msg_type = NOC_NEW;
       }
       if (!send_packet(req, msg_type, 1)) continue;
-      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s (new)\n", m_level, m_id, m_level + 1,
-                 req->m_cache_id[m_level + 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id,
+                 "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s (new)\n",
+                 m_level, m_id, m_level + 1, req->m_cache_id[m_level + 1],
+                 req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     }
@@ -960,8 +1009,8 @@ void dcu_c::process_out_queue() {
     // -------------------------------------
     else if (req->m_state == MEM_OUT_FILL) {
       int msg_type;
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && req->m_with_data &&
-          m_level == MEM_LLC) {
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_with_data && m_level == MEM_LLC) {
         // can change if to req->m_type == MRT_DSTORE
         msg_type = NOC_ACK;
       } else {
@@ -969,8 +1018,10 @@ void dcu_c::process_out_queue() {
       }
 
       if (!send_packet(req, msg_type, -1)) continue;
-      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", m_level, m_id, m_level - 1,
-                 req->m_cache_id[m_level - 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id,
+                 "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n",
+                 m_level, m_id, m_level - 1, req->m_cache_id[m_level - 1],
+                 req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     }
@@ -979,8 +1030,10 @@ void dcu_c::process_out_queue() {
     // -------------------------------------
     else if (req->m_state == MEM_OUT_WB) {
       if (!send_packet(req, NOC_FILL, 1)) continue;
-      DEBUG_CORE(req->m_core_id, "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n", m_level, m_id, m_level + 1,
-                 req->m_cache_id[m_level + 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id,
+                 "L%d[%d]->L%d[%d] (out_queue->noc) req:%d type:%s(fill)\n",
+                 m_level, m_id, m_level + 1, req->m_cache_id[m_level + 1],
+                 req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       done_list.push_back(req);
       ++count;
     } else
@@ -1006,7 +1059,8 @@ void dcu_c::process_fill_queue() {
   list<mem_req_s*> done_list;
   int count = 0;
 
-  for (auto I = m_fill_queue->m_entry.begin(), E = m_fill_queue->m_entry.end(); I != E; ++I) {
+  for (auto I = m_fill_queue->m_entry.begin(), E = m_fill_queue->m_entry.end();
+       I != E; ++I) {
     if (count == 4) break;
 
     // if wb-queue is full, fill request cannot be made
@@ -1014,9 +1068,10 @@ void dcu_c::process_fill_queue() {
 
     mem_req_s* req = (*I);
 
-    if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && m_level == MEM_L1 &&
-        req->m_type == MRT_DSTORE) {
-      ASSERTM(m_done && req->m_done_func && req->m_done_func(req), "done function failed\n");
+    if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+        m_level == MEM_L1 && req->m_type == MRT_DSTORE) {
+      ASSERTM(m_done && req->m_done_func && req->m_done_func(req),
+              "done function failed\n");
       req->m_done = true;
       done_list.push_back(req);
       ++count;
@@ -1024,7 +1079,8 @@ void dcu_c::process_fill_queue() {
     }
 
     if (m_level != MEM_LLC) {
-      POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
+      POWER_CORE_EVENT(req->m_core_id,
+                       POWER_DCACHE_LINEFILL_BUF_R_TAG + m_level - MEM_L1);
     } else {
       POWER_EVENT(POWER_LLC_LINEFILL_BUF_R_TAG);
     }
@@ -1032,7 +1088,8 @@ void dcu_c::process_fill_queue() {
     if (req->m_rdy_cycle > m_cycle) continue;
 
     if (m_level != MEM_LLC) {
-      POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
+      POWER_CORE_EVENT(req->m_core_id,
+                       POWER_DCACHE_LINEFILL_BUF_R + m_level - MEM_L1);
     } else {
       POWER_EVENT(POWER_LLC_LINEFILL_BUF_R);
     }
@@ -1051,7 +1108,8 @@ void dcu_c::process_fill_queue() {
 
         // Access cache to check whether there is the same line in the cache.
         if (!m_disable) {
-          line = (dcache_data_s*)m_cache->access_cache(req->m_addr, &line_addr, false, req->m_appl_id);
+          line = (dcache_data_s*)m_cache->access_cache(req->m_addr, &line_addr,
+                                                       false, req->m_appl_id);
           cache_hit = (line) ? true : false;
         }
 
@@ -1067,8 +1125,9 @@ void dcu_c::process_fill_queue() {
           // Insert a cache line
           // -------------------------------------
           dcache_data_s* data;
-          data = (dcache_data_s*)m_cache->insert_cache(req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id,
-                                                       req->m_ptx);
+          data = (dcache_data_s*)m_cache->insert_cache(
+            req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id,
+            req->m_ptx);
 
           if (m_level != MEM_LLC) {
             POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level - 1));
@@ -1087,20 +1146,25 @@ void dcu_c::process_fill_queue() {
               }
 
               // new write-back request
-              mem_req_s* wb = m_simBase->m_memory->new_wb_req(victim_line_addr, m_line_size, m_ptx_sim, data, m_level);
+              mem_req_s* wb = m_simBase->m_memory->new_wb_req(
+                victim_line_addr, m_line_size, m_ptx_sim, data, m_level);
 
               wb->m_rdy_cycle = m_cycle + 1;
 
               if (!m_wb_queue->push(wb)) ASSERT(0);
 
               if (m_level != MEM_LLC) {
-                POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
+                POWER_CORE_EVENT(req->m_core_id,
+                                 POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
               } else {
                 POWER_EVENT(POWER_LLC_WB_BUF_W);
               }
 
-              DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue) new_wb_req:%d addr:0x%llx type:%s by req:%d\n", m_level,
-                         m_id, wb->m_id, victim_line_addr, mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
+              DEBUG_CORE(req->m_core_id,
+                         "L%d[%d] (fill_queue) new_wb_req:%d addr:0x%llx "
+                         "type:%s by req:%d\n",
+                         m_level, m_id, wb->m_id, victim_line_addr,
+                         mem_req_c::mem_req_type_name[wb->m_type], req->m_id);
             }
           }
 
@@ -1118,18 +1182,25 @@ void dcu_c::process_fill_queue() {
 
         // L2: done function has been called in this level
         if (m_done == true) {
-          ASSERTM(m_level != MEM_LLC, "req:%d type:%s", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+          ASSERTM(m_level != MEM_LLC, "req:%d type:%s", req->m_id,
+                  mem_req_c::mem_req_type_name[req->m_type]);
           if (req->m_done_func && !req->m_done_func(req)) {
             req->m_state = MEM_FILL_WAIT_DONE;
             continue;
           }
           req->m_done = true;
-          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n", m_level, m_id,
-                     cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+          DEBUG_CORE(
+            req->m_core_id,
+            "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
+            m_level, m_id, cache_hit, req->m_id,
+            mem_req_c::mem_req_type_name[req->m_type]);
         } else if (req->m_type == MRT_WB) {
           req->m_done = true;
-          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n", m_level, m_id,
-                     cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+          DEBUG_CORE(
+            req->m_core_id,
+            "L%d[%d] (fill_queue->done_func()) hit:%d req:%d type:%s filled\n",
+            m_level, m_id, cache_hit, req->m_id,
+            mem_req_c::mem_req_type_name[req->m_type]);
         } else {
           // Disabled Cache
           if (m_disable) {
@@ -1138,28 +1209,38 @@ void dcu_c::process_fill_queue() {
                 req->m_state = MEM_FILL_WAIT_FILL;
                 continue;
               }
-              DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s bypass\n", m_level, m_id,
-                         m_level - 1, req->m_cache_id[m_level - 1], cache_hit, req->m_id,
-                         mem_req_c::mem_req_type_name[req->m_type]);
+              DEBUG_CORE(
+                req->m_core_id,
+                "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s bypass\n",
+                m_level, m_id, m_level - 1, req->m_cache_id[m_level - 1],
+                cache_hit, req->m_id,
+                mem_req_c::mem_req_type_name[req->m_type]);
             } else {
               if (!m_out_queue->push(req)) {
                 req->m_state = MEM_FILL_WAIT_FILL;
                 continue;
               }
               req->m_state = MEM_OUT_FILL;
-              DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->out_queue) hit:%d req:%d type:%s filled\n", m_level,
-                         m_id, cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+              DEBUG_CORE(req->m_core_id,
+                         "L%d[%d] (fill_queue->out_queue) hit:%d req:%d "
+                         "type:%s filled\n",
+                         m_level, m_id, cache_hit, req->m_id,
+                         mem_req_c::mem_req_type_name[req->m_type]);
             }
           }
           // COUPLED LLC OR without router: fill upper level cache
-          else if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level - 1]) || !m_has_router) {
+          else if ((m_coupled_up &&
+                    m_prev_id == req->m_cache_id[m_level - 1]) ||
+                   !m_has_router) {
             if (!m_prev[req->m_cache_id[m_level - 1]]->fill(req)) {
               req->m_state = MEM_FILL_WAIT_FILL;
               continue;
             }
-            DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s filled\n", m_level, m_id,
-                       m_level - 1, req->m_cache_id[m_level - 1], cache_hit, req->m_id,
-                       mem_req_c::mem_req_type_name[req->m_type]);
+            DEBUG_CORE(
+              req->m_core_id,
+              "L%d[%d] (fill_queue->L%d[%d]) hit:%d req:%d type:%s filled\n",
+              m_level, m_id, m_level - 1, req->m_cache_id[m_level - 1],
+              cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
           }
           // DECOUPLED LLC: send to busout queue
           else {
@@ -1168,8 +1249,11 @@ void dcu_c::process_fill_queue() {
               continue;
             }
             req->m_state = MEM_OUT_FILL;
-            DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->out_queue) hit:%d req:%d type:%s filled\n", m_level, m_id,
-                       cache_hit, req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+            DEBUG_CORE(
+              req->m_core_id,
+              "L%d[%d] (fill_queue->out_queue) hit:%d req:%d type:%s filled\n",
+              m_level, m_id, cache_hit, req->m_id,
+              mem_req_c::mem_req_type_name[req->m_type]);
           }
         }
         done_list.push_back(req);
@@ -1193,13 +1277,16 @@ void dcu_c::process_fill_queue() {
       // -------------------------------------
       case MEM_FILL_WAIT_FILL: {
         // COUPLED LLC OR without router: fill upper level cache
-        if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level - 1]) || !m_has_router) {
+        if ((m_coupled_up && m_prev_id == req->m_cache_id[m_level - 1]) ||
+            !m_has_router) {
           if (!m_prev[req->m_cache_id[m_level - 1]]->fill(req)) {
             req->m_state = MEM_FILL_WAIT_FILL;
             continue;
           }
-          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->L%d[%d]) req:%d type:%s filled\n", m_level, m_id,
-                     m_level - 1, req->m_cache_id[m_level - 1], req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+          DEBUG_CORE(req->m_core_id,
+                     "L%d[%d] (fill_queue->L%d[%d]) req:%d type:%s filled\n",
+                     m_level, m_id, m_level - 1, req->m_cache_id[m_level - 1],
+                     req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
         }
         // DECOUPLED LLC: send to busout queue
         else {
@@ -1208,8 +1295,10 @@ void dcu_c::process_fill_queue() {
             continue;
           }
           req->m_state = MEM_OUT_FILL;
-          DEBUG_CORE(req->m_core_id, "L%d[%d] (fill_queue->out_queue) req:%d type:%s filled\n", m_level, m_id,
-                     req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+          DEBUG_CORE(req->m_core_id,
+                     "L%d[%d] (fill_queue->out_queue) req:%d type:%s filled\n",
+                     m_level, m_id, req->m_id,
+                     mem_req_c::mem_req_type_name[req->m_type]);
         }
         done_list.push_back(req);
         ++count;
@@ -1227,10 +1316,14 @@ void dcu_c::process_fill_queue() {
     m_fill_queue->pop((*I));
     if ((*I)->m_done == true) {
       mem_req_s* req = *I;
-      DEBUG_CORE(req->m_core_id, "L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n", m_level, m_id,
-                 req->m_id, mem_req_c::mem_req_type_name[req->m_type], m_cycle - req->m_in);
+      DEBUG_CORE(
+        req->m_core_id,
+        "L%d[%d] fill_queue req:%d type:%s has been completed lat:%lld\n",
+        m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type],
+        m_cycle - req->m_in);
 
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && req->m_type == MRT_DSTORE) {
+      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+          req->m_type == MRT_DSTORE) {
         m_simBase->m_memory->free_write_req(req);
       } else {
         m_memory->free_req(req->m_core_id, req);
@@ -1247,13 +1340,15 @@ void dcu_c::process_fill_queue() {
 void dcu_c::process_wb_queue() {
   list<mem_req_s*> done_list;
   int count = 0;
-  for (auto I = m_wb_queue->m_entry.begin(), E = m_wb_queue->m_entry.end(); I != E; ++I) {
+  for (auto I = m_wb_queue->m_entry.begin(), E = m_wb_queue->m_entry.end();
+       I != E; ++I) {
     if (count == 4) break;
 
     mem_req_s* req = (*I);
 
     if (m_level != MEM_LLC) {
-      POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R_TAG + m_level - MEM_L1);
+      POWER_CORE_EVENT(req->m_core_id,
+                       POWER_DCACHE_WB_BUF_R_TAG + m_level - MEM_L1);
     } else {
       POWER_EVENT(POWER_LLC_WB_BUF_R_TAG);
     }
@@ -1261,23 +1356,28 @@ void dcu_c::process_wb_queue() {
     if (req->m_rdy_cycle > m_cycle) continue;
 
     if (m_level != MEM_LLC) {
-      POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
+      POWER_CORE_EVENT(req->m_core_id,
+                       POWER_DCACHE_WB_BUF_R + m_level - MEM_L1);
     } else {
       POWER_EVENT(POWER_LLC_WB_BUF_R);
     }
 
     // L1 and L2 : insert next level's in_queue
-    if (m_level != MEM_LLC && m_coupled_down == true && m_next_id == req->m_cache_id[m_level + 1]) {
+    if (m_level != MEM_LLC && m_coupled_down == true &&
+        m_next_id == req->m_cache_id[m_level + 1]) {
       // if (!m_next->insert(req))
       if (!m_next[m_next_id]->fill(req)) continue;
-      DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s inserted to L%d[%d]\n", m_level, m_id, req->m_id,
-                 mem_req_c::mem_req_type_name[req->m_type], m_level + 1, req->m_cache_id[m_level + 1]);
+      DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s inserted to L%d[%d]\n",
+                 m_level, m_id, req->m_id,
+                 mem_req_c::mem_req_type_name[req->m_type], m_level + 1,
+                 req->m_cache_id[m_level + 1]);
     }
     // LLC : send to dram controller
     else {
       if (!m_out_queue->push(req)) continue;
-      DEBUG_CORE(req->m_core_id, "L%d[%d] req:%d type:%s send to busout queue\n", m_level, m_id, req->m_id,
-                 mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG_CORE(req->m_core_id,
+                 "L%d[%d] req:%d type:%s send to busout queue\n", m_level, m_id,
+                 req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
       req->m_state = MEM_OUT_WB;
     }
 
@@ -1318,13 +1418,15 @@ bool dcu_c::done(mem_req_s* req) {
     }
 
     // for the safety check, do not insert duplicate blocks
-    line = (dcache_data_s*)m_cache->access_cache(addr, &line_addr, false, req->m_appl_id);
+    line = (dcache_data_s*)m_cache->access_cache(addr, &line_addr, false,
+                                                 req->m_appl_id);
 
     if (!line) {
       // -------------------------------------
       // DCACHE insertion
       // -------------------------------------
-      data = (dcache_data_s*)m_cache->insert_cache(addr, &line_addr, &repl_line_addr, req->m_appl_id, req->m_ptx);
+      data = (dcache_data_s*)m_cache->insert_cache(
+        addr, &line_addr, &repl_line_addr, req->m_appl_id, req->m_ptx);
 
       if (m_level != MEM_LLC) {
         POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level - 1));
@@ -1347,18 +1449,23 @@ bool dcu_c::done(mem_req_s* req) {
           }
 
           // new write back request
-          mem_req_s* wb = m_simBase->m_memory->new_wb_req(repl_line_addr, m_line_size, m_ptx_sim, data, m_level);
+          mem_req_s* wb = m_simBase->m_memory->new_wb_req(
+            repl_line_addr, m_line_size, m_ptx_sim, data, m_level);
 
           wb->m_rdy_cycle = m_cycle + 1;
 
           // FIXME(jaekyu, 10-26-2011) - queue rejection
           if (!m_wb_queue->push(wb)) ASSERT(0);
 
-          DEBUG_CORE(req->m_core_id, "L%d[%d] (done) new_wb_req:%d addr:0x%llx by req:%d type:%s\n", m_level, m_id,
-                     wb->m_id, repl_line_addr, req->m_id, mem_req_c::mem_req_type_name[MRT_WB]);
+          DEBUG_CORE(
+            req->m_core_id,
+            "L%d[%d] (done) new_wb_req:%d addr:0x%llx by req:%d type:%s\n",
+            m_level, m_id, wb->m_id, repl_line_addr, req->m_id,
+            mem_req_c::mem_req_type_name[MRT_WB]);
 
           if (m_level != MEM_LLC) {
-            POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
+            POWER_CORE_EVENT(req->m_core_id,
+                             POWER_DCACHE_WB_BUF_W + m_level - MEM_L1);
           } else {
             POWER_EVENT(POWER_LLC_WB_BUF_W);
           }
@@ -1377,8 +1484,9 @@ bool dcu_c::done(mem_req_s* req) {
 
   if (req->m_uop) {
     uop_c* uop = req->m_uop;
-    DEBUG_CORE(req->m_core_id, "req_id:%d inst:%lld uop:%lld done in_cycle:%llu\n", req->m_id, uop->m_inst_num,
-               uop->m_uop_num, req->m_in_global);
+    DEBUG_CORE(req->m_core_id,
+               "req_id:%d inst:%lld uop:%lld done in_cycle:%llu\n", req->m_id,
+               uop->m_inst_num, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
     if (m_ptx_sim || m_igpu_sim) {
@@ -1387,8 +1495,9 @@ bool dcu_c::done(mem_req_s* req) {
         ++puop->m_num_child_uops_done;
         if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
           if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-            m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready(puop->m_thread_id,
-                                                                                        puop->m_uop_num);
+            m_simBase->m_core_pointers[puop->m_core_id]
+              ->get_frontend()
+              ->set_load_ready(puop->m_thread_id, puop->m_uop_num);
           }
 
           puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
@@ -1397,7 +1506,9 @@ bool dcu_c::done(mem_req_s* req) {
       }  // uop->m_parent_uop
       else {
         if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-          m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready(uop->m_thread_id, uop->m_uop_num);
+          m_simBase->m_core_pointers[uop->m_core_id]
+            ->get_frontend()
+            ->set_load_ready(uop->m_thread_id, uop->m_uop_num);
         }
       }
     }
@@ -1416,8 +1527,9 @@ bool dcu_c::write_done(mem_req_s* req) {
       ++puop->m_num_child_uops_done;
       if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
         if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-          m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready(puop->m_thread_id,
-                                                                                      puop->m_uop_num);
+          m_simBase->m_core_pointers[puop->m_core_id]
+            ->get_frontend()
+            ->set_load_ready(puop->m_thread_id, puop->m_uop_num);
         }
 
         puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
@@ -1426,7 +1538,9 @@ bool dcu_c::write_done(mem_req_s* req) {
     }  // uop->m_parent_uop
     else {
       if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-        m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready(uop->m_thread_id, uop->m_uop_num);
+        m_simBase->m_core_pointers[uop->m_core_id]
+          ->get_frontend()
+          ->set_load_ready(uop->m_thread_id, uop->m_uop_num);
       }
     }
   }
@@ -1450,7 +1564,8 @@ int memory_c::m_unique_id = 0;
 // =======================================
 memory_c::memory_c(macsim_c* simBase) {
   m_simBase = simBase;
-  REPORT("Memory system(%s) has been initialized.\n", KNOB(KNOB_MEMORY_TYPE)->getValue().c_str());
+  REPORT("Memory system(%s) has been initialized.\n",
+         KNOB(KNOB_MEMORY_TYPE)->getValue().c_str());
 
   m_num_core = *m_simBase->m_knobs->KNOB_NUM_SIM_CORES;
   m_num_l3 = *m_simBase->m_knobs->KNOB_NUM_L3;
@@ -1502,28 +1617,36 @@ memory_c::memory_c(macsim_c* simBase) {
 
   int id = 0;
   for (int ii = 0; ii < num_large_core; ++id, ++ii) {
-    m_l1_cache[id] = new dcu_c(id, UNIT_LARGE, MEM_L1, this, id, m_l2_cache, NULL, simBase);
-    m_l2_cache[id] = new dcu_c(id, UNIT_LARGE, MEM_L2, this, id + m_num_core, m_llc_cache, m_l1_cache, simBase);
+    m_l1_cache[id] =
+      new dcu_c(id, UNIT_LARGE, MEM_L1, this, id, m_l2_cache, NULL, simBase);
+    m_l2_cache[id] = new dcu_c(id, UNIT_LARGE, MEM_L2, this, id + m_num_core,
+                               m_llc_cache, m_l1_cache, simBase);
   }
 
   for (int ii = 0; ii < num_medium_core; ++id, ++ii) {
-    m_l1_cache[id] = new dcu_c(id, UNIT_MEDIUM, MEM_L1, this, id, m_l2_cache, NULL, simBase);
-    m_l2_cache[id] = new dcu_c(id, UNIT_MEDIUM, MEM_L2, this, id + m_num_core, m_llc_cache, m_l1_cache, simBase);
+    m_l1_cache[id] =
+      new dcu_c(id, UNIT_MEDIUM, MEM_L1, this, id, m_l2_cache, NULL, simBase);
+    m_l2_cache[id] = new dcu_c(id, UNIT_MEDIUM, MEM_L2, this, id + m_num_core,
+                               m_llc_cache, m_l1_cache, simBase);
   }
 
   for (int ii = 0; ii < num_small_core; ++id, ++ii) {
-    m_l1_cache[id] = new dcu_c(id, UNIT_SMALL, MEM_L1, this, id, m_l2_cache, NULL, simBase);
-    m_l2_cache[id] = new dcu_c(id, UNIT_SMALL, MEM_L2, this, id + m_num_core, m_llc_cache, m_l1_cache, simBase);
+    m_l1_cache[id] =
+      new dcu_c(id, UNIT_SMALL, MEM_L1, this, id, m_l2_cache, NULL, simBase);
+    m_l2_cache[id] = new dcu_c(id, UNIT_SMALL, MEM_L2, this, id + m_num_core,
+                               m_llc_cache, m_l1_cache, simBase);
   }
 
   // L3 cache
   id += m_num_core;
   for (int ii = 0; ii < m_num_l3; ++ii, ++id)
-    m_l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L3, this, id, m_llc_cache, m_l2_cache, simBase);
+    m_l3_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_L3, this, id, m_llc_cache,
+                               m_l2_cache, simBase);
 
   // LLC cache
   for (int ii = 0; ii < m_num_llc; ++ii, ++id)
-    m_llc_cache[ii] = new dcu_c(ii, UNIT_LARGE, MEM_LLC, this, id, NULL, m_l3_cache, simBase);
+    m_llc_cache[ii] =
+      new dcu_c(ii, UNIT_LARGE, MEM_LLC, this, id, NULL, m_l3_cache, simBase);
 
   m_noc_index_base[MEM_L1] = 0;
   m_noc_index_base[MEM_L2] = m_num_core;
@@ -1536,17 +1659,19 @@ memory_c::memory_c(macsim_c* simBase) {
   m_cycle = 0;
 
   if (*m_simBase->m_knobs->KNOB_DEFAULT_INTERLEAVING) {
-    m_l3_interleave_factor =
-      log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
+    m_l3_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_L3_NUM_SET) +
+                             log2_int(*m_simBase->m_knobs->KNOB_L3_LINE_SIZE);
     m_l3_interleave_factor = static_cast<int>(pow(2, m_l3_interleave_factor));
 
-    m_llc_interleave_factor =
-      log2_int(*m_simBase->m_knobs->KNOB_LLC_NUM_SET) + log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE);
+    m_llc_interleave_factor = log2_int(*m_simBase->m_knobs->KNOB_LLC_NUM_SET) +
+                              log2_int(*m_simBase->m_knobs->KNOB_LLC_LINE_SIZE);
     m_llc_interleave_factor = static_cast<int>(pow(2, m_llc_interleave_factor));
 
     m_dram_interleave_factor =
-      log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) + log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
-    m_dram_interleave_factor = static_cast<int>(pow(2, m_dram_interleave_factor));
+      log2_int(*m_simBase->m_knobs->KNOB_DRAM_ROWBUFFER_SIZE) +
+      log2_int(*m_simBase->m_knobs->KNOB_DRAM_NUM_BANKS);
+    m_dram_interleave_factor =
+      static_cast<int>(pow(2, m_dram_interleave_factor));
   }
   // diff granularity for LLC and DRAM
   else if (*m_simBase->m_knobs->KNOB_NEW_INTERLEAVING_DIFF_GRANULARITY) {
@@ -1596,11 +1721,13 @@ void memory_c::init(void) {
 
 // generate a new memory request
 // called from 1) data cache, 2) instruction cache, and 3) prefetcher
-bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hit, bool with_data, uns delay,
-                           uop_c* uop, function<bool(mem_req_s*)> done_func, Counter unique_num,
-                           pref_req_info_s* pref_info, int core_id, int thread_id, bool ptx) {
-  DEBUG_CORE(core_id, "MSHR[%d] new_req type:%s (%d)\n", core_id, mem_req_c::mem_req_type_name[type],
-             (int)m_mshr[core_id].size());
+bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size,
+                           bool cache_hit, bool with_data, uns delay,
+                           uop_c* uop, function<bool(mem_req_s*)> done_func,
+                           Counter unique_num, pref_req_info_s* pref_info,
+                           int core_id, int thread_id, bool ptx) {
+  DEBUG_CORE(core_id, "MSHR[%d] new_req type:%s (%d)\n", core_id,
+             mem_req_c::mem_req_type_name[type], (int)m_mshr[core_id].size());
 
   if (m_stop_prefetch > m_cycle && type == MRT_DPRF) {
     DEBUG_CORE(core_id, "PREFETCHING blocked\n");
@@ -1625,12 +1752,14 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
     }
   }
 
-  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && type == MRT_DSTORE) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      type == MRT_DSTORE) {
     STAT_CORE_EVENT(core_id, NUM_WRITES);
     STAT_EVENT(TOTAL_WRITES);
   }
 
-  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && matching_req && type == MRT_DSTORE) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      matching_req && type == MRT_DSTORE) {
     // nbl: TBD dec-20-2012
     // store matching a load, we cannot have a load matching
     // a store because stores are not allocated mshrs
@@ -1642,10 +1771,11 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
       return true;
     } else if (matching_req->m_type == MRT_DPRF) {
       // promotion from hardware prefetch to demand
-      DEBUG_CORE(core_id, "req:%d has been promoted type:%s\n", matching_req->m_id,
+      DEBUG_CORE(core_id, "req:%d has been promoted type:%s\n",
+                 matching_req->m_id,
                  mem_req_c::mem_req_type_name[matching_req->m_type]);
-      adjust_req(matching_req, type, addr, size, delay, uop, done_func, unique_num, g_mem_priority[type], core_id,
-                 thread_id, ptx);
+      adjust_req(matching_req, type, addr, size, delay, uop, done_func,
+                 unique_num, g_mem_priority[type], core_id, thread_id, ptx);
       return true;
     } else if (matching_req->m_type == MRT_WB) {
       ASSERT(0);
@@ -1668,7 +1798,8 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   // allocate an entry
   mem_req_s* new_req = NULL;
 
-  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && type == MRT_DSTORE) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      type == MRT_DSTORE) {
     new_req = m_mem_req_pool->acquire_entry(m_simBase);
   } else {
     new_req = allocate_new_entry(core_id);
@@ -1702,26 +1833,30 @@ bool memory_c::new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hi
   Counter priority = g_mem_priority[type];
 
   // init new request
-  init_new_req(new_req, type, addr, size, with_data, delay, uop, done_func, unique_num, priority, core_id, thread_id,
-               ptx);
+  init_new_req(new_req, type, addr, size, with_data, delay, uop, done_func,
+               unique_num, priority, core_id, thread_id, ptx);
 
   // merge to existing request
-  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f && matching_req && type == MRT_DSTORE) {
+  if (ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      matching_req && type == MRT_DSTORE) {
     // nbl: TBD - dec-20-2012
     // store matching a load, we cannot have a load matching
     // a store because stores are not allocated mshrs
   } else if (matching_req) {
     STAT_EVENT(TOTAL_MEMORY_MERGE);
-    DEBUG_CORE(core_id, "req:%d addr:0x%llx has matching entry req:%d addr:0x%llx type:%s\n", new_req->m_id,
-               new_req->m_addr, matching_req->m_id, matching_req->m_addr,
-               mem_req_c::mem_req_type_name[matching_req->m_type]);
+    DEBUG_CORE(
+      core_id,
+      "req:%d addr:0x%llx has matching entry req:%d addr:0x%llx type:%s\n",
+      new_req->m_id, new_req->m_addr, matching_req->m_id, matching_req->m_addr,
+      mem_req_c::mem_req_type_name[matching_req->m_type]);
 
     matching_req->m_merge.push_back(new_req);
     new_req->m_merged_req = matching_req;
     new_req->m_state = MEM_MERGED;
 
     // adjust priority
-    if (matching_req->m_priority < priority) matching_req->m_priority = priority;
+    if (matching_req->m_priority < priority)
+      matching_req->m_priority = priority;
 
     return true;
   }
@@ -1745,7 +1880,8 @@ mem_req_s* memory_c::allocate_new_entry(int core_id) {
 
 // search matching request
 mem_req_s* memory_c::search_req(int core_id, Addr addr, int size) {
-  for (auto I = m_mshr[core_id].begin(), E = m_mshr[core_id].end(); I != E; ++I) {
+  for (auto I = m_mshr[core_id].begin(), E = m_mshr[core_id].end(); I != E;
+       ++I) {
     mem_req_s* req = (*I);
     if (req->m_addr <= addr && req->m_addr + req->m_size >= addr + size) {
       return req;
@@ -1756,9 +1892,11 @@ mem_req_s* memory_c::search_req(int core_id, Addr addr, int size) {
 }
 
 // initialize a new request
-void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, bool with_data, int delay,
-                            uop_c* uop, function<bool(mem_req_s*)> done_func, Counter unique_num, Counter priority,
-                            int core_id, int thread_id, bool ptx) {
+void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr,
+                            int size, bool with_data, int delay, uop_c* uop,
+                            function<bool(mem_req_s*)> done_func,
+                            Counter unique_num, Counter priority, int core_id,
+                            int thread_id, bool ptx) {
   req->m_id = m_unique_id++;
   req->m_appl_id = m_simBase->m_core_pointers[core_id]->get_appl_id(thread_id);
   req->m_core_id = core_id;
@@ -1793,8 +1931,10 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int si
 }
 
 // adjust a new request
-void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, int delay, uop_c* uop,
-                          function<bool(mem_req_s*)> done_func, Counter unique_num, Counter priority, int core_id,
+void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr,
+                          int size, int delay, uop_c* uop,
+                          function<bool(mem_req_s*)> done_func,
+                          Counter unique_num, Counter priority, int core_id,
                           int thread_id, bool ptx) {
   req->m_appl_id = m_simBase->m_core_pointers[core_id]->get_appl_id(thread_id);
   ;
@@ -1829,8 +1969,10 @@ void memory_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_LLC] = BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
+  req->m_cache_id[MEM_LLC] =
+    BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
+  req->m_cache_id[MEM_MC] =
+    BANK(req->m_addr, m_num_mc, *KNOB(KNOB_DRAM_INTERLEAVE_FACTOR));
 }
 
 // deallocate a memory request
@@ -1840,11 +1982,13 @@ void memory_c::free_req(int core_id, mem_req_s* req) {
 
   // when there are still merged requests, call done wrapper function
   if (!req->m_merge.empty()) {
-    DEBUG_CORE(req->m_core_id, "req:%d has merged req type:%s\n", req->m_id, mem_req_c::mem_req_type_name[req->m_type]);
+    DEBUG_CORE(req->m_core_id, "req:%d has merged req type:%s\n", req->m_id,
+               mem_req_c::mem_req_type_name[req->m_type]);
     dcache_fill_line_wrapper(req);
   }
 
-  ASSERTM(req->m_merge.empty(), "type:%s\n", mem_req_c::mem_req_type_name[req->m_type]);
+  ASSERTM(req->m_merge.empty(), "type:%s\n",
+          mem_req_c::mem_req_type_name[req->m_type]);
 
   if (req->m_type == MRT_WB) {
     delete req;
@@ -1907,7 +2051,8 @@ bool memory_c::get_read_port(int core_id, int bank_id) {
 }
 
 // access data cache
-dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr* line_addr, bool update, int appl_id) {
+dcache_data_s* memory_c::access_cache(int core_id, Addr addr, Addr* line_addr,
+                                      bool update, int appl_id) {
   return m_l1_cache[core_id]->access_cache(addr, line_addr, update, appl_id);
 }
 
@@ -1924,10 +2069,12 @@ void memory_c::run_a_cycle_core(int core_id, bool pll_lock) {
 
 void memory_c::run_a_cycle_uncore(bool pll_lock) {
   int index = m_cycle % m_num_llc;
-  for (int ii = index; ii < index + m_num_llc; ++ii) m_llc_cache[ii % m_num_llc]->run_a_cycle(pll_lock);
+  for (int ii = index; ii < index + m_num_llc; ++ii)
+    m_llc_cache[ii % m_num_llc]->run_a_cycle(pll_lock);
 
   index = m_cycle % m_num_l3;
-  for (int ii = index; ii < index + m_num_l3; ++ii) m_l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
+  for (int ii = index; ii < index + m_num_l3; ++ii)
+    m_l3_cache[ii % m_num_l3]->run_a_cycle(pll_lock);
 }
 
 // evict a prefetch request
@@ -1941,8 +2088,10 @@ mem_req_s* memory_c::evict_prefetch(int core_id) {
 }
 
 // new write-back request
-#define GET_APPL_ID(xx, yy) (m_simBase->m_core_pointers[(xx)]->get_appl_id((yy)))
-mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* data, int level) {
+#define GET_APPL_ID(xx, yy) \
+  (m_simBase->m_core_pointers[(xx)]->get_appl_id((yy)))
+mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx,
+                                dcache_data_s* data, int level) {
   STAT_EVENT(TOTAL_WB);
   STAT_EVENT(L1_WB + (level - 1));
   mem_req_s* req = new mem_req_s(m_simBase);
@@ -1988,16 +2137,23 @@ void memory_c::print_mshr(void) {
   FILE* fp = fopen("bug_detect_mem.out", "w");
   for (int ii = 0; ii < m_num_core; ++ii) {
     fprintf(fp, "== Core %d ==\n", ii);
-    fprintf(fp, "%-20s %-10s %-10s %-15s %-15s %-7s %-20s %-15s %-15s\n", "ID", "IN_TIME", "DELTA", "TYPE", "STATE",
-            "MERGED", "MERGED_ID", "MERGED_TYPE", "MERGED_STATE");
+    fprintf(fp, "%-20s %-10s %-10s %-15s %-15s %-7s %-20s %-15s %-15s\n", "ID",
+            "IN_TIME", "DELTA", "TYPE", "STATE", "MERGED", "MERGED_ID",
+            "MERGED_TYPE", "MERGED_STATE");
 
     for (auto I = m_mshr[ii].begin(), E = m_mshr[ii].end(); I != E; ++I) {
       mem_req_s* req = (*I);
-      fprintf(fp, "%-20d %-10llu %-10llu %-15s %-15s %-7d %-20d %-15s %-15s\n", req->m_id, req->m_in,
-              m_cycle - req->m_in, mem_req_c::mem_req_type_name[req->m_type], mem_req_c::mem_state[req->m_state],
-              (req->m_merged_req ? 1 : 0), (req->m_merged_req ? req->m_merged_req->m_id : -1),
-              (req->m_merged_req ? mem_req_c::mem_req_type_name[req->m_merged_req->m_type] : "NULL"),
-              (req->m_merged_req ? mem_req_c::mem_state[req->m_merged_req->m_state] : NULL));
+      fprintf(
+        fp, "%-20d %-10llu %-10llu %-15s %-15s %-7d %-20d %-15s %-15s\n",
+        req->m_id, req->m_in, m_cycle - req->m_in,
+        mem_req_c::mem_req_type_name[req->m_type],
+        mem_req_c::mem_state[req->m_state], (req->m_merged_req ? 1 : 0),
+        (req->m_merged_req ? req->m_merged_req->m_id : -1),
+        (req->m_merged_req
+           ? mem_req_c::mem_req_type_name[req->m_merged_req->m_type]
+           : "NULL"),
+        (req->m_merged_req ? mem_req_c::mem_state[req->m_merged_req->m_state]
+                           : NULL));
     }
     fprintf(fp, "\n");
   }
@@ -2007,7 +2163,8 @@ void memory_c::print_mshr(void) {
 // flush all prefetches in the mshr
 void memory_c::flush_prefetch(int core_id) {
   list<mem_req_s*> done_list;
-  for (auto I = m_mshr[core_id].begin(), E = m_mshr[core_id].end(); I != E; ++I) {
+  for (auto I = m_mshr[core_id].begin(), E = m_mshr[core_id].end(); I != E;
+       ++I) {
     if ((*I)->m_type == MRT_DPRF && (*I)->m_merge.empty()) {
       done_list.push_back((*I));
     }
@@ -2021,7 +2178,8 @@ void memory_c::flush_prefetch(int core_id) {
   }
 }
 
-void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache) {
+void memory_c::handle_coherence(int level, bool hit, bool store, Addr addr,
+                                dcu_c* cache) {
   int state = I_STATE;
 
   // READ Hit
@@ -2129,7 +2287,8 @@ void memory_c::handle_coherence()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-llc_coupled_network_c::llc_coupled_network_c(macsim_c* simBase) : memory_c(simBase) {
+llc_coupled_network_c::llc_coupled_network_c(macsim_c* simBase)
+  : memory_c(simBase) {
   ASSERT(m_num_core == m_num_llc);
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
@@ -2146,16 +2305,19 @@ llc_coupled_network_c::~llc_coupled_network_c() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-llc_decoupled_network_c::llc_decoupled_network_c(macsim_c* simBase) : memory_c(simBase) {
+llc_decoupled_network_c::llc_decoupled_network_c(macsim_c* simBase)
+  : memory_c(simBase) {
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true, false, false);
     m_l2_cache[ii]->init(-1, ii, true, true, false, false, true);
   }
 
-  for (int ii = 0; ii < m_num_l3; ++ii) m_l3_cache[ii]->init(-1, -1, false, false, false, true, true);
+  for (int ii = 0; ii < m_num_l3; ++ii)
+    m_l3_cache[ii]->init(-1, -1, false, false, false, true, true);
 
-  for (int ii = 0; ii < m_num_llc; ++ii) m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
+  for (int ii = 0; ii < m_num_llc; ++ii)
+    m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
 
   NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_llc, m_num_mc);
 }
@@ -2185,7 +2347,8 @@ void l2_coupled_local_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_LLC] = req->m_core_id;
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_MC] = BANK(
+    req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2209,12 +2372,14 @@ void no_cache_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_LLC] = req->m_core_id;
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_MC] = BANK(
+    req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-l2_decoupled_network_c::l2_decoupled_network_c(macsim_c* simBase) : memory_c(simBase) {
+l2_decoupled_network_c::l2_decoupled_network_c(macsim_c* simBase)
+  : memory_c(simBase) {
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true, false, false);
@@ -2222,10 +2387,12 @@ l2_decoupled_network_c::l2_decoupled_network_c(macsim_c* simBase) : memory_c(sim
   }
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
-  for (int ii = 0; ii < m_num_l3; ++ii) m_l3_cache[ii]->init(-1, -1, false, false, false, true, true);
+  for (int ii = 0; ii < m_num_l3; ++ii)
+    m_l3_cache[ii]->init(-1, -1, false, false, false, true, true);
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
-  for (int ii = 0; ii < m_num_llc; ++ii) m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
+  for (int ii = 0; ii < m_num_llc; ++ii)
+    m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
 
   NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_llc, m_num_mc);
 }
@@ -2238,19 +2405,25 @@ void l2_decoupled_network_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L2] = req->m_core_id;
 
   if ((m_num_l3 & (m_num_l3 - 1)) == 0)  // if m_num_l3 is a power of 2
-    req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
+    req->m_cache_id[MEM_L3] =
+      BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
   else
-    req->m_cache_id[MEM_L3] = (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3;
+    req->m_cache_id[MEM_L3] =
+      (req->m_addr >> log2_int(m_l3_interleave_factor)) % m_num_l3;
 
   if ((m_num_llc & (m_num_llc - 1)) == 0)  // if m_num_llc is a power of 2
-    req->m_cache_id[MEM_LLC] = BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
+    req->m_cache_id[MEM_LLC] =
+      BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
   else
-    req->m_cache_id[MEM_LLC] = (req->m_addr >> log2_int(m_llc_interleave_factor)) % m_num_llc;
+    req->m_cache_id[MEM_LLC] =
+      (req->m_addr >> log2_int(m_llc_interleave_factor)) % m_num_llc;
 
   if ((m_num_mc & (m_num_mc - 1)) == 0)  // if m_num_mc is a power of 2
-    req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, m_dram_interleave_factor);
+    req->m_cache_id[MEM_MC] =
+      BANK(req->m_addr, m_num_mc, m_dram_interleave_factor);
   else
-    req->m_cache_id[MEM_MC] = (req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc;
+    req->m_cache_id[MEM_MC] =
+      (req->m_addr >> log2_int(m_dram_interleave_factor)) % m_num_mc;
 }
 
 void l2_decoupled_network_c::invalidate(Addr page_addr) {
@@ -2274,20 +2447,25 @@ void l2_decoupled_network_c::invalidate(Addr page_addr) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-l2_decoupled_local_c::l2_decoupled_local_c(macsim_c* simBase) : memory_c(simBase) {
+l2_decoupled_local_c::l2_decoupled_local_c(macsim_c* simBase)
+  : memory_c(simBase) {
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_core; ++ii) {
-    m_l1_cache[ii]->init(ii, -1, !HAS_DONE_FUNC, !ULINK, DLINK, ENABLE, !HAS_ROUTER);
-    m_l2_cache[ii]->init(-1, ii, HAS_DONE_FUNC, ULINK, !DLINK, !ENABLE, !HAS_ROUTER);
+    m_l1_cache[ii]->init(ii, -1, !HAS_DONE_FUNC, !ULINK, DLINK, ENABLE,
+                         !HAS_ROUTER);
+    m_l2_cache[ii]->init(-1, ii, HAS_DONE_FUNC, ULINK, !DLINK, !ENABLE,
+                         !HAS_ROUTER);
   }
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_l3; ++ii)
-    m_l3_cache[ii]->init(-1, -1, !HAS_DONE_FUNC, !ULINK, !DLINK, !ENABLE, HAS_ROUTER);
+    m_l3_cache[ii]->init(-1, -1, !HAS_DONE_FUNC, !ULINK, !DLINK, !ENABLE,
+                         HAS_ROUTER);
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
   for (int ii = 0; ii < m_num_llc; ++ii)
-    m_llc_cache[ii]->init(-1, -1, !HAS_DONE_FUNC, !ULINK, !DLINK, ENABLE, HAS_ROUTER);
+    m_llc_cache[ii]->init(-1, -1, !HAS_DONE_FUNC, !ULINK, !DLINK, ENABLE,
+                          HAS_ROUTER);
 }
 
 l2_decoupled_local_c::~l2_decoupled_local_c() {
@@ -2297,8 +2475,10 @@ void l2_decoupled_local_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_LLC] = BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_LLC] =
+    BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
+  req->m_cache_id[MEM_MC] = BANK(
+    req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2313,10 +2493,12 @@ igpu_network_c::igpu_network_c(macsim_c* simBase) : memory_c(simBase) {
   }
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
-  for (int ii = 0; ii < m_num_l3; ++ii) m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
+  for (int ii = 0; ii < m_num_l3; ++ii)
+    m_l3_cache[ii]->init(-1, -1, false, false, false, false, true);
 
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
-  for (int ii = 0; ii < m_num_llc; ++ii) m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
+  for (int ii = 0; ii < m_num_llc; ++ii)
+    m_llc_cache[ii]->init(-1, -1, false, false, false, false, true);
 
   NETWORK->init(m_num_cpu, m_num_gpu, m_num_l3, m_num_llc, m_num_mc);
 }
@@ -2328,8 +2510,10 @@ void igpu_network_c::set_cache_id(mem_req_s* req) {
   req->m_cache_id[MEM_L1] = req->m_core_id;
   req->m_cache_id[MEM_L2] = req->m_core_id;
   req->m_cache_id[MEM_L3] = BANK(req->m_addr, m_num_l3, m_l3_interleave_factor);
-  req->m_cache_id[MEM_LLC] = BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
-  req->m_cache_id[MEM_MC] = BANK(req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
+  req->m_cache_id[MEM_LLC] =
+    BANK(req->m_addr, m_num_llc, m_llc_interleave_factor);
+  req->m_cache_id[MEM_MC] = BANK(
+    req->m_addr, m_num_mc, *m_simBase->m_knobs->KNOB_DRAM_INTERLEAVE_FACTOR);
 }
 
 void igpu_network_c::invalidate(Addr page_addr) {
@@ -2343,7 +2527,8 @@ void igpu_network_c::invalidate(Addr page_addr) {
 
   for (int ii = 0; ii < m_num_llc; ++ii) {
     int line_size = m_llc_cache[ii]->line_size();
-    for (; addr < end_addr; addr += line_size) m_llc_cache[ii]->invalidate(addr);
+    for (; addr < end_addr; addr += line_size)
+      m_llc_cache[ii]->invalidate(addr);
   }
 }
 

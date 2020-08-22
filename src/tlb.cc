@@ -47,7 +47,8 @@ POSSIBILITY OF SUCH DAMAGE.
 TLB::TLB(macsim_c *simBase, long _num_entries, long _page_size)
   : m_simBase(simBase), m_max_entries(_num_entries), m_page_size(_page_size) {
   m_entries = new Entry[m_max_entries];
-  for (long i = 0; i < m_max_entries; ++i) m_free_entries.push_back(m_entries + i);
+  for (long i = 0; i < m_max_entries; ++i)
+    m_free_entries.push_back(m_entries + i);
 
   m_head = new Entry;
   m_tail = new Entry;
@@ -100,25 +101,28 @@ void TLB::insert(Addr addr, Addr frame_number) {
 
   // insert an entry into the MRU position
   if (!m_free_entries.empty()) {  // free entry available
-                                  // insert a new entry into the MRU position
+    // insert a new entry into the MRU position
     Entry *node = m_free_entries.back();
     m_free_entries.pop_back();
     node->page_number = page_number;
     node->page_desc.frame_number = frame_number;
     attach(node);
     m_table.emplace(page_number, node);
-    DEBUG("page:%llx inserted - free_entries:%zu\n", page_number, m_free_entries.size());
+    DEBUG("page:%llx inserted - free_entries:%zu\n", page_number,
+          m_free_entries.size());
   } else {  // free entry not available
-            // replace the entry in the LRU position
+    // replace the entry in the LRU position
     Entry *node = m_tail->prev;
     detach(node);
     m_table.erase(node->page_number);
-    DEBUG("page:%llx replaced - free_entries:%zu\n", node->page_number, m_free_entries.size());
+    DEBUG("page:%llx replaced - free_entries:%zu\n", node->page_number,
+          m_free_entries.size());
     node->page_number = page_number;
     node->page_desc.frame_number = frame_number;
     m_table.emplace(page_number, node);
     attach(node);
-    DEBUG("page:%llx inserted - free_entries:%zu\n", page_number, m_free_entries.size());
+    DEBUG("page:%llx inserted - free_entries:%zu\n", page_number,
+          m_free_entries.size());
   }
 }
 
@@ -134,6 +138,7 @@ void TLB::invalidate(Addr page_number) {
     m_free_entries.push_back(node);
 
     m_table.erase(page_number);
-    DEBUG("page:%llx invalidated - free_entries:%zu\n", page_number, m_free_entries.size());
+    DEBUG("page:%llx invalidated - free_entries:%zu\n", page_number,
+          m_free_entries.size());
   }
 }

@@ -56,7 +56,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug_macros.h"
 #include "all_knobs.h"
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_ALLOC_STAGE, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_ALLOC_STAGE, ##args)
 #define DEBUG_CORE(m_core_id, args...)                           \
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {    \
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_ALLOC_STAGE, ##args); \
@@ -65,8 +66,10 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // allocate_c constructor
-allocate_c::allocate_c(int core_id, pqueue_c<int *> *q_frontend, pqueue_c<int> **alloc_q, pool_c<uop_c> *uop_pool,
-                       rob_c *rob, Unit_Type unit_type, int num_queues, resource_c *resource, macsim_c *simBase) {
+allocate_c::allocate_c(int core_id, pqueue_c<int *> *q_frontend,
+                       pqueue_c<int> **alloc_q, pool_c<uop_c> *uop_pool,
+                       rob_c *rob, Unit_Type unit_type, int num_queues,
+                       resource_c *resource, macsim_c *simBase) {
   m_core_id = core_id;
   m_frontend_q = q_frontend;
   m_alloc_q = alloc_q;
@@ -106,8 +109,8 @@ void allocate_c::run_a_cycle(void) {
     // fetch an uop from frontend queue
     uop_c *uop = (uop_c *)m_frontend_q->peek(0);
 
-    DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu is peeked\n", m_core_id, uop->m_thread_id,
-               uop->m_uop_num);
+    DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu is peeked\n",
+               m_core_id, uop->m_thread_id, uop->m_uop_num);
 
     // -------------------------------------
     // check resource requirement
@@ -127,7 +130,8 @@ void allocate_c::run_a_cycle(void) {
     else if (uop->m_uop_type == UOP_IADD ||  // integer register
              uop->m_uop_type == UOP_IMUL || uop->m_uop_type == UOP_ICMP)
       req_int_reg = 1;
-    else if (uop->m_uop_type == UOP_FCVT || uop->m_uop_type == UOP_FADD)  // fp register
+    else if (uop->m_uop_type == UOP_FCVT ||
+             uop->m_uop_type == UOP_FADD)  // fp register
       req_fp_reg = 1;
     else if (uop->m_uop_type == UOP_SIMD)  // simd register
       req_simd_reg = 1;
@@ -151,12 +155,15 @@ void allocate_c::run_a_cycle(void) {
     pqueue_c<int> *alloc_q = m_alloc_q[q_type];
 
     // check rob and other physical resources
-    if (m_rob->space() < req_rob || m_resource->get_num_sb() < req_sb || m_resource->get_num_lb() < req_lb ||
-        alloc_q->space() < 1 || m_resource->get_num_int_regs() < req_int_reg ||
+    if (m_rob->space() < req_rob || m_resource->get_num_sb() < req_sb ||
+        m_resource->get_num_lb() < req_lb || alloc_q->space() < 1 ||
+        m_resource->get_num_int_regs() < req_int_reg ||
         m_resource->get_num_fp_regs() < req_fp_reg) {
       DEBUG_CORE(m_core_id,
-                 "not enough physical resources: rob_space:%d num_sb:%d num_lb:%d alloc_q:%d int_reg:%d fp_reg:%d \n",
-                 m_rob->space(), m_resource->get_num_sb(), m_resource->get_num_lb(), alloc_q->space(),
+                 "not enough physical resources: rob_space:%d num_sb:%d "
+                 "num_lb:%d alloc_q:%d int_reg:%d fp_reg:%d \n",
+                 m_rob->space(), m_resource->get_num_sb(),
+                 m_resource->get_num_lb(), alloc_q->space(),
                  m_resource->get_num_int_regs(), m_resource->get_num_fp_regs());
       break;
     }
@@ -194,11 +201,14 @@ void allocate_c::run_a_cycle(void) {
     // -------------------------------------
     // insert an uop into reorder buffer
     // -------------------------------------
-    uop->m_allocq_num = (q_type == *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX)
-                          ? gen_ALLOCQ
-                          : (q_type == *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX)
-                              ? mem_ALLOCQ
-                              : (q_type == *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX) ? fp_ALLOCQ : simd_ALLOCQ;
+    uop->m_allocq_num =
+      (q_type == *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX)
+        ? gen_ALLOCQ
+        : (q_type == *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX)
+            ? mem_ALLOCQ
+            : (q_type == *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX)
+                ? fp_ALLOCQ
+                : simd_ALLOCQ;
     m_rob->push(uop);
 
     POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);
@@ -208,14 +218,17 @@ void allocate_c::run_a_cycle(void) {
     // -------------------------------------
     m_frontend_q->dequeue();
 
-    DEBUG_CORE(m_core_id,
-               "cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%llx "
-               "alloc_q:%d mem_type:%d\n",
-               m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr,
-               uop->m_allocq_num, uop->m_mem_type);
+    DEBUG_CORE(
+      m_core_id,
+      "cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld uop.va:0x%llx "
+      "alloc_q:%d mem_type:%d\n",
+      m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num,
+      uop->m_inst_num, uop->m_vaddr, uop->m_allocq_num, uop->m_mem_type);
 
-    DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d id:%lld uop is pushed. inst_count:%lld\n", m_core_id,
-               uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
+    DEBUG_CORE(
+      m_core_id,
+      "core_id:%d thread_id:%d id:%lld uop is pushed. inst_count:%lld\n",
+      m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
 
     // BTB miss is resolved
     if (uop->m_uop_info.m_btb_miss && !(uop->m_uop_info.m_btb_miss_resolved)) {
@@ -223,14 +236,16 @@ void allocate_c::run_a_cycle(void) {
       if ((uop->m_cf_type < CF_IBR) && (uop->m_cf_type > CF_ICO)) {
         m_bp_data->m_bp_targ_pred->update(uop);
         m_bp_data->m_bp_redirect_cycle[uop->m_thread_id] =
-          m_cur_core_cycle + 1 + *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;  // redirect cycle
+          m_cur_core_cycle + 1 +
+          *m_simBase->m_knobs->KNOB_EXTRA_RECOVERY_CYCLES;  // redirect cycle
         uop->m_uop_info.m_btb_miss_resolved = true;
 
-        DEBUG_CORE(m_core_id,
-                   "cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld btb_miss "
-                   "resolved redirect_cycle:%lld\n",
-                   m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num, uop->m_inst_num,
-                   m_bp_data->m_bp_redirect_cycle[uop->m_thread_id]);
+        DEBUG_CORE(
+          m_core_id,
+          "cycle_count:%lld core_id:%d uop_num:%lld inst_num:%lld btb_miss "
+          "resolved redirect_cycle:%lld\n",
+          m_simBase->m_core_cycle[m_core_id], m_core_id, uop->m_uop_num,
+          uop->m_inst_num, m_bp_data->m_bp_redirect_cycle[uop->m_thread_id]);
 
         STAT_CORE_EVENT(m_core_id, BP_REDIRECT_RESOLVED);
       }

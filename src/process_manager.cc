@@ -90,7 +90,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define BLOCK_ID_MOD 16384
 #define t_gen_ver "1.3"
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SIM_THREAD_SCHEDULE, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SIM_THREAD_SCHEDULE, ##args)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -147,14 +148,16 @@ process_s::~process_s() {
 thread_s::thread_s(macsim_c *simBase) {
   m_simBase = simBase;
   m_fetch_data = new frontend_s;
-  int buf_ele_size = (CPU_TRACE_SIZE > GPU_TRACE_SIZE) ? CPU_TRACE_SIZE : GPU_TRACE_SIZE;
+  int buf_ele_size =
+    (CPU_TRACE_SIZE > GPU_TRACE_SIZE) ? CPU_TRACE_SIZE : GPU_TRACE_SIZE;
   m_buffer = new char[1000 * buf_ele_size];
   m_prev_trace_info = NULL;
   m_next_trace_info = NULL;
 
   for (int ii = 0; ii < MAX_PUP; ++ii) {
     m_trace_uop_array[ii] = new trace_uop_s;
-    if (static_cast<string>(*m_simBase->m_knobs->KNOB_FETCH_POLICY) == "row_hit") {
+    if (static_cast<string>(*m_simBase->m_knobs->KNOB_FETCH_POLICY) ==
+        "row_hit") {
       m_next_trace_uop_array[ii] = new trace_uop_s;
     }
   }
@@ -239,9 +242,11 @@ process_manager_c::~process_manager_c() {
 //  allocates a node for the thread/warp and add its to m_thread_queue (for x86)
 //  or m_block_queue (for ptx)
 ////////////////////////////////////////////////////////////////////////////////
-void process_manager_c::create_thread_node(process_s *process, int tid, bool main) {
+void process_manager_c::create_thread_node(process_s *process, int tid,
+                                           bool main) {
   // create a new thread node
-  thread_trace_info_node_s *node = m_simBase->m_trace_node_pool->acquire_entry();
+  thread_trace_info_node_s *node =
+    m_simBase->m_trace_node_pool->acquire_entry();
 
   // initialize the node
   node->m_trace_info_ptr = NULL;
@@ -259,12 +264,17 @@ void process_manager_c::create_thread_node(process_s *process, int tid, bool mai
   // block id assignment in case of multiple applications
   int block_id = start_info->m_thread_id >> BLOCK_ID_SHIFT;
   node->m_block_id = m_simBase->m_block_id_mapper->find(
-    process->m_process_id, block_id + process->m_kernel_block_start_count[process->m_current_vector_index - 1]);
+    process->m_process_id,
+    block_id +
+      process->m_kernel_block_start_count[process->m_current_vector_index - 1]);
 
   // new block has been executed.
   if (node->m_block_id == -1) {
     node->m_block_id = m_simBase->m_block_id_mapper->insert(
-      process->m_process_id, block_id + process->m_kernel_block_start_count[process->m_current_vector_index - 1]);
+      process->m_process_id,
+      block_id +
+        process
+          ->m_kernel_block_start_count[process->m_current_vector_index - 1]);
 
     // increase total block count
     ++process->m_block_count;
@@ -331,7 +341,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
 
   // Setup file name of process trace
   size_t dot_location = appl.find_last_of(".");
-  if (dot_location == string::npos) ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", appl.c_str());
+  if (dot_location == string::npos)
+    ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", appl.c_str());
 
   // open trace configuration file
   ifstream trace_config_file;
@@ -346,12 +357,15 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
   // Read the first line of trace configuration file
   // TYPE
   string trace_type;
-  if (!(trace_config_file >> trace_type)) ASSERTM(0, "error reading from file:%s", appl.c_str());
+  if (!(trace_config_file >> trace_type))
+    ASSERTM(0, "error reading from file:%s", appl.c_str());
 
   int trace_ver = -1;
   if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14) {
-      ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
+      ASSERTM(0,
+              "this version of the simulator supports only version 1.4 of the "
+              "GPU traces\n");
     }
   }
 
@@ -366,8 +380,9 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
     string kernel_directory;
     while (trace_config_file >> kernel_directory) {
       string kernel_path = appl.substr(0, appl.find_last_of('/'));
-      kernel_path += kernel_directory.substr(kernel_directory.rfind('/', kernel_directory.find_last_of('/') - 1),
-                                             kernel_directory.length());
+      kernel_path += kernel_directory.substr(
+        kernel_directory.rfind('/', kernel_directory.find_last_of('/') - 1),
+        kernel_directory.length());
       // When a trace directory is moved to the different path,
       // since everything is coded in absolute path, this will cause problem.
       // By taking relative path here, the problem can be solved
@@ -392,9 +407,11 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
     // structure used when generating traces) match with the structure used when
     // generating traces
     if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
-      assert(sizeof(trace_info_gpu_s) == (sizeof(trace_info_gpu_small_s) + sizeof(uint64_t)));
+      assert(sizeof(trace_info_gpu_s) ==
+             (sizeof(trace_info_gpu_small_s) + sizeof(uint64_t)));
     } else {
-      assert(sizeof(trace_info_gpu_s) == (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
+      assert(sizeof(trace_info_gpu_s) ==
+             (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
     }
   } else {
     process->m_ptx = false;
@@ -410,34 +427,43 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
 // setup a process to run. Each process has vector which holds all sub-applications.
 // (GPU with multiple kernel calls).
 void process_manager_c::setup_process(process_s *process) {
-  report("setup_process:" << process->m_orig_pid << " " << process->m_applications[process->m_current_vector_index]
-                          << " current_index:" << process->m_current_vector_index << " ("
-                          << process->m_applications.size() << ")");
+  report(
+    "setup_process:" << process->m_orig_pid << " "
+                     << process->m_applications[process->m_current_vector_index]
+                     << " current_index:" << process->m_current_vector_index
+                     << " (" << process->m_applications.size() << ")");
 
   ASSERT(process->m_current_vector_index < process->m_applications.size());
 
   // Each block within an application (across multiple kernels) has unique id
-  process->m_kernel_block_start_count[process->m_current_vector_index] = process->m_block_count;
+  process->m_kernel_block_start_count[process->m_current_vector_index] =
+    process->m_block_count;
 
   // trace file name
-  string trace_info_file_name = process->m_applications[process->m_current_vector_index++];
+  string trace_info_file_name =
+    process->m_applications[process->m_current_vector_index++];
 
   size_t dot_location = trace_info_file_name.find_last_of(".");
   if (dot_location == string::npos)
-    ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n", trace_info_file_name.c_str());
+    ASSERTM(0, "file(%s) formats should be <appl_name>.<extn>\n",
+            trace_info_file_name.c_str());
 
   // get the base name of current application (without extension)
-  process->m_current_file_name_base = trace_info_file_name.substr(0, dot_location);
+  process->m_current_file_name_base =
+    trace_info_file_name.substr(0, dot_location);
 
   // get hmc info if hmc inst is enabled
-  if (*KNOB(KNOB_ENABLE_HMC_INST) || *KNOB(KNOB_ENABLE_NONHMC_STAT) || *KNOB(KNOB_ENABLE_HMC_TRANS) ||
-      *KNOB(KNOB_ENABLE_HMC_INST_SKIP))
-    hmc_function_c::hmc_info_read(process->m_current_file_name_base, process->m_hmc_info, process->m_hmc_info_ext);
+  if (*KNOB(KNOB_ENABLE_HMC_INST) || *KNOB(KNOB_ENABLE_NONHMC_STAT) ||
+      *KNOB(KNOB_ENABLE_HMC_TRANS) || *KNOB(KNOB_ENABLE_HMC_INST_SKIP))
+    hmc_function_c::hmc_info_read(process->m_current_file_name_base,
+                                  process->m_hmc_info, process->m_hmc_info_ext);
   if (*KNOB(KNOB_ENABLE_HMC_FENCE))
-    hmc_function_c::hmc_fence_info_read(process->m_current_file_name_base, process->m_hmc_fence_info);
+    hmc_function_c::hmc_fence_info_read(process->m_current_file_name_base,
+                                        process->m_hmc_fence_info);
 
   if (*KNOB(KNOB_ENABLE_LOCK_SKIP))
-    hmc_function_c::lock_info_read(process->m_current_file_name_base, process->m_lock_info);
+    hmc_function_c::lock_info_read(process->m_current_file_name_base,
+                                   process->m_lock_info);
 
   // open TRACE_CONFIG file
   ifstream trace_config_file;
@@ -463,14 +489,17 @@ void process_manager_c::setup_process(process_s *process) {
   // GPU Traces (NEW) : (#Warps | newptx | #MaxBlocks per Core)
 
   string trace_type;
-  if (!(trace_config_file >> trace_type)) ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
+  if (!(trace_config_file >> trace_type))
+    ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
   printf("trace:%s is opened \n", trace_info_file_name.c_str());
 
   int trace_ver = -1;
   if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14) {
-      ASSERTM(0, "this version of the simulator supports only version 1.4 of the GPU traces\n");
+      ASSERTM(0,
+              "this version of the simulator supports only version 1.4 of the "
+              "GPU traces\n");
     }
   }
 
@@ -491,19 +520,22 @@ void process_manager_c::setup_process(process_s *process) {
     std::string gen_version;
     trace_config_file >> gen_version;
     if (gen_version != t_gen_ver)
-      std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; trace may not be read correctly."
+      std::cout << "!!WARNING!! Trace reader and trace generator version "
+                   "mismatch; trace may not be read correctly."
                 << std::endl;
   }
 
   // get thread count
   int thread_count;
-  if (!(trace_config_file >> thread_count)) ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
+  if (!(trace_config_file >> thread_count))
+    ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
   // # thread_count > 0
   if (thread_count <= 0) ASSERTM(0, "invalid thread count:%d", thread_count);
 
   if (*KNOB(KNOB_ENABLE_TRACE_MAX_THREAD)) {
-    if (thread_count > *KNOB(KNOB_TRACE_MAX_THREAD_COUNT)) thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
+    if (thread_count > *KNOB(KNOB_TRACE_MAX_THREAD_COUNT))
+      thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
   }
 
   report("thread_count:" << thread_count);
@@ -518,7 +550,8 @@ void process_manager_c::setup_process(process_s *process) {
   process->m_thread_start_info = new thread_start_info_s[thread_count];
   process->m_thread_trace_info = new thread_s *[thread_count];
 
-  if (process->m_thread_start_info == NULL || process->m_thread_trace_info == NULL) {
+  if (process->m_thread_start_info == NULL ||
+      process->m_thread_trace_info == NULL) {
     ASSERTM(0, "unable to allocate memory\n");
   }
 
@@ -527,7 +560,8 @@ void process_manager_c::setup_process(process_s *process) {
   for (int ii = 0; ii < thread_count; ++ii) {
     if (!(trace_config_file >> process->m_thread_start_info[ii].m_thread_id >>
           process->m_thread_start_info[ii].m_inst_count)) {
-      ASSERTM(0, "error reading from file:%s ii:%d\n", trace_info_file_name.c_str(), ii);
+      ASSERTM(0, "error reading from file:%s ii:%d\n",
+              trace_info_file_name.c_str(), ii);
     }
   }
 
@@ -541,7 +575,8 @@ void process_manager_c::setup_process(process_s *process) {
 
     // read trace information file
     ifstream trace_lengths_file(path.c_str());
-    if (!trace_lengths_file.good()) ASSERTM(0, "could not open file: %s\n", path.c_str());
+    if (!trace_lengths_file.good())
+      ASSERTM(0, "could not open file: %s\n", path.c_str());
 
     // FIXME
     Counter inst_count_tot = 0;
@@ -587,7 +622,8 @@ void process_manager_c::setup_process(process_s *process) {
     // get limited (*m_simBase->m_knobs->KNOB_MAX_NUM_CORE_PER_APPL) number of cores
     else {
       int count = 0;
-      while (!core_pool->empty() && count < *m_simBase->m_knobs->KNOB_MAX_NUM_CORE_PER_APPL) {
+      while (!core_pool->empty() &&
+             count < *m_simBase->m_knobs->KNOB_MAX_NUM_CORE_PER_APPL) {
         int core_id = core_pool->front();
         core_pool->pop();
 
@@ -606,11 +642,13 @@ void process_manager_c::setup_process(process_s *process) {
     if ((*KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block) <
         static_cast<unsigned int>(thread_count)) {
       uns temp = thread_count;
-      thread_count = *KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block;
+      thread_count =
+        *KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block;
 
       // print the thread count of the application at the beginning
       REPORT("new thread count %d\n", thread_count);
-      process->m_no_of_threads = thread_count;  // assign thread_count to the number of threads of the process
+      process->m_no_of_threads =
+        thread_count;  // assign thread_count to the number of threads of the process
 
       m_simBase->m_all_threads += thread_count;
 
@@ -654,14 +692,16 @@ bool process_manager_c::terminate_process(process_s *process) {
   m_simBase->m_inst_info_hash[process->m_process_id]->clear();
 
   // deallocate data structures
-  thread_stat_s *thread_stat_data_to_delete = m_simBase->m_thread_stats[process->m_process_id];
+  thread_stat_s *thread_stat_data_to_delete =
+    m_simBase->m_thread_stats[process->m_process_id];
   m_simBase->m_thread_stats.erase(process->m_process_id);
   delete[] thread_stat_data_to_delete;
 
   // Since there are more kernels within an application, we need to finish these
   // before terminate this application
   if (process->m_current_vector_index < process->m_applications.size() &&
-      (*m_simBase->m_ProcessorStats)[INST_COUNT_TOT].getCount() < *KNOB(KNOB_MAX_INSTS1)) {
+      (*m_simBase->m_ProcessorStats)[INST_COUNT_TOT].getCount() <
+        *KNOB(KNOB_MAX_INSTS1)) {
     setup_process(process);
 
     return false;
@@ -670,15 +710,18 @@ bool process_manager_c::terminate_process(process_s *process) {
   m_simBase->m_block_id_mapper->delete_table(process->m_process_id);
 
   // release allocated cores
-  for (auto I = process->m_core_list.begin(), E = process->m_core_list.end(); I != E; ++I) {
+  for (auto I = process->m_core_list.begin(), E = process->m_core_list.end();
+       I != E; ++I) {
     int core_id = (*I).first;
     process->m_core_pool->push(core_id);
 
-    m_simBase->m_core_pointers[core_id]->delete_application(process->m_process_id);
+    m_simBase->m_core_pointers[core_id]->delete_application(
+      process->m_process_id);
   }
   process->m_core_list.clear();
 
-  hash_c<inst_info_s> *inst_info_hash = m_simBase->m_inst_info_hash[process->m_process_id];
+  hash_c<inst_info_s> *inst_info_hash =
+    m_simBase->m_inst_info_hash[process->m_process_id];
   m_simBase->m_inst_info_hash.erase(process->m_process_id);
   inst_info_hash->clear();
   m_inst_hash_pool->release_entry(inst_info_hash);
@@ -689,7 +732,8 @@ bool process_manager_c::terminate_process(process_s *process) {
   sstr >> ext;
 
   int delta;
-  if (m_appl_cyccount_info.find(process->m_orig_pid) == m_appl_cyccount_info.end()) {
+  if (m_appl_cyccount_info.find(process->m_orig_pid) ==
+      m_appl_cyccount_info.end()) {
     delta = static_cast<int>(CYCLE);
   } else {
     delta = static_cast<int>(CYCLE - m_appl_cyccount_info[process->m_orig_pid]);
@@ -715,7 +759,8 @@ static int global_unique_thread_id = 0;
 // create a new thread (actually, a thread has been created when create_thread_node()
 // has been called. However, when a thread is actually scheduled, we allocate and initialize
 // data in a thread.
-thread_s *process_manager_c::create_thread(process_s *process, int tid, bool main) {
+thread_s *process_manager_c::create_thread(process_s *process, int tid,
+                                           bool main) {
   thread_s *trace_info = m_simBase->m_thread_pool->acquire_entry(m_simBase);
   process->m_thread_trace_info[tid] = trace_info;
 
@@ -734,7 +779,8 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid, bool mai
       trace_info->m_prev_trace_info = new trace_info_igpu_s;
       trace_info->m_next_trace_info = new trace_info_igpu_s;
     } else {
-      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
+      ASSERTM(0, "Wrong core type %s\n",
+              KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
   }
   thread_start_info_s *start_info = &process->m_thread_start_info[tid];
@@ -744,7 +790,9 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid, bool mai
   // original block id
   trace_info->m_orig_block_id = block_id;
   trace_info->m_block_id = m_simBase->m_block_id_mapper->find(
-    process->m_process_id, block_id + process->m_kernel_block_start_count[process->m_current_vector_index - 1]);
+    process->m_process_id,
+    block_id +
+      process->m_kernel_block_start_count[process->m_current_vector_index - 1]);
 
   // FIXME
   // trace_info->m_orig_thread_id = start_info->m_thread_id;
@@ -754,7 +802,8 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid, bool mai
 
   // set up trace file name
   stringstream sstr;
-  sstr << process->m_current_file_name_base << "_" << start_info->m_thread_id << ".raw";
+  sstr << process->m_current_file_name_base << "_" << start_info->m_thread_id
+       << ".raw";
 
   string filename = "";
   sstr >> filename;
@@ -762,7 +811,8 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid, bool mai
 #ifndef USING_QSIM
   // open trace file
   trace_info->m_trace_file = gzopen(filename.c_str(), "r");
-  if (trace_info->m_trace_file == NULL) ASSERTM(0, "error opening trace file:%s\n", filename.c_str());
+  if (trace_info->m_trace_file == NULL)
+    ASSERTM(0, "error opening trace file:%s\n", filename.c_str());
 #endif
 
   trace_info->m_file_opened = true;
@@ -797,7 +847,8 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid, bool mai
 }
 
 // terminate a thread
-int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int thread_id, int b_id) {
+int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
+                                        int thread_id, int b_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
 
   ASSERT(core->m_running_thread_num);
@@ -809,7 +860,8 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
   --core->m_running_thread_num;
 
   // All threads have been terminated in a core. Mark core as ended.
-  if (core->m_running_thread_num == 0) m_simBase->m_core_end_trace[core_id] = true;
+  if (core->m_running_thread_num == 0)
+    m_simBase->m_core_end_trace[core_id] = true;
 
   // Mark thread terminated
   core->m_thread_finished[thread_id] = 1;
@@ -817,8 +869,11 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
   // deallocate data structures
   core->deallocate_thread_data(thread_id);
 
-  DEBUG("core_id:%d terminated block: %d thread - %d running_thread_num:%d block_id:%d \n", core_id,
-        trace_info->m_block_id, trace_info->m_thread_id, core->m_running_thread_num, b_id);
+  DEBUG(
+    "core_id:%d terminated block: %d thread - %d running_thread_num:%d "
+    "block_id:%d \n",
+    core_id, trace_info->m_block_id, trace_info->m_thread_id,
+    core->m_running_thread_num, b_id);
 
   // update number of terminated thread for an application
   ++trace_info->m_process->m_no_of_threads_terminated;
@@ -830,15 +885,19 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
   if (trace_info->m_ptx == true) {
     int t_process_id = trace_info->m_process->m_process_id;
     int t_thread_id = trace_info->m_unique_thread_id;
-    m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle = core->get_cycle_count();
+    m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle =
+      core->get_cycle_count();
 
-    block_schedule_info_s *block_info = m_simBase->m_block_schedule_info[block_id];
+    block_schedule_info_s *block_info =
+      m_simBase->m_block_schedule_info[block_id];
     ++block_info->m_retired_thread_num;
 
     DEBUG(
-      "core_id:%d block_id:%d block_retired_thread_num:%d block_total_thread_num:%d "
+      "core_id:%d block_id:%d block_retired_thread_num:%d "
+      "block_total_thread_num:%d "
       "running_block_num:%d\n",
-      core_id, block_id, block_info->m_retired_thread_num, block_info->m_total_thread_num, core->m_running_block_num);
+      core_id, block_id, block_info->m_retired_thread_num,
+      block_info->m_total_thread_num, core->m_running_block_num);
 
     // BLOCK RETIRE : all threads in a block have been retired, so the block is retired now
     if (block_info->m_retired_thread_num == block_info->m_total_thread_num) {
@@ -846,12 +905,14 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
       --core->m_running_block_num;
 
       // deallocate block information
-      block_schedule_info_s *block_schedule_info = m_simBase->m_block_schedule_info[block_id];
+      block_schedule_info_s *block_schedule_info =
+        m_simBase->m_block_schedule_info[block_id];
       m_simBase->m_block_schedule_info.erase(block_id);
       delete block_schedule_info;
 
       trace_info->m_process->m_block_list.erase(block_id);
-      list<thread_trace_info_node_s *> *block_queue = (*m_block_queue)[block_id];
+      list<thread_trace_info_node_s *> *block_queue =
+        (*m_block_queue)[block_id];
       m_block_queue->erase(block_id);
       block_queue->clear();
       delete block_queue;
@@ -862,7 +923,8 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
 
       ++m_simBase->m_total_retired_block;
       if (*m_simBase->m_knobs->KNOB_MAX_BLOCKS_TO_SIMULATE > 0 &&
-          m_simBase->m_total_retired_block >= *m_simBase->m_knobs->KNOB_MAX_BLOCKS_TO_SIMULATE) {
+          m_simBase->m_total_retired_block >=
+            *m_simBase->m_knobs->KNOB_MAX_BLOCKS_TO_SIMULATE) {
         m_simBase->m_end_simulation = true;
       }
     }
@@ -911,28 +973,33 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info, int t
 
   // TODO - nbl (apr-17-2013): use pools
   if (trace_info->m_process->m_ptx) {
-    trace_info_gpu_s *temp = static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
+    trace_info_gpu_s *temp =
+      static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
     delete temp;
     temp = static_cast<trace_info_gpu_s *>(trace_info->m_next_trace_info);
     delete temp;
   } else {
     if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
-      trace_info_cpu_s *temp = static_cast<trace_info_cpu_s *>(trace_info->m_prev_trace_info);
+      trace_info_cpu_s *temp =
+        static_cast<trace_info_cpu_s *>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_cpu_s *>(trace_info->m_next_trace_info);
       delete temp;
     } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
-      trace_info_a64_s *temp = static_cast<trace_info_a64_s *>(trace_info->m_prev_trace_info);
+      trace_info_a64_s *temp =
+        static_cast<trace_info_a64_s *>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_a64_s *>(trace_info->m_next_trace_info);
       delete temp;
     } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
-      trace_info_igpu_s *temp = static_cast<trace_info_igpu_s *>(trace_info->m_prev_trace_info);
+      trace_info_igpu_s *temp =
+        static_cast<trace_info_igpu_s *>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_igpu_s *>(trace_info->m_next_trace_info);
       delete temp;
     } else {
-      ASSERTM(0, "Wrong core type %s\n", KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
+      ASSERTM(0, "Wrong core type %s\n",
+              KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
   }
 
@@ -957,7 +1024,8 @@ void process_manager_c::insert_thread(thread_trace_info_node_s *incoming) {
 void process_manager_c::insert_block(thread_trace_info_node_s *incoming) {
   ++m_simBase->m_num_waiting_dispatched_threads;
   int block_id = incoming->m_block_id;
-  if (m_simBase->m_block_schedule_info.find(block_id) == m_simBase->m_block_schedule_info.end()) {
+  if (m_simBase->m_block_schedule_info.find(block_id) ==
+      m_simBase->m_block_schedule_info.end()) {
     block_schedule_info_s *block_schedule_info = new block_schedule_info_s;
     m_simBase->m_block_schedule_info[block_id] = block_schedule_info;
   }
@@ -969,7 +1037,8 @@ void process_manager_c::insert_block(thread_trace_info_node_s *incoming) {
         m_simBase->m_block_schedule_info[block_id]->m_trace_exist);
 
   if (m_block_queue->find(block_id) == m_block_queue->end()) {
-    list<thread_trace_info_node_s *> *new_list = new list<thread_trace_info_node_s *>;
+    list<thread_trace_info_node_s *> *new_list =
+      new list<thread_trace_info_node_s *>;
     (*m_block_queue)[block_id] = new_list;
   }
   (*m_block_queue)[block_id]->push_back(incoming);
@@ -1017,11 +1086,13 @@ int process_manager_c::get_next_low_occupancy_core(std::string core_type) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
-        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) || *KNOB(KNOB_CORE_ENABLE_END) < core_id))
+        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
+         *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
 
     if ((core->m_running_thread_num < core->get_max_threads_per_core()) &&
-        (core->m_running_thread_num < min_occupancy) && core->get_core_type() == core_type) {
+        (core->m_running_thread_num < min_occupancy) &&
+        core->get_core_type() == core_type) {
       least_occupied_core = core_id;
       min_occupancy = core->m_running_thread_num;
     }
@@ -1035,10 +1106,12 @@ int process_manager_c::get_next_available_core(std::string core_type) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
-        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) || *KNOB(KNOB_CORE_ENABLE_END) < core_id))
+        (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
+         *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
 
-    if (core->m_running_thread_num < core->get_max_threads_per_core() && core->get_core_type() == core_type) {
+    if (core->m_running_thread_num < core->get_max_threads_per_core() &&
+        core->get_core_type() == core_type) {
       result = core_id;
       break;
     }
@@ -1079,7 +1152,8 @@ void process_manager_c::sim_thread_schedule(bool initial) {
   }
 
   // Iterate over core types
-  for (std::set<std::string>::const_iterator itr = core_type_set.begin(); itr != core_type_set.end(); itr++) {
+  for (std::set<std::string>::const_iterator itr = core_type_set.begin();
+       itr != core_type_set.end(); itr++) {
     std::string core_type = *itr;
     if (core_type == "ptx") continue;
 
@@ -1096,25 +1170,28 @@ void process_manager_c::sim_thread_schedule(bool initial) {
       trace_to_run = fetch_thread();
       if (trace_to_run != NULL) {
         // create a new thread
-        trace_to_run->m_trace_info_ptr =
-          create_thread(trace_to_run->m_process, trace_to_run->m_tid, trace_to_run->m_main);
+        trace_to_run->m_trace_info_ptr = create_thread(
+          trace_to_run->m_process, trace_to_run->m_tid, trace_to_run->m_main);
 
         // unique thread num of a core
         int unique_scheduled_thread_num = core->m_unique_scheduled_thread_num;
-        trace_to_run->m_trace_info_ptr->m_thread_id = unique_scheduled_thread_num;
+        trace_to_run->m_trace_info_ptr->m_thread_id =
+          unique_scheduled_thread_num;
 
         // add a new application to the core
-        core->add_application(unique_scheduled_thread_num, trace_to_run->m_process);
+        core->add_application(unique_scheduled_thread_num,
+                              trace_to_run->m_process);
 
         // add a new thread trace information
-        core->create_trace_info(unique_scheduled_thread_num, trace_to_run->m_trace_info_ptr);
+        core->create_trace_info(unique_scheduled_thread_num,
+                                trace_to_run->m_trace_info_ptr);
 
         thread_s *m_trace_info_ptr = trace_to_run->m_trace_info_ptr;
         int m_thread_id = m_trace_info_ptr->m_thread_id;
         int m_unique_thread_id = m_trace_info_ptr->m_unique_thread_id;
 
-        DEBUG("schedule: core %d will run thread id %d unique_thread_id:%d\n", core_id, m_thread_id,
-              m_unique_thread_id);
+        DEBUG("schedule: core %d will run thread id %d unique_thread_id:%d\n",
+              core_id, m_thread_id, m_unique_thread_id);
 
         // set flag for the simulation
         m_simBase->m_core_end_trace[core_id] = false;
@@ -1158,8 +1235,8 @@ void process_manager_c::sim_thread_schedule(bool initial) {
     // try to schedule as many threads as possible in the same block
     while (trace_to_run != NULL) {
       // create a new thread
-      trace_to_run->m_trace_info_ptr =
-        create_thread(trace_to_run->m_process, trace_to_run->m_tid, trace_to_run->m_main);
+      trace_to_run->m_trace_info_ptr = create_thread(
+        trace_to_run->m_process, trace_to_run->m_tid, trace_to_run->m_main);
 
       // increment dispatched thread number of a block
       ++m_simBase->m_block_schedule_info[block_id]->m_dispatched_thread_num;
@@ -1169,10 +1246,12 @@ void process_manager_c::sim_thread_schedule(bool initial) {
       trace_to_run->m_trace_info_ptr->m_thread_id = unique_scheduled_thread_num;
 
       // add a new application to the core
-      core->add_application(unique_scheduled_thread_num, trace_to_run->m_process);
+      core->add_application(unique_scheduled_thread_num,
+                            trace_to_run->m_process);
 
       // add a new thread trace information
-      core->create_trace_info(unique_scheduled_thread_num, trace_to_run->m_trace_info_ptr);
+      core->create_trace_info(unique_scheduled_thread_num,
+                              trace_to_run->m_trace_info_ptr);
 
       // m_simBase->m_trace_reader->pre_read_trace(trace_to_run->m_trace_info_ptr);
 
@@ -1182,11 +1261,14 @@ void process_manager_c::sim_thread_schedule(bool initial) {
       m_simBase->m_core_started[core_id] = true;
 
       // for thread start end cycles
-      uint32_t unique_thread_id = trace_to_run->m_trace_info_ptr->m_unique_thread_id;
-      uint32_t process_id = trace_to_run->m_trace_info_ptr->m_process->m_process_id;
+      uint32_t unique_thread_id =
+        trace_to_run->m_trace_info_ptr->m_unique_thread_id;
+      uint32_t process_id =
+        trace_to_run->m_trace_info_ptr->m_process->m_process_id;
       ASSERT(unique_thread_id < m_simBase->m_all_threads);
 
-      thread_stat_s *thread_stat = &m_simBase->m_thread_stats[process_id][unique_thread_id];
+      thread_stat_s *thread_stat =
+        &m_simBase->m_thread_stats[process_id][unique_thread_id];
 
       thread_stat->m_unique_thread_id = unique_thread_id;
       thread_stat->m_block_id = block_id;
@@ -1218,25 +1300,37 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
   int new_block_id = -1;
   int fetching_block_id = core->m_fetching_block_id;
   if ((fetching_block_id != -1) &&
-      m_simBase->m_block_schedule_info.find(fetching_block_id) != m_simBase->m_block_schedule_info.end()) {
+      m_simBase->m_block_schedule_info.find(fetching_block_id) !=
+        m_simBase->m_block_schedule_info.end()) {
     DEBUG(
-      "core:%d fetching_block_id:%d total_thread_num:%d dispatched_thread_num:%d "
+      "core:%d fetching_block_id:%d total_thread_num:%d "
+      "dispatched_thread_num:%d "
       "running_block_num:%d block_retired:%d \n",
-      core_id, fetching_block_id, (m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num),
-      (m_simBase->m_block_schedule_info[fetching_block_id]->m_dispatched_thread_num), core->m_running_block_num,
+      core_id, fetching_block_id,
+      (m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num),
+      (m_simBase->m_block_schedule_info[fetching_block_id]
+         ->m_dispatched_thread_num),
+      core->m_running_block_num,
       m_simBase->m_block_schedule_info[fetching_block_id]->m_retired);
   }
 
   // All threads from the currently serviced block should be scheduled before a new block
   // executes. Check currently fetching block has other threads to schedule
   if ((fetching_block_id != -1) &&
-      m_simBase->m_block_schedule_info.find(fetching_block_id) != m_simBase->m_block_schedule_info.end() &&
+      m_simBase->m_block_schedule_info.find(fetching_block_id) !=
+        m_simBase->m_block_schedule_info.end() &&
       !(m_simBase->m_block_schedule_info[fetching_block_id]->m_retired)) {
-    if (m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num >
-        m_simBase->m_block_schedule_info[fetching_block_id]->m_dispatched_thread_num) {
-      DEBUG("fetching_continue block_id:%d total_thread_num:%d dispatched_thread_num:%d \n", fetching_block_id,
-            m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num,
-            m_simBase->m_block_schedule_info[fetching_block_id]->m_dispatched_thread_num);
+    if (m_simBase->m_block_schedule_info[fetching_block_id]
+          ->m_total_thread_num >
+        m_simBase->m_block_schedule_info[fetching_block_id]
+          ->m_dispatched_thread_num) {
+      DEBUG(
+        "fetching_continue block_id:%d total_thread_num:%d "
+        "dispatched_thread_num:%d \n",
+        fetching_block_id,
+        m_simBase->m_block_schedule_info[fetching_block_id]->m_total_thread_num,
+        m_simBase->m_block_schedule_info[fetching_block_id]
+          ->m_dispatched_thread_num);
       return fetching_block_id;
     }
   }
@@ -1250,10 +1344,12 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
 
   bool block_found = true;
   process_s *process = m_simBase->m_sim_processes[appl_id];
-  for (auto I = process->m_block_list.begin(), E = process->m_block_list.end(); I != E; ++I) {
+  for (auto I = process->m_block_list.begin(), E = process->m_block_list.end();
+       I != E; ++I) {
     int block_id = (*I).first;
 
-    if (initial && !*m_simBase->m_knobs->KNOB_ASSIGN_BLOCKS_GREEDILY_INITIALLY) {
+    if (initial &&
+        !*m_simBase->m_knobs->KNOB_ASSIGN_BLOCKS_GREEDILY_INITIALLY) {
       int min_core_id;
       if (*m_simBase->m_knobs->KNOB_MAX_NUM_CORE_PER_APPL == 0) {
         min_core_id = 0;
@@ -1264,7 +1360,8 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
 
       if ((block_id -
            m_simBase->m_block_id_mapper->find(
-             process->m_process_id, process->m_kernel_block_start_count[process->m_current_vector_index - 1])) %
+             process->m_process_id, process->m_kernel_block_start_count
+                                      [process->m_current_vector_index - 1])) %
             num_core_per_appl !=
           (core_id - min_core_id)) {
         continue;
@@ -1286,15 +1383,19 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
 
   // set up block
   m_simBase->m_block_schedule_info[new_block_id]->m_start_to_fetch = true;
-  m_simBase->m_block_schedule_info[new_block_id]->m_dispatched_core_id = core_id;
-  m_simBase->m_block_schedule_info[new_block_id]->m_sched_cycle = core->get_cycle_count();
+  m_simBase->m_block_schedule_info[new_block_id]->m_dispatched_core_id =
+    core_id;
+  m_simBase->m_block_schedule_info[new_block_id]->m_sched_cycle =
+    core->get_cycle_count();
 
   // set up core
   core->m_running_block_num = core->m_running_block_num + 1;
   core->m_fetching_block_id = new_block_id;
 
-  DEBUG("new block is allocated to core:%d running_block:%d fetching_block_id:%d \n", core_id, new_block_id,
-        core->m_fetching_block_id);
+  DEBUG(
+    "new block is allocated to core:%d running_block:%d fetching_block_id:%d "
+    "\n",
+    core_id, new_block_id, core->m_fetching_block_id);
 
   return new_block_id;
 }

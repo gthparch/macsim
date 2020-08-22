@@ -42,9 +42,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "uop.h"
 #include "pqueue.h"
 
-#define SCHEDULE_INTERFACE_PARAMS()                                                                           \
-  int core_id, pqueue_c<int>**q_iaq, pqueue_c<gpu_allocq_entry_s>**gpu_q_iaq, rob_c *rob, smc_rob_c *gpu_rob, \
-    int num_iaq, exec_c *exec, Unit_Type unit_type, frontend_c *frontend  // end macro
+#define SCHEDULE_INTERFACE_PARAMS()                                           \
+  int core_id, pqueue_c<int> **q_iaq,                                         \
+    pqueue_c<gpu_allocq_entry_s> **gpu_q_iaq, rob_c *rob, smc_rob_c *gpu_rob, \
+    int num_iaq, exec_c *exec, Unit_Type unit_type,                           \
+    frontend_c *frontend  // end macro
 
 #define SCHEDULE_INTERFACE_DECL()           \
   int core_id;                              \
@@ -56,14 +58,16 @@ POSSIBILITY OF SUCH DAMAGE.
   exec_c* exec;                             \
   Unit_Type unit_type;                      \
   frontend_c* frontend;                     \
-  // end macro
+// end macro
 
-#define SCHEDULE_INTERFACE_ARGS() \
-  core_id, q_iaq, gpu_q_iaq, rob, gpu_rob, num_iaq, exec, unit_type, frontend  // end macro
+#define SCHEDULE_INTERFACE_ARGS()                                    \
+  core_id, q_iaq, gpu_q_iaq, rob, gpu_rob, num_iaq, exec, unit_type, \
+    frontend  // end macro
 
-#define SCHEDULE_INTERFACE_INIT()                                                                                 \
-  core_id(core_id), q_iaq(q_iaq), gpu_q_iaq(gpu_q_iaq), rob(rob), gpu_rob(gpu_rob), num_iaq(num_iaq), exec(exec), \
-    unit_type(unit_type), frontend(frontend)  // end macro
+#define SCHEDULE_INTERFACE_INIT()                                         \
+  core_id(core_id), q_iaq(q_iaq), gpu_q_iaq(gpu_q_iaq), rob(rob),         \
+    gpu_rob(gpu_rob), num_iaq(num_iaq), exec(exec), unit_type(unit_type), \
+    frontend(frontend)  // end macro
 
 #define SCHEDULE_INTERFACE_CAST() \
   static_cast<void>(core_id);     \
@@ -99,8 +103,8 @@ public:
   /**
    * Constructor
    */
-  schedule_c(exec_c* exec, int core_id, Unit_Type unit_type, frontend_c* frontend, pqueue_c<int>** alloc_q,
-             macsim_c* simBase);
+  schedule_c(exec_c* exec, int core_id, Unit_Type unit_type,
+             frontend_c* frontend, pqueue_c<int>** alloc_q, macsim_c* simBase);
 
   /**
    * Destructor

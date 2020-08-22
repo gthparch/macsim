@@ -929,30 +929,40 @@ void a64_decoder_c::init_pin_convert() {
   m_fp_uop_table[ARM64_INS_TLBI] = UOP_NOP;
 }
 
-inst_info_s *a64_decoder_c::get_inst_info(thread_s *thread_trace_info, int core_id, int sim_thread_id) {
+inst_info_s *a64_decoder_c::get_inst_info(thread_s *thread_trace_info,
+                                          int core_id, int sim_thread_id) {
   trace_info_a64_s trace_info;
   inst_info_s *info;
   // Copy current instruction to data structure
-  memcpy(&trace_info, thread_trace_info->m_prev_trace_info, sizeof(trace_info_a64_s));
+  memcpy(&trace_info, thread_trace_info->m_prev_trace_info,
+         sizeof(trace_info_a64_s));
 
   // Set next pc address
-  trace_info_a64_s *next_trace_info = static_cast<trace_info_a64_s *>(thread_trace_info->m_next_trace_info);
+  trace_info_a64_s *next_trace_info =
+    static_cast<trace_info_a64_s *>(thread_trace_info->m_next_trace_info);
   trace_info.m_instruction_next_addr = next_trace_info->m_instruction_addr;
 
   // Copy next instruction to current instruction field
-  memcpy(thread_trace_info->m_prev_trace_info, thread_trace_info->m_next_trace_info, sizeof(trace_info_a64_s));
+  memcpy(thread_trace_info->m_prev_trace_info,
+         thread_trace_info->m_next_trace_info, sizeof(trace_info_a64_s));
 
-  DEBUG_CORE(core_id, "trace_read core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n", core_id,
-             sim_thread_id, (Addr)(trace_info.m_instruction_addr), static_cast<int>(trace_info.m_opcode),
-             (Counter)(thread_trace_info->m_temp_inst_count));
+  DEBUG_CORE(
+    core_id,
+    "trace_read core_id:%d thread_id:%d pc:0x%llx opcode:%d inst_count:%llu\n",
+    core_id, sim_thread_id, (Addr)(trace_info.m_instruction_addr),
+    static_cast<int>(trace_info.m_opcode),
+    (Counter)(thread_trace_info->m_temp_inst_count));
 
   // So far we have raw instruction format, so we need to MacSim specific trace format
-  info = convert_pinuop_to_t_uop(&trace_info, thread_trace_info->m_trace_uop_array, core_id, sim_thread_id);
+  info = convert_pinuop_to_t_uop(
+    &trace_info, thread_trace_info->m_trace_uop_array, core_id, sim_thread_id);
 
   return info;
 }
 
-inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_s **trace_uop, int core_id,
+inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
+                                                    trace_uop_s **trace_uop,
+                                                    int core_id,
                                                     int sim_thread_id) {
   trace_info_a64_s *pi = static_cast<trace_info_a64_s *>(trace_info);
   core_c *core = m_simBase->m_core_pointers[core_id];
@@ -1036,8 +1046,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
       trace_uop[0]->m_cf_type = NOT_CF;
       trace_uop[0]->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
-      if (pi->m_opcode == ARM64_INS_LDAXR || pi->m_opcode == ARM64_INS_LDAXRB || pi->m_opcode == ARM64_INS_LDAXRH ||
-          pi->m_opcode == ARM64_INS_LDAR || pi->m_opcode == ARM64_INS_LDARB || pi->m_opcode == ARM64_INS_LDARH)
+      if (pi->m_opcode == ARM64_INS_LDAXR || pi->m_opcode == ARM64_INS_LDAXRB ||
+          pi->m_opcode == ARM64_INS_LDAXRH || pi->m_opcode == ARM64_INS_LDAR ||
+          pi->m_opcode == ARM64_INS_LDARB || pi->m_opcode == ARM64_INS_LDARH)
         trace_uop[0]->m_bar_type = ACQ_BAR;
       else
         trace_uop[0]->m_bar_type = NOT_BAR;
@@ -1099,7 +1110,8 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
         trace_uop[1]->m_eom = 0;
         trace_uop[1]->m_alu_uop = false;
         trace_uop[1]->m_inst_size = pi->m_size;
-        trace_uop[1]->m_mul_mem_uops = 0;  // pi->m_has_immediate; // uncoalesced memory accesses
+        trace_uop[1]->m_mul_mem_uops =
+          0;  // pi->m_has_immediate; // uncoalesced memory accesses
 
         num_uop = 2;
       }  // num_loads == 2
@@ -1121,8 +1133,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
     // load acquire: create a new acquire UOP fence
     if (num_uop == 1 &&
-        (pi->m_opcode == ARM64_INS_LDAXR || pi->m_opcode == ARM64_INS_LDAXRB || pi->m_opcode == ARM64_INS_LDAXRH ||
-         pi->m_opcode == ARM64_INS_LDAR || pi->m_opcode == ARM64_INS_LDARB || pi->m_opcode == ARM64_INS_LDARH)) {
+        (pi->m_opcode == ARM64_INS_LDAXR || pi->m_opcode == ARM64_INS_LDAXRB ||
+         pi->m_opcode == ARM64_INS_LDAXRH || pi->m_opcode == ARM64_INS_LDAR ||
+         pi->m_opcode == ARM64_INS_LDARB || pi->m_opcode == ARM64_INS_LDARH)) {
       trace_uop[1]->m_opcode = pi->m_opcode;
       trace_uop[1]->m_mem_type = NOT_MEM;
       trace_uop[1]->m_cf_type = NOT_CF;
@@ -1138,8 +1151,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
     // store release: create a new release UOP fence
     if (num_uop == 0 &&
-        (pi->m_opcode == ARM64_INS_STLXR || pi->m_opcode == ARM64_INS_STLXRB || pi->m_opcode == ARM64_INS_STLXRH ||
-         pi->m_opcode == ARM64_INS_STLR || pi->m_opcode == ARM64_INS_STLRB || pi->m_opcode == ARM64_INS_STLRH)) {
+        (pi->m_opcode == ARM64_INS_STLXR || pi->m_opcode == ARM64_INS_STLXRB ||
+         pi->m_opcode == ARM64_INS_STLXRH || pi->m_opcode == ARM64_INS_STLR ||
+         pi->m_opcode == ARM64_INS_STLRB || pi->m_opcode == ARM64_INS_STLRH)) {
       trace_uop[0]->m_opcode = pi->m_opcode;
       trace_uop[0]->m_mem_type = NOT_MEM;
       trace_uop[0]->m_cf_type = NOT_CF;
@@ -1190,8 +1204,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       cur_trace_uop->m_opcode = pi->m_opcode;
       cur_trace_uop->m_cf_type = NOT_CF;
       cur_trace_uop->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
-      if (pi->m_opcode == ARM64_INS_STLXR || pi->m_opcode == ARM64_INS_STLXRB || pi->m_opcode == ARM64_INS_STLXRH ||
-          pi->m_opcode == ARM64_INS_STLR || pi->m_opcode == ARM64_INS_STLRB || pi->m_opcode == ARM64_INS_STLRH)
+      if (pi->m_opcode == ARM64_INS_STLXR || pi->m_opcode == ARM64_INS_STLXRB ||
+          pi->m_opcode == ARM64_INS_STLXRH || pi->m_opcode == ARM64_INS_STLR ||
+          pi->m_opcode == ARM64_INS_STLRB || pi->m_opcode == ARM64_INS_STLRH)
         cur_trace_uop->m_bar_type = REL_BAR;
       else
         cur_trace_uop->m_bar_type = NOT_BAR;
@@ -1240,10 +1255,10 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
           cur_trace_uop->m_cf_type = CF_IBR;
           break;
 
-          /* not currently mapped
-             cur_trace_uop->m_cf_type   = CF_ICALL;
-             cur_trace_uop->m_cf_type   = CF_ICO;
-          */
+        /* not currently mapped
+           cur_trace_uop->m_cf_type   = CF_ICALL;
+           cur_trace_uop->m_cf_type   = CF_ICO;
+        */
         case ARM64_INS_RET:
         case ARM64_INS_ERET:
           cur_trace_uop->m_cf_type = CF_RET;
@@ -1260,11 +1275,13 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
     }
 
     // Full Fence instruction
-    if (num_uop == 0 && (pi->m_opcode == ARM64_INS_DMB || pi->m_opcode == ARM64_INS_DSB)) {
+    if (num_uop == 0 &&
+        (pi->m_opcode == ARM64_INS_DMB || pi->m_opcode == ARM64_INS_DSB)) {
       trace_uop[0]->m_opcode = pi->m_opcode;
       trace_uop[0]->m_mem_type = NOT_MEM;
       trace_uop[0]->m_cf_type = NOT_CF;
-      if (pi->m_st_vaddr == ARM64_BARRIER_ISHLD || pi->m_st_vaddr == ARM64_BARRIER_OSHLD ||
+      if (pi->m_st_vaddr == ARM64_BARRIER_ISHLD ||
+          pi->m_st_vaddr == ARM64_BARRIER_OSHLD ||
           pi->m_st_vaddr == ARM64_BARRIER_LD)
         trace_uop[0]->m_op_type = UOP_LFENCE;
       else
@@ -1287,7 +1304,8 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       trace_uop[0]->m_mem_type = NOT_MEM;
       trace_uop[0]->m_cf_type = NOT_CF;
       trace_uop[0]->m_op_type =
-        (Uop_Type)((pi->m_is_fp) ? m_fp_uop_table[pi->m_opcode] : m_int_uop_table[pi->m_opcode]);
+        (Uop_Type)((pi->m_is_fp) ? m_fp_uop_table[pi->m_opcode]
+                                 : m_int_uop_table[pi->m_opcode]);
       trace_uop[0]->m_bar_type = NOT_BAR;
       trace_uop[0]->m_num_dest_regs = 0;
       trace_uop[0]->m_num_src_regs = 0;
@@ -1313,15 +1331,18 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
         info->m_trace_info.m_bom = false;
         info->m_trace_info.m_eom = false;
       }
-      ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n", core_id);
+      ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n",
+              core_id);
 
       trace_uop[ii]->m_addr = pi->m_instruction_addr;
 
       DEBUG_CORE(core_id,
-                 "pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx num_src_regs:%d num_read_regs:%d "
+                 "pi->instruction_addr:0x%llx trace_uop[%d]->addr:0x%llx "
+                 "num_src_regs:%d num_read_regs:%d "
                  "pi:num_dst_regs:%d uop:num_dst_regs:%d \n",
-                 (Addr)(pi->m_instruction_addr), ii, trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs,
-                 pi->m_num_read_regs, pi->m_num_dest_regs, trace_uop[ii]->m_num_dest_regs);
+                 (Addr)(pi->m_instruction_addr), ii, trace_uop[ii]->m_addr,
+                 trace_uop[ii]->m_num_src_regs, pi->m_num_read_regs,
+                 pi->m_num_dest_regs, trace_uop[ii]->m_num_dest_regs);
 
       // set source register
       for (jj = 0; jj < trace_uop[ii]->m_num_src_regs; ++jj) {
@@ -1331,7 +1352,8 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       }
 
       // store or control flow has a dependency whoever the last one
-      if ((trace_uop[ii]->m_mem_type == MEM_ST) || (trace_uop[ii]->m_cf_type != NOT_CF)) {
+      if ((trace_uop[ii]->m_mem_type == MEM_ST) ||
+          (trace_uop[ii]->m_cf_type != NOT_CF)) {
         if (tmp_reg_needed && !inst_has_ALU_uop) {
           (trace_uop[ii])->m_srcs[jj].m_type = (Reg_Type)0;
           (trace_uop[ii])->m_srcs[jj].m_id = TR_REG_TMP0;
@@ -1375,8 +1397,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
 
-      DEBUG_CORE(core_id, "tuop: pc 0x%llx num_src_reg:%d num_dest_reg:%d \n", trace_uop[ii]->m_addr,
-                 trace_uop[ii]->m_num_src_regs, trace_uop[ii]->m_num_dest_regs);
+      DEBUG_CORE(core_id, "tuop: pc 0x%llx num_src_reg:%d num_dest_reg:%d \n",
+                 trace_uop[ii]->m_addr, trace_uop[ii]->m_num_src_regs,
+                 trace_uop[ii]->m_num_dest_regs);
 
       trace_uop[ii]->m_info = info;
 
@@ -1389,9 +1412,9 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
 
     ASSERT(num_uop > 0);
   }  // NEW_ENTRY
-     ///
-     /// Hash table already has matching instruction, we can skip above decoding process
-     ///
+  ///
+  /// Hash table already has matching instruction, we can skip above decoding process
+  ///
   else {
     ASSERT(info);
 
@@ -1436,12 +1459,14 @@ inst_info_s *a64_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop_
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
-  DEBUG("%s: read: %d write: %d\n", a64_opcode_names[pi->m_opcode], pi->m_num_read_regs, pi->m_num_dest_regs);
+  DEBUG("%s: read: %d write: %d\n", a64_opcode_names[pi->m_opcode],
+        pi->m_num_read_regs, pi->m_num_dest_regs);
 
   return first_info;
 }
 
-void a64_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_uop_s *trace_uop, Addr rep_offset,
+void a64_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
+                                    trace_uop_s *trace_uop, Addr rep_offset,
                                     int core_id) {
   trace_info_a64_s *pi = static_cast<trace_info_a64_s *>(trace_info);
   core_c *core = m_simBase->m_core_pointers[core_id];
@@ -1461,8 +1486,10 @@ void a64_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info, trace_u
         trace_uop->m_va = 0xabadabad;
         trace_uop->m_mem_size = 4;
       }
-    } else if ((info->m_table_info->m_mem_type == MEM_LD) || (info->m_table_info->m_mem_type == MEM_PF) ||
-               (info->m_table_info->m_mem_type >= MEM_SWPREF_NTA && info->m_table_info->m_mem_type <= MEM_SWPREF_T2)) {
+    } else if ((info->m_table_info->m_mem_type == MEM_LD) ||
+               (info->m_table_info->m_mem_type == MEM_PF) ||
+               (info->m_table_info->m_mem_type >= MEM_SWPREF_NTA &&
+                info->m_table_info->m_mem_type <= MEM_SWPREF_T2)) {
       if (info->m_trace_info.m_second_mem)
         trace_uop->m_va = pi->m_ld_vaddr2;
       else
@@ -1482,10 +1509,14 @@ void a64_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
   trace_info_a64_s *t_info = static_cast<trace_info_a64_s *>(trace_info);
 
   *m_dprint_output << "*** begin of the data structure *** " << endl;
-  *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id << endl;
-  *m_dprint_output << "uop_opcode " << a64_opcode_names[(uint32_t)t_info->m_opcode] << endl;
-  *m_dprint_output << "num_read_regs: " << hex << (uint32_t)t_info->m_num_read_regs << endl;
-  *m_dprint_output << "num_dest_regs: " << hex << (uint32_t)t_info->m_num_dest_regs << endl;
+  *m_dprint_output << "core_id:" << core_id << " thread_id:" << thread_id
+                   << endl;
+  *m_dprint_output << "uop_opcode "
+                   << a64_opcode_names[(uint32_t)t_info->m_opcode] << endl;
+  *m_dprint_output << "num_read_regs: " << hex
+                   << (uint32_t)t_info->m_num_read_regs << endl;
+  *m_dprint_output << "num_dest_regs: " << hex
+                   << (uint32_t)t_info->m_num_dest_regs << endl;
   /* TODO: Register name mappings
   for (uint32_t ii = 0; ii < (uint32_t) t_info->m_num_read_regs; ++ii)
     *m_dprint_output << "src" << ii << ": "
@@ -1496,20 +1527,30 @@ void a64_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
       << hex << g_tr_reg_names[static_cast<uint32_t>(t_info->m_dst[ii])] << endl;
   *m_dprint_output << "cf_type: " << hex << g_tr_cf_names[(uint32_t) t_info->m_cf_type] << endl;
   */
-  *m_dprint_output << "has_immediate: " << hex << (uint32_t)t_info->m_has_immediate << endl;
+  *m_dprint_output << "has_immediate: " << hex
+                   << (uint32_t)t_info->m_has_immediate << endl;
   *m_dprint_output << "r_dir:" << (uint32_t)t_info->m_rep_dir << endl;
   *m_dprint_output << "has_st: " << hex << (uint32_t)t_info->m_has_st << endl;
   *m_dprint_output << "num_ld: " << hex << (uint32_t)t_info->m_num_ld << endl;
-  *m_dprint_output << "mem_read_size: " << hex << (uint32_t)t_info->m_mem_read_size << endl;
-  *m_dprint_output << "mem_write_size: " << hex << (uint32_t)t_info->m_mem_write_size << endl;
+  *m_dprint_output << "mem_read_size: " << hex
+                   << (uint32_t)t_info->m_mem_read_size << endl;
+  *m_dprint_output << "mem_write_size: " << hex
+                   << (uint32_t)t_info->m_mem_write_size << endl;
   *m_dprint_output << "is_fp: " << (uint32_t)t_info->m_is_fp << endl;
-  *m_dprint_output << "ld_vaddr1: " << hex << (uint64_t)t_info->m_ld_vaddr1 << endl;
-  *m_dprint_output << "ld_vaddr2: " << hex << (uint64_t)t_info->m_ld_vaddr2 << endl;
-  *m_dprint_output << "st_vaddr: " << hex << (uint64_t)t_info->m_st_vaddr << endl;
-  *m_dprint_output << "instruction_addr: " << hex << (uint64_t)t_info->m_instruction_addr << endl;
-  *m_dprint_output << "branch_target: " << hex << (uint64_t)t_info->m_branch_target << endl;
-  *m_dprint_output << "actually_taken: " << hex << (uint32_t)t_info->m_actually_taken << endl;
-  *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg << endl;
+  *m_dprint_output << "ld_vaddr1: " << hex << (uint64_t)t_info->m_ld_vaddr1
+                   << endl;
+  *m_dprint_output << "ld_vaddr2: " << hex << (uint64_t)t_info->m_ld_vaddr2
+                   << endl;
+  *m_dprint_output << "st_vaddr: " << hex << (uint64_t)t_info->m_st_vaddr
+                   << endl;
+  *m_dprint_output << "instruction_addr: " << hex
+                   << (uint64_t)t_info->m_instruction_addr << endl;
+  *m_dprint_output << "branch_target: " << hex
+                   << (uint64_t)t_info->m_branch_target << endl;
+  *m_dprint_output << "actually_taken: " << hex
+                   << (uint32_t)t_info->m_actually_taken << endl;
+  *m_dprint_output << "write_flg: " << hex << (uint32_t)t_info->m_write_flg
+                   << endl;
   *m_dprint_output << "size: " << hex << (uint64_t)t_info->m_size << endl;
   *m_dprint_output << "*** end of the data structure *** " << endl << endl;
 }

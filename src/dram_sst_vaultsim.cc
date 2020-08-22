@@ -80,7 +80,8 @@ void dram_sst_vaultsim_c::run_a_cycle(bool pll_lock) {
 }
 
 void dram_sst_vaultsim_c::receive_packet() {
-  for (auto it = m_pending_request.begin(), et = m_pending_request.end(); it != et; ++it) {
+  for (auto it = m_pending_request.begin(), et = m_pending_request.end();
+       it != et; ++it) {
     uint64_t key = it->first;
     mem_req_s* req = it->second;
 
@@ -135,14 +136,16 @@ void dram_sst_vaultsim_c::receive(void) {
 
 void dram_sst_vaultsim_c::send(void) {
   vector<mem_req_s*> temp_list;
-  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E;
+       ++I) {
     mem_req_s* req = (*I);
     req->m_msg_type = NOC_FILL;
-    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
+    bool insert_packet =
+      NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
     if (!insert_packet) {
-      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id, req->m_addr,
-            mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id,
+            req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
       break;
     }
 

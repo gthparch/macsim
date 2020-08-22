@@ -74,9 +74,14 @@ static Uop_Dispatch_Latency uop_dispatch_latency_ptx[] = {
 };
 
 // schedule_smc_c constructor
-schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s> **gpu_allocq, smc_rob_c *gpu_rob, exec_c *exec,
-                               Unit_Type unit_type, frontend_c *frontend, macsim_c *simBase)
-  : schedule_c(exec, core_id, unit_type, frontend, NULL, simBase), m_gpu_rob(gpu_rob), m_gpu_allocq(gpu_allocq) {
+schedule_smc_c::schedule_smc_c(int core_id,
+                               pqueue_c<gpu_allocq_entry_s> **gpu_allocq,
+                               smc_rob_c *gpu_rob, exec_c *exec,
+                               Unit_Type unit_type, frontend_c *frontend,
+                               macsim_c *simBase)
+  : schedule_c(exec, core_id, unit_type, frontend, NULL, simBase),
+    m_gpu_rob(gpu_rob),
+    m_gpu_allocq(gpu_allocq) {
   m_simBase = simBase;
 
   // configuration
@@ -99,13 +104,16 @@ schedule_smc_c::schedule_smc_c(int core_id, pqueue_c<gpu_allocq_entry_s> **gpu_a
   m_first_schlist = 0;
   m_last_schlist = 0;
   m_dispatch_busy_cycle = new Counter[*KNOB(KNOB_NUM_WARP_SCHEDULER)];
-  fill_n(m_dispatch_busy_cycle, m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER->getValue(), 0);
+  fill_n(m_dispatch_busy_cycle,
+         m_simBase->m_knobs->KNOB_NUM_WARP_SCHEDULER->getValue(), 0);
   m_sfu_dispatch_busy_cycle = 0;
 
   int factor = *KNOB(KNOB_PTX_DISPATCH_LATENCY_FACTOR);
-  int latency_array_size = (sizeof(uop_dispatch_latency_ptx) / sizeof(uop_dispatch_latency_ptx[0]));
+  int latency_array_size =
+    (sizeof(uop_dispatch_latency_ptx) / sizeof(uop_dispatch_latency_ptx[0]));
   for (int i = 0; i < latency_array_size; ++i) {
-    m_dispatch_latency[uop_dispatch_latency_ptx[i].uop_type_s] = factor * uop_dispatch_latency_ptx[i].m_latency;
+    m_dispatch_latency[uop_dispatch_latency_ptx[i].uop_type_s] =
+      factor * uop_dispatch_latency_ptx[i].m_latency;
   }
   m_next_sched_id = 0;
 }
@@ -150,7 +158,8 @@ void schedule_smc_c::advance(int q_index) {
     }
 
     ALLOCQ_Type allocq = (*m_rob)[allocq_entry.m_rob_entry]->m_allocq_num;
-    if ((m_count[allocq] >= m_sched_rate[allocq]) || (m_num_per_sched[allocq] >= m_sched_size[allocq])) {
+    if ((m_count[allocq] >= m_sched_rate[allocq]) ||
+        (m_num_per_sched[allocq] >= m_sched_size[allocq])) {
       break;
     }
 
@@ -178,8 +187,8 @@ void schedule_smc_c::advance(int q_index) {
     ++m_num_per_sched[allocq];
     assert(m_last_schlist != m_first_schlist);
 
-    DEBUG("core_id:%d thread_id:%d uop_num:%lld inserted into scheduler\n", m_core_id, cur_uop->m_thread_id,
-          cur_uop->m_uop_num);
+    DEBUG("core_id:%d thread_id:%d uop_num:%lld inserted into scheduler\n",
+          m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
 
     POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_W);
   }
@@ -216,17 +225,23 @@ bool schedule_smc_c::check_srcs_smc(int thread_id, int entry) {
       "core_cycle_m_count:%lld core_id:%d thread_id:%d uop_num:%llu "
       "src_uop_num:%llu src_uop->uop_num:%llu src_uop->done_cycle:%lld "
       "src_uop->uop_num:%llu  src_uop_num:%llu \n",
-      m_cur_core_cycle, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, src_uop_num, src_uop->m_uop_num,
-      src_uop->m_done_cycle, src_uop->m_uop_num, src_uop_num);
+      m_cur_core_cycle, m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num,
+      src_uop_num, src_uop->m_uop_num, src_uop->m_done_cycle,
+      src_uop->m_uop_num, src_uop_num);
 
     // Check if the source uop is ready
-    if ((src_uop->m_done_cycle == 0) || (m_simBase->m_core_cycle[m_core_id] < src_uop->m_done_cycle)) {
+    if ((src_uop->m_done_cycle == 0) ||
+        (m_simBase->m_core_cycle[m_core_id] < src_uop->m_done_cycle)) {
       // Source is not ready.
       // Hence we update the last_dep_exec field of this uop and return.
-      if (!cur_uop->m_last_dep_exec || (*(cur_uop->m_last_dep_exec) < src_uop->m_done_cycle)) {
-        DEBUG("*cur_uop->last_dep_exec:%lld src_uop->uop_num:%lld src_uop->done_cycle:%lld \n",
-              cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec) : 0, src_uop ? src_uop->m_uop_num : 0,
-              src_uop ? src_uop->m_done_cycle : 1);
+      if (!cur_uop->m_last_dep_exec ||
+          (*(cur_uop->m_last_dep_exec) < src_uop->m_done_cycle)) {
+        DEBUG(
+          "*cur_uop->last_dep_exec:%lld src_uop->uop_num:%lld "
+          "src_uop->done_cycle:%lld \n",
+          cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec) : 0,
+          src_uop ? src_uop->m_uop_num : 0,
+          src_uop ? src_uop->m_done_cycle : 1);
 
         cur_uop->m_last_dep_exec = &(src_uop->m_done_cycle);
       }
@@ -244,7 +259,8 @@ bool schedule_smc_c::check_srcs_smc(int thread_id, int entry) {
 // schedule an uop from reorder buffer
 // called by schedule_io_c::run_a_cycle
 // call exec_c::exec function for uop execution
-bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE *sched_fail_reason) {
+bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry,
+                                      SCHED_FAIL_TYPE *sched_fail_reason) {
   uop_c *cur_uop = NULL;
   rob_c *thread_m_rob = m_gpu_rob->get_thread_rob(thread_id);
 
@@ -257,8 +273,10 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
   DEBUG(
     "uop_schedule core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
     "uop.va:0x%llx allocq:%d mem_type:%d last_dep_exec:%llu done_cycle:%llu\n",
-    m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, cur_uop->m_vaddr, cur_uop->m_allocq_num,
-    cur_uop->m_mem_type, (cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec) : 0), cur_uop->m_done_cycle);
+    m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num,
+    cur_uop->m_vaddr, cur_uop->m_allocq_num, cur_uop->m_mem_type,
+    (cur_uop->m_last_dep_exec ? *(cur_uop->m_last_dep_exec) : 0),
+    cur_uop->m_done_cycle);
 
   // Return if sources are not ready
   if (!bogus && !(cur_uop->m_srcs_rdy) && cur_uop->m_last_dep_exec &&
@@ -271,8 +289,8 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
     // source registers are not ready
     if (!check_srcs_smc(thread_id, entry)) {
       *sched_fail_reason = SCHED_FAIL_OPERANDS_NOT_READY;
-      DEBUG("core_id:%d thread_id:%d uop_num:%lld operands are not ready \n", m_core_id, cur_uop->m_thread_id,
-            cur_uop->m_uop_num);
+      DEBUG("core_id:%d thread_id:%d uop_num:%lld operands are not ready \n",
+            m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
 
       return false;
     }
@@ -280,16 +298,18 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
     // Check for port availability.
     if (!m_exec->port_available(q_num)) {
       *sched_fail_reason = SCHED_FAIL_NO_AVAILABLE_PORTS;
-      DEBUG("core_id:%d thread_id:%d uop_num:%lld ports are not ready \n", m_core_id, cur_uop->m_thread_id,
-            cur_uop->m_uop_num);
+      DEBUG("core_id:%d thread_id:%d uop_num:%lld ports are not ready \n",
+            m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
       return false;
     }
 
     // check available mshr spaces for scheduling
     core_c *core = m_simBase->m_core_pointers[m_core_id];
-    if ("ptx" == core->get_core_type() && cur_uop->m_mem_type != NOT_MEM && cur_uop->m_num_child_uops > 0) {
+    if ("ptx" == core->get_core_type() && cur_uop->m_mem_type != NOT_MEM &&
+        cur_uop->m_num_child_uops > 0) {
       // constant or texture memory access
-      if (cur_uop->m_mem_type == MEM_LD_CM || cur_uop->m_mem_type == MEM_LD_TM) {
+      if (cur_uop->m_mem_type == MEM_LD_CM ||
+          cur_uop->m_mem_type == MEM_LD_TM) {
         if (!m_simBase->m_memory->get_num_avail_entry(m_core_id)) {
           *sched_fail_reason = SCHED_FAIL_NO_MEM_REQ_SLOTS;
           return false;
@@ -307,14 +327,15 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
   if (!m_exec->exec(thread_id, entry, cur_uop)) {
     if (cur_uop->m_mem_type == MEM_LD_SM || cur_uop->m_mem_type == MEM_ST_SM)
       *sched_fail_reason = SCHED_FAIL_NO_AVAILABLE_PORTS;
-    else if (cur_uop->m_mem_type == MEM_LD_CM || cur_uop->m_mem_type == MEM_LD_TM)
+    else if (cur_uop->m_mem_type == MEM_LD_CM ||
+             cur_uop->m_mem_type == MEM_LD_TM)
       *sched_fail_reason = SCHED_FAIL_NO_MEM_REQ_SLOTS;
     else  // other (global, texture, local) memory access
       *sched_fail_reason = SCHED_FAIL_MEM_MANAGEMENT;
 
     // uop could not execute
-    DEBUG("core_id:%d thread_id:%d uop_num:%lld just cannot be executed\n", m_core_id, cur_uop->m_thread_id,
-          cur_uop->m_uop_num);
+    DEBUG("core_id:%d thread_id:%d uop_num:%lld just cannot be executed\n",
+          m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num);
 
     return false;
   }
@@ -323,14 +344,16 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
   STAT_EVENT(DISPATCHED_INST);
   STAT_EVENT_N(DISPATCH_WAIT, m_cur_core_cycle - cur_uop->m_alloc_cycle);
   STAT_CORE_EVENT(m_core_id, CORE_DISPATCHED_INST);
-  STAT_CORE_EVENT_N(m_core_id, CORE_DISPATCH_WAIT, m_cur_core_cycle - cur_uop->m_alloc_cycle);
+  STAT_CORE_EVENT_N(m_core_id, CORE_DISPATCH_WAIT,
+                    m_cur_core_cycle - cur_uop->m_alloc_cycle);
 
   POWER_CORE_EVENT(m_core_id, POWER_RESERVATION_STATION_R_TAG);
   POWER_CORE_EVENT(m_core_id, POWER_INST_ISSUE_SEL_LOGIC_R);
   POWER_CORE_EVENT(m_core_id, POWER_PAYLOAD_RAM_R);
 
   // Decrement dispatch m_count for the current thread
-  --m_simBase->m_core_pointers[m_core_id]->m_ops_to_be_dispatched[cur_uop->m_thread_id];
+  --m_simBase->m_core_pointers[m_core_id]
+      ->m_ops_to_be_dispatched[cur_uop->m_thread_id];
 
   // Uop m_exec ok; update scheduler
   cur_uop->m_in_scheduler = false;
@@ -357,8 +380,9 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry, SCHED_FAIL_TYPE 
     "done schedule core_id:%d thread_id:%d uop_num:%lld inst_num:%lld "
     "entry:%d queue:%d m_num_in_sched:%d m_num_per_sched[general]:%d "
     "m_num_per_sched[mem]:%d m_num_per_sched[fp]:%d done_cycle:%lld\n",
-    m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num, entry, cur_uop->m_allocq_num,
-    m_num_in_sched, m_num_per_sched[gen_ALLOCQ], m_num_per_sched[mem_ALLOCQ], m_num_per_sched[fp_ALLOCQ],
+    m_core_id, cur_uop->m_thread_id, cur_uop->m_uop_num, cur_uop->m_inst_num,
+    entry, cur_uop->m_allocq_num, m_num_in_sched, m_num_per_sched[gen_ALLOCQ],
+    m_num_per_sched[mem_ALLOCQ], m_num_per_sched[fp_ALLOCQ],
     cur_uop->m_done_cycle);
 
   return true;
@@ -389,13 +413,15 @@ void schedule_smc_c::run_a_cycle(void) {
   int num_schedulers = *KNOB(KNOB_NUM_WARP_SCHEDULER);
   int round_count;
   int inst_per_sched = 1;
-  for (int sched_id = m_next_sched_id, sched_count = 0; sched_count < num_schedulers;
+  for (int sched_id = m_next_sched_id, sched_count = 0;
+       sched_count < num_schedulers;
        sched_id = (sched_id + 1) % num_schedulers, ++sched_count) {
     if (m_dispatch_busy_cycle[sched_id] > m_cur_core_cycle) {
       continue;
     }
     round_count = 0;
-    for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) {
+    for (int ii = m_first_schlist; ii != m_last_schlist;
+         ii = (ii + 1) % m_schlist_size) {
       // -------------------------------------
       // Schedule stops when
       // 1) no uops in the scheduler (m_num_in_sched and first == last)
@@ -460,9 +486,11 @@ void schedule_smc_c::run_a_cycle(void) {
             */
 
             if (sfu_inst) {
-              m_sfu_dispatch_busy_cycle = m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
+              m_sfu_dispatch_busy_cycle =
+                m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
             } else {
-              m_dispatch_busy_cycle[sched_id] = m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
+              m_dispatch_busy_cycle[sched_id] =
+                m_cur_core_cycle + m_dispatch_latency[cur_uop->m_uop_type];
             }
           }
           ++round_count;
@@ -470,7 +498,8 @@ void schedule_smc_c::run_a_cycle(void) {
             break;
           }
         } else {
-          STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 6));
+          STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS +
+                                       MIN2(sched_fail_reason, 6));
         }
       } else if (ii == m_first_schlist) {
         m_first_schlist = (m_first_schlist + 1) % m_schlist_size;
@@ -514,14 +543,17 @@ void schedule_smc_c::run_a_cycle(void) {
   // can schedule instructions from different threads. We enforce threads selected by
   // each warp scheduler should be different.
   int count = 0;
-  for (int ii = m_first_schlist; ii != m_last_schlist; ii = (ii + 1) % m_schlist_size) {
+  for (int ii = m_first_schlist; ii != m_last_schlist;
+       ii = (ii + 1) % m_schlist_size) {
     // -------------------------------------
     // Schedule stops when
     // 1) no uops in the scheduler (m_num_in_sched and first == last)
     // 2) # warp scheduler
     // 3) FIXME add width condition
     // -------------------------------------
-    if (!m_num_in_sched || m_first_schlist == m_last_schlist || count == *KNOB(KNOB_NUM_WARP_SCHEDULER)) break;
+    if (!m_num_in_sched || m_first_schlist == m_last_schlist ||
+        count == *KNOB(KNOB_NUM_WARP_SCHEDULER))
+      break;
 
     SCHED_FAIL_TYPE sched_fail_reason;
 
@@ -544,7 +576,8 @@ void schedule_smc_c::run_a_cycle(void) {
         uop_scheduled = true;
         ++count;
       } else {
-        STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 5));
+        STAT_CORE_EVENT(
+          m_core_id, SCHED_FAILED_REASON_SUCCESS + MIN2(sched_fail_reason, 5));
       }
     } else if (ii == m_first_schlist) {
       m_first_schlist = (m_first_schlist + 1) % m_schlist_size;
@@ -565,8 +598,9 @@ void schedule_smc_c::run_a_cycle(void) {
 #endif
 
 bool schedule_smc_c::is_sfu_inst(uop_c *uop) {
-  if (uop->m_uop_type == UOP_GPU_FCOS || uop->m_uop_type == UOP_GPU_FEX2 || uop->m_uop_type == UOP_GPU_FLG2 ||
-      uop->m_uop_type == UOP_GPU_FRCP || uop->m_uop_type == UOP_GPU_FRSQRT || uop->m_uop_type == UOP_GPU_FSIN ||
+  if (uop->m_uop_type == UOP_GPU_FCOS || uop->m_uop_type == UOP_GPU_FEX2 ||
+      uop->m_uop_type == UOP_GPU_FLG2 || uop->m_uop_type == UOP_GPU_FRCP ||
+      uop->m_uop_type == UOP_GPU_FRSQRT || uop->m_uop_type == UOP_GPU_FSIN ||
       uop->m_uop_type == UOP_GPU_FSQRT) {
     return true;
   }

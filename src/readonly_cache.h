@@ -58,8 +58,9 @@ public:
   /**
    *  \brief constructor to create a read-only cache
    */
-  readonly_cache_c(string name, int c_id, uns32 c_size, uns8 c_assoc, uns8 c_line_size, uns8 c_banks, uns8 c_cycles,
-                   bool by_pass, Cache_Type c_type, int c_data_size, macsim_c *simBase);
+  readonly_cache_c(string name, int c_id, uns32 c_size, uns8 c_assoc,
+                   uns8 c_line_size, uns8 c_banks, uns8 c_cycles, bool by_pass,
+                   Cache_Type c_type, int c_data_size, macsim_c *simBase);
 
   /*! \fn ~readonly_cache_c()
    *  \brief destructor for class readonly_cache_c

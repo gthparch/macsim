@@ -76,7 +76,8 @@ void network_mesh_c::run_a_cycle(bool pll_lock) {
     m_router.push_back(new_router);                                            \
   }
 
-void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_llc, int num_mc) {
+void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_llc,
+                          int num_mc) {
   m_num_router = 0;
   m_num_cpu = num_cpu;
   m_num_gpu = num_gpu;
@@ -101,11 +102,13 @@ void network_mesh_c::init(int num_cpu, int num_gpu, int num_l3, int num_llc, int
     ++width;
   }
 
-  report("TOTAL_ROUTER:" << m_num_router << " CPU:" << m_num_cpu << " GPU:" << m_num_gpu << " L3:" << m_num_l3
+  report("TOTAL_ROUTER:" << m_num_router << " CPU:" << m_num_cpu
+                         << " GPU:" << m_num_gpu << " L3:" << m_num_l3
                          << " LLC:" << m_num_llc << " MC:" << m_num_mc);
 
   for (int ii = 0; ii < m_num_router; ++ii) {
-    m_router[ii]->init(m_num_router, &g_total_packet, m_flit_pool, m_credit_pool);
+    m_router[ii]->init(m_num_router, &g_total_packet, m_flit_pool,
+                       m_credit_pool);
   }
 
   // connect routers
@@ -181,7 +184,8 @@ void network_mesh_c::print(void) {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-router_mesh_c::router_mesh_c(macsim_c* simBase, int type, int id) : router_c(simBase, type, id, 5) {
+router_mesh_c::router_mesh_c(macsim_c* simBase, int type, int id)
+  : router_c(simBase, type, id, 5) {
   // configurations
   m_topology = "mesh";
   assert(*KNOB(KNOB_NOC_DIMENSION) == 2);
@@ -198,7 +202,8 @@ void router_mesh_c::stage_rc(void) {
       if (m_input_buffer[port][vc].empty()) continue;
 
       flit_c* flit = m_input_buffer[port][vc].front();
-      if (flit->m_head == true && flit->m_state == IB && flit->m_rdy_cycle <= m_cycle) {
+      if (flit->m_head == true && flit->m_state == IB &&
+          flit->m_rdy_cycle <= m_cycle) {
         fill_n(m_route[port][vc][0], m_num_port, false);
         fill_n(m_route[port][vc][1], m_num_port, false);
         // local
@@ -234,14 +239,18 @@ void router_mesh_c::stage_rc(void) {
             m_route[port][vc][1][DOWN] = true;
         }
         flit->m_state = RC;
-        DEBUG("cycle:%-10lld node:%d [RC] req_id:%d flit_id:%d src:%d dst:%d ip:%d vc:%d\n", m_cycle, m_id,
-              flit->m_req->m_id, flit->m_id, flit->m_req->m_msg_src, flit->m_req->m_msg_dst, port, vc);
+        DEBUG(
+          "cycle:%-10lld node:%d [RC] req_id:%d flit_id:%d src:%d dst:%d ip:%d "
+          "vc:%d\n",
+          m_cycle, m_id, flit->m_req->m_id, flit->m_id, flit->m_req->m_msg_src,
+          flit->m_req->m_msg_dst, port, vc);
       }
     }
   }
 }
 
-void router_mesh_c::stage_vca_pick_winner(int oport, int ovc, int& iport, int& ivc) {
+void router_mesh_c::stage_vca_pick_winner(int oport, int ovc, int& iport,
+                                          int& ivc) {
   int rc_index = ovc / (m_num_vc - 1);
 
   // Oldest-first arbitration
@@ -253,12 +262,14 @@ void router_mesh_c::stage_vca_pick_winner(int oport, int ovc, int& iport, int& i
       if (ii == oport) continue;
 
       for (int jj = 0; jj < m_num_vc; ++jj) {
-        if (m_input_buffer[ii][jj].empty() || !m_route[ii][jj][rc_index][oport]) continue;
+        if (m_input_buffer[ii][jj].empty() || !m_route[ii][jj][rc_index][oport])
+          continue;
 
         flit_c* flit = m_input_buffer[ii][jj].front();
 
         // header && RC stage && oldest
-        if (flit->m_head == true && flit->m_state == RC && flit->m_timestamp < oldest_timestamp) {
+        if (flit->m_head == true && flit->m_state == RC &&
+            flit->m_timestamp < oldest_timestamp) {
           oldest_timestamp = flit->m_timestamp;
           iport = ii;
           ivc = jj;

@@ -60,16 +60,19 @@ dram_dramsim_c::dram_dramsim_c(macsim_c* simBase) : dram_c(simBase) {
   m_output_buffer = new list<mem_req_s*>;
   m_tmp_output_buffer = new list<mem_req_s*>;
   m_pending_request = new list<mem_req_s*>;
-  m_dramsim = getMemorySystemInstance("tools/DDR4_ramulator_2133P_8Gb_x8.ini", "tools/system.ini.igpu", "..",
+  m_dramsim = getMemorySystemInstance("tools/DDR4_ramulator_2133P_8Gb_x8.ini",
+                                      "tools/system.ini.igpu", "..",
                                       "resultsfilename", 65536);
 
   // this only makes sense when MC frequency is the same as that of CPU
   m_dramsim->setCPUClockSpeed(*KNOB(KNOB_CLOCK_MC) * 1e9);
 
   TransactionCompleteCB* read_cb =
-    new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::read_callback);
+    new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(
+      this, &dram_dramsim_c::read_callback);
   TransactionCompleteCB* write_cb =
-    new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(this, &dram_dramsim_c::write_callback);
+    new Callback<dram_dramsim_c, void, unsigned, uint64_t, uint64_t>(
+      this, &dram_dramsim_c::write_callback);
 
   m_dramsim->RegisterCallbacks(read_cb, write_cb, NULL);
 }
@@ -95,7 +98,8 @@ void dram_dramsim_c::run_a_cycle(bool temp) {
   ++m_cycle;
 }
 
-void dram_dramsim_c::read_callback(unsigned id, uint64_t address, uint64_t clock_cycle) {
+void dram_dramsim_c::read_callback(unsigned id, uint64_t address,
+                                   uint64_t clock_cycle) {
   // find requests with this address
   auto I = m_pending_request->begin();
   auto E = m_pending_request->end();
@@ -114,7 +118,8 @@ void dram_dramsim_c::read_callback(unsigned id, uint64_t address, uint64_t clock
   }
 }
 
-void dram_dramsim_c::write_callback(unsigned id, uint64_t address, uint64_t clock_cycle) {
+void dram_dramsim_c::write_callback(unsigned id, uint64_t address,
+                                    uint64_t clock_cycle) {
   // find requests with this address
   auto I = m_pending_request->begin();
   auto E = m_pending_request->end();
@@ -134,7 +139,8 @@ void dram_dramsim_c::receive(void) {
   mem_req_s* req = NETWORK->receive(MEM_MC, m_id);
   if (!req) return;
 
-  if (m_dramsim->addTransaction(req->m_type == MRT_WB, static_cast<uint64_t>(req->m_addr))) {
+  if (m_dramsim->addTransaction(req->m_type == MRT_WB,
+                                static_cast<uint64_t>(req->m_addr))) {
     STAT_EVENT(TOTAL_DRAM);
     m_pending_request->push_back(req);
     NETWORK->receive_pop(MEM_MC, m_id);
@@ -147,7 +153,8 @@ void dram_dramsim_c::receive(void) {
 void dram_dramsim_c::send(void) {
   vector<mem_req_s*> temp_list;
 
-  for (auto I = m_tmp_output_buffer->begin(), E = m_tmp_output_buffer->end(); I != E; ++I) {
+  for (auto I = m_tmp_output_buffer->begin(), E = m_tmp_output_buffer->end();
+       I != E; ++I) {
     mem_req_s* req = *I;
     if (req->m_rdy_cycle <= m_cycle) {
       temp_list.push_back(req);
@@ -161,14 +168,16 @@ void dram_dramsim_c::send(void) {
     m_tmp_output_buffer->remove((*itr));
   }
 
-  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E; ++I) {
+  for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E;
+       ++I) {
     mem_req_s* req = (*I);
     req->m_msg_type = NOC_FILL;
-    bool insert_packet = NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
+    bool insert_packet =
+      NETWORK->send(req, MEM_MC, m_id, MEM_LLC, req->m_cache_id[MEM_LLC]);
 
     if (!insert_packet) {
-      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id, req->m_addr,
-            mem_req_c::mem_req_type_name[req->m_type]);
+      DEBUG("MC[%d] req:%d addr:0x%llx type:%s noc busy\n", m_id, req->m_id,
+            req->m_addr, mem_req_c::mem_req_type_name[req->m_type]);
       break;
     }
 

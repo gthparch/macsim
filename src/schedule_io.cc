@@ -57,10 +57,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "all_knobs.h"
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SCHEDULE_STAGE, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_SCHEDULE_STAGE, ##args)
 
 // schedule_io_c constructor
-schedule_io_c::schedule_io_c(int core_id, pqueue_c<int>** alloc_q, rob_c* rob, exec_c* exec, Unit_Type unit_type,
+schedule_io_c::schedule_io_c(int core_id, pqueue_c<int>** alloc_q, rob_c* rob,
+                             exec_c* exec, Unit_Type unit_type,
                              frontend_c* frontend, macsim_c* simBase)
   : schedule_c(exec, core_id, unit_type, frontend, alloc_q, simBase) {
   m_rob = rob;
@@ -94,7 +96,8 @@ void schedule_io_c::run_a_cycle(void) {
 
       // schedule an uop
       if (!uop_schedule(m_next_inorder_to_schedule, &sched_fail_reason)) {
-        STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS + MIN2((int)sched_fail_reason, 6));
+        STAT_CORE_EVENT(m_core_id, SCHED_FAILED_REASON_SUCCESS +
+                                     MIN2((int)sched_fail_reason, 6));
         break;
       }
 
@@ -107,7 +110,8 @@ void schedule_io_c::run_a_cycle(void) {
 
       // find the next entry to schedule
       int dec_index = m_rob->dec_index(m_next_inorder_to_schedule);
-      ASSERT(m_next_inorder_to_schedule == m_rob->front_rob() || (*m_rob)[dec_index]->m_sched_cycle);
+      ASSERT(m_next_inorder_to_schedule == m_rob->front_rob() ||
+             (*m_rob)[dec_index]->m_sched_cycle);
       m_next_inorder_to_schedule = m_rob->inc_index(m_next_inorder_to_schedule);
     }
 

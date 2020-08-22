@@ -131,9 +131,10 @@ public:
    *  \param simBase - Pointer to base simulation class for perf/stat counters
    *  \return void (Called with new operator)
    */
-  cache_c(string name, int num_set, int assoc, int line_size, int data_size, int bank_num, bool cache_by_pass,
-          int core_id, Cache_Type cache_type_info, bool enable_partition, int num_tiles, int interleave_factor,
-          macsim_c *simBase);
+  cache_c(string name, int num_set, int assoc, int line_size, int data_size,
+          int bank_num, bool cache_by_pass, int core_id,
+          Cache_Type cache_type_info, bool enable_partition, int num_tiles,
+          int interleave_factor, macsim_c *simBase);
 
   virtual ~cache_c();
 
@@ -183,7 +184,8 @@ public:
   /**
    * Update set on replacement
    */
-  virtual void update_set_on_replacement(Addr tag, int appl_id, int set_id, bool gpuline);
+  virtual void update_set_on_replacement(Addr tag, int appl_id, int set_id,
+                                         bool gpuline);
 
   /**
    * \brief Funtion to find line where a new insert could be performed.
@@ -199,7 +201,8 @@ public:
    * @param appl_id - application id
    * @param gpuline - gpu cache line
    */
-  cache_entry_c *find_replacement_line_from_same_type(int set, int appl_id, bool gpuline);
+  cache_entry_c *find_replacement_line_from_same_type(int set, int appl_id,
+                                                      bool gpuline);
 
   /**
    * \brief Funtion to initialize a new cache line.
@@ -212,7 +215,8 @@ public:
    * \param skip - skip LLC
    * \return void
    */
-  virtual void initialize_cache_line(cache_entry_c *ins_line, Addr tag, Addr addr, int appl_id, bool gpuline,
+  virtual void initialize_cache_line(cache_entry_c *ins_line, Addr tag,
+                                     Addr addr, int appl_id, bool gpuline,
                                      int set_id, bool skip);
 
   /**
@@ -226,7 +230,8 @@ public:
    * \param gpuline line from gpu cores
    * \return void* - Pointer to the data of the new cache line
    */
-  void *insert_cache(Addr addr, Addr *line_addr, Addr *repl_line, int appl_id, bool gpuline);
+  void *insert_cache(Addr addr, Addr *line_addr, Addr *repl_line, int appl_id,
+                     bool gpuline);
 
   /**
    * \brief Function to insert cache line(wrapper around worker_insert_cache)
@@ -240,7 +245,8 @@ public:
    * \param skip
    * \return void* - Pointer to the data of the new cache line
    */
-  void *insert_cache(Addr addr, Addr *line_addr, Addr *repl_line, int appl_id, bool gpuline, bool skip);
+  void *insert_cache(Addr addr, Addr *line_addr, Addr *repl_line, int appl_id,
+                     bool gpuline, bool skip);
 
   /**
    * \brief Function to null out all fields in the caache line

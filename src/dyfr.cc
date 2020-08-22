@@ -46,7 +46,8 @@ POSSIBILITY OF SUCH DAMAGE.
 // =======================================
 // dyfr_c constructor
 // =======================================
-dyfr_c::dyfr_c(macsim_c* simBase, int num_sim_cores) : m_simBase(simBase), m_num_sim_cores(num_sim_cores) {
+dyfr_c::dyfr_c(macsim_c* simBase, int num_sim_cores)
+  : m_simBase(simBase), m_num_sim_cores(num_sim_cores) {
   m_gpu_freq_min = *KNOB(KNOB_DYFR_GPU_FREQ_MIN);
   m_gpu_freq_max = *KNOB(KNOB_DYFR_GPU_FREQ_MAX);
   m_cpu_freq_min = *KNOB(KNOB_DYFR_CPU_FREQ_MIN);

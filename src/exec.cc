@@ -67,7 +67,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "all_knobs.h"
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_EXEC_STAGE, ##args)
 #define DEBUG_HMC(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_HMC, ##args)
 #define DEBUG_CORE(m_core_id, args...)                          \
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {   \
@@ -123,7 +124,8 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_igpu[] = {
 };
 
 // exec_c constructor
-exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase) : EXEC_INTERFACE_INIT() {
+exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase)
+  : EXEC_INTERFACE_INIT() {
   m_simBase = simBase;
 
   EXEC_CONFIG();
@@ -132,26 +134,31 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase) : EXEC_INTERFACE_INIT
 
   // latency binding
   if (m_ptx_sim) {
-    int latency_array_size = (sizeof uop_latencybinding_init_ptx / sizeof(uop_latencybinding_init_ptx[0]));
+    int latency_array_size = (sizeof uop_latencybinding_init_ptx /
+                              sizeof(uop_latencybinding_init_ptx[0]));
 
     for (int ii = 0; ii < latency_array_size; ++ii) {
-      m_latency[uop_latencybinding_init_ptx[ii].uop_type_s] = uop_latencybinding_init_ptx[ii].m_latency;
+      m_latency[uop_latencybinding_init_ptx[ii].uop_type_s] =
+        uop_latencybinding_init_ptx[ii].m_latency;
     }
   } else if (m_igpu_sim) {
-    int latency_array_size = (sizeof uop_latencybinding_init_igpu / sizeof(uop_latencybinding_init_igpu[0]));
+    int latency_array_size = (sizeof uop_latencybinding_init_igpu /
+                              sizeof(uop_latencybinding_init_igpu[0]));
 
     for (int ii = 0; ii < latency_array_size; ++ii) {
-      m_latency[uop_latencybinding_init_igpu[ii].uop_type_s] = uop_latencybinding_init_igpu[ii].m_latency;
+      m_latency[uop_latencybinding_init_igpu[ii].uop_type_s] =
+        uop_latencybinding_init_igpu[ii].m_latency;
     }
   } else {
-    latency_map lat_map = m_simBase->m_knobsContainer->getDecodedUOPLatencyKnob();
+    latency_map lat_map =
+      m_simBase->m_knobsContainer->getDecodedUOPLatencyKnob();
 
     int latency_array_size = 0;
     switch (lat_map) {
       case LATENCY_SKYLAKE:
         report("UOP latency mapped to Skylake");
-        latency_array_size =
-          (sizeof uop_latencybinding_init_x86_skylake / sizeof(uop_latencybinding_init_x86_skylake[0]));
+        latency_array_size = (sizeof uop_latencybinding_init_x86_skylake /
+                              sizeof(uop_latencybinding_init_x86_skylake[0]));
 
         for (int ii = 0; ii < latency_array_size; ++ii) {
           m_latency[uop_latencybinding_init_x86_skylake[ii].uop_type_s] =
@@ -160,8 +167,8 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase) : EXEC_INTERFACE_INIT
         break;
       case LATENCY_SKYLAKE_X:
         report("UOP latency mapped to Skylake X");
-        latency_array_size =
-          (sizeof uop_latencybinding_init_x86_skylake_x / sizeof(uop_latencybinding_init_x86_skylake_x[0]));
+        latency_array_size = (sizeof uop_latencybinding_init_x86_skylake_x /
+                              sizeof(uop_latencybinding_init_x86_skylake_x[0]));
 
         for (int ii = 0; ii < latency_array_size; ++ii) {
           m_latency[uop_latencybinding_init_x86_skylake_x[ii].uop_type_s] =
@@ -171,7 +178,8 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase) : EXEC_INTERFACE_INIT
       case LATENCY_COFFEE_LAKE:
         report("UOP latency mapped to Coffee Lake");
         latency_array_size =
-          (sizeof uop_latencybinding_init_x86_coffee_lake / sizeof(uop_latencybinding_init_x86_coffee_lake[0]));
+          (sizeof uop_latencybinding_init_x86_coffee_lake /
+           sizeof(uop_latencybinding_init_x86_coffee_lake[0]));
 
         for (int ii = 0; ii < latency_array_size; ++ii) {
           m_latency[uop_latencybinding_init_x86_coffee_lake[ii].uop_type_s] =
@@ -180,10 +188,12 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase) : EXEC_INTERFACE_INIT
         break;
       default:
         report("UOP latency mapped to Sandy Bridge");
-        latency_array_size = (sizeof uop_latencybinding_init_x86 / sizeof(uop_latencybinding_init_x86[0]));
+        latency_array_size = (sizeof uop_latencybinding_init_x86 /
+                              sizeof(uop_latencybinding_init_x86[0]));
 
         for (int ii = 0; ii < latency_array_size; ++ii) {
-          m_latency[uop_latencybinding_init_x86[ii].uop_type_s] = uop_latencybinding_init_x86[ii].m_latency;
+          m_latency[uop_latencybinding_init_x86[ii].uop_type_s] =
+            uop_latencybinding_init_x86[ii].m_latency;
         }
     }
   }
@@ -257,9 +267,11 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
   // m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num,
   // uop->m_inst_num, uop->m_mem_type, uop->m_bogus);
 
-  DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu mem_type:%d bogus:%d \n",
-             m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num, uop->m_inst_num, uop->m_mem_type,
-             uop->m_bogus);
+  DEBUG_CORE(m_core_id,
+             "m_core_id:%d thread_id:%d uop->iaq:%d uop_num:%llu inst_num:%llu "
+             "mem_type:%d bogus:%d \n",
+             m_core_id, uop->m_thread_id, uop->m_allocq_num, uop->m_uop_num,
+             uop->m_inst_num, uop->m_mem_type, uop->m_bogus);
 
   uop->m_state = OS_EXEC_BEGIN;
 
@@ -306,7 +318,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
           }
           // other (global, texture, local) memory access
           else {
-            // FIXME
+// FIXME
 #if PORT_FIXME
             if (m_bank_busy[uop->m_dcache_bank_id] == true) {
               STAT_EVENT(CACHE_BANK_BUSY);
@@ -321,7 +333,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
 
 #if PORT_FIXME
               if (uop_latency == 0) {
-                if (uop->m_dcache_bank_id >= 128) m_bank_busy[uop->m_dcache_bank_id] = true;
+                if (uop->m_dcache_bank_id >= 128)
+                  m_bank_busy[uop->m_dcache_bank_id] = true;
               }
             }
 #endif
@@ -373,8 +386,9 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         // get the next child uop for the current parent uop
         int next_set_bit = get_next_set_bit64(uop->m_pending_child_uops, 0);
 
-        DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d uop_num:%llu num_child_uops:%d\n", m_core_id, uop->m_thread_id,
-                   uop->m_uop_num, uop->m_num_child_uops);
+        DEBUG_CORE(
+          m_core_id, "core_id:%d thread_id:%d uop_num:%llu num_child_uops:%d\n",
+          m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_num_child_uops);
         uop->m_num_page_table_walks = 0;
 
         // executing children uops
@@ -383,7 +397,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
           // shared memory access
           // -------------------------------------
           if (uop->m_mem_type == MEM_LD_SM || uop->m_mem_type == MEM_ST_SM) {
-            latency = core->get_shared_memory()->load(uop->m_child_uops[next_set_bit]);
+            latency =
+              core->get_shared_memory()->load(uop->m_child_uops[next_set_bit]);
             if (latency != 0) {
               uop->m_mem_start_cycle = m_cur_core_cycle;
             }
@@ -401,21 +416,27 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
             // constant memory
             if (uop->m_mem_type == MEM_LD_CM) {
 #ifdef USING_SST
-              latency = access_const_texture_cache(uop->m_child_uops[next_set_bit]);
+              latency =
+                access_const_texture_cache(uop->m_child_uops[next_set_bit]);
 #else
-              latency = core->get_const_cache()->load(uop->m_child_uops[next_set_bit]);
+              latency =
+                core->get_const_cache()->load(uop->m_child_uops[next_set_bit]);
 #endif
             } else if (uop->m_mem_type == MEM_LD_TM) {
 #ifdef USING_SST
-              latency = access_const_texture_cache(uop->m_child_uops[next_set_bit]);
+              latency =
+                access_const_texture_cache(uop->m_child_uops[next_set_bit]);
 #else
-              latency = core->get_texture_cache()->load(uop->m_child_uops[next_set_bit]);
+              latency = core->get_texture_cache()->load(
+                uop->m_child_uops[next_set_bit]);
 #endif
             }
             // other (global, texture, local) memory access
             else {
 #if PORT_FIXME
-              if (0 && m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] == true) {
+              if (0 &&
+                  m_bank_busy[uop->m_child_uops[next_set_bit]
+                                ->m_dcache_bank_id] == true) {
                 STAT_EVENT(CACHE_BANK_BUSY);
                 uop_latency = 0;
               } else {
@@ -428,8 +449,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
 
 #if PORT_FIXME
                 if (latency == 0) {
-                  if (m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] < 128)
-                    m_bank_busy[uop->m_child_uops[next_set_bit]->m_dcache_bank_id] = true;
+                  if (m_bank_busy[uop->m_child_uops[next_set_bit]
+                                    ->m_dcache_bank_id] < 128)
+                    m_bank_busy[uop->m_child_uops[next_set_bit]
+                                  ->m_dcache_bank_id] = true;
                 }
               }
 #endif
@@ -442,14 +465,17 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
             }
 
             // mark current uop as executed
-            uop->m_pending_child_uops = CLEAR_BIT(uop->m_pending_child_uops, next_set_bit);
+            uop->m_pending_child_uops =
+              CLEAR_BIT(uop->m_pending_child_uops, next_set_bit);
 
             // cache hit
             if (latency > 0) {
               ++uop->m_num_child_uops_done;
               DEBUG_CORE(m_core_id,
-                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu hit\n",
-                         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
+                         "child_uop_num:%llu m_dcu hit\n",
+                         m_core_id, uop->m_thread_id, uop->m_uop_num,
+                         uop->m_inst_num,
                          uop->m_child_uops[next_set_bit]->m_uop_num);
 
               if (latency > max_latency) {
@@ -460,17 +486,23 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
             else if (-1 == latency) {
               uop_latency = -1;
               DEBUG_CORE(m_core_id,
-                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu child_uop_num:%llu m_dcu miss\n",
-                         m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
+                         "child_uop_num:%llu m_dcu miss\n",
+                         m_core_id, uop->m_thread_id, uop->m_uop_num,
+                         uop->m_inst_num,
                          uop->m_child_uops[next_set_bit]->m_uop_num);
             }
           } else {
-            DEBUG_CORE(m_core_id, "m_core_id:%d thread_id:%d uop_num:%llu child_uop_num:%llu fail\n", m_core_id,
-                       uop->m_thread_id, uop->m_uop_num, uop->m_child_uops[next_set_bit]->m_uop_num);
+            DEBUG_CORE(m_core_id,
+                       "m_core_id:%d thread_id:%d uop_num:%llu "
+                       "child_uop_num:%llu fail\n",
+                       m_core_id, uop->m_thread_id, uop->m_uop_num,
+                       uop->m_child_uops[next_set_bit]->m_uop_num);
           }
 
           // find next uop to execute
-          next_set_bit = get_next_set_bit64(uop->m_pending_child_uops, next_set_bit + 1);
+          next_set_bit =
+            get_next_set_bit64(uop->m_pending_child_uops, next_set_bit + 1);
         }
 
         // uop_latency can be
@@ -506,18 +538,24 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
       use_port(thread_id, entry);
 
       // GPU : if we use load-block policy, block current thread due to load instruction
-      if (uop_latency == -1 && m_ptx_sim && *m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
+      if (uop_latency == -1 && m_ptx_sim &&
+          *m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
         m_frontend->set_load_wait(uop->m_thread_id, uop->m_uop_num);
 
-        DEBUG_CORE(m_core_id, "set_load_wait m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu\n", uop->m_core_id,
-                   uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
+        DEBUG_CORE(m_core_id,
+                   "set_load_wait m_core_id:%d thread_id:%d uop_num:%llu "
+                   "inst_num:%llu\n",
+                   uop->m_core_id, uop->m_thread_id, uop->m_uop_num,
+                   uop->m_inst_num);
       }
 
-      DEBUG_CORE(m_core_id,
-                 "m_core_id:%d thread_id:%d vaddr:0x%llx uop_num:%llu inst_num:%llu "
-                 "uop->m_uop_info.dcmiss:%d latency:%d done_cycle:%llu\n",
-                 m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num, uop->m_inst_num, uop->m_uop_info.m_dcmiss,
-                 uop_latency, uop->m_done_cycle);
+      DEBUG_CORE(
+        m_core_id,
+        "m_core_id:%d thread_id:%d vaddr:0x%llx uop_num:%llu inst_num:%llu "
+        "uop->m_uop_info.dcmiss:%d latency:%d done_cycle:%llu\n",
+        m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num,
+        uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency,
+        uop->m_done_cycle);
     }
     POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_R);
     POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_W);
@@ -572,8 +610,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
       case UOP_ACQ_FENCE:
         uop_latency = -1;
         if (KNOB(KNOB_FENCE_ENABLE)->getValue()) {
-          DEBUG_CORE(m_core_id, "thread_id:%d uop_num:%llu inst_num:%llu fence operations exec \n", uop->m_thread_id,
-                     uop->m_uop_num, uop->m_inst_num);
+          DEBUG_CORE(
+            m_core_id,
+            "thread_id:%d uop_num:%llu inst_num:%llu fence operations exec \n",
+            uop->m_thread_id, uop->m_uop_num, uop->m_inst_num);
 
           if (KNOB(KNOB_ACQ_REL)->getValue() == false) {
             m_rob->ins_fence_entry(entry, FENCE_FULL);
@@ -613,17 +653,21 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
 
   // set uop done cycle
   if (uop_latency > 0) {
-    int max_latency = std::max(uop_latency, static_cast<int>(*m_simBase->m_knobs->KNOB_EXEC_RETIRE_LATENCY));
+    int max_latency =
+      std::max(uop_latency,
+               static_cast<int>(*m_simBase->m_knobs->KNOB_EXEC_RETIRE_LATENCY));
     uop->m_done_cycle = m_cur_core_cycle + max_latency;
   }
 
-  DEBUG_CORE(m_core_id,
-             "done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
-             " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
-             "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx\n",
-             m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num, uop->m_inst_num, uop->m_sched_cycle,
-             uop->m_exec_cycle, uop->m_done_cycle, uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency,
-             uop->m_done_cycle, uop->m_pc);
+  DEBUG_CORE(
+    m_core_id,
+    "done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
+    " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
+    "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx\n",
+    m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num,
+    uop->m_inst_num, uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle,
+    uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle,
+    uop->m_pc);
 
   // branch execution
   if (uop->m_cf_type) {
@@ -647,7 +691,7 @@ void exec_c::br_exec(uop_c* uop) {
     case CF_CALL:
       break;
 
-      // indirect branches
+    // indirect branches
     case CF_IBR:
     case CF_ICALL:
     case CF_ICO:
@@ -666,11 +710,12 @@ void exec_c::br_exec(uop_c* uop) {
 
     STAT_CORE_EVENT(m_core_id, BP_RESOLVED);
 
-    DEBUG_CORE(m_core_id,
-               "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch is resolved: "
-               "recovery_cycle:%llu uop_num:%llu\n",
-               m_core_id, uop->m_thread_id, m_cur_core_cycle, m_bp_data->m_bp_recovery_cycle[uop->m_thread_id],
-               uop->m_uop_num);
+    DEBUG_CORE(
+      m_core_id,
+      "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch is resolved: "
+      "recovery_cycle:%llu uop_num:%llu\n",
+      m_core_id, uop->m_thread_id, m_cur_core_cycle,
+      m_bp_data->m_bp_recovery_cycle[uop->m_thread_id], uop->m_uop_num);
   }
 
   // handle misfetched branch  (miss target prediction: indirect branches)
@@ -686,9 +731,11 @@ void exec_c::br_exec(uop_c* uop) {
 
       uop->m_uop_info.m_btb_miss_resolved = true;
       DEBUG_CORE(m_core_id,
-                 "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch misprediction is resolved: "
+                 "m_core_id:%d thread_id:%d cur_core_cycle:%llu branch "
+                 "misprediction is resolved: "
                  "redirect_cycle:%llu uop_num:%llu\n",
-                 m_core_id, uop->m_thread_id, m_cur_core_cycle, m_bp_data->m_bp_recovery_cycle[uop->m_thread_id],
+                 m_core_id, uop->m_thread_id, m_cur_core_cycle,
+                 m_bp_data->m_bp_recovery_cycle[uop->m_thread_id],
                  uop->m_uop_num);
     }
   }
@@ -705,8 +752,10 @@ void exec_c::update_memory_stats(uop_c* uop) {
     case MEM_LD_SM:
     case MEM_ST_SM:
       STAT_EVENT(SHARED_MEM_ACCESS);
-      POWER_CORE_EVENT(uop->m_core_id, POWER_SHARED_MEM_R);  // FIXME Jieun Mar-14-2012
-      POWER_CORE_EVENT(uop->m_core_id, POWER_SHARED_MEM_R_TAG);  // FIXME Jieun Mar-14-2012
+      POWER_CORE_EVENT(uop->m_core_id,
+                       POWER_SHARED_MEM_R);  // FIXME Jieun Mar-14-2012
+      POWER_CORE_EVENT(uop->m_core_id,
+                       POWER_SHARED_MEM_R_TAG);  // FIXME Jieun Mar-14-2012
       break;
 
     case MEM_LD_CM:
@@ -742,15 +791,17 @@ void exec_c::run_a_cycle(void) {
     }
 
     if (responseArrived) {
-      DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key, uop->m_vaddr);
+      DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key,
+                 uop->m_vaddr);
       if (m_ptx_sim || m_igpu_sim) {
         if (uop->m_parent_uop) {
           uop_c* puop = uop->m_parent_uop;
           ++puop->m_num_child_uops_done;
           if (puop->m_num_child_uops_done == puop->m_num_child_uops) {
             if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-              m_simBase->m_core_pointers[puop->m_core_id]->get_frontend()->set_load_ready(puop->m_thread_id,
-                                                                                          puop->m_uop_num);
+              m_simBase->m_core_pointers[puop->m_core_id]
+                ->get_frontend()
+                ->set_load_ready(puop->m_thread_id, puop->m_uop_num);
             }
 
             puop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
@@ -759,8 +810,9 @@ void exec_c::run_a_cycle(void) {
         }  // uop->m_parent_uop
         else {
           if (*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
-            m_simBase->m_core_pointers[uop->m_core_id]->get_frontend()->set_load_ready(uop->m_thread_id,
-                                                                                       uop->m_uop_num);
+            m_simBase->m_core_pointers[uop->m_core_id]
+              ->get_frontend()
+              ->set_load_ready(uop->m_thread_id, uop->m_uop_num);
           }
         }
       }
@@ -782,9 +834,11 @@ void exec_c::run_a_cycle(void) {
         }
 
       DEBUG_CORE(m_core_id,
-                 "response to m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx has arrived "
+                 "response to m_core_id:%d thread_id:%d uop_num:%llu "
+                 "inst_num:%llu uop->m_vaddr:0x%llx has arrived "
                  "from memHierarchy!\n",
-                 m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
+                 m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+                 uop->m_vaddr);
       m_uop_buffer.erase(I);
     }
   }
@@ -801,14 +855,16 @@ void exec_c::insert_fence_pref(uop_c* uop) {
   bool dc_hit;
 
 #ifndef USING_SST
-  dc_hit = (dcache_data_s*)m_simBase->m_memory->access_cache(m_core_id, req_addr, &dummy_line_addr, false, 0);
+  dc_hit = (dcache_data_s*)m_simBase->m_memory->access_cache(
+    m_core_id, req_addr, &dummy_line_addr, false, 0);
 #else
   dc_hit = access_data_cache(uop);
 #endif
 
   if (!dc_hit) {
-    bool result = m_simBase->m_memory->new_mem_req(MRT_DPRF, req_addr, 64, false, false, 1, NULL, NULL, 0, &info,
-                                                   m_core_id, uop->m_thread_id, false);
+    bool result = m_simBase->m_memory->new_mem_req(
+      MRT_DPRF, req_addr, 64, false, false, 1, NULL, NULL, 0, &info, m_core_id,
+      uop->m_thread_id, false);
     STAT_CORE_EVENT(m_core_id, FENCE_PREF_REQ);
   }
 }
@@ -816,27 +872,33 @@ void exec_c::insert_fence_pref(uop_c* uop) {
 #ifdef USING_SST
 int exec_c::access_data_cache(uop_c* uop) {
   // assign unique key to each memory request; this will be used later in time for strobbing
-  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, m_unique_request_id++);
-  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n",
+  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num,
+                            uop->m_vaddr, m_unique_request_id++);
+  DEBUG_CORE(m_core_id,
+             "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, "
+             "uop->m_vaddr = 0x%llx, key = 0x%lx\n",
              m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, key);
 
   // check if this uop has already been executed;
   auto i = m_uop_buffer.find(key);
   ASSERTM(m_uop_buffer.end() == i, "uop has already been executed!\n");
 
-  int block_size = m_ptx_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue() : KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
+  int block_size = m_ptx_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue()
+                             : KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
   // Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size) uop->m_mem_size = block_size - offset;
+  if (offset + uop->m_mem_size > block_size)
+    uop->m_mem_size = block_size - offset;
 
-  DEBUG_CORE(
-    m_core_id,
-    "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to data cache\n",
-    m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
+  DEBUG_CORE(m_core_id,
+             "sending memory request (core_id:%d thread_id:%d uop_num:%llu "
+             "inst_num:%llu uop->m_vaddr:0x%llx) to data cache\n",
+             m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+             uop->m_vaddr);
 
-  // core_c *core = m_simBase->m_core_pointers[m_core_id];
+// core_c *core = m_simBase->m_core_pointers[m_core_id];
 #ifdef USE_VAULTSIM_HMC
   uint32_t hmc_type = uop->m_hmc_inst;
   // if (hmc_type!=0) HMC_EVENT_COUNT(m_core_id, hmc_type);
@@ -844,25 +906,31 @@ int exec_c::access_data_cache(uop_c* uop) {
     if (hmc_type != 0) {
       // cout<<"-HMC- "<<uop->m_hmc_inst<<"\t id: "<<uop->m_hmc_trans_id<<endl;
       DEBUG_HMC_CORE(m_core_id,
-                     "core_id:%d thread_id:%d uop_num:%llu unique_num:%llu pc:%llx va:%llx hmc_type:%d trans_id:%d\n",
-                     m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_unique_num, uop->m_pc, uop->m_vaddr, hmc_type,
+                     "core_id:%d thread_id:%d uop_num:%llu unique_num:%llu "
+                     "pc:%llx va:%llx hmc_type:%d trans_id:%d\n",
+                     m_core_id, uop->m_thread_id, uop->m_uop_num,
+                     uop->m_unique_num, uop->m_pc, uop->m_vaddr, hmc_type,
                      (int)uop->m_hmc_trans_id);
     }
   }
   // mark highest bit if enabled cache bypass
-  if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE))) hmc_type = hmc_type | 0x0080;
+  if (hmc_type != 0 && (*KNOB(KNOB_ENABLE_HMC_BYPASS_CACHE)))
+    hmc_type = hmc_type | 0x0080;
   uint64_t trans_id = uop->m_hmc_trans_id;
   if (!*KNOB(KNOB_ENABLE_HMC_TRANS)) trans_id = 0;
 
-  (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type, hmc_type,
-                                       trans_id);
+  (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr,
+                                       uop->m_mem_size, uop->m_mem_type,
+                                       hmc_type, trans_id);
 #else
-  (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size, uop->m_mem_type);
+  (*(m_simBase->sendDataCacheRequest))(m_core_id, key, uop->m_vaddr,
+                                       uop->m_mem_size, uop->m_mem_type);
 #endif
 
   // insert uop into the buffer; this will be taken out when a response arrives
   m_uop_buffer.insert(std::make_pair(key, uop));
-  DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
+  DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n",
+             uop->m_vaddr);
 
   return -1;  // cache miss
 }
@@ -872,8 +940,11 @@ int exec_c::access_const_texture_cache(uop_c* uop) {
   ASSERT(uop->m_mem_type == MEM_LD_CM || uop->m_mem_type == MEM_LD_TM);
 
   // assign unique key to each memory request; this will be used later in time for strobbing
-  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, m_unique_request_id++);
-  DEBUG_CORE(m_core_id, "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, uop->m_vaddr = 0x%llx, key = 0x%lx\n",
+  uint64_t key = UNIQUE_KEY(m_core_id, uop->m_thread_id, uop->m_uop_num,
+                            uop->m_vaddr, m_unique_request_id++);
+  DEBUG_CORE(m_core_id,
+             "core_id = %d, thread_id = %d, uop->m_uop_num = 0x%llu, "
+             "uop->m_vaddr = 0x%llx, key = 0x%lx\n",
              m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, key);
 
   // check if this uop has already been executed;
@@ -885,25 +956,33 @@ int exec_c::access_const_texture_cache(uop_c* uop) {
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size) uop->m_mem_size = block_size - offset;
+  if (offset + uop->m_mem_size > block_size)
+    uop->m_mem_size = block_size - offset;
 
   if (uop->m_mem_type == MEM_LD_CM) {
     DEBUG_CORE(m_core_id,
-               "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to "
+               "sending memory request (core_id:%d thread_id:%d uop_num:%llu "
+               "inst_num:%llu uop->m_vaddr:0x%llx) to "
                "const cache\n",
-               m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
-    (*(m_simBase->sendConstCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size);
+               m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+               uop->m_vaddr);
+    (*(m_simBase->sendConstCacheRequest))(m_core_id, key, uop->m_vaddr,
+                                          uop->m_mem_size);
   } else {  // uop->m_mem_type == MEM_LD_TM
     DEBUG_CORE(m_core_id,
-               "sending memory request (core_id:%d thread_id:%d uop_num:%llu inst_num:%llu uop->m_vaddr:0x%llx) to "
+               "sending memory request (core_id:%d thread_id:%d uop_num:%llu "
+               "inst_num:%llu uop->m_vaddr:0x%llx) to "
                "texture cache\n",
-               m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num, uop->m_vaddr);
-    (*(m_simBase->sendTextureCacheRequest))(m_core_id, key, uop->m_vaddr, uop->m_mem_size);
+               m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
+               uop->m_vaddr);
+    (*(m_simBase->sendTextureCacheRequest))(m_core_id, key, uop->m_vaddr,
+                                            uop->m_mem_size);
   }
 
   // insert uop into the buffer; this will be taken out when a response arrives
   m_uop_buffer.insert(std::make_pair(key, uop));
-  DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n", uop->m_vaddr);
+  DEBUG_CORE(m_core_id, "uop inserted into buffer. uop->m_vaddr = 0x%llx\n",
+             uop->m_vaddr);
 
   return -1;  // cache miss
 }

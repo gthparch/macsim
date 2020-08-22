@@ -44,9 +44,22 @@ const char* mem_req_c::mem_req_type_name[MAX_MEM_REQ_TYPE] = {
 
 // memory request state string
 const char* mem_req_c::mem_state[MEM_STATE_MAX] = {
-  "MEM_INV",       "MEM_NEW",       "MEM_MERGED",         "MEM_OUTQUEUE_NEW",   "MEM_IN_NOC",     "MEM_OUT_FILL",
-  "MEM_OUT_WB",    "MEM_FILL_NEW",  "MEM_FILL_WAIT_DONE", "MEM_FILL_WAIT_FILL", "MEM_DRAM_START", "MEM_DRAM_CMD",
-  "MEM_DRAM_DATA", "MEM_DRAM_DONE", "MEM_NOC_START",      "MEM_NOC_DONE",
+  "MEM_INV",
+  "MEM_NEW",
+  "MEM_MERGED",
+  "MEM_OUTQUEUE_NEW",
+  "MEM_IN_NOC",
+  "MEM_OUT_FILL",
+  "MEM_OUT_WB",
+  "MEM_FILL_NEW",
+  "MEM_FILL_WAIT_DONE",
+  "MEM_FILL_WAIT_FILL",
+  "MEM_DRAM_START",
+  "MEM_DRAM_CMD",
+  "MEM_DRAM_DATA",
+  "MEM_DRAM_DONE",
+  "MEM_NOC_START",
+  "MEM_NOC_DONE",
 };
 
 mem_req_s::mem_req_s(macsim_c* simBase) {

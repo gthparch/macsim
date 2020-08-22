@@ -112,7 +112,8 @@ hwp_common_c::~hwp_common_c() {
   delete[] m_l2req_queue;
 
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) {
-    for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_NUMTRACKING_REGIONS; ++ii) {
+    for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_NUMTRACKING_REGIONS;
+         ++ii) {
       delete[] region_info[ii].status;
     }
     delete[] region_info;
@@ -134,8 +135,10 @@ void hwp_common_c::pref_init(bool ptx) {
   knob_ptx_sim = ptx;
 
   // initialize queues
-  m_l1req_queue = new pref_mem_req_s[*m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE];
-  m_l2req_queue = new pref_mem_req_s[*m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE];
+  m_l1req_queue =
+    new pref_mem_req_s[*m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE];
+  m_l2req_queue =
+    new pref_mem_req_s[*m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE];
 
   m_l1req_queue_req_pos = -1;
   m_l1req_queue_send_pos = 0;
@@ -158,7 +161,8 @@ void hwp_common_c::pref_init(bool ptx) {
   // call init for each prefetcher
   // qsort(pref_table, pref_table.size(), sizeof(HWP), pref_compare_hwp_priority);
 
-  if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON) PREF_TRACE_OUT = file_tag_fopen(pref_trace_filename, "w", m_simBase);
+  if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON)
+    PREF_TRACE_OUT = file_tag_fopen(pref_trace_filename, "w", m_simBase);
 
   if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_STATPHASEFILE) {
     PREF_DEGFB_FILE = file_tag_fopen("prefdefbstats.out", "w", m_simBase);
@@ -180,10 +184,13 @@ void hwp_common_c::pref_init(bool ptx) {
 
   // region
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) {
-    region_info = new pref_region_info_s[*m_simBase->m_knobs->KNOB_PREF_NUMTRACKING_REGIONS];
+    region_info = new pref_region_info_s[*m_simBase->m_knobs
+                                            ->KNOB_PREF_NUMTRACKING_REGIONS];
     ASSERT(region_info);
     for (int ii = 0; ii < *KNOB(KNOB_PREF_NUMTRACKING_REGIONS); ++ii) {
-      region_info[ii].status = new pref_region_line_status_s[*m_simBase->m_knobs->KNOB_PREF_REGION_SIZE];
+      region_info[ii].status =
+        new pref_region_line_status_s[*m_simBase->m_knobs
+                                         ->KNOB_PREF_REGION_SIZE];
       ASSERT(region_info[ii].status);
       region_info[ii].trained = false;
       region_info[ii].last_access = 0;
@@ -215,7 +222,8 @@ void hwp_common_c::pref_done(void) {
   }
 
   for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
-    if (pref_table[ii]->hwp_info->enabled && *m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) {
+    if (pref_table[ii]->hwp_info->enabled &&
+        *m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) {
       fprintf(PREF_ACC_OUT, "Pref: %s\n", pref_table[ii]->name.c_str());
       fprintf(PREF_ACC_OUT, "Buckets       : ");
       for (int kk = 0; kk < PREF_TRACKERS_NUM; ++kk) {
@@ -225,7 +233,8 @@ void hwp_common_c::pref_done(void) {
       for (int jj = 0; jj < 10; ++jj) {
         fprintf(PREF_ACC_OUT, "\nAccuracy  %d   : ", jj);
         for (int kk = 0; kk < PREF_TRACKERS_NUM; ++kk) {
-          fprintf(PREF_ACC_OUT, "%llu      ", pref_table[ii]->hwp_info->trackhist[jj][kk]);
+          fprintf(PREF_ACC_OUT, "%llu      ",
+                  pref_table[ii]->hwp_info->trackhist[jj][kk]);
         }
       }
       fprintf(PREF_ACC_OUT, "\n");
@@ -238,14 +247,16 @@ void hwp_common_c::pref_done(void) {
 }
 
 // L1 miss handler
-void hwp_common_c::pref_l1_miss(int tid, Addr line_addr, Addr load_PC, uop_c *uop) {
+void hwp_common_c::pref_l1_miss(int tid, Addr line_addr, Addr load_PC,
+                                uop_c *uop) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_DL0_MISS_ON) {
     for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
       if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l1_miss) {
         if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
-          if (m_last_inst_num.find(tid) == m_last_inst_num.end() || m_last_inst_num[tid] != uop->m_inst_num) {
+          if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
+              m_last_inst_num[tid] != uop->m_inst_num) {
             pref_table[ii]->l1_miss_func(tid, line_addr, load_PC, uop);
             m_last_inst_num[tid] = uop->m_inst_num;
           }
@@ -258,14 +269,16 @@ void hwp_common_c::pref_l1_miss(int tid, Addr line_addr, Addr load_PC, uop_c *uo
 }
 
 // L1 hit handler
-void hwp_common_c::pref_l1_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop) {
+void hwp_common_c::pref_l1_hit(int tid, Addr line_addr, Addr load_PC,
+                               uop_c *uop) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_DL0_HIT_ON) {
     for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
       if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l1_hit) {
         if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
-          if (m_last_inst_num.find(tid) == m_last_inst_num.end() || m_last_inst_num[tid] != uop->m_inst_num) {
+          if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
+              m_last_inst_num[tid] != uop->m_inst_num) {
             pref_table[ii]->l1_hit_func(tid, line_addr, load_PC, uop);
             m_last_inst_num[tid] = uop->m_inst_num;
           }
@@ -278,7 +291,8 @@ void hwp_common_c::pref_l1_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop
 }
 
 // L1 prefetch hit handler
-void hwp_common_c::pref_l1_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop) {
+void hwp_common_c::pref_l1_pref_hit(int tid, Addr line_addr, Addr load_PC,
+                                    uns8 prefetcher_id, uop_c *uop) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (prefetcher_id == 0) return;
@@ -302,10 +316,11 @@ void hwp_common_c::pref_l2_miss(int tid, Addr line_addr, uop_c *uop) {
   m_curr_l2_misses++;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON)
-    fprintf(PREF_TRACE_OUT, "%llu \t 0x%llx \t 0x%llx \t %s\n", m_simBase->m_simulation_cycle, load_PC, line_addr,
-            "UL1_MISS");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x%llx \t 0x%llx \t %s\n",
+            m_simBase->m_simulation_cycle, load_PC, line_addr, "UL1_MISS");
 
-  if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) pref_update_regioninfo(line_addr, false, true, false, 0, 0);
+  if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON)
+    pref_update_regioninfo(line_addr, false, true, false, 0, 0);
 
   if (*m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) pref_acc_useupdate(line_addr);
 
@@ -322,7 +337,8 @@ void hwp_common_c::pref_l2_miss(int tid, Addr line_addr, uop_c *uop) {
   for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l2_miss) {
       if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
-        if (m_last_inst_num.find(tid) == m_last_inst_num.end() || m_last_inst_num[tid] != uop->m_inst_num) {
+        if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
+            m_last_inst_num[tid] != uop->m_inst_num) {
           pref_table[ii]->l2_miss_func(tid, line_addr, load_PC, uop);
           m_last_inst_num[tid] = uop->m_inst_num;
         }
@@ -334,20 +350,24 @@ void hwp_common_c::pref_l2_miss(int tid, Addr line_addr, uop_c *uop) {
 }
 
 // L2 hit handler
-void hwp_common_c::pref_l2_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop) {
+void hwp_common_c::pref_l2_hit(int tid, Addr line_addr, Addr load_PC,
+                               uop_c *uop) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON)
-    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n", m_simBase->m_simulation_cycle, line_addr, "UL1_HIT");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n",
+            m_simBase->m_simulation_cycle, line_addr, "UL1_HIT");
 
-  if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON) pref_update_regioninfo(line_addr, true, false, false, 0, 0);
+  if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON)
+    pref_update_regioninfo(line_addr, true, false, false, 0, 0);
 
   if (*m_simBase->m_knobs->KNOB_PREF_ACC_STUDY) pref_acc_useupdate(line_addr);
 
   for (unsigned int ii = 0; ii < pref_table.size(); ++ii) {
     if (pref_table[ii]->hwp_info->enabled && pref_table[ii]->l2_hit) {
       if (*m_simBase->m_knobs->KNOB_PREF_TRAIN_INST_ONCE) {
-        if (m_last_inst_num.find(tid) == m_last_inst_num.end() || m_last_inst_num[tid] != uop->m_inst_num) {
+        if (m_last_inst_num.find(tid) == m_last_inst_num.end() ||
+            m_last_inst_num[tid] != uop->m_inst_num) {
           pref_table[ii]->l2_hit_func(tid, line_addr, load_PC, uop);
           m_last_inst_num[tid] = uop->m_inst_num;
         }
@@ -359,7 +379,8 @@ void hwp_common_c::pref_l2_hit(int tid, Addr line_addr, Addr load_PC, uop_c *uop
 }
 
 // L2 late prefetch handler
-void hwp_common_c::pref_l2_pref_hit_late(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop) {
+void hwp_common_c::pref_l2_pref_hit_late(int tid, Addr line_addr, Addr load_PC,
+                                         uns8 prefetcher_id, uop_c *uop) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (prefetcher_id == 0) return;
@@ -371,14 +392,15 @@ void hwp_common_c::pref_l2_pref_hit_late(int tid, Addr line_addr, Addr load_PC, 
 }
 
 // L2 prefetch hit handler
-void hwp_common_c::pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC, uns8 prefetcher_id, uop_c *uop) {
+void hwp_common_c::pref_l2_pref_hit(int tid, Addr line_addr, Addr load_PC,
+                                    uns8 prefetcher_id, uop_c *uop) {
   if (prefetcher_id == 0) return;
 
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (*m_simBase->m_knobs->KNOB_PREF_TRACE_ON)
-    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n", m_simBase->m_simulation_cycle, line_addr,
-            "UL1_PREFHIT");
+    fprintf(PREF_TRACE_OUT, "%llu \t 0x0000 \t 0x%llx \t %s\n",
+            m_simBase->m_simulation_cycle, line_addr, "UL1_PREFHIT");
 
   if (!*m_simBase->m_knobs->KNOB_PREF_USEREGION_TOCALC_ACC) {
     m_overall_l2useful++;
@@ -409,8 +431,11 @@ void hwp_common_c::pref_l2_hit(mem_req_s *req) {
 bool hwp_common_c::pref_l1req_queue_filter(Addr line_addr) {
   if (!*m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_FILTER_ON) return false;
 
-  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE; ++ii) {
-    if (m_l1req_queue[ii].valid && (m_l1req_queue[ii].line_addr >> m_shift_bit) == (line_addr >> m_shift_bit)) {
+  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
+       ++ii) {
+    if (m_l1req_queue[ii].valid &&
+        (m_l1req_queue[ii].line_addr >> m_shift_bit) ==
+          (line_addr >> m_shift_bit)) {
       m_l1req_queue[ii].valid = false;
       STAT_EVENT(PREF_DL0REQ_QUEUE_HIT_BY_DEMAND);
 
@@ -424,8 +449,11 @@ bool hwp_common_c::pref_l1req_queue_filter(Addr line_addr) {
 bool hwp_common_c::pref_l2req_queue_filter(Addr line_addr) {
   if (!*m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_FILTER_ON) return false;
 
-  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE; ++ii) {
-    if (m_l2req_queue[ii].valid && (m_l2req_queue[ii].line_addr >> m_shift_bit) == (line_addr >> m_shift_bit)) {
+  for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE;
+       ++ii) {
+    if (m_l2req_queue[ii].valid &&
+        (m_l2req_queue[ii].line_addr >> m_shift_bit) ==
+          (line_addr >> m_shift_bit)) {
       m_l2req_queue[ii].valid = false;
       STAT_EVENT(PREF_UL2REQ_QUEUE_HIT_BY_DEMAND);
 
@@ -442,14 +470,17 @@ bool hwp_common_c::pref_addto_l1req_queue(Addr line_index, uns8 prefetcher_id) {
     return true;
 
   if (*m_simBase->m_knobs->KNOB_PREF_DL0REQ_ADD_FILTER_ON) {
-    for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE; ++ii) {
+    for (int ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
+         ++ii) {
       if (m_l1req_queue[ii].line_index == line_index) {
         STAT_EVENT(PREF_DL0REQ_QUEUE_MATCHED_REQ);
         return true;  // Hit another request
       }
     }
   }
-  if (m_l1req_queue[(m_l1req_queue_req_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE].valid) {
+  if (m_l1req_queue[(m_l1req_queue_req_pos + 1) %
+                    *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE]
+        .valid) {
     STAT_EVENT(PREF_DL0REQ_QUEUE_FULL);
     if (!*m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_OVERWRITE_ON_FULL) {
       return false;  // Q full
@@ -460,7 +491,8 @@ bool hwp_common_c::pref_addto_l1req_queue(Addr line_index, uns8 prefetcher_id) {
   new_req.line_index = line_index;
   new_req.valid = true;
   new_req.prefetcher_id = prefetcher_id;
-  m_l1req_queue_req_pos = (m_l1req_queue_req_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
+  m_l1req_queue_req_pos = (m_l1req_queue_req_pos + 1) %
+                          *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
   m_l1req_queue[m_l1req_queue_req_pos] = new_req;
 
   return true;
@@ -468,27 +500,36 @@ bool hwp_common_c::pref_addto_l1req_queue(Addr line_index, uns8 prefetcher_id) {
 
 // send a new request to l2 request queue
 bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id) {
-  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false, 0, 0);
+  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false, 0,
+                                    0);
 }
 
 // send a new request to l2 request queue
-bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id, Addr loadPC) {
-  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false, loadPC, 0);
+bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
+                                          Addr loadPC) {
+  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false,
+                                    loadPC, 0);
 }
 
 // send a new request to l2 request queue
-bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id, Addr loadPC, int tid) {
-  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false, loadPC, tid);
+bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
+                                          Addr loadPC, int tid) {
+  return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false,
+                                    loadPC, tid);
 }
 
 // send a new request to l2 request queue
-bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id, bool Begin, bool End, Addr loadPC) {
-  return pref_addto_l2req_queue_set(line_index, prefetcher_id, Begin, End, loadPC, 0);
+bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index,
+                                              uns8 prefetcher_id, bool Begin,
+                                              bool End, Addr loadPC) {
+  return pref_addto_l2req_queue_set(line_index, prefetcher_id, Begin, End,
+                                    loadPC, 0);
 }
 
 // send a new request to l2 request queue
-bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_id, bool Begin, bool End, Addr loadPC,
-                                              int tid) {
+bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index,
+                                              uns8 prefetcher_id, bool Begin,
+                                              bool End, Addr loadPC, int tid) {
   int ii;
   pref_mem_req_s new_req;
   Addr line_addr;
@@ -505,20 +546,24 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_i
 
     m_num_l2_evicts = 0;
     if (hwp_info->curr_sent) {
-      hwp_info->useful = static_cast<Counter>(0.5 * hwp_info->useful + (0.5 * hwp_info->curr_useful));
+      hwp_info->useful = static_cast<Counter>(0.5 * hwp_info->useful +
+                                              (0.5 * hwp_info->curr_useful));
       hwp_info->curr_useful = 0;
       m_useful = hwp_info->useful;
 
-      hwp_info->sent = static_cast<Counter>((0.5 * hwp_info->sent) + (0.5 * hwp_info->curr_sent));
+      hwp_info->sent = static_cast<Counter>((0.5 * hwp_info->sent) +
+                                            (0.5 * hwp_info->curr_sent));
       hwp_info->curr_sent = 0;
 
       m_pfpol = static_cast<Counter>((0.5 * m_pfpol) + (0.5 * m_curr_pfpol));
       m_curr_pfpol = 0;
 
-      hwp_info->late = static_cast<Counter>(0.5 * hwp_info->late + (0.5 * hwp_info->curr_late));
+      hwp_info->late = static_cast<Counter>(0.5 * hwp_info->late +
+                                            (0.5 * hwp_info->curr_late));
       hwp_info->curr_late = 0;
 
-      m_l2_misses = static_cast<Counter>((0.5 * m_l2_misses) + (0.5 * m_curr_l2_misses));
+      m_l2_misses =
+        static_cast<Counter>((0.5 * m_l2_misses) + (0.5 * m_curr_l2_misses));
       m_curr_l2_misses = 0;
 
       m_update_acc = true;
@@ -618,7 +663,8 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_i
           hwp_info->track_num++;
         }
       }
-      if (hwp_info->track_num == PREF_TRACKERS_NUM || (End && hwp_info->track_num != 0)) {
+      if (hwp_info->track_num == PREF_TRACKERS_NUM ||
+          (End && hwp_info->track_num != 0)) {
         hwp_info->track_lastsample_cycle = m_simBase->m_simulation_cycle;
       }
     }
@@ -633,7 +679,9 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_i
     }
   }
 
-  if (m_l2req_queue[(m_l2req_queue_req_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE].valid) {
+  if (m_l2req_queue[(m_l2req_queue_req_pos + 1) %
+                    *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE]
+        .valid) {
     STAT_EVENT(PREF_UL2REQ_QUEUE_FULL);
     if (!*m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_OVERWRITE_ON_FULL) {
       return false;  // Q full
@@ -649,7 +697,8 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index, uns8 prefetcher_i
   new_req.core_id = core_id;
   new_req.thread_id = tid;
 
-  m_l2req_queue_req_pos = (m_l2req_queue_req_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE;
+  m_l2req_queue_req_pos = (m_l2req_queue_req_pos + 1) %
+                          *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE;
   m_l2req_queue[m_l2req_queue_req_pos] = new_req;
 
   return true;
@@ -679,24 +728,29 @@ void hwp_common_c::pref_update_queues(void) {
 
     if (m_l1req_queue[q_index].valid) {
       // port access
-      bank = m_simBase->m_memory->bank_id(m_l1req_queue[q_index].core_id, m_l1req_queue[q_index].line_addr);
+      bank = m_simBase->m_memory->bank_id(m_l1req_queue[q_index].core_id,
+                                          m_l1req_queue[q_index].line_addr);
 
-      if (!m_simBase->m_memory->get_read_port(m_l1req_queue[q_index].core_id, bank)) {
+      if (!m_simBase->m_memory->get_read_port(m_l1req_queue[q_index].core_id,
+                                              bank)) {
         // Port is not available.
         continue;
       }
-      DEBUG_MEM("prefetch L1[%d] port bank:%d acquired\n", m_l1req_queue[q_index].core_id, bank);
+      DEBUG_MEM("prefetch L1[%d] port bank:%d acquired\n",
+                m_l1req_queue[q_index].core_id, bank);
 
       // Now, access the cache
       // FIXME (jaekyu, 4-26-2011) use right application id
       dc_hit = (dcache_data_s *)m_simBase->m_memory->access_cache(
-        m_l1req_queue[q_index].core_id, m_l1req_queue[q_index].line_addr, &dummy_line_addr, false, 0);
+        m_l1req_queue[q_index].core_id, m_l1req_queue[q_index].line_addr,
+        &dummy_line_addr, false, 0);
 
       if (dc_hit) {
         // nothing for now
       } else {
         // put req. into the l2req_queue
-        if (!pref_addto_l2req_queue(m_l1req_queue[q_index].line_index, m_l1req_queue[q_index].prefetcher_id)) {
+        if (!pref_addto_l2req_queue(m_l1req_queue[q_index].line_index,
+                                    m_l1req_queue[q_index].prefetcher_id)) {
           m_overall_l1sent++;
           inc_send_pos = false;
         }
@@ -704,7 +758,8 @@ void hwp_common_c::pref_update_queues(void) {
     }
     // Done with the l1
     if (inc_send_pos) {
-      m_l1req_queue_send_pos = (m_l1req_queue_send_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
+      m_l1req_queue_send_pos = (m_l1req_queue_send_pos + 1) %
+                               *m_simBase->m_knobs->KNOB_PREF_DL0REQ_QUEUE_SIZE;
     }
   }
 
@@ -733,17 +788,22 @@ void hwp_common_c::pref_update_queues(void) {
         if (static_cast<int64_t>(m_l2req_queue[q_index].line_addr) < 0) {
           result = true;
         } else {
-          result = m_simBase->m_memory->new_mem_req(MRT_DPRF, m_l2req_queue[q_index].line_addr, 64, false, false, 1,
-                                                    NULL, NULL, 0, &info, pref_core_id,
-                                                    m_l2req_queue[q_index].thread_id, knob_ptx_sim);
+          result = m_simBase->m_memory->new_mem_req(
+            MRT_DPRF, m_l2req_queue[q_index].line_addr, 64, false, false, 1,
+            NULL, NULL, 0, &info, pref_core_id,
+            m_l2req_queue[q_index].thread_id, knob_ptx_sim);
         }
 
         if (result) {
-          DEBUG_MEM("core_id:%d thread_id:%d addr:0x%llx type:%s [prefetch generated]\n", pref_core_id,
-                    m_l2req_queue[q_index].thread_id, m_l2req_queue[q_index].line_addr,
-                    mem_req_c::mem_req_type_name[MRT_DPRF]);
+          DEBUG_MEM(
+            "core_id:%d thread_id:%d addr:0x%llx type:%s [prefetch "
+            "generated]\n",
+            pref_core_id, m_l2req_queue[q_index].thread_id,
+            m_l2req_queue[q_index].line_addr,
+            mem_req_c::mem_req_type_name[MRT_DPRF]);
 
-          DEBUG("Sent req %llx to l2 Qpos:%d\n", m_l2req_queue[q_index].line_index, m_l2req_queue_send_pos);
+          DEBUG("Sent req %llx to l2 Qpos:%d\n",
+                m_l2req_queue[q_index].line_index, m_l2req_queue_send_pos);
           STAT_EVENT(PREF_UL2REQ_QUEUE_SENTREQ);
           m_l2req_queue[q_index].valid = false;
         } else {
@@ -758,7 +818,8 @@ void hwp_common_c::pref_update_queues(void) {
     }
 
     if (inc_send_pos) {
-      m_l2req_queue_send_pos = (m_l2req_queue_send_pos + 1) % *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE;
+      m_l2req_queue_send_pos = (m_l2req_queue_send_pos + 1) %
+                               *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE;
     }
   }
 }
@@ -773,23 +834,29 @@ void hwp_common_c::pref_l2sent(uns8 prefetcher_id) {
     m_overall_l2sent++;
     pref_table[prefetcher_id]->hwp_info->curr_sent++;
 
-    if (pref_table[prefetcher_id]->hwp_info->curr_sent == *m_simBase->m_knobs->KNOB_PREF_DHAL_SENTTHRESH &&
+    if (pref_table[prefetcher_id]->hwp_info->curr_sent ==
+          *m_simBase->m_knobs->KNOB_PREF_DHAL_SENTTHRESH &&
         *m_simBase->m_knobs->KNOB_PREF_DHAL) {
-      if (pref_table[prefetcher_id]->hwp_info->curr_useful > *m_simBase->m_knobs->KNOB_PREF_DHAL_USETHRESH_MAX) {
+      if (pref_table[prefetcher_id]->hwp_info->curr_useful >
+          *m_simBase->m_knobs->KNOB_PREF_DHAL_USETHRESH_MAX) {
         // INC
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < *m_simBase->m_knobs->KNOB_PREF_DHAL_MAXDEG)
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree <
+            *m_simBase->m_knobs->KNOB_PREF_DHAL_MAXDEG)
           pref_table[prefetcher_id]->hwp_info->dyn_degree++;
       } else if (pref_table[prefetcher_id]->hwp_info->curr_useful <
                  *m_simBase->m_knobs->KNOB_PREF_DHAL_USETHRESH_MIN2) {
-        if (pref_table[prefetcher_id]->hwp_info->curr_useful < *m_simBase->m_knobs->KNOB_PREF_DHAL_USETHRESH_MIN1) {
+        if (pref_table[prefetcher_id]->hwp_info->curr_useful <
+            *m_simBase->m_knobs->KNOB_PREF_DHAL_USETHRESH_MIN1) {
           // FAST DEC
           if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 8)
-            pref_table[prefetcher_id]->hwp_info->dyn_degree = pref_table[prefetcher_id]->hwp_info->dyn_degree / 2;
+            pref_table[prefetcher_id]->hwp_info->dyn_degree =
+              pref_table[prefetcher_id]->hwp_info->dyn_degree / 2;
           else
             pref_table[prefetcher_id]->hwp_info->dyn_degree = 4;
         } else {
           // DEC
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 4) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 4)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         }
       }
       // reset the counts.
@@ -826,7 +893,8 @@ void hwp_common_c::pref_l2evictOnPF(Addr addr) {
   }
 
   if (*m_simBase->m_knobs->KNOB_PREF_REGION_ON)
-    pref_update_regioninfo(addr, false, false, true, m_simBase->m_simulation_cycle, 0);
+    pref_update_regioninfo(addr, false, false, true,
+                           m_simBase->m_simulation_cycle, 0);
 }
 
 // Get the prefetch accuracy
@@ -835,7 +903,8 @@ float hwp_common_c::pref_get_replaccuracy(uns8 prefetcher_id) {
   // For replacement wait a long time before switching.
   if (*m_simBase->m_knobs->KNOB_PREF_UPDATE_INTERVAL != 0) {
     acc = (pref_table[prefetcher_id]->hwp_info->sent > 1000)
-            ? ((float)pref_table[prefetcher_id]->hwp_info->useful / (float)pref_table[prefetcher_id]->hwp_info->sent)
+            ? ((float)pref_table[prefetcher_id]->hwp_info->useful /
+               (float)pref_table[prefetcher_id]->hwp_info->sent)
             : 1.0;
   } else {
     acc = (pref_table[prefetcher_id]->hwp_info->curr_sent > 1000)
@@ -900,40 +969,51 @@ HWP_DynAggr hwp_common_c::pref_get_degfb(uns8 prefetcher_id) {
       STAT_EVENT(PREF_TIMELY_10);
 
     if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_USEONLYLATE) {
-      if (timely > *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {  // NOT TIMELY
+      if (timely >
+          *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {  // NOT TIMELY
         ret = AGGR_INC;
         STAT_EVENT(PREF_ACC1_HT_LP);
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree++;
 
-      } else if (timely < *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH_2) {  // TOO TIMELY... go down
+      } else if (timely <
+                 *m_simBase->m_knobs
+                    ->KNOB_PREF_TIMELY_THRESH_2) {  // TOO TIMELY... go down
         ret = AGGR_DEC;
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree--;
       }
     } else if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_USEONLYPOL) {
       if (pol > *m_simBase->m_knobs->KNOB_PREF_POL_THRESH_1) {
         ret = AGGR_DEC;
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree--;
       } else if (pol < *m_simBase->m_knobs->KNOB_PREF_POL_THRESH_2) {
         ret = AGGR_INC;
         STAT_EVENT(PREF_ACC1_HT_LP);
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree++;
       }
     } else if (acc > *m_simBase->m_knobs->KNOB_PREF_ACC_THRESH_1) {
       if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_USEONLYACC) {
         ret = AGGR_INC;
         STAT_EVENT(PREF_ACC1_HT_LP);
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree++;
       } else if (timely < *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC1_HT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC1_HT_LP);
           ret = AGGR_STAY;
         }
       } else {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC1_LT_HP);
           /*
             ret = AGGR_DEC;  // MAYBE STAY???
@@ -942,11 +1022,13 @@ HWP_DynAggr hwp_common_c::pref_get_degfb(uns8 prefetcher_id) {
           */
           //		    ret = AGGR_STAY;
           ret = AGGR_INC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree++;
         } else {  // NOT TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC1_LT_LP);
           ret = AGGR_INC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree++;
         }
       }
     } else if (acc > *m_simBase->m_knobs->KNOB_PREF_ACC_THRESH_2) {
@@ -954,48 +1036,59 @@ HWP_DynAggr hwp_common_c::pref_get_degfb(uns8 prefetcher_id) {
         ret = AGGR_STAY;
         STAT_EVENT(PREF_ACC2_HT_LP);
       } else if (timely < *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC2_HT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC2_HT_LP);
           ret = AGGR_STAY;
         }
       } else {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC2_LT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
           //		    ret = AGGR_STAY;
         } else {  // NOT TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC2_LT_LP);
           ret = AGGR_INC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4) pref_table[prefetcher_id]->hwp_info->dyn_degree++;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree < 4)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree++;
         }
       }
     } else if (acc > *m_simBase->m_knobs->KNOB_PREF_ACC_THRESH_3) {
       if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_USEONLYACC) {
         STAT_EVENT(PREF_ACC3_HT_LP);
         ret = AGGR_DEC;
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree--;
       } else if (timely < *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC3_HT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC3_HT_LP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
 
           // ret = AGGR_STAY; // MAYBE DEC for B/W
         }
       } else {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC3_LT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // NOT TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC3_LT_LP);
           ret = AGGR_STAY;
@@ -1005,23 +1098,29 @@ HWP_DynAggr hwp_common_c::pref_get_degfb(uns8 prefetcher_id) {
       if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_USEONLYACC) {
         STAT_EVENT(PREF_ACC4_HT_LP);
         ret = AGGR_DEC;
-        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+        if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+          pref_table[prefetcher_id]->hwp_info->dyn_degree--;
       } else if (timely < *m_simBase->m_knobs->KNOB_PREF_TIMELY_THRESH) {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC4_HT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC4_HT_LP);
           //		    ret = AGGR_STAY; // MAYBE DEC FOR BW
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         }
       } else {
-        if (pol > *m_simBase->m_knobs->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
+        if (pol > *m_simBase->m_knobs
+                     ->KNOB_PREF_POLPF_THRESH) {  // NOT TIMELY WITH HIGH POL
           STAT_EVENT(PREF_ACC4_LT_HP);
           ret = AGGR_DEC;
-          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0) pref_table[prefetcher_id]->hwp_info->dyn_degree--;
+          if (pref_table[prefetcher_id]->hwp_info->dyn_degree > 0)
+            pref_table[prefetcher_id]->hwp_info->dyn_degree--;
         } else {  // NOT TIMELY WITH LOW POL
           STAT_EVENT(PREF_ACC4_LT_LP);
           ret = AGGR_STAY;
@@ -1043,7 +1142,8 @@ HWP_DynAggr hwp_common_c::pref_get_degfb(uns8 prefetcher_id) {
     m_phase++;
 
     if (*m_simBase->m_knobs->KNOB_PREF_DEGFB_STATPHASEFILE) {
-      fprintf(PREF_DEGFB_FILE, "%d %d\n", pref_table[prefetcher_id]->hwp_info->dyn_degree, m_phase);
+      fprintf(PREF_DEGFB_FILE, "%d %d\n",
+              pref_table[prefetcher_id]->hwp_info->dyn_degree, m_phase);
     }
   }
 
@@ -1055,7 +1155,8 @@ float hwp_common_c::pref_get_accuracy(uns8 prefetcher_id) {
   float acc;
   if (*m_simBase->m_knobs->KNOB_PREF_UPDATE_INTERVAL != 0) {
     acc = (pref_table[prefetcher_id]->hwp_info->sent > 20)
-            ? ((float)pref_table[prefetcher_id]->hwp_info->useful / (float)pref_table[prefetcher_id]->hwp_info->sent)
+            ? ((float)pref_table[prefetcher_id]->hwp_info->useful /
+               (float)pref_table[prefetcher_id]->hwp_info->sent)
             : 1.0;
   } else {
     acc = (pref_table[prefetcher_id]->hwp_info->curr_sent > 100)
@@ -1071,10 +1172,14 @@ float hwp_common_c::pref_get_overallaccuracy(HWP_Type type) {
   float acc = 1.0;
   switch (type) {
     case Mem_To_UL1:
-      acc = (m_overall_l2sent > 20) ? ((float)m_overall_l2useful / (float)m_overall_l2sent) : 1.0;
+      acc = (m_overall_l2sent > 20)
+              ? ((float)m_overall_l2useful / (float)m_overall_l2sent)
+              : 1.0;
       break;
     case UL1_To_DL0:
-      acc = (m_overall_l2sent > 20) ? ((float)m_overall_l2useful / (float)m_overall_l2sent) : 1.0;
+      acc = (m_overall_l2sent > 20)
+              ? ((float)m_overall_l2useful / (float)m_overall_l2sent)
+              : 1.0;
       break;
   }
   return acc;
@@ -1085,7 +1190,8 @@ float hwp_common_c::pref_get_timeliness(uns8 prefetcher_id) {
   float timely = 0.0;
   if (*m_simBase->m_knobs->KNOB_PREF_UPDATE_INTERVAL != 0) {
     timely = (pref_table[prefetcher_id]->hwp_info->useful > 100)
-               ? ((float)pref_table[prefetcher_id]->hwp_info->late / (float)pref_table[prefetcher_id]->hwp_info->useful)
+               ? ((float)pref_table[prefetcher_id]->hwp_info->late /
+                  (float)pref_table[prefetcher_id]->hwp_info->useful)
                : 1.0;
   } else {
     timely = (pref_table[prefetcher_id]->hwp_info->curr_useful > 100)
@@ -1100,9 +1206,12 @@ float hwp_common_c::pref_get_timeliness(uns8 prefetcher_id) {
 float hwp_common_c::pref_get_l2pollution(void) {
   float pol;
   if (*m_simBase->m_knobs->KNOB_PREF_UPDATE_INTERVAL != 0) {
-    pol = (((m_l2_misses) > 100) ? ((float)m_pfpol / (float)(m_l2_misses)) : 0.0);
+    pol =
+      (((m_l2_misses) > 100) ? ((float)m_pfpol / (float)(m_l2_misses)) : 0.0);
   } else {
-    pol = (((m_curr_l2_misses) > 1000) ? ((float)m_curr_pfpol / (float)(m_curr_l2_misses)) : 0.0);
+    pol = (((m_curr_l2_misses) > 1000)
+             ? ((float)m_curr_pfpol / (float)(m_curr_l2_misses))
+             : 0.0);
   }
 
   return pol;
@@ -1111,18 +1220,23 @@ float hwp_common_c::pref_get_l2pollution(void) {
 // get region based accuracy
 float hwp_common_c::pref_get_regionbased_acc(void) {
   float acc;
-  acc = (((m_region_sent) > 1000) ? ((float)m_region_useful / (float)(m_region_sent)) : 1.0);
+  acc = (((m_region_sent) > 1000)
+           ? ((float)m_region_useful / (float)(m_region_sent))
+           : 1.0);
   return acc;
 }
 
 // update prefetch region information
-void hwp_common_c::pref_update_regioninfo(Addr line_addr, bool l2_hit, bool l2_miss, bool evict_onPF,
-                                          Counter cycle_evict, uns8 prefetcher_id) {
+void hwp_common_c::pref_update_regioninfo(Addr line_addr, bool l2_hit,
+                                          bool l2_miss, bool evict_onPF,
+                                          Counter cycle_evict,
+                                          uns8 prefetcher_id) {
   uns region_linenum;
   Addr reg_id;
   int idx;
 
-  region_linenum = (line_addr >> m_shift_bit) & (N_BIT_MASK(LOG2_PREF_REGION_SIZE));
+  region_linenum =
+    (line_addr >> m_shift_bit) & (N_BIT_MASK(LOG2_PREF_REGION_SIZE));
   reg_id = line_addr >> (LOG2_PREF_REGION_SIZE + m_shift_bit);
   idx = pref_matchregion(reg_id, evict_onPF);
 
@@ -1176,7 +1290,8 @@ int hwp_common_c::pref_matchregion(Addr reg_id, bool evict_onPF) {
 
     // find entry to replace
     if ((idx == -1) || (!region_info[ii].valid) ||
-        (region_info[idx].valid && region_info[idx].last_access > region_info[ii].last_access)) {
+        (region_info[idx].valid &&
+         region_info[idx].last_access > region_info[ii].last_access)) {
       idx = ii;
     }
   }
@@ -1190,7 +1305,8 @@ int hwp_common_c::pref_matchregion(Addr reg_id, bool evict_onPF) {
     rinfo->valid = true;
     rinfo->region_id = reg_id;
     rinfo->trained = false;
-    memset(rinfo->status, 0, *m_simBase->m_knobs->KNOB_PREF_REGION_SIZE * sizeof(pref_region_line_status_s));
+    memset(rinfo->status, 0, *m_simBase->m_knobs->KNOB_PREF_REGION_SIZE *
+                               sizeof(pref_region_line_status_s));
 
     return idx;
   }
@@ -1214,7 +1330,8 @@ void hwp_common_c::pref_hybrid_makeselection(int reg_idx) {
 
   ASSERT(pref_table.size() < 16);
   uns mem_accesses;
-  if ((m_simBase->m_simulation_cycle - m_last_update_time) > *m_simBase->m_knobs->KNOB_PREF_HYBRID_DEFAULT_TIMEPERIOD) {
+  if ((m_simBase->m_simulation_cycle - m_last_update_time) >
+      *m_simBase->m_knobs->KNOB_PREF_HYBRID_DEFAULT_TIMEPERIOD) {
     // TIME To update the default.
     if ((m_simBase->m_simulation_cycle - m_last_update_time) >
         *m_simBase->m_knobs->KNOB_PREF_HYBRID_UPDATE_MULTIPLE *
@@ -1268,14 +1385,16 @@ void hwp_common_c::pref_hybrid_makeselection(int reg_idx) {
       printf("%d", useful);
     }
 
-    if ((region_info[reg_idx].status[ii].l2_hit || region_info[reg_idx].status[ii].l2_miss)) {
+    if ((region_info[reg_idx].status[ii].l2_hit ||
+         region_info[reg_idx].status[ii].l2_miss)) {
       useful = true;
       mem_accesses++;
     }
 
     for (unsigned int jj = 0; jj < pref_table.size(); ++jj) {
 #if NEED_TO_DEBUG
-      if (g_pref_table[jj].hwp_info->enabled && TESTBIT(region_info[reg_idx].status[ii].pref_sent, jj)) {
+      if (g_pref_table[jj].hwp_info->enabled &&
+          TESTBIT(region_info[reg_idx].status[ii].pref_sent, jj)) {
         pref_sent[jj]++;
         if (m_useful) pref_useful[jj]++;
       }
@@ -1322,7 +1441,8 @@ void hwp_common_c::pref_acc_useupdate(Addr line_addr) {
     pref_info_s *hwp_info = pref_table[jj]->hwp_info;
     if (hwp_info->enabled) {
       for (int ii = 0; ii < hwp_info->track_num; ++ii) {
-        if (line_index == hwp_info->trackers[ii]) hwp_info->trackers_used[ii] = true;
+        if (line_index == hwp_info->trackers[ii])
+          hwp_info->trackers_used[ii] = true;
       }
     }
   }
@@ -1330,14 +1450,16 @@ void hwp_common_c::pref_acc_useupdate(Addr line_addr) {
 
 // Access prefetch pollution bit vector
 char *hwp_common_c::pref_polbv_access(Addr lineIndex) {
-  uns index = ((lineIndex >> *m_simBase->m_knobs->KNOB_LOG2_PREF_POLBV_SIZE) ^ lineIndex) &
+  uns index = ((lineIndex >> *m_simBase->m_knobs->KNOB_LOG2_PREF_POLBV_SIZE) ^
+               lineIndex) &
               *m_simBase->m_knobs->KNOB_LOG2_PREF_POLBV_SIZE;
 
   return &m_polbv_info[index];
 }
 
 // Train hardware prefetchers
-void hwp_common_c::train(int level, int tid, Addr line_addr, Addr load_PC, uop_c *uop, bool hit) {
+void hwp_common_c::train(int level, int tid, Addr line_addr, Addr load_PC,
+                         uop_c *uop, bool hit) {
   if (!*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON) return;
 
   if (level == MEM_L2) {

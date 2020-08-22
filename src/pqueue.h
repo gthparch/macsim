@@ -77,7 +77,8 @@ public:
   /**
    * pqueue constructor
    */
-  pqueue_c(const int& size, const int& latency, const string name, macsim_c* simBase) {
+  pqueue_c(const int& size, const int& latency, const string name,
+           macsim_c* simBase) {
     m_capacity = size;
     m_last_index = latency;
     m_current_index = 0;
@@ -120,7 +121,9 @@ public:
 
     bool insert = false;
     int count = 0;
-    for (auto I = m_entry[m_last_index].begin(), E = m_entry[m_last_index].end(); I != E; ++I) {
+    for (auto I = m_entry[m_last_index].begin(),
+              E = m_entry[m_last_index].end();
+         I != E; ++I) {
       count++;
       if ((*I)->m_priority < priority) {
         m_entry[m_last_index].insert(I, new_entry);
@@ -178,7 +181,8 @@ public:
     int count = 0;
     for (int ii = m_current_index; ii < m_current_index + m_size; ++ii) {
       int index = ii % m_size;
-      for (auto I = m_entry[index].begin(), E = m_entry[index].end(); I != E; ++I) {
+      for (auto I = m_entry[index].begin(), E = m_entry[index].end(); I != E;
+           ++I) {
         if (count++ == entry) {
           data = (*I)->m_data;
           break;

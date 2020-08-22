@@ -52,9 +52,11 @@ public:
 
 protected:
   macsim_c* m_simBase;  //!< macsim base class for simulation globals
-  map<uint64_t, uint64_t> m_page_table;  //!< page table (virtual page && physical page)
+  map<uint64_t, uint64_t>
+    m_page_table;  //!< page table (virtual page && physical page)
   uint64_t m_page_size;  //!< page size (4KB default)
-  uint64_t m_physical_tag;  //!< physical page/region number allocated to a new virtual page/region
+  uint64_t
+    m_physical_tag;  //!< physical page/region number allocated to a new virtual page/region
 
   PageMapper(macsim_c* simBase, uint32_t page_size, uint64_t physical_tag)
     : m_simBase(simBase), m_page_size(page_size), m_physical_tag(physical_tag) {
@@ -67,11 +69,14 @@ protected:
 class FCFSPageMapper : public PageMapper
 {
 public:
-  FCFSPageMapper(macsim_c* simBase, uint32_t page_size = 4096);  //!< default page size is 4KB
+  FCFSPageMapper(macsim_c* simBase,
+                 uint32_t page_size = 4096);  //!< default page size is 4KB
   ~FCFSPageMapper();
 
 public:
-  uint64_t translate(uint64_t virtual_address);  //!< provide physical translation for virtual address
+  uint64_t translate(
+    uint64_t
+      virtual_address);  //!< provide physical translation for virtual address
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,14 +87,17 @@ public:
 class RegionBasedFCFSPageMapper : public PageMapper
 {
 public:
-  RegionBasedFCFSPageMapper(macsim_c* simBase, uint32_t page_size, uint64_t region_size);
+  RegionBasedFCFSPageMapper(macsim_c* simBase, uint32_t page_size,
+                            uint64_t region_size);
   ~RegionBasedFCFSPageMapper();
 
 public:
   uint64_t getNumPhysicalRegions() {
     return m_region_table.size();
   }  //!< get the number of physical regions allocated
-  uint64_t translate(uint64_t virtual_address);  //!< provide physical translation for virtual address
+  uint64_t translate(
+    uint64_t
+      virtual_address);  //!< provide physical translation for virtual address
 
 private:
   std::map<uint64_t, uint64_t> m_region_table;  //!< region mapping table

@@ -175,7 +175,8 @@ void delete_store_hash_entry_wrapper(map_c *map, uop_c *uop);
 // #define NUM_REG_IDS 1024
 #define NUM_REG_IDS 1600
 #define NUM_INT_REGS 32
-#define MAX_UOP_SRC_DEPS 10  // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009
+#define MAX_UOP_SRC_DEPS \
+  10  // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009
 #define MAX_DRAM_BANKS 32
 #define MAX_SRCS 9
 #define MAX_DESTS 6
@@ -211,23 +212,35 @@ void delete_store_hash_entry_wrapper(map_c *map, uop_c *uop);
 
 #ifdef USING_SST
 #include "callback.h"
-typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int> CallbackSendInstructionCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendInstructionCacheRequest;
 #ifdef USE_VAULTSIM_HMC
-typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int, uint32_t, uint64_t>
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int,
+                                  uint32_t, uint64_t>
   CallbackSendDataCacheRequest;
 #else
-typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int> CallbackSendDataCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int>
+  CallbackSendDataCacheRequest;
 #endif
-typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int> CallbackSendConstCacheRequest;
-typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int> CallbackSendTextureCacheRequest;
-typedef SST::MacSim::CallbackBase<void, uint64_t, uint64_t, int, int> CallbackSendCubeRequest;
-typedef SST::MacSim::CallbackBase<bool, int, uint64_t> CallbackStrobeInstructionCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool, int, uint64_t> CallbackStrobeDataCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool, int, uint64_t> CallbackStrobeConstCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool, int, uint64_t> CallbackStrobeTextureCacheRespQ;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendConstCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendTextureCacheRequest;
+typedef SST::MacSim::CallbackBase<void, uint64_t, uint64_t, int, int>
+  CallbackSendCubeRequest;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeInstructionCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeDataCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeConstCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeTextureCacheRespQ;
 typedef SST::MacSim::CallbackBase<bool, uint64_t> CallbackStrobeCubeRespQ;
 
-#define UNIQUE_KEY(C, T, U, A, I) ((A << 35) | ((U & 0xFFF) << 23) | ((C & 0x3F) << 17) | ((T & 0x7F) << 10) | I)
+#define UNIQUE_KEY(C, T, U, A, I)                                              \
+  ((A << 35) | ((U & 0xFFF) << 23) | ((C & 0x3F) << 17) | ((T & 0x7F) << 10) | \
+   I)
 #endif  // USING_SST
 
 #endif

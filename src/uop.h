@@ -47,7 +47,13 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief allocation queue types
 ///////////////////////////////////////////////////////////////////////////////////////////////
-typedef enum Iaq_Type_enum { gen_ALLOCQ = 0, mem_ALLOCQ, fp_ALLOCQ, simd_ALLOCQ, max_ALLOCQ } ALLOCQ_Type;
+typedef enum Iaq_Type_enum {
+  gen_ALLOCQ = 0,
+  mem_ALLOCQ,
+  fp_ALLOCQ,
+  simd_ALLOCQ,
+  max_ALLOCQ
+} ALLOCQ_Type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief uop types
@@ -591,10 +597,12 @@ public:
    */
   void allocate();
 
-  static const char *g_mem_type_name[NUM_MEM_TYPES]; /**< uop memory type string */
+  static const char
+    *g_mem_type_name[NUM_MEM_TYPES]; /**< uop memory type string */
   static const char *g_uop_state_name[NUM_OP_STATES]; /**< uop state string */
   static const char *g_cf_type_name[NUM_CF_TYPES]; /**< branch type string */
-  static const char *g_dep_type_name[NUM_DEP_TYPES]; /**< uop dependence type string */
+  static const char
+    *g_dep_type_name[NUM_DEP_TYPES]; /**< uop dependence type string */
   static const char *g_uop_type_name[NUM_UOP_TYPES]; /**< uop type string */
 
   Counter m_uop_num; /**< uop number */

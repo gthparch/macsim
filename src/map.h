@@ -63,7 +63,8 @@ public:
 class mem_map_entry_c
 {
 public:
-  uop_c *m_uop[BYTES_IN_QUADWORD]; /**< last op to write (invalid when committed) */
+  uop_c
+    *m_uop[BYTES_IN_QUADWORD]; /**< last op to write (invalid when committed) */
   Quad m_data; /**< memory dependence data */
   uns8 m_store_mask; /**< shows position of all distinct stores
                        supplying a partial value to this map entry */
@@ -125,7 +126,8 @@ public:
    * @param map_entry map entry corresponding to the register #
    * @param type register dependence (always)
    */
-  void add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_entry, Dep_Type type);
+  void add_src_from_map_entry(uop_c *uop, int src_num, map_entry_c *map_entry,
+                              Dep_Type type);
 
   /**
    * Set dependent-source information from a source uop

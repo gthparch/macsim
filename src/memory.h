@@ -145,7 +145,8 @@ public:
   /**
    * data cache constructor
    */
-  dcu_c(int id, Unit_Type type, int level, memory_c* mem, int, dcu_c** next, dcu_c** prev, macsim_c* simBase);
+  dcu_c(int id, Unit_Type type, int level, memory_c* mem, int, dcu_c** next,
+        dcu_c** prev, macsim_c* simBase);
 
   /**
    * data cache destructor
@@ -162,7 +163,8 @@ public:
    * @param disable disabled cache (in case of 2-level cache hierarchy)
    * @param has_router decide the next destination (NoC or next cache)
    */
-  void init(int next_id, int prev_id, bool done, bool coupled_up, bool coupled_down, bool disable, bool has_router);
+  void init(int next_id, int prev_id, bool done, bool coupled_up,
+            bool coupled_down, bool disable, bool has_router);
 
   /**
    * Get the cache line address
@@ -222,7 +224,8 @@ public:
   /**
    * Access the data cache
    */
-  dcache_data_s* access_cache(Addr addr, Addr* line_addr, bool update, int appl_id);
+  dcache_data_s* access_cache(Addr addr, Addr* line_addr, bool update,
+                              int appl_id);
 
   /**
    * Search a prefetch request from queues
@@ -353,9 +356,11 @@ public:
    * @return false, if mshr full or l2 queue full
    * @return true, otherwise
    */
-  bool new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hit, bool with_data, uns delay, uop_c* uop,
-                   function<bool(mem_req_s*)> done_func, Counter unique_num, pref_req_info_s* pref_info, int core_id,
-                   int thread_id, bool ptx);
+  bool new_mem_req(Mem_Req_Type type, Addr addr, uns size, bool cache_hit,
+                   bool with_data, uns delay, uop_c* uop,
+                   function<bool(mem_req_s*)> done_func, Counter unique_num,
+                   pref_req_info_s* pref_info, int core_id, int thread_id,
+                   bool ptx);
 
   /**
    * Access first-level cache from execution stage
@@ -443,12 +448,14 @@ public:
   /**
    * Access L1 data cache
    */
-  dcache_data_s* access_cache(int core_id, Addr addr, Addr* line_addr, bool update, int appl_id);
+  dcache_data_s* access_cache(int core_id, Addr addr, Addr* line_addr,
+                              bool update, int appl_id);
 
   /**
    * Generate a new write-back request
    */
-  mem_req_s* new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* data, int level);
+  mem_req_s* new_wb_req(Addr addr, int size, bool ptx, dcache_data_s* data,
+                        int level);
 
   /**
    * Print all entries in MSHR
@@ -469,7 +476,8 @@ public:
   /**
    * Handle coherence traffic (currently empty, will support coherence soon)
    */
-  void handle_coherence(int level, bool hit, bool store, Addr addr, dcu_c* cache);
+  void handle_coherence(int level, bool hit, bool store, Addr addr,
+                        dcu_c* cache);
 
   /**
    * Invalidate cache lines of the given page
@@ -490,16 +498,18 @@ protected:
   /**
    * Initialize a new request
    */
-  void init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, bool with_data, int delay, uop_c* uop,
-                    function<bool(mem_req_s*)> done_func, Counter unique_num, Counter priority, int core_id,
-                    int thread_id, bool ptx);
+  void init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size,
+                    bool with_data, int delay, uop_c* uop,
+                    function<bool(mem_req_s*)> done_func, Counter unique_num,
+                    Counter priority, int core_id, int thread_id, bool ptx);
 
   /**
    * Adjust a new request. In case of finding matching entry, we need to adjust
    * fields of the matching request
    */
-  void adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size, int delay, uop_c* uop,
-                  function<bool(mem_req_s*)> done_func, Counter unique_num, Counter priority, int core_id,
+  void adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr, int size,
+                  int delay, uop_c* uop, function<bool(mem_req_s*)> done_func,
+                  Counter unique_num, Counter priority, int core_id,
                   int thread_id, bool ptx);
 
   /**
@@ -546,11 +556,14 @@ protected:
   bool m_igpu_sim; /**< intel gpu */
 
   // cache coherence
-  unordered_map<Addr, vector<bool>*> m_tag_directory; /**< oracle cache coherence table */
-  unordered_map<Addr, bool> m_td_pending_req; /**< pending requests in tag directory */
+  unordered_map<Addr, vector<bool>*>
+    m_tag_directory; /**< oracle cache coherence table */
+  unordered_map<Addr, bool>
+    m_td_pending_req; /**< pending requests in tag directory */
 
   Counter m_cycle; /**< clock cycle */
-  pool_c<mem_req_s>* m_mem_req_pool; /**< pool for write requests in ptx simulations */
+  pool_c<mem_req_s>*
+    m_mem_req_pool; /**< pool for write requests in ptx simulations */
 };
 
 #define NEW_MEMORY_CLASS(x) \

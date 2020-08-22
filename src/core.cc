@@ -102,7 +102,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ##args)
+#define DEBUG(args...) \
+  _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ##args)
 #define DEBUG_CORE(m_core_id, args...)                          \
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {   \
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ##args); \
@@ -161,8 +162,9 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   m_map = new map_c(m_simBase);
 
   // instruction cache
-  m_icache = new cache_c("icache", icache_size, icache_assoc, icache_line_size, sizeof(icache_data_c), icache_banks,
-                         icache_bypass, c_id, CACHE_IL1, false, 1, 0, m_simBase);
+  m_icache = new cache_c("icache", icache_size, icache_assoc, icache_line_size,
+                         sizeof(icache_data_c), icache_banks, icache_bypass,
+                         c_id, CACHE_IL1, false, 1, 0, m_simBase);
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer
@@ -175,8 +177,9 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   }
 
   // frontend queue
-  m_q_frontend = new pqueue_c<int*>(*m_simBase->m_knobs->KNOB_FE_SIZE, (m_knob_fetch_latency + m_knob_alloc_latency),
-                                    "q_frontend", m_simBase);
+  m_q_frontend = new pqueue_c<int*>(
+    *m_simBase->m_knobs->KNOB_FE_SIZE,
+    (m_knob_fetch_latency + m_knob_alloc_latency), "q_frontend", m_simBase);
 
   // allocation queue
   if (m_core_type == "ptx" || m_core_type == "igpu") {
@@ -199,14 +202,18 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
       sstr << "q_iaq" << i;
       sstr >> name;
       m_gpu_q_iaq[i] = new pqueue_c<gpu_allocq_entry_s>(
-        q_iaq_size[i], (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)), name.c_str(), m_simBase);
+        q_iaq_size[i],
+        (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)),
+        name.c_str(), m_simBase);
     }
   } else {
     for (int i = 0; i < max_ALLOCQ; ++i) {
       sstr << "q_iaq" << i;
       sstr >> name;
-      m_q_iaq[i] = new pqueue_c<int>(q_iaq_size[i], (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)),
-                                     name.c_str(), m_simBase);
+      m_q_iaq[i] = new pqueue_c<int>(
+        q_iaq_size[i],
+        (*KNOB(KNOB_ALLOC_TO_EXEC_LATENCY) - *KNOB(KNOB_SCHED_CLOCK)),
+        name.c_str(), m_simBase);
     }
   }
 
@@ -216,16 +223,19 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   m_resource = new resource_c(type, m_simBase);
 
   // frontend stage
-  m_frontend = fetch_factory_c::get()->allocate_frontend(FRONTEND_INTERFACE_ARGS(), m_simBase);
+  m_frontend = fetch_factory_c::get()->allocate_frontend(
+    FRONTEND_INTERFACE_ARGS(), m_simBase);
 
   // allocation stage
   if (m_core_type == "ptx" || m_core_type == "igpu") {
     m_allocate = NULL;
-    m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq, m_uop_pool, m_gpu_rob, m_unit_type,
+    m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq,
+                                        m_uop_pool, m_gpu_rob, m_unit_type,
                                         max_ALLOCQ, m_resource, m_simBase);
   } else {
-    m_allocate = new allocate_c(m_core_id, m_q_frontend, m_q_iaq, m_uop_pool, m_rob, m_unit_type, max_ALLOCQ,
-                                m_resource, m_simBase);
+    m_allocate =
+      new allocate_c(m_core_id, m_q_frontend, m_q_iaq, m_uop_pool, m_rob,
+                     m_unit_type, max_ALLOCQ, m_resource, m_simBase);
     m_gpu_allocate = NULL;
   }
 
@@ -234,16 +244,21 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
 
   // instruction scheduler
   if (m_core_type == "ptx") {
-    m_schedule = new schedule_smc_c(m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec, m_unit_type, m_frontend, m_simBase);
+    m_schedule = new schedule_smc_c(m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec,
+                                    m_unit_type, m_frontend, m_simBase);
   } else if (m_core_type == "igpu") {
-    m_schedule = new schedule_igpu_c(m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec, m_unit_type, m_frontend, m_simBase);
+    m_schedule = new schedule_igpu_c(m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec,
+                                     m_unit_type, m_frontend, m_simBase);
   } else {
     if (m_knob_schedule == "ooo")
-      m_schedule = new schedule_ooo_c(m_core_id, m_q_iaq, m_rob, m_exec, m_unit_type, m_frontend, m_simBase);
+      m_schedule = new schedule_ooo_c(m_core_id, m_q_iaq, m_rob, m_exec,
+                                      m_unit_type, m_frontend, m_simBase);
     else if (m_knob_schedule == "io")
-      m_schedule = new schedule_io_c(m_core_id, m_q_iaq, m_rob, m_exec, m_unit_type, m_frontend, m_simBase);
+      m_schedule = new schedule_io_c(m_core_id, m_q_iaq, m_rob, m_exec,
+                                     m_unit_type, m_frontend, m_simBase);
     else {
-      std::cerr << "ERROR: unrecognized schedule class: " << m_knob_schedule << "\n";
+      std::cerr << "ERROR: unrecognized schedule class: " << m_knob_schedule
+                << "\n";
       exit(1);
     }
   }
@@ -256,16 +271,19 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     m_hw_pref = new hwp_common_c(c_id, type, m_simBase);
 
   // const / texture cache
-  if (m_core_type == "ptx" && *m_simBase->m_knobs->KNOB_USE_CONST_AND_TEX_CACHES) {
-    m_const_cache =
-      new readonly_cache_c("const_cache", m_core_id, *KNOB(KNOB_CONST_CACHE_SIZE), *KNOB(KNOB_CONST_CACHE_ASSOC),
-                           *KNOB(KNOB_CONST_CACHE_LINE_SIZE), *KNOB(KNOB_CONST_CACHE_BANKS),
-                           *KNOB(KNOB_CONST_CACHE_CYCLES), 0, CACHE_CONST, sizeof(dcache_data_s), m_simBase);
+  if (m_core_type == "ptx" &&
+      *m_simBase->m_knobs->KNOB_USE_CONST_AND_TEX_CACHES) {
+    m_const_cache = new readonly_cache_c(
+      "const_cache", m_core_id, *KNOB(KNOB_CONST_CACHE_SIZE),
+      *KNOB(KNOB_CONST_CACHE_ASSOC), *KNOB(KNOB_CONST_CACHE_LINE_SIZE),
+      *KNOB(KNOB_CONST_CACHE_BANKS), *KNOB(KNOB_CONST_CACHE_CYCLES), 0,
+      CACHE_CONST, sizeof(dcache_data_s), m_simBase);
 
-    m_texture_cache =
-      new readonly_cache_c("texture_cache", m_core_id, *KNOB(KNOB_TEXTURE_CACHE_SIZE), *KNOB(KNOB_TEXTURE_CACHE_ASSOC),
-                           *KNOB(KNOB_TEXTURE_CACHE_LINE_SIZE), *KNOB(KNOB_TEXTURE_CACHE_BANKS),
-                           *KNOB(KNOB_TEXTURE_CACHE_CYCLES), 0, CACHE_TEXTURE, sizeof(dcache_data_s), m_simBase);
+    m_texture_cache = new readonly_cache_c(
+      "texture_cache", m_core_id, *KNOB(KNOB_TEXTURE_CACHE_SIZE),
+      *KNOB(KNOB_TEXTURE_CACHE_ASSOC), *KNOB(KNOB_TEXTURE_CACHE_LINE_SIZE),
+      *KNOB(KNOB_TEXTURE_CACHE_BANKS), *KNOB(KNOB_TEXTURE_CACHE_CYCLES), 0,
+      CACHE_TEXTURE, sizeof(dcache_data_s), m_simBase);
   } else {
     m_const_cache = NULL;
     m_texture_cache = NULL;
@@ -274,9 +292,11 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   // shared memory
   if (m_core_type == "ptx") {
     m_shared_memory = new sw_managed_cache_c(
-      "shared_memory", m_core_id, *KNOB(KNOB_SHARED_MEM_SIZE), *KNOB(KNOB_SHARED_MEM_ASSOC),
-      *KNOB(KNOB_SHARED_MEM_LINE_SIZE), *KNOB(KNOB_SHARED_MEM_BANKS), *KNOB(KNOB_SHARED_MEM_CYCLES), 0,
-      CACHE_SW_MANAGED, *KNOB(KNOB_SHARED_MEM_PORTS), *KNOB(KNOB_SHARED_MEM_PORTS), sizeof(dcache_data_s), m_simBase);
+      "shared_memory", m_core_id, *KNOB(KNOB_SHARED_MEM_SIZE),
+      *KNOB(KNOB_SHARED_MEM_ASSOC), *KNOB(KNOB_SHARED_MEM_LINE_SIZE),
+      *KNOB(KNOB_SHARED_MEM_BANKS), *KNOB(KNOB_SHARED_MEM_CYCLES), 0,
+      CACHE_SW_MANAGED, *KNOB(KNOB_SHARED_MEM_PORTS),
+      *KNOB(KNOB_SHARED_MEM_PORTS), sizeof(dcache_data_s), m_simBase);
   } else {
     m_shared_memory = NULL;
   }
@@ -371,7 +391,8 @@ void core_c::run_a_cycle(bool pll_lock) {
   m_retire->run_a_cycle();
 
   // prefetcher
-  if (*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON && m_knob_enable_pref) m_hw_pref->pref_update_queues();
+  if (*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON && m_knob_enable_pref)
+    m_hw_pref->pref_update_queues();
 
   // scheduler
   m_schedule->run_a_cycle();
@@ -421,8 +442,11 @@ void core_c::final_heartbeat(int thread_id) {
 void core_c::check_heartbeat(bool final) {
   core_heartbeat(final);
 
-  for (int ii = m_last_terminated_tid; ii < m_unique_scheduled_thread_num; ++ii) {
-    if (m_heartbeat.find(ii) == m_heartbeat.end() || m_heartbeat[ii]->m_check_done) continue;
+  for (int ii = m_last_terminated_tid; ii < m_unique_scheduled_thread_num;
+       ++ii) {
+    if (m_heartbeat.find(ii) == m_heartbeat.end() ||
+        m_heartbeat[ii]->m_check_done)
+      continue;
 
     // print thread heartbeat
     thread_heartbeat(ii, final);
@@ -435,33 +459,44 @@ void core_c::thread_heartbeat(int tid, bool final) {
 
   /* End Bookkeeping */
   m_inst_count = m_retire->get_instrs_retired(tid);
-  Counter inst_diff =
-    ((m_inst_count > m_heartbeat[tid]->m_printed_inst_count) ? m_inst_count - m_heartbeat[tid]->m_printed_inst_count
-                                                             : 0);
+  Counter inst_diff = ((m_inst_count > m_heartbeat[tid]->m_printed_inst_count)
+                         ? m_inst_count - m_heartbeat[tid]->m_printed_inst_count
+                         : 0);
 
   /* print heartbeat message if necessary */
-  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) && inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) || final) {
+  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) &&
+       inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) ||
+      final) {
     time_t cur_time = time(NULL);
-    double int_ipc = (double)(m_inst_count - m_heartbeat[tid]->m_last_inst_count) /
-                     (m_core_cycle_count - m_heartbeat[tid]->m_last_cycle_count);
+    double int_ipc =
+      (double)(m_inst_count - m_heartbeat[tid]->m_last_inst_count) /
+      (m_core_cycle_count - m_heartbeat[tid]->m_last_cycle_count);
     double cum_ipc = (double)m_inst_count / m_core_cycle_count;
 
     double int_khz =
-      (double)(m_inst_count - m_heartbeat[tid]->m_last_inst_count) / (cur_time - m_heartbeat[tid]->m_last_time) / 1000;
+      (double)(m_inst_count - m_heartbeat[tid]->m_last_inst_count) /
+      (cur_time - m_heartbeat[tid]->m_last_time) / 1000;
 
-    double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
+    double cum_khz =
+      (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
     if (final) {
       fprintf(m_simBase->g_mystdout,
               "**Core %02d Thread %02d Finished:   insts:%-10llu  "
-              "cycles:%-10llu (%llu)  seconds:%-5llu -- %.2f IPC (%.2f IPC) --  N/A  KHz (%.2f KHz) \n",
-              m_core_id, tid, m_inst_count, m_core_cycle_count, m_simBase->m_simulation_cycle,
-              (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
+              "cycles:%-10llu (%llu)  seconds:%-5llu -- %.2f IPC (%.2f IPC) -- "
+              " N/A  KHz (%.2f KHz) \n",
+              m_core_id, tid, m_inst_count, m_core_cycle_count,
+              m_simBase->m_simulation_cycle,
+              (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc,
+              cum_khz);
     } else {
       fprintf(m_simBase->g_mystdout,
               "** Heartbeat for core[%02d]:  Thread:%-6d insts:%-10llu  "
-              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
-              m_core_id, tid, m_inst_count / 100 * 100, m_core_cycle_count, m_simBase->m_simulation_cycle,
-              (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
+              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) "
+              "-- %-3.2f KIPS (%-3.2f KIPS)\n",
+              m_core_id, tid, m_inst_count / 100 * 100, m_core_cycle_count,
+              m_simBase->m_simulation_cycle,
+              (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz,
+              cum_khz);
       fflush(m_simBase->g_mystdout);
     }
 
@@ -469,7 +504,8 @@ void core_c::thread_heartbeat(int tid, bool final) {
     m_heartbeat[tid]->m_last_time = cur_time;
     m_heartbeat[tid]->m_last_cycle_count = m_core_cycle_count;
     m_heartbeat[tid]->m_last_inst_count = m_inst_count;
-    m_heartbeat[tid]->m_printed_inst_count += *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL;
+    m_heartbeat[tid]->m_printed_inst_count +=
+      *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL;
   }
 }
 
@@ -479,31 +515,41 @@ void core_c::core_heartbeat(bool final) {
   m_inst_count = m_retire->get_total_insts_retired();
 
   // instruction difference from last heartbeat print
-  Counter inst_diff =
-    ((m_inst_count > m_heartbeat_printed_inst_count_core) ? m_inst_count - m_heartbeat_printed_inst_count_core : 0);
+  Counter inst_diff = ((m_inst_count > m_heartbeat_printed_inst_count_core)
+                         ? m_inst_count - m_heartbeat_printed_inst_count_core
+                         : 0);
 
   /* print heartbeat message if necessary */
-  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) && inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) || final) {
+  if ((*KNOB(KNOB_HEARTBEAT_INTERVAL) &&
+       inst_diff >= *KNOB(KNOB_HEARTBEAT_INTERVAL)) ||
+      final) {
     time_t cur_time = time(NULL);
     double int_ipc = (double)(m_inst_count - m_heartbeat_last_inst_count_core) /
                      (m_core_cycle_count - m_heartbeat_last_cycle_count_core);
     double cum_ipc = (double)m_inst_count / m_core_cycle_count;
-    double int_khz =
-      (double)(m_inst_count - m_heartbeat_last_inst_count_core) / (cur_time - m_heartbeat_last_time_core) / 1000;
-    double cum_khz = (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
+    double int_khz = (double)(m_inst_count - m_heartbeat_last_inst_count_core) /
+                     (cur_time - m_heartbeat_last_time_core) / 1000;
+    double cum_khz =
+      (double)m_inst_count / (cur_time - m_sim_start_time) / 1000;
 
     if (final) {
       fprintf(m_simBase->g_mystdout,
               "**Core %02d Core_Total  Finished:   insts:%-10llu  "
-              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) --  N/A  KHz (%-3.2f KHz)\n",
-              m_core_id, m_inst_count, m_core_cycle_count, m_simBase->m_simulation_cycle,
-              (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc, cum_khz);
+              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) "
+              "--  N/A  KHz (%-3.2f KHz)\n",
+              m_core_id, m_inst_count, m_core_cycle_count,
+              m_simBase->m_simulation_cycle,
+              (Counter)(cur_time - m_sim_start_time), cum_ipc, cum_ipc,
+              cum_khz);
     } else {
       fprintf(m_simBase->g_mystdout,
               "** Heartbeat for core[%02d]:        insts:%-10llu  "
-              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) -- %-3.2f KIPS (%-3.2f KIPS)\n",
-              m_core_id, m_inst_count / 100 * 100, m_core_cycle_count, m_simBase->m_simulation_cycle,
-              (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz, cum_khz);
+              "cycles:%-10llu (%llu) seconds:%-5llu -- %-3.2f IPC (%-3.2f IPC) "
+              "-- %-3.2f KIPS (%-3.2f KIPS)\n",
+              m_core_id, m_inst_count / 100 * 100, m_core_cycle_count,
+              m_simBase->m_simulation_cycle,
+              (Counter)(cur_time - m_sim_start_time), int_ipc, cum_ipc, int_khz,
+              cum_khz);
       fflush(m_simBase->g_mystdout);
     }
 
@@ -511,7 +557,8 @@ void core_c::core_heartbeat(bool final) {
     m_heartbeat_last_time_core = cur_time;
     m_heartbeat_last_cycle_count_core = m_core_cycle_count;
     m_heartbeat_last_inst_count_core = m_inst_count;
-    m_heartbeat_printed_inst_count_core += *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL;
+    m_heartbeat_printed_inst_count_core +=
+      *m_simBase->m_knobs->KNOB_HEARTBEAT_INTERVAL;
   }
 }
 
@@ -528,7 +575,8 @@ void core_c::check_forward_progress() {
 
   // if no instruction has been retired more than KNOB_FORWARD_PROGRESS_LIMIT cycle,
   // raise forward progress exception
-  if (m_core_cycle_count - m_last_forward_progress > *KNOB(KNOB_FORWARD_PROGRESS_LIMIT)) {
+  if (m_core_cycle_count - m_last_forward_progress >
+      *KNOB(KNOB_FORWARD_PROGRESS_LIMIT)) {
     STAT_EVENT(PROGRESS_ERROR);
 
     // print all mshr entries
@@ -547,11 +595,13 @@ void core_c::check_forward_progress() {
 
     m_simBase->m_network->print();
 
-    ASSERTM(m_core_cycle_count - m_last_forward_progress <= *KNOB(KNOB_FORWARD_PROGRESS_LIMIT),
-            "core_id:%d core_cycle_count:%llu (%llu) last_forward_progress:%llu last_tid:%d "
+    ASSERTM(m_core_cycle_count - m_last_forward_progress <=
+              *KNOB(KNOB_FORWARD_PROGRESS_LIMIT),
+            "core_id:%d core_cycle_count:%llu (%llu) "
+            "last_forward_progress:%llu last_tid:%d "
             "last_inst_count:%llu\n",
-            m_core_id, m_core_cycle_count, m_simBase->m_simulation_cycle, m_last_forward_progress,
-            m_last_terminated_tid, m_last_inst_count);
+            m_core_id, m_core_cycle_count, m_simBase->m_simulation_cycle,
+            m_last_forward_progress, m_last_terminated_tid, m_last_inst_count);
   }
 }
 
@@ -584,7 +634,8 @@ void core_c::allocate_thread_data(int tid) {
   m_heartbeat[tid] = heartbeat;
 
   // allocate bp recovery
-  bp_recovery_info_c* bp_recovery_info = m_simBase->m_bp_recovery_info_pool->acquire_entry();
+  bp_recovery_info_c* bp_recovery_info =
+    m_simBase->m_bp_recovery_info_pool->acquire_entry();
   bp_recovery_info->m_recovery_cycle = MAX_CTR;
   bp_recovery_info->m_redirect_cycle = MAX_CTR;
   m_bp_recovery_info[tid] = bp_recovery_info;
@@ -596,7 +647,8 @@ void core_c::allocate_thread_data(int tid) {
   m_retire->allocate_retire_data(tid);
 
   // allocate scheduler queue and rob for GPU simulation
-  if (m_core_type == "ptx" || m_core_type == "igpu") m_gpu_rob->reserve_rob(tid);
+  if (m_core_type == "ptx" || m_core_type == "igpu")
+    m_gpu_rob->reserve_rob(tid);
 }
 
 // When a thread is terminated, deallocate all data used by this thread
@@ -632,8 +684,10 @@ void core_c::deallocate_thread_data(int tid) {
 
   // check forward progress
   if (m_unique_scheduled_thread_num >= m_last_terminated_tid + 1000) {
-    DEBUG("core_id=%d thread_id:%d last_terminated_tid:%d\n", m_core_id, tid, m_last_terminated_tid);
-    ASSERTM(0, "core_id=%d thread_id:%d last_terminated_tid:%d\n", m_core_id, tid, m_last_terminated_tid);
+    DEBUG("core_id=%d thread_id:%d last_terminated_tid:%d\n", m_core_id, tid,
+          m_last_terminated_tid);
+    ASSERTM(0, "core_id=%d thread_id:%d last_terminated_tid:%d\n", m_core_id,
+            tid, m_last_terminated_tid);
   }
 }
 
@@ -642,7 +696,8 @@ void core_c::deallocate_thread_data(int tid) {
 // hardware prefetchers
 
 // train hardware prefetchers based on the event
-void core_c::train_hw_pref(int level, int tid, Addr addr, Addr pc, uop_c* uop, bool hit) {
+void core_c::train_hw_pref(int level, int tid, Addr addr, Addr pc, uop_c* uop,
+                           bool hit) {
   if (*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON && m_knob_enable_pref) {
     m_hw_pref->train(level, tid, addr, pc, uop, hit);
   }
@@ -670,7 +725,8 @@ void core_c::add_application(int tid, process_s* process) {
 void core_c::delete_application(int appl_id) {
   // since many threads may be mapped to same application id
   // we need to delete all entries from the map
-  for (auto I = m_tid_to_appl_map.begin(), E = m_tid_to_appl_map.end(); I != E;) {
+  for (auto I = m_tid_to_appl_map.begin(), E = m_tid_to_appl_map.end();
+       I != E;) {
     auto current = I++;
     if ((*current).second->m_orig_pid == appl_id) {
       m_tid_to_appl_map.erase(current);

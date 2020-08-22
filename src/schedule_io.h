@@ -60,8 +60,9 @@ public:
    *  \param simBase - simulation base class pointer
    *  \return void
    */
-  schedule_io_c(int m_core_id, pqueue_c<int>** m_alloc_q, rob_c* m_rob, exec_c* m_exec, Unit_Type m_unit_type,
-                frontend_c* m_frontend, macsim_c* simBase);
+  schedule_io_c(int m_core_id, pqueue_c<int>** m_alloc_q, rob_c* m_rob,
+                exec_c* m_exec, Unit_Type m_unit_type, frontend_c* m_frontend,
+                macsim_c* simBase);
 
   /**
    *  \brief Destructor for the Inorder scheduler

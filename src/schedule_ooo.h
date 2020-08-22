@@ -57,8 +57,8 @@ public:
    *  \param simBase - simulation base class pointer
    *  \return void
    */
-  schedule_ooo_c(int core_id, pqueue_c<int>** q_iaq, rob_c* rob, exec_c* exec, Unit_Type unit_type,
-                 frontend_c* frontend, macsim_c* simBase);
+  schedule_ooo_c(int core_id, pqueue_c<int>** q_iaq, rob_c* rob, exec_c* exec,
+                 Unit_Type unit_type, frontend_c* frontend, macsim_c* simBase);
 
   /*! \fn void ~schedule_ooo_c()
    *  \brief Destructor for the Out of order scheduler

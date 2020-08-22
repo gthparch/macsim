@@ -185,8 +185,10 @@ bool sort_uops(uop_c* a, uop_c* b) {
 
 // get a list of retireable uops from multiple threads
 // called by retire stage
-vector<uop_c*>* smc_rob_c::get_n_uops_in_ready_order(int n, Counter core_cycle) {
-  for (auto I = m_thread_to_rob_map.begin(), E = m_thread_to_rob_map.end(); I != E; ++I) {
+vector<uop_c*>* smc_rob_c::get_n_uops_in_ready_order(int n,
+                                                     Counter core_cycle) {
+  for (auto I = m_thread_to_rob_map.begin(), E = m_thread_to_rob_map.end();
+       I != E; ++I) {
     int index = I->second;
     rob_c* rob = m_thread_robs[index];
 

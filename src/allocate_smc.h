@@ -57,7 +57,8 @@ typedef struct gpu_allocq_entry_s {
    * Constructor
    * @param init_val - init value
    */
-  gpu_allocq_entry_s(int init_val) : m_thread_id(init_val), m_rob_entry(init_val) {
+  gpu_allocq_entry_s(int init_val)
+    : m_thread_id(init_val), m_rob_entry(init_val) {
     // do nothing
   }
 
@@ -83,8 +84,10 @@ public:
    * \param simBase - Pointer to base simulation class for perf/stat counters
    * \return void
    */
-  smc_allocate_c(int core_id, pqueue_c<int*>* q_frontend, pqueue_c<gpu_allocq_entry_s>** gpu_alloc_q,
-                 pool_c<uop_c>* uop_pool, smc_rob_c* gpu_rob, Unit_Type unit_type, int num_queues, resource_c* resource,
+  smc_allocate_c(int core_id, pqueue_c<int*>* q_frontend,
+                 pqueue_c<gpu_allocq_entry_s>** gpu_alloc_q,
+                 pool_c<uop_c>* uop_pool, smc_rob_c* gpu_rob,
+                 Unit_Type unit_type, int num_queues, resource_c* resource,
                  macsim_c* simBase);
 
   /*! \fn ~smc_allocate_c()
@@ -135,7 +138,8 @@ private:
   Counter m_cur_core_cycle; /**< current core cycle */
   int m_num_queues; /**< number of allocation queue types */
 
-  resource_c* m_resource; /**< resource structure to hold ld/st buffer, INT/REG buffer */
+  resource_c*
+    m_resource; /**< resource structure to hold ld/st buffer, INT/REG buffer */
   macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 };
 

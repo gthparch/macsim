@@ -66,7 +66,8 @@ public:
   /**
    * Register a fetch class
    */
-  void register_class(string, function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)>);
+  void register_class(
+    string, function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)>);
 
   /**
    * Allocate a new fetch class
@@ -88,7 +89,8 @@ public:
 
 private:
   /** fetch wrapper function table */
-  map<string, function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)> > m_func_table;
+  map<string, function<frontend_c *(FRONTEND_INTERFACE_PARAMS(), macsim_c *)> >
+    m_func_table;
 };
 
 #endif

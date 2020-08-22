@@ -91,7 +91,8 @@ public:
   void gen_trace(void);
   void count_fences(const uint8_t *b, uint8_t l) {
   }
-  void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b, enum inst_type t);
+  void inst_cb(int c, uint64_t v, uint64_t p, uint8_t l, const uint8_t *b,
+               enum inst_type t);
 
   ~trace_gen_x86() {
   }

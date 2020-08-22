@@ -300,7 +300,8 @@ public:
    * @param uop uop that trains hardware prefetcher
    * @param hit cache hit/miss information
    */
-  void train_hw_pref(int level, int tid, Addr addr, Addr pc, uop_c* uop, bool hit);
+  void train_hw_pref(int level, int tid, Addr addr, Addr pc, uop_c* uop,
+                     bool hit);
 
   /**
    * Get dependence map
@@ -365,12 +366,15 @@ public:
 
   // current core stats per thread
   unordered_map<int, bool> m_fetch_ended; /**< fetch ended */
-  unordered_map<int, bool> m_thread_reach_end; /**< thread reaches last instruction */
+  unordered_map<int, bool>
+    m_thread_reach_end; /**< thread reaches last instruction */
   unordered_map<int, bool> m_thread_finished; /**< thread finished */
 
   // additional fetch policies
-  unordered_map<int, Counter> m_inst_fetched; /**< last fetched cycle for the thread */
-  unordered_map<int, Counter> m_ops_to_be_dispatched; /**< number of uops to be scheduled */
+  unordered_map<int, Counter>
+    m_inst_fetched; /**< last fetched cycle for the thread */
+  unordered_map<int, Counter>
+    m_ops_to_be_dispatched; /**< number of uops to be scheduled */
   unordered_map<int, Counter> m_last_fetch_cycle; /**< last fetched cycle */
   Counter m_max_inst_fetched; /**< maximum inst fetched */
 
@@ -416,7 +420,8 @@ private:
   time_t m_heartbeat_last_time_core; /**< last heartbeat time */
   Counter m_heartbeat_last_cycle_count_core; /**< last heartbeat cycle */
   Counter m_heartbeat_last_inst_count_core; /**< last heartbeat inst. count */
-  Counter m_heartbeat_printed_inst_count_core; /**< last printed heartbeat inst. count */
+  Counter
+    m_heartbeat_printed_inst_count_core; /**< last printed heartbeat inst. count */
   bool m_heartbeat_check_done_core; /**< check heartbeat done */
 
   // configuration
@@ -425,11 +430,14 @@ private:
   macsim_c* m_simBase; /**< macsim_c base class for simulation globals */
 
   // application id mapping
-  unordered_map<int, process_s*> m_tid_to_appl_map; /**< get application id with tid */
+  unordered_map<int, process_s*>
+    m_tid_to_appl_map; /**< get application id with tid */
   int m_appl_id; /**< id of currently running application */
 
-  unordered_map<int, thread_s*> m_thread_trace_info; /**< thread trace information */
-  unordered_map<int, bp_recovery_info_c*> m_bp_recovery_info; /**< thread bp recovery info */
+  unordered_map<int, thread_s*>
+    m_thread_trace_info; /**< thread trace information */
+  unordered_map<int, bp_recovery_info_c*>
+    m_bp_recovery_info; /**< thread bp recovery info */
 
   // clock cycle
   Counter m_cycle; /**< clock cycle */

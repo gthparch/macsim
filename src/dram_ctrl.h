@@ -128,7 +128,8 @@ public:
   /**
    * Insert a new request to dram request buffer (DRB).
    */
-  void insert_req_in_drb(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid);
+  void insert_req_in_drb(mem_req_s* req, uint64_t bid, uint64_t rid,
+                         uint64_t cid);
 
   /**
    * Tick a cycle.
@@ -143,7 +144,8 @@ public:
 public:
 #define DRAM_REQ_PRIORITY_COUNT 12
 #define DRAM_STATE_COUNT 5
-  static int dram_req_priority[DRAM_REQ_PRIORITY_COUNT]; /**< dram request priority */
+  static int
+    dram_req_priority[DRAM_REQ_PRIORITY_COUNT]; /**< dram request priority */
   static const char* dram_state[DRAM_STATE_COUNT]; /**< dram state string */
 
 protected:
@@ -223,7 +225,8 @@ protected:
   /**
    * Function to do any book-keeping that might be needed by scheduling policies
    */
-  virtual void on_insert(mem_req_s* req, uint64_t bid, uint64_t rid, uint64_t cid);
+  virtual void on_insert(mem_req_s* req, uint64_t bid, uint64_t rid,
+                         uint64_t cid);
 
   /**
    * Function to do any book-keeping that might be needed by scheduling policies
@@ -256,7 +259,8 @@ protected:
   uint64_t m_rid_shift; /**< row id shift */
   uint64_t m_bid_xor_shift; /**< bank id xor factor */
 
-  int m_num_completed_in_last_cycle; /**< number of requests completed in last cycle */
+  int
+    m_num_completed_in_last_cycle; /**< number of requests completed in last cycle */
   int m_starvation_cycle; /**< number of cycles without completed requests*/
   int m_total_req; /**< total pending requests */
 
@@ -266,7 +270,8 @@ protected:
   int m_column_latency; /**< column access latency */
 
   list<mem_req_s*>* m_output_buffer; /**< output buffer */
-  list<mem_req_s*>* m_tmp_output_buffer; /**< buffer to simulate any additional dram latency */
+  list<mem_req_s*>*
+    m_tmp_output_buffer; /**< buffer to simulate any additional dram latency */
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

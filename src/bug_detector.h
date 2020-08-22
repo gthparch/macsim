@@ -104,7 +104,8 @@ private:
   uint64_t* m_latency_sum; /**< sum of each uop's execution latency */
   uint64_t* m_latency_count; /**< total uop count */
 
-  unordered_map<mem_req_s*, uint64_t>* m_packet_table; /**< memeory requests in noc */
+  unordered_map<mem_req_s*, uint64_t>*
+    m_packet_table; /**< memeory requests in noc */
 
   macsim_c* m_simBase; /**< pointer to the simulation base class */
   set<int> m_fences;
