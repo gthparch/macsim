@@ -14,7 +14,8 @@ namespace ramulator {
 class Request;
 class MemoryBase;
 
-class RamulatorWrapper {
+class RamulatorWrapper
+{
 private:
   MemoryBase *mem;
 
@@ -29,5 +30,5 @@ public:
 
 } /*namespace ramulator*/
 
-#endif // RAMULATOR
+#endif  // RAMULATOR
 #endif /*__RAMULATOR_WRAPPER_H*/

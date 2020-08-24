@@ -38,26 +38,27 @@ static map<string, function<MemoryBase *(const Config &, int)>> name_to_func = {
 RamulatorWrapper::RamulatorWrapper(const Config &configs, int cacheline) {
   Stats::statlist.output("ramulator.stat.out");
   const string &std_name = configs["standard"];
-  assert(name_to_func.find(std_name) != name_to_func.end() && "unrecognized standard name");
+  assert(name_to_func.find(std_name) != name_to_func.end() &&
+         "unrecognized standard name");
   mem = name_to_func[std_name](configs, cacheline);
   tCK = mem->clk_ns();
 }
 
-RamulatorWrapper::~RamulatorWrapper() { 
+RamulatorWrapper::~RamulatorWrapper() {
   Stats::statlist.printall();
-  delete mem; 
+  delete mem;
 }
 
-void RamulatorWrapper::tick() { 
-  mem->tick(); 
+void RamulatorWrapper::tick() {
+  mem->tick();
 }
 
 bool RamulatorWrapper::send(Request req) {
-  return mem->send(req); 
+  return mem->send(req);
 }
 
 void RamulatorWrapper::finish(void) {
-  mem->finish(); 
+  mem->finish();
 }
 
-#endif // RAMULATOR
+#endif  // RAMULATOR
