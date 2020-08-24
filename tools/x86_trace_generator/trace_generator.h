@@ -44,7 +44,7 @@ typedef unsigned __int32 uint32_t;
 #define MAX_SRC_NUM 9
 #define MAX_DST_NUM 6
 #define USE_MAP 0
-#define MAX_THREADS 1000
+#define MAX_THREADS 10000
 
 /**
  * Instrumentation Option
