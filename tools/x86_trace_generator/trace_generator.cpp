@@ -937,8 +937,13 @@ void Instruction(INS ins, void *v)
 /////////////////////////////////////////////////////////////////////////////////////////
 void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
 {
-  if (tid >= Knob_num_thread.Value() ) 
-    printf("Warning! the nubmer of threads is greater than the threads to collect info!! This might generate seg fault!!\n");  
+  if (tid >= Knob_num_thread.Value()){ 
+    printf("**************************************\n");
+    printf("Warning! the nubmer of threads is greater than the threads to collect info!!\n");
+    printf("This might generate seg fault!!\n");  
+    printf("use -thread Knob to set up the correct number of threads\n");
+    printf("**************************************\n");
+  }
    cout << "-> Thread[" << tid << "->" << threadMap[tid] << "] begins." << endl;
   THREADID threadid = threadMap[tid];
 
