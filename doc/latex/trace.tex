@@ -29,9 +29,10 @@ this procedure.
 
 \SIM includes a CPU (x86) trace generator which is based on Pin~\cite{pin}, a
 binary instrumentation tool. Documentation regarding Pin can be found at
-\urlc{http://www.pintool.org}. After installing Pin\footnote{Note that our
+\urlc{https://software.intel.com/content/www/us/en/develop/articles/pin-a-dynamic-binary-instrumentation-tool.html}. 
+After installing Pin\footnote{Note that our
 trace generator may not be backward/forward compatible with different Pin
-versions. Currently, pin 2.12 (version number 56759  )  must be used.}, the x86
+versions. Currently, pin 3.13 (version number 98189)  must be used.}, the x86
 trace generator module has to be built. The command for doing so is:
 
 
@@ -39,11 +40,11 @@ trace generator module has to be built. The command for doing so is:
 		{
 		CPU (x86) traces are generated with the aid of Pin~\cite{pin}, a
 		binary instrumentation tool.  Documentation regarding Pin can be found 
-		here \urlc{http://www.pintool.org}.  We provide
-		\cpu trace generator within \SIM repository. After installing
+		here \urlc{https://software.intel.com/content/www/us/en/develop/articles/pin-a-dynamic-binary-instrumentation-tool.html}. 
+		We provide \cpu trace generator within \SIM repository. After installing
 		Pin\footnote{Note that our CPU trace generator may not be
 		  backward/forward compatible with the pin version. Currently, pin
-		  41150 revision (Jun 07, 2011) must be used.}, we need to build the
+		  98189 revision (March 25, 2020) must be used.}, we need to build the
 		X86 trace generator module (trace\_generator.so), which can be simply
 		done with the following commands.
 		}
@@ -51,7 +52,7 @@ trace generator module has to be built. The command for doing so is:
 
 
 \begin{Verbatim}
-cd toos/x86_trace_generator
+cd tools/x86_trace_generator
 make
 \end{Verbatim}
 
@@ -87,15 +88,15 @@ xed_extractor.o  xed_extractor.so
 \end{Verbatim}
 
 The trace generator generates two files (in case of a single threaded
-application) - Trace.txt and trace\_0.raw, in the current directory.
+application) - trace.txt and trace\_0.raw, in the current directory.
 Section~\ref{sec:traceformat} provides details of the generated files.
-It is also possibel to generate traces for a given code section.
+It is also possible to generate traces for a given code section.
 Users can add routine call SIM\_BEGIN(1) and SIM\_END(1) in the 
 source code to indicate the begin/end point. An example is shown as
 follows.
 
 \begin{Verbatim}
-pin -t trace\_generator.so -manual 1 -thread N -- $BIN $ARGS (enable user defined annotations) 
+pin -t trace_generator.so -manual 1 -thread N -- $BIN $ARGS (enable user defined annotations) 
 \end{Verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -251,25 +252,27 @@ extensibility and clarity are underway.}
 
 
 On a successful trace generation, the x86 trace generator generates a
-configuration file called Trace.txt and one Trace\_xx.raw file
-(assuming that \Verb+TRACE\_PATH+ was set to "Trace") for each thread
-of the application in the output directory. On the other hand, the PTX
+configuration file called trace.txt and one trace\_xx.raw file
+(assuming that \Verb+TRACE_PATH+ was not changed from the default "trace") for each thread
+of the application in the output directory. Note that the verssio numbers
+of the trace generator and reader must match in order to guarantee correct
+trace reading for x86 traces; the current version is 1.3. On the other hand, the PTX
 trace generator generates a kernel information file and several
 directories containing traces of individual kernel invocations. The
-directory for each kernel invocation contains a Trace.txt file and one
-Trace\_xx.raw file for each warp in the kernel.  Note that in case of
+directory for each kernel invocation contains a trace.txt file and one
+trace\_xx.raw file for each warp in the kernel.  Note that in case of
 PTX kernels, one trace file is generated for each warp, there are no
 per thread trace files. Further details regarding trace generation for
 PTX kernels can be found in Section~\ref{sec:ptx_traces}. The purposes
-of Trace.txt and Trace\_xx.raw are shown below and their formats are
+of trace.txt and trace\_xx.raw are shown below and their formats are
 explained in detail in subsequent sections.
 
 
 \begin{itemize}\itemsep2pt
-\item Trace.txt (info trace): contains information about the generated
-  trace files (\#threads, trace type, ...).
+\item trace.txt (info trace): contains information about the generated
+  trace files (trace version, \#threads, trace type, ...).
 
-\item Trace\_xx.raw (raw trace): contains instruction trace for a
+\item trace\_xx.raw (raw trace): contains instruction trace for a
   thread and is generated for each thread.\footnote{In case of GPU, a
     warp is mapped to a \SIM thread, where a warp consists of 32
     threads in CUDA.}
@@ -278,26 +281,61 @@ explained in detail in subsequent sections.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Trace.txt}
+\subsection{trace.txt}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{figure*}[htb]
-\centering
-\includegraphics{figs/trace_format}
-\caption{Trace.txt format} 
-\label{fig:trace_format}
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \begin{tabular}{l l}
+             \Verb+x86 1.3+ & \Verb+// Trace format and trace version+ \\
+             \Verb+4+       & \Verb+// Total Number of threads+ \\
+             \Verb+0    0+     & \Verb+// 1st thread ID | Start Instruction Number+ \\
+             \Verb+1    x+     & \Verb+// 2nd thread ID | Start Instruction Number+ \\
+             \Verb+2    y+     & \Verb+// 3rd thread ID | Start Instruction Number+ \\
+             \Verb+3    z+     & \Verb+// 4th thread ID | Start Instruction Number+
+        \end{tabular}
+        \caption{trace.txt (CPU)}
+        \label{fig:trace_format_first}
+    \end{subfigure}
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \begin{tabular}{l l}
+             \Verb+GPU+      & \Verb+// Trace format+ \\
+             \Verb+newptx+   & \Verb+// Trace type+ \\
+             \Verb+14+       & \Verb+// GPU Trace version+ \\
+             \Verb+6+        & \Verb+// Max blocks per core+ \\
+             \Verb+2048+     & \Verb+// Total number of (warp)+ \\
+             \Verb+0     0+  & \Verb+// 1st warp ID | Start Instruction Number (Thread block 0 start)+ \\
+             \Verb+1     0+  & \Verb+// 2nd warp ID | Start Instruction Number+ \\
+             \Verb+2     0+  & \Verb+// 3rd warp ID | Start Instruction Number+ \\
+             \Verb+3     0+  & \Verb+// 4th warp ID | Start Instruction Number+ \\
+             \Verb+65536 0+  & \Verb+// Thread block 1 start+ \\
+             \Verb+65537 0+  & \Verb++ \\
+             \Verb+...+      & \Verb++
+        \end{tabular}
+        \caption{trace.txt (GPU)}
+        \label{fig:trace_format_second}
+    \end{subfigure}
+    \caption{trace.txt format} 
+    \label{fig:trace_format}
 \end{figure*}
 
+Figure~\ref{fig:trace_format} shows the format of trace.txt and its CPU and GPU
+examples. In Figure~\ref{fig:trace_format_first}, the CPU trace has four threads and its
+type is set to x86. The ids of the threads are 0-3 with the corresponding trace
+files being trace\_0.raw$-$trace\_3.raw . Thread 0 is ready at the start of
+simulation, while Threads 1, 2 and 3 become ready when Thread 0 has fetched x,
+y and z instructions respectively.
 
-Figure~\ref{fig:trace_format}-(a) shows the format of Trace.txt and its CPU and GPU
-examples.  As shown in Figure~\ref{fig:trace_format}-(a), the first line in
-Trace.txt has different fields from the rest of the lines.
+As shown in Figure~\ref{fig:trace_format_first}, the first line in
+trace.txt has different fields from the rest of the lines.
 
 \begin{itemize}\itemsep2pt
 \item \#Threads: indicates the number of threads for which traces have
   been generated, and this value is equal to the number of lines in
-  the file excluding the first line.
+  the file excluding the first two lines.
 \item Trace Type: indicates whether the generated traces are for an
   x86 application or a PTX kernel.
 \item Optional Field(s): currently used for PTX traces only and
@@ -305,9 +343,10 @@ Trace.txt has different fields from the rest of the lines.
   streaming multiprocessor(SM) core (occupancy).
 \end{itemize}
 
-From the second line (5th line on GPU format)  onwards, there are two fields in each line:
+From the third line (fifth line in Figure~\ref{fig:trace_format_second}) onwards, 
+there are two fields in each line:
 thread id and start instruction number. For each thread, there is a
-Trace\_<thread\_id>.raw file which contains the dynamic instruction
+trace\_<thread\_id>.raw file which contains the dynamic instruction
 trace for the thread. Finally, start instruction number indicates when
 each thread should be started in terms of the number of instructions
 simulated for the main thread of the application. In a PTX kernel,
@@ -316,15 +355,7 @@ the start instruction number for all threads is zero. On the other
 hand, for an x86 application, the start instruction is non-zero for all
 threads except thread 0, which is the main (or parent) thread in the
 application. This is because in most multi-threaded CPU applications,
-main thread (thread id 0) spawns children threads.
-
-
-In Figure~\ref{fig:trace_format}-(b), the CPU trace has four threads and its
-type is set to x86. The ids of the threads are 0-3 with the corresponding trace
-files being Trace\_0.raw$-$Trace\_3.raw . Thread 0 is ready at the start of
-simulation, while Threads 1, 2 and 3 become ready when Thread 0 has fetched x,
-y and z instructions respectively.
-
+the main thread (thread id 0) spawns children threads.
 
 In the GPU example, the number of traces files is 2048 since \#Threads
 (representing \#Warps in case of GPUs) is 2048.  The optional field indicates
@@ -346,10 +377,10 @@ block_id = id / (1 << 16)
 		}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Trace\_xx.raw}
+\subsection{trace\_xx.raw}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Trace\_xx.raw is generated for each thread/warp and contains the
+The trace\_xx.raw file is generated for each thread/warp and contains the
 dynamic instruction trace for the thread/warp in binary
 format. The structure/format for encoding instructions is the same in
 both x86 and PTX traces and looks like as follows (in order):
