@@ -26,18 +26,16 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED O
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 /**********************************************************************************************
-* File         : global_defs.h
-* Author       : Hyesoon Kim
-* Date         : 12/18/2007
-* CVS          : $Id: global_defs.h 890 2009-11-09 18:36:00Z nageshbl $:
-* Description  :  Global defines that are intended to be included in every source file.
-**********************************************************************************************/
+ * File         : global_defs.h
+ * Author       : Hyesoon Kim
+ * Date         : 12/18/2007
+ * CVS          : $Id: global_defs.h 890 2009-11-09 18:36:00Z nageshbl $:
+ * Description  :  Global defines that are intended to be included in every source file.
+ **********************************************************************************************/
 
 #ifndef GLOBAL_DEFS_INCLUDED
 #define GLOBAL_DEFS_INCLUDED
-
 
 #include <vector>
 #include <map>
@@ -45,9 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <queue>
 #include <string>
 
-
 using namespace std;
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Class forward declarations
@@ -122,15 +118,15 @@ class cache_partition_framework_c;
 class dyfr_c;
 class MMU;
 
-
-template <class T> class pqueue_c;
-template <typename T> class hash_c;
-template <class T> class pool_c;
-
+template <class T>
+class pqueue_c;
+template <typename T>
+class hash_c;
+template <class T>
+class pool_c;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Struct declarations
-
 
 struct thread_trace_info_node_s;
 
@@ -153,29 +149,24 @@ typedef struct HWP_Struct HWP;
 typedef struct gpu_allocq_entry_s gpu_allocq_entry_s;
 typedef struct thread_stat_s thread_stat_s;
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Function declarations
 
-
 void init_block_schedule_info(void);
-void terminate_process(process_s*);
-void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
-
+void terminate_process(process_s *);
+void delete_store_hash_entry_wrapper(map_c *map, uop_c *uop);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions
 
-
-#define MAX_TR_OPCODE_NAME  GPU_OPCODE_LAST
-#define MAX_GPU_ADDR_SPACE  GPU_ADDR_SP_LAST
-#define MAX_GPU_CACHE_OP    GPU_CACHE_OP_LAST
+#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
+#define MAX_GPU_ADDR_SPACE GPU_ADDR_SP_LAST
+#define MAX_GPU_CACHE_OP GPU_CACHE_OP_LAST
 #define MAX_GPU_CACHE_LEVEL GPU_CACHE_LAST
 #define MAX_GPU_FENCE_LEVEL GPU_FENCE_LAST
 
 #define MAX_PUP 256
-//per core
+// per core
 #define MAX_NUM_THREADS 3000
 #define MAX_NUM_BLOCKS 64
 // across all the cores
@@ -184,35 +175,36 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 // #define NUM_REG_IDS 1024
 #define NUM_REG_IDS 1600
 #define NUM_INT_REGS 32
-#define MAX_UOP_SRC_DEPS 10 // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009
+#define MAX_UOP_SRC_DEPS \
+  10  // 6 + max 4 (store-load dependencies for each BYTE) // hyesoon 3-12-2009
 #define MAX_DRAM_BANKS 32
-#define MAX_SRCS    9
-#define MAX_DESTS   6
+#define MAX_SRCS 9
+#define MAX_DESTS 6
 #define CACHE_MISS 1
 #define CACHE_HIT 0
-#define MAX_STR_LENGTH        256         /* default 256 */
-#define MAX_SIMULTANEOUS_STRINGS    32      /* default 32 */ /* power of 2 */
+#define MAX_STR_LENGTH 256 /* default 256 */
+#define MAX_SIMULTANEOUS_STRINGS 32 /* default 32 */ /* power of 2 */
 //#define SUCCESS 1
 //#define FAILURE 0
-#define MAX_CTR  0xffffffffffffffffULL
+#define MAX_CTR 0xffffffffffffffffULL
 #define MAX_SCTR 0x7fffffffffffffffLL
-#define MAX_INT64  0x7fffffffffffffffLL
-#define MAX_INT    0x7fffffff
-#define MAX_UNS64  0xffffffffffffffffULL
-#define MAX_UNS    0xffffffffU
-#define MAX_ADDR   0xffffffffffffffffULL
+#define MAX_INT64 0x7fffffffffffffffLL
+#define MAX_INT 0x7fffffff
+#define MAX_UNS64 0xffffffffffffffffULL
+#define MAX_UNS 0xffffffffU
+#define MAX_ADDR 0xffffffffffffffffULL
 #define INT64_C_M_1 0xffffffffffffffffLL
 // ISA macros
 #define MAX_TRACE_BUFFER_SIZE 500
-#define BYTES_IN_INST           4
-#define BYTES_IN_BYTE		1
-#define BYTES_IN_WORD		2
-#define BYTES_IN_LONGWORD	4
-#define BYTES_IN_QUADWORD	8
-#define BITS_IN_BYTE		8
-#define BITS_IN_WORD		16
-#define BITS_IN_LONGWORD	32
-#define BITS_IN_QUADWORD	64
+#define BYTES_IN_INST 4
+#define BYTES_IN_BYTE 1
+#define BYTES_IN_WORD 2
+#define BYTES_IN_LONGWORD 4
+#define BYTES_IN_QUADWORD 8
+#define BITS_IN_BYTE 8
+#define BITS_IN_WORD 16
+#define BITS_IN_LONGWORD 32
+#define BITS_IN_QUADWORD 64
 
 #ifndef NULL
 #define NULL ((void *)0x0)
@@ -220,22 +212,35 @@ void delete_store_hash_entry_wrapper (map_c *map, uop_c *uop);
 
 #ifdef USING_SST
 #include "callback.h"
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendInstructionCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendInstructionCacheRequest;
 #ifdef USE_VAULTSIM_HMC
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int,uint32_t,uint64_t> CallbackSendDataCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int,
+                                  uint32_t, uint64_t>
+  CallbackSendDataCacheRequest;
 #else
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int,int> CallbackSendDataCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int, int>
+  CallbackSendDataCacheRequest;
 #endif
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendConstCacheRequest;
-typedef SST::MacSim::CallbackBase<void,int,uint64_t,uint64_t,int> CallbackSendTextureCacheRequest;
-typedef SST::MacSim::CallbackBase<void,uint64_t,uint64_t,int,int> CallbackSendCubeRequest;
-typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeInstructionCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeDataCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeConstCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool,int,uint64_t> CallbackStrobeTextureCacheRespQ;
-typedef SST::MacSim::CallbackBase<bool,uint64_t> CallbackStrobeCubeRespQ;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendConstCacheRequest;
+typedef SST::MacSim::CallbackBase<void, int, uint64_t, uint64_t, int>
+  CallbackSendTextureCacheRequest;
+typedef SST::MacSim::CallbackBase<void, uint64_t, uint64_t, int, int>
+  CallbackSendCubeRequest;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeInstructionCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeDataCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeConstCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
+  CallbackStrobeTextureCacheRespQ;
+typedef SST::MacSim::CallbackBase<bool, uint64_t> CallbackStrobeCubeRespQ;
 
-#define UNIQUE_KEY(C,T,U,A,I) ((A<<35)|((U&0xFFF)<<23)|((C&0x3F)<<17)|((T&0x7F)<<10)|I)
-#endif //USING_SST
+#define UNIQUE_KEY(C, T, U, A, I)                                              \
+  ((A << 35) | ((U & 0xFFF) << 23) | ((C & 0x3F) << 17) | ((T & 0x7F) << 10) | \
+   I)
+#endif  // USING_SST
 
 #endif
