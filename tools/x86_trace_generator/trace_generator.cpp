@@ -873,7 +873,8 @@ void instrument(INS ins)
   // ----------------------------------------
   if (g_inst_storage[tid].find(iaddr) == g_inst_storage[tid].end())
   {
-    for (UINT32 ii = 0; ii < Knob_num_thread.Value(); ++ii)
+    for (UINT32 ii = 0; ii < MAX_THREADS; ++ii)
+    // for (UINT32 ii = 0; ii < Knob_num_thread.Value(); ++ii)
     {
       g_inst_storage[ii][iaddr] = info;
     }
@@ -936,7 +937,14 @@ void Instruction(INS ins, void *v)
 /////////////////////////////////////////////////////////////////////////////////////////
 void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
 {
-  cout << "-> Thread[" << tid << "->" << threadMap[tid] << "] begins." << endl;
+  if (tid >= Knob_num_thread.Value()){ 
+    printf("**************************************\n");
+    printf("Warning! the nubmer of threads is greater than the threads to collect info!!\n");
+    printf("This might generate seg fault!!\n");  
+    printf("use -thread Knob to set up the correct number of threads\n");
+    printf("**************************************\n");
+  }
+   cout << "-> Thread[" << tid << "->" << threadMap[tid] << "] begins." << endl;
   THREADID threadid = threadMap[tid];
 
   if (threadid == 100000)
@@ -1140,14 +1148,16 @@ void initialize(void)
   {
     threadMap[0] = 0;
     threadMap[1] = 100000;
-    for (UINT32 ii = 2; ii <= Knob_num_thread.Value(); ++ii)
+    for (UINT32 ii = 2; ii <= MAX_THREADS; ++ii)
+    // for (UINT32 ii = 2; ii <= Knob_num_thread.Value(); ++ii)
     {
       threadMap[ii] = ii - 1;
     }
   }
   else if (Knob_compiler.Value() == "gcc")
   {
-    for (UINT32 ii = 0; ii < Knob_num_thread.Value(); ++ii)
+    for (UINT32 ii = 0; ii <= MAX_THREADS; ++ii)
+    // for (UINT32 ii = 0; ii < Knob_num_thread.Value(); ++ii)
     {
       threadMap[ii] = ii;
     }
