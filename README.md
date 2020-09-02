@@ -1,4 +1,6 @@
-#Macsim [![Build Status](https://travis-ci.org/gthparch/macsim.svg?branch=master)](https://travis-ci.org/gthparch/macsim)
+[![Build Status](https://travis-ci.org/gthparch/macsim.svg?branch=master)](https://travis-ci.org/gthparch/macsim)
+
+# Macsim 
 ## Introduction
 
 * MacSim is a heterogeneous architecture timing model simulator that is
