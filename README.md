@@ -1,4 +1,6 @@
-#Macsim [![Build Status](https://travis-ci.org/gthparch/macsim.svg?branch=master)](https://travis-ci.org/gthparch/macsim)
+[![Build Status](https://travis-ci.org/gthparch/macsim.svg?branch=master)](https://travis-ci.org/gthparch/macsim)
+
+# Macsim 
 ## Introduction
 
 * MacSim is a heterogeneous architecture timing model simulator that is
@@ -57,12 +59,13 @@ download traces
 
 * Prof. Hyesoon Kim (Project Leader) at Georgia Tech 
 Hparch research group 
-(http://comparch.gatech.edu/hparch/people.hparch) 
+(http://hparch.gatech.edu/people.hparch) 
 
 
-## Mailing list
 
-If you have a question, feel free to send an email to macsim-dev@googlegroups.com.
+## Q & A 
+
+If you have a question, please use github issue ticket. 
 
 
 ## Tutorial

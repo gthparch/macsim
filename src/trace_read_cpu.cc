@@ -271,7 +271,7 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
     trace_uop->m_reconverge_addr = pi->m_st_vaddr;
   } else if (info->m_table_info->m_mem_type) {
     int amp_val = 1;
-    if (pi->m_opcode != XED_CATEGORY_STRINGOP) {
+    if (pi->m_opcode == XED_CATEGORY_STRINGOP) {
       amp_val = *KNOB(KNOB_MEM_SIZE_AMP);
     }
 
