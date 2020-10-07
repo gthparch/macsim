@@ -858,11 +858,97 @@ int frontend_c::fetch(void) {
   return (*this.*MT_fetch_scheduler)();
 }
 
+// round-robin instruction fetch
+
+int frontend_c::fetch_rr(){
+  // round-robin implementation from Michael - only returns thread ID?
+  // remember to notice when thread is terminated
+
+  // int to hold returned id
+  int ret_id = -1;
+
+  // track attempts to schedule - can only loop through available threads
+  int attempts = 0, max_attempts = m_fetching_thread_num;
+
+  // track threads
+  vector<int> threads;
+  threads.resize(m_running_thread_num);
+
+  // assign thread numbers to vector
+  threads[0] = m_fetch_arbiter;
+  if(m_running_thread_num > 1)
+    for(int i = 1; i < m_running_thread_num; ++i){
+      threads[i] = m_fetch_arbiter + i;
+    }
+  
+  // find available thread
+  while(attempts < max_attempts){
+    ret_id = threads[attempts];
+
+    // make sure the number isn't too large
+    if(ret_id >= m_unique_scheduled_thread_num)
+      ret_id %= m_unique_scheduled_thread_num;
+    
+    // update fetch arbiter
+    if (likely(!m_last_fetch_tid_failed)) {
+      m_fetch_arbiter++;
+      if (likely(m_fetch_arbiter == m_unique_scheduled_thread_num))
+        m_fetch_arbiter = 0;
+    } else 
+      m_last_fetch_tid_failed = false;
+    
+    // make sure arbiter doesn't fall below the last terminated id
+    if(m_fetch_arbiter < m_last_terminated_tid)
+      m_fetch_arbiter = m_last_terminated_tid;
+
+    // if this fetch has ended or isn't ready, try again
+    if(m_core->m_fetch_ended[ret_id] || m_core->m_thread_reach_end[ret_id] || 
+      (KNOB(KNOB_NO_FETCH_ON_ICACHE_MISS)->getValue() && !check_fetch_ready(ret_id))){
+      ++attempts;
+      continue;
+    }
+
+    // if fetch is blocked, try again
+    frontend_s *fetch_data = m_core->get_trace_info(ret_id)->m_fetch_data;
+    if(unlikely(fetch_data != NULL && fetch_data->m_fetch_blocked)){
+      ++attempts;
+      continue;
+    }
+
+    // fetch thread if ready, try again otherwise
+    if(m_knob_ptx_sim){
+      // check if previous branch has resolved
+      if(*m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR && !check_br_ready(ret_id)){
+        if(attempts == 0) STAT_EVENT(FETCH_THREAD_SKIP_BR_WAIT);
+        ++attempts;
+        continue;
+      }
+      // check if previous memory access resolved
+      if(*m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY && !check_load_ready(ret_id)){
+        if(attempts == 0) STAT_EVENT(FETCH_THREAD_SKIP_LD_WAIT);
+        ++attempts;
+        continue;
+      }
+    }
+
+    // if thread found, break out of loop
+    if(ret_id != -1)
+      break;
+    else ++attempts;
+  }
+
+  if(attempts == max_attempts)
+    ret_id = -1;
+
+  return ret_id;
+}
+
 // FIXME
 // every 4 cycles, controll will go to the next thread always
 
-// round-robin instruction fetch
-int frontend_c::fetch_rr(void) {
+
+/*int frontend_c::fetch_rr(void) {
+  // old round-robin implementation
   int try_again = 1;
   int fetch_id = -1;
 
@@ -944,10 +1030,10 @@ int frontend_c::fetch_rr(void) {
   // no thread to fetch
   if (try_again > max_try) fetch_id = -1;
 
-  // DEBUG_CORE(m_core_id, "m_core_id:%d try_agin:%d tid:%d\n", m_core_id, try_again, fetch_id);
+  // DEBUG_CORE(m_core_id, "m_core_id:%d try_again:%d tid:%d\n", m_core_id, try_again, fetch_id);
 
   return fetch_id;
-}
+}*/
 
 // check thread is ready to be fetched
 bool frontend_c::check_fetch_ready(int tid) {
