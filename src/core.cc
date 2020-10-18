@@ -689,6 +689,8 @@ void core_c::deallocate_thread_data(int tid) {
     ASSERTM(0, "core_id=%d thread_id:%d last_terminated_tid:%d\n", m_core_id,
             tid, m_last_terminated_tid);
   }
+
+  cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -768,6 +770,8 @@ void core_c::create_trace_info(int tid, thread_s* thread) {
 
   // to prevent from unnecessary forward progress error for a newely launched cores
   m_last_forward_progress = m_core_cycle_count;
+
+  cout << "thread " << tid << " added to core " << this->m_core_id << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

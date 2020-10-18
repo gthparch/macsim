@@ -860,7 +860,7 @@ int frontend_c::fetch(void) {
 
 // round-robin instruction fetch
 
-int frontend_c::fetch_rr(){
+/*int frontend_c::fetch_rr(){
   // round-robin implementation from Michael - only returns thread ID?
   // remember to notice when thread is terminated
 
@@ -941,13 +941,13 @@ int frontend_c::fetch_rr(){
     ret_id = -1;
 
   return ret_id;
-}
+}*/
 
 // FIXME
 // every 4 cycles, controll will go to the next thread always
 
 
-/*int frontend_c::fetch_rr(void) {
+int frontend_c::fetch_rr(void) {
   // old round-robin implementation
   int try_again = 1;
   int fetch_id = -1;
@@ -1033,7 +1033,7 @@ int frontend_c::fetch_rr(){
   // DEBUG_CORE(m_core_id, "m_core_id:%d try_again:%d tid:%d\n", m_core_id, try_again, fetch_id);
 
   return fetch_id;
-}*/
+}
 
 // check thread is ready to be fetched
 bool frontend_c::check_fetch_ready(int tid) {
