@@ -651,6 +651,14 @@ void core_c::allocate_thread_data(int tid) {
     m_gpu_rob->reserve_rob(tid);
 }
 
+void print_thread_queue(list<int> &queue){
+  if(queue.empty())
+    cout << "queue empty";
+  else for(auto tid: queue)
+    cout << tid << " ";
+  cout << endl;
+}
+
 // When a thread is terminated, deallocate all data used by this thread
 void core_c::deallocate_thread_data(int tid) {
   if (tid != 0) {
@@ -690,7 +698,10 @@ void core_c::deallocate_thread_data(int tid) {
             tid, m_last_terminated_tid);
   }
 
+  // remove thread from core's queue
   cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
+  this->m_thread_queue.remove(tid);
+  print_thread_queue(this->m_thread_queue);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -768,10 +779,13 @@ void core_c::create_trace_info(int tid, thread_s* thread) {
   ++m_running_thread_num;
   ++m_fetching_thread_num;
 
-  // to prevent from unnecessary forward progress error for a newely launched cores
+  // to prevent from unnecessary forward progress error for a newly launched cores
   m_last_forward_progress = m_core_cycle_count;
 
+  // add thread to core's queue
   cout << "thread " << tid << " added to core " << this->m_core_id << endl;
+  this->m_thread_queue.push_back(tid);
+  print_thread_queue(this->m_thread_queue);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

@@ -38,6 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CORE_H_INCLUDED
 
 #include <string>
+#include <list>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -361,6 +362,7 @@ public:
   int m_num_thread_reach_end; /**< number of total terminated threads */
   int m_fetching_block_id; /**< currently fetching block id */
   int m_running_thread_num; /**< number of currently running threads */
+  list<int> m_thread_queue;
 
   unordered_map<int, unordered_set<Counter>> m_per_thread_fault_parent_uops;
 
