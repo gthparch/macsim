@@ -946,6 +946,15 @@ int frontend_c::fetch(void) {
 // FIXME
 // every 4 cycles, controll will go to the next thread always
 
+int frontend_c::read_thread_queue(){
+  list<int> &thread_queue = this->m_core->m_thread_queue;
+  int front = thread_queue.front();
+  thread_queue.pop_front();
+  thread_queue.push_back(front);
+  cout << "thread " << front << " on core " << this->m_core_id << " pushed to back of the queue" << endl;
+  this->m_core->print_thread_queue();
+  return front;
+}
 
 int frontend_c::fetch_rr(void) {
   // old round-robin implementation
@@ -960,22 +969,21 @@ int frontend_c::fetch_rr(void) {
 
   while (m_fetching_thread_num && try_again && try_again <= max_try) {
     // find next thread id to fetch
-    fetch_id = m_fetch_arbiter;
-    if (fetch_id >= m_unique_scheduled_thread_num)
+    fetch_id = read_thread_queue();
+    /*if (fetch_id >= m_unique_scheduled_thread_num)
       fetch_id %= m_unique_scheduled_thread_num;
-
+    thread_queue.remove(fetch_id);
+    thread_queue.push_back(fetch_id);*/
     // update arbiter for next fetching
     if (likely(!m_last_fetch_tid_failed)) {
-      m_fetch_arbiter++;
-      if (likely(m_fetch_arbiter == m_unique_scheduled_thread_num))
-        m_fetch_arbiter = 0;
+      read_thread_queue();
     } else {
       m_last_fetch_tid_failed = false;
     }
 
     // when fetch id goes back to 0, fast-forward until last terminated thread
-    if (m_fetch_arbiter < m_last_terminated_tid)
-      m_fetch_arbiter = m_last_terminated_tid;
+    /*if (m_fetch_arbiter < m_last_terminated_tid)
+      m_fetch_arbiter = m_last_terminated_tid;*/
 
     // already terminated or fetch not ready
     if (m_core->m_fetch_ended[fetch_id] ||

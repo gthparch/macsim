@@ -361,7 +361,7 @@ public:
 
 public:
   hash_c<sync_thread_s>* m_sync_info; /**< synchronization information */
-
+  int read_thread_queue();
 protected:
   /**
    * Copy constructor
