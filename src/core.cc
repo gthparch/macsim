@@ -651,10 +651,10 @@ void core_c::allocate_thread_data(int tid) {
     m_gpu_rob->reserve_rob(tid);
 }
 
-void print_thread_queue(list<int> &queue){
-  if(queue.empty())
+void core_c::print_thread_queue(void){
+  if(this->m_thread_queue.empty())
     cout << "queue empty";
-  else for(auto tid: queue)
+  else for(auto tid: this->m_thread_queue)
     cout << tid << " ";
   cout << endl;
 }
@@ -701,7 +701,7 @@ void core_c::deallocate_thread_data(int tid) {
   // remove thread from core's queue
   cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
   this->m_thread_queue.remove(tid);
-  print_thread_queue(this->m_thread_queue);
+  print_thread_queue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -785,7 +785,7 @@ void core_c::create_trace_info(int tid, thread_s* thread) {
   // add thread to core's queue
   cout << "thread " << tid << " added to core " << this->m_core_id << endl;
   this->m_thread_queue.push_back(tid);
-  print_thread_queue(this->m_thread_queue);
+  print_thread_queue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
