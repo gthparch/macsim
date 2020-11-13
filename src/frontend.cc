@@ -191,6 +191,8 @@ void frontend_c::run_a_cycle(void) {
   // fetch every KNOB_FETCH_RATIO cycle
   // CPU : every cycle
   // NVIDIA G80 : 1/4 cycles, NVIDIA Fermi: 1/2 cycles
+  // check core type for the fetch rate
+  // Hyesoon: Aug-2020 please check whether this need to be changed with heteroe and igpu
   if (m_fetch_ratio != 1) {
     m_fetch_modulo++;
     if (m_fetch_modulo == m_fetch_ratio)
@@ -300,7 +302,7 @@ void frontend_c::run_a_cycle(void) {
 
   // TONAGESH
   // nagesh - comments for BAR are incomplete...
-  if (m_knob_ptx_sim) {
+  if (m_ptx_sim) {
     // handling of BAR instruction in PTX - can/should this be moved?
     // do we have any blocks for which all warps have reached (retired)
     // their next barrier?
@@ -346,7 +348,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
 
   // First time : set up traces for current thread
   if (fetch_data->m_first_time) {
-    m_simBase->m_trace_reader->setup_trace(m_core_id, tid, m_knob_ptx_sim);
+    m_simBase->m_trace_reader->setup_trace(m_core_id, tid, m_ptx_sim);
     fetch_data->m_first_time = false;
 
     ++m_core->m_inst_fetched[tid]; /*! initial increase */
@@ -356,11 +358,18 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
 
     // set up initial fetch address
     thread_s *thread = m_core->get_trace_info(tid);
-    if (thread->m_ptx) {
-      trace_info_gpu_s *prev_trace_info =
-        static_cast<trace_info_gpu_s *>(thread->m_prev_trace_info);
-      fetch_data->m_MT_scheduler.m_next_fetch_addr =
-        prev_trace_info->m_inst_addr;
+    if (thread->m_acc) {
+      if (m_ptx_sim) {
+        trace_info_gpu_s *prev_trace_info =
+          static_cast<trace_info_gpu_s *>(thread->m_prev_trace_info);
+        fetch_data->m_MT_scheduler.m_next_fetch_addr =
+          prev_trace_info->m_inst_addr;
+      } else if (m_igpu_sim) {
+        trace_info_igpu_s *prev_trace_info =
+          static_cast<trace_info_igpu_s *>(thread->m_prev_trace_info);
+        fetch_data->m_MT_scheduler.m_next_fetch_addr =
+          prev_trace_info->m_instruction_addr;
+      }
     } else {
       if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
         trace_info_cpu_s *prev_trace_info =
@@ -370,11 +379,6 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
       } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
         trace_info_a64_s *prev_trace_info =
           static_cast<trace_info_a64_s *>(thread->m_prev_trace_info);
-        fetch_data->m_MT_scheduler.m_next_fetch_addr =
-          prev_trace_info->m_instruction_addr;
-      } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
-        trace_info_igpu_s *prev_trace_info =
-          static_cast<trace_info_igpu_s *>(thread->m_prev_trace_info);
         fetch_data->m_MT_scheduler.m_next_fetch_addr =
           prev_trace_info->m_instruction_addr;
       } else {
@@ -457,8 +461,8 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
         ASSERT(new_uop);
 
         // read an uop from the traces
-        if (!m_simBase->m_trace_reader->get_uops_from_traces(
-              m_core_id, new_uop, tid, m_knob_ptx_sim)) {
+        if (!m_simBase->m_trace_reader->get_uops_from_traces(m_core_id, new_uop,
+                                                             tid, m_ptx_sim)) {
           // couldn't get an uop
           DEBUG_CORE(m_core_id, "not success\n");
           m_uop_pool->release_entry(new_uop->free());
@@ -631,7 +635,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr,
     int result = m_simBase->m_memory->new_mem_req(
       MRT_IFETCH, line_addr, m_knob_icache_line_size, false, false, 0, NULL,
       icache_fill_line_wrapper, m_core->get_unique_uop_num(), NULL, m_core_id,
-      tid, m_knob_ptx_sim);
+      tid, m_ptx_sim);
 
     // mshr full
     if (!result) return false;
@@ -712,7 +716,7 @@ bool frontend_c::icache_fill_line(mem_req_s *req) {
   if (m_icache->access_cache(req->m_addr, &line_addr, false, req->m_appl_id) ==
       NULL) {
     m_icache->insert_cache(req->m_addr, &line_addr, &repl_line_addr,
-                           req->m_appl_id, req->m_ptx);
+                           req->m_appl_id, req->m_acc);
     POWER_CORE_EVENT(req->m_core_id, POWER_ICACHE_W);
   }
 
@@ -806,7 +810,7 @@ int frontend_c::predict_bpu(uop_c *uop) {
   // no branch prediction
   else {
     // GPU : stall on branch policy, stop fetching
-    if (m_knob_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
+    if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
       set_br_wait(uop->m_thread_id);
       mispredicted = false;
     }
@@ -906,7 +910,7 @@ int frontend_c::fetch_rr(void) {
     }
 
     // check the thread is ready to fetch
-    if (m_knob_ptx_sim) {
+    if (m_ptx_sim) {
       // GPU : stall on branch policy, check whether previous branch has been resolved
       if (*m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR &&
           !check_br_ready(fetch_id)) {

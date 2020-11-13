@@ -188,7 +188,7 @@ bool readonly_cache_c::cache_fill_line(mem_req_s* req) {
 
   // insert cache
   m_cache->insert_cache(req->m_addr, &line_addr, &repl_line_addr,
-                        req->m_appl_id, req->m_ptx);
+                        req->m_appl_id, req->m_acc);
 
   if (req->m_uop) {
     uop_c* uop = req->m_uop;

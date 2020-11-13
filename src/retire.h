@@ -218,8 +218,9 @@ private:
   Counter m_total_insts_retired; /**< total retired instructions */
   Counter m_cur_core_cycle; /**< current core cycle */
   uns16 m_knob_width; /**< pipeline width */
-  bool m_knob_ptx_sim; /**< gpu simulation */
-  bool m_knob_igpu_sim; /**< intel gpu simulation */
+  bool m_ptx_sim; /**< ptx simulation */
+  bool m_acc_sim; /**< accelerator simulation */
+  bool m_igpu_sim; /**< intel gpu simulation */
   unordered_map<int, Counter>
     m_insts_retired; /**< number of retired inst. per thread */
   unordered_map<int, Counter>

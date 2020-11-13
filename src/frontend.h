@@ -407,7 +407,9 @@ protected:
   uns m_knob_icache_line_size; /**< icache line size */
   bool m_fe_stall; /**< frontend stalled */
   bool m_fe_running; /**< enabled frontend */
-  bool m_knob_ptx_sim; /**< GPU simulation */
+  bool m_ptx_sim; /**< PTX simulation */
+  bool m_igpu_sim; /**< iGPU simulation */
+  bool m_acc_sim; /**< Accelerator simulation */
   bool m_ready_thread_available; /**< ready thread available */
   bool m_last_fetch_tid_failed;
   core_c* m_core; /**< core pointer */

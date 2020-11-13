@@ -152,7 +152,7 @@ typedef struct mem_req_s {
   Addr m_pc; /**< load pc */
   uns8 m_prefetcher_id; /**< prefetcher id, if prefetch request */
   Addr m_pref_loadPC; /**< prefetch load pc */
-  bool m_ptx; /**< GPU request */
+  bool m_acc; /**< GPU request */
   queue_c* m_queue; /**< current memory queue in */
   int m_cache_id[MEM_LAST]; /**< each level cache id */
   uop_c* m_uop; /**< uop that generates this request */

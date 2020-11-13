@@ -243,7 +243,7 @@ public:
   // process manager
   process_manager_c *m_process_manager; /**< process manager */
   queue<int> m_x86_core_pool; /**< x86 cores pool */
-  queue<int> m_ptx_core_pool; /**< GPU cores pool */
+  queue<int> m_acc_core_pool; /**< GPU cores pool */
   multi_key_map_c *m_block_id_mapper; /**< block id mapper */
 
   // data structure pools (to reduce overhead of memory allocation)
