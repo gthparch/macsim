@@ -161,6 +161,9 @@ bool MMU::translate(uop_c *cur_uop) {
 
   Addr frame_number = -1;
   bool tlb_hit = m_TLB->lookup(addr);
+
+  STAT_CORE_EVENT(cur_uop->m_core_id, TLB_MISS + tlb_hit);
+  
   if (tlb_hit) {
     frame_number = m_TLB->translate(addr);
     cur_uop->m_paddr = (frame_number << m_offset_bits) | page_offset;
