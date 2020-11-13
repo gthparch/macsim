@@ -202,14 +202,14 @@ cache_c* default_llc(macsim_c* m_simBase) {
 
 bool queue_c::sort_func::operator()(mem_req_s* a, mem_req_s* b) {
   if (*m_simBase->m_knobs->KNOB_HETERO_MEM_PRIORITY_CPU) {
-    if (a->m_ptx != true && b->m_ptx == true) {
+    if (a->m_acc != true && b->m_acc == true) {
       return true;
-    } else if (a->m_ptx == true && b->m_ptx != true)
+    } else if (a->m_acc == true && b->m_acc != true)
       return false;
   } else if (*m_simBase->m_knobs->KNOB_HETERO_MEM_PRIORITY_GPU) {
-    if (a->m_ptx != true && b->m_ptx == true) {
+    if (a->m_acc != true && b->m_acc == true) {
       return false;
-    } else if (a->m_ptx == true && b->m_ptx != true)
+    } else if (a->m_acc == true && b->m_acc != true)
       return true;
   }
 
@@ -479,7 +479,7 @@ int dcu_c::access(uop_c* uop) {
     } else {
       POWER_EVENT(POWER_LLC_R);
     }
-    STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
+    STAT_EVENT(L1_HIT_CPU + this->m_acc_sim);
     DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level,
                m_id, uop->m_uop_num);
     // stat
@@ -496,7 +496,7 @@ int dcu_c::access(uop_c* uop) {
     if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
     }
 
-    if (this->m_ptx_sim &&
+    if (this->m_acc_sim &&
         *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         type == MEM_ST) {
       // evict global data on write hit in L1
@@ -504,7 +504,7 @@ int dcu_c::access(uop_c* uop) {
 
       int req_size;
       Addr req_addr;
-      if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+      if (m_acc_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
         req_size = uop->m_mem_size;
         req_addr = vaddr;
       } else {
@@ -518,7 +518,7 @@ int dcu_c::access(uop_c* uop) {
 
       int result = m_simBase->m_memory->new_mem_req(
         req_type, req_addr, req_size, cache_hit, true, m_latency, uop,
-        done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
+        done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
 
       if (!result) {
         uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
@@ -534,7 +534,7 @@ int dcu_c::access(uop_c* uop) {
   // DCACHE miss
   // -------------------------------------
   else {  // !cache_hit
-    STAT_EVENT(L1_MISS_CPU + this->m_ptx_sim);
+    STAT_EVENT(L1_MISS_CPU + this->m_acc_sim);
     DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level,
                m_id, uop->m_uop_num);
 
@@ -579,7 +579,7 @@ int dcu_c::access(uop_c* uop) {
     // -------------------------------------
     int req_size;
     Addr req_addr;
-    if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+    if (m_acc_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
       req_size = uop->m_mem_size;
       req_addr = vaddr;
     } else {
@@ -600,7 +600,7 @@ int dcu_c::access(uop_c* uop) {
     // Generate a new memory request (MSHR access)
     // -------------------------------------
     function<bool(mem_req_s*)> done_func = NULL;
-    if (this->m_ptx_sim &&
+    if (this->m_acc_sim &&
         *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         (type == MEM_ST || type == MEM_ST_LM)) {
       done_func = dcache_write_ack_wrapper;
@@ -612,7 +612,7 @@ int dcu_c::access(uop_c* uop) {
     result = m_simBase->m_memory->new_mem_req(
       req_type, req_addr, req_size, cache_hit,
       (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func,
-      uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
+      uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
 
     // -------------------------------------
     // MSHR full
@@ -772,7 +772,7 @@ void dcu_c::process_in_queue() {
         m_level, req->m_thread_id, req->m_addr, req->m_pc,
         req->m_uop ? req->m_uop : NULL, true);
 
-      STAT_EVENT(L1_HIT_CPU + (m_level - 1) * 4 + req->m_ptx);
+      STAT_EVENT(L1_HIT_CPU + (m_level - 1) * 4 + req->m_acc);
 
       if (line && req->m_type == MRT_DSTORE) {
         line->m_dirty = true;
@@ -841,7 +841,7 @@ void dcu_c::process_in_queue() {
         //    req->m_addr, req->m_pc, req->m_uop ? req->m_uop : NULL, false);
       }
 
-      STAT_EVENT(L1_HIT_CPU + (m_level - 1) * 4 + 2 + req->m_ptx);
+      STAT_EVENT(L1_HIT_CPU + (m_level - 1) * 4 + 2 + req->m_acc);
 
       //      handle_coherence(m_level, false, );
 
@@ -895,7 +895,7 @@ void dcu_c::process_in_queue() {
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type],
         m_cycle - req->m_in);
 
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      if (req->m_acc && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_type == MRT_DSTORE) {
         m_simBase->m_memory->free_write_req(req);
       } else {
@@ -989,7 +989,7 @@ void dcu_c::process_out_queue() {
     // -------------------------------------
     if (req->m_state == MEM_OUTQUEUE_NEW) {
       int msg_type;
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      if (req->m_acc && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_with_data && m_level != MEM_LLC) {
         // can change if to req->m_type == MRT_DSTORE
         msg_type = NOC_NEW_WITH_DATA;
@@ -1009,7 +1009,7 @@ void dcu_c::process_out_queue() {
     // -------------------------------------
     else if (req->m_state == MEM_OUT_FILL) {
       int msg_type;
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      if (req->m_acc && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_with_data && m_level == MEM_LLC) {
         // can change if to req->m_type == MRT_DSTORE
         msg_type = NOC_ACK;
@@ -1068,7 +1068,7 @@ void dcu_c::process_fill_queue() {
 
     mem_req_s* req = (*I);
 
-    if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+    if (req->m_acc && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         m_level == MEM_L1 && req->m_type == MRT_DSTORE) {
       ASSERTM(m_done && req->m_done_func && req->m_done_func(req),
               "done function failed\n");
@@ -1127,7 +1127,7 @@ void dcu_c::process_fill_queue() {
           dcache_data_s* data;
           data = (dcache_data_s*)m_cache->insert_cache(
             req->m_addr, &line_addr, &victim_line_addr, req->m_appl_id,
-            req->m_ptx);
+            req->m_acc);
 
           if (m_level != MEM_LLC) {
             POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level - 1));
@@ -1147,7 +1147,7 @@ void dcu_c::process_fill_queue() {
 
               // new write-back request
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(
-                victim_line_addr, m_line_size, m_ptx_sim, data, m_level);
+                victim_line_addr, m_line_size, m_acc_sim, data, m_level);
 
               wb->m_rdy_cycle = m_cycle + 1;
 
@@ -1322,7 +1322,7 @@ void dcu_c::process_fill_queue() {
         m_level, m_id, req->m_id, mem_req_c::mem_req_type_name[req->m_type],
         m_cycle - req->m_in);
 
-      if (req->m_ptx && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
+      if (req->m_acc && *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
           req->m_type == MRT_DSTORE) {
         m_simBase->m_memory->free_write_req(req);
       } else {
@@ -1426,7 +1426,7 @@ bool dcu_c::done(mem_req_s* req) {
       // DCACHE insertion
       // -------------------------------------
       data = (dcache_data_s*)m_cache->insert_cache(
-        addr, &line_addr, &repl_line_addr, req->m_appl_id, req->m_ptx);
+        addr, &line_addr, &repl_line_addr, req->m_appl_id, req->m_acc);
 
       if (m_level != MEM_LLC) {
         POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_W + (m_level - 1));
@@ -1450,7 +1450,7 @@ bool dcu_c::done(mem_req_s* req) {
 
           // new write back request
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(
-            repl_line_addr, m_line_size, m_ptx_sim, data, m_level);
+            repl_line_addr, m_line_size, m_acc_sim, data, m_level);
 
           wb->m_rdy_cycle = m_cycle + 1;
 
@@ -1489,7 +1489,7 @@ bool dcu_c::done(mem_req_s* req) {
                uop->m_inst_num, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
-    if (m_ptx_sim || m_igpu_sim) {
+    if (m_acc_sim) {
       if (uop->m_parent_uop) {
         uop_c* puop = uop->m_parent_uop;
         ++puop->m_num_child_uops_done;
@@ -1521,7 +1521,7 @@ bool dcu_c::write_done(mem_req_s* req) {
   uop_c* uop = req->m_uop;
   uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
   uop->m_state = OS_SCHEDULED;
-  if (m_ptx_sim || m_igpu_sim) {
+  if (m_acc_sim || m_igpu_sim) {
     if (uop->m_parent_uop) {
       uop_c* puop = uop->m_parent_uop;
       ++puop->m_num_child_uops_done;
@@ -1575,17 +1575,20 @@ memory_c::memory_c(macsim_c* simBase) {
   m_num_gpu = 0;
   m_num_cpu = 0;
 
-  if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
+  if ((KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx") ||
+      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
 
-  if (KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx")
+  if ((KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx") ||
+      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
-  if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx")
+  if ((KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") ||
+      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
@@ -1912,7 +1915,7 @@ void memory_c::init_new_req(mem_req_s* req, Mem_Req_Type type, Addr addr,
   req->m_pc = uop ? uop->m_pc : 0;
   req->m_prefetcher_id = 0;
   req->m_pref_loadPC = 0;
-  req->m_ptx = ptx;
+  req->m_acc = ptx;
   req->m_done_func = done_func;
   req->m_uop = uop ? uop : NULL;
   if (type == MRT_DPRF) req->m_uop = NULL;
@@ -1948,7 +1951,7 @@ void memory_c::adjust_req(mem_req_s* req, Mem_Req_Type type, Addr addr,
   req->m_pc = uop ? uop->m_pc : 0;
   req->m_prefetcher_id = 0;
   req->m_pref_loadPC = 0;
-  req->m_ptx = ptx;
+  req->m_acc = ptx;
   req->m_done_func = done_func;
   req->m_uop = uop ? uop : NULL;
   if (type == MRT_DPRF) req->m_uop = NULL;
@@ -2110,7 +2113,7 @@ mem_req_s* memory_c::new_wb_req(Addr addr, int size, bool ptx,
   req->m_pc = data->m_pc;
   req->m_prefetcher_id = 0;
   req->m_pref_loadPC = 0;
-  req->m_ptx = ptx;
+  req->m_acc = ptx;
   req->m_done_func = NULL;
   req->m_uop = NULL;
   req->m_in = m_cycle;

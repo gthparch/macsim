@@ -578,9 +578,9 @@ void dram_ctrl_c::send(void) {
     for (auto I = m_output_buffer->begin(), E = m_output_buffer->end(); I != E;
          ++I) {
       mem_req_s* req = (*I);
-      if (req_type_allowed[req->m_ptx] == false) continue;
+      if (req_type_allowed[req->m_acc] == false) continue;
 
-      req_type_checked[req->m_ptx] = true;
+      req_type_checked[req->m_acc] = true;
       req->m_msg_type = NOC_FILL;
 
       bool insert_packet =
@@ -764,7 +764,7 @@ void dram_ctrl_c::channel_schedule_data(void) {
               m_current_list[bank]->m_req->m_id);
         ASSERT(m_current_list[bank]->m_state == DRAM_DATA);
         m_data_ready[bank] = acquire_data_bus(
-          ii, m_current_list[bank]->m_size, m_current_list[bank]->m_req->m_ptx);
+          ii, m_current_list[bank]->m_size, m_current_list[bank]->m_req->m_acc);
         m_data_avail[bank] = ULLONG_MAX;
         m_current_list[bank]->m_state = DRAM_DATA_WAIT;
       } else

@@ -60,7 +60,16 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
     m_clock_freq,
     new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
-  m_ptx_core = params.find<bool>("ptx_core", 0);
+  if (params.find<bool>("ptx_core", 0)) {
+    m_acc_type = PTX_CORE;
+    m_acc_core = 1;
+  } else if (params.find<bool>("igpu_core", 0)) {
+    m_acc_type = IGPU_CORE;
+    m_acc_core = 1;
+  } else {
+    m_acc_core = 0;
+    m_acc_type = NO_ACC;
+  }
   m_num_link = params.find<uint32_t>("num_link", 1);
   configureLinks(params, tc);
 
@@ -150,7 +159,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_data_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_data_cache_responses.push_back(std::set<uint64_t>());
 
-    if (m_ptx_core) {
+    if (m_acc_core) {
       auto ccache_link = loadUserSubComponent<Interfaces::SimpleMem>(
         "core" + std::to_string(l) + "-ccache", ComponentInfo::SHARE_NONE, tc,
         new Interfaces::SimpleMem::Handler<macsimComponent>(
@@ -194,7 +203,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
   m_data_cache_request_counters = std::vector<uint64_t>(m_num_link, 0);
   m_data_cache_response_counters = std::vector<uint64_t>(m_num_link, 0);
 
-  if (m_ptx_core) {
+  if (m_acc_core) {
     m_const_cache_request_counters = std::vector<uint64_t>(m_num_link, 0);
     m_const_cache_response_counters = std::vector<uint64_t>(m_num_link, 0);
     m_texture_cache_request_counters = std::vector<uint64_t>(m_num_link, 0);
@@ -275,7 +284,7 @@ void macsimComponent::setup() {
     new Callback<macsimComponent, bool, int, uint64_t>(
       this, &macsimComponent::strobeDataCacheRespQ);
 
-  if (m_ptx_core) {
+  if (m_acc_core) {
     CallbackSendConstCacheRequest* scr =
       new Callback<macsimComponent, void, int, uint64_t, uint64_t, int>(
         this, &macsimComponent::sendConstCacheRequest);
@@ -347,7 +356,7 @@ bool macsimComponent::ticReceived(Cycle_t) {
   // Debugging
   if (m_cycle % 100000 == 0) {
     for (unsigned int l = 0; l < m_num_link; ++l) {
-      if (m_ptx_core) {
+      if (m_acc_core) {
         MSC_DEBUG(
           "Core[%2d] I$: (%lu, %lu), D$: (%lu, %lu) C$: (%lu, %lu), T$: (%lu, "
           "%lu)\n",

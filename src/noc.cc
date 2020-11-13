@@ -67,12 +67,12 @@ bool noc_c::insert(int src, int dst, int msg, mem_req_s* req) {
   noc_entry_s* new_entry = m_pool->acquire_entry();
 
   if (src > dst) {
-    if (req->m_ptx == true)
+    if (req->m_acc == true)
       m_cpu_entry_up->push_back(new_entry);
     else
       m_gpu_entry_up->push_back(new_entry);
   } else {
-    if (req->m_ptx == true)
+    if (req->m_acc == true)
       m_cpu_entry_down->push_back(new_entry);
     else
       m_gpu_entry_down->push_back(new_entry);

@@ -336,7 +336,7 @@ void macsim_c::init_cores(int num_max_core) {
 
     // insert to the core type pool
     if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx")
-      m_ptx_core_pool.push(ii);
+      m_acc_core_pool.push(ii);
     else
       m_x86_core_pool.push(ii);
   }
@@ -352,7 +352,7 @@ void macsim_c::init_cores(int num_max_core) {
     // insert to the core type pool
     if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==
         "ptx")
-      m_ptx_core_pool.push(ii + total_core);
+      m_acc_core_pool.push(ii + total_core);
     else
       m_x86_core_pool.push(ii + total_core);
   }
@@ -367,7 +367,7 @@ void macsim_c::init_cores(int num_max_core) {
 
     // insert to the core type pool
     if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx")
-      m_ptx_core_pool.push(ii + total_core);
+      m_acc_core_pool.push(ii + total_core);
     else
       m_x86_core_pool.push(ii + total_core);
   }
