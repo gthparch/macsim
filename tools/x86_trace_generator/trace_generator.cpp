@@ -151,6 +151,7 @@ Knob(UINT32, Knob_num_thread, "thread", "1", "Total number of threads to gather 
 Knob(string, Knob_compiler, "compiler", "gcc", "Which compiler was used?");
 Knob(string, Knob_pl, "pl", "normal", "Programming Language");
 Knob(UINT64, Knob_skip, "skipinst", "0", "Instructions to skip");
+Knob(UINT64, Knob_skip_thread0, "skip_thread0", "0", "skip thread 0");
 Knob(UINT64, Knob_max, "max", "0", "Max number of instruction to collect");
 Knob(UINT64, Knob_rtn_min, "rmin", "0", "Max number of function calls to collect data");
 Knob(UINT64, Knob_rtn_max, "rmax", "0", "Max number of function calls to collect data");
@@ -441,6 +442,9 @@ UINT64 last_count[MAX_THREADS] = {0};
 VOID PIN_FAST_ANALYSIS_CALL INST_count(UINT32 count)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
+
+  if ((Knob_skip_thread0.Value()==1) && (tid == 0))
+    return; 
   if (tid == 100000)
     return;
 
@@ -565,6 +569,10 @@ VOID INST_trace(TRACE trace, VOID *v)
 void instrument(INS ins)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
+
+  if ((Knob_skip_thread0.Value()==1) && (tid == 0))
+    return; 
+
   if (tid == 100000)
     return;
 
@@ -908,6 +916,10 @@ VOID InstHMC(ADDRINT pc)
   if (!Knob_enable_hmc.Value())
     return;
   THREADID tid = threadMap[PIN_ThreadId()];
+
+  if ((Knob_skip_thread0.Value()==1) && (tid == 0))
+    return; 
+
   if (tid != 0)
     return;
 
@@ -946,6 +958,9 @@ void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
   }
    cout << "-> Thread[" << tid << "->" << threadMap[tid] << "] begins." << endl;
   THREADID threadid = threadMap[tid];
+
+  if ((Knob_skip_thread0.Value()==1) && (threadid == 0))
+    return; 
 
   if (threadid == 100000)
     return;
@@ -1028,6 +1043,9 @@ void thread_end(void)
 void thread_end(THREADID threadid)
 {
   //	THREADID threadid = threadMap[PIN_ThreadId()];
+
+  if ((Knob_skip_thread0.Value()==1) && (threadid == 0))
+    return; 
   if (threadid == 100000)
     return;
 
@@ -1205,6 +1223,10 @@ void sanity_check(void)
 void write_inst_to_file(ofstream *file, Inst_info *t_info)
 {
   THREADID tid = threadMap[PIN_ThreadId()];
+
+  if ((Knob_skip_thread0.Value()==1) && (tid == 0))
+    return; 
+
   if (tid == 100000 || !g_enable_thread_instrument[tid] || g_inst_print_count[tid] > Knob_dump_max.Value())
     return;
 
