@@ -406,12 +406,30 @@ mem_req_s* dcu_c::search_pref_in_queue() {
 // If miss in the cache, it will go thru the memory system.
 int dcu_c::access(uop_c* uop) {
   ASSERT(m_level == MEM_L1);
-  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld access\n", m_level, m_id,
-             uop->m_uop_num);
+  DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld va:%llx access\n", m_level, m_id,
+             uop->m_uop_num, uop->m_vaddr);
+
+  int additional_lat = 0; 
+
 
   if (*m_simBase->m_knobs->KNOB_ENABLE_PHYSICAL_MAPPING) {
-    bool success = m_simBase->m_MMU->translate(uop);
-    if (!success) return -1;  // treat a TLB miss as a longer latency cache miss
+    if (!(uop->m_translated)) 
+    {
+        STAT_CORE_EVENT(uop->m_core_id, NUM_OF_TRANSLATION);
+       bool success = m_simBase->m_MMU->translate(uop);
+
+      if (!success) return -1;  // treat a TLB miss as a longer latency cache miss
+      
+      if (KNOB(KNOB_SIMPLE_TLB_LATENCY_MODEL)->getValue()){
+        // if we do ideal tlb insertion but model the timing, here is the place 
+        if (uop->m_state == OS_TRANS_TLB_MISS){
+            additional_lat = KNOB(KNOB_TLB_SIMPLE_MISS_LAT)->getValue();  
+            uop->m_state = OS_TRANS_DONE;
+         }
+        else  additional_lat = KNOB(KNOB_TLB_SIMPLE_HIT_LAT)->getValue();  
+      
+      }
+    }
   } else
     uop->m_paddr = uop->m_vaddr;
 
@@ -480,8 +498,8 @@ int dcu_c::access(uop_c* uop) {
       POWER_EVENT(POWER_LLC_R);
     }
     STAT_EVENT(L1_HIT_CPU + this->m_acc_sim);
-    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level,
-               m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] thread_id:%d uop_num:%lld va:0x%llx pa:0x%llx cache hit\n", m_level,
+               m_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, uop->m_paddr);
     // stat
     uop->m_uop_info.m_dcmiss = false;
 
@@ -517,17 +535,16 @@ int dcu_c::access(uop_c* uop) {
       function<bool(mem_req_s*)> done_func = dcache_write_ack_wrapper;
 
       int result = m_simBase->m_memory->new_mem_req(
-        req_type, req_addr, req_size, cache_hit, true, m_latency, uop,
+        req_type, req_addr, req_size, cache_hit, true, (m_latency + additional_lat), uop,
         done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
 
       if (!result) {
         uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
         return 0;
       }
-
       return -1;
     } else {
-      return m_latency;
+      return (m_latency + additional_lat); 
     }
   }
   // -------------------------------------
@@ -535,8 +552,8 @@ int dcu_c::access(uop_c* uop) {
   // -------------------------------------
   else {  // !cache_hit
     STAT_EVENT(L1_MISS_CPU + this->m_acc_sim);
-    DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level,
-               m_id, uop->m_uop_num);
+    DEBUG_CORE(uop->m_core_id, "L%d[%d] thread_id:%d uop_num:%lld va:0x%llx pa:0x%llx cache miss\n", m_level,
+               m_id, uop->m_thread_id, uop->m_uop_num, uop->m_vaddr, uop->m_paddr);
 
     // -------------------------------------
     // hardware prefetcher training
@@ -573,7 +590,6 @@ int dcu_c::access(uop_c* uop) {
       default:
         ASSERTM(0, "type:%d\n", type);
     }
-
     // -------------------------------------
     // set address and size
     // -------------------------------------
@@ -611,7 +627,7 @@ int dcu_c::access(uop_c* uop) {
     int result;
     result = m_simBase->m_memory->new_mem_req(
       req_type, req_addr, req_size, cache_hit,
-      (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func,
+      (type == MEM_ST_GM || type == MEM_ST_LM), (m_latency + additional_lat), uop, done_func,
       uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
 
     // -------------------------------------
@@ -625,10 +641,9 @@ int dcu_c::access(uop_c* uop) {
     // In case of software prefetch, generate pref request and retire the instruction
     // -------------------------------------
     else if (req_type == MRT_DPRF) {
-      return m_latency;
+        return (m_latency+additional_lat);
     }
   }  // !cache_hit
-
   return -1;  // cache miss
 }
 

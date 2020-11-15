@@ -162,7 +162,7 @@ bool MMU::translate(uop_c *cur_uop) {
   Addr frame_number = -1;
   bool tlb_hit = m_TLB->lookup(addr);
 
-  STAT_CORE_EVENT(cur_uop->m_core_id, TLB_MISS + tlb_hit);
+  STAT_EVENT(TLB_MISS + tlb_hit);
   
   if (tlb_hit) {
     frame_number = m_TLB->translate(addr);
@@ -172,36 +172,64 @@ bool MMU::translate(uop_c *cur_uop) {
 
     DEBUG(
       "TLB hit at %llu - core_id:%d thread_id:%d inst_num:%llu "
-      "uop_num:%llu\n",
+      "uop_num:%llu va:%llx pa:%llx page_number:%lld frame_number:%lld\n",
       m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num,
-      cur_uop->m_uop_num);
+      cur_uop->m_uop_num, cur_uop->m_vaddr, cur_uop->m_paddr, page_number, frame_number);
     return true;
   }
 
   DEBUG(
-    "TLB miss at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu\n",
+    "TLB miss at %llu - core_id:%d thread_id:%d inst_num:%llu uop_num:%llu va:%llx page_number:%lld\n",
     m_cycle, cur_uop->m_core_id, cur_uop->m_thread_id, cur_uop->m_inst_num,
-    cur_uop->m_uop_num);
+    cur_uop->m_uop_num, cur_uop->m_vaddr, page_number);
+    if (KNOB(KNOB_IDEAL_PAGEWALK)){
+      auto it = m_page_table.find(page_number);
+      if (it != m_page_table.end()) {  // page table hit
+      Addr frame_number = it->second.frame_number;
+      cur_uop->m_paddr = (frame_number << m_offset_bits) | page_offset;
+      cur_uop->m_state = OS_TRANS_TLB_MISS;
+      cur_uop->m_translated = true;
+      if (!m_TLB->lookup(addr)) m_TLB->insert(addr, frame_number);
+      m_TLB->update(addr);
+      m_replacement_unit->update(page_number);
+      STAT_EVENT(PAGETABLE_HIT);
+      } else {// page fault 
+            STAT_EVENT(PAGETABLE_MISS);
+            Addr frame_number = m_frame_to_allocate;
 
-  // TLB miss occurs
-  // Put this request into page table walk queue so that it can be handled later
-  // in time
-  auto it = m_walk_queue_page.find(page_number);
-  if (it !=
-      m_walk_queue_page
-        .end())  // this page is already being serviced, so piggyback
-    it->second.emplace_back(cur_uop);
+            DEBUG("fault resolved page_number:%llx at %llu\n", page_number, m_cycle);
+
+            // allocate an entry in the page table
+            m_page_table.emplace(piecewise_construct, forward_as_tuple(page_number),
+                       forward_as_tuple(frame_number));
+              m_replacement_unit->insert(page_number);
+              
+             m_free_frames[frame_number] = false;
+            --m_free_frames_remaining;
+      } 
+      return true; 
+    }
   else {
-    Counter ready_cycle = m_cycle + m_walk_latency;
-    m_walk_queue_cycle.emplace(ready_cycle, list<Addr>());
-    m_walk_queue_cycle[ready_cycle].emplace_back(page_number);
-    m_walk_queue_page.emplace(page_number, list<uop_c *>());
-    m_walk_queue_page[page_number].emplace_back(cur_uop);
-  }
+    // TLB miss occurs
+    //  Put this request into page table walk queue so that it can be handled later
+    // in time
+    auto it = m_walk_queue_page.find(page_number);
+    if (it !=
+        m_walk_queue_page
+          .end())  // this page is already being serviced, so piggyback
+      it->second.emplace_back(cur_uop);
+    else {
+      Counter ready_cycle = m_cycle + m_walk_latency;
+      m_walk_queue_cycle.emplace(ready_cycle, list<Addr>());
+      m_walk_queue_cycle[ready_cycle].emplace_back(page_number);
+      m_walk_queue_page.emplace(page_number, list<uop_c *>());
+      m_walk_queue_page[page_number].emplace_back(cur_uop);
+   }
 
   cur_uop->m_state = OS_TRANS_WALK_QUEUE;
   if (cur_uop->m_parent_uop) ++cur_uop->m_parent_uop->m_num_page_table_walks;
   return false;
+  }
 }
 
 void MMU::run_a_cycle(bool pll_lock) {

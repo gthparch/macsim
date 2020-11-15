@@ -287,6 +287,12 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
     // perfect dcache
     if (KNOB(KNOB_PERFECT_DCACHE)->getValue()) {
       uop_latency = 1;
+      DEBUG_CORE(m_core_id,
+                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
+                         "num_child_uop:%d\n",
+                         m_core_id, uop->m_thread_id, uop->m_uop_num,
+                         uop->m_inst_num,
+                         uop->m_num_child_uops);
     } else {
       // -------------------------------------
       // single uop in an instruction
@@ -344,6 +350,12 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
             uop->m_mem_start_cycle = m_cur_core_cycle;
           }
         }
+        DEBUG_CORE(m_core_id,
+                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
+                         "no_child_uop latency:%d\n",
+                         m_core_id, uop->m_thread_id, uop->m_uop_num,
+                         uop->m_inst_num,
+                         uop_latency);
 
         switch (type) {
           case MEM_LD:
@@ -473,10 +485,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
               ++uop->m_num_child_uops_done;
               DEBUG_CORE(m_core_id,
                          "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
-                         "child_uop_num:%llu m_dcu hit\n",
+                         "child_uop_num:%llu m_dcu hit latency:%d mem_type:%d \n",
                          m_core_id, uop->m_thread_id, uop->m_uop_num,
                          uop->m_inst_num,
-                         uop->m_child_uops[next_set_bit]->m_uop_num);
+                         uop->m_child_uops[next_set_bit]->m_uop_num, latency, uop->m_mem_type);
 
               if (latency > max_latency) {
                 max_latency = latency;
@@ -487,10 +499,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
               uop_latency = -1;
               DEBUG_CORE(m_core_id,
                          "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
-                         "child_uop_num:%llu m_dcu miss\n",
+                         "child_uop_num:%llu m_dcu miss mem_type:%d \n",
                          m_core_id, uop->m_thread_id, uop->m_uop_num,
                          uop->m_inst_num,
-                         uop->m_child_uops[next_set_bit]->m_uop_num);
+                         uop->m_child_uops[next_set_bit]->m_uop_num, uop->m_mem_type);
             }
           } else {
             DEBUG_CORE(m_core_id,

@@ -473,6 +473,7 @@ typedef enum Uop_State_enum {
   OS_TRANS_FAULT_RETRY_QUEUE,
   OS_TRANS_FAULT_BUFFER,
   OS_TRANS_DONE,
+  OS_TRANS_TLB_MISS,
   NUM_OP_STATES,
 } Uop_State;
 
