@@ -410,7 +410,28 @@ int dcu_c::access(uop_c* uop) {
              uop->m_uop_num, uop->m_vaddr);
 
   int additional_lat = 0; 
-
+/*
+  if (KNOB(KNOB_ENABLE_BOUNDS_CHEKING)){
+    if (!(uop->m_bounds_checked))
+    {
+      STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);
+      bool success = m_simBase->m_MMU->boundschecking(uop);
+    }
+      // algorithms to decide different latency  
+      if (uop->m_bounds_check_status == 1) {
+          STAT_CORE_EVENT(BOUNDS_CACHE_HIT);
+          additional_lat += KNOB(KNOB_BOUNDS_CACHE_HIT_LAT->getValue();
+      }
+        else if (uop->m_bounds_check_status == 2) {
+          STAT_CORE_EVENT(BOUNDS_TABLE_HIT);
+          additional_lat += KNOB(KNOB_BOUNDS_TABLE_HIT_LAT->getValue();
+        }
+        else{
+           STAT_CORE_EVENT(BOUNDS_TABLE_MISS);
+          additional_lat += KNOB(KNOB_BOUNDS_TABLE_MISS_LAT->getValue();
+        }
+  }
+*/
 
   if (*m_simBase->m_knobs->KNOB_ENABLE_PHYSICAL_MAPPING) {
     if (!(uop->m_translated)) 
@@ -423,15 +444,20 @@ int dcu_c::access(uop_c* uop) {
       if (KNOB(KNOB_SIMPLE_TLB_LATENCY_MODEL)->getValue()){
         // if we do ideal tlb insertion but model the timing, here is the place 
         if (uop->m_state == OS_TRANS_TLB_MISS){
-            additional_lat = KNOB(KNOB_TLB_SIMPLE_MISS_LAT)->getValue();  
+            additional_lat += KNOB(KNOB_TLB_SIMPLE_MISS_LAT)->getValue();  
             uop->m_state = OS_TRANS_DONE;
          }
-        else  additional_lat = KNOB(KNOB_TLB_SIMPLE_HIT_LAT)->getValue();  
+        else  additional_lat += KNOB(KNOB_TLB_SIMPLE_HIT_LAT)->getValue();  
       
       }
     }
   } else
     uop->m_paddr = uop->m_vaddr;
+
+
+
+
+
 
   uop->m_state = OS_DCACHE_BEGIN;
 
