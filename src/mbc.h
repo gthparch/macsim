@@ -49,6 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "macsim.h"
 #include "uop.h"
 #include "tlb.h"
+#include "cache.h"
 
 class bounds_info_s
 {
@@ -73,12 +74,17 @@ bool bounds_insert(Addr id, Addr min_addr, Addr max_addr);
 private: 
 
 int m_core_id; 
+macsim_c * m_simBase; 
 
-unordered_map<Addr, bounds_info_s> rbt; 
-std::unique_ptr<bounds_info_s> rbt_l0_cache; 
-std::unique_ptr<bounds_info_s> rbt_l1_cache; 
-/* cache_c rbt_l0_cache; 
-cache_c rbt_l1_cache;  */ 
+unordered_map<Addr, bounds_info_s> m_rbt; 
+// vector<bounds_info_s *>m_free_entries; 
+
+// std::unique_ptr<bounds_info_s> rbt_l0_cache; 
+// std::unique_ptr<bounds_info_s> rbt_l1_cache; 
+cache_c *m_l0_cache; 
+port_c *m_l0_port; 
+cache_c *m_l1_cache; 
+port_c *m_l1_port; 
 
 
 };

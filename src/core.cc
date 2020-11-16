@@ -239,6 +239,8 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
                      m_unit_type, max_ALLOCQ, m_resource, m_simBase);
     m_gpu_allocate = NULL;
   }
+  
+  m_mbc = new mbc_c(c_id, m_simBase); // this should be called before calling new exec 
 
   // execution stage
   m_exec = new exec_c(EXEC_INTERFACE_ARGS(), m_simBase);
@@ -301,9 +303,6 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   } else {
     m_shared_memory = NULL;
   }
-  // bounds checking mechanism 
-
-  m_mbc = new mbc_c(c_id, m_simBase);
 
   // clock cycle
   m_cycle = 0;

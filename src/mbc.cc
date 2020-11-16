@@ -50,6 +50,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "mbc.h"
 #include "statistics.h"
 
+#include "all_knobs.h"
+#include "statistics.h"
+
 
 using namespace std;
 
@@ -62,9 +65,18 @@ using namespace std;
 mbc_c::mbc_c(int core_id, macsim_c *simBase)
 {
   m_core_id = core_id; 
-  
+  m_simBase = simBase; 
 
 /* init hash map rbt, cache rbt_l0_cache, cache rbt_l1_cache */ 
+  m_l0_cache = new cache_c (
+  "rbt_l1_cache", *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY), *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY),
+    *KNOB(KNOB_LLC_LINE_SIZE), sizeof(dcache_data_s), *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY),
+    false, core_id, CACHE_MBC_L0, false, 0, 0 /*ideal interleaving */ , m_simBase);
+  
+  // printf("MBC_L0_CACHE core_id:%d m_l0_cache:%p is created\n", core_id, m_l0_cache);
+// port_c *rbt_l0_port; 
+// cache_c *rbt_l1_cache; 
+// port_c *rbt_l1_port; 
 
 }
 
@@ -74,8 +86,36 @@ mbc_c::~mbc_c() {
 
 bool mbc_c::bounds_checking(uop_c *cur_uop)
 {
+  
+  if (*KNOB(KNOB_PERFECT_BOUNDS_CACHE)== true) {
+
+    cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
+    return true; 
+  }
+  bool l0_cache_hit = false; 
+ // int appl_id =  m_simBase->m_core_pointers[cur_uop->m_core_id]->get_appl_id(cur_uop->m_thread_id);
+ int appl_id = 0;
+  dcache_data_s* line = NULL; 
+  Addr region_id = cur_uop->m_pc;  // weill be replaced with reading a separate file 
+  Addr line_addr;
+  Addr victim_line_addr; 
   cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
-return true; 
+ 
+  line = (dcache_data_s*)m_l0_cache->access_cache(region_id, &line_addr, true,
+                                               appl_id);
+  l0_cache_hit = (line)? true: false; 
+
+  // port latency modeling? 
+
+  if (!line) {
+    // ideal insert of l0 or not ? 
+    line = (dcache_data_s*)m_l0_cache->insert_cache(region_id, &line_addr, &victim_line_addr, appl_id, false);
+  }
+
+  cur_uop->m_bounds_check_status = (l0_cache_hit ? BOUNDS_L0_HIT : BOUNDS_L1_HIT); 
+
+  return l0_cache_hit; 
+  // return true; 
 }
 
 bool mbc_c::bounds_insert(Addr id, Addr min_addr, Addr max_addr)

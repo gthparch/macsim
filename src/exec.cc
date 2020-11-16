@@ -577,6 +577,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
       if ((uop->m_bounds_check_status) == NOT_CHECKED)
       {
         STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);
+     
         bool success = m_mbc->bounds_checking(uop);
     
         // algorithms to decide different latency  

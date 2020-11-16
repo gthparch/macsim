@@ -265,3 +265,4 @@ param<BOUNDS_L0_CACHE_ENTRY, bounds_l0_cache_entry, int, 4>
 param<BOUNDS_L1_CACHE_ENTRY, bounds_l1_cache_entry, int, 256> 
 param<BOUNDS_L0_CACHE_PORT, bounds_l0_cache_port, int, 32>
 param<BOUNDS_L1_CACHE_PORT, bounds_l1_cache_port, int, 4> 
+param<PERFECT_BOUNDS_CACHE, perfect_bounds_cache, bool, 0> 
