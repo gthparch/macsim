@@ -60,6 +60,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "rob_smc.h"
 #include "sw_managed_cache.h"
 #include "process_manager.h"
+
 #include "mbc.h"
 
 #include "debug_macros.h"
@@ -129,6 +130,7 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase)
   : EXEC_INTERFACE_INIT() {
   m_simBase = simBase;
 
+  EXEC_CONFIG();
 
   clear_ports();
 
@@ -560,6 +562,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
                    uop->m_core_id, uop->m_thread_id, uop->m_uop_num,
                    uop->m_inst_num);
       }
+
       DEBUG_CORE(
         m_core_id,
         "m_core_id:%d thread_id:%d vaddr:0x%llx uop_num:%llu inst_num:%llu "
@@ -568,27 +571,26 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency,
         uop->m_done_cycle);
     }
-  }
-
+    
     if (KNOB(KNOB_ENABLE_BOUNDS_CHECKING)->getValue()){
       int additional_lat = 0; 
-    if ((uop->m_bounds_check_status) == NOT_CHECKED)
-    {
-      STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);
-       bool success = m_mbc->bounds_checking(uop);
+      if ((uop->m_bounds_check_status) == NOT_CHECKED)
+      {
+        STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);
+        bool success = m_mbc->bounds_checking(uop);
     
-      // algorithms to decide different latency  
-      if (uop->m_bounds_check_status == BOUNDS_L0_HIT ) {
-          STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L0_CACHE_HIT);
-          additional_lat += KNOB(KNOB_BOUNDS_L0_CACHE_LAT)->getValue();
-      }
-        else if (uop->m_bounds_check_status == BOUNDS_L1_HIT) {
-          STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_HIT);
-          additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_LAT)->getValue();
+        // algorithms to decide different latency  
+        if (uop->m_bounds_check_status == BOUNDS_L0_HIT ) {
+           STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L0_CACHE_HIT);
+           additional_lat += KNOB(KNOB_BOUNDS_L0_CACHE_LAT)->getValue();
+        }
+          else if (uop->m_bounds_check_status == BOUNDS_L1_HIT) {
+           STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_HIT);
+            additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_LAT)->getValue();
         }
         else if (uop->m_bounds_check_status == BOUNDS_TABLE_HIT) {
            STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_MISS);
-          additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_MISS_LAT)->getValue();
+            additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_MISS_LAT)->getValue();
         }
         else {
           ASSERT(1);
@@ -601,7 +603,9 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num,
         uop->m_inst_num, uop->m_bounds_check_status, additional_lat, uop_latency,
         uop->m_done_cycle);
-    }
+      }
+    } 
+
     POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_R);
     POWER_CORE_EVENT(m_core_id, POWER_SEGMENT_REGISTER_W);
     POWER_CORE_EVENT(m_core_id, POWER_GP_REGISTER_R);
