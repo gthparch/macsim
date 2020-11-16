@@ -57,6 +57,7 @@ class bp_recovery_info_c;
 class cache_c;
 class cache_cohe_c;
 class context_pool_c;
+class mbc_c; 
 class core_c;
 class dcu_c;
 class exec_c;
@@ -117,6 +118,7 @@ class CoreStatistics;
 class cache_partition_framework_c;
 class dyfr_c;
 class MMU;
+
 
 template <class T>
 class pqueue_c;

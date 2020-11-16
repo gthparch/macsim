@@ -378,6 +378,8 @@ public:
   unordered_map<int, Counter> m_last_fetch_cycle; /**< last fetched cycle */
   Counter m_max_inst_fetched; /**< maximum inst fetched */
 
+
+
 private:
   int m_core_id; /**< core id */
   string m_core_type; /**< simulation core type (x86 or ptx) */
@@ -414,7 +416,8 @@ private:
   pool_c<uop_c>* m_uop_pool; /**< uop pool */
   map_c* m_map; /**< dependence information */
   bp_data_c* m_bp_data; /**< branch predictor */
-
+  mbc_c* m_mbc; /**< bounds checking structure */ 
+  
   // heartbeat
   unordered_map<int, heartbeat_s*> m_heartbeat; /**< heartbeat per thread*/
   time_t m_heartbeat_last_time_core; /**< last heartbeat time */
@@ -438,6 +441,8 @@ private:
     m_thread_trace_info; /**< thread trace information */
   unordered_map<int, bp_recovery_info_c*>
     m_bp_recovery_info; /**< thread bp recovery info */
+
+
 
   // clock cycle
   Counter m_cycle; /**< clock cycle */

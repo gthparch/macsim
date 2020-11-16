@@ -470,6 +470,7 @@ void uop_c::init() {
   m_dep_on_hmc_inst = false;
 
   m_translated = false;
+  m_bounds_check_status = NOT_CHECKED; 
 }
 
 // initialize a new uop

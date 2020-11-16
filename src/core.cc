@@ -89,6 +89,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "network.h"
 #include "dram.h"
 #include "resource.h"
+#include "mbc.h"
 
 #include "config.h"
 
@@ -300,6 +301,9 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   } else {
     m_shared_memory = NULL;
   }
+  // bounds checking mechanism 
+
+  m_mbc = new mbc_c(c_id, m_simBase);
 
   // clock cycle
   m_cycle = 0;
@@ -333,6 +337,7 @@ core_c::~core_c() {
   delete m_schedule;
   delete m_retire;
   delete m_icache;
+  delete m_mbc;
 }
 
 // start core simulation

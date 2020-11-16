@@ -255,3 +255,13 @@ param<PAGE_EVICTION_LATENCY, page_eviction_latency, long, 1000>
 param<BATCH_PROCESSING_OVERHEAD, batch_processing_overhead, long, 50000>
 
 param<FAULT_BUFFER_SIZE, fault_buffer_size, long, 512>
+
+/* Bounds Checking */ 
+param<ENABLE_BOUNDS_CHECKING, enable_bounds_checking, bool, 0>
+param<BOUNDS_L0_CACHE_LAT, bounds_l2_cache_lat, int, 1> 
+param<BOUNDS_L1_CACHE_LAT, bounds_l1_cache_lat, int, 2> 
+param<BOUNDS_L1_CACHE_MISS_LAT, bounds_l1_cache_miss_lat, int, 100> 
+param<BOUNDS_L0_CACHE_ENTRY, bounds_l0_cache_entry, int, 4>
+param<BOUNDS_L1_CACHE_ENTRY, bounds_l1_cache_entry, int, 256> 
+param<BOUNDS_L0_CACHE_PORT, bounds_l0_cache_port, int, 32>
+param<BOUNDS_L1_CACHE_PORT, bounds_l1_cache_port, int, 4> 

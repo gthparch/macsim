@@ -506,6 +506,21 @@ typedef enum Dep_Type_enum {
 } Dep_Type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief Dependence type
+///////////////////////////////////////////////////////////////////////////////////////////////
+typedef enum Bounds_Check_Type_enum {
+  NOT_CHECKED, 
+  BOUNDS_L0_HIT,
+  BOUNDS_L1_HIT,
+  BOUNDS_TABLE_INSERT,
+  BOUNDS_TABLE_HIT,
+  BOUNDS_TABLE_MISS,
+  BOUNDS_CHECK_FAIL, 
+}Bounds_Check_Type;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Source uop information class
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class src_info_c
@@ -678,8 +693,9 @@ public:
   bool m_skip_llc; /**< skip last level cache */
   uint16_t m_mem_version; /**< version number for load/store */
 
-  bool m_translated;
-  int m_num_page_table_walks;
+  bool m_translated; /**< VA to PA translation status */ 
+  Bounds_Check_Type m_bounds_check_status;  /**< bounds check status */ 
+  int m_num_page_table_walks; /**< Number of page table walks */ 
 
   // hmc info
   // changed by Lifeng
