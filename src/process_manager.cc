@@ -516,7 +516,7 @@ void process_manager_c::setup_process(process_s *process) {
     }
   }
 
-  if (trace_type == "x86") {
+  if (trace_type == "x86" && (*KNOB(KNOB_OLD_IGPU_TRACES)  == false)) {
     std::string gen_version;
     trace_config_file >> gen_version;
     if (gen_version != t_gen_ver)

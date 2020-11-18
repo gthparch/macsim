@@ -94,7 +94,7 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   }
   bool l0_cache_hit = false; 
  // int appl_id =  m_simBase->m_core_pointers[cur_uop->m_core_id]->get_appl_id(cur_uop->m_thread_id);
- int appl_id = 0;
+  int appl_id = 0;
   dcache_data_s* line = NULL; 
   Addr region_id = cur_uop->m_pc;  // weill be replaced with reading a separate file 
   Addr line_addr;
@@ -109,6 +109,7 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
 
   if (!line) {
     // ideal insert of l0 or not ? 
+    bounds_insert(cur_uop->m_core_id, region_id, 1, 1000);
     line = (dcache_data_s*)m_l0_cache->insert_cache(region_id, &line_addr, &victim_line_addr, appl_id, false);
   }
 
@@ -118,8 +119,34 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   // return true; 
 }
 
-bool mbc_c::bounds_insert(Addr id, Addr min_addr, Addr max_addr)
+bool mbc_c::bounds_insert(int core_id, Addr id, Addr min_addr, Addr max_addr)
 {
+ 
+//unordered_map<Addr, bounds_info_s> m_rbt;  
+
+auto rbt_iter = m_rbt.find(id);
+
+if (rbt_iter != m_rbt.end()){
+  // founds the bounds info 
+  STAT_CORE_EVENT(core_id, BOUNDS_INFO_HASH_HIT);
+}
+else {
+  
+  // not found the bounds info 
+  /*
+  bounds_info_s bounds_info; 
+  bounds_info.id = id; 
+  bounds_info.min_addr = min_addr; 
+  bounds_info.max_addr = max_addr; 
+
+  m_rbt.insert(std::make_pair <Addr, bounds_info_s> (id, bounds_info)); 
+  */
+  m_rbt[id]= id; 
+
+  STAT_CORE_EVENT(core_id, BOUNDS_INFO_INSERT);
+
+}
+
 
 return true; 
 }

@@ -53,9 +53,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class bounds_info_s
 {
-Addr id; 
-Addr min_addr; 
-Addr max_addr; 
+    public:
+        Addr id; 
+        Addr min_addr; 
+        Addr max_addr; 
 };
 
 class mbc_c // Bounds Checking Unit 
@@ -69,14 +70,14 @@ mbc_c(int core_id, macsim_c *simBase);
 void finalize();
 
 bool bounds_checking(uop_c *cur_uop);
-bool bounds_insert(Addr id, Addr min_addr, Addr max_addr); 
+bool bounds_insert(int core_id, Addr id, Addr min_addr, Addr max_addr); 
 
 private: 
 
 int m_core_id; 
 macsim_c * m_simBase; 
 
-unordered_map<Addr, bounds_info_s> m_rbt; 
+unordered_map<Addr, Addr> m_rbt; 
 // vector<bounds_info_s *>m_free_entries; 
 
 // std::unique_ptr<bounds_info_s> rbt_l0_cache; 
