@@ -70,6 +70,7 @@ public:
   Addr m_tag;  //!< tag for the line
   Addr m_base;  //!< address of first element
   Counter m_last_access_time;  //!< for replacement policy
+  Counter m_insert_time; //!< cache insertion time 
   Counter m_access_counter;  //!< access counter
   void *m_data;  //!< poiter to arbitrary data
   bool m_pref;  //!< data is brought by a prefetcher

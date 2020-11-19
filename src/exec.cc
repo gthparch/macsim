@@ -589,7 +589,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
            STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_HIT);
             additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_LAT)->getValue();
         }
-        else if (uop->m_bounds_check_status == BOUNDS_TABLE_HIT) {
+        else if (uop->m_bounds_check_status == BOUNDS_TABLE_INSERT) {
            STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_MISS);
             additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_MISS_LAT)->getValue();
         }

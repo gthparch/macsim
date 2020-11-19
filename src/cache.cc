@@ -121,6 +121,7 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
     for (int jj = 0; jj < assoc; ++jj) {
       m_set[ii]->m_entry[jj].m_valid = false;
       m_set[ii]->m_entry[jj].m_access_counter = false;
+      m_set[ii]->m_entry[jj].m_insert_time = 0; 
       if (data_size > 0) {
         m_set[ii]->m_entry[jj].m_data = (void *)malloc(data_size);
         memset(m_set[ii]->m_entry[jj].m_data, 0, data_size);
@@ -326,6 +327,7 @@ void cache_c::initialize_cache_line(cache_entry_c *ins_line, Addr tag,
   ins_line->m_tag = tag;
   ins_line->m_base = (addr & ~m_offset_mask);
   ins_line->m_access_counter = 0;
+  ins_line->m_insert_time = CYCLE; 
   ins_line->m_last_access_time = CYCLE;
   ins_line->m_pref = false;
   ins_line->m_skip = skip;
@@ -385,6 +387,7 @@ void *cache_c::insert_cache(Addr addr, Addr *line_addr, Addr *updated_line,
   // Initialize the other fileds of the cache line
   initialize_cache_line(ins_line, tag, addr, appl_id, gpuline, set, skip);
 
+  
   // Check if prefetch flag was set and update the field accordingly
   ++m_insert_count;
 

@@ -93,6 +93,7 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
     return true; 
   }
   bool l0_cache_hit = false; 
+  bool l1_cache_hit = false; 
  // int appl_id =  m_simBase->m_core_pointers[cur_uop->m_core_id]->get_appl_id(cur_uop->m_thread_id);
   int appl_id = 0;
   dcache_data_s* line = NULL; 
@@ -103,17 +104,32 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
  
   line = (dcache_data_s*)m_l0_cache->access_cache(region_id, &line_addr, true,
                                                appl_id);
-  l0_cache_hit = (line)? true: false; 
+
+  if (line) {
+      if ((line->m_fetch_cycle +  *KNOB(KNOB_BOUNDS_L0_INSERT_LATENCY)) <= (m_simBase->m_core_cycle[cur_uop->m_core_id] )) { 
+        l0_cache_hit = true;
+      }
+      else {
+          l0_cache_hit = false;
+          STAT_CORE_EVENT(cur_uop->m_core_id, BOUNDS_L0_INSERT_DELAY_MISS); 
+      }
+      DEBUG_CORE(cur_uop->m_core_id, "fetched_cycle:%lld ready_cycle:%lld curr_cycle:%lld l0_cache_hit:%d\n",
+         line->m_fetch_cycle, ( line->m_fetch_cycle +  *KNOB(KNOB_BOUNDS_L0_INSERT_LATENCY)), (m_simBase->m_core_cycle[cur_uop->m_core_id]) , l0_cache_hit);
+  }else {
+    l0_cache_hit = false; 
+  }
+  // l0_cache_hit = (line)? true: false; 
 
   // port latency modeling? 
 
   if (!line) {
     // ideal insert of l0 or not ? 
-    bounds_insert(cur_uop->m_core_id, region_id, 1, 1000);
+    l1_cache_hit = bounds_insert(cur_uop->m_core_id, region_id, 1, 1000);
     line = (dcache_data_s*)m_l0_cache->insert_cache(region_id, &line_addr, &victim_line_addr, appl_id, false);
+    line->m_fetch_cycle = m_simBase->m_core_cycle[cur_uop->m_core_id];
   }
 
-  cur_uop->m_bounds_check_status = (l0_cache_hit ? BOUNDS_L0_HIT : BOUNDS_L1_HIT); 
+  cur_uop->m_bounds_check_status = (l0_cache_hit ? BOUNDS_L0_HIT : (l1_cache_hit ? BOUNDS_L1_HIT: BOUNDS_TABLE_INSERT)); 
 
   return l0_cache_hit; 
   // return true; 
@@ -129,6 +145,7 @@ auto rbt_iter = m_rbt.find(id);
 if (rbt_iter != m_rbt.end()){
   // founds the bounds info 
   STAT_CORE_EVENT(core_id, BOUNDS_INFO_HASH_HIT);
+  return true; 
 }
 else {
   
@@ -144,9 +161,8 @@ else {
   m_rbt[id]= id; 
 
   STAT_CORE_EVENT(core_id, BOUNDS_INFO_INSERT);
-
+  return false; 
 }
 
 
-return true; 
 }
