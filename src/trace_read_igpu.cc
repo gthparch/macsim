@@ -229,7 +229,7 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
 
     trace_uop[0]->m_rep_uop_num = 0;
     trace_uop[0]->m_opcode = pi->m_opcode;
-
+ 
     // temporal register rules:
     // load->dest_reg (through tmp), load->store (through tmp), dest_reg->store (real reg)
     // load->cf (through tmp), dest_reg->cf (thought dest), st->cf (no dependency)
@@ -278,7 +278,8 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
       trace_uop[0]->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
       trace_uop[0]->m_bar_type = NOT_BAR;
       trace_uop[0]->m_num_src_regs = pi->m_num_read_regs;
-      
+      trace_uop[0]->m_mem_type = MEM_LD; // not sure why this was omitted : added in Nov-18-2020 
+
       //if (pi->m_opcode == XED_CATEGORY_DATAXFER)
         //trace_uop[0]->m_num_dest_regs = pi->m_num_dest_regs;
       //else
@@ -573,7 +574,8 @@ inst_info_s* igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info, trace_uop
   ASSERT(num_uop > 0);
   first_info->m_trace_info.m_num_uop = num_uop;
 
-  DEBUG("%s: read: %d write: %d\n", igpu_opcode_names[pi->m_opcode], pi->m_num_read_regs, pi->m_num_dest_regs);
+  DEBUG("%s: read: %d write: %d pc:%lx va:%lx num_ld:%d\n", 
+    igpu_opcode_names[pi->m_opcode], pi->m_num_read_regs, pi->m_num_dest_regs, pi->m_instruction_next_addr,  pi->m_instruction_addr, pi->m_num_ld);
 
   return first_info;
 }

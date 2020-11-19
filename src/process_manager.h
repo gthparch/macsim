@@ -74,6 +74,8 @@ typedef struct thread_trace_info_node_s {
   int m_tid; /**< thread id */
   bool m_main; /**< main thread */
   bool m_acc; /**< GPU simulation */
+  bool m_ptx; /**<PTX simulation */ 
+  bool m_igpu;  /**<IGPU simulation */ 
   int m_block_id; /**< block id */
 } thread_trace_info_node_s;
 
@@ -188,7 +190,9 @@ typedef struct thread_s {
   uint64_t m_uop_count; /**< total uop counts */
   bool m_trace_ended; /**< trace ended */
   process_s* m_process; /**< point to the application belongs to */
-  bool m_acc; /**< GPU thread */
+  bool m_acc; /**< ACC thread */
+  bool m_ptx; /**< PTX thread */ 
+  bool m_igpu; /**< IGPU thread */
   char* m_buffer; /**< trace buffer */
   int m_buffer_index; /**< current trace buffer index */
   int m_buffer_index_max; /**< maximum buffer index */
@@ -258,7 +262,9 @@ typedef struct process_s {
   map<int, bool>
     m_core_list; /**< list of cores that this process is executed */
   queue<int>* m_core_pool; /**< core pool pointer */
-  bool m_acc; /**< GPU application */
+  bool m_acc; /**< GPU aapplication */
+  bool m_ptx; /**< PTX applications */ 
+  bool m_igpu;  /**< Intel GPU applications */ 
   int m_repeat; /**< application has been re-executed */
   vector<string> m_applications; /**< list of sub-applications */
   vector<int>

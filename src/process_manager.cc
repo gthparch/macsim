@@ -254,6 +254,8 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
   node->m_tid = tid;
   node->m_main = main;
   node->m_acc = process->m_acc;
+  node->m_ptx = process->m_ptx;
+  node->m_igpu = process->m_igpu; 
 
   // create a new thread start information
   thread_start_info_s *start_info = &(process->m_thread_start_info[tid]);
@@ -284,7 +286,7 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
   process->m_block_list[node->m_block_id] = true;
 
   // add a new node to m_thread_queue (for x86) or m_block_queue (for ptx)
-  if (process->m_acc == true)
+  if (process->m_ptx == true)
     insert_block(node);
   else
     insert_thread(node);
@@ -400,6 +402,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
   // setup core pool
   if (trace_type == "ptx" || trace_type == "newptx") {
     process->m_acc = true;
+    process->m_ptx = true; 
+    process->m_igpu = false; 
     process->m_core_pool = &m_simBase->m_acc_core_pool;
 
     // most basic check to ensure that offsets of members in structure that we
@@ -413,12 +417,20 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
       assert(sizeof(trace_info_gpu_s) ==
              (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
     }
-  } else {
+  } else if (trace_type == "igpu" ) { 
+   process->m_acc = true;
+   process->m_igpu = true; 
+   process->m_ptx = false; 
+   process->m_core_pool = &m_simBase->m_acc_core_pool;
+
+    
+  }else {
     process->m_acc = false;
     process->m_core_pool = &m_simBase->m_x86_core_pool;
   }
 
   // now we set up a new process to execute it
+  DEBUG("process->m_acc:%d process->m_ptx:%d process->m_igpu:%d \n", process->m_acc, process->m_ptx, process->m_igpu);
   setup_process(process);
 
   return 0;
@@ -538,7 +550,11 @@ void process_manager_c::setup_process(process_s *process) {
       thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
   }
 
-  report("thread_count:" << thread_count);
+  report("thread_count: " << thread_count);
+  report("trace_type: " << trace_type);
+  report("process->m_ptx: " << process->m_ptx);
+  report("process->m_igpu: " << process->m_igpu);
+  report("process->m_acc: " << process->m_acc);
 
   // create data structures
   thread_stat_s *new_stat = new thread_stat_s[thread_count];
@@ -569,7 +585,9 @@ void process_manager_c::setup_process(process_s *process) {
   trace_config_file.close();
 
   // GPU simulation
-  if (true == process->m_acc) {
+  // Hyesoon Nov-18-2020 : this code needs to review. It works for PTX but not sure about iGPU 
+  // if (true == process->m_ptx) {
+  if (process->m_ptx) { 
     string path = process->m_current_file_name_base;
     path += "_info.txt";
 
@@ -597,14 +615,17 @@ void process_manager_c::setup_process(process_s *process) {
 
     // Calculate the number of threads (warps) per block
     // Currently, (n * 65536) is assigned to the first global warp ID for the nth block.
+    
     m_simBase->m_no_threads_per_block = 0;
-    for (int ii = 0; ii < thread_count; ++ii) {
-      if (process->m_thread_start_info[ii].m_thread_id < 100)
-        ++m_simBase->m_no_threads_per_block;
-      else
-        break;
-    }
 
+    if (process->m_ptx == true){  // Hyesoon: we need to review this code. Nov-18-2020 
+      for (int ii = 0; ii < thread_count; ++ii) {
+          if (process->m_thread_start_info[ii].m_thread_id < 100)
+            ++m_simBase->m_no_threads_per_block;
+        else
+          break;
+     }
+    }
     queue<int> *core_pool = process->m_core_pool;
 
     // Allocate cores to this application (bi-directonal)
@@ -763,28 +784,38 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
                                            bool main) {
   thread_s *trace_info = m_simBase->m_thread_pool->acquire_entry(m_simBase);
   process->m_thread_trace_info[tid] = trace_info;
-
   // TODO - nbl (apr-17-2013): use pools
   if (process->m_acc) {
-    trace_info->m_prev_trace_info = new trace_info_gpu_s;
-    trace_info->m_next_trace_info = new trace_info_gpu_s;
+    if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") {
+      trace_info->m_prev_trace_info = new trace_info_gpu_s;
+      trace_info->m_next_trace_info = new trace_info_gpu_s;
+ //     report("ptx trace is set up for tid: " << tid);
+    }
+    else if (KNOB(KNOB_CORE_TYPE)->getValue() == "igpu") { 
+      trace_info->m_prev_trace_info = new trace_info_igpu_s;
+      trace_info->m_next_trace_info = new trace_info_igpu_s;
+ //     report ("igpu trace is set up for tid: " << tid);
+    }
   } else {
     if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info->m_prev_trace_info = new trace_info_cpu_s;
       trace_info->m_next_trace_info = new trace_info_cpu_s;
+   //   report ("x86 trace is set up for tid: " << tid);
     } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64") {
       trace_info->m_prev_trace_info = new trace_info_a64_s;
       trace_info->m_next_trace_info = new trace_info_a64_s;
-    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
-      trace_info->m_prev_trace_info = new trace_info_igpu_s;
-      trace_info->m_next_trace_info = new trace_info_igpu_s;
+   //  report ("a64 trace is set up for tid: " << tid);
+        /*  } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+       trace_info->m_prev_trace_info = new trace_info_igpu_s;
+       trace_info->m_next_trace_info = new trace_info_igpu_s;
+       */
     } else {
       ASSERTM(0, "Wrong core type %s\n",
               KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
   }
   thread_start_info_s *start_info = &process->m_thread_start_info[tid];
-
+  
   int block_id = start_info->m_thread_id >> BLOCK_ID_SHIFT;
 
   // original block id
@@ -818,6 +849,8 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
   trace_info->m_file_opened = true;
   trace_info->m_trace_ended = false;
   trace_info->m_acc = process->m_acc;
+  trace_info->m_ptx = process->m_ptx;
+  trace_info->m_igpu = process->m_igpu; 
   trace_info->m_buffer_index = 0;
   trace_info->m_buffer_index_max = 0;
   trace_info->m_buffer_exhausted = true;
@@ -882,7 +915,8 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
   --m_simBase->m_num_active_threads;
 
   // GPU simulation
-  if (trace_info->m_acc == true) {
+  // Hyesoon needs to check whether iGPU also needs this feature Nov-18-2020 
+  if (trace_info->m_ptx == true) {
     int t_process_id = trace_info->m_process->m_process_id;
     int t_thread_id = trace_info->m_unique_thread_id;
     m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle =
@@ -973,11 +1007,20 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
 
   // TODO - nbl (apr-17-2013): use pools
   if (trace_info->m_process->m_acc) {
+    if (trace_info->m_process->m_ptx) {
     trace_info_gpu_s *temp =
       static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
     delete temp;
     temp = static_cast<trace_info_gpu_s *>(trace_info->m_next_trace_info);
     delete temp;
+    }
+    else if (trace_info->m_process->m_igpu){ 
+       trace_info_igpu_s *temp =
+        static_cast<trace_info_igpu_s *>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_igpu_s *>(trace_info->m_next_trace_info);
+      delete temp;
+    }
   } else {
     if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info_cpu_s *temp =
@@ -991,13 +1034,15 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
       delete temp;
       temp = static_cast<trace_info_a64_s *>(trace_info->m_next_trace_info);
       delete temp;
-    } else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
+    } 
+    /* else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu") {
       trace_info_igpu_s *temp =
         static_cast<trace_info_igpu_s *>(trace_info->m_prev_trace_info);
       delete temp;
       temp = static_cast<trace_info_igpu_s *>(trace_info->m_next_trace_info);
       delete temp;
-    } else {
+    } */
+    else {
       ASSERTM(0, "Wrong core type %s\n",
               KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
     }
@@ -1144,6 +1189,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
   // We do this only for non-ptx cores.
   // ptx continues to do whatever it was doing earlier
   // -pgera 03-20-2017
+ // Heysoon: Need to check Nov-18-2020 
 
   std::set<std::string> core_type_set;
   for (int core_id = 0; core_id < *KNOB(KNOB_NUM_SIM_CORES); ++core_id) {

@@ -684,8 +684,8 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
     m_cpu_decoder = new cpu_decoder_c(simBase, m_dprint_output);
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "a64")
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
-  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
-    m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
+ //  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
+//    m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n",
             KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
@@ -693,7 +693,12 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
 
   m_cpu_decoder->init_pin_convert();
 
-  m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
+  if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx"){
+    m_gpu_decoder = new ptx_decoder_c(simBase, m_dprint_output);
+  }
+  else if (KNOB(KNOB_CORE_TYPE)->getValue() == "igpu"){
+    m_gpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
+  }
 }
 
 trace_reader_wrapper_c::trace_reader_wrapper_c() {
@@ -707,8 +712,8 @@ trace_reader_wrapper_c::~trace_reader_wrapper_c() {
 }
 
 void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id,
-                                         bool gpu_sim) {
-  if (gpu_sim)
+                                         bool ptx_sim, bool igpu_sim) {
+  if (ptx_sim || igpu_sim)
     m_gpu_decoder->setup_trace(core_id, sim_thread_id);
   else
     m_cpu_decoder->setup_trace(core_id, sim_thread_id);
@@ -716,8 +721,8 @@ void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id,
 
 bool trace_reader_wrapper_c::get_uops_from_traces(int core_id, uop_c *uop,
                                                   int sim_thread_id,
-                                                  bool gpu_sim) {
-  if (gpu_sim)
+                                                  bool ptx_sim, bool igpu_sim) {
+  if (ptx_sim || igpu_sim)
     return m_gpu_decoder->get_uops_from_traces(core_id, uop, sim_thread_id);
   else
     return m_cpu_decoder->get_uops_from_traces(core_id, uop, sim_thread_id);
