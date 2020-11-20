@@ -62,6 +62,8 @@ using namespace std;
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MMU, ##args);      \
   }
 
+//static set<int> bounds_info; 
+
 mbc_c::mbc_c(int core_id, macsim_c *simBase)
 {
   m_core_id = core_id; 
@@ -72,7 +74,12 @@ mbc_c::mbc_c(int core_id, macsim_c *simBase)
   "rbt_l1_cache", *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY), *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY),
     *KNOB(KNOB_LLC_LINE_SIZE), sizeof(dcache_data_s), *KNOB(KNOB_BOUNDS_L0_CACHE_ENTRY),
     false, core_id, CACHE_MBC_L0, false, 0, 0 /*ideal interleaving */ , m_simBase);
-  
+
+/*
+  if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) mbc_info_read()
+    MEMDEP_OUT = file_tag_fopen(boundsid_filename, "r", m_simBase);	
+  }
+  */
   // printf("MBC_L0_CACHE core_id:%d m_l0_cache:%p is created\n", core_id, m_l0_cache);
 // port_c *rbt_l0_port; 
 // cache_c *rbt_l1_cache; 
@@ -80,8 +87,58 @@ mbc_c::mbc_c(int core_id, macsim_c *simBase)
 
 }
 
+
+void mbc_c::bounds_info_read(string file_name_base,  set <int> &m_bounds_info)
+{
+
+  ifstream bounds_info_file;
+  string bounds_info = file_name_base + ".Binfo";
+  // string bounds_info = "test.Binfo";
+  cout <<" bounds file name is " << bounds_info << endl; 
+  
+
+  bounds_info_file.open(bounds_info.c_str());
+
+  unsigned linenum = 0;
+  while (bounds_info_file.good()) {
+    string line;
+    getline(bounds_info_file, line);
+    // skip empty lines
+    if (line.empty()) continue;
+    // skip comment lines
+    if (line[0] == '#') continue;
+    // skip the first line (csv header)
+    if (linenum == 0) {
+      linenum++;
+      continue;
+    }
+    int reg_id; 
+    string name;
+    std::stringstream ss(line);
+    ss >> reg_id;
+    std::cout << "reg_id:" << reg_id << endl; 
+
+    m_bounds_info.insert(reg_id);
+    linenum++;
+  }
+  bounds_info_file.close();
+  
+}
+
 mbc_c::~mbc_c() {
 
+}
+
+bool mbc_c::bounds_info_check_signed(int src1_id, set <int> &m_bounds_info){ 
+
+//  bool mbc_c::bounds_info_check_signed( set <int> &m_bounds_info){ 
+//    int src1_id = 1; 
+    /* check whether uop sources the destination or */ 
+    if(m_bounds_info.find(src1_id) != m_bounds_info.end()){
+      return true;
+    }
+    else return false; 
+    if(m_bounds_info.empty()) return true; // if there is no bounds info, thne all memory instructions are signed 
 }
 
 bool mbc_c::bounds_checking(uop_c *cur_uop)
@@ -101,6 +158,8 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   Addr line_addr;
   Addr victim_line_addr; 
   cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
+
+
  
   line = (dcache_data_s*)m_l0_cache->access_cache(region_id, &line_addr, true,
                                                appl_id);
@@ -130,8 +189,9 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   }
 
   cur_uop->m_bounds_check_status = (l0_cache_hit ? BOUNDS_L0_HIT : (l1_cache_hit ? BOUNDS_L1_HIT: BOUNDS_TABLE_INSERT)); 
-
+  
   return l0_cache_hit; 
+
   // return true; 
 }
 

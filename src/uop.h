@@ -515,6 +515,7 @@ typedef enum Bounds_Check_Type_enum {
   BOUNDS_TABLE_INSERT,
   BOUNDS_TABLE_HIT,
   BOUNDS_TABLE_MISS,
+  BOUNDS_TYPE_1, 
   BOUNDS_CHECK_FAIL, 
 }Bounds_Check_Type;
 
@@ -695,6 +696,7 @@ public:
 
   bool m_translated; /**< VA to PA translation status */ 
   Bounds_Check_Type m_bounds_check_status;  /**< bounds check status */ 
+  bool m_bounds_signed; /**< bounds signed */ 
   int m_num_page_table_walks; /**< Number of page table walks */ 
 
   // hmc info
@@ -702,6 +704,8 @@ public:
   HMC_Type m_hmc_inst; /**< hmc type of current uop*/
   uint64_t m_hmc_trans_id;
   bool m_dep_on_hmc_inst;
+
+  
 
 private:
   macsim_c *m_simBase; /**< macsim_c base class for simulation globals */

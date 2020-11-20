@@ -269,6 +269,8 @@ typedef struct trace_uop_s {
   // changed by Lifeng
   HMC_Type m_hmc_inst; /**<  hmc type of cur uop */
   uint64_t m_hmc_trans_id;
+
+  bool m_bounds_signed; /**< bounds checking singed  */
 } trace_uop_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

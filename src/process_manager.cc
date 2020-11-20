@@ -476,6 +476,11 @@ void process_manager_c::setup_process(process_s *process) {
   if (*KNOB(KNOB_ENABLE_LOCK_SKIP))
     hmc_function_c::lock_info_read(process->m_current_file_name_base,
                                    process->m_lock_info);
+                                   
+  if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE))
+   mbc_c::bounds_info_read(process->m_current_file_name_base, process->m_bounds_info);
+
+    // mbc_c::bounds_info_read(process->m_current_file_name_base);
 
   // open TRACE_CONFIG file
   ifstream trace_config_file;

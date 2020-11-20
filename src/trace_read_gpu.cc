@@ -55,6 +55,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "sw_managed_cache.h"
 #include "memory.h"
 #include "inst_info.h"
+#include "mbc.h"
 
 #include "all_knobs.h"
 
@@ -293,6 +294,7 @@ void ptx_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_gpu_s *pi = static_cast<trace_info_gpu_s *>(trace_info);
   trace_uop->m_va = 0;
+  trace_uop->m_bounds_signed = 0; 
 
   trace_uop->m_active_mask = pi->m_active_mask;
   if (info->m_table_info->m_cf_type) {
@@ -329,6 +331,7 @@ void ptx_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     }
+    trace_uop->m_bounds_signed = info->m_table_info->m_bounds_signed; 
   }
 
   // next pc
@@ -354,6 +357,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   // simulator maintains a cache of decoded instructions (uop) for each process,
   // this avoids decoding of instructions everytime an instruction is executed
   int process_id = core->get_trace_info(sim_thread_id)->m_process->m_process_id;
+  process_s *process = core->get_trace_info(sim_thread_id)->m_process; 
   hash_c<inst_info_s> *htable = m_simBase->m_inst_info_hash[process_id];
 
   // since each instruction can be decoded into multiple uops, the key to the
@@ -382,7 +386,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
     trace_uop[0]->m_rep_uop_num = 0;
     trace_uop[0]->m_opcode = pi->m_opcode;
-
+    
     // temporal register rules:
     // load->dest_reg (through tmp), load->store (through tmp), dest_reg->store (real reg)
     // load->cf (through tmp), dest_reg->cf (thought dest), st->cf (no dependency)
@@ -393,6 +397,16 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     if (pi->m_is_load) {
       num_uop = 1;
 
+
+      if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
+  
+        info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info); 
+       // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
+      }
+      else info->m_table_info->m_bounds_signed = false; 
+
+
+      
       // set memory type
       switch (pi->m_opcode) {
         case GPU_MEM_LD_GM:
@@ -445,6 +459,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       trace_uop[0]->m_eom = 0;
       trace_uop[0]->m_alu_uop = false;
       trace_uop[0]->m_inst_size = pi->m_size;
+      trace_uop[0]->m_bounds_signed =    info->m_table_info->m_bounds_signed; 
 
       // m_has_immediate is meaningless for GPU traces
       trace_uop[0]->m_mul_mem_uops = 0;
@@ -480,7 +495,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_pin_2nd_mem = 0;
       cur_trace_uop->m_eom = 0;
       cur_trace_uop->m_alu_uop = true;
-
+      cur_trace_uop->m_bounds_signed = 0; 
       inst_has_ALU_uop = true;
     }
 
@@ -512,6 +527,13 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
           break;
       }
 
+      if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
+  
+       info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info); 
+       // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
+      }
+      else info->m_table_info->m_bounds_signed = false; 
+
       cur_trace_uop->m_opcode = pi->m_opcode;
       cur_trace_uop->m_cf_type = NOT_CF;
       cur_trace_uop->m_op_type = (pi->m_is_fp) ? UOP_FMEM : UOP_IMEM;
@@ -523,6 +545,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_alu_uop = false;
       cur_trace_uop->m_inst_size = pi->m_size;
       cur_trace_uop->m_mul_mem_uops = 0;
+      cur_trace_uop->m_bounds_signed = info->m_table_info->m_bounds_signed; 
     }
 
     ///
@@ -544,6 +567,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_eom = 0;
       cur_trace_uop->m_alu_uop = false;
       cur_trace_uop->m_inst_size = pi->m_size;
+      cur_trace_uop->m_bounds_signed = false; 
     }
 
     ASSERTM((pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED) &&
@@ -566,6 +590,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       trace_uop[0]->m_pin_2nd_mem = 0;
       trace_uop[0]->m_eom = 1;
       trace_uop[0]->m_inst_size = pi->m_size;
+      trace_uop[0]->m_bounds_signed = false;
       ++num_uop;
     }
 
@@ -714,6 +739,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         // not for only the first instance, because depending on the address
         // calculation, some accesses may be coalesced, some may be uncoalesced
         trace_uop[ii]->m_mul_mem_uops = 0;
+        trace_uop[ii]->m_bounds_signed = info->m_table_info->m_bounds_signed; 
       }
     }
 
@@ -934,6 +960,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   uop->m_bar_type = trace_uop->m_bar_type;
   uop->m_npc = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
+  uop->m_bounds_signed = trace_uop->m_bounds_signed; 
 
   if (uop->m_cf_type) {
     uop->m_taken_mask = trace_uop->m_taken_mask;
@@ -990,7 +1017,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   if (uop->m_num_srcs < MAX_SRCS) {
     for (int index = 0; index < uop->m_num_srcs; ++index) {
       uop->m_src_info[index] = trace_uop->m_srcs[index].m_id;
-      // DEBUG("uop_num:%lld src_info[%d]:%d\n", uop->uop_num, index, uop->src_info[index]);
+       DEBUG("uop_num:%lld src_info[%d]:%d pc:%lld\n", uop->m_uop_num, index, uop->m_src_info[index], uop->m_pc);
     }
   } else {
     ASSERTM(uop->m_num_srcs < MAX_SRCS, "src_num:%d MAX_SRC:%d",
@@ -999,6 +1026,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
 
   for (int index = 0; index < uop->m_num_dests; ++index) {
     uop->m_dest_info[index] = trace_uop->m_dests[index].m_id;
+    // DEBUG("uop_num:%lld dst_info[%d]:%d pc:%lld\n", uop->m_uop_num, index, uop->m_dest_info[index], uop->m_pc);
     ASSERT(trace_uop->m_dests[index].m_reg < NUM_REG_IDS);
   }
 
@@ -1251,7 +1279,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
         child_mem_uop->m_mem_size = line_size;
         child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
         child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
-
+        child_mem_uop->m_bounds_signed = uop->m_bounds_signed; 
         uop->m_child_uops[count++] = child_mem_uop;
 
         ++itr;
@@ -1261,9 +1289,18 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
 
   DEBUG_CORE(
     uop->m_core_id,
-    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
-    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mem_type:%d src1:%u  num_child:%d \n",
+    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_pc, uop->m_opcode, uop->m_bounds_signed, uop->m_mem_type, uop->m_src_info[0], uop->m_num_child_uops); 
+  if (uop->m_num_child_uops>0) { 
+    for (int ii = 0; ii < uop->m_num_child_uops; ii++){
+      uop_c *c_uop = uop->m_child_uops[ii];
+        DEBUG_CORE(
+      uop->m_core_id,
+      "new child uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mem_type:%d src1:%u  num_child:%d \n",
+      c_uop->m_uop_num, c_uop->m_inst_num, c_uop->m_thread_id, c_uop->m_unique_num, c_uop->m_pc, c_uop->m_opcode, c_uop->m_bounds_signed, c_uop->m_mem_type, c_uop->m_src_info[0], c_uop->m_num_child_uops); 
+      }
 
+  }
   return read_success;
 }
 

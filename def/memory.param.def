@@ -267,3 +267,4 @@ param<BOUNDS_L0_CACHE_PORT, bounds_l0_cache_port, int, 32>
 param<BOUNDS_L1_CACHE_PORT, bounds_l1_cache_port, int, 4> 
 param<PERFECT_BOUNDS_CACHE, perfect_bounds_cache, bool, 0> 
 param<BOUNDS_L0_INSERT_LATENCY, bounds_l0_insert_latency, int, 0> 
+param<ENABLE_BOUNDS_IDS_FILE, enable_bounds_ids_file, bool, false> 

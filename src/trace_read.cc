@@ -116,6 +116,8 @@ trace_uop_s::trace_uop_s() {
   m_mul_mem_uops = false;
 
   m_hmc_inst = HMC_NONE;
+  m_bounds_signed = false; 
+  
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

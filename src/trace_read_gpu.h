@@ -49,6 +49,8 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class ptx_decoder_c : public trace_read_c
 {
+  friend class mbc_c; 
+  
 public:
   /**
    * Constructor

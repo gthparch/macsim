@@ -71,6 +71,10 @@ void finalize();
 
 bool bounds_checking(uop_c *cur_uop);
 bool bounds_insert(int core_id, Addr id, Addr min_addr, Addr max_addr); 
+// static void bounds_info_read(string file_name_base);
+static void bounds_info_read(string file_name_base, set<int> &m_bounds_info);
+static bool bounds_info_check_signed(int src1, set <int> &m_bounds_info); 
+// need to have one for igpu as well 
 
 private: 
 
@@ -78,6 +82,7 @@ int m_core_id;
 macsim_c * m_simBase; 
 
 unordered_map<Addr, Addr> m_rbt; 
+// static set<int> m_bounds_info; 
 // vector<bounds_info_s *>m_free_entries; 
 
 // std::unique_ptr<bounds_info_s> rbt_l0_cache; 
@@ -87,7 +92,5 @@ port_c *m_l0_port;
 cache_c *m_l1_cache; 
 port_c *m_l1_port; 
 
-
 };
-
 #endif //MBC_H_INCLUDED 

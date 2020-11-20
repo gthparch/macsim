@@ -574,8 +574,17 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
     
     if (KNOB(KNOB_ENABLE_BOUNDS_CHECKING)->getValue()){
       int additional_lat = 0; 
-      if ((uop->m_bounds_check_status) == NOT_CHECKED)
-      {
+      bool need_to_check_bounds = true; 
+
+     if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE) == 1){ 
+        if (uop->m_bounds_signed) need_to_check_bounds = true; 
+        else need_to_check_bounds = false;
+      } else {
+        need_to_check_bounds = true;
+      } 
+
+      if (((uop->m_bounds_check_status)== NOT_CHECKED) && need_to_check_bounds)  { 
+
         STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);
      
         bool success = m_mbc->bounds_checking(uop);
@@ -592,6 +601,9 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         else if (uop->m_bounds_check_status == BOUNDS_TABLE_INSERT) {
            STAT_CORE_EVENT(uop->m_core_id, BOUNDS_L1_CACHE_MISS);
             additional_lat += KNOB(KNOB_BOUNDS_L1_CACHE_MISS_LAT)->getValue();
+        } else if (uop->m_bounds_check_status == BOUNDS_TYPE_1) {
+          STAT_CORE_EVENT(uop->m_core_id, BOUNDS_TYPE_1); 
+          // no additional latency 
         }
         else {
           ASSERT(1);
@@ -600,10 +612,10 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         DEBUG_CORE(
          m_core_id,
         "m_core_id:%d thread_id:%d vaddr:0x%llx uop_num:%llu inst_num:%llu "
-        "bounds checking status = %d additional_latency: %d latency:%d done_cycle:%llu\n",
+        "bounds checking status = %d additional_latency: %d latency:%d done_cycle:%llu mem_type:%d m_signed:%d \n",
         m_core_id, uop->m_thread_id, uop->m_vaddr, uop->m_uop_num,
         uop->m_inst_num, uop->m_bounds_check_status, additional_lat, uop_latency,
-        uop->m_done_cycle);
+        uop->m_done_cycle, uop->m_mem_type, uop->m_bounds_signed);
       }
     } 
 
