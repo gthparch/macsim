@@ -271,6 +271,7 @@ typedef struct trace_uop_s {
   uint64_t m_hmc_trans_id;
 
   bool m_bounds_signed; /**< bounds checking singed  */
+  int m_bounds_id; /**< bounds buffer id */ 
 } trace_uop_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

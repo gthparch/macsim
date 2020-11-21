@@ -88,7 +88,7 @@ mbc_c::mbc_c(int core_id, macsim_c *simBase)
 }
 
 
-void mbc_c::bounds_info_read(string file_name_base,  set <int> &m_bounds_info)
+void mbc_c::bounds_info_read(string file_name_base,  unordered_map <int, int> &m_bounds_info)
 {
 
   ifstream bounds_info_file;
@@ -113,12 +113,19 @@ void mbc_c::bounds_info_read(string file_name_base,  set <int> &m_bounds_info)
       continue;
     }
     int reg_id; 
+    int region_id; 
+    int ec_region_id; 
     string name;
     std::stringstream ss(line);
     ss >> reg_id;
-    std::cout << "reg_id:" << reg_id << endl; 
-
+    ss >> region_id; 
+    ec_region_id = region_id * 16 + 1000; 
+    std::cout << "reg_id:" << reg_id << " region_id : " << region_id <<  " ec_region_id: " << ec_region_id << endl; 
+    /*
     m_bounds_info.insert(reg_id);
+    
+    */
+    m_bounds_info[reg_id] = ec_region_id; 
     linenum++;
   }
   bounds_info_file.close();
@@ -129,12 +136,13 @@ mbc_c::~mbc_c() {
 
 }
 
-bool mbc_c::bounds_info_check_signed(int src1_id, set <int> &m_bounds_info){ 
+bool mbc_c::bounds_info_check_signed(int src1_id, unordered_map<int, int>  &m_bounds_info, int &region_id){ 
 
 //  bool mbc_c::bounds_info_check_signed( set <int> &m_bounds_info){ 
 //    int src1_id = 1; 
     /* check whether uop sources the destination or */ 
     if(m_bounds_info.find(src1_id) != m_bounds_info.end()){
+      region_id = m_bounds_info[src1_id]; 
       return true;
     }
     else return false; 
@@ -149,14 +157,19 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
     cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
     return true; 
   }
-  bool l0_cache_hit = false; 
+  bool l0_cache_hit = false;  
   bool l1_cache_hit = false; 
  // int appl_id =  m_simBase->m_core_pointers[cur_uop->m_core_id]->get_appl_id(cur_uop->m_thread_id);
   int appl_id = 0;
   dcache_data_s* line = NULL; 
-  Addr region_id = cur_uop->m_pc;  // weill be replaced with reading a separate file 
+  Addr region_id;  
   Addr line_addr;
   Addr victim_line_addr; 
+  bool bounds_insert_hw = false; 
+
+  if (cur_uop->m_bounds_id) region_id = cur_uop->m_bounds_id; 
+  else region_id = cur_uop->m_pc;  // when bounds id files are not available, we will just use pc 
+
   cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
 
 
@@ -186,10 +199,12 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
     l1_cache_hit = bounds_insert(cur_uop->m_core_id, region_id, 1, 1000);
     line = (dcache_data_s*)m_l0_cache->insert_cache(region_id, &line_addr, &victim_line_addr, appl_id, false);
     line->m_fetch_cycle = m_simBase->m_core_cycle[cur_uop->m_core_id];
+    bounds_insert_hw = true; 
   }
 
   cur_uop->m_bounds_check_status = (l0_cache_hit ? BOUNDS_L0_HIT : (l1_cache_hit ? BOUNDS_L1_HIT: BOUNDS_TABLE_INSERT)); 
-  
+  DEBUG_CORE(cur_uop->m_core_id, "pc:%lld region_id:%lld  bounds_id:%d l0_cache_hit:%d bounds_hw_insert:%d \n", 
+         cur_uop->m_pc, region_id, cur_uop->m_bounds_id, l0_cache_hit, bounds_insert_hw);
   return l0_cache_hit; 
 
   // return true; 

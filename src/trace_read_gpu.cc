@@ -295,6 +295,7 @@ void ptx_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
   trace_info_gpu_s *pi = static_cast<trace_info_gpu_s *>(trace_info);
   trace_uop->m_va = 0;
   trace_uop->m_bounds_signed = 0; 
+  trace_uop->m_bounds_id = 0; 
 
   trace_uop->m_active_mask = pi->m_active_mask;
   if (info->m_table_info->m_cf_type) {
@@ -332,6 +333,7 @@ void ptx_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     }
     trace_uop->m_bounds_signed = info->m_table_info->m_bounds_signed; 
+    trace_uop->m_bounds_id = info->m_table_info->m_bounds_id; 
   }
 
   // next pc
@@ -400,10 +402,21 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
   
-        info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info); 
+        int region_id;
+        if (mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, region_id)) {
+            info->m_table_info->m_bounds_signed = true;
+            info->m_table_info->m_bounds_id = region_id; 
+        } else {
+          info->m_table_info->m_bounds_signed = false; 
+          info->m_table_info->m_bounds_id = 0; 
+        }
+        //info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, &region_id); 
        // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
       }
-      else info->m_table_info->m_bounds_signed = false; 
+      else {
+          info->m_table_info->m_bounds_signed = false; 
+          info->m_table_info->m_bounds_id = 0; 
+      }
 
 
       
@@ -460,6 +473,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       trace_uop[0]->m_alu_uop = false;
       trace_uop[0]->m_inst_size = pi->m_size;
       trace_uop[0]->m_bounds_signed =    info->m_table_info->m_bounds_signed; 
+      trace_uop[0]->m_bounds_id = info->m_table_info->m_bounds_id; 
 
       // m_has_immediate is meaningless for GPU traces
       trace_uop[0]->m_mul_mem_uops = 0;
@@ -496,6 +510,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_eom = 0;
       cur_trace_uop->m_alu_uop = true;
       cur_trace_uop->m_bounds_signed = 0; 
+      cur_trace_uop->m_bounds_id = 0; 
       inst_has_ALU_uop = true;
     }
 
@@ -528,11 +543,21 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       }
 
       if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
-  
-       info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info); 
-       // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
+          int region_id; 
+          if (mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, region_id)) {
+            info->m_table_info->m_bounds_signed = true;
+            info->m_table_info->m_bounds_id = region_id; 
+          }
+          else { 
+            info->m_table_info->m_bounds_signed = false; 
+              info->m_table_info->m_bounds_id = 0; 
+            }  
+          // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
+          }
+      else {
+          info->m_table_info->m_bounds_signed = false; 
+          info->m_table_info->m_bounds_id = 0; 
       }
-      else info->m_table_info->m_bounds_signed = false; 
 
       cur_trace_uop->m_opcode = pi->m_opcode;
       cur_trace_uop->m_cf_type = NOT_CF;
@@ -546,6 +571,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_inst_size = pi->m_size;
       cur_trace_uop->m_mul_mem_uops = 0;
       cur_trace_uop->m_bounds_signed = info->m_table_info->m_bounds_signed; 
+      cur_trace_uop->m_bounds_id = info->m_table_info->m_bounds_id; 
     }
 
     ///
@@ -568,6 +594,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_alu_uop = false;
       cur_trace_uop->m_inst_size = pi->m_size;
       cur_trace_uop->m_bounds_signed = false; 
+      cur_trace_uop->m_bounds_id = 0; 
     }
 
     ASSERTM((pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED) &&
@@ -591,6 +618,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       trace_uop[0]->m_eom = 1;
       trace_uop[0]->m_inst_size = pi->m_size;
       trace_uop[0]->m_bounds_signed = false;
+      trace_uop[0]->m_bounds_id = 0; 
       ++num_uop;
     }
 
@@ -740,6 +768,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         // calculation, some accesses may be coalesced, some may be uncoalesced
         trace_uop[ii]->m_mul_mem_uops = 0;
         trace_uop[ii]->m_bounds_signed = info->m_table_info->m_bounds_signed; 
+        trace_uop[ii]->m_bounds_id = info->m_table_info->m_bounds_id; 
       }
     }
 
@@ -961,6 +990,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   uop->m_npc = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
   uop->m_bounds_signed = trace_uop->m_bounds_signed; 
+  uop->m_bounds_id = trace_uop->m_bounds_id; 
 
   if (uop->m_cf_type) {
     uop->m_taken_mask = trace_uop->m_taken_mask;
@@ -1280,6 +1310,7 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
         child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
         child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
         child_mem_uop->m_bounds_signed = uop->m_bounds_signed; 
+        child_mem_uop->m_bounds_id = uop->m_bounds_id; 
         uop->m_child_uops[count++] = child_mem_uop;
 
         ++itr;
@@ -1289,15 +1320,15 @@ bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
 
   DEBUG_CORE(
     uop->m_core_id,
-    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mem_type:%d src1:%u  num_child:%d \n",
-    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_pc, uop->m_opcode, uop->m_bounds_signed, uop->m_mem_type, uop->m_src_info[0], uop->m_num_child_uops); 
+    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mbb_id:%d mem_type:%d src1:%u  num_child:%d \n",
+    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_pc, uop->m_opcode, uop->m_bounds_signed, uop->m_bounds_id, uop->m_mem_type, uop->m_src_info[0], uop->m_num_child_uops); 
   if (uop->m_num_child_uops>0) { 
     for (int ii = 0; ii < uop->m_num_child_uops; ii++){
       uop_c *c_uop = uop->m_child_uops[ii];
         DEBUG_CORE(
       uop->m_core_id,
-      "new child uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mem_type:%d src1:%u  num_child:%d \n",
-      c_uop->m_uop_num, c_uop->m_inst_num, c_uop->m_thread_id, c_uop->m_unique_num, c_uop->m_pc, c_uop->m_opcode, c_uop->m_bounds_signed, c_uop->m_mem_type, c_uop->m_src_info[0], c_uop->m_num_child_uops); 
+      "new child uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mbb_id:%d mem_type:%d src1:%u  num_child:%d \n",
+      c_uop->m_uop_num, c_uop->m_inst_num, c_uop->m_thread_id, c_uop->m_unique_num, c_uop->m_pc, c_uop->m_opcode, c_uop->m_bounds_signed, c_uop->m_bounds_id, c_uop->m_mem_type, c_uop->m_src_info[0], c_uop->m_num_child_uops); 
       }
 
   }

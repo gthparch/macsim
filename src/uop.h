@@ -697,6 +697,7 @@ public:
   bool m_translated; /**< VA to PA translation status */ 
   Bounds_Check_Type m_bounds_check_status;  /**< bounds check status */ 
   bool m_bounds_signed; /**< bounds signed */ 
+  int m_bounds_id; /*<< bounds buffer id */ 
   int m_num_page_table_walks; /**< Number of page table walks */ 
 
   // hmc info
@@ -705,6 +706,7 @@ public:
   uint64_t m_hmc_trans_id;
   bool m_dep_on_hmc_inst;
 
+  
   
 
 private:

@@ -72,8 +72,10 @@ void finalize();
 bool bounds_checking(uop_c *cur_uop);
 bool bounds_insert(int core_id, Addr id, Addr min_addr, Addr max_addr); 
 // static void bounds_info_read(string file_name_base);
-static void bounds_info_read(string file_name_base, set<int> &m_bounds_info);
-static bool bounds_info_check_signed(int src1, set <int> &m_bounds_info); 
+// static void bounds_info_read(string file_name_base, set<int> &m_bounds_info);
+static void bounds_info_read(string file_name_base, unordered_map<int,int> &m_bounds_info);
+// static bool bounds_info_check_signed(int src1, set <int> &m_bounds_info); 
+static bool bounds_info_check_signed(int src1, unordered_map <int, int> &m_bounds_info, int &reg_id); 
 // need to have one for igpu as well 
 
 private: 

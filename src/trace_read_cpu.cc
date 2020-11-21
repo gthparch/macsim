@@ -1120,6 +1120,7 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   uop->m_npc = trace_uop->m_npc;
   uop->m_active_mask = trace_uop->m_active_mask;
   uop->m_bounds_signed = false; 
+  uop->m_bounds_id = 0; 
   // pass over hmc inst info
   uop->m_hmc_inst = trace_uop->m_hmc_inst;
   if (uop->m_hmc_inst != HMC_NONE) {
