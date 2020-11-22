@@ -223,7 +223,20 @@ void frontend_c::run_a_cycle(void) {
       }
       break;
     }
-
+/*
+    if (m_igpu_sim) { 
+      // HYESOON 
+       DEBUG_CORE(m_core_id, "core_id:%d thread_id:%d fetched_inst:%lld try to stop fetching\n", 
+       m_core_id, fetch_thread, m_core->m_inst_fetched[fetch_thread]);
+       
+      // let's check max insts here and terminate to fetch instructions 
+      if (m_core->m_inst_fetched[fetch_thread] > *KNOB(KNOB_MAX_INSTS)){
+        printf("core_id:%d thread_id:%d fetched_inst:%lld will stop fetching", m_core_id, fetch_thread, m_core->m_inst_fetched[fetch_thread]);
+        
+        break; 
+      }
+    }
+*/
     // in case of double fetch, stop fetching if second thread is not available
     if (prev_fetched_tid == fetch_thread) {
       // DEBUG_CORE(m_core_id, "same thread id m_core_id:%d tid:%d prev_tid:%d\n",
@@ -758,9 +771,9 @@ inline void frontend_c::send_uop_to_qfe(uop_c *uop) {
   POWER_CORE_EVENT(m_core_id, POWER_FETCH_QUEUE_W);
   DEBUG_CORE(m_core_id,
              "m_core_id:%d tid:%d inst_num:%llu uop_num:%llu opcode:%d "
-             "isitEOM:%d sent to qfe \n",
+             "isitBOM:%d isitEOM:%d sent to qfe \n",
              m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num,
-             (int)uop->m_opcode, uop->m_isitEOM);
+             (int)uop->m_opcode, uop->m_isitBOM, uop->m_isitEOM);
 
   ASSERT(success);
 }

@@ -111,6 +111,12 @@ void schedule_igpu_c::advance(int q_index) {
     gpu_allocq_entry_s allocq_entry = m_gpu_allocq[q_index]->peek(0);
 
     int tid = allocq_entry.m_thread_id;
+/*
+    if (m_simBase->m_core_pointers[m_core_id]->m_thread_finished[tid]) {
+      m_gpu_allocq[q_index]->dequeue();
+      continue;  // PLEASE DOUBLE CHECK: Hyesoon Nov-21-2020 
+    }
+*/
     rob_c* m_rob = m_gpu_rob->get_thread_rob(tid);
     uop_c* cur_uop = (uop_c*)(*m_rob)[allocq_entry.m_rob_entry];
 
@@ -386,7 +392,7 @@ void schedule_igpu_c::run_a_cycle(void) {
         if (m_processed_threads.find(thread_id) != m_processed_threads.end())
           continue;
 
-        if (m_simBase->m_core_pointers[m_core_id]->m_thread_reach_end[thread_id]) continue;  // PLEASE DOUBLE CHECK: Hyesoon Nov-21-2020 
+        // if (m_simBase->m_core_pointers[m_core_id]->m_thread_finished[thread_id]) continue;  // PLEASE DOUBLE CHECK: Hyesoon Nov-21-2020 
 
         m_processed_threads[thread_id] = 1;
 

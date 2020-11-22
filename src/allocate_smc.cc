@@ -110,7 +110,13 @@ void smc_allocate_c::run_a_cycle(void) {
                "core_id:%d thread_id:%d inst_num:%llu uop_num:%llu is peeked\n",
                m_core_id, uop->m_thread_id, uop->m_inst_num, uop->m_uop_num);
     ASSERT(uop);
-
+/*
+    if (m_simBase->m_core_pointers[m_core_id]->m_thread_finished[uop->m_thread_id]) {
+      printf("core_id:%d thread_id:%d uop_num;%d is drained from the queue",m_core_id, uop->m_thread_id, uop->m_uop->num )
+      m_frontend_q->dequeue();
+    
+      continue;  // PLEASE DOUBLE CHECK: Hyesoon Nov-21-2020 
+    } */
     // check resource requirement
     int req_rob = 1;  // required rob entries
     int req_sb = 0;  // required store buffer entries

@@ -262,7 +262,8 @@ void retire_c::run_a_cycle() {
     // nagesh - ISTR that I tried changing and something failed - not 100%
     // sure though : (jaekyu) I think this is the matter of the design. we can update
     // everything from the first uop of an instruction.
-    if (cur_uop->m_isitBOM) {
+   // if (cur_uop->m_isitBOM) { // HYESOON: this is causing a problem of fail in iGPU due to accessing rob when the second uop is trying to access after a thread is terminated 
+     if (cur_uop->m_isitEOM) { 
       if (cur_uop->m_uop_type >= UOP_FCF && cur_uop->m_uop_type <= UOP_FCMOV) {
         STAT_EVENT(FP_OPS_TOT);
         STAT_CORE_EVENT(cur_uop->m_core_id, FP_OPS);

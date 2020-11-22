@@ -113,7 +113,7 @@ rob_c* smc_rob_c::get_thread_rob(int thread_id) {
   }
   // find a new one
   else {
-    ASSERTM(0, "core_id:%d thread_id:%d\n", m_core_id, thread_id); // Hyesoon !! can't understand this // Nov-18-2020  why does it generate assert! 
+    ASSERTM(0, "core_id:%d thread_id:%d terminated:%d \n", m_core_id, thread_id, m_simBase->m_core_pointers[m_core_id]->m_thread_finished[thread_id]) ; // Hyesoon !! can't understand this // Nov-18-2020  why does it generate assert! 
     itr = m_thread_to_rob_map.begin();
     int count = 0;
     while (itr != end) {
