@@ -386,6 +386,8 @@ void schedule_igpu_c::run_a_cycle(void) {
         if (m_processed_threads.find(thread_id) != m_processed_threads.end())
           continue;
 
+        if (m_simBase->m_core_pointers[m_core_id]->m_thread_reach_end[thread_id]) continue;  // PLEASE DOUBLE CHECK: Hyesoon Nov-21-2020 
+
         m_processed_threads[thread_id] = 1;
 
         // schedule a uop from a thread
