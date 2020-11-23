@@ -571,13 +571,21 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
         uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency,
         uop->m_done_cycle);
     }
-    
     if (KNOB(KNOB_ENABLE_BOUNDS_CHECKING)->getValue()){
       int additional_lat = 0; 
       bool need_to_check_bounds = true; 
 
      if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE) == 1){ 
-        if (uop->m_bounds_signed) need_to_check_bounds = true; 
+        if (uop->m_bounds_signed) {
+          int pointer_type = (uop->m_bounds_id)%16;
+          if (*KNOB(KNOB_ENABLE_BOUNDS_STATIC_FILTER) && pointer_type == 1){ 
+              need_to_check_bounds = false;
+              STAT_CORE_EVENT(m_core_id, BOUNDS_CHECK_SKIP_STATIC); 
+          }
+          else  need_to_check_bounds = true; 
+        }
+
+
         else need_to_check_bounds = false;
       } else {
         need_to_check_bounds = true;

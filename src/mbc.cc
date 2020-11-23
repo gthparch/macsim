@@ -112,20 +112,23 @@ void mbc_c::bounds_info_read(string file_name_base,  unordered_map <int, int> &m
       linenum++;
       continue;
     }
+    int load_store_type; 
     int reg_id; 
     int region_id; 
     int ec_region_id; 
+    int pointer_type; 
     string name;
     std::stringstream ss(line);
+    ss >> load_store_type; 
     ss >> reg_id;
     ss >> region_id; 
-    ec_region_id = region_id * 16 + 1000; 
-    std::cout << "reg_id:" << reg_id << " region_id : " << region_id <<  " ec_region_id: " << ec_region_id << endl; 
-    /*
-    m_bounds_info.insert(reg_id);
+    ss >> pointer_type; 
     
-    */
+    ec_region_id = region_id * 16 + pointer_type; 
+    std::cout << "reg_id:" << reg_id << " region_id : " << region_id <<  " ec_region_id: " << ec_region_id;
+    std::cout << "load/store:" << load_store_type << "pointer_type: " << pointer_type << endl; 
     m_bounds_info[reg_id] = ec_region_id; 
+    
     linenum++;
   }
   bounds_info_file.close();
@@ -170,6 +173,9 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   if (cur_uop->m_bounds_id) region_id = cur_uop->m_bounds_id; 
   else region_id = cur_uop->m_pc;  // when bounds id files are not available, we will just use pc 
 
+  int pointer_type = (cur_uop->m_bounds_id)%16; 
+
+  STAT_CORE_EVENT(cur_uop->m_core_id, DYN_BOUNDS_POINTER_TYPE__0 + MIN2(pointer_type, 3));
   cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
 
 
@@ -233,6 +239,9 @@ else {
 
   m_rbt.insert(std::make_pair <Addr, bounds_info_s> (id, bounds_info)); 
   */
+  int pointer_type = (id)%16; 
+
+  STAT_CORE_EVENT(core_id, DYN_BOUNDS_POINTER_TYPE__0 + MIN2(pointer_type, 3));
   m_rbt[id]= id; 
 
   STAT_CORE_EVENT(core_id, BOUNDS_INFO_INSERT);
