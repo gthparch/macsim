@@ -350,6 +350,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
   ifstream trace_config_file;
   trace_config_file.open(appl.c_str(), ifstream::in);
 
+
   // open trace configuration file
   if (trace_config_file.fail()) {
     STAT_EVENT(FILE_OPEN_ERROR);
@@ -478,7 +479,8 @@ void process_manager_c::setup_process(process_s *process) {
                                    process->m_lock_info);
                                    
   if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE))
-   mbc_c::bounds_info_read(process->m_current_file_name_base, process->m_bounds_info);
+   // mbc_c::bounds_info_read(process->m_current_file_name_base, process->m_bounds_info);
+   mbc_c::bounds_info_read(process->m_kernel_config_name, process->m_bounds_info);
 
     // mbc_c::bounds_info_read(process->m_current_file_name_base);
 

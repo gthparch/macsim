@@ -148,8 +148,23 @@ bool mbc_c::bounds_info_check_signed(int src1_id, unordered_map<int, int>  &m_bo
       region_id = m_bounds_info[src1_id]; 
       return true;
     }
-    else return false; 
-    if(m_bounds_info.empty()) return true; // if there is no bounds info, thne all memory instructions are signed 
+   /* else if (*KNOB(KNOB_ENABLE_BOUNDS_PROB_FILTER)) { 
+       double x = rand()/static_cast<double>(RAND_MAX+1); 
+      if (x*10 > *KNOB(KNOB_BOUNDS_PROB_TH)){
+        region_id = src1_id*16+2;
+        return true; 
+      } else {
+        region_id = src1_id*16+1; 
+        return true; 
+      }
+    } */
+      else 
+        return false; 
+
+    if(m_bounds_info.empty()) {
+      region_id = src1_id * 16 + 2; 
+      return true; // if there is no bounds info, then all memory instructions are signed 
+    }
 }
 
 bool mbc_c::bounds_checking(uop_c *cur_uop)
