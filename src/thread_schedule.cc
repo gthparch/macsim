@@ -47,7 +47,7 @@ thread_schedule_c::thread_schedule_c(macsim_c *simBase, int core_id) : m_simBase
 /** constructor
  * @param tid thread id 
  */
-thread_schedule_c::thread_data_s::scheduled_thread_data_struct(int tid = -1) : tid(tid), stalled(false) {}
+thread_schedule_c::thread_data_s::scheduled_thread_data_s(int tid = -1) : tid(tid), stalled(false) {}
 
 /** overload insertion stream operator to print out tid and stall state in the following format:
  *  [tid,stalled]
@@ -55,7 +55,7 @@ thread_schedule_c::thread_data_s::scheduled_thread_data_struct(int tid = -1) : t
  * @param RHS thread_data_s reference containing tid
  * @return os reference
  */
-ostream& operator<<(ostream& os, const thread_schedule_c::scheduled_thread_data_struct& RHS){
+ostream& operator<<(ostream& os, const thread_schedule_c::scheduled_thread_data_s& RHS){
     os << '[' << RHS.tid << ',' << RHS.stalled << ']';
     return os;
 }
@@ -64,6 +64,6 @@ ostream& operator<<(ostream& os, const thread_schedule_c::scheduled_thread_data_
  * @param RHS thread_data_s being compared to this one
  * @return true if thread ids match
  */
-bool thread_schedule_c::thread_data_s::operator==(const thread_schedule_c::scheduled_thread_data_struct& RHS){
+bool thread_schedule_c::thread_data_s::operator==(const thread_schedule_c::scheduled_thread_data_s& RHS){
     return this->tid == RHS.tid;
 }

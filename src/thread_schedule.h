@@ -48,11 +48,11 @@ class thread_schedule_c {
          * @param tid thread id
          * @param stalled bool indicating whether this thread is stalled
          */
-        typedef struct scheduled_thread_data_struct {
+        typedef struct scheduled_thread_data_s {
             /** constructor
              * @param tid thread id 
              */
-            scheduled_thread_data_struct(int tid);
+            scheduled_thread_data_s(int tid);
 
             /** overload insertion stream operator to print out tid and stall state in the following format:
              *  [tid,stalled]
@@ -60,13 +60,13 @@ class thread_schedule_c {
              * @param RHS thread_data_s reference containing tid
              * @return os reference
              */
-            friend ostream& operator<<(ostream& os, const scheduled_thread_data_struct& RHS);
+            friend ostream& operator<<(ostream& os, const scheduled_thread_data_s& RHS);
 
             /** overload comparison operator
              * @param RHS thread_data_s being compared to this one
              * @return true if thread ids match
              */
-            bool operator==(const scheduled_thread_data_struct& RHS);
+            bool operator==(const scheduled_thread_data_s& RHS);
 
             int tid;
             bool stalled;
