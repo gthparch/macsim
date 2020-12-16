@@ -47,9 +47,10 @@ POSSIBILITY OF SUCH DAMAGE.
 class thread_schedule_rr_c : public thread_schedule_c{
     public:
         /** constructor
-         * @param simBase pointer to global macsim data
+         * @param simBase pointer to the global macsim data
+         * @param core_id int id of core this scheduler is assigned to
          */
-        thread_schedule_rr_c(macsim_c* simBase);
+        thread_schedule_rr_c(macsim_c* simBase, int core_id);
 
         /** insert thread into scheduler via thread id
          * @param tid integer thread id
@@ -79,7 +80,6 @@ class thread_schedule_rr_c : public thread_schedule_c{
          */
         int last_fetch(void);
     private:
-        macsim_c* m_simBase; // pointer to global macsim data
         std::list<int> threads; // list containing all thread ids on this core
         int last;
 };

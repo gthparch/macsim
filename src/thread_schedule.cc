@@ -27,57 +27,17 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**********************************************************************************************
- * File         : thread_schedule.h
+ * File         : thread_schedule.cc
  * Author       : Michael Goldstein
  * Date         : 12/15/2020
  * SVN          : $Id: main.cc,v 911 2009-11-20 19:08:10Z kacear $:
  * Description  : abstract thread scheduler interface inserted into core_c
  *********************************************************************************************/
 
-#ifndef THREAD_SCHEDULE_H_INCLUDED
-#define THREAD_SCHEDULE_H_INCLUDED
+#include "thread_schedule.h"
 
-#include "global_types.h"
-#include "global_defs.h"
-
-class thread_schedule_c {
-    public:
-        /** abstract constructor for data present in all thread schedulers
-         * @param simBase pointer to the global macsim data
-         * @param core_id int id of core this scheduler is assigned to
-         */
-        thread_schedule_c(macsim_c *simBase, int core_id);
-
-        /** insert thread into scheduler via thread id
-         * @param tid integer thread id
-         */
-        virtual void insert(int tid) = 0;
-
-        /** remove thread from scheduler via thread id
-         * @param tid integer thread id
-         */
-        virtual void remove(int tid) = 0;
-
-        /** print contents of scheduler
-         */
-        virtual void print(void) = 0;
-
-        /** cycle to the next thread in the scheduler
-         */
-        virtual void cycle(void) = 0;
-
-        /** get thread id of the next thread 
-         * @return integer thread id on this core
-         */
-        virtual int fetch(void) = 0;
-
-        /** get thread id of last fetched thread
-         * @return integer thread id on this core
-         */
-        virtual int last_fetch(void) = 0;
-    protected:
-        macsim_c* m_simBase; // pointer to global macsim data
-        int m_core_id; // pointer to the core this scheduler is running on
-};
-
-#endif
+/** abstract constructor for data present in all thread schedulers
+ * @param simBase pointer to the global macsim data
+ * @param core_id int id of core this scheduler is assigned to
+ */
+thread_schedule_c::thread_schedule_c(macsim_c *simBase, int core_id) : m_simBase(simBase), m_core_id(core_id) {}

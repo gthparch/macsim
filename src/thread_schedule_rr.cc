@@ -39,9 +39,10 @@ POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 /** constructor
- * @param simBase pointer to global macsim data
+ * @param simBase pointer to the global macsim data
+ * @param core_id int id of core this scheduler is assigned to
  */
-thread_schedule_rr_c::thread_schedule_rr_c(macsim_c* simBase) : m_simBase(simBase), last(-1) {}
+thread_schedule_rr_c::thread_schedule_rr_c(macsim_c* simBase, int core_id) : thread_schedule_c(simBase, core_id), last(-1) {}
 
 /** insert thread into scheduler via thread id
  * @param tid integer thread id
@@ -60,7 +61,7 @@ void thread_schedule_rr_c::remove(int tid){
 /** print contents of scheduler
  */
 void thread_schedule_rr_c::print(void){
-    cout << "Round robin scheduler queue:" << endl;
+    cout << "Round robin scheduler queue on core " << this->m_core_id << ':' << endl;
     for(auto th: this->threads){
         cout << th << ' ';
     }

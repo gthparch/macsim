@@ -868,8 +868,10 @@ int frontend_c::read_thread_queue(){
   int front = thread_queue.front();
   thread_queue.pop_front();
   thread_queue.push_back(front);
-  cout << "thread " << front << " on core " << this->m_core_id << " pushed to back of the queue" << endl;
-  this->m_core->print_thread_queue();
+  this->m_core->m_thread_sched->cycle();
+  this->m_core->m_thread_sched->print();
+  //cout << "thread " << front << " on core " << this->m_core_id << " pushed to back of the queue" << endl;
+  //this->m_core->print_thread_queue();
   return front;
 }
 
@@ -889,7 +891,8 @@ int frontend_c::fetch_rr(void) {
 
     // update front of queue for next fetching
     if (likely(!m_last_fetch_tid_failed)) {
-      read_thread_queue();
+      this->m_core->m_thread_sched->cycle();
+      this->m_core->m_thread_sched->print();
     } else {
       m_last_fetch_tid_failed = false;
     }

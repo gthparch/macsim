@@ -225,6 +225,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   // frontend stage
   m_frontend = fetch_factory_c::get()->allocate_frontend(
     FRONTEND_INTERFACE_ARGS(), m_simBase);
+  m_thread_sched = new thread_schedule_rr_c(m_simBase, this->m_core_id);
 
   // allocation stage
   if (m_core_type == "ptx" || m_core_type == "igpu") {
@@ -311,6 +312,7 @@ core_c::~core_c() {
   delete m_q_frontend;
   delete m_frontend;
   delete m_uop_pool;
+  delete m_thread_sched;
   if (m_core_type == "ptx" || m_core_type == "igpu") {
     delete m_gpu_rob;
     delete m_gpu_allocate;
@@ -701,7 +703,9 @@ void core_c::deallocate_thread_data(int tid) {
   // remove thread from core's queue
   cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
   this->m_thread_queue.remove(tid);
-  print_thread_queue();
+  this->m_thread_sched->remove(tid);
+  this->m_thread_sched->print();
+  //print_thread_queue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -785,7 +789,9 @@ void core_c::create_trace_info(int tid, thread_s* thread) {
   // add thread to core's queue
   cout << "thread " << tid << " added to core " << this->m_core_id << endl;
   this->m_thread_queue.push_back(tid);
-  print_thread_queue();
+  this->m_thread_sched->insert(tid);
+  this->m_thread_sched->print();
+  //print_thread_queue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

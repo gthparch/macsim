@@ -45,6 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "macsim.h"
 #include "global_defs.h"
 #include "global_types.h"
+#include "thread_schedule_rr.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief per thread heartbeat data structure
@@ -363,6 +364,7 @@ public:
   int m_fetching_block_id; /**< currently fetching block id */
   int m_running_thread_num; /**< number of currently running threads */
   list<int> m_thread_queue;
+  thread_schedule_c* m_thread_sched;
 
   unordered_map<int, unordered_set<Counter>> m_per_thread_fault_parent_uops;
 
