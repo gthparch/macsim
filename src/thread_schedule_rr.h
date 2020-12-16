@@ -80,7 +80,7 @@ class thread_schedule_rr_c : public thread_schedule_c{
          */
         int last_fetch(void);
     private:
-        std::list<int> threads; // list containing all thread ids on this core
+        std::list<thread_data_s> threads; // list containing all thread ids on this core
         int last;
 };
 

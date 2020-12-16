@@ -36,8 +36,34 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "thread_schedule.h"
 
+using namespace std;
+
 /** abstract constructor for data present in all thread schedulers
  * @param simBase pointer to the global macsim data
  * @param core_id int id of core this scheduler is assigned to
  */
 thread_schedule_c::thread_schedule_c(macsim_c *simBase, int core_id) : m_simBase(simBase), m_core_id(core_id) {}
+
+/** constructor
+ * @param tid thread id 
+ */
+thread_schedule_c::thread_data_s::scheduled_thread_data_struct(int tid = -1) : tid(tid), stalled(false) {}
+
+/** overload insertion stream operator to print out tid and stall state in the following format:
+ *  [tid,stalled]
+ * @param os ostream reference
+ * @param RHS thread_data_s reference containing tid
+ * @return os reference
+ */
+ostream& operator<<(ostream& os, const thread_schedule_c::scheduled_thread_data_struct& RHS){
+    os << '[' << RHS.tid << ',' << RHS.stalled << ']';
+    return os;
+}
+
+/** overload comparison operator
+ * @param RHS thread_data_s being compared to this one
+ * @return true if thread ids match
+ */
+bool thread_schedule_c::thread_data_s::operator==(const thread_schedule_c::scheduled_thread_data_struct& RHS){
+    return this->tid == RHS.tid;
+}

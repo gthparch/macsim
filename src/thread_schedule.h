@@ -37,11 +37,41 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef THREAD_SCHEDULE_H_INCLUDED
 #define THREAD_SCHEDULE_H_INCLUDED
 
+#include <iostream>
+
 #include "global_types.h"
 #include "global_defs.h"
 
 class thread_schedule_c {
     public:
+        /** struct to hold the data for a thread that is being scheduled
+         * @param tid thread id
+         * @param stalled bool indicating whether this thread is stalled
+         */
+        typedef struct scheduled_thread_data_struct {
+            /** constructor
+             * @param tid thread id 
+             */
+            scheduled_thread_data_struct(int tid);
+
+            /** overload insertion stream operator to print out tid and stall state in the following format:
+             *  [tid,stalled]
+             * @param os ostream reference
+             * @param RHS thread_data_s reference containing tid
+             * @return os reference
+             */
+            friend ostream& operator<<(ostream& os, const scheduled_thread_data_struct& RHS);
+
+            /** overload comparison operator
+             * @param RHS thread_data_s being compared to this one
+             * @return true if thread ids match
+             */
+            bool operator==(const scheduled_thread_data_struct& RHS);
+
+            int tid;
+            bool stalled;
+        } thread_data_s;
+
         /** abstract constructor for data present in all thread schedulers
          * @param simBase pointer to the global macsim data
          * @param core_id int id of core this scheduler is assigned to

@@ -71,7 +71,7 @@ void thread_schedule_rr_c::print(void){
 /** cycle to the next thread in the scheduler
  */
 void thread_schedule_rr_c::cycle(void){
-    int first = this->threads.front();
+    thread_data_s first = this->threads.front();
     this->threads.pop_front();
     this->threads.push_back(first);
 }
@@ -80,7 +80,7 @@ void thread_schedule_rr_c::cycle(void){
  * @return integer thread id on this core
  */
 int thread_schedule_rr_c::fetch(void){
-    this->last = this->threads.front();
+    this->last = this->threads.front().tid;
     return this->last;
 }
 
