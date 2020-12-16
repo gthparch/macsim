@@ -363,7 +363,6 @@ public:
   int m_num_thread_reach_end; /**< number of total terminated threads */
   int m_fetching_block_id; /**< currently fetching block id */
   int m_running_thread_num; /**< number of currently running threads */
-  list<int> m_thread_queue;
   thread_schedule_c* m_thread_sched;
 
   unordered_map<int, unordered_set<Counter>> m_per_thread_fault_parent_uops;
@@ -381,7 +380,6 @@ public:
     m_ops_to_be_dispatched; /**< number of uops to be scheduled */
   unordered_map<int, Counter> m_last_fetch_cycle; /**< last fetched cycle */
   Counter m_max_inst_fetched; /**< maximum inst fetched */
-  void print_thread_queue(void);
 
 private:
   int m_core_id; /**< core id */

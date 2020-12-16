@@ -864,14 +864,9 @@ int frontend_c::fetch(void) {
 // every 4 cycles, controll will go to the next thread always
 
 int frontend_c::read_thread_queue(){
-  list<int> &thread_queue = this->m_core->m_thread_queue;
-  int front = thread_queue.front();
-  thread_queue.pop_front();
-  thread_queue.push_back(front);
+  int front = this->m_core->m_thread_sched->fetch();
   this->m_core->m_thread_sched->cycle();
   this->m_core->m_thread_sched->print();
-  //cout << "thread " << front << " on core " << this->m_core_id << " pushed to back of the queue" << endl;
-  //this->m_core->print_thread_queue();
   return front;
 }
 
@@ -896,6 +891,7 @@ int frontend_c::fetch_rr(void) {
     } else {
       m_last_fetch_tid_failed = false;
     }
+    
 
     // check if thread already terminated or fetch not ready
     if (m_core->m_fetch_ended[fetch_id] ||
