@@ -61,11 +61,15 @@ void thread_schedule_rr_c::remove(int tid){
 /** print contents of scheduler
  */
 void thread_schedule_rr_c::print(void){
-    cout << "Round robin scheduler queue on core " << this->m_core_id << ':' << endl;
-    for(auto th: this->threads){
-        cout << th << ' ';
+    if(this->threads.size()){
+        cout << "Round robin scheduler queue on core " << this->m_core_id << ':' << endl;
+        for(auto th: this->threads){
+            cout << th << ' ';
+        }
+        cout << endl;
+    } else {
+        cout << "Round robin scheduler queue on core " << this->m_core_id << " is empty." << endl;
     }
-    cout << endl;
 }
 
 /** cycle to the next thread in the scheduler
@@ -89,4 +93,26 @@ int thread_schedule_rr_c::fetch(void){
  */
 int thread_schedule_rr_c::last_fetch(void){
     return this->last;
+}
+
+/** mark a thread as stalled in the scheduler
+ * @param tid thread's id
+ */
+void thread_schedule_rr_c::stall(int tid){
+    for(auto& th : this->threads){
+        if(th.tid == tid){
+            th.stalled = true;
+        }
+    }
+}
+
+/** mark a thread as unstalled in the scheduler
+ * @param tid thread's id
+ */
+void thread_schedule_rr_c::unstall(int tid){
+    for(auto& th : this->threads){
+        if(th.tid == tid){
+            th.stalled = false;
+        }
+    }
 }

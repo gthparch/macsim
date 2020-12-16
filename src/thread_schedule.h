@@ -105,6 +105,16 @@ class thread_schedule_c {
          * @return integer thread id on this core
          */
         virtual int last_fetch(void) = 0;
+
+        /** mark a thread as stalled in the scheduler
+         * @param tid thread's id
+         */
+        virtual void stall(int tid) = 0;
+
+        /** mark a thread as unstalled in the scheduler
+         * @param tid thread's id
+         */
+        virtual void unstall(int tid) = 0;
     protected:
         macsim_c* m_simBase; // pointer to global macsim data
         int m_core_id; // pointer to the core this scheduler is running on

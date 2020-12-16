@@ -79,6 +79,16 @@ class thread_schedule_rr_c : public thread_schedule_c{
          * @return integer thread id on this core
          */
         int last_fetch(void);
+
+        /** mark a thread as stalled in the scheduler
+         * @param tid thread's id
+         */
+        void stall(int tid);
+
+        /** mark a thread as unstalled in the scheduler
+         * @param tid thread's id
+         */
+        void unstall(int tid);
     private:
         std::list<thread_data_s> threads; // list containing all thread ids on this core
         int last;
