@@ -39,6 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <list>
 #include <iostream>
+#include <utility>
 
 #include "global_types.h"
 #include "global_defs.h"
@@ -61,6 +62,12 @@ class thread_schedule_tlrr_c : public thread_schedule_c{
              * @param tid thread id to be inserted
              */
             void insert(int tid);
+
+            /** operator==
+             * @param RHS fetch group reference on the right side of the operator
+             * @return true is group number is equal
+             */
+            bool operator==(const fetch_group_s& RHS);
 
             std::list<thread_data_s> threads;
             int size;
@@ -112,11 +119,16 @@ class thread_schedule_tlrr_c : public thread_schedule_c{
          */
         void unstall(int tid);
     private:
+        /** cycle the fetch groups internally 
+         */
+        inline void cycle_internal(void);
+
         std::list<thread_data_s> base_group; // list containing thread ids on this core when count < 16
         std::list<fetch_group_s> groups; // list containing fetch groups when count >= 16
         int last;
         int num_threads;
         bool grouped;
+        int group_fetches;
 };
 
 #endif
