@@ -102,6 +102,7 @@ void thread_schedule_rr_c::stall(int tid){
     for(auto& th : this->threads){
         if(th.tid == tid){
             th.stalled = true;
+            break;
         }
     }
 }
@@ -113,6 +114,7 @@ void thread_schedule_rr_c::unstall(int tid){
     for(auto& th : this->threads){
         if(th.tid == tid){
             th.stalled = false;
+            break;
         }
     }
 }

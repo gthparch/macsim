@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_defs.h"
 #include "global_types.h"
 #include "thread_schedule_rr.h"
+#include "thread_schedule_tlrr.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief per thread heartbeat data structure

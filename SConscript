@@ -265,6 +265,7 @@ macsim_src = [
   'src/sw_managed_cache.cc',
   'src/thread_schedule.cc',
   'src/thread_schedule_rr.cc',
+  'src/thread_schedule_tlrr.cc',
   'src/trace_read.cc',  
   'src/uop.cc',
   'src/utils.cc',
