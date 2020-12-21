@@ -694,9 +694,9 @@ void core_c::deallocate_thread_data(int tid) {
   }
 
   // remove thread from core's queue
-  cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
+  //cout << "thread " << tid << " removed from core " << this->m_core_id << endl;
   this->m_thread_sched->remove(tid);
-  this->m_thread_sched->print();
+  //this->m_thread_sched->print();
   //print_thread_queue();
 }
 
@@ -779,9 +779,9 @@ void core_c::create_trace_info(int tid, thread_s* thread) {
   m_last_forward_progress = m_core_cycle_count;
 
   // add thread to core's queue
-  cout << "thread " << tid << " added to core " << this->m_core_id << endl;
+  //cout << "thread " << tid << " added to core " << this->m_core_id << endl;
   this->m_thread_sched->insert(tid);
-  this->m_thread_sched->print();
+  //this->m_thread_sched->print();
   //print_thread_queue();
 }
 

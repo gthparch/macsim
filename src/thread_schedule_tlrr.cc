@@ -206,9 +206,11 @@ void thread_schedule_tlrr_c::cycle(void){
         }
     } else {
         // look in base_group
-        thread_data_s first_thread = this->base_group.front();
-        this->base_group.pop_front();
-        this->base_group.push_back(first_thread);
+        if(base_group.size() > 0){
+            thread_data_s first_thread = this->base_group.front();
+            this->base_group.pop_front();
+            this->base_group.push_back(first_thread);
+        }
     }
 }
 
@@ -230,13 +232,19 @@ int thread_schedule_tlrr_c::fetch(void){
         // look in groups
         this->last = this->groups.front().threads.front().tid;
         // increment group fetches and check if it has been long enough without a pause to cycle
+        /*
         if(++this->group_fetches == 1024){
             this->cycle_internal();
             this->group_fetches = 0;
         }
+        */
     } else {
         // look in base_group
-        this->last = this->base_group.front().tid;
+        if(this->base_group.size() > 0){
+            this->last = this->base_group.front().tid;
+        } else {
+            return -1;
+        }
     }
     return this->last;
 }

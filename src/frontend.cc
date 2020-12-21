@@ -866,7 +866,7 @@ int frontend_c::fetch(void) {
 int frontend_c::read_thread_queue(){
   int front = this->m_core->m_thread_sched->fetch();
   this->m_core->m_thread_sched->cycle();
-  this->m_core->m_thread_sched->print();
+  //this->m_core->m_thread_sched->print();
   return front;
 }
 
@@ -887,7 +887,7 @@ int frontend_c::fetch_rr(void) {
     // update front of queue for next fetching
     if (likely(!m_last_fetch_tid_failed)) {
       this->m_core->m_thread_sched->cycle();
-      this->m_core->m_thread_sched->print();
+      //this->m_core->m_thread_sched->print();
     } else {
       m_last_fetch_tid_failed = false;
     }
