@@ -225,8 +225,12 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   // frontend stage
   m_frontend = fetch_factory_c::get()->allocate_frontend(
     FRONTEND_INTERFACE_ARGS(), m_simBase);
-  //m_thread_sched = new thread_schedule_rr_c(m_simBase, this->m_core_id);
-  m_thread_sched = new thread_schedule_tlrr_c(m_simBase, this->m_core_id);
+  string th_sched_alg = *KNOB(KNOB_THREAD_SCHED_ALG);
+  if(th_sched_alg == "tlrr"){
+    m_thread_sched = new thread_schedule_tlrr_c(m_simBase, this->m_core_id);
+  } else {
+    m_thread_sched = new thread_schedule_rr_c(m_simBase, this->m_core_id);
+  }
 
   // allocation stage
   if (m_core_type == "ptx" || m_core_type == "igpu") {

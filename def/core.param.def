@@ -196,3 +196,5 @@ param<QSIM_BENCH, qsim_bench, string, "">
 param<CORE_THREAD_SCHED, core_thread_sched, string, greedy>
 
 param<UOP_LATENCY_MAP, uop_latency_map, string, x86>
+
+param<THREAD_SCHED_ALG, thread_sched_alg, string, rr>
