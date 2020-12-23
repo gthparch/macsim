@@ -197,8 +197,7 @@ void thread_schedule_tlrr_c::cycle(void){
         // look in groups
         fetch_group_s first_group = this->groups.front();
         if(first_group.stalled){
-            this->groups.pop_front();
-            this->groups.push_back(first_group);
+            this->cycle_internal();
         } else {
             thread_data_s first_thread = first_group.threads.front();
             first_group.threads.pop_front();
@@ -221,6 +220,7 @@ inline void thread_schedule_tlrr_c::cycle_internal(void){
     fetch_group_s first_group = this->groups.front();
     this->groups.pop_front();
     this->groups.push_back(first_group);
+    this->group_fetches = 0;
 }
 
 /** get thread id of the next thread 
@@ -232,12 +232,9 @@ int thread_schedule_tlrr_c::fetch(void){
         // look in groups
         this->last = this->groups.front().threads.front().tid;
         // increment group fetches and check if it has been long enough without a pause to cycle
-        /*
         if(++this->group_fetches == 1024){
             this->cycle_internal();
-            this->group_fetches = 0;
         }
-        */
     } else {
         // look in base_group
         if(this->base_group.size() > 0){

@@ -881,8 +881,11 @@ int frontend_c::fetch_rr(void) {
   int max_try = m_unique_scheduled_thread_num - m_last_terminated_tid;
 
   while (m_fetching_thread_num && try_again && try_again <= max_try) {
-    // find next thread id to fetch
-    fetch_id = read_thread_queue();
+    // find next thread id to fetch; if nothing available try again
+    if((fetch_id = read_thread_queue()) == -1){
+      ++try_again;
+      continue;
+    }
 
     // update front of queue for next fetching
     if (likely(!m_last_fetch_tid_failed)) {
