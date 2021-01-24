@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 
 #########################################################################################
 # Author      : Jaekyu Lee (jq.lee17@gmail.com)
