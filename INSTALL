@@ -2,10 +2,10 @@
 
 === Requirement ===
 
-  SCons
+  SCons and dependencies
 
   * How to get SCons
-    Ubuntu --> apt-get install scons
+    Ubuntu --> apt-get install scons python-metaconfig
 
 
 === Build steps ===
