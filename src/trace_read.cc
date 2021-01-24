@@ -697,11 +697,11 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
 }
 
 trace_reader_wrapper_c::trace_reader_wrapper_c() {
-  m_dprint_output->close();
-  delete m_dprint_output;
 }
 
 trace_reader_wrapper_c::~trace_reader_wrapper_c() {
+  m_dprint_output->close();
+  delete m_dprint_output;
   delete m_cpu_decoder;
   delete m_gpu_decoder;
 }
