@@ -59,6 +59,8 @@ class bounds_info_s
         Addr max_addr; 
 };
 
+
+
 class mbc_c // Bounds Checking Unit 
 {
 

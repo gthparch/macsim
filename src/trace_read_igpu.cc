@@ -14,7 +14,7 @@
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) {   \
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_TRACE_READ, ##args); \
   }
-#define READ_1st_GEN_IGPU_TRACES // this should be moved to make file 
+// #define READ_1st_GEN_IGPU_TRACES // this should be moved to make file 
 #ifdef READ_1st_GEN_IGPU_TRACES 
 
 void igpu_decoder_c::init_pin_convert()

@@ -124,7 +124,7 @@ void mbc_c::bounds_info_read(string file_name_base,  unordered_map <int, int> &m
     ss >> region_id; 
     ss >> pointer_type; 
     
-    ec_region_id = region_id * 16 + pointer_type; 
+    ec_region_id = region_id * 64 + pointer_type; 
     std::cout << "reg_id:" << reg_id << " region_id : " << region_id <<  " ec_region_id: " << ec_region_id;
     std::cout << "load/store:" << load_store_type << "pointer_type: " << pointer_type << endl; 
     m_bounds_info[reg_id] = ec_region_id; 
@@ -148,21 +148,26 @@ bool mbc_c::bounds_info_check_signed(int src1_id, unordered_map<int, int>  &m_bo
       region_id = m_bounds_info[src1_id]; 
       return true;
     }
+    else {
+      region_id = src1_id*64+2; 
+      return true;
+    }
+
    /* else if (*KNOB(KNOB_ENABLE_BOUNDS_PROB_FILTER)) { 
        double x = rand()/static_cast<double>(RAND_MAX+1); 
       if (x*10 > *KNOB(KNOB_BOUNDS_PROB_TH)){
-        region_id = src1_id*16+2;
+        region_id = src1_id*64+2;
         return true; 
       } else {
-        region_id = src1_id*16+1; 
+        region_id = src1_id*64+1; 
         return true; 
       }
     } */
-      else 
-        return false; 
+   //   else 
+    //    return false; 
 
     if(m_bounds_info.empty()) {
-      region_id = src1_id * 16 + 2; 
+      region_id = src1_id *64 + 2; 
       return true; // if there is no bounds info, then all memory instructions are signed 
     }
 }
@@ -188,7 +193,7 @@ bool mbc_c::bounds_checking(uop_c *cur_uop)
   if (cur_uop->m_bounds_id) region_id = cur_uop->m_bounds_id; 
   else region_id = cur_uop->m_pc;  // when bounds id files are not available, we will just use pc 
 
-  int pointer_type = (cur_uop->m_bounds_id)%16; 
+  int pointer_type = (cur_uop->m_bounds_id)%64; 
 
   STAT_CORE_EVENT(cur_uop->m_core_id, DYN_BOUNDS_POINTER_TYPE__0 + MIN2(pointer_type, 3));
   cur_uop->m_bounds_check_status = BOUNDS_L0_HIT; 
@@ -254,7 +259,7 @@ else {
 
   m_rbt.insert(std::make_pair <Addr, bounds_info_s> (id, bounds_info)); 
   */
-  int pointer_type = (id)%16; 
+  int pointer_type = (id)%64; 
 
   STAT_CORE_EVENT(core_id, DYN_BOUNDS_POINTER_TYPE__0 + MIN2(pointer_type, 3));
   m_rbt[id]= id; 

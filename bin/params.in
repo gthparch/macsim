@@ -99,3 +99,4 @@ debug_cache_lib 0
 debug_bp_dir 0
 debug_print_trace 0 
 debug_noc 0 
+debug_mmu 1 

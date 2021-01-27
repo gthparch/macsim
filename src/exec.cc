@@ -577,20 +577,40 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
 
      if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE) == 1){ 
         if (uop->m_bounds_signed) {
-          int pointer_type = (uop->m_bounds_id)%16;
+          int pointer_type = (uop->m_bounds_id)%64;
           if (*KNOB(KNOB_ENABLE_BOUNDS_STATIC_FILTER) && pointer_type == 1){ 
               need_to_check_bounds = false;
               STAT_CORE_EVENT(m_core_id, BOUNDS_CHECK_SKIP_STATIC); 
           }
           else  need_to_check_bounds = true; 
         }
-
-
         else need_to_check_bounds = false;
       } else {
         need_to_check_bounds = true;
       } 
 
+      if (*KNOB(KNOB_BOUNDS_ONLY_GLOBAL_LOAD_STORE) == 1) { 
+        
+          if (((uop->m_mem_type) == MEM_LD_GM) || 
+              ((uop->m_mem_type) == MEM_LD) || 
+              ((uop->m_mem_type) == MEM_ST) || 
+              ((uop->m_mem_type) == MEM_ST_GM)) {
+              if (need_to_check_bounds) {
+                STAT_CORE_EVENT (m_core_id, BOUNDS_CHECK_KEEP_DUE_TO_TYPE);
+              }
+          }
+          else {
+            if (need_to_check_bounds == true) {
+              STAT_CORE_EVENT(m_core_id, BOUNDS_CHECK_DROP_DUE_TO_TYPE);
+            }
+            else 
+            {
+              need_to_check_bounds = false;     
+            }
+          } 
+      }
+
+    
       if (((uop->m_bounds_check_status)== NOT_CHECKED) && need_to_check_bounds)  { 
 
         STAT_CORE_EVENT(uop->m_core_id, NUM_OF_BOUNDS_CHECKING);

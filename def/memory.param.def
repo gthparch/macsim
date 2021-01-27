@@ -271,3 +271,4 @@ param<ENABLE_BOUNDS_IDS_FILE, enable_bounds_ids_file, bool, false>
 param<ENABLE_BOUNDS_STATIC_FILTER, enable_bounds_static_filter, bool, false> 
 param<ENABLE_BOUNDS_PROB_FILTER, enable_bounds_prob_filter, bool, false> 
 param<BOUNDS_PROB_TH, bounds_prob_th, int, 3> 
+param<BOUNDS_ONLY_GLOBAL_LOAD_STORE, bounds_only_global_load_store, bool, true>
