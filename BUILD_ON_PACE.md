@@ -15,4 +15,8 @@ conda install gcc_linux-64 gxx_linux-64 scons zlib
 export CC=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-gcc
 export CXX=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-g++
 ```
-* Run macsim build (currently only support build with --ramnulator flag).
+* Checkout `pace-release` brnach and run macsim build (currently only support build with --ramnulator flag).
+```
+git checkout pace-release
+./build --ramulator
+```
