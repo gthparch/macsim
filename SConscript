@@ -214,11 +214,11 @@ if flags['ramulator'] == '1':
   env['CPPFLAGS'] += ' -Wno-missing-field-initializers '
   env['CPPFLAGS'] += ' -Wno-unused-variable '
   env['CPPFLAGS'] += ' -Wno-reorder '
-  env['CPPFLAGS'] += ' -I/storage/home/hcocice1/jcao62/miniconda3/envs/macsim/include '
-  env['CPPFLAGS'] += ' -L/storage/home/hcocice1/jcao62/miniconda3/envs/macsim/lib '
+  env['CPPFLAGS'] += ' -I/storage/home/hcocice1/<your dir>/miniconda3/envs/macsim/include '
+  env['CPPFLAGS'] += ' -L/storage/home/hcocice1/<your dir>/miniconda3/envs/macsim/lib '
   env['CPPDEFINES'] += ['RAMULATOR']
   env['CPPPATH'] += ['#src/ramulator']
-  env['LIBPATH'] += [Dir('.'), '/storage/home/hcocice1/jcao62/miniconda3/envs/macsim/lib']
+  env['LIBPATH'] += [Dir('.'), '/storage/home/hcocice1/<your dir>/miniconda3/envs/macsim/lib']
   env.Library('ramulator', ramulator_srcs, CPPDEFINES=['RAMULATOR'])
 
 #########################################################################################
