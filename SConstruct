@@ -54,10 +54,10 @@ def pre_compile_check():
 
   conf = Configure(env, custom_tests = {'CheckCPP14' : CheckCPP14()})
 
-  if not conf.CheckCPP14():
-    print('Error: Your compiler does not support c++14. Exit now...')
-    os.system('cat config.log')
-    sys.exit()
+  # if not conf.CheckCPP14():
+  #   print('Error: Your compiler does not support c++14. Exit now...')
+  #   os.system('cat config.log')
+  #   sys.exit()
 
 
 pre_compile_check()
