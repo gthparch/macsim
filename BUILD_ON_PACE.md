@@ -15,9 +15,12 @@ conda install gcc_linux-64 gxx_linux-64 scons zlib
 export CC=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-gcc
 export CXX=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-g++
 ```
-* Modify path in `SConscript` to point to your local library and header file. There are three places that you need to modify, Line 217, 218, and 221.
-* Checkout `pace-release` brnach and run macsim build (currently only support build with --ramnulator flag).
+* Checkout `pace-release` brnach.
 ```
 git checkout pace-release
+```
+* Modify path in `SConscript` to point to your local library and header file. There are three places that you need to modify, Line 217, 218, and 221.
+* Run macsim build (currently only support build with --ramnulator flag).
+```
 ./build --ramulator
 ```
