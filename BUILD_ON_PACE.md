@@ -24,3 +24,4 @@ git checkout pace-release
 ```
 ./build --ramulator
 ```
+* Last, though the build runs correctly, you will probably still see an error `TypeError: signal handler must be signal.SIG_IGN, signal.SIG_DFL, or a callable object:` because Python cannot handle the SIGNAL from OS. Then, you can navigate to `macsim/bin` to make sure the `macsim` binary is correctly generated and can be ran with the provided sample traces,
