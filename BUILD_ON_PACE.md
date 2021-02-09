@@ -12,8 +12,8 @@ conda install gcc_linux-64 gxx_linux-64 scons zlib
 ```
 * Set default compilation flags.
 ```
-export CC=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-gcc
-export CXX=~/miniconda2/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-g++
+export CC=~/miniconda3/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-gcc
+export CXX=~/miniconda3/envs/macsim/bin/x86_64-conda_cos6-linux-gnu-g++
 ```
 * Checkout `pace-release` brnach.
 ```
