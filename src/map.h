@@ -80,6 +80,8 @@ public:
   bool m_map_flags[NUM_REG_IDS * 2]; /**< map data exist for the source */
   map_entry_c m_last_store[2]; /**< last store map entry */
   bool m_last_store_flag; /**< last store flag */
+  
+  int m_regs_used;
 
   hash_c<mem_map_entry_c> *m_oracle_mem_hash; /**< oracle memory hash */
 

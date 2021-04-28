@@ -77,6 +77,7 @@ POSSIBILITY OF SUCH DAMAGE.
 map_data_c::map_data_c(macsim_c *simBase) {
   /* initialize the memory dependence hash table */
   m_simBase = simBase;
+  m_regs_used = 0;
   m_oracle_mem_hash =
     new hash_c<mem_map_entry_c>(simBase->m_mem_map_entry_pool);
 }

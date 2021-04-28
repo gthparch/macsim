@@ -505,6 +505,20 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
         }
 
         // -------------------------------------
+        // register mapping - registers remaining
+        // -------------------------------------
+        if(new_uop->m_mem_type == MEM_ST){
+          int regs_used = m_map->m_core_map_data->hash_table_access(new_uop->m_thread_id)->m_regs_used;
+          if((regs_used + new_uop->m_num_dests) > *KNOB(KNOB_MAX_REGISTERS)){
+            // TODO: don't fetch?
+            return FRONTEND_MODE_IFETCH;
+          } else if ((regs_used + new_uop->m_num_dests) <= *KNOB(KNOB_MAX_REGISTERS)){
+            // increment registers in use
+            m_map->m_core_map_data->hash_table_access(new_uop->m_thread_id)->m_regs_used += new_uop->m_num_dests;
+          }
+        }
+
+        // -------------------------------------
         // access branch predictors
         // -------------------------------------
         int br_mispred = false;

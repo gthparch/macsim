@@ -200,6 +200,8 @@ void retire_c::run_a_cycle() {
                             m_cur_core_cycle - cur_uop->m_alloc_cycle);
           STAT_CORE_EVENT_N(cur_uop->m_core_id, HMC_DEP_UOP_RETIRE_COUNT, 1);
         }
+        // TODO: decrement registers in use
+        this->m_core_map_data->hash_table_access(cur_uop->m_thread_id)->m_regs_used -= cur_uop->m_num_dests;
       } else if (cur_uop->m_mem_type == MEM_LD) {
         // check if load can be retired before any previous stores
         if (check_ld_ordering_wb(cur_uop)) {

@@ -29,6 +29,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* -*- Mode: c -*- */
 
+param<MAX_REGISTERS,                max_registers,                  uns32,  128>
+
 param<FE_SIZE, 						fe_size, 						uns32, 	256>
 
 param<SCHED_CLOCK, 					sched_clock, 					uns32, 	1>

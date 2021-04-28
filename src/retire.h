@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
   int m_core_id, pqueue_c<int *> *m_q_frontend, pqueue_c<int> **m_q_iaq,   \
     pqueue_c<gpu_allocq_entry_s> **m_gpu_q_iaq, pool_c<uop_c> *m_uop_pool, \
     rob_c *m_rob, resource_c *m_resource, smc_rob_c *m_gpu_rob,            \
-    Unit_Type m_unit_type  // end macro
+    Unit_Type m_unit_type, hash_c<map_data_c> *core_map_data  // end macro
 
 #define RETIRE_INTERFACE_DECL()                                    \
   int m_core_id; /**< core id */                                   \
@@ -65,13 +65,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define RETIRE_INTERFACE_ARGS()                                     \
   m_core_id, m_q_frontend, m_q_iaq, m_gpu_q_iaq, m_uop_pool, m_rob, \
-    m_resource, m_gpu_rob, m_unit_type  // end macro
+    m_resource, m_gpu_rob, m_unit_type,                             \
+    this->m_map->m_core_map_data  // end macro
 
 #define RETIRE_INTERFACE_INIT()                                       \
   m_core_id(m_core_id), m_q_frontend(m_q_frontend), m_q_iaq(m_q_iaq), \
     m_gpu_q_iaq(m_gpu_q_iaq), m_uop_pool(m_uop_pool), m_rob(m_rob),   \
     m_resource(m_resource), m_gpu_rob(m_gpu_rob),                     \
-    m_unit_type(m_unit_type)  // end macro
+    m_unit_type(m_unit_type), m_core_map_data(core_map_data)  // end macro
 
 #define RETIRE_INTERFACE_CAST()       \
   static_cast<void>(m_core_id);       \
@@ -228,6 +229,8 @@ private:
 
   write_buffer_c m_write_buffer;
   queue<int> m_orq;
+
+  hash_c<map_data_c> *m_core_map_data;
 
   int
     m_period_inst_count; /**< counter for periodic logging number of retired inst. */
