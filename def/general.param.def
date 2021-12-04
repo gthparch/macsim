@@ -54,6 +54,16 @@ param<CLOCK_LLC, clock_llc, float, 1.0>
 param<CLOCK_NOC, clock_noc, float, 1.0> 
 param<CLOCK_MC,  clock_mc,  float, 0.8> 
 
+//++ akar34 start
+//This knob is to set the cycle interval for dumping stats
+param<STAT_CYCLE_INTERVAL, stat_cycle_interval, uint64_t, 0>
+param<ENABLE_DVFS_MODE, enable_dvfs_mode, int, 0>
+param<DVFS_CYCLE_INTERVAL, dvfs_cycle_interval, uint64_t,0>
+param<DVFS_TIME_INTERVAL, dvfs_time_interval, uint64_t,0>
+param<DVFS_CLOCK_STEP_CPU, dvfs_clock_step_cpu, float, 0.0>
+param<DVFS_CLOCK_STEP_GPU, dvfs_clock_step_gpu, float, 0.0>
+//++ akar34 end
+
 param<COMPUTE_CAPABILITY, compute_capability, float, 2.0>
 param<GPU_WARP_SIZE, gpu_warp_size, int, 32>
 param<TRACE_USES_64_BIT_ADDR, trace_uses_64_bit_addr, bool, true>

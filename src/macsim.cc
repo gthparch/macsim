@@ -99,6 +99,11 @@ macsim_c::macsim_c()
   m_all_threads                    = 0;
   m_no_threads_per_block           = 0;
   m_total_retired_block            = 0;
+  //++akar34 start
+  m_last_cpu_dvfs_cycle            = 0;
+  m_dvfs_cpu_clock_step            = 0;
+  m_dvfs_current_cpu_freq          = 0;
+  //++akar34 end
   m_end_simulation                 = false;
   m_repeat_done                    = false;
   m_gpu_paused                     = true;
@@ -778,6 +783,8 @@ void macsim_c::initialize(int argc, char** argv)
 // =======================================
 // To maintain different clock frequency for CPU, GPU, NOC, LLC, MC
 // =======================================
+
+// ++ akar34 start
 void macsim_c::init_clock_domain(void)
 {
   CLOCK_CPU = 0;
@@ -788,6 +795,7 @@ void macsim_c::init_clock_domain(void)
 
   m_clock_internal = 0;
   float domain_f[5];
+  m_dvfs_current_cpu_freq = *KNOB(KNOB_CLOCK_CPU);
   domain_f[0] = *KNOB(KNOB_CLOCK_CPU);
   domain_f[1] = *KNOB(KNOB_CLOCK_GPU);
   domain_f[2] = *KNOB(KNOB_CLOCK_LLC);
@@ -796,11 +804,13 @@ void macsim_c::init_clock_domain(void)
 
 
   // allow only .x format
+  /*
   for (int ii = 0; ii < 1; ++ii) {
     bool found = false;
     for (int jj = 0; jj < 5; ++jj) {
       int int_cast = static_cast<int>(domain_f[jj]);
       float float_cast = static_cast<float>(int_cast);
+      printf("jj:%d domain_f[jj]:%f int_cast:%d float_cast:%f\n",jj,domain_f[jj],int_cast,float_cast);
       if (domain_f[jj] != float_cast) {
         found = true;
         break;
@@ -816,6 +826,44 @@ void macsim_c::init_clock_domain(void)
       break;
     }
   }
+  */
+  uns64 max_decimals =0;
+  for(int i=0; i<5;++i)
+  {
+    //printf("Flag 1\n");
+    uns64 decimals =0;
+    int int_cast = static_cast<int>(domain_f[i]);
+    float float_cast = static_cast<float>(int_cast);
+    float temp_domain = domain_f[i];
+    /*if(*KNOB(KNOB_ENABLE_DVFS_MODE))
+    {
+      temp_domain = domain_f[i]+ *KNOB(KNOB_DVFS_CLOCK_STEP_CPU);
+    }*/
+    while(temp_domain != float_cast)
+    {
+      //printf("Flag 2\n");
+      temp_domain *= 10;
+      decimals ++;
+      int_cast = static_cast<int>(temp_domain);
+      float_cast = static_cast<float>(int_cast);
+    }
+    if(decimals > max_decimals)
+    {
+      max_decimals = decimals;
+    }
+
+  }
+
+  for(int i=0; i<5; i++)
+  {
+    for(int j=0; j<max_decimals; j++)
+    {
+      domain_f[i] *=10;
+      m_dvfs_cpu_clock_step *=10;
+    }
+  }
+
+  printf("new values are: %f %f %f %f %f \n",domain_f[0],domain_f[1],domain_f[2],domain_f[3],domain_f[4]);
 
   m_domain_freq  = new int[3 + m_num_sim_cores];
   m_domain_count = new int[3 + m_num_sim_cores];
@@ -855,8 +903,124 @@ void macsim_c::init_clock_domain(void)
   report("NOC clock frequency : " << *KNOB(KNOB_CLOCK_NOC) << " GHz");
   report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC)  << " GHz");
 }
+// ++ akar34 end
+
+// ++ akar34 start
+void macsim_c::dvfs_cpu_clock_update(void)
+{
+  CLOCK_CPU = 0;
+  CLOCK_GPU = 1;
+  CLOCK_LLC = m_num_sim_cores;
+  CLOCK_NOC = m_num_sim_cores + 1;
+  CLOCK_MC  = m_num_sim_cores + 2;
+
+  m_clock_internal = 0;
+  float domain_f[5];
+  m_dvfs_current_cpu_freq += *KNOB(KNOB_DVFS_CLOCK_STEP_CPU);
+  float cpu_step = *KNOB(KNOB_DVFS_CLOCK_STEP_CPU);
+  float gpu_step = *KNOB(KNOB_DVFS_CLOCK_STEP_GPU);
+  for (int ii = 0; ii < m_num_sim_cores; ++ii) {
+    core_c *core = m_core_pointers[ii];
+    string core_type = core->get_core_type();
+    if (core_type == "ptx") {
+      domain_f[1] = m_domain_freq[ii];
+    }
+    else {
+      domain_f[0] = m_domain_freq[ii];
+    } 
+  }
+  domain_f[0] = m_dvfs_current_cpu_freq;
+  domain_f[1] = *KNOB(KNOB_CLOCK_GPU);
+  domain_f[2] = *KNOB(KNOB_CLOCK_LLC);
+  domain_f[3] = *KNOB(KNOB_CLOCK_NOC);
+  domain_f[4] = *KNOB(KNOB_CLOCK_MC);
+
+  printf("before cpu frequency: %f      ",domain_f[0]);
+  
+  uns64 max_decimals =0;
+  for(int i=0; i<5;++i)
+  {
+    //printf("Flag 1\n");
+    uns64 decimals =0;
+    int int_cast = static_cast<int>(domain_f[i]);
+    float float_cast = static_cast<float>(int_cast);
+    float temp_domain = domain_f[i];
+    printf("Temp domain: %f\n",temp_domain);
+    
+    /*if(*KNOB(KNOB_ENABLE_DVFS_MODE))
+    {
+      temp_domain = domain_f[i]+ *KNOB(KNOB_DVFS_CLOCK_STEP_CPU);
+    }*/
+    while(temp_domain != float_cast)
+    {
+      //printf("Flag 2\n");
+      temp_domain *= 10;
+      temp_domain = floorf(temp_domain * 10000)/10000;
+      decimals ++;
+      int_cast = static_cast<int>(temp_domain);
+      float_cast = static_cast<float>(int_cast);
+    }
+    if(decimals > max_decimals)
+    {
+      max_decimals = decimals;
+    }
+
+  }
+
+  for(int i=0; i<5; i++)
+  {
+    for(int j=0; j<max_decimals; j++)
+    {
+      domain_f[i] *=10;
+      domain_f[i] = floorf(domain_f[i]*10000)/10000;
+      m_dvfs_cpu_clock_step *=10;
+    }
+  }
+
+  printf("new dvfs values are: %f %f %f %f %f \n",domain_f[0],domain_f[1],domain_f[2],domain_f[3],domain_f[4]);
+  char a;
+  a = getchar();
+  m_domain_freq  = new int[3 + m_num_sim_cores];
+  m_domain_count = new int[3 + m_num_sim_cores];
+  m_domain_next  = new int[3 + m_num_sim_cores];
 
 
+  // Cores
+  for (int ii = 0; ii < m_num_sim_cores; ++ii) {
+    core_c *core = m_core_pointers[ii];
+    string core_type = core->get_core_type();
+    if (core_type == "ptx") {
+      m_domain_freq[ii]  = static_cast<int>(domain_f[CLOCK_GPU]);
+    }
+    else {
+      m_domain_freq[ii]  = static_cast<int>(domain_f[CLOCK_CPU]);
+    } 
+    m_domain_count[ii] = 0;
+    m_domain_next[ii]  = 0;
+  }
+  
+  // LLC, NOC, MC
+  for (int ii = 0; ii < 3; ++ii) {
+    m_domain_freq[ii+m_num_sim_cores]  = static_cast<int>(domain_f[ii+2]);
+    m_domain_count[ii+m_num_sim_cores] = 0;
+    m_domain_next[ii+m_num_sim_cores]  = 0;
+  }
+
+  
+  m_clock_lcm = m_domain_freq[0];
+  for (int i = 1; i < 3 + m_num_sim_cores; i++) {
+    m_clock_lcm = lcm(m_clock_lcm, m_domain_freq[i]);
+  }
+
+  
+  report("Clock LCM           : " << m_clock_lcm);
+  report("CPU clock frequency : " << domain_f[0] << " GHz");
+  report("GPU clock frequency : " << domain_f[1] << " GHz");
+  report("LLC clock frequency : " << domain_f[2]  << " GHz");
+  report("NOC clock frequency : " << domain_f[3] << " GHz");
+  report("MC  clock frequency : " << domain_f[4] << " GHz");
+}
+// ++ akar34 end
 
 #define GET_NEXT_CYCLE(domain) \
   ++m_domain_count[domain]; \
@@ -1024,6 +1188,75 @@ int macsim_c::run_a_cycle()
 
   // increase simulation cycle
   m_simulation_cycle++;
+  
+   //++ akar34 start
+  
+  //Dumps stats at STAT_CYCLE_INTERVAL gaps. This can be set from the knobs.
+  if(*KNOB(KNOB_STAT_CYCLE_INTERVAL) != 0)
+  {
+    if(m_simulation_cycle % *KNOB(KNOB_STAT_CYCLE_INTERVAL) ==0)
+    {
+      string extension = ".cycle_"+std::to_string(m_simulation_cycle);
+      m_ProcessorStats->saveStats(extension);
+      //m_allCoresStats.clear();
+    }
+  }
+  if(*KNOB(KNOB_ENABLE_DVFS_MODE) == 1)
+  {
+    float current_cpu_freq = 0;
+    float current_gpu_freq = 0;
+    uns64 cpu_current_cycle = 0;
+      for (int ii = 0; ii < m_num_sim_cores; ++ii) {
+        core_c *core = m_core_pointers[ii];
+        string core_type = core->get_core_type();
+        if (core_type == "ptx") {
+          current_gpu_freq =  m_domain_freq[ii];
+        }
+        else {
+          //printf("Flag before freq\n");
+          current_cpu_freq = m_domain_freq[ii];
+          //printf("Current cpu freq is : %f \n", current_cpu_freq);
+          //printf("Flag 1\n");
+          cpu_current_cycle = core->get_cycle_count();
+          //printf("CPU current cycle: %llu\n", cpu_current_cycle);
+        } 
+      }
+    
+    printf("m_current_cpu_freq:%lf     CPU Frequency:%lf     CPU Current Cycle: %llu     Last CPU DVFS cycle: %llu     Time elapsed:%lf\n",m_dvfs_current_cpu_freq,current_cpu_freq,cpu_current_cycle,m_last_cpu_dvfs_cycle,double((cpu_current_cycle - m_last_cpu_dvfs_cycle))/double(current_cpu_freq));
+    //if((cpu_current_cycle - m_last_cpu_dvfs_cycle) !=0 && double((cpu_current_cycle - m_last_cpu_dvfs_cycle))/double(m_dvfs_current_cpu_freq) >= double(*KNOB(KNOB_DVFS_CYCLE_INTERVAL)))
+    if((cpu_current_cycle - m_last_cpu_dvfs_cycle) !=0 && double((cpu_current_cycle - m_last_cpu_dvfs_cycle))/double(current_cpu_freq) >= double(*KNOB(KNOB_DVFS_CYCLE_INTERVAL))) // need to fix this line
+    {
+      m_last_cpu_dvfs_cycle = cpu_current_cycle;
+      printf("Inside the condition now\n");
+      dvfs_cpu_clock_update();
+      float new_cpu_freq;
+      float new_gpu_freq;
+      for (int ii = 0; ii < m_num_sim_cores; ++ii) {
+        core_c *core = m_core_pointers[ii];
+        string core_type = core->get_core_type();
+        if (core_type == "ptx") {
+          new_gpu_freq =  m_domain_freq[ii];
+        }
+        else {
+          new_cpu_freq = m_domain_freq[ii];
+        } 
+      }
+      string extension = ".cpufreq_"+std::to_string(new_cpu_freq)+".gpufreq_"+std::to_string(new_gpu_freq);
+      m_ProcessorStats->saveStats(extension);
+      m_ProcessorStats->~ProcessorStatistics();
+        // initialize stats again so that it's discrete instead of cumulative
+      m_coreStatsTemplate = new CoreStatistics(m_simBase);
+      m_ProcessorStats = new ProcessorStatistics(m_simBase);
+      m_allStats = new all_stats_c(m_ProcessorStats);
+      m_allStats->initialize(m_ProcessorStats, m_coreStatsTemplate);
+      m_num_sim_cores = *KNOB(KNOB_NUM_SIM_CORES);
+      init_per_core_stats(m_num_sim_cores, m_simBase);
+ 
+    }
+  }
+
+  //++ akar34 end
+
   STAT_EVENT(CYC_COUNT_TOT);
 
 

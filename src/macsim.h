@@ -134,6 +134,11 @@ class macsim_c
     void init_clock_domain(void);
 
     /**
+     * Update the clock frequencies for CPU and GPU based on DVFS settings
+     */
+    void dvfs_cpu_clock_update(void);
+
+    /**
      * Initialize output streams
      */
 		void init_output_streams(void);
@@ -216,6 +221,11 @@ class macsim_c
 		FILE *g_mystderr;	/**< default error stream */
 		FILE *g_mystatus; /**< default status stream */
 		Counter m_simulation_cycle; /**< simulation cycle count */
+    //++ akar34 start
+    Counter m_last_cpu_dvfs_cycle; /**< last cpu cycle when dvfs was triggered */
+    float m_dvfs_cpu_clock_step; /**< step for increasing dvfs clock frequency */
+    float m_dvfs_current_cpu_freq; /**< variable to keep track of current cpu frequency */
+    //++ akar34 end
 		Counter m_core0_inst_count; /**< core 0 inst count for debug/assert */
 		Counter m_core_cycle[MAX_NUM_CORES];/**< core cycle count */
 		int m_end_simulation; /**< flag to end simulation */

@@ -418,6 +418,9 @@ void core_c::run_a_cycle(bool pll_lock)
   m_frontend->run_a_cycle();
 
   ++m_cycle;
+  // ++ akar34
+  //printf("Cycle value here is : %llu\n",m_cycle);
+  //saveStats()
 }
 
 

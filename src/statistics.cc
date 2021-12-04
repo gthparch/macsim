@@ -289,7 +289,7 @@ void GlobalStatistics::saveStats(string ext)
         pStat->writeTo(stream);
       }
     }
-
+    //printf("Anurag Was here");
     iter++;
   }
     
