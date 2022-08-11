@@ -14,7 +14,7 @@ AM_CPPFLAGS = \
   -I$(srcdir)/src/manifold/kernel/include/kernel \
   -I$(srcdir)/src/orion \
   -I$(srcdir)/src/rwqueue \
-  -std=c++0x \
+  -std=c++11 \
 	-DUSING_SST  \
   -DNO_DEBUG \
 	$(HMC_FLAG)  \
@@ -29,7 +29,6 @@ comp_LTLIBRARIES = libmacsimComponent.la
 libmacsimComponent_la_SOURCES =                                        \
 macsimEvent.h                                                          \
 macsimComponent.cpp          macsimComponent.h                         \
-libmacsimComponent.cc                                                  \
 src/dram_sst_vaultsim.cc     src/dram_sst_vaultsim.h                   \
 src/all_knobs.cc             src/all_knobs.h                           \
 src/allocate.cc              src/allocate.h                            \
@@ -77,6 +76,7 @@ src/schedule.cc              src/schedule.h                            \
 src/schedule_io.cc           src/schedule_io.h                         \
 src/schedule_ooo.cc          src/schedule_ooo.h                        \
 src/schedule_smc.cc          src/schedule_smc.h                        \
+src/schedule_igpu.cc         src/schedule_igpu.h                       \
 src/statistics.cc            src/statistics.h                          \
 src/statsEnums.h                                                       \
 src/sw_managed_cache.cc      src/sw_managed_cache.h                    \
@@ -100,6 +100,8 @@ src/schedule_interface.h                                               \
 src/hmc_process.cc           src/hmc_process.h                         \
 src/trace_gen.h                                                        \
 src/trace_gen_a64.cc         src/trace_gen_a64.h                       \
+src/mmu.cc                   src/mmu.h                                 \
+src/tlb.cc                   src/tlb.h                                 \
 src/cs_disas.cc              src/cs_disas.h
 
 

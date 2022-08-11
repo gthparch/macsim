@@ -1,10 +1,9 @@
 # Simulation Configuration
-num_sim_cores 24
+num_sim_cores 1
 num_sim_small_cores 0
 num_sim_medium_cores 0
-num_sim_large_cores 24
-core_type ptx
-large_core_type igpu
+num_sim_large_cores 1
+large_core_type x86 
 sim_cycle_count 0
 max_insts 3000000
 heartbeat_interval 1000000
@@ -21,6 +20,7 @@ clock_mc  1.15
 fetch_policy rr
 mt_no_fetch_br 1
 one_cycle_exec 0
+uop_latency_map x86
 
 # Large Core Configuration
 large_width 2
@@ -72,7 +72,7 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 8
 dram_rowbuffer_size 2048
-dram_scheduling_policy DRAMSIM
+dram_scheduling_policy FRFCFS
 dram_additional_latency 95
 
 # ETC

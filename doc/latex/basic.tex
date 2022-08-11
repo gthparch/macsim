@@ -13,9 +13,9 @@ This chapter provides instructions for building, installing, and running \SIM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \SIM is hosted on github at the following URL:
-\urlc{https://github.com/macsimgt/macsim-public }. 
+\urlc{https://github.com/gthparch/macsim }. 
 The project page for \SIM on
-Google Code provides stable version of \SIM, detailed documentation,
+GitHub provides stable version of \SIM, detailed documentation,
 issue/bug tracking, sample traces and so on. Users can use the project
 page for filing issues and for contacting the maintainers of \SIM.
 
@@ -30,22 +30,17 @@ page for filing issues and for contacting the maintainers of \SIM.
 \subsection{Obtaining Source}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\SIM source code is maintained using subversion. Users can obtain a copy of the
+\SIM source code is available on GitHub. Users can obtain a copy of the
 source code using this command:
 
 \begin{Verbatim}
-svn co https://svn.research.cc.gatech.edu/macsim/trunk macsim-readonly --username readonly
+git clone https://github.com/gthparch/macsim.git
 \end{Verbatim}
 
 \noindent
-Note that currently password is not set for the readonly account. Press `enter' when you are prompted for a password. Due to a technical issue, we do
-not allow anonymous checkout right now. The documentation will be updated when this issue is resolved.
-
-Users will have read-only permission by default and users interested
-in contributing to \SIM must contact
+Users will have read-only permission by default, and users interested in
+contributing to \SIM must contact
 \href{mailto:macsim-dev@googlegroups.com}{macsim-dev@googlegroups.com}.
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Requirements}
@@ -285,7 +280,8 @@ params\_8800gt         &             & NVIDIA GeForce 8800 GT (G80)         \\
 params\_gtx280         &             & NVIDIA GeForce GTX 280 (GT200)       \\
 params\_gtx465         &             & NVIDIA GeForce GTX 465 (Fermi)       \\
 params\_x86            &             & Intel's Sandy Bridge (CPU part only) \\
-params\_hetero\_4c\_4g &             & Intel's Sandy Bridge (CPU + GPU)     \\ \hline
+params\_hetero\_4c\_4g &             & Intel's Sandy Bridge (CPU + GPU)     \\
+params\_intel          &             & Intel's GEN9 GPU                     \\ \hline
 \end{tabular}
 \end{center}
 \end{footnotesize}
@@ -296,9 +292,8 @@ params\_hetero\_4c\_4g &             & Intel's Sandy Bridge (CPU + GPU)     \\ \
 content of a sample \Verb+trace_file_list+: \\
 
 \begin{tabular}[!h]{l l}
- \Verb+2+	& \Verb+<-- number of traces+ \\
- \Verb+/trace/ptx/cuda2.2/FastWalshTransform/kernel_config.txt+	& \Verb+<-- trace #1 path+ \\
- \Verb+/trace/ptx/cuda2.2/BlackScholes/kernel_config.txt+	& \Verb+<-- trace #2 path+ \\
+ \Verb+1+	& \Verb+<-- number of traces+ \\
+ \Verb+../sst-unit-test/traces/cachesize_1/trace.txt+ & \Verb+<-- trace #1 path+ \\
  & \\
 \end{tabular}
 
@@ -309,21 +304,19 @@ configuration file in the trace directory of an application. The contents of a
 sample trace configuration file are shown below.
 
 \begin{Verbatim}
-1 x86
+x86
+1
 0 0
 \end{Verbatim}
 
-\noindent In the first line, the first field indicates the number of threads in
-the application (1 in this case) and the second field specifies the type of the
-application (x86 in this case). Other lines contain a thread id and the starting 
-point of the thread in terms of the instruction count of the main thread
-(thread 0).
+\noindent The first line indicates the type of the application (x86 in this case),
+and the second line specifies the number of threads in the application (1 in this case).
+Other lines contain a thread id and the starting point of the thread in terms of the
+instruction count of the main thread (thread 0).
 
-
-Several sample trace files are available at
-\urlc{http://code.google.com/p/macsim}. Users can generate their own
-traces by following instructions in Chapter~\ref{ch:trace}.
-
+Several sample trace files are available at sst-unit-test/traces directory.
+Users can generate their own traces by following instructions in
+Chapter~\ref{ch:trace}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Executing}
@@ -496,13 +489,12 @@ The instructions for building SST can be found at
 \subsection{Building \SIM as a SST component}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Checkout \SIM from our SVN or GitHub repository (\urlc{https://github.com/macsimgt/macsim-public}) under \textit{<sst-root>/sst/elements}.
+Checkout \SIM from GitHub repository (\urlc{https://github.com/gthparch/macsim}) under \textit{<sst-root>/sst/elements}.
 Make sure to change the name of the directory as \textit{macsimComponent}.
 
 \begin{Verbatim}
 cd <sst-root>/sst/elements
-svn co https://svn.research.cc.gatech.edu/macsim/trunk macsimComponent
---username readonly 
+git clone https://github.com/gthparch/macsim.git macsimComponent
 \end{Verbatim}
 Re-build the SST in order for \SIM to be included in the build procedure.
 

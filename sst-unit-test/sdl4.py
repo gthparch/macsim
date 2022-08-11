@@ -500,7 +500,7 @@ comp_memory0.addParams({
      "clock" : "1 GHz",
      "access_time" : "97 ns",
      "rangeStart" : "0",
-     "backend.mem_size" : "4096",
+     "backend.mem_size" : "4096MiB",
      "backend" : "memHierarchy.vaultsim"
 })
 

@@ -1,11 +1,11 @@
 #!/bin/sh
 # Download and compile DISTORM 
 
-DISTORM=distorm3-3
-DISTORM_DIST=$DISTORM-sdist
-DISTORM_ARCHIVE=$DISTORM_DIST.zip
-DISTORM_URL=https://distorm.googlecode.com/files/$DISTORM_ARCHIVE
-UNPACK="unzip -q"
+VERSION=3.4.1
+DISTORM=distorm3-$VERSION
+DISTORM_ARCHIVE=$DISTORM.tar.gz
+DISTORM_URL=https://github.com/gdabah/distorm/releases/download/v$VERSION/$DISTORM_ARCHIVE
+UNPACK="tar -xzf"
 
 # Only download it if we don't already have it.
 if [ ! -e $DISTORM_ARCHIVE ]; then

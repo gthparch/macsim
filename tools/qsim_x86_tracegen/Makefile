@@ -26,9 +26,9 @@
 #POSSIBILITY OF SUCH DAMAGE.
 #
 
-XED ?= ./xed2-intel64
+XED ?= ./xed-intel64
 QSIM_PREFIX ?= /usr/local
-DISTORM ?= ./distorm3-3
+DISTORM ?= ./distorm3-3.4.1
 DISTORM_VERSION ?= 3
 
 CXXFLAGS ?= -O2 -Iinclude -I$(DISTORM)/include -I$(QSIM_PREFIX)/include -I$(XED)/include -std=gnu++11

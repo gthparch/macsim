@@ -49,6 +49,10 @@ do {                                                              \
   }                                                               \
 } while (0)
 
+#define PIN_3_13_TRACE 
+
+#define t_read_ver "1.3"
+
 all_knobs_c* g_knobs;
 
 int read_trace(string trace_path, int truncate_size)
@@ -63,6 +67,7 @@ int read_trace(string trace_path, int truncate_size)
   }
   */
 
+  string gen_version;
   int num_thread;
   string type;
   int max_block_per_core;
@@ -70,7 +75,10 @@ int read_trace(string trace_path, int truncate_size)
   int load_count = 0;
 
   // read number of threads and type of trace
-  trace_file >> type >> num_thread ;
+  trace_file >> type >> gen_version >> num_thread;
+
+  if (gen_version != t_read_ver) 
+    std::cout << "!!WARNING!! Trace reader and trace generator version mismatch; results may not be accurate.\n";
 
 #ifdef GPU_TRACE
     ASSERTM(type == "newptx", "GPU arch of trace reader being used for %s traces", type.c_str());
@@ -85,12 +93,11 @@ int read_trace(string trace_path, int truncate_size)
 
   // open each thread trace file
   for (int ii = 0; ii < num_thread; ++ii) {
-    int tid;
-    int start_inst_count;
     int cur_file_inst_count = 0; 
     int slice_file_num = 0; 
-
     // set up thread trace file name
+    int tid;
+    int start_inst_count;
     trace_file >> tid >> start_inst_count;
 
     stringstream sstr;
@@ -188,9 +195,9 @@ int main(int argc, char* argv[])
 {
   KnobsContainer* knob_container = new KnobsContainer();
   g_knobs = knob_container->getAllKnobs();
-  knob_container->applyParamFile("params.in");
+  // knob_container->applyParamFile("params.in");
   char* pInvalidArgument = NULL;
-  knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
+  // knob_container->applyComandLineArguments(argc-1, &argv[1], &pInvalidArgument);
   int truncate_size = 0; 
 
   register_trace_reader();

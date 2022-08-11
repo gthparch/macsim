@@ -228,6 +228,24 @@ By default these parameter values are applied to large cores.
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\cpu Latency Parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By default the uop\_latency\_map knob is set to just "x86," which is Intel's Sandy Bridge. You can give it 
+an alternative value of "skylake", "skylake\_x", or "coffee\_lake" to change the mapping to either of those architectures.
+This knob determines the instruction latency for each UOP when it reaches an execution unit, and can have a great effect
+on the number of cycles it takes to run the simulation.
+\\
+\noindent Example usage (pick one):
+
+\begin{tabular}{l l}
+ \Verb+uop_latency_map x86+ & \Verb+// default latency mapping to Intel Sandy Bridge+ \\
+ \Verb+uop_latency_map skylake+ & \Verb+// latency mapping to Intel Skylake+ \\
+ \Verb+uop_latency_map skylake_x+ & \Verb+// latency mapping to Intel Skylake-X+ \\
+ \Verb+uop_latency_map coffee_lake+ & \Verb+// latency mapping to Intel Coffee Lake+
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\gpu Simulations}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
      */
 
 DEFUOP( UOP_INV,     1) 
-DEFUOP( UOP_INV,     1)
 DEFUOP( UOP_NOP,     1)
 DEFUOP( UOP_CF,      1)
 DEFUOP( UOP_CMOV,    1)
@@ -44,6 +43,7 @@ DEFUOP( UOP_LD,      1)
 DEFUOP( UOP_ST,      1)
 DEFUOP( UOP_IADD,    1)
 DEFUOP( UOP_IMUL,    2)
+DEFUOP( UOP_IDIV,    1) // not used in regular x86
 DEFUOP( UOP_ICMP,    1)
 DEFUOP( UOP_LOGIC,   1)
 DEFUOP( UOP_SHIFT,   1)
@@ -51,6 +51,15 @@ DEFUOP( UOP_BYTE,    1)
 DEFUOP( UOP_MM,      1)
 
 DEFUOP( UOP_FMEM,    1)
+
+DEFUOP( UOP_VADD,    1) // not used in regular x86
+DEFUOP( UOP_VSTR,    1) // not used in regular x86
+DEFUOP( UOP_VFADD,   1) // not used in regular x86
+DEFUOP( UOP_AES,     1) // not used in regular x86
+DEFUOP( UOP_PCLMUL,  1) // not used in regular x86
+DEFUOP( UOP_X87,     1) // not used in regular x86
+DEFUOP( UOP_XSAVE,   1) // not used in regular x86
+DEFUOP( UOP_XSAVEOPT, 1) // not used in regular x86
 
 DEFUOP( UOP_LFENCE,     100)
 DEFUOP( UOP_FULL_FENCE, 100)
