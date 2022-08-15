@@ -358,7 +358,11 @@ POSSIBILITY OF SUCH DAMAGE.
       m_ptx_sim = static_cast<string>(                                     \
                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx"   \
                     ? true                                                 \
-                    : false;                                               \
+                    : false;                                              \
+      m_igpu_sim =                                                         \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu" \
+          ? true                                                           \
+          : false;                                                         \
       m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
       break;                                                               \
                                                                            \
@@ -456,19 +460,22 @@ POSSIBILITY OF SUCH DAMAGE.
       m_knob_fetch_width = *m_simBase->m_knobs->KNOB_FETCH_WDITH;              \
       m_knob_icache_line_size = *m_simBase->m_knobs->KNOB_ICACHE_LINE_SIZE;    \
       m_fetch_modulo = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1;          \
-      if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx") { \
-        m_ptx_sim = true;                                                      \
+      if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx") {\
+        m_ptx_sim = true;                                                     \
+        m_igpu_sim = false;                                                    \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
-      } else {                                                                 \
+      } else if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu") { \
+        m_igpu_sim = true;                                                      \
         m_ptx_sim = false;                                                     \
+        m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;            \
+      } else {                                                                 \
+        m_ptx_sim = false;                                                    \
+        m_igpu_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
       }                                                                        \
-      break;                                                                   \
-      m_igpu_sim = static_cast<string>(                                        \
-                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
-                     ? true                                                    \
-                     : false;                                                  \
-      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
+                                                                                \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                  \
+         break;                                                                \
     case UNIT_MEDIUM:                                                          \
       m_knob_width = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH;                   \
       m_knob_fetch_width = *m_simBase->m_knobs->KNOB_FETCH_MEDIUM_WDITH;       \
@@ -478,17 +485,21 @@ POSSIBILITY OF SUCH DAMAGE.
       if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==   \
           "ptx") {                                                             \
         m_ptx_sim = true;                                                      \
+        m_igpu_sim = false;                                                    \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
-      } else {                                                                 \
-        m_ptx_sim = false;                                                     \
+      } else if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==   \
+          "igpu") {                                                             \
+        m_igpu_sim = true;                                                     \
+        m_ptx_sim = false;                                                    \
+        m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
+      }                                                                       \
+      else {                                                                 \
+        m_ptx_sim = false;                                                    \
+        m_igpu_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
-      }                                                                        \
+      }                                                                         \
+              m_acc_sim = (m_igpu_sim || m_ptx_sim);                           \
       break;                                                                   \
-      m_igpu_sim = static_cast<string>(                                        \
-                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
-                     ? true                                                    \
-                     : false;                                                  \
-      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
                                                                                \
     case UNIT_LARGE:                                                           \
       m_knob_width = *m_simBase->m_knobs->KNOB_LARGE_WIDTH;                    \
@@ -499,17 +510,20 @@ POSSIBILITY OF SUCH DAMAGE.
       if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) ==    \
           "ptx") {                                                             \
         m_ptx_sim = true;                                                      \
+        m_igpu_sim = false;                                                    \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
-      } else {                                                                 \
+      } else if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) ==    \
+          "igpu") {                                                             \
+        m_igpu_sim = true;                                                      \
+        m_ptx_sim =  false;                                                     \
+        m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
+      }                                                                         \
+      else {                                                                 \
         m_ptx_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
       }                                                                        \
-      break;                                                                   \
-      m_igpu_sim = static_cast<string>(                                        \
-                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
-                     ? true                                                    \
-                     : false;                                                  \
       m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
+      break;                                                                   \
   }
 
 #define CORE_CONFIG()                                                          \

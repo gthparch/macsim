@@ -375,5 +375,4 @@ private:
     return ret;
   }
 };
-
 #endif

@@ -823,9 +823,9 @@ public:
   trace_reader_wrapper_c(macsim_c *simBase);
   ~trace_reader_wrapper_c();
 
-  void setup_trace(int core_id, int sim_thread_id, bool gpu_sim);
+  void setup_trace(int core_id, int sim_thread_id, bool ptx_sim, bool igpu_sim);
   bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id,
-                            bool gpu_sim);
+                            bool ptx_sim, bool igpu_sim);
   void pre_read_trace(thread_s *trace_info);
 
 private:

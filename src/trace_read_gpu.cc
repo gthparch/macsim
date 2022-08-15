@@ -71,7 +71,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Constructor
  */
-gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
+ptx_decoder_c::ptx_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   : trace_read_c(simBase, m_dprint_output) {
   m_trace_size = GPU_TRACE_SIZE;
 
@@ -82,7 +82,7 @@ gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
 /**
  * Destructor
  */
-gpu_decoder_c::~gpu_decoder_c() {
+ptx_decoder_c::~ptx_decoder_c() {
 }
 
 /**
@@ -95,7 +95,7 @@ gpu_decoder_c::~gpu_decoder_c() {
  * @param inst_read - indicate instruction read successful
  * @see get_uops_from_traces
  */
-bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
+bool ptx_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
                                bool *inst_read) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   int bytes_read = -1;
@@ -150,7 +150,7 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
  * @param num_inst - number of instructions to rewind
  * @see peek_trace
  */
-bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
+bool ptx_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
                                   int num_inst) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
@@ -182,7 +182,7 @@ bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
  * @param core_id - core id
  * @param thread_id - thread id
  */
-void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
+void ptx_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
   if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE)) return;
   trace_info_gpu_s *inst_info = static_cast<trace_info_gpu_s *>(trace_info);
 
@@ -266,7 +266,7 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
  * @see process_manager_c::sim_thread_schedule
  */
 
-void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
+void ptx_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_gpu_s inst_info;
 
@@ -287,7 +287,7 @@ void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
  * @param rep_offset - repetition offet
  * @param core_id - core id
  */
-void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
+void ptx_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
                                     trace_uop_s *trace_uop, Addr rep_offset,
                                     int core_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
@@ -344,7 +344,7 @@ void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
  * @param core_id - core id
  * @param sim_thread_id - thread id
  */
-inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
+inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
                                                     trace_uop_s **trace_uop,
                                                     int core_id,
                                                     int sim_thread_id) {
@@ -382,7 +382,6 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
     trace_uop[0]->m_rep_uop_num = 0;
     trace_uop[0]->m_opcode = pi->m_opcode;
-
     // temporal register rules:
     // load->dest_reg (through tmp), load->store (through tmp), dest_reg->store (real reg)
     // load->cf (through tmp), dest_reg->cf (thought dest), st->cf (no dependency)
@@ -550,7 +549,7 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
               (pi->m_opcode != GPU_MEMBAR_CTA &&
                pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
             "unsupported uop - %s",
-            gpu_decoder_c::g_tr_opcode_names[pi->m_opcode]);
+            ptx_decoder_c::g_tr_opcode_names[pi->m_opcode]);
 
     ///
     /// Non-memory, non-branch instruction
@@ -762,7 +761,7 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
  * @param uop - uop object to hold instruction information
  * @param sim_thread_id thread id
  */
-bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
+bool ptx_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
                                          int sim_thread_id) {
   ASSERT(uop);
 
@@ -1107,7 +1106,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       ASSERTM(access_size,
               "access size cannot be zero %s tid %d core %d uop num %llu block "
               "id %d orig id %d\n",
-              gpu_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
+              ptx_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
               core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
 
       // even if a warp has fewer than 32 threads or even if fewer than
@@ -1263,7 +1262,19 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
     uop->m_core_id,
     "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
     uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+  /*
+    "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mbb_id:%d mem_type:%d src1:%u  num_child:%d \n",
+    uop->m_uop_num, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num, uop->m_pc, uop->m_opcode, uop->m_bounds_signed, uop->m_bounds_id, uop->m_mem_type, uop->m_src_info[0], uop->m_num_child_uops); 
+  if (uop->m_num_child_uops>0) { 
+    for (int ii = 0; ii < uop->m_num_child_uops; ii++){
+      uop_c *c_uop = uop->m_child_uops[ii];
+        DEBUG_CORE(
+      uop->m_core_id,
+      "new child uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld pc:%llx opcode:%d m_signed:%d mbb_id:%d mem_type:%d src1:%u  num_child:%d \n",
+      c_uop->m_uop_num, c_uop->m_inst_num, c_uop->m_thread_id, c_uop->m_unique_num, c_uop->m_pc, c_uop->m_opcode, c_uop->m_bounds_signed, c_uop->m_bounds_id, c_uop->m_mem_type, c_uop->m_src_info[0], c_uop->m_num_child_uops); 
+      }
 
+  }*/
   return read_success;
 }
 
@@ -1272,7 +1283,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
 /**
  * Initialize the mapping between trace opcode and uop type
  */
-void gpu_decoder_c::init_pin_convert(void) {
+void ptx_decoder_c::init_pin_convert(void) {
   m_int_uop_table[GPU_ABS] = UOP_GPU_ABS;
   m_int_uop_table[GPU_ABS64] = UOP_GPU_ABS64;
   m_int_uop_table[GPU_ADD] = UOP_GPU_ADD;
@@ -1580,7 +1591,7 @@ void gpu_decoder_c::init_pin_convert(void) {
   m_fp_uop_table[GPU_DATA_XFER_SM] = UOP_FADD;
 }
 
-const char *gpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
+const char *ptx_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "*invalid*", "*none*",     "*imm8*",    "*imm*",
   "*imm32*",   "*mem*",      "*mem*",     "*mem*",
   "*off*",     "*off*",      "*off*",     "*modx*",
@@ -1630,7 +1641,7 @@ const char *gpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "rdf",
 };
 
-const char *gpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+const char *ptx_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "GPU_INVALID",      "GPU_ABS",       "GPU_ABS64",        "GPU_ADD",
   "GPU_ADD64",        "GPU_ADDC",      "GPU_AND",          "GPU_AND64",
   "GPU_ATOM_GM",      "GPU_ATOM_SM",   "GPU_ATOM64_GM",    "GPU_ATOM64_SM",
@@ -1672,7 +1683,7 @@ const char *gpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "GPU_DATA_XFER_SM",
 };
 
-const char *gpu_decoder_c::g_tr_cf_names[10] = {
+const char *ptx_decoder_c::g_tr_cf_names[10] = {
   "NOT_CF",  // not a control flow instruction
   "CF_BR",  // an unconditional branch
   "CF_CBR",  // a conditional branch
@@ -1683,24 +1694,24 @@ const char *gpu_decoder_c::g_tr_cf_names[10] = {
   "CF_RET",  // a return
   "CF_SYS",   "CF_ICBR"};
 
-const char *gpu_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
+const char *ptx_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
   "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",   "GPU_ADDR_SP_GLOBAL",
   "GPU_ADDR_SP_LOCAL",   "GPU_ADDR_SP_PARAM",   "GPU_ADDR_SP_SHARED",
   "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC",
 };
 
-const char *gpu_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
+const char *ptx_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
   "GPU_CACHE_OP_INVALID", "GPU_CACHE_OP_CA", "GPU_CACHE_OP_CV",
   "GPU_CACHE_OP_CG",      "GPU_CACHE_OP_CS", "GPU_CACHE_OP_WB",
   "GPU_CACHE_OP_WT"};
 
-const char *gpu_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {
+const char *ptx_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {
   "GPU_CACHE_INVALID", "GPU_CACHE_L1", "GPU_CACHE_L2"};
 
-const char *gpu_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {
+const char *ptx_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {
   "GPU_FENCE_INVALID", "GPU_FENCE_CTA", "GPU_FENCE_GL", "GPU_FENCE_SYS"};
 
-const char *gpu_decoder_c::g_optype_names[37] = {
+const char *ptx_decoder_c::g_optype_names[37] = {
   "OP_INV",  // invalid opcode
   "OP_SPEC",  // something weird (rpcc)
   "OP_NOP",  // is a decoded nop
@@ -1726,7 +1737,7 @@ const char *gpu_decoder_c::g_optype_names[37] = {
   "OP_FCMOV"  // floating point cond move
 };
 
-const char *gpu_decoder_c::g_mem_type_names[20] = {
+const char *ptx_decoder_c::g_mem_type_names[20] = {
   "NOT_MEM",  // not a memory instruction
   "MEM_LD",  // a load instruction
   "MEM_ST",  // a store instruction

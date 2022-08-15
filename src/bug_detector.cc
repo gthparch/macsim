@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "uop.h"
 #include "trace_read.h"
 #include "trace_read_gpu.h"
+#include "trace_read_igpu.h"
 #include "trace_read_cpu.h"
 
 #include "all_knobs.h"
@@ -170,8 +171,10 @@ void bug_detector_c::print(int core_id, int thread_id) {
           << CYCLE - (*m_uop_table[ii])[(*I)] << setw(25) << left
           << uop_c::g_uop_state_name[uop->m_state] << setw(25) << left
           << (core_type == "ptx"
-                ? gpu_decoder_c::g_tr_opcode_names[uop->m_opcode]
-                : cpu_decoder_c::g_tr_opcode_names[uop->m_opcode])
+                ? ptx_decoder_c::g_tr_opcode_names[uop->m_opcode]
+                :(core_type == "igpu" ? 
+                    igpu_decoder_c::g_tr_opcode_names[uop->m_opcode] 
+                    : cpu_decoder_c::g_tr_opcode_names[uop->m_opcode]))
           << setw(20) << left << uop_c::g_uop_type_name[uop->m_uop_type]
           << setw(20) << left << uop_c::g_mem_type_name[uop->m_mem_type]
           << setw(20) << left << hex << uop->m_vaddr << dec << setw(20) << left
