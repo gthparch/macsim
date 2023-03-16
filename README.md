@@ -14,7 +14,7 @@
   cores) and SMT or MT architectures as well.
 * Currently interconnection network model (based on IRIS) and power model (based
   on McPAT) are connected.
-* MacSim is also one of the components of SST, so muiltiple MacSim simulatore
+* MacSim is also one of the components of SST, so multiple MacSim simulatore
   can run concurrently.
 * The project has been supported by Intel, NSF, Sandia National Lab.
 
