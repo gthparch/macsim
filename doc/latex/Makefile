@@ -9,4 +9,4 @@ all:
 	cp macsim.pdf ../;
 
 clean: 
-	$(RM) *.log *.aux *.blg *.bbl *.dvi *.brf macsim.ps macsim.pdf
+	$(RM) *.out *.log *.aux *.blg *.bbl *.toc *.styles *.dvi *.brf macsim.ps macsim.pdf
