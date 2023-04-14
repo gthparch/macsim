@@ -47,18 +47,18 @@ POSSIBILITY OF SUCH DAMAGE.
 /// This class handles all trace related operations. Read instructions from the file,
 /// decode, split to micro ops, uop setups ...
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class gpu_decoder_c : public trace_read_c
+class nvbit_decoder_c : public trace_read_c
 {
 public:
   /**
    * Constructor
    */
-  gpu_decoder_c(macsim_c *simBase, ofstream *dprint_output);
+  nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output);
 
   /**
    * Destructor
    */
-  ~gpu_decoder_c();
+  ~nvbit_decoder_c();
 
   /**
    * Get an uop from trace

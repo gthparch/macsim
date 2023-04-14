@@ -36,10 +36,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <set>
+#include <fstream>
 
 #include "assert_macros.h"
 #include "trace_read.h"
-#include "trace_read_gpu.h"
+#include "trace_read_nvbit.h"
 #include "uop.h"
 #include "global_types.h"
 #include "core.h"
@@ -71,9 +72,9 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Constructor
  */
-gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
+nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   : trace_read_c(simBase, m_dprint_output) {
-  m_trace_size = GPU_TRACE_SIZE;
+  m_trace_size = NVBIT_TRACE_SIZE;
 
   // map opcode type to uop type
   init_pin_convert();
@@ -82,7 +83,7 @@ gpu_decoder_c::gpu_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
 /**
  * Destructor
  */
-gpu_decoder_c::~gpu_decoder_c() {
+nvbit_decoder_c::~nvbit_decoder_c() {
 }
 
 /**
@@ -95,13 +96,13 @@ gpu_decoder_c::~gpu_decoder_c() {
  * @param inst_read - indicate instruction read successful
  * @see get_uops_from_traces
  */
-bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
+bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
                                bool *inst_read) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   int bytes_read = -1;
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
   bool ret_val = false;
-  trace_info_gpu_s *trace_info = static_cast<trace_info_gpu_s *>(t_info);
+  trace_info_nvbit_s *trace_info = static_cast<trace_info_nvbit_s *>(t_info);
 
   if (!thread_trace_info->m_buffer_exhausted) {
     memcpy(trace_info,
@@ -125,8 +126,9 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   }
   // read one instruction each
   else {
-    bytes_read =
-      gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
+    std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+    trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
+    bytes_read = static_cast<std::size_t>(trace_file.gcount());
   }
 
   if (m_trace_size == bytes_read) {
@@ -150,7 +152,7 @@ bool gpu_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
  * @param num_inst - number of instructions to rewind
  * @see peek_trace
  */
-bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
+bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
                                   int num_inst) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
@@ -167,8 +169,9 @@ bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
   }
 
   // rewind trace file
-  off_t offset = gzseek(thread_trace_info->m_trace_file,
-                        -1 * num_inst * m_trace_size, SEEK_CUR);
+  std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+  trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
+  std::streamoff offset = trace_file.tellg();
 
   if (offset == -1) {
     return false;
@@ -182,9 +185,9 @@ bool gpu_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
  * @param core_id - core id
  * @param thread_id - thread id
  */
-void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
+void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
   if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE)) return;
-  trace_info_gpu_s *inst_info = static_cast<trace_info_gpu_s *>(trace_info);
+  trace_info_nvbit_s *inst_info = static_cast<trace_info_nvbit_s *>(trace_info);
 
   (*m_dprint_output) << "*** begin of the data structure *** " << endl;
   (*m_dprint_output) << "core_id:" << core_id << " thread_id:" << thread_id
@@ -266,7 +269,7 @@ void gpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
  * @see process_manager_c::sim_thread_schedule
  */
 
-void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
+void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_gpu_s inst_info;
 
@@ -287,7 +290,7 @@ void gpu_decoder_c::pre_read_trace(thread_s *trace_info) {
  * @param rep_offset - repetition offet
  * @param core_id - core id
  */
-void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
+void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
                                     trace_uop_s *trace_uop, Addr rep_offset,
                                     int core_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
@@ -344,7 +347,7 @@ void gpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
  * @param core_id - core id
  * @param sim_thread_id - thread id
  */
-inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
+inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
                                                     trace_uop_s **trace_uop,
                                                     int core_id,
                                                     int sim_thread_id) {
@@ -550,7 +553,7 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
               (pi->m_opcode != GPU_MEMBAR_CTA &&
                pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
             "unsupported uop - %s",
-            gpu_decoder_c::g_tr_opcode_names[pi->m_opcode]);
+            nvbit_decoder_c::g_tr_opcode_names[pi->m_opcode]);
 
     ///
     /// Non-memory, non-branch instruction
@@ -762,7 +765,7 @@ inst_info_s *gpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
  * @param uop - uop object to hold instruction information
  * @param sim_thread_id thread id
  */
-bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
+bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
                                          int sim_thread_id) {
   ASSERT(uop);
 
@@ -1107,7 +1110,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       ASSERTM(access_size,
               "access size cannot be zero %s tid %d core %d uop num %llu block "
               "id %d orig id %d\n",
-              gpu_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
+              nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
               core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
 
       // even if a warp has fewer than 32 threads or even if fewer than
@@ -1272,7 +1275,7 @@ bool gpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
 /**
  * Initialize the mapping between trace opcode and uop type
  */
-void gpu_decoder_c::init_pin_convert(void) {
+void nvbit_decoder_c::init_pin_convert(void) {
   m_int_uop_table[GPU_ABS] = UOP_GPU_ABS;
   m_int_uop_table[GPU_ABS64] = UOP_GPU_ABS64;
   m_int_uop_table[GPU_ADD] = UOP_GPU_ADD;
@@ -1580,7 +1583,7 @@ void gpu_decoder_c::init_pin_convert(void) {
   m_fp_uop_table[GPU_DATA_XFER_SM] = UOP_FADD;
 }
 
-const char *gpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
+const char *nvbit_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "*invalid*", "*none*",     "*imm8*",    "*imm*",
   "*imm32*",   "*mem*",      "*mem*",     "*mem*",
   "*off*",     "*off*",      "*off*",     "*modx*",
@@ -1630,49 +1633,173 @@ const char *gpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "rdf",
 };
 
-const char *gpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
-  "GPU_INVALID",      "GPU_ABS",       "GPU_ABS64",        "GPU_ADD",
-  "GPU_ADD64",        "GPU_ADDC",      "GPU_AND",          "GPU_AND64",
-  "GPU_ATOM_GM",      "GPU_ATOM_SM",   "GPU_ATOM64_GM",    "GPU_ATOM64_SM",
-  "GPU_BAR_ARRIVE",   "GPU_BAR_SYNC",  "GPU_BAR_RED",      "GPU_BFE",
-  "GPU_BFE64",        "GPU_BFI",       "GPU_BFI64",        "GPU_BFIND",
-  "GPU_BFIND64",      "GPU_BRA",       "GPU_BREV",         "GPU_BREV64",
-  "GPU_BRKPT",        "GPU_CALL",      "GPU_CLZ",          "GPU_CLZ64",
-  "GPU_CNOT",         "GPU_CNOT64",    "GPU_COPYSIGN",     "GPU_COPYSIGN64",
-  "GPU_COS",          "GPU_CVT",       "GPU_CVT64",        "GPU_CVTA",
-  "GPU_CVTA64",       "GPU_DIV",       "GPU_DIV64",        "GPU_EX2",
-  "GPU_EXIT",         "GPU_FMA",       "GPU_FMA64",        "GPU_ISSPACEP",
-  "GPU_LD",           "GPU_LD64",      "GPU_LDU",          "GPU_LDU64",
-  "GPU_LG2",          "GPU_MAD24",     "GPU_MAD",          "GPU_MAD64",
-  "GPU_MADC",         "GPU_MADC64",    "GPU_MAX",          "GPU_MAX64",
-  "GPU_MEMBAR_CTA",   "GPU_MEMBAR_GL", "GPU_MEMBAR_SYS",   "GPU_MIN",
-  "GPU_MIN64",        "GPU_MOV",       "GPU_MOV64",        "GPU_MUL24",
-  "GPU_MUL",          "GPU_MUL64",     "GPU_NEG",          "GPU_NEG64",
-  "GPU_NOT",          "GPU_NOT64",     "GPU_OR",           "GPU_OR64",
-  "GPU_PMEVENT",      "GPU_POPC",      "GPU_POPC64",       "GPU_PREFETCH",
-  "GPU_PREFETCHU",    "GPU_PRMT",      "GPU_RCP",          "GPU_RCP64",
-  "GPU_RED_GM",       "GPU_RED_SM",    "GPU_RED64_GM",     "GPU_RED64_SM",
-  "GPU_REM",          "GPU_REM64",     "GPU_RET",          "GPU_RSQRT",
-  "GPU_RSQRT64",      "GPU_SAD",       "GPU_SAD64",        "GPU_SELP",
-  "GPU_SELP64",       "GPU_SET",       "GPU_SET64",        "GPU_SETP",
-  "GPU_SETP64",       "GPU_SHFL",      "GPU_SHFL64",       "GPU_SHL",
-  "GPU_SHL64",        "GPU_SHR",       "GPU_SHR64",        "GPU_SIN",
-  "GPU_SLCT",         "GPU_SLCT64",    "GPU_SQRT",         "GPU_SQRT64",
-  "GPU_ST",           "GPU_ST64",      "GPU_SUB",          "GPU_SUB64",
-  "GPU_SUBC",         "GPU_SULD",      "GPU_SULD64",       "GPU_SURED",
-  "GPU_SURED64",      "GPU_SUST",      "GPU_SUST64",       "GPU_SUQ",
-  "GPU_TESTP",        "GPU_TESTP64",   "GPU_TEX",          "GPU_TLD4",
-  "GPU_TXQ",          "GPU_TRAP",      "GPU_VABSDIFF",     "GPU_VADD",
-  "GPU_VMAD",         "GPU_VMAX",      "GPU_VMIN",         "GPU_VSET",
-  "GPU_VSHL",         "GPU_VSHR",      "GPU_VSUB",         "GPU_VOTE",
-  "GPU_XOR",          "GPU_XOR64",     "GPU_RECONVERGE",   "GPU_PHI",
-  "GPU_MEM_LD_GM",    "GPU_MEM_LD_LM", "GPU_MEM_LD_SM",    "GPU_MEM_LD_CM",
-  "GPU_MEM_LD_TM",    "GPU_MEM_LD_PM", "GPU_MEM_LDU_GM",   "GPU_MEM_ST_GM",
-  "GPU_MEM_ST_LM",    "GPU_MEM_ST_SM", "GPU_DATA_XFER_GM", "GPU_DATA_XFER_LM",
-  "GPU_DATA_XFER_SM",
+const char *nvbit_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+  "FADD",
+  "FADD32I",
+  "FCHK",
+  "FFMA32I",
+  "FFMA",
+  "FMNMX",
+  "FMUL",
+  "FMUL32I",
+  "FSEL",
+  "FSET",
+  "FSETP",
+  "FSWZADD",
+  "MUFU",
+  "HADD2",
+  "HADD2_32I",
+  "HFMA2",
+  "HFMA2_32I",
+  "HMMA",
+  "HMUL2",
+  "HMUL2_32I",
+  "HSET2",
+  "HSETP2",
+  "DADD",
+  "DFMA",
+  "DMUL",
+  "DSETP",
+  "BMMA",
+  "BMSK",
+  "BREV",
+  "FLO",
+  "IABS",
+  "IADD",
+  "IADD3",
+  "IADD32I",
+  "IDP",
+  "IDP4A",
+  "IMAD",
+  "IMMA",
+  "IMNMX",
+  "IMUL",
+  "IMUL32I",
+  "ISCADD",
+  "ISCADD32I",
+  "ISETP",
+  "LEA",
+  "LOP",
+  "LOP3",
+  "LOP32I",
+  "POPC",
+  "SHF",
+  "SHL",
+  "SHR",
+  "VABSDIFF",
+  "VABSDIFF4",
+  "F2F",
+  "F2I",
+  "I2F",
+  "I2I",
+  "I2IP",
+  "FRND",
+  "MOV",
+  "MOV32I",
+  "MOVM",
+  "PRMT",
+  "SEL",
+  "SGXT",
+  "SHFL",
+  "PLOP3",
+  "PSETP",
+  "P2R",
+  "R2P",
+  "LD",
+  "LDC",
+  "LDG",
+  "LDL",
+  "LDS",
+  "LDSM",
+  "ST",
+  "STG",
+  "STL",
+  "STS",
+  "MATCH",
+  "QSPC",
+  "ATOM",
+  "ATOMS",
+  "ATOMG",
+  "RED",
+  "CCTL",
+  "CCTLL",
+  "ERRBAR",
+  "MEMBAR",
+  "CCTLT",
+  "R2UR",
+  "S2UR",
+  "UBMSK",
+  "UBREV",
+  "UCLEA",
+  "UFLO",
+  "UIADD3",
+  "UIADD3_64",
+  "UIMAD",
+  "UISETP",
+  "ULDC",
+  "ULEA",
+  "ULOP",
+  "ULOP3",
+  "ULOP32I",
+  "UMOV",
+  "UP2UR",
+  "UPLOP3",
+  "UPOPC",
+  "UPRMT",
+  "UPSETP",
+  "UR2UP",
+  "USEL",
+  "USGXT",
+  "USHF",
+  "USHL",
+  "USHR",
+  "VOTEU",
+  "TEX",
+  "TLD",
+  "TLD4",
+  "TMML",
+  "TXD",
+  "TXQ", 
+  "SUATOM",
+  "SULD",
+  "SURED",
+  "SUST",
+  "BMOV",
+  "BPT",
+  "BRA",
+  "BREAK",
+  "BRX",
+  "BRXU",
+  "BSSY",
+  "BSYNC",
+  "CALL",
+  "EXIT",
+  "JMP",
+  "JMX",
+  "JMXU",
+  "KILL",
+  "NANOSLEEP",
+  "RET",
+  "RPCMOV",
+  "RTT",
+  "WARPSYNC",
+  "YIELD",
+  "B2R",
+  "BAR",
+  "CS2R",
+  "DEPBAR",
+  "GETLMEMBASE",
+  "LEPC",
+  "NOP",
+  "PMTRIG",
+  "R2B",
+  "S2R",
+  "SETCTAID",
+  "SETLMEMBASE",
+  "VOTE"
 };
 
-const char *gpu_decoder_c::g_tr_cf_names[10] = {
+const char *nvbit_decoder_c::g_tr_cf_names[10] = {
   "NOT_CF",  // not a control flow instruction
   "CF_BR",  // an unconditional branch
   "CF_CBR",  // a conditional branch
@@ -1681,26 +1808,27 @@ const char *gpu_decoder_c::g_tr_cf_names[10] = {
   "CF_ICALL",  // an indirect call
   "CF_ICO",  // an indirect jump to co-routine
   "CF_RET",  // a return
-  "CF_SYS",   "CF_ICBR"};
+  "CF_MITE"
+};
 
-const char *gpu_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
+const char *nvbit_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
   "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",   "GPU_ADDR_SP_GLOBAL",
   "GPU_ADDR_SP_LOCAL",   "GPU_ADDR_SP_PARAM",   "GPU_ADDR_SP_SHARED",
   "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC",
 };
 
-const char *gpu_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
+const char *nvbit_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
   "GPU_CACHE_OP_INVALID", "GPU_CACHE_OP_CA", "GPU_CACHE_OP_CV",
   "GPU_CACHE_OP_CG",      "GPU_CACHE_OP_CS", "GPU_CACHE_OP_WB",
   "GPU_CACHE_OP_WT"};
 
-const char *gpu_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {
+const char *nvbit_decoder_c::g_cache_level_names[MAX_GPU_CACHE_LEVEL] = {
   "GPU_CACHE_INVALID", "GPU_CACHE_L1", "GPU_CACHE_L2"};
 
-const char *gpu_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {
+const char *nvbit_decoder_c::g_fence_level_names[MAX_GPU_FENCE_LEVEL] = {
   "GPU_FENCE_INVALID", "GPU_FENCE_CTA", "GPU_FENCE_GL", "GPU_FENCE_SYS"};
 
-const char *gpu_decoder_c::g_optype_names[37] = {
+const char *nvbit_decoder_c::g_optype_names[37] = {
   "OP_INV",  // invalid opcode
   "OP_SPEC",  // something weird (rpcc)
   "OP_NOP",  // is a decoded nop
@@ -1726,7 +1854,7 @@ const char *gpu_decoder_c::g_optype_names[37] = {
   "OP_FCMOV"  // floating point cond move
 };
 
-const char *gpu_decoder_c::g_mem_type_names[20] = {
+const char *nvbit_decoder_c::g_mem_type_names[20] = {
   "NOT_MEM",  // not a memory instruction
   "MEM_LD",  // a load instruction
   "MEM_ST",  // a store instruction
