@@ -223,6 +223,38 @@ typedef struct trace_info_gpu_s {
     m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
 
+typedef struct trace_info_nvbit_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint16_t m_src[MAX_GPU_SRC_NUM];
+  uint16_t m_dst[MAX_GPU_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space;  // for loads, stores, atomic, prefetch(?)
+    uint8_t m_level;  // for membar
+  };
+  uint8_t m_cache_level;  // for prefetch?
+  uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+} trace_info_nvbit_s;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief structure to hold decoded uop information
 ///
@@ -585,6 +617,172 @@ typedef enum GPU_FENCE_LEVEL_ENUM_ {
   GPU_FENCE_SYS,
   GPU_FENCE_LAST
 } GPU_FENCE_LEVEL_ENUM;
+
+typedef enum GPU_NVBIT_OPCODE_ {
+  FADD,
+  FADD32I,
+  FCHK,
+  FFMA32I,
+  FFMA,
+  FMNMX,
+  FMUL,
+  FMUL32I,
+  FSEL,
+  FSET,
+  FSETP,
+  FSWZADD,
+  MUFU,
+  HADD2,
+  HADD2_32I,
+  HFMA2,
+  HFMA2_32I,
+  HMMA,
+  HMUL2,
+  HMUL2_32I,
+  HSET2,
+  HSETP2,
+  DADD,
+  DFMA,
+  DMUL,
+  DSETP,
+  BMMA,
+  BMSK,
+  BREV,
+  FLO,
+  IABS,
+  IADD,
+  IADD3,
+  IADD32I,
+  IDP,
+  IDP4A,
+  IMAD,
+  IMMA,
+  IMNMX,
+  IMUL,
+  IMUL32I,
+  ISCADD,
+  ISCADD32I,
+  ISETP,
+  LEA,
+  LOP,
+  LOP3,
+  LOP32I,
+  POPC,
+  SHF,
+  SHL,
+  SHR,
+  VABSDIFF,
+  VABSDIFF4,
+  F2F,
+  F2I,
+  I2F,
+  I2I,
+  I2IP,
+  FRND,
+  MOV,
+  MOV32I,
+  MOVM,
+  PRMT,
+  SEL,
+  SGXT,
+  SHFL,
+  PLOP3,
+  PSETP,
+  P2R,
+  R2P,
+  LD,
+  LDC,
+  LDG,
+  LDL,
+  LDS,
+  LDSM,
+  ST,
+  STG,
+  STL,
+  STS,
+  MATCH,
+  QSPC,
+  ATOM,
+  ATOMS,
+  ATOMG,
+  RED,
+  CCTL,
+  CCTLL,
+  ERRBAR,
+  MEMBAR,
+  CCTLT,
+  R2UR,
+  S2UR,
+  UBMSK,
+  UBREV,
+  UCLEA,
+  UFLO,
+  UIADD3,
+  UIADD3_64,
+  UIMAD,
+  UISETP,
+  ULDC,
+  ULEA,
+  ULOP,
+  ULOP3,
+  ULOP32I,
+  UMOV,
+  UP2UR,
+  UPLOP3,
+  UPOPC,
+  UPRMT,
+  UPSETP,
+  UR2UP,
+  USEL,
+  USGXT,
+  USHF,
+  USHL,
+  USHR,
+  VOTEU,
+  TEX,
+  TLD,
+  TLD4,
+  TMML,
+  TXD,
+  TXQ,
+  SUATOM,
+  SULD,
+  SURED,
+  SUST,
+  BMOV,
+  BPT,
+  BRA,
+  BREAK,
+  BRX,
+  BRXU,
+  BSSY,
+  BSYNC,
+  CALL,
+  EXIT,
+  JMP,
+  JMX,
+  JMXU,
+  KILL,
+  NANOSLEEP,
+  RET,
+  RPCMOV,
+  RTT,
+  WARPSYNC,
+  YIELD,
+  B2R,
+  BAR,
+  CS2R,
+  DEPBAR,
+  GETLMEMBASE,
+  LEPC,
+  NOP,
+  PMTRIG,
+  R2B,
+  S2R,
+  SETCTAID,
+  SETLMEMBASE,
+  VOTE
+} GPU_NVBIT_OPCODE;
 
 // in trace generator, special registers are assigned values starting from 200
 // matches order in ocelot/ir/interface/PTXOperand.h
