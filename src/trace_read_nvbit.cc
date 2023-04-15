@@ -664,7 +664,7 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       // the last uop
       if (ii == (num_uop - 1) &&
           trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
-        if (pi->m_opcode == GPU_BAR_SYNC) {
+        if (pi->m_opcode == NVBIT_BAR) {
           // only the last instruction will have bar type - this is in case of
           // CPU, in case of GPU there is always only one uop?
           trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
