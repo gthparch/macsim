@@ -226,6 +226,41 @@ typedef struct trace_info_gpu_s {
     m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
 
+// the same structure as the trace generator 
+
+typedef struct trace_info_nvbit_small_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint16_t m_src[MAX_NVBIT_SRC_NUM];
+  uint16_t m_dst[MAX_NVBIT_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space;  // for loads, stores, atomic, prefetch(?)
+    uint8_t m_level;  // for membar
+  };
+  uint8_t m_cache_level;  // for prefetch?
+  uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+} trace_info_nvbit_small_s;
+
+//trace_info_nvbit_small_s + m_next_inst_addr 
 typedef struct trace_info_nvbit_s {
   uint8_t m_opcode;
   bool m_is_fp;
@@ -256,6 +291,9 @@ typedef struct trace_info_nvbit_s {
   };
   uint8_t m_cache_level;  // for prefetch?
   uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+  uint64_t
+    m_next_inst_addr;  // next pc address, not present in raw trace fo
+
 } trace_info_nvbit_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1019,7 +1057,7 @@ public:
   trace_reader_wrapper_c(macsim_c *simBase);
   ~trace_reader_wrapper_c();
 
-  void setup_trace(int core_id, int sim_thread_id, bool gpu_sim, bool nvbit_sim);
+  void setup_trace(int core_id, int sim_thread_id, bool gpu_sim);
   bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id,
                             bool gpu_sim);
   void pre_read_trace(thread_s *trace_info);

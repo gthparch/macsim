@@ -36,7 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <set>
-#include <fstream>
+// #include <fstream>
 
 #include "assert_macros.h"
 #include "trace_read.h"
@@ -72,6 +72,8 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Constructor
  */
+ // move constructor to header file 
+/*
 nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   : trace_read_c(simBase, m_dprint_output) {
   m_trace_size = NVBIT_TRACE_SIZE;
@@ -79,10 +81,11 @@ nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   // map opcode type to uop type
   init_pin_convert();
 }
-
+*/
 /**
  * Destructor
  */
+
 nvbit_decoder_c::~nvbit_decoder_c() {
 }
 
@@ -126,9 +129,12 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   }
   // read one instruction each
   else {
-    std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-    trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
-    bytes_read = static_cast<std::size_t>(trace_file.gcount());
+      bytes_read =
+        (thread_trace_info->m_trace_file, trace_info, m_trace_size); 
+
+    // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+    // trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
+    // bytes_read = static_cast<std::size_t>(trace_file.gcount());
   }
 
   if (m_trace_size == bytes_read) {
@@ -169,9 +175,11 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
   }
 
   // rewind trace file
-  std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-  trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
-  std::streamoff offset = trace_file.tellg();
+   off_t offset = gzseek(thread_trace_info->m_trace_file,
+                        -1 * num_inst * m_trace_size, SEEK_CUR);
+  // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+  // trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
+  // std::streamoff offset = trace_file.tellg();
 
   if (offset == -1) {
     return false;
@@ -273,13 +281,17 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) 
 void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_nvbit_s inst_info;
-
-  std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
-  while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
-      // do something
+  while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
+                              m_trace_size)) == m_trace_size) {
+    // do something
   }
-  trace_file.clear(); // clear EOF flag
-  trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
+  gzrewind(trace_info->m_trace_file);
+  // std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
+  // while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
+  //     // do something
+ //  }
+  // trace_file.clear(); // clear EOF flag
+  // trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1635,7 +1647,7 @@ const char *nvbit_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
   "rdf",
 };
 
-const char *nvbit_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+const char *nvbit_decoder_c::g_tr_opcode_names[MAX_NVBIT_OPCODE_NAME] = {
   "NVBIT_FADD",
   "NVBIT_FADD32I",
   "NVBIT_FCHK",

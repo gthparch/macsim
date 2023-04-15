@@ -41,19 +41,28 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "inst_info.h"
 #include "trace_read.h"
 
+#define MAX_NVBIT_OPCODE_NAME 163 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
 ///
 /// This class handles all trace related operations. Read instructions from the file,
 /// decode, split to micro ops, uop setups ...
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class nvbit_decoder_c : public trace_read_c
+// class nvbit_decoder_c : public 
+ class nvbit_decoder_c : public gpu_decoder_c 
 {
 public:
   /**
    * Constructor
    */
-  nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output);
+  nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output)
+  :gpu_decoder_c(simBase, m_dprint_output) {
+  m_trace_size = NVBIT_TRACE_SIZE;
+
+  // map opcode type to uop type
+  init_pin_convert();
+}
 
   /**
    * Destructor
@@ -78,7 +87,7 @@ public:
 
   static const char *g_tr_reg_names[MAX_TR_REG]; /**< register name string */
   static const char
-    *g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
+    *g_tr_opcode_names[MAX_NVBIT_OPCODE_NAME]; /**< opcode name string */
   static const char *g_tr_cf_names[10]; /**< cf type string */
   static const char *g_optype_names[37]; /**< opcode type string */
   static const char *g_mem_type_names[20]; /**< memeory request type string */
