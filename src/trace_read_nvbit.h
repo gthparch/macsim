@@ -34,8 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
  * Description  : Trace handling class
  *********************************************************************************************/
 
-#ifndef TRACE_READ_GPU_H_INCLUDED
-#define TRACE_READ_GPU_H_INCLUDED
+#ifndef TRACE_READ_NVBIT_H_INCLUDED
+#define TRACE_READ_NVBIT_H_INCLUDED
 
 #include "uop.h"
 #include "inst_info.h"
@@ -50,19 +50,14 @@ POSSIBILITY OF SUCH DAMAGE.
 /// decode, split to micro ops, uop setups ...
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // class nvbit_decoder_c : public 
- class nvbit_decoder_c : public gpu_decoder_c 
+ class nvbit_decoder_c : public trace_read_c
 {
 public:
   /**
    * Constructor
    */
-  nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output)
-  :gpu_decoder_c(simBase, m_dprint_output) {
-  m_trace_size = NVBIT_TRACE_SIZE;
+  nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output);
 
-  // map opcode type to uop type
-  init_pin_convert();
-}
 
   /**
    * Destructor
@@ -160,4 +155,4 @@ private:
 private:
 };
 
-#endif  // TRACE_READ_GPU_H_INCLUDED
+#endif  // TRACE_READ_NVBIT_H_INCLUDED

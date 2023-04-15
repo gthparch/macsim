@@ -73,7 +73,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Constructor
  */
  // move constructor to header file 
-/*
+
 nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   : trace_read_c(simBase, m_dprint_output) {
   m_trace_size = NVBIT_TRACE_SIZE;
@@ -81,7 +81,7 @@ nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   // map opcode type to uop type
   init_pin_convert();
 }
-*/
+
 /**
  * Destructor
  */
