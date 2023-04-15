@@ -59,6 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "trace_read_a64.h"
 #include "trace_read_igpu.h"
 #include "trace_read_gpu.h"
+#include "trace_read_nvbit.h"
 
 #ifdef USING_QSIM
 #include "trace_gen_x86.h"
@@ -686,6 +687,10 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
     m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
+  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
+    m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
+  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "nvbit")
+    m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n",
             KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
@@ -693,7 +698,7 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
 
   m_cpu_decoder->init_pin_convert();
 
-  m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
+  
 }
 
 trace_reader_wrapper_c::trace_reader_wrapper_c() {
