@@ -27,7 +27,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**********************************************************************************************
- * File         : trace_read_gpu.cc
+ * File         : trace_read_nvbit.cc
  * Author       : HPArch Research Group
  * Date         :
  * SVN          : $Id: trace_read.cc 912 2009-11-20 19:09:21Z kacear $
