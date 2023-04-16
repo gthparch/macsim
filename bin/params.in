@@ -1,9 +1,10 @@
 # Simulation Configuration
 num_sim_cores 1
-num_sim_small_cores 0
+num_sim_small_cores 1
 num_sim_medium_cores 0
-num_sim_large_cores 1
+num_sim_large_cores 0
 large_core_type x86 
+core_type nvbit 
 sim_cycle_count 0
 max_insts 3000000
 heartbeat_interval 1000000
@@ -93,7 +94,8 @@ debug_dcu_stage 0
 debug_retire_stage 0
 debug_map_stage 0
 debug_mem  0
-debug_trace_read 0
+debug_print_trace 1 
+debug_trace_read 1
 debug_sim_thread_schedule 0
 debug_cache_lib 0
 debug_bp_dir 0
