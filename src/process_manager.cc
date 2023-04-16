@@ -398,7 +398,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
   trace_config_file.close();
 
   // setup core pool
-  if (trace_type == "ptx" || trace_type == "newptx") {
+  if (trace_type == "ptx" || trace_type == "newptx" ) {
     process->m_acc = true;
     process->m_core_pool = &m_simBase->m_acc_core_pool;
 
@@ -406,6 +406,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
     // use for reading traces (which contains one extra field compared to the
     // structure used when generating traces) match with the structure used when
     // generating traces
+
     if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
       assert(sizeof(trace_info_gpu_s) ==
              (sizeof(trace_info_gpu_small_s) + sizeof(uint64_t)));
@@ -413,7 +414,12 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
       assert(sizeof(trace_info_gpu_s) ==
              (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
     }
-  } else {
+  } 
+  else if (trace_type  == "nvbit" ) {
+    process->m_acc = true;
+    process->m_core_pool = &m_simBase->m_acc_core_pool;
+  }
+  else {
     process->m_acc = false;
     process->m_core_pool = &m_simBase->m_x86_core_pool;
   }
@@ -493,7 +499,7 @@ void process_manager_c::setup_process(process_s *process) {
     ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
 
   printf("trace:%s is opened \n", trace_info_file_name.c_str());
-
+  
   int trace_ver = -1;
   if (trace_type != "x86" && trace_type != "a64" && trace_type != "igpu") {
     if (!(trace_config_file >> trace_ver) || trace_ver != 14) {
@@ -502,6 +508,9 @@ void process_manager_c::setup_process(process_s *process) {
               "GPU traces\n");
     }
   }
+  printf("trace type: "); 
+  cout << trace_type ;
+  cout << " end" << endl; 
 
   // get occupancy
   if (trace_type == "ptx") {
@@ -538,7 +547,8 @@ void process_manager_c::setup_process(process_s *process) {
       thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
   }
 
-  report("thread_count:" << thread_count);
+  report("thread_count: " << thread_count);
+  report("max threads per core: " << process->m_max_block);
 
   // create data structures
   thread_stat_s *new_stat = new thread_stat_s[thread_count];

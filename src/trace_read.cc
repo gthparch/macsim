@@ -689,13 +689,14 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
     m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
    m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
-  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "nvbit") // for debugging to compile 
-    m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
+ // else if (KNOB(KNOB_SMALL_CORE_TYPE)->getValue() == "nvbit") 
+  //  m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n",
             KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
   }
-
+  if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit")  //need to double check this // hyesoon Apr-16-2023 
+    m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
   m_cpu_decoder->init_pin_convert();
 
   
