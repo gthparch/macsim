@@ -542,7 +542,7 @@ void retire_c::update_stats(process_s* process) {
   // TOCHECK I will get back to this later
   if (*KNOB(KNOB_REPEAT_TRACE) &&
       process->m_repeat < *KNOB(KNOB_REPEAT_TRACE_N) &&
-      core->get_core_type() == "ptx") {
+      (core->get_core_type() == "ptx" || core->get_core_type() == "nvbit")) {
     if ((process->m_repeat + 1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
       STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
@@ -554,7 +554,7 @@ void retire_c::update_stats(process_s* process) {
     }
   } else {
     if (process->m_repeat == 0) {
-      if (core->get_core_type() == "ptx") {
+      if ((core->get_core_type() == "ptx") || (core->get_core_type() == "nvbit")) {
         STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
       } else {
         STAT_EVENT_N(CYC_COUNT_X86, CYCLE);

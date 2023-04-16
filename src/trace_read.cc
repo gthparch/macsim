@@ -714,6 +714,7 @@ trace_reader_wrapper_c::~trace_reader_wrapper_c() {
 
 void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id,
                                          bool gpu_sim) {
+
   if (gpu_sim)
     m_gpu_decoder->setup_trace(core_id, sim_thread_id);
   else

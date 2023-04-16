@@ -305,7 +305,7 @@ bool schedule_smc_c::uop_schedule_smc(int thread_id, int entry,
 
     // check available mshr spaces for scheduling
     core_c *core = m_simBase->m_core_pointers[m_core_id];
-    if ("ptx" == core->get_core_type() && cur_uop->m_mem_type != NOT_MEM &&
+    if ((("ptx" == core->get_core_type()) || (core->get_core_type() == "nvbit") )&& cur_uop->m_mem_type != NOT_MEM &&
         cur_uop->m_num_child_uops > 0) {
       // constant or texture memory access
       if (cur_uop->m_mem_type == MEM_LD_CM ||

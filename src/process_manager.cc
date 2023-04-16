@@ -1095,7 +1095,7 @@ int process_manager_c::get_next_low_occupancy_core(std::string core_type) {
   for (int core_id = 0; core_id < *KNOB(KNOB_NUM_SIM_CORES); ++core_id) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
-    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
+    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" && core->get_core_type() != "nvbit" && 
         (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
          *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
@@ -1115,7 +1115,7 @@ int process_manager_c::get_next_available_core(std::string core_type) {
   for (int core_id = 0; core_id < *KNOB(KNOB_NUM_SIM_CORES); ++core_id) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
-    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
+    if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" && core->get_core_type() != "nvbit" &&
         (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
          *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
@@ -1165,7 +1165,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
   for (std::set<std::string>::const_iterator itr = core_type_set.begin();
        itr != core_type_set.end(); itr++) {
     std::string core_type = *itr;
-    if (core_type == "ptx") continue;
+    if (core_type == "ptx" || core_type =="nvbit") continue;
 
     // Get a core of this type
     // Follow the knob policy (greedy or balanced)
@@ -1228,7 +1228,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     std::string core_type = core->get_core_type();
-    if (core_type != "ptx") continue;
+    if (core_type != "ptx" && core_type != "nvbit") continue;
 
     // get currently fetching id
     int prev_fetching_block_id = core->m_fetching_block_id;
