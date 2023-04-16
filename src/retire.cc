@@ -108,7 +108,7 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase)
 
   RETIRE_CONFIG();
 
-  if (m_ptx_sim || m_igpu_sim) m_knob_width = 1000;
+  if (m_ptx_sim || m_igpu_sim || m_nvbit_sim) m_knob_width = 1000;
 }
 
 // retire_c destructor
@@ -130,7 +130,7 @@ void retire_c::run_a_cycle() {
 
   vector<uop_c*>* uop_list = NULL;
   unsigned int uop_list_index = 0;
-  if (m_ptx_sim || m_igpu_sim) {
+  if (m_ptx_sim || m_igpu_sim || m_nvbit_sim) {
     // GPU : many retireable uops from multiple threads. Get entire retireable uops
     uop_list =
       m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);
@@ -144,7 +144,7 @@ void retire_c::run_a_cycle() {
     // we need to handle retirement for x86 and ptx separately
 
     // retirement logic for GPU
-    if (m_ptx_sim || m_igpu_sim) {
+    if (m_ptx_sim || m_igpu_sim || m_nvbit_sim) {
       // GPU : many retireable uops from multiple threads. Get entire retireable uops
       if (uop_list_index == uop_list->size()) {
         uop_list->clear();

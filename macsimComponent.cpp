@@ -66,6 +66,10 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   } else if (params.find<bool>("igpu_core", 0)) {
     m_acc_type = IGPU_CORE;
     m_acc_core = 1;
+  } else if (params.find<bool>("nvbit_core", 0)) {
+    m_acc_type = NVBIT_CORE;
+    m_acc_core = 1;
+    
   } else {
     m_acc_core = 0;
     m_acc_type = NO_ACC;

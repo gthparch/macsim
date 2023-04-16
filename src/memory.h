@@ -306,6 +306,7 @@ private:
   bool m_acc_sim; /**< gpu cache */
   bool m_igpu_sim; /**< intel gpu cache */
   bool m_ptx_sim; /**< gpu cache */
+  bool m_nvbit_sim; /**< NVBIT simulation */ 
   queue_c* m_in_queue; /**< input queue */
   queue_c* m_wb_queue; /**< write-back queue */
   queue_c* m_fill_queue; /**< fill queue */

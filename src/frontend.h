@@ -409,6 +409,7 @@ protected:
   bool m_fe_running; /**< enabled frontend */
   bool m_ptx_sim; /**< PTX simulation */
   bool m_igpu_sim; /**< iGPU simulation */
+  bool m_nvbit_sim; /**< NVBIT simulation */ 
   bool m_acc_sim; /**< Accelerator simulation */
   bool m_ready_thread_available; /**< ready thread available */
   bool m_last_fetch_tid_failed;
