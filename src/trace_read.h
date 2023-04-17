@@ -59,8 +59,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_GPU_DST_NUM 4
 #define MAX_NVBIT_SRC_NUM 4
 #define MAX_NVBIT_DST_NUM 4
-#define MAX_NVBIT_SRC_NUM 4
-#define MAX_NVBIT_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
 #define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_small_s))
@@ -1064,7 +1062,7 @@ public:
   trace_reader_wrapper_c(macsim_c *simBase);
   ~trace_reader_wrapper_c();
 
-  void setup_trace(int core_id, int sim_thread_id, bool gpu_sim, bool nvbit_sim);
+  void setup_trace(int core_id, int sim_thread_id, bool gpu_sim);
   bool get_uops_from_traces(int core_id, uop_c *uop, int sim_thread_id,
                             bool gpu_sim);
   void pre_read_trace(thread_s *trace_info);

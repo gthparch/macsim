@@ -60,7 +60,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "trace_read_igpu.h"
 #include "trace_read_gpu.h"
 #include "trace_read_nvbit.h"
-#include "trace_read_nvbit.h"
 
 #ifdef USING_QSIM
 #include "trace_gen_x86.h"
