@@ -45,7 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "knob.h"
 #include "process_manager.h"
 #include "debug_macros.h"
-#include "statistics.h"
+// #include "statistics.h"
 #include "frontend.h"
 #include "statsEnums.h"
 #include "utils.h"
@@ -191,12 +191,15 @@ void trace_read_c::setup_trace(int core_id, int sim_thread_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
 
+  int size = 0;
   // read one instruction from the trace file to get next instruction. Always one instruction
   // will be read ahead to get next pc address
   if (core->m_running_thread_num) {
 #ifndef USING_QSIM
-    gzread(thread_trace_info->m_trace_file,
-           thread_trace_info->m_prev_trace_info, m_trace_size);
+    if ((size = gzread(thread_trace_info->m_trace_file,
+                       thread_trace_info->m_prev_trace_info, m_trace_size)) <=
+        0)
+      printf("%s\n", gzerror(thread_trace_info->m_trace_file, 0));
 #else
     m_tg->read_trace(core_id, (void *)(thread_trace_info->m_prev_trace_info),
                      m_trace_size);
@@ -687,19 +690,17 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
     m_cpu_decoder = new a64_decoder_c(simBase, m_dprint_output);
   else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu")
     m_cpu_decoder = new igpu_decoder_c(simBase, m_dprint_output);
-  else if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
-   m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
- // else if (KNOB(KNOB_SMALL_CORE_TYPE)->getValue() == "nvbit") 
-  //  m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
   else {
     ASSERTM(0, "Wrong core type %s\n",
             KNOB(KNOB_LARGE_CORE_TYPE)->getValue().c_str());
   }
-  if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit")  //need to double check this // hyesoon Apr-16-2023 
-    m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
+  //if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit")  //need to double check this // hyesoon Apr-16-2023
+  //  m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
   m_cpu_decoder->init_pin_convert();
-
-  
+  if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit")
+    m_gpu_decoder = new nvbit_decoder_c(simBase, m_dprint_output);
+  else
+    m_gpu_decoder = new gpu_decoder_c(simBase, m_dprint_output);
 }
 
 trace_reader_wrapper_c::trace_reader_wrapper_c() {
@@ -714,7 +715,6 @@ trace_reader_wrapper_c::~trace_reader_wrapper_c() {
 
 void trace_reader_wrapper_c::setup_trace(int core_id, int sim_thread_id,
                                          bool gpu_sim) {
-
   if (gpu_sim)
     m_gpu_decoder->setup_trace(core_id, sim_thread_id);
   else

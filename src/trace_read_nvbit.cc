@@ -72,7 +72,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /**
  * Constructor
  */
- // move constructor to header file 
+// move constructor to header file
 
 nvbit_decoder_c::nvbit_decoder_c(macsim_c *simBase, ofstream *m_dprint_output)
   : trace_read_c(simBase, m_dprint_output) {
@@ -100,7 +100,7 @@ nvbit_decoder_c::~nvbit_decoder_c() {
  * @see get_uops_from_traces
  */
 bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
-                               bool *inst_read) {
+                                 bool *inst_read) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   int bytes_read = -1;
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
@@ -129,8 +129,7 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   }
   // read one instruction each
   else {
-      bytes_read =
-        (thread_trace_info->m_trace_file, trace_info, m_trace_size); 
+    bytes_read = (thread_trace_info->m_trace_file, trace_info, m_trace_size);
 
     // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
     // trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
@@ -159,7 +158,7 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
  * @see peek_trace
  */
 bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
-                                  int num_inst) {
+                                    int num_inst) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
 
@@ -175,7 +174,7 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
   }
 
   // rewind trace file
-   off_t offset = gzseek(thread_trace_info->m_trace_file,
+  off_t offset = gzseek(thread_trace_info->m_trace_file,
                         -1 * num_inst * m_trace_size, SEEK_CUR);
   // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
   // trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
@@ -193,7 +192,8 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
  * @param core_id - core id
  * @param thread_id - thread id
  */
-void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
+void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id,
+                                  int thread_id) {
   if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE)) return;
   trace_info_nvbit_s *inst_info = static_cast<trace_info_nvbit_s *>(trace_info);
 
@@ -207,9 +207,10 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) 
   (*m_dprint_output) << "num_dest_regs: "
                      << (uint32_t)inst_info->m_num_dest_regs << endl;
 
-  for (uint32_t ii = 0; ii < (uint32_t)inst_info->m_num_read_regs; ++ii)
+  for (uint32_t ii = 0; ii < (uint32_t)inst_info->m_num_read_regs; ++ii) {
     (*m_dprint_output) << "src" << ii << ": " << (uint32_t)inst_info->m_src[ii]
                        << endl;
+  }
 
   for (uint32_t ii = 0; ii < (uint32_t)inst_info->m_num_dest_regs; ++ii)
     (*m_dprint_output) << "dst" << ii << ": " << (uint32_t)inst_info->m_dst[ii]
@@ -240,7 +241,7 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) 
                      << (uint32_t)inst_info->m_mem_access_size << endl;
   (*m_dprint_output) << "num_barrier_threads: "
                      << (uint32_t)inst_info->m_num_barrier_threads << endl;
-                     
+
   if (inst_info->m_opcode == GPU_MEMBAR_CTA ||
       inst_info->m_opcode == GPU_MEMBAR_GL ||
       inst_info->m_opcode == GPU_MEMBAR_SYS) {
@@ -250,14 +251,14 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) 
     (*m_dprint_output) << "addr_space/fence_level: "
                        << g_addr_space_names[inst_info->m_addr_space] << endl;
   }
-  (*m_dprint_output) << "cache_operator: "
-                     << g_cache_op_names[inst_info->m_cache_operator] << endl;
+  //(*m_dprint_output) << "cache_operator: "
+  //                   << g_cache_op_names[inst_info->m_cache_operator] << endl;
 
   (*m_dprint_output) << "barrier_id/mem_access_size: "
                      << (uint32_t)inst_info->m_barrier_id << endl;
 
-  (*m_dprint_output) << "cache_level: "
-                     << g_cache_level_names[inst_info->m_cache_level] << endl;
+  //(*m_dprint_output) << "cache_level: "
+  //                   << g_cache_level_names[inst_info->m_cache_level] << endl;
   if (inst_info->m_level < GPU_FENCE_LAST) {
     (*m_dprint_output) << "fence_level/addr_space: "
                        << g_fence_level_names[inst_info->m_level] << endl;
@@ -283,13 +284,15 @@ void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   trace_info_nvbit_s inst_info;
   while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
                               m_trace_size)) == m_trace_size) {
+    printf("%x ", bytes_read);
     // do something
   }
+  printf("\n");
   gzrewind(trace_info->m_trace_file);
   // std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
   // while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
   //     // do something
- //  }
+  //  }
   // trace_file.clear(); // clear EOF flag
   // trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
 }
@@ -305,8 +308,8 @@ void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
  * @param core_id - core id
  */
 void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
-                                    trace_uop_s *trace_uop, Addr rep_offset,
-                                    int core_id) {
+                                      trace_uop_s *trace_uop, Addr rep_offset,
+                                      int core_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_nvbit_s *pi = static_cast<trace_info_nvbit_s *>(trace_info);
   trace_uop->m_va = 0;
@@ -362,9 +365,9 @@ void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
  * @param sim_thread_id - thread id
  */
 inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
-                                                    trace_uop_s **trace_uop,
-                                                    int core_id,
-                                                    int sim_thread_id) {
+                                                      trace_uop_s **trace_uop,
+                                                      int core_id,
+                                                      int sim_thread_id) {
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_nvbit_s *pi = static_cast<trace_info_nvbit_s *>(trace_info);
 
@@ -780,7 +783,7 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
  * @param sim_thread_id thread id
  */
 bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
-                                         int sim_thread_id) {
+                                           int sim_thread_id) {
   ASSERT(uop);
 
   trace_uop_s *trace_uop;
@@ -1183,13 +1186,15 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
         }
 
         if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
-          memcpy(&addr, ((uint8_t *)&trace_info) +
-                          ((read_addr - 1) % addr_per_trace_inst) * 8,
+          memcpy(&addr,
+                 ((uint8_t *)&trace_info) +
+                   ((read_addr - 1) % addr_per_trace_inst) * 8,
                  8);
         } else {
           addr = 0;
-          memcpy(&addr, ((uint8_t *)&trace_info) +
-                          ((read_addr - 1) % addr_per_trace_inst) * 4,
+          memcpy(&addr,
+                 ((uint8_t *)&trace_info) +
+                   ((read_addr - 1) % addr_per_trace_inst) * 4,
                  4);
         }
 
@@ -1290,6 +1295,170 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
  * Initialize the mapping between trace opcode and uop type
  */
 void nvbit_decoder_c::init_pin_convert(void) {
+  m_fp_uop_table[NVBIT_FADD] = UOP_NVBIT_FADD;
+  m_fp_uop_table[NVBIT_FADD32I] = UOP_NVBIT_FADD32I;
+  m_fp_uop_table[NVBIT_FCHK] = UOP_NVBIT_FCHK;
+  m_fp_uop_table[NVBIT_FFMA32I] = UOP_NVBIT_FFMA32I;
+  m_fp_uop_table[NVBIT_FFMA] = UOP_NVBIT_FFMA;
+  m_fp_uop_table[NVBIT_FMNMX] = UOP_NVBIT_FMNMX;
+  m_fp_uop_table[NVBIT_FMUL] = UOP_NVBIT_FMUL;
+  m_fp_uop_table[NVBIT_FMUL32I] = UOP_NVBIT_FMUL32I;
+  m_fp_uop_table[NVBIT_FSEL] = UOP_NVBIT_FSEL;
+  m_fp_uop_table[NVBIT_FSET] = UOP_NVBIT_FSET;
+  m_fp_uop_table[NVBIT_FSETP] = UOP_NVBIT_FSETP;
+  m_fp_uop_table[NVBIT_FSWZADD] = UOP_NVBIT_FSWZADD;
+  m_int_uop_table[NVBIT_MUFU] = UOP_NVBIT_MUFU;
+  m_int_uop_table[NVBIT_HADD2] = UOP_NVBIT_HADD2;
+  m_int_uop_table[NVBIT_HADD2_32I] = UOP_NVBIT_HADD2_32I;
+  m_int_uop_table[NVBIT_HFMA2] = UOP_NVBIT_HFMA2;
+  m_int_uop_table[NVBIT_HFMA2_32I] = UOP_NVBIT_HFMA2_32I;
+  m_int_uop_table[NVBIT_HMMA] = UOP_NVBIT_HMMA;
+  m_int_uop_table[NVBIT_HMUL2] = UOP_NVBIT_HMUL2;
+  m_int_uop_table[NVBIT_HMUL2_32I] = UOP_NVBIT_HMUL2_32I;
+  m_int_uop_table[NVBIT_HSET2] = UOP_NVBIT_HSET2;
+  m_int_uop_table[NVBIT_HSETP2] = UOP_NVBIT_HSETP2;
+  m_int_uop_table[NVBIT_DADD] = UOP_NVBIT_DADD;
+  m_int_uop_table[NVBIT_DFMA] = UOP_NVBIT_DFMA;
+  m_int_uop_table[NVBIT_DMUL] = UOP_NVBIT_DMUL;
+  m_int_uop_table[NVBIT_DSETP] = UOP_NVBIT_DSETP;
+  m_int_uop_table[NVBIT_BMMA] = UOP_NVBIT_BMMA;
+  m_int_uop_table[NVBIT_BMSK] = UOP_NVBIT_BMSK;
+  m_int_uop_table[NVBIT_BREV] = UOP_NVBIT_BREV;
+  m_int_uop_table[NVBIT_FLO] = UOP_NVBIT_FLO;
+  m_int_uop_table[NVBIT_IABS] = UOP_NVBIT_IABS;
+  m_int_uop_table[NVBIT_IADD] = UOP_NVBIT_IADD;
+  m_int_uop_table[NVBIT_IADD3] = UOP_NVBIT_IADD3;
+  m_int_uop_table[NVBIT_IADD32I] = UOP_NVBIT_IADD32I;
+  m_int_uop_table[NVBIT_IDP] = UOP_NVBIT_IDP;
+  m_int_uop_table[NVBIT_IDP4A] = UOP_NVBIT_IDP4A;
+  m_int_uop_table[NVBIT_IMAD] = UOP_NVBIT_IMAD;
+  m_int_uop_table[NVBIT_IMMA] = UOP_NVBIT_IMMA;
+  m_int_uop_table[NVBIT_IMNMX] = UOP_NVBIT_IMNMX;
+  m_int_uop_table[NVBIT_IMUL] = UOP_NVBIT_IMUL;
+  m_int_uop_table[NVBIT_IMUL32I] = UOP_NVBIT_IMUL32I;
+  m_int_uop_table[NVBIT_ISCADD] = UOP_NVBIT_ISCADD;
+  m_int_uop_table[NVBIT_ISCADD32I] = UOP_NVBIT_ISCADD32I;
+  m_int_uop_table[NVBIT_ISETP] = UOP_NVBIT_ISETP;
+  m_int_uop_table[NVBIT_LEA] = UOP_NVBIT_LEA;
+  m_int_uop_table[NVBIT_LOP] = UOP_NVBIT_LOP;
+  m_int_uop_table[NVBIT_LOP3] = UOP_NVBIT_LOP3;
+  m_int_uop_table[NVBIT_LOP32I] = UOP_NVBIT_LOP32I;
+  m_int_uop_table[NVBIT_POPC] = UOP_NVBIT_POPC;
+  m_int_uop_table[NVBIT_SHF] = UOP_NVBIT_SHF;
+  m_int_uop_table[NVBIT_SHL] = UOP_NVBIT_SHL;
+  m_int_uop_table[NVBIT_SHR] = UOP_NVBIT_SHR;
+  m_int_uop_table[NVBIT_VABSDIFF] = UOP_NVBIT_VABSDIFF;
+  m_int_uop_table[NVBIT_VABSDIFF4] = UOP_NVBIT_VABSDIFF4;
+  m_int_uop_table[NVBIT_F2F] = UOP_NVBIT_F2F;
+  m_int_uop_table[NVBIT_F2I] = UOP_NVBIT_F2I;
+  m_int_uop_table[NVBIT_I2F] = UOP_NVBIT_I2F;
+  m_int_uop_table[NVBIT_I2I] = UOP_NVBIT_I2I;
+  m_int_uop_table[NVBIT_I2IP] = UOP_NVBIT_I2IP;
+  m_int_uop_table[NVBIT_FRND] = UOP_NVBIT_FRND;
+  m_int_uop_table[NVBIT_MOV] = UOP_NVBIT_MOV;
+  m_int_uop_table[NVBIT_MOV32I] = UOP_NVBIT_MOV32I;
+  m_int_uop_table[NVBIT_MOVM] = UOP_NVBIT_MOVM;
+  m_int_uop_table[NVBIT_PRMT] = UOP_NVBIT_PRMT;
+  m_int_uop_table[NVBIT_SEL] = UOP_NVBIT_SEL;
+  m_int_uop_table[NVBIT_SGXT] = UOP_NVBIT_SGXT;
+  m_int_uop_table[NVBIT_SHFL] = UOP_NVBIT_SHFL;
+  m_int_uop_table[NVBIT_PLOP3] = UOP_NVBIT_PLOP3;
+  m_int_uop_table[NVBIT_PSETP] = UOP_NVBIT_PSETP;
+  m_int_uop_table[NVBIT_P2R] = UOP_NVBIT_P2R;
+  m_int_uop_table[NVBIT_R2P] = UOP_NVBIT_R2P;
+  m_int_uop_table[NVBIT_LD] = UOP_NVBIT_LD;
+  m_int_uop_table[NVBIT_LDC] = UOP_NVBIT_LDC;
+  m_int_uop_table[NVBIT_LDG] = UOP_NVBIT_LDG;
+  m_int_uop_table[NVBIT_LDL] = UOP_NVBIT_LDL;
+  m_int_uop_table[NVBIT_LDS] = UOP_NVBIT_LDS;
+  m_int_uop_table[NVBIT_LDSM] = UOP_NVBIT_LDSM;
+  m_int_uop_table[NVBIT_ST] = UOP_NVBIT_ST;
+  m_int_uop_table[NVBIT_STG] = UOP_NVBIT_STG;
+  m_int_uop_table[NVBIT_STL] = UOP_NVBIT_STL;
+  m_int_uop_table[NVBIT_STS] = UOP_NVBIT_STS;
+  m_int_uop_table[NVBIT_MATCH] = UOP_NVBIT_MATCH;
+  m_int_uop_table[NVBIT_QSPC] = UOP_NVBIT_QSPC;
+  m_int_uop_table[NVBIT_ATOM] = UOP_NVBIT_ATOM;
+  m_int_uop_table[NVBIT_ATOMS] = UOP_NVBIT_ATOMS;
+  m_int_uop_table[NVBIT_ATOMG] = UOP_NVBIT_ATOMG;
+  m_int_uop_table[NVBIT_RED] = UOP_NVBIT_RED;
+  m_int_uop_table[NVBIT_CCTL] = UOP_NVBIT_CCTL;
+  m_int_uop_table[NVBIT_CCTLL] = UOP_NVBIT_CCTLL;
+  m_int_uop_table[NVBIT_ERRBAR] = UOP_NVBIT_ERRBAR;
+  m_int_uop_table[NVBIT_MEMBAR] = UOP_NVBIT_MEMBAR;
+  m_int_uop_table[NVBIT_CCTLT] = UOP_NVBIT_CCTLT;
+  m_int_uop_table[NVBIT_R2UR] = UOP_NVBIT_R2UR;
+  m_int_uop_table[NVBIT_S2UR] = UOP_NVBIT_S2UR;
+  m_int_uop_table[NVBIT_UBMSK] = UOP_NVBIT_UBMSK;
+  m_int_uop_table[NVBIT_UBREV] = UOP_NVBIT_UBREV;
+  m_int_uop_table[NVBIT_UCLEA] = UOP_NVBIT_UCLEA;
+  m_int_uop_table[NVBIT_UFLO] = UOP_NVBIT_UFLO;
+  m_int_uop_table[NVBIT_UIADD3] = UOP_NVBIT_UIADD3;
+  m_int_uop_table[NVBIT_UIADD3_64] = UOP_NVBIT_UIADD3_64;
+  m_int_uop_table[NVBIT_UIMAD] = UOP_NVBIT_UIMAD;
+  m_int_uop_table[NVBIT_UISETP] = UOP_NVBIT_UISETP;
+  m_int_uop_table[NVBIT_ULDC] = UOP_NVBIT_ULDC;
+  m_int_uop_table[NVBIT_ULEA] = UOP_NVBIT_ULEA;
+  m_int_uop_table[NVBIT_ULOP] = UOP_NVBIT_ULOP;
+  m_int_uop_table[NVBIT_ULOP3] = UOP_NVBIT_ULOP3;
+  m_int_uop_table[NVBIT_ULOP32I] = UOP_NVBIT_ULOP32I;
+  m_int_uop_table[NVBIT_UMOV] = UOP_NVBIT_UMOV;
+  m_int_uop_table[NVBIT_UP2UR] = UOP_NVBIT_UP2UR;
+  m_int_uop_table[NVBIT_UPLOP3] = UOP_NVBIT_UPLOP3;
+  m_int_uop_table[NVBIT_UPOPC] = UOP_NVBIT_UPOPC;
+  m_int_uop_table[NVBIT_UPRMT] = UOP_NVBIT_UPRMT;
+  m_int_uop_table[NVBIT_UPSETP] = UOP_NVBIT_UPSETP;
+  m_int_uop_table[NVBIT_UR2UP] = UOP_NVBIT_UR2UP;
+  m_int_uop_table[NVBIT_USEL] = UOP_NVBIT_USEL;
+  m_int_uop_table[NVBIT_USGXT] = UOP_NVBIT_USGXT;
+  m_int_uop_table[NVBIT_USHF] = UOP_NVBIT_USHF;
+  m_int_uop_table[NVBIT_USHL] = UOP_NVBIT_USHL;
+  m_int_uop_table[NVBIT_USHR] = UOP_NVBIT_USHR;
+  m_int_uop_table[NVBIT_VOTEU] = UOP_NVBIT_VOTEU;
+  m_int_uop_table[NVBIT_TEX] = UOP_NVBIT_TEX;
+  m_int_uop_table[NVBIT_TLD] = UOP_NVBIT_TLD;
+  m_int_uop_table[NVBIT_TLD4] = UOP_NVBIT_TLD4;
+  m_int_uop_table[NVBIT_TMML] = UOP_NVBIT_TMML;
+  m_int_uop_table[NVBIT_TXD] = UOP_NVBIT_TXD;
+  m_int_uop_table[NVBIT_TXQ] = UOP_NVBIT_TXQ;
+  m_int_uop_table[NVBIT_SUATOM] = UOP_NVBIT_SUATOM;
+  m_int_uop_table[NVBIT_SULD] = UOP_NVBIT_SULD;
+  m_int_uop_table[NVBIT_SURED] = UOP_NVBIT_SURED;
+  m_int_uop_table[NVBIT_SUST] = UOP_NVBIT_SUST;
+  m_int_uop_table[NVBIT_BMOV] = UOP_NVBIT_BMOV;
+  m_int_uop_table[NVBIT_BPT] = UOP_NVBIT_BPT;
+  m_int_uop_table[NVBIT_BRA] = UOP_NVBIT_BRA;
+  m_int_uop_table[NVBIT_BREAK] = UOP_NVBIT_BREAK;
+  m_int_uop_table[NVBIT_BRX] = UOP_NVBIT_BRX;
+  m_int_uop_table[NVBIT_BRXU] = UOP_NVBIT_BRXU;
+  m_int_uop_table[NVBIT_BSSY] = UOP_NVBIT_BSSY;
+  m_int_uop_table[NVBIT_BSYNC] = UOP_NVBIT_BSYNC;
+  m_int_uop_table[NVBIT_CALL] = UOP_NVBIT_CALL;
+  m_int_uop_table[NVBIT_EXIT] = UOP_NVBIT_EXIT;
+  m_int_uop_table[NVBIT_JMP] = UOP_NVBIT_JMP;
+  m_int_uop_table[NVBIT_JMX] = UOP_NVBIT_JMX;
+  m_int_uop_table[NVBIT_JMXU] = UOP_NVBIT_JMXU;
+  m_int_uop_table[NVBIT_KILL] = UOP_NVBIT_KILL;
+  m_int_uop_table[NVBIT_NANOSLEEP] = UOP_NVBIT_NANOSLEEP;
+  m_int_uop_table[NVBIT_RET] = UOP_NVBIT_RET;
+  m_int_uop_table[NVBIT_RPCMOV] = UOP_NVBIT_RPCMOV;
+  m_int_uop_table[NVBIT_RTT] = UOP_NVBIT_RTT;
+  m_int_uop_table[NVBIT_WARPSYNC] = UOP_NVBIT_WARPSYNC;
+  m_int_uop_table[NVBIT_YIELD] = UOP_NVBIT_YIELD;
+  m_int_uop_table[NVBIT_B2R] = UOP_NVBIT_B2R;
+  m_int_uop_table[NVBIT_BAR] = UOP_NVBIT_BAR;
+  m_int_uop_table[NVBIT_CS2R] = UOP_NVBIT_CS2R;
+  m_int_uop_table[NVBIT_DEPBAR] = UOP_NVBIT_DEPBAR;
+  m_int_uop_table[NVBIT_GETLMEMBASE] = UOP_NVBIT_GETLMEMBASE;
+  m_int_uop_table[NVBIT_LEPC] = UOP_NVBIT_LEPC;
+  m_int_uop_table[NVBIT_NOP] = UOP_NVBIT_NOP;
+  m_int_uop_table[NVBIT_PMTRIG] = UOP_NVBIT_PMTRIG;
+  m_int_uop_table[NVBIT_R2B] = UOP_NVBIT_R2B;
+  m_int_uop_table[NVBIT_S2R] = UOP_NVBIT_S2R;
+  m_int_uop_table[NVBIT_SETCTAID] = UOP_NVBIT_SETCTAID;
+  m_int_uop_table[NVBIT_SETLMEMBASE] = UOP_NVBIT_SETLMEMBASE;
+  m_int_uop_table[NVBIT_VOTE] = UOP_NVBIT_VOTE;
+  /*
   m_int_uop_table[GPU_ABS] = UOP_GPU_ABS;
   m_int_uop_table[GPU_ABS64] = UOP_GPU_ABS64;
   m_int_uop_table[GPU_ADD] = UOP_GPU_ADD;
@@ -1595,6 +1764,7 @@ void nvbit_decoder_c::init_pin_convert(void) {
   m_fp_uop_table[GPU_DATA_XFER_GM] = UOP_FADD;
   m_fp_uop_table[GPU_DATA_XFER_LM] = UOP_FADD;
   m_fp_uop_table[GPU_DATA_XFER_SM] = UOP_FADD;
+*/
 }
 
 const char *nvbit_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
@@ -1648,170 +1818,61 @@ const char *nvbit_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
 };
 
 const char *nvbit_decoder_c::g_tr_opcode_names[MAX_NVBIT_OPCODE_NAME] = {
-  "NVBIT_FADD",
-  "NVBIT_FADD32I",
-  "NVBIT_FCHK",
-  "NVBIT_FFMA32I",
-  "NVBIT_FFMA",
-  "NVBIT_FMNMX",
-  "NVBIT_FMUL",
-  "NVBIT_FMUL32I",
-  "NVBIT_FSEL",
-  "NVBIT_FSET",
-  "NVBIT_FSETP",
-  "NVBIT_FSWZADD",
-  "NVBIT_MUFU",
-  "NVBIT_HADD2",
-  "NVBIT_HADD2_32I",
-  "NVBIT_HFMA2",
-  "NVBIT_HFMA2_32I",
-  "NVBIT_HMMA",
-  "NVBIT_HMUL2",
-  "NVBIT_HMUL2_32I",
-  "NVBIT_HSET2",
-  "NVBIT_HSETP2",
-  "NVBIT_DADD",
-  "NVBIT_DFMA",
-  "NVBIT_DMUL",
-  "NVBIT_DSETP",
-  "NVBIT_BMMA",
-  "NVBIT_BMSK",
-  "NVBIT_BREV",
-  "NVBIT_FLO",
-  "NVBIT_IABS",
-  "NVBIT_IADD",
-  "NVBIT_IADD3",
-  "NVBIT_IADD32I",
-  "NVBIT_IDP",
-  "NVBIT_IDP4A",
-  "NVBIT_IMAD",
-  "NVBIT_IMMA",
-  "NVBIT_IMNMX",
-  "NVBIT_IMUL",
-  "NVBIT_IMUL32I",
-  "NVBIT_ISCADD",
-  "NVBIT_ISCADD32I",
-  "NVBIT_ISETP",
-  "NVBIT_LEA",
-  "NVBIT_LOP",
-  "NVBIT_LOP3",
-  "NVBIT_LOP32I",
-  "NVBIT_POPC",
-  "NVBIT_SHF",
-  "NVBIT_SHL",
-  "NVBIT_SHR",
-  "NVBIT_VABSDIFF",
-  "NVBIT_VABSDIFF4",
-  "NVBIT_F2F",
-  "NVBIT_F2I",
-  "NVBIT_I2F",
-  "NVBIT_I2I",
-  "NVBIT_I2IP",
-  "NVBIT_FRND",
-  "NVBIT_MOV",
-  "NVBIT_MOV32I",
-  "NVBIT_MOVM",
-  "NVBIT_PRMT",
-  "NVBIT_SEL",
-  "NVBIT_SGXT",
-  "NVBIT_SHFL",
-  "NVBIT_PLOP3",
-  "NVBIT_PSETP",
-  "NVBIT_P2R",
-  "NVBIT_R2P",
-  "NVBIT_LD",
-  "NVBIT_LDC",
-  "NVBIT_LDG",
-  "NVBIT_LDL",
-  "NVBIT_LDS",
-  "NVBIT_LDSM",
-  "NVBIT_ST",
-  "NVBIT_STG",
-  "NVBIT_STL",
-  "NVBIT_STS",
-  "NVBIT_MATCH",
-  "NVBIT_QSPC",
-  "NVBIT_ATOM",
-  "NVBIT_ATOMS",
-  "NVBIT_ATOMG",
-  "NVBIT_RED",
-  "NVBIT_CCTL",
-  "NVBIT_CCTLL",
-  "NVBIT_ERRBAR",
-  "NVBIT_MEMBAR",
-  "NVBIT_CCTLT",
-  "NVBIT_R2UR",
-  "NVBIT_S2UR",
-  "NVBIT_UBMSK",
-  "NVBIT_UBREV",
-  "NVBIT_UCLEA",
-  "NVBIT_UFLO",
-  "NVBIT_UIADD3",
-  "NVBIT_UIADD3_64",
-  "NVBIT_UIMAD",
-  "NVBIT_UISETP",
-  "NVBIT_ULDC",
-  "NVBIT_ULEA",
-  "NVBIT_ULOP",
-  "NVBIT_ULOP3",
-  "NVBIT_ULOP32I",
-  "NVBIT_UMOV",
-  "NVBIT_UP2UR",
-  "NVBIT_UPLOP3",
-  "NVBIT_UPOPC",
-  "NVBIT_UPRMT",
-  "NVBIT_UPSETP",
-  "NVBIT_UR2UP",
-  "NVBIT_USEL",
-  "NVBIT_USGXT",
-  "NVBIT_USHF",
-  "NVBIT_USHL",
-  "NVBIT_USHR",
-  "NVBIT_VOTEU",
-  "NVBIT_TEX",
-  "NVBIT_TLD",
-  "NVBIT_TLD4",
-  "NVBIT_TMML",
-  "NVBIT_TXD",
-  "NVBIT_TXQ", 
-  "NVBIT_SUATOM",
-  "NVBIT_SULD",
-  "NVBIT_SURED",
-  "NVBIT_SUST",
-  "NVBIT_BMOV",
-  "NVBIT_BPT",
-  "NVBIT_BRA",
-  "NVBIT_BREAK",
-  "NVBIT_BRX",
-  "NVBIT_BRXU",
-  "NVBIT_BSSY",
-  "NVBIT_BSYNC",
-  "NVBIT_CALL",
-  "NVBIT_EXIT",
-  "NVBIT_JMP",
-  "NVBIT_JMX",
-  "NVBIT_JMXU",
-  "NVBIT_KILL",
-  "NVBIT_NANOSLEEP",
-  "NVBIT_RET",
-  "NVBIT_RPCMOV",
-  "NVBIT_RTT",
-  "NVBIT_WARPSYNC",
-  "NVBIT_YIELD",
-  "NVBIT_B2R",
-  "NVBIT_BAR",
-  "NVBIT_CS2R",
-  "NVBIT_DEPBAR",
-  "NVBIT_GETLMEMBASE",
-  "NVBIT_LEPC",
-  "NVBIT_NOP",
-  "NVBIT_PMTRIG",
-  "NVBIT_R2B",
-  "NVBIT_S2R",
-  "NVBIT_SETCTAID",
-  "NVBIT_SETLMEMBASE",
-  "NVBIT_VOTE"
-};
+  "NVBIT_FADD",      "NVBIT_FADD32I",     "NVBIT_FCHK",
+  "NVBIT_FFMA32I",   "NVBIT_FFMA",        "NVBIT_FMNMX",
+  "NVBIT_FMUL",      "NVBIT_FMUL32I",     "NVBIT_FSEL",
+  "NVBIT_FSET",      "NVBIT_FSETP",       "NVBIT_FSWZADD",
+  "NVBIT_MUFU",      "NVBIT_HADD2",       "NVBIT_HADD2_32I",
+  "NVBIT_HFMA2",     "NVBIT_HFMA2_32I",   "NVBIT_HMMA",
+  "NVBIT_HMUL2",     "NVBIT_HMUL2_32I",   "NVBIT_HSET2",
+  "NVBIT_HSETP2",    "NVBIT_DADD",        "NVBIT_DFMA",
+  "NVBIT_DMUL",      "NVBIT_DSETP",       "NVBIT_BMMA",
+  "NVBIT_BMSK",      "NVBIT_BREV",        "NVBIT_FLO",
+  "NVBIT_IABS",      "NVBIT_IADD",        "NVBIT_IADD3",
+  "NVBIT_IADD32I",   "NVBIT_IDP",         "NVBIT_IDP4A",
+  "NVBIT_IMAD",      "NVBIT_IMMA",        "NVBIT_IMNMX",
+  "NVBIT_IMUL",      "NVBIT_IMUL32I",     "NVBIT_ISCADD",
+  "NVBIT_ISCADD32I", "NVBIT_ISETP",       "NVBIT_LEA",
+  "NVBIT_LOP",       "NVBIT_LOP3",        "NVBIT_LOP32I",
+  "NVBIT_POPC",      "NVBIT_SHF",         "NVBIT_SHL",
+  "NVBIT_SHR",       "NVBIT_VABSDIFF",    "NVBIT_VABSDIFF4",
+  "NVBIT_F2F",       "NVBIT_F2I",         "NVBIT_I2F",
+  "NVBIT_I2I",       "NVBIT_I2IP",        "NVBIT_FRND",
+  "NVBIT_MOV",       "NVBIT_MOV32I",      "NVBIT_MOVM",
+  "NVBIT_PRMT",      "NVBIT_SEL",         "NVBIT_SGXT",
+  "NVBIT_SHFL",      "NVBIT_PLOP3",       "NVBIT_PSETP",
+  "NVBIT_P2R",       "NVBIT_R2P",         "NVBIT_LD",
+  "NVBIT_LDC",       "NVBIT_LDG",         "NVBIT_LDL",
+  "NVBIT_LDS",       "NVBIT_LDSM",        "NVBIT_ST",
+  "NVBIT_STG",       "NVBIT_STL",         "NVBIT_STS",
+  "NVBIT_MATCH",     "NVBIT_QSPC",        "NVBIT_ATOM",
+  "NVBIT_ATOMS",     "NVBIT_ATOMG",       "NVBIT_RED",
+  "NVBIT_CCTL",      "NVBIT_CCTLL",       "NVBIT_ERRBAR",
+  "NVBIT_S2UR",      "NVBIT_UBMSK",       "NVBIT_UBREV",
+  "NVBIT_MEMBAR",    "NVBIT_CCTLT",       "NVBIT_R2UR",
+  "NVBIT_UCLEA",     "NVBIT_UFLO",        "NVBIT_UIADD3",
+  "NVBIT_UIADD3_64", "NVBIT_UIMAD",       "NVBIT_UISETP",
+  "NVBIT_ULDC",      "NVBIT_ULEA",        "NVBIT_ULOP",
+  "NVBIT_ULOP3",     "NVBIT_ULOP32I",     "NVBIT_UMOV",
+  "NVBIT_UP2UR",     "NVBIT_UPLOP3",      "NVBIT_UPOPC",
+  "NVBIT_UPRMT",     "NVBIT_UPSETP",      "NVBIT_UR2UP",
+  "NVBIT_USEL",      "NVBIT_USGXT",       "NVBIT_USHF",
+  "NVBIT_USHL",      "NVBIT_USHR",        "NVBIT_VOTEU",
+  "NVBIT_TEX",       "NVBIT_TLD",         "NVBIT_TLD4",
+  "NVBIT_TMML",      "NVBIT_TXD",         "NVBIT_TXQ",
+  "NVBIT_SUATOM",    "NVBIT_SULD",        "NVBIT_SURED",
+  "NVBIT_SUST",      "NVBIT_BMOV",        "NVBIT_BPT",
+  "NVBIT_BRA",       "NVBIT_BREAK",       "NVBIT_BRX",
+  "NVBIT_BRXU",      "NVBIT_BSSY",        "NVBIT_BSYNC",
+  "NVBIT_CALL",      "NVBIT_EXIT",        "NVBIT_JMP",
+  "NVBIT_JMX",       "NVBIT_JMXU",        "NVBIT_KILL",
+  "NVBIT_NANOSLEEP", "NVBIT_RET",         "NVBIT_RPCMOV",
+  "NVBIT_RTT",       "NVBIT_WARPSYNC",    "NVBIT_YIELD",
+  "NVBIT_B2R",       "NVBIT_BAR",         "NVBIT_CS2R",
+  "NVBIT_DEPBAR",    "NVBIT_GETLMEMBASE", "NVBIT_LEPC",
+  "NVBIT_NOP",       "NVBIT_PMTRIG",      "NVBIT_R2B",
+  "NVBIT_S2R",       "NVBIT_SETCTAID",    "NVBIT_SETLMEMBASE",
+  "NVBIT_VOTE"};
 
 const char *nvbit_decoder_c::g_tr_cf_names[10] = {
   "NOT_CF",  // not a control flow instruction
@@ -1822,8 +1883,7 @@ const char *nvbit_decoder_c::g_tr_cf_names[10] = {
   "CF_ICALL",  // an indirect call
   "CF_ICO",  // an indirect jump to co-routine
   "CF_RET",  // a return
-  "CF_MITE"
-};
+  "CF_MITE"};
 
 const char *nvbit_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
   "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",   "GPU_ADDR_SP_GLOBAL",

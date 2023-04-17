@@ -154,8 +154,8 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase)
       m_latency[uop_latencybinding_init_igpu[ii].uop_type_s] =
         uop_latencybinding_init_igpu[ii].m_latency;
     }
-    } else if (m_nvbit_sim) { 
-       int latency_array_size = (sizeof uop_latencybinding_init_ptx /
+  } else if (m_nvbit_sim) {
+    int latency_array_size = (sizeof uop_latencybinding_init_nvbit /
                               sizeof(uop_latencybinding_init_nvbit[0]));
 
     for (int ii = 0; ii < latency_array_size; ++ii) {
@@ -447,9 +447,8 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
             // other (global, texture, local) memory access
             else {
 #if PORT_FIXME
-              if (0 &&
-                  m_bank_busy[uop->m_child_uops[next_set_bit]
-                                ->m_dcache_bank_id] == true) {
+              if (0 && m_bank_busy[uop->m_child_uops[next_set_bit]
+                                     ->m_dcache_bank_id] == true) {
                 STAT_EVENT(CACHE_BANK_BUSY);
                 uop_latency = 0;
               } else {

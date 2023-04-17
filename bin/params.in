@@ -1,86 +1,108 @@
+
 # Simulation Configuration
-num_sim_cores 1
-num_sim_small_cores 1
+num_sim_cores 16
+num_sim_small_cores 16
+core_type nvbit
+max_threads_per_core 80
 num_sim_medium_cores 0
 num_sim_large_cores 0
-large_core_type x86 
-core_type nvbit 
-sim_cycle_count 0
-max_insts 3000000
-heartbeat_interval 1000000
-forward_progress_limit 1000000
-core_thread_sched balanced
+
 
 # Clock
-clock_cpu 1.15
-clock_gpu 1.15
-clock_noc 1.15
-clock_mc  1.15
+# from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
+clock_cpu 4.0
+clock_gpu 4.0
+clock_llc 4.0
+clock_noc 4.0
+clock_mc  4.0
 
-# Common Core Configuration
+
+# Small Core Configuration
+fetch_wdith 2
+width 1
+fetch_latency 5
+alloc_latency 5
+rob_size 1024
+schedule ooo
+isched_rate 4
+msched_rate 2
+fsched_rate 2
+bp_hist_length 14
+max_block_per_core 4
 fetch_policy rr
 mt_no_fetch_br 1
-one_cycle_exec 0
-uop_latency_map x86
+fetch_only_load_ready 0
+schedule_ratio 2
+fetch_ratio 2
+gpu_sched 1
+icache_num_set 8
 
-# Large Core Configuration
-large_width 2
-large_core_fetch_latency 5
-large_core_alloc_latency 10
-isched_large_rate 4
-msched_large_rate 2
-fsched_large_rate 2
-ssched_large_rate 1
-isched_large_size 64
-msched_large_size 32
-fsched_large_size 96
-ssched_large_size 128
-bp_hist_length 16
-rob_large_size 512
-large_core_schedule ooo
-max_threads_per_large_core 7
-
-mem_mshr_size 9
-
-# L3-I
-icache_large_num_set 4096 # 768 KB
-icache_large_assoc 3
-icache_large_line_size 64
-icache_large_cycles 14
-
-# L3-D
-l1_large_num_set 512 # 512 KB
-l1_large_assoc 16
-l1_large_line_size 64
-l1_large_latency 100
-l1_large_bypass 0
 
 # Memory
-memory_type igpu_network
+memory_type l2_decoupled_network
+perfect_dcache 0
+enable_cache_coherence 0
+dram_merge_requests 1
+mem_ooo_stores 0
+ptx_common_cache 0
+const_cache_size 8192
+texture_cache_size 8192
+shared_mem_size 16384
+shared_mem_banks 32
+shared_mem_cycles 2
+shared_mem_ports 1
+byte_level_access 0
 
-# LLC
-num_l3 1
-l3_num_set 8192
-l3_assoc 32
-l3_line_size 64
-l3_latency 100
+l1_small_line_size 128
+#48 KB
+l1_small_num_set 64
+l1_small_assoc 6
+#16 KB
+#l1_small_num_set 32
+#l1_small_assoc 4
+
+# L3 Cache
+num_llc 6
+llc_num_set 128
+llc_line_size 128
+llc_assoc 8
+llc_num_bank 4
+llc_latency 10
+
 
 # DRAM
-dram_bus_width 4
+dram_num_mc 6
+dram_bus_width 8
 dram_column 11
 dram_activate 25
 dram_precharge 10
 dram_num_banks 16
-dram_num_channel 8
+dram_num_channel 1
 dram_rowbuffer_size 2048
 dram_scheduling_policy FRFCFS
-dram_additional_latency 95
 
-# ETC
+
+
+infinite_port 0
+pref_train_inst_once 0
+pref_framework_on 1
+
+
+
 bug_detector_enable 1
 
-perfect_icache 1
-ideal_noc 1
+sim_cycle_count 0
+max_insts 200000000
+heartbeat_interval 1000000
+forward_progress_limit 50000
+blocks_to_simulate 0
+ptx_exec_ratio 2
+num_warp_scheduler 2
+
+
+noc_topology simple_noc
+noc_dimension 0
+link_width 32
 
 # DEBUG
 debug_core_id 0
@@ -94,10 +116,8 @@ debug_dcu_stage 0
 debug_retire_stage 0
 debug_map_stage 0
 debug_mem  0
-debug_print_trace 1 
-debug_trace_read 1
+debug_trace_read 1 
+debug_print_trace 1
 debug_sim_thread_schedule 0
 debug_cache_lib 0
 debug_bp_dir 0
-debug_print_trace 0 
-debug_noc 0 

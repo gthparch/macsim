@@ -226,7 +226,7 @@ typedef struct trace_info_gpu_s {
     m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
 
-// the same structure as the trace generator 
+// the same structure as the trace generator
 
 typedef struct trace_info_nvbit_small_s {
   uint8_t m_opcode;
@@ -260,7 +260,7 @@ typedef struct trace_info_nvbit_small_s {
   uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
 } trace_info_nvbit_small_s;
 
-//trace_info_nvbit_small_s + m_next_inst_addr 
+//trace_info_nvbit_small_s + m_next_inst_addr
 typedef struct trace_info_nvbit_s {
   uint8_t m_opcode;
   bool m_is_fp;
@@ -291,8 +291,7 @@ typedef struct trace_info_nvbit_s {
   };
   uint8_t m_cache_level;  // for prefetch?
   uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
-  uint64_t
-    m_next_inst_addr;  // next pc address, not present in raw trace fo
+  uint64_t m_next_inst_addr;  // next pc address, not present in raw trace fo
 
 } trace_info_nvbit_s;
 
@@ -659,7 +658,7 @@ typedef enum GPU_FENCE_LEVEL_ENUM_ {
   GPU_FENCE_LAST
 } GPU_FENCE_LEVEL_ENUM;
 
-typedef enum GPU_NVBIT_OPCODE_ {
+typedef enum NVBIT_OPCODE_ {
   NVBIT_FADD,
   NVBIT_FADD32I,
   NVBIT_FCHK,
@@ -769,6 +768,11 @@ typedef enum GPU_NVBIT_OPCODE_ {
   NVBIT_ULOP32I,
   NVBIT_UMOV,
   NVBIT_UP2UR,
+  NVBIT_UPLOP3,
+  NVBIT_UPOPC,
+  NVBIT_UPRMT,
+  NVBIT_UPSETP,
+  NVBIT_UR2UP,
   NVBIT_USEL,
   NVBIT_USGXT,
   NVBIT_USHF,
@@ -817,8 +821,9 @@ typedef enum GPU_NVBIT_OPCODE_ {
   NVBIT_S2R,
   NVBIT_SETCTAID,
   NVBIT_SETLMEMBASE,
-  NVBIT_VOTE
-} GPU_NVBIT_OPCODE;
+  NVBIT_VOTE,
+  NVBIT_OPCODE_LAST
+} NVBIT_OPCODE;
 
 // in trace generator, special registers are assigned values starting from 200
 // matches order in ocelot/ir/interface/PTXOperand.h

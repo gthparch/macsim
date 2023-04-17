@@ -41,7 +41,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "inst_info.h"
 #include "trace_read.h"
 
-#define MAX_NVBIT_OPCODE_NAME 163 
+//#define MAX_NVBIT_OPCODE_NAME  163
+#define MAX_NVBIT_OPCODE_NAME NVBIT_OPCODE_LAST
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
@@ -49,15 +50,14 @@ POSSIBILITY OF SUCH DAMAGE.
 /// This class handles all trace related operations. Read instructions from the file,
 /// decode, split to micro ops, uop setups ...
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// class nvbit_decoder_c : public 
- class nvbit_decoder_c : public trace_read_c
+// class nvbit_decoder_c : public
+class nvbit_decoder_c : public trace_read_c
 {
 public:
   /**
    * Constructor
    */
   nvbit_decoder_c(macsim_c *simBase, ofstream *dprint_output);
-
 
   /**
    * Destructor
