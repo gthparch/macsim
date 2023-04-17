@@ -34,12 +34,15 @@ POSSIBILITY OF SUCH DAMAGE.
  * Description  : Trace handling class
  *********************************************************************************************/
 
-#ifndef TRACE_READ_GPU_H_INCLUDED
-#define TRACE_READ_GPU_H_INCLUDED
+#ifndef TRACE_READ_NVBIT_H_INCLUDED
+#define TRACE_READ_NVBIT_H_INCLUDED
 
 #include "uop.h"
 #include "inst_info.h"
 #include "trace_read.h"
+
+//#define MAX_NVBIT_OPCODE_NAME  163
+#define MAX_NVBIT_OPCODE_NAME NVBIT_OPCODE_LAST
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Trace reader class
@@ -47,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /// This class handles all trace related operations. Read instructions from the file,
 /// decode, split to micro ops, uop setups ...
 ///////////////////////////////////////////////////////////////////////////////////////////////
+// class nvbit_decoder_c : public
 class nvbit_decoder_c : public trace_read_c
 {
 public:
@@ -78,7 +82,7 @@ public:
 
   static const char *g_tr_reg_names[MAX_TR_REG]; /**< register name string */
   static const char
-    *g_tr_opcode_names[MAX_TR_OPCODE_NAME]; /**< opcode name string */
+    *g_tr_opcode_names[MAX_NVBIT_OPCODE_NAME]; /**< opcode name string */
   static const char *g_tr_cf_names[10]; /**< cf type string */
   static const char *g_optype_names[37]; /**< opcode type string */
   static const char *g_mem_type_names[20]; /**< memeory request type string */
@@ -151,4 +155,4 @@ private:
 private:
 };
 
-#endif  // TRACE_READ_GPU_H_INCLUDED
+#endif  // TRACE_READ_NVBIT_H_INCLUDED

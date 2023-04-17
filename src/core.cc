@@ -168,7 +168,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   m_icache->set_core_id(m_core_id);
 
   // reorder buffer
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type  == "nvbit") {
     m_rob = NULL;
     m_gpu_rob = new smc_rob_c(m_unit_type, m_core_id, m_simBase);
   } else {
@@ -182,7 +182,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     (m_knob_fetch_latency + m_knob_alloc_latency), "q_frontend", m_simBase);
 
   // allocation queue
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type  == "nvbit") {
     m_q_iaq = NULL;
     m_gpu_q_iaq = new pqueue_c<gpu_allocq_entry_s>*[max_ALLOCQ];
   } else {
@@ -197,7 +197,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   q_iaq_size[simd_ALLOCQ] = siaq_size;
 
   sstr.clear();
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type  == "nvbit") {
     for (int i = 0; i < max_ALLOCQ; ++i) {
       sstr << "q_iaq" << i;
       sstr >> name;
@@ -227,7 +227,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     FRONTEND_INTERFACE_ARGS(), m_simBase);
 
   // allocation stage
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type == "nvbit") {
     m_allocate = NULL;
     m_gpu_allocate = new smc_allocate_c(m_core_id, m_q_frontend, m_gpu_q_iaq,
                                         m_uop_pool, m_gpu_rob, m_unit_type,
@@ -243,7 +243,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   m_exec = new exec_c(EXEC_INTERFACE_ARGS(), m_simBase);
 
   // instruction scheduler
-  if (m_core_type == "ptx") {
+  if (m_core_type == "ptx" || m_core_type == "nvbit") {
     m_schedule = new schedule_smc_c(m_core_id, m_gpu_q_iaq, m_gpu_rob, m_exec,
                                     m_unit_type, m_frontend, m_simBase);
   } else if (m_core_type == "igpu") {
@@ -271,7 +271,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     m_hw_pref = new hwp_common_c(c_id, type, m_simBase);
 
   // const / texture cache
-  if (m_core_type == "ptx" &&
+  if ((m_core_type == "ptx" | m_core_type == "nvbit") &&
       *m_simBase->m_knobs->KNOB_USE_CONST_AND_TEX_CACHES) {
     m_const_cache = new readonly_cache_c(
       "const_cache", m_core_id, *KNOB(KNOB_CONST_CACHE_SIZE),
@@ -290,7 +290,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   }
 
   // shared memory
-  if (m_core_type == "ptx") {
+  if ((m_core_type == "ptx") || (m_core_type == "nvbit")) {
     m_shared_memory = new sw_managed_cache_c(
       "shared_memory", m_core_id, *KNOB(KNOB_SHARED_MEM_SIZE),
       *KNOB(KNOB_SHARED_MEM_ASSOC), *KNOB(KNOB_SHARED_MEM_LINE_SIZE),
@@ -311,7 +311,7 @@ core_c::~core_c() {
   delete m_q_frontend;
   delete m_frontend;
   delete m_uop_pool;
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type == "nvbit") {
     delete m_gpu_rob;
     delete m_gpu_allocate;
     for (int i = 0; i < max_ALLOCQ; ++i) {
@@ -415,7 +415,7 @@ void core_c::advance_queues(void) {
   m_q_frontend->advance();
 
   // advance allocation queue
-  if (m_core_type == "ptx" || m_core_type == "igpu") {
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type  == "nvbit") {
     for (int i = 0; i < max_ALLOCQ; ++i) {
       m_gpu_q_iaq[i]->advance();
     }
@@ -647,8 +647,8 @@ void core_c::allocate_thread_data(int tid) {
   m_retire->allocate_retire_data(tid);
 
   // allocate scheduler queue and rob for GPU simulation
-  if (m_core_type == "ptx" || m_core_type == "igpu")
-    m_gpu_rob->reserve_rob(tid);
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type == "nvbit")
+    m_gpu_rob->reserve_rob(tid); 
 }
 
 // When a thread is terminated, deallocate all data used by this thread
@@ -680,7 +680,7 @@ void core_c::deallocate_thread_data(int tid) {
     m_last_terminated_tid = ++t_id;
   }
 
-  if (m_core_type == "ptx" || m_core_type == "igpu") m_gpu_rob->free_rob(tid);
+  if (m_core_type == "ptx" || m_core_type == "igpu" || m_core_type == "nvbit") m_gpu_rob->free_rob(tid);
 
   // check forward progress
   if (m_unique_scheduled_thread_num >= m_last_terminated_tid + 1000) {

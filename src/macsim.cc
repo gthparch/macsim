@@ -335,7 +335,8 @@ void macsim_c::init_cores(int num_max_core) {
     m_core_pointers[ii]->pref_init();
 
     // insert to the core type pool
-    if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx")
+    if ((static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx") ||
+    (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "nvbit"))
       m_acc_core_pool.push(ii);
     else
       m_x86_core_pool.push(ii);
@@ -350,8 +351,10 @@ void macsim_c::init_cores(int num_max_core) {
     m_core_pointers[ii + num_large_cores]->pref_init();
 
     // insert to the core type pool
-    if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==
-        "ptx")
+    if ((static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==
+        "ptx") || 
+        (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==
+        "nvbit"))
       m_acc_core_pool.push(ii + total_core);
     else
       m_x86_core_pool.push(ii + total_core);
@@ -366,7 +369,8 @@ void macsim_c::init_cores(int num_max_core) {
     m_core_pointers[ii + num_large_medium_cores]->pref_init();
 
     // insert to the core type pool
-    if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx")
+    if ((static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx") ||
+         (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "nvbit"))
       m_acc_core_pool.push(ii + total_core);
     else
       m_x86_core_pool.push(ii + total_core);
@@ -814,7 +818,7 @@ void macsim_c::init_clock_domain(void) {
   for (int ii = 0; ii < m_num_sim_cores; ++ii) {
     core_c* core = m_core_pointers[ii];
     string core_type = core->get_core_type();
-    if (core_type == "ptx") {
+    if (core_type == "ptx" || core_type == "nvbit") {
       m_domain_freq[ii] = static_cast<int>(domain_f[CLOCK_GPU]);
     } else {
       m_domain_freq[ii] = static_cast<int>(domain_f[CLOCK_CPU]);

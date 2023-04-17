@@ -148,6 +148,7 @@ process_s::~process_s() {
 thread_s::thread_s(macsim_c *simBase) {
   m_simBase = simBase;
   m_fetch_data = new frontend_s;
+
   int buf_ele_size =
     (CPU_TRACE_SIZE > GPU_TRACE_SIZE) ? CPU_TRACE_SIZE : GPU_TRACE_SIZE;
   m_buffer = new char[1000 * buf_ele_size];
@@ -406,6 +407,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
     // use for reading traces (which contains one extra field compared to the
     // structure used when generating traces) match with the structure used when
     // generating traces
+
     if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
       assert(sizeof(trace_info_gpu_s) ==
              (sizeof(trace_info_gpu_small_s) + sizeof(uint64_t)));
@@ -413,6 +415,9 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
       assert(sizeof(trace_info_gpu_s) ==
              (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
     }
+  } else if (trace_type == "nvbit") {
+    process->m_acc = true;
+    process->m_core_pool = &m_simBase->m_acc_core_pool;
   } else {
     process->m_acc = false;
     process->m_core_pool = &m_simBase->m_x86_core_pool;
@@ -502,6 +507,9 @@ void process_manager_c::setup_process(process_s *process) {
               "GPU traces\n");
     }
   }
+  printf("trace type: ");
+  cout << trace_type;
+  cout << " end" << endl;
 
   // get occupancy
   if (trace_type == "ptx") {
@@ -538,7 +546,8 @@ void process_manager_c::setup_process(process_s *process) {
       thread_count = *KNOB(KNOB_TRACE_MAX_THREAD_COUNT);
   }
 
-  report("thread_count:" << thread_count);
+  report("thread_count: " << thread_count);
+  report("max threads per core: " << process->m_max_block);
 
   // create data structures
   thread_stat_s *new_stat = new thread_stat_s[thread_count];
@@ -766,8 +775,13 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
 
   // TODO - nbl (apr-17-2013): use pools
   if (process->m_acc) {
-    trace_info->m_prev_trace_info = new trace_info_gpu_s;
-    trace_info->m_next_trace_info = new trace_info_gpu_s;
+    if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") {
+      trace_info->m_prev_trace_info = new trace_info_nvbit_s;
+      trace_info->m_next_trace_info = new trace_info_nvbit_s;
+    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") {
+      trace_info->m_prev_trace_info = new trace_info_gpu_s;
+      trace_info->m_next_trace_info = new trace_info_gpu_s;
+    }
   } else {
     if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info->m_prev_trace_info = new trace_info_cpu_s;
@@ -973,11 +987,19 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
 
   // TODO - nbl (apr-17-2013): use pools
   if (trace_info->m_process->m_acc) {
-    trace_info_gpu_s *temp =
-      static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
-    delete temp;
-    temp = static_cast<trace_info_gpu_s *>(trace_info->m_next_trace_info);
-    delete temp;
+    if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") {
+      trace_info_gpu_s *temp =
+        static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_gpu_s *>(trace_info->m_next_trace_info);
+      delete temp;
+    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") {
+      trace_info_nvbit_s *temp =
+        static_cast<trace_info_nvbit_s *>(trace_info->m_prev_trace_info);
+      delete temp;
+      temp = static_cast<trace_info_nvbit_s *>(trace_info->m_next_trace_info);
+      delete temp;
+    }
   } else {
     if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "x86") {
       trace_info_cpu_s *temp =
@@ -1086,6 +1108,7 @@ int process_manager_c::get_next_low_occupancy_core(std::string core_type) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
+        core->get_core_type() != "nvbit" &&
         (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
          *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
@@ -1106,6 +1129,7 @@ int process_manager_c::get_next_available_core(std::string core_type) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     if (*KNOB(KNOB_ROUTER_PLACEMENT) == 1 && core->get_core_type() != "ptx" &&
+        core->get_core_type() != "nvbit" &&
         (core_id < *KNOB(KNOB_CORE_ENABLE_BEGIN) ||
          *KNOB(KNOB_CORE_ENABLE_END) < core_id))
       continue;
@@ -1155,7 +1179,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
   for (std::set<std::string>::const_iterator itr = core_type_set.begin();
        itr != core_type_set.end(); itr++) {
     std::string core_type = *itr;
-    if (core_type == "ptx") continue;
+    if (core_type == "ptx" || core_type == "nvbit") continue;
 
     // Get a core of this type
     // Follow the knob policy (greedy or balanced)
@@ -1218,7 +1242,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     std::string core_type = core->get_core_type();
-    if (core_type != "ptx") continue;
+    if (core_type != "ptx" && core_type != "nvbit") continue;
 
     // get currently fetching id
     int prev_fetching_block_id = core->m_fetching_block_id;

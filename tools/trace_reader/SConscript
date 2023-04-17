@@ -30,12 +30,12 @@ env = Environment()
 env['CPPFLAGS'] = '-O3 -std=c++0x -funroll-loops %s %s -DNO_DEBUG -TRACE_FORMAT=1' % (warn_flags, header_dirs)
 env['LIBS'] = 'z'
 arch = ARGUMENTS.get('arch', 'x86')
-if arch == 'gpu':
-  env['CPPDEFINES'] = 'GPU_TRACE'
+if arch == 'cpu':
+  env['CPPDEFINES'] = 'X86_TRACE'
 elif arch == 'a64':
   env['CPPDEFINES'] = 'ARM64_TRACE'
 else:
-  env['CPPDEFINES'] = 'X86_TRACE'
+  env['CPPDEFINES'] = 'GPU_TRACE'
 
 
 #########################################################################################

@@ -59,9 +59,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_GPU_DST_NUM 4
 #define MAX_NVBIT_SRC_NUM 4
 #define MAX_NVBIT_DST_NUM 4
+#define MAX_NVBIT_SRC_NUM 4
+#define MAX_NVBIT_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
-#define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_s))
+#define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_small_s))
 #define MAX_TR_OPCODE 452  // ARM_INS_ENDING
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +228,41 @@ typedef struct trace_info_gpu_s {
     m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
 
+// the same structure as the trace generator
+
+typedef struct trace_info_nvbit_small_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint16_t m_src[MAX_NVBIT_SRC_NUM];
+  uint16_t m_dst[MAX_NVBIT_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space;  // for loads, stores, atomic, prefetch(?)
+    uint8_t m_level;  // for membar
+  };
+  uint8_t m_cache_level;  // for prefetch?
+  uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+} trace_info_nvbit_small_s;
+
+//trace_info_nvbit_small_s + m_next_inst_addr
 typedef struct trace_info_nvbit_s {
   uint8_t m_opcode;
   bool m_is_fp;
@@ -256,6 +293,8 @@ typedef struct trace_info_nvbit_s {
   };
   uint8_t m_cache_level;  // for prefetch?
   uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+  uint64_t m_next_inst_addr;  // next pc address, not present in raw trace fo
+
 } trace_info_nvbit_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -621,7 +660,7 @@ typedef enum GPU_FENCE_LEVEL_ENUM_ {
   GPU_FENCE_LAST
 } GPU_FENCE_LEVEL_ENUM;
 
-typedef enum GPU_NVBIT_OPCODE_ {
+typedef enum NVBIT_OPCODE_ {
   NVBIT_FADD,
   NVBIT_FADD32I,
   NVBIT_FCHK,
@@ -731,6 +770,11 @@ typedef enum GPU_NVBIT_OPCODE_ {
   NVBIT_ULOP32I,
   NVBIT_UMOV,
   NVBIT_UP2UR,
+  NVBIT_UPLOP3,
+  NVBIT_UPOPC,
+  NVBIT_UPRMT,
+  NVBIT_UPSETP,
+  NVBIT_UR2UP,
   NVBIT_USEL,
   NVBIT_USGXT,
   NVBIT_USHF,
@@ -779,8 +823,9 @@ typedef enum GPU_NVBIT_OPCODE_ {
   NVBIT_S2R,
   NVBIT_SETCTAID,
   NVBIT_SETLMEMBASE,
-  NVBIT_VOTE
-} GPU_NVBIT_OPCODE;
+  NVBIT_VOTE,
+  NVBIT_OPCODE_LAST
+} NVBIT_OPCODE;
 
 // in trace generator, special registers are assigned values starting from 200
 // matches order in ocelot/ir/interface/PTXOperand.h
