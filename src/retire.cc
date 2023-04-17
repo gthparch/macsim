@@ -281,7 +281,7 @@ void retire_c::run_a_cycle() {
     STAT_EVENT(UOP_COUNT_TOT);
 
     // GPU : barrier
-    if (m_ptx_sim && cur_uop->m_bar_type == BAR_FETCH) {
+    if ((m_ptx_sim  || m_nvbit_sim) && cur_uop->m_bar_type == BAR_FETCH) {
       frontend_c* frontend = core->get_frontend();
       frontend->synch_thread(cur_uop->m_block_id, cur_uop->m_thread_id);
     }

@@ -302,7 +302,7 @@ void frontend_c::run_a_cycle(void) {
 
   // TONAGESH
   // nagesh - comments for BAR are incomplete...
-  if (m_ptx_sim) {
+  if (m_ptx_sim || m_nvbit_sim) {
     // handling of BAR instruction in PTX - can/should this be moved?
     // do we have any blocks for which all warps have reached (retired)
     // their next barrier?
@@ -348,7 +348,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
 
   // First time : set up traces for current thread
   if (fetch_data->m_first_time) {
-    m_simBase->m_trace_reader->setup_trace(m_core_id, tid, m_ptx_sim);
+    m_simBase->m_trace_reader->setup_trace(m_core_id, tid, m_ptx_sim || m_nvbit_sim);
     fetch_data->m_first_time = false;
 
     ++m_core->m_inst_fetched[tid]; /*! initial increase */
@@ -467,7 +467,7 @@ FRONTEND_MODE frontend_c::process_ifetch(unsigned int tid,
 
         // read an uop from the traces
         if (!m_simBase->m_trace_reader->get_uops_from_traces(m_core_id, new_uop,
-                                                             tid, m_ptx_sim)) {
+                                                             tid, m_ptx_sim || m_nvbit_sim)) {
           // couldn't get an uop
           DEBUG_CORE(m_core_id, "not success\n");
           m_uop_pool->release_entry(new_uop->free());
@@ -640,7 +640,7 @@ bool frontend_c::access_icache(int tid, Addr fetch_addr,
     int result = m_simBase->m_memory->new_mem_req(
       MRT_IFETCH, line_addr, m_knob_icache_line_size, false, false, 0, NULL,
       icache_fill_line_wrapper, m_core->get_unique_uop_num(), NULL, m_core_id,
-      tid, m_ptx_sim);
+      tid, m_ptx_sim||m_nvbit_sim);
 
     // mshr full
     if (!result) return false;
@@ -815,7 +815,7 @@ int frontend_c::predict_bpu(uop_c *uop) {
   // no branch prediction
   else {
     // GPU : stall on branch policy, stop fetching
-    if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
+    if ((m_ptx_sim  || m_nvbit_sim) && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
       set_br_wait(uop->m_thread_id);
       mispredicted = false;
     }
@@ -915,7 +915,7 @@ int frontend_c::fetch_rr(void) {
     }
 
     // check the thread is ready to fetch
-    if (m_ptx_sim) {
+    if (m_ptx_sim || m_nvbit_sim) {
       // GPU : stall on branch policy, check whether previous branch has been resolved
       if (*m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR &&
           !check_br_ready(fetch_id)) {

@@ -542,6 +542,8 @@ POSSIBILITY OF SUCH DAMAGE.
                      *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "nvbit"     \
                      ? true                                                    \
                      : false;                                            \
+      if (m_nvbit_sim)                                                        \
+      m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;              \
         m_acc_sim = (m_igpu_sim || m_ptx_sim || m_nvbit_sim);                 \
     break;                                                                   \
     case UNIT_MEDIUM:                                                          \
@@ -566,6 +568,8 @@ POSSIBILITY OF SUCH DAMAGE.
                      *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "nvbit"     \
                      ? true                                                    \
                      : false;                                                  \
+    if (m_nvbit_sim)                                                        \
+        m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;              \
         m_acc_sim = (m_igpu_sim || m_ptx_sim || m_nvbit_sim);                 \
                                                                                \
        break;                                                                   \
@@ -591,6 +595,8 @@ POSSIBILITY OF SUCH DAMAGE.
                      *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "nvbit"     \
                      ? true                                                    \
                      : false;                                                  \
+      if (m_nvbit_sim)                                                        \
+      m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;              \
       m_acc_sim = (m_igpu_sim || m_ptx_sim || m_nvbit_sim);                 \
       break;                                                                   \
   }
