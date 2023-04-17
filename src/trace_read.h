@@ -61,7 +61,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_NVBIT_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
-#define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_s))
+#define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_small_s))
 #define MAX_TR_OPCODE 452  // ARM_INS_ENDING
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
