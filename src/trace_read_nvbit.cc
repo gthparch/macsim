@@ -400,45 +400,25 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       // set memory type
       switch (pi->m_opcode) {
-        case GPU_MEM_LD_GM:
-        case GPU_DATA_XFER_GM:
-          trace_uop[0]->m_mem_type = MEM_LD;
-          break;
-        // XFER_LM is not valid for current PTX
-        // check ptx manual, Atom and Red instrutions can be in only global/shared
-        case GPU_MEM_LD_LM:
-        case GPU_DATA_XFER_LM:
-          trace_uop[0]->m_mem_type = MEM_LD_LM;
-          break;
-        case GPU_MEM_LD_SM:
-        case GPU_DATA_XFER_SM:
-          trace_uop[0]->m_mem_type = MEM_LD_SM;
-          break;
-        case GPU_MEM_LD_CM:
-          trace_uop[0]->m_mem_type = MEM_LD_CM;
-          break;
-        case GPU_MEM_LD_TM:
-          trace_uop[0]->m_mem_type = MEM_LD_TM;
-          break;
-        // parameter access same as shared mem access
-        case GPU_MEM_LD_PM:
-          trace_uop[0]->m_mem_type = MEM_LD_SM;
-          break;
-        case GPU_ATOM_GM:
-        case GPU_ATOM64_GM:
-        case GPU_RED_GM:
-        case GPU_RED64_GM:
-          trace_uop[0]->m_mem_type = MEM_LD;
-          break;
-        case GPU_ATOM_SM:
-        case GPU_ATOM64_SM:
-        case GPU_RED_SM:
-        case GPU_RED64_SM:
-          trace_uop[0]->m_mem_type = MEM_LD_SM;
-          break;
-        default:
-          trace_uop[0]->m_mem_type = MEM_LD;
-          break;
+        case NVBIT_LD:
+        trace_uop[0]->m_mem_type = MEM_LD;
+        break;
+      case NVBIT_LDC:
+        trace_uop[0]->m_mem_type = MEM_LD_CM;
+        break;
+      case NVBIT_LDG:
+        trace_uop[0]->m_mem_type = MEM_LD_GM;
+        break;
+      case NVBIT_LDL:
+        trace_uop[0]->m_mem_type = MEM_LD_LM;
+        break;
+      case NVBIT_LDS:
+      case NVBIT_LDSM:
+        trace_uop[0]->m_mem_type = MEM_LD_SM;
+        break;
+      default:
+        trace_uop[0]->m_mem_type = MEM_LD;
+        break;
       }
 
       trace_uop[0]->m_cf_type = NOT_CF;
@@ -492,24 +472,23 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     ///
     /// 2. Instruction has a memory store operation
     ///
-    if (pi->m_opcode == GPU_MEM_ST_GM || pi->m_opcode == GPU_MEM_ST_LM ||
-        pi->m_opcode == GPU_MEM_ST_SM) {
+    if (pi->m_opcode == NVBIT_ST || pi->m_opcode == NVBIT_STG ||
+        pi->m_opcode == NVBIT_STL || pi->m_opcode == NVBIT_STS) {
       trace_uop_s *cur_trace_uop = trace_uop[num_uop++];
       if (inst_has_ld_uop) tmp_reg_needed = true;
 
       // set memory type
       switch (pi->m_opcode) {
-        case GPU_MEM_ST_GM:
-        case GPU_DATA_XFER_GM:
+        case NVBIT_ST:
           cur_trace_uop->m_mem_type = MEM_ST;
           break;
-
-        case GPU_MEM_ST_LM:
-        case GPU_DATA_XFER_LM:  // XFER_LM is not valid for current PTX
+        case NVBIT_STG:
+          cur_trace_uop->m_mem_type = MEM_ST_GM;
+          break;
+        case NVBIT_STL:
           cur_trace_uop->m_mem_type = MEM_ST_LM;
           break;
-        case GPU_MEM_ST_SM:
-        case GPU_DATA_XFER_SM:
+        case NVBIT_STS:
           cur_trace_uop->m_mem_type = MEM_ST_SM;
           break;
         default:
@@ -551,6 +530,7 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_inst_size = pi->m_size;
     }
 
+    // To-do.. fix GPU_ to NVBIT_
     ASSERTM((pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED) &&
               (pi->m_opcode != GPU_MEMBAR_CTA &&
                pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
@@ -843,14 +823,12 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
     // Set appropiriate opcode type (not using shared memory)
     if (*KNOB(KNOB_PTX_COMMON_CACHE)) {
       switch (trace_info.m_opcode) {
-        case GPU_MEM_LD_SM:
-          trace_info.m_opcode = GPU_MEM_LD_LM;
+        case NVBIT_STS:
+          trace_info.m_opcode = NVBIT_STL;
           break;
-        case GPU_MEM_ST_SM:
-          trace_info.m_opcode = GPU_MEM_ST_LM;
-          break;
-        case GPU_DATA_XFER_SM:
-          trace_info.m_opcode = GPU_DATA_XFER_LM;
+        case NVBIT_LDS:
+        case NVBIT_LDSM:
+          trace_info.m_opcode = NVBIT_LDL;
           break;
       }
     }
@@ -944,10 +922,6 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
     uop->m_taken_mask = trace_uop->m_taken_mask;
     uop->m_reconverge_addr = trace_uop->m_reconverge_addr;
     uop->m_target_addr = trace_uop->m_target;
-  }
-
-  if (uop->m_opcode == GPU_EN) {
-    m_simBase->m_gpu_paused = false;
   }
 
   // address translation
@@ -1278,311 +1252,170 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
  * Initialize the mapping between trace opcode and uop type
  */
 void nvbit_decoder_c::init_pin_convert(void) {
-  m_int_uop_table[GPU_ABS] = UOP_GPU_ABS;
-  m_int_uop_table[GPU_ABS64] = UOP_GPU_ABS64;
-  m_int_uop_table[GPU_ADD] = UOP_GPU_ADD;
-  m_int_uop_table[GPU_ADD64] = UOP_GPU_ADD64;
-  m_int_uop_table[GPU_ADDC] = UOP_GPU_ADDC;
-  m_int_uop_table[GPU_AND] = UOP_GPU_AND;
-  m_int_uop_table[GPU_AND64] = UOP_GPU_AND64;
-  m_int_uop_table[GPU_ATOM_GM] = UOP_GPU_ATOM_GM;
-  m_int_uop_table[GPU_ATOM_SM] = UOP_GPU_ATOM_SM;
-  m_int_uop_table[GPU_ATOM64_GM] = UOP_GPU_ATOM64_GM;
-  m_int_uop_table[GPU_ATOM64_SM] = UOP_GPU_ATOM64_SM;
-  m_int_uop_table[GPU_BAR_ARRIVE] = UOP_GPU_BAR_ARRIVE;
-  m_int_uop_table[GPU_BAR_SYNC] = UOP_GPU_BAR_SYNC;
-  m_int_uop_table[GPU_BAR_RED] = UOP_GPU_BAR_RED;
-  m_int_uop_table[GPU_BFE] = UOP_GPU_BFE;
-  m_int_uop_table[GPU_BFE64] = UOP_GPU_BFE64;
-  m_int_uop_table[GPU_BFI] = UOP_GPU_BFI;
-  m_int_uop_table[GPU_BFI64] = UOP_GPU_BFI64;
-  m_int_uop_table[GPU_BFIND] = UOP_GPU_BFIND;
-  m_int_uop_table[GPU_BFIND64] = UOP_GPU_BFIND64;
-  m_int_uop_table[GPU_BRA] = UOP_GPU_BRA;
-  m_int_uop_table[GPU_BREV] = UOP_GPU_BREV;
-  m_int_uop_table[GPU_BREV64] = UOP_GPU_BREV64;
-  m_int_uop_table[GPU_BRKPT] = UOP_GPU_BRKPT;
-  m_int_uop_table[GPU_CALL] = UOP_GPU_CALL;
-  m_int_uop_table[GPU_CLZ] = UOP_GPU_CLZ;
-  m_int_uop_table[GPU_CLZ64] = UOP_GPU_CLZ64;
-  m_int_uop_table[GPU_CNOT] = UOP_GPU_CNOT;
-  m_int_uop_table[GPU_CNOT64] = UOP_GPU_CNOT64;
-  m_int_uop_table[GPU_COPYSIGN] = UOP_GPU_COPYSIGN;
-  m_int_uop_table[GPU_COPYSIGN64] = UOP_GPU_COPYSIGN64;
-  m_int_uop_table[GPU_COS] = UOP_GPU_COS;
-  m_int_uop_table[GPU_CVT] = UOP_GPU_CVT;
-  m_int_uop_table[GPU_CVT64] = UOP_GPU_CVT64;
-  m_int_uop_table[GPU_CVTA] = UOP_GPU_CVTA;
-  m_int_uop_table[GPU_CVTA64] = UOP_GPU_CVTA64;
-  m_int_uop_table[GPU_DIV] = UOP_GPU_DIV;
-  m_int_uop_table[GPU_DIV64] = UOP_GPU_DIV64;
-  m_int_uop_table[GPU_EX2] = UOP_GPU_EX2;
-  m_int_uop_table[GPU_EXIT] = UOP_GPU_EXIT;
-  m_int_uop_table[GPU_FMA] = UOP_GPU_FMA;
-  m_int_uop_table[GPU_FMA64] = UOP_GPU_FMA64;
-  m_int_uop_table[GPU_ISSPACEP] = UOP_GPU_ISSPACEP;
-  m_int_uop_table[GPU_LD] = UOP_GPU_LD;
-  m_int_uop_table[GPU_LD64] = UOP_GPU_LD64;
-  m_int_uop_table[GPU_LDU] = UOP_GPU_LDU;
-  m_int_uop_table[GPU_LDU64] = UOP_GPU_LDU64;
-  m_int_uop_table[GPU_LG2] = UOP_GPU_LG2;
-  m_int_uop_table[GPU_MAD24] = UOP_GPU_MAD24;
-  m_int_uop_table[GPU_MAD] = UOP_GPU_MAD;
-  m_int_uop_table[GPU_MAD64] = UOP_GPU_MAD64;
-  m_int_uop_table[GPU_MADC] = UOP_GPU_MAD;
-  m_int_uop_table[GPU_MADC64] = UOP_GPU_MAD64;
-  m_int_uop_table[GPU_MAX] = UOP_GPU_MAX;
-  m_int_uop_table[GPU_MAX64] = UOP_GPU_MAX64;
-  m_int_uop_table[GPU_MEMBAR_CTA] = UOP_GPU_MEMBAR_CTA;
-  m_int_uop_table[GPU_MEMBAR_GL] = UOP_GPU_MEMBAR_GL;
-  m_int_uop_table[GPU_MEMBAR_SYS] = UOP_GPU_MEMBAR_SYS;
-  m_int_uop_table[GPU_MIN] = UOP_GPU_MIN;
-  m_int_uop_table[GPU_MIN64] = UOP_GPU_MIN64;
-  m_int_uop_table[GPU_MOV] = UOP_GPU_MOV;
-  m_int_uop_table[GPU_MOV64] = UOP_GPU_MOV64;
-  m_int_uop_table[GPU_MUL24] = UOP_GPU_MUL24;
-  m_int_uop_table[GPU_MUL] = UOP_GPU_MUL;
-  m_int_uop_table[GPU_MUL64] = UOP_GPU_MUL64;
-  m_int_uop_table[GPU_NEG] = UOP_GPU_NEG;
-  m_int_uop_table[GPU_NEG64] = UOP_GPU_NEG64;
-  m_int_uop_table[GPU_NOT] = UOP_GPU_NOT;
-  m_int_uop_table[GPU_NOT64] = UOP_GPU_NOT64;
-  m_int_uop_table[GPU_OR] = UOP_GPU_OR;
-  m_int_uop_table[GPU_OR64] = UOP_GPU_OR64;
-  m_int_uop_table[GPU_PMEVENT] = UOP_GPU_PMEVENT;
-  m_int_uop_table[GPU_POPC] = UOP_GPU_POPC;
-  m_int_uop_table[GPU_POPC64] = UOP_GPU_POPC64;
-  m_int_uop_table[GPU_PREFETCH] = UOP_GPU_PREFETCH;
-  m_int_uop_table[GPU_PREFETCHU] = UOP_GPU_PREFETCHU;
-  m_int_uop_table[GPU_PRMT] = UOP_GPU_PRMT;
-  m_int_uop_table[GPU_RCP] = UOP_GPU_RCP;
-  m_int_uop_table[GPU_RCP64] = UOP_GPU_RCP64;
-  m_int_uop_table[GPU_RED_GM] = UOP_GPU_RED_GM;
-  m_int_uop_table[GPU_RED_SM] = UOP_GPU_RED_SM;
-  m_int_uop_table[GPU_RED64_GM] = UOP_GPU_RED64_GM;
-  m_int_uop_table[GPU_RED64_SM] = UOP_GPU_RED64_SM;
-  m_int_uop_table[GPU_REM] = UOP_GPU_REM;
-  m_int_uop_table[GPU_REM64] = UOP_GPU_REM64;
-  m_int_uop_table[GPU_RET] = UOP_GPU_RET;
-  m_int_uop_table[GPU_RSQRT] = UOP_GPU_RSQRT;
-  m_int_uop_table[GPU_RSQRT64] = UOP_GPU_RSQRT64;
-  m_int_uop_table[GPU_SAD] = UOP_GPU_SAD;
-  m_int_uop_table[GPU_SAD64] = UOP_GPU_SAD64;
-  m_int_uop_table[GPU_SELP] = UOP_GPU_SELP;
-  m_int_uop_table[GPU_SELP64] = UOP_GPU_SELP64;
-  m_int_uop_table[GPU_SET] = UOP_GPU_SET;
-  m_int_uop_table[GPU_SET64] = UOP_GPU_SET64;
-  m_int_uop_table[GPU_SETP] = UOP_GPU_SETP;
-  m_int_uop_table[GPU_SETP64] = UOP_GPU_SETP64;
-  m_int_uop_table[GPU_SHFL] = UOP_GPU_SHFL;
-  m_int_uop_table[GPU_SHFL64] = UOP_GPU_SHFL64;
-  m_int_uop_table[GPU_SHL] = UOP_GPU_SHL;
-  m_int_uop_table[GPU_SHL64] = UOP_GPU_SHL64;
-  m_int_uop_table[GPU_SHR] = UOP_GPU_SHR;
-  m_int_uop_table[GPU_SHR64] = UOP_GPU_SHR64;
-  m_int_uop_table[GPU_SIN] = UOP_GPU_SIN;
-  m_int_uop_table[GPU_SLCT] = UOP_GPU_SLCT;
-  m_int_uop_table[GPU_SLCT64] = UOP_GPU_SLCT64;
-  m_int_uop_table[GPU_SQRT] = UOP_GPU_SQRT;
-  m_int_uop_table[GPU_SQRT64] = UOP_GPU_SQRT64;
-  m_int_uop_table[GPU_ST] = UOP_GPU_ST;
-  m_int_uop_table[GPU_ST64] = UOP_GPU_ST64;
-  m_int_uop_table[GPU_SUB] = UOP_GPU_SUB;
-  m_int_uop_table[GPU_SUB64] = UOP_GPU_SUB64;
-  m_int_uop_table[GPU_SUBC] = UOP_GPU_SUBC;
-  m_int_uop_table[GPU_SULD] = UOP_GPU_SULD;
-  m_int_uop_table[GPU_SULD64] = UOP_GPU_SULD64;
-  m_int_uop_table[GPU_SURED] = UOP_GPU_SURED;
-  m_int_uop_table[GPU_SURED64] = UOP_GPU_SURED64;
-  m_int_uop_table[GPU_SUST] = UOP_GPU_SUST;
-  m_int_uop_table[GPU_SUST64] = UOP_GPU_SUST64;
-  m_int_uop_table[GPU_SUQ] = UOP_GPU_SUQ;
-  m_int_uop_table[GPU_TESTP] = UOP_GPU_TESTP;
-  m_int_uop_table[GPU_TESTP64] = UOP_GPU_TESTP64;
-  m_int_uop_table[GPU_TEX] = UOP_GPU_TEX;
-  m_int_uop_table[GPU_TLD4] = UOP_GPU_TLD4;
-  m_int_uop_table[GPU_TXQ] = UOP_GPU_TXQ;
-  m_int_uop_table[GPU_TRAP] = UOP_GPU_TRAP;
-  m_int_uop_table[GPU_VABSDIFF] = UOP_GPU_VABSDIFF;
-  m_int_uop_table[GPU_VADD] = UOP_GPU_VADD;
-  m_int_uop_table[GPU_VMAD] = UOP_GPU_VMAD;
-  m_int_uop_table[GPU_VMAX] = UOP_GPU_VMAX;
-  m_int_uop_table[GPU_VMIN] = UOP_GPU_VMIN;
-  m_int_uop_table[GPU_VSET] = UOP_GPU_VSET;
-  m_int_uop_table[GPU_VSHL] = UOP_GPU_VSHL;
-  m_int_uop_table[GPU_VSHR] = UOP_GPU_VSHR;
-  m_int_uop_table[GPU_VSUB] = UOP_GPU_VSUB;
-  m_int_uop_table[GPU_VOTE] = UOP_GPU_VOTE;
-  m_int_uop_table[GPU_XOR] = UOP_GPU_XOR;
-  m_int_uop_table[GPU_XOR64] = UOP_GPU_XOR64;
-  m_int_uop_table[GPU_RECONVERGE] = UOP_GPU_RECONVERGE;
-  m_int_uop_table[GPU_PHI] = UOP_GPU_PHI;
-  m_int_uop_table[GPU_MEM_LD_GM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LD_LM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LD_SM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LD_CM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LD_TM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LD_PM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_LDU_GM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_ST_GM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_ST_LM] = UOP_IADD;
-  m_int_uop_table[GPU_MEM_ST_SM] = UOP_IADD;
-  m_int_uop_table[GPU_DATA_XFER_GM] = UOP_IADD;
-  m_int_uop_table[GPU_DATA_XFER_LM] = UOP_IADD;
-  m_int_uop_table[GPU_DATA_XFER_SM] = UOP_IADD;
+  m_fp_uop_table[NVBIT_FADD] = UOP_NVBIT_FADD;
+  m_fp_uop_table[NVBIT_FADD32I] = UOP_NVBIT_FADD32I;
+  m_fp_uop_table[NVBIT_FCHK] = UOP_NVBIT_FCHK;
+  m_fp_uop_table[NVBIT_FFMA32I] = UOP_NVBIT_FFMA32I;
+  m_fp_uop_table[NVBIT_FFMA] = UOP_NVBIT_FFMA;
+  m_fp_uop_table[NVBIT_FMNMX] = UOP_NVBIT_FMNMX;
+  m_fp_uop_table[NVBIT_FMUL] = UOP_NVBIT_FMUL;
+  m_fp_uop_table[NVBIT_FMUL32I] = UOP_NVBIT_FMUL32I;
+  m_fp_uop_table[NVBIT_FSEL] = UOP_NVBIT_FSEL;
+  m_fp_uop_table[NVBIT_FSET] = UOP_NVBIT_FSET;
+  m_fp_uop_table[NVBIT_FSETP] = UOP_NVBIT_FSETP;
+  m_fp_uop_table[NVBIT_FSWZADD] = UOP_NVBIT_FSWZADD;
+  m_fp_uop_table[NVBIT_MUFU] = UOP_NVBIT_MUFU;
+  m_fp_uop_table[NVBIT_HADD2] = UOP_NVBIT_HADD2;
+  m_fp_uop_table[NVBIT_HADD2_32I] = UOP_NVBIT_HADD2_32I;
+  m_fp_uop_table[NVBIT_HFMA2] = UOP_NVBIT_HFMA2;
+  m_fp_uop_table[NVBIT_HFMA2_32I] = UOP_NVBIT_HFMA2_32I;
+  m_fp_uop_table[NVBIT_HMMA] = UOP_NVBIT_HMMA;
+  m_fp_uop_table[NVBIT_HMUL2] = UOP_NVBIT_HMUL2;
+  m_fp_uop_table[NVBIT_HMUL2_32I] = UOP_NVBIT_HMUL2_32I;
+  m_fp_uop_table[NVBIT_HSET2] = UOP_NVBIT_HSET2;
+  m_fp_uop_table[NVBIT_HSETP2] = UOP_NVBIT_HSETP2;
+  m_fp_uop_table[NVBIT_DADD] = UOP_NVBIT_DADD;
+  m_fp_uop_table[NVBIT_DFMA] = UOP_NVBIT_DFMA;
+  m_fp_uop_table[NVBIT_DMUL] = UOP_NVBIT_DMUL;
+  m_fp_uop_table[NVBIT_DSETP] = UOP_NVBIT_DSETP;
 
-  m_fp_uop_table[GPU_ABS] = UOP_GPU_FABS;
-  m_fp_uop_table[GPU_ABS64] = UOP_GPU_FABS64;
-  m_fp_uop_table[GPU_ADD] = UOP_GPU_FADD;
-  m_fp_uop_table[GPU_ADD64] = UOP_GPU_FADD64;
-  m_fp_uop_table[GPU_ADDC] = UOP_GPU_FADDC;
-  m_fp_uop_table[GPU_AND] = UOP_GPU_FAND;
-  m_fp_uop_table[GPU_AND64] = UOP_GPU_FAND64;
-  m_fp_uop_table[GPU_ATOM_GM] = UOP_GPU_FATOM_GM;
-  m_fp_uop_table[GPU_ATOM_SM] = UOP_GPU_FATOM_SM;
-  m_fp_uop_table[GPU_ATOM64_GM] = UOP_GPU_FATOM64_GM;
-  m_fp_uop_table[GPU_ATOM64_SM] = UOP_GPU_FATOM64_SM;
-  m_fp_uop_table[GPU_BAR_ARRIVE] = UOP_GPU_FBAR_ARRIVE;
-  m_fp_uop_table[GPU_BAR_SYNC] = UOP_GPU_FBAR_SYNC;
-  m_fp_uop_table[GPU_BAR_RED] = UOP_GPU_FBAR_RED;
-  m_fp_uop_table[GPU_BFE] = UOP_GPU_FBFE;
-  m_fp_uop_table[GPU_BFE64] = UOP_GPU_FBFE64;
-  m_fp_uop_table[GPU_BFI] = UOP_GPU_FBFI;
-  m_fp_uop_table[GPU_BFI64] = UOP_GPU_FBFI64;
-  m_fp_uop_table[GPU_BFIND] = UOP_GPU_FBFIND;
-  m_fp_uop_table[GPU_BFIND64] = UOP_GPU_FBFIND64;
-  m_fp_uop_table[GPU_BRA] = UOP_GPU_FBRA;
-  m_fp_uop_table[GPU_BREV] = UOP_GPU_FBREV;
-  m_fp_uop_table[GPU_BREV64] = UOP_GPU_FBREV64;
-  m_fp_uop_table[GPU_BRKPT] = UOP_GPU_FBRKPT;
-  m_fp_uop_table[GPU_CALL] = UOP_GPU_FCALL;
-  m_fp_uop_table[GPU_CLZ] = UOP_GPU_FCLZ;
-  m_fp_uop_table[GPU_CLZ64] = UOP_GPU_FCLZ64;
-  m_fp_uop_table[GPU_CNOT] = UOP_GPU_FCNOT;
-  m_fp_uop_table[GPU_CNOT64] = UOP_GPU_FCNOT64;
-  m_fp_uop_table[GPU_COPYSIGN] = UOP_GPU_FCOPYSIGN;
-  m_fp_uop_table[GPU_COPYSIGN64] = UOP_GPU_FCOPYSIGN64;
-  m_fp_uop_table[GPU_COS] = UOP_GPU_FCOS;
-  m_fp_uop_table[GPU_CVT] = UOP_GPU_FCVT;
-  m_fp_uop_table[GPU_CVT64] = UOP_GPU_FCVT64;
-  m_fp_uop_table[GPU_CVTA] = UOP_GPU_FCVTA;
-  m_fp_uop_table[GPU_CVTA64] = UOP_GPU_FCVTA64;
-  m_fp_uop_table[GPU_DIV] = UOP_GPU_FDIV;
-  m_fp_uop_table[GPU_DIV64] = UOP_GPU_FDIV64;
-  m_fp_uop_table[GPU_EX2] = UOP_GPU_FEX2;
-  m_fp_uop_table[GPU_EXIT] = UOP_GPU_FEXIT;
-  m_fp_uop_table[GPU_FMA] = UOP_GPU_FFMA;
-  m_fp_uop_table[GPU_FMA64] = UOP_GPU_FFMA64;
-  m_fp_uop_table[GPU_ISSPACEP] = UOP_GPU_FISSPACEP;
-  m_fp_uop_table[GPU_LD] = UOP_GPU_FLD;
-  m_fp_uop_table[GPU_LD64] = UOP_GPU_FLD64;
-  m_fp_uop_table[GPU_LDU] = UOP_GPU_FLDU;
-  m_fp_uop_table[GPU_LDU64] = UOP_GPU_FLDU64;
-  m_fp_uop_table[GPU_LG2] = UOP_GPU_FLG2;
-  m_fp_uop_table[GPU_MAD24] = UOP_GPU_FMAD24;
-  m_fp_uop_table[GPU_MAD] = UOP_GPU_FMAD;
-  m_fp_uop_table[GPU_MAD64] = UOP_GPU_FMAD64;
-  m_fp_uop_table[GPU_MADC] = UOP_GPU_FMADC;
-  m_fp_uop_table[GPU_MADC64] = UOP_GPU_FMADC64;
-  m_fp_uop_table[GPU_MAX] = UOP_GPU_FMAX;
-  m_fp_uop_table[GPU_MAX64] = UOP_GPU_FMAX64;
-  m_fp_uop_table[GPU_MEMBAR_CTA] = UOP_GPU_FMEMBAR_CTA;
-  m_fp_uop_table[GPU_MEMBAR_GL] = UOP_GPU_FMEMBAR_GL;
-  m_fp_uop_table[GPU_MEMBAR_SYS] = UOP_GPU_FMEMBAR_SYS;
-  m_fp_uop_table[GPU_MIN] = UOP_GPU_FMIN;
-  m_fp_uop_table[GPU_MIN64] = UOP_GPU_FMIN64;
-  m_fp_uop_table[GPU_MOV] = UOP_GPU_FMOV;
-  m_fp_uop_table[GPU_MOV64] = UOP_GPU_FMOV64;
-  m_fp_uop_table[GPU_MUL24] = UOP_GPU_FMUL24;
-  m_fp_uop_table[GPU_MUL] = UOP_GPU_FMUL;
-  m_fp_uop_table[GPU_MUL64] = UOP_GPU_FMUL64;
-  m_fp_uop_table[GPU_NEG] = UOP_GPU_FNEG;
-  m_fp_uop_table[GPU_NEG64] = UOP_GPU_FNEG64;
-  m_fp_uop_table[GPU_NOT] = UOP_GPU_FNOT;
-  m_fp_uop_table[GPU_NOT64] = UOP_GPU_FNOT64;
-  m_fp_uop_table[GPU_OR] = UOP_GPU_FOR;
-  m_fp_uop_table[GPU_OR64] = UOP_GPU_FOR64;
-  m_fp_uop_table[GPU_PMEVENT] = UOP_GPU_FPMEVENT;
-  m_fp_uop_table[GPU_POPC] = UOP_GPU_FPOPC;
-  m_fp_uop_table[GPU_POPC64] = UOP_GPU_FPOPC64;
-  m_fp_uop_table[GPU_PREFETCH] = UOP_GPU_FPREFETCH;
-  m_fp_uop_table[GPU_PREFETCHU] = UOP_GPU_FPREFETCHU;
-  m_fp_uop_table[GPU_PRMT] = UOP_GPU_FPRMT;
-  m_fp_uop_table[GPU_RCP] = UOP_GPU_FRCP;
-  m_fp_uop_table[GPU_RCP64] = UOP_GPU_FRCP64;
-  m_fp_uop_table[GPU_RED_GM] = UOP_GPU_FRED_GM;
-  m_fp_uop_table[GPU_RED_SM] = UOP_GPU_FRED_SM;
-  m_fp_uop_table[GPU_RED64_GM] = UOP_GPU_FRED64_GM;
-  m_fp_uop_table[GPU_RED64_SM] = UOP_GPU_FRED64_SM;
-  m_fp_uop_table[GPU_REM] = UOP_GPU_FREM;
-  m_fp_uop_table[GPU_REM64] = UOP_GPU_FREM64;
-  m_fp_uop_table[GPU_RET] = UOP_GPU_FRET;
-  m_fp_uop_table[GPU_RSQRT] = UOP_GPU_FRSQRT;
-  m_fp_uop_table[GPU_RSQRT64] = UOP_GPU_FRSQRT64;
-  m_fp_uop_table[GPU_SAD] = UOP_GPU_FSAD;
-  m_fp_uop_table[GPU_SAD64] = UOP_GPU_FSAD64;
-  m_fp_uop_table[GPU_SELP] = UOP_GPU_FSELP;
-  m_fp_uop_table[GPU_SELP64] = UOP_GPU_FSELP64;
-  m_fp_uop_table[GPU_SET] = UOP_GPU_FSET;
-  m_fp_uop_table[GPU_SET64] = UOP_GPU_FSET64;
-  m_fp_uop_table[GPU_SETP] = UOP_GPU_FSETP;
-  m_fp_uop_table[GPU_SETP64] = UOP_GPU_FSETP64;
-  m_fp_uop_table[GPU_SHFL] = UOP_GPU_FSHFL;
-  m_fp_uop_table[GPU_SHFL64] = UOP_GPU_FSHFL64;
-  m_fp_uop_table[GPU_SHL] = UOP_GPU_FSHL;
-  m_fp_uop_table[GPU_SHL64] = UOP_GPU_FSHL64;
-  m_fp_uop_table[GPU_SHR] = UOP_GPU_FSHR;
-  m_fp_uop_table[GPU_SHR64] = UOP_GPU_FSHR64;
-  m_fp_uop_table[GPU_SIN] = UOP_GPU_FSIN;
-  m_fp_uop_table[GPU_SLCT] = UOP_GPU_FSLCT;
-  m_fp_uop_table[GPU_SLCT64] = UOP_GPU_FSLCT64;
-  m_fp_uop_table[GPU_SQRT] = UOP_GPU_FSQRT;
-  m_fp_uop_table[GPU_SQRT64] = UOP_GPU_FSQRT64;
-  m_fp_uop_table[GPU_ST] = UOP_GPU_FST;
-  m_fp_uop_table[GPU_ST64] = UOP_GPU_FST64;
-  m_fp_uop_table[GPU_SUB] = UOP_GPU_FSUB;
-  m_fp_uop_table[GPU_SUB64] = UOP_GPU_FSUB64;
-  m_fp_uop_table[GPU_SUBC] = UOP_GPU_FSUBC;
-  m_fp_uop_table[GPU_SULD] = UOP_GPU_FSULD;
-  m_fp_uop_table[GPU_SULD64] = UOP_GPU_FSULD64;
-  m_fp_uop_table[GPU_SURED] = UOP_GPU_FSURED;
-  m_fp_uop_table[GPU_SURED64] = UOP_GPU_FSURED64;
-  m_fp_uop_table[GPU_SUST] = UOP_GPU_FSUST;
-  m_fp_uop_table[GPU_SUST64] = UOP_GPU_FSUST64;
-  m_fp_uop_table[GPU_SUQ] = UOP_GPU_FSUQ;
-  m_fp_uop_table[GPU_TESTP] = UOP_GPU_FTESTP;
-  m_fp_uop_table[GPU_TESTP64] = UOP_GPU_FTESTP64;
-  m_fp_uop_table[GPU_TEX] = UOP_GPU_FTEX;
-  m_fp_uop_table[GPU_TLD4] = UOP_GPU_FTLD4;
-  m_fp_uop_table[GPU_TXQ] = UOP_GPU_FTXQ;
-  m_fp_uop_table[GPU_TRAP] = UOP_GPU_FTRAP;
-  m_fp_uop_table[GPU_VABSDIFF] = UOP_GPU_FVABSDIFF;
-  m_fp_uop_table[GPU_VADD] = UOP_GPU_FVADD;
-  m_fp_uop_table[GPU_VMAD] = UOP_GPU_FVMAD;
-  m_fp_uop_table[GPU_VMAX] = UOP_GPU_FVMAX;
-  m_fp_uop_table[GPU_VMIN] = UOP_GPU_FVMIN;
-  m_fp_uop_table[GPU_VSET] = UOP_GPU_FVSET;
-  m_fp_uop_table[GPU_VSHL] = UOP_GPU_FVSHL;
-  m_fp_uop_table[GPU_VSHR] = UOP_GPU_FVSHR;
-  m_fp_uop_table[GPU_VSUB] = UOP_GPU_FVSUB;
-  m_fp_uop_table[GPU_VOTE] = UOP_GPU_FVOTE;
-  m_fp_uop_table[GPU_XOR] = UOP_GPU_FXOR;
-  m_fp_uop_table[GPU_XOR64] = UOP_GPU_FXOR64;
-  m_fp_uop_table[GPU_RECONVERGE] = UOP_GPU_FRECONVERGE;
-  m_fp_uop_table[GPU_PHI] = UOP_GPU_FPHI;
-  m_fp_uop_table[GPU_MEM_LD_GM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LD_LM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LD_SM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LD_CM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LD_TM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LD_PM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_LDU_GM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_ST_GM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_ST_LM] = UOP_FADD;
-  m_fp_uop_table[GPU_MEM_ST_SM] = UOP_FADD;
-  m_fp_uop_table[GPU_DATA_XFER_GM] = UOP_FADD;
-  m_fp_uop_table[GPU_DATA_XFER_LM] = UOP_FADD;
-  m_fp_uop_table[GPU_DATA_XFER_SM] = UOP_FADD;
+  m_int_uop_table[NVBIT_BMMA] = UOP_NVBIT_BMMA;
+  m_int_uop_table[NVBIT_BMSK] = UOP_NVBIT_BMSK;
+  m_int_uop_table[NVBIT_BREV] = UOP_NVBIT_BREV;
+  m_int_uop_table[NVBIT_FLO] = UOP_NVBIT_FLO;
+  m_int_uop_table[NVBIT_IABS] = UOP_NVBIT_IABS;
+  m_int_uop_table[NVBIT_IADD] = UOP_NVBIT_IADD;
+  m_int_uop_table[NVBIT_IADD3] = UOP_NVBIT_IADD3;
+  m_int_uop_table[NVBIT_IADD32I] = UOP_NVBIT_IADD32I;
+  m_int_uop_table[NVBIT_IDP] = UOP_NVBIT_IDP;
+  m_int_uop_table[NVBIT_IDP4A] = UOP_NVBIT_IDP4A;
+  m_int_uop_table[NVBIT_IMAD] = UOP_NVBIT_IMAD;
+  m_int_uop_table[NVBIT_IMMA] = UOP_NVBIT_IMMA;
+  m_int_uop_table[NVBIT_IMNMX] = UOP_NVBIT_IMNMX;
+  m_int_uop_table[NVBIT_IMUL] = UOP_NVBIT_IMUL;
+  m_int_uop_table[NVBIT_IMUL32I] = UOP_NVBIT_IMUL32I;
+  m_int_uop_table[NVBIT_ISCADD] = UOP_NVBIT_ISCADD;
+  m_int_uop_table[NVBIT_ISCADD32I] = UOP_NVBIT_ISCADD32I;
+  m_int_uop_table[NVBIT_ISETP] = UOP_NVBIT_ISETP;
+  m_int_uop_table[NVBIT_LEA] = UOP_NVBIT_LEA;
+  m_int_uop_table[NVBIT_LOP] = UOP_NVBIT_LOP;
+  m_int_uop_table[NVBIT_LOP3] = UOP_NVBIT_LOP3;
+  m_int_uop_table[NVBIT_LOP32I] = UOP_NVBIT_LOP32I;
+  m_int_uop_table[NVBIT_POPC] = UOP_NVBIT_POPC;
+  m_int_uop_table[NVBIT_SHF] = UOP_NVBIT_SHF;
+  m_int_uop_table[NVBIT_SHL] = UOP_NVBIT_SHL;
+  m_int_uop_table[NVBIT_SHR] = UOP_NVBIT_SHR;
+  m_int_uop_table[NVBIT_VABSDIFF] = UOP_NVBIT_VABSDIFF;
+  m_int_uop_table[NVBIT_VABSDIFF4] = UOP_NVBIT_VABSDIFF4;
+  m_int_uop_table[NVBIT_F2F] = UOP_NVBIT_F2F;
+  m_int_uop_table[NVBIT_F2I] = UOP_NVBIT_F2I;
+  m_int_uop_table[NVBIT_I2F] = UOP_NVBIT_I2F;
+  m_int_uop_table[NVBIT_I2I] = UOP_NVBIT_I2I;
+  m_int_uop_table[NVBIT_I2IP] = UOP_NVBIT_I2IP;
+  m_int_uop_table[NVBIT_FRND] = UOP_NVBIT_FRND;
+  m_int_uop_table[NVBIT_MOV] = UOP_NVBIT_MOV;
+  m_int_uop_table[NVBIT_MOV32I] = UOP_NVBIT_MOV32I;
+  m_int_uop_table[NVBIT_MOVM] = UOP_NVBIT_MOVM;
+  m_int_uop_table[NVBIT_PRMT] = UOP_NVBIT_PRMT;
+  m_int_uop_table[NVBIT_SEL] = UOP_NVBIT_SEL;
+  m_int_uop_table[NVBIT_SGXT] = UOP_NVBIT_SGXT;
+  m_int_uop_table[NVBIT_SHFL] = UOP_NVBIT_SHFL;
+  m_int_uop_table[NVBIT_PLOP3] = UOP_NVBIT_PLOP3;
+  m_int_uop_table[NVBIT_PSETP] = UOP_NVBIT_PSETP;
+  m_int_uop_table[NVBIT_P2R] = UOP_NVBIT_P2R;
+  m_int_uop_table[NVBIT_R2P] = UOP_NVBIT_R2P;
+  m_int_uop_table[NVBIT_LD] = UOP_NVBIT_LD;
+  m_int_uop_table[NVBIT_LDC] = UOP_NVBIT_LDC;
+  m_int_uop_table[NVBIT_LDG] = UOP_NVBIT_LDG;
+  m_int_uop_table[NVBIT_LDL] = UOP_NVBIT_LDL;
+  m_int_uop_table[NVBIT_LDS] = UOP_NVBIT_LDS;
+  m_int_uop_table[NVBIT_LDSM] = UOP_NVBIT_LDSM;
+  m_int_uop_table[NVBIT_ST] = UOP_NVBIT_ST;
+  m_int_uop_table[NVBIT_STG] = UOP_NVBIT_STG;
+  m_int_uop_table[NVBIT_STL] = UOP_NVBIT_STL;
+  m_int_uop_table[NVBIT_STS] = UOP_NVBIT_STS;
+  m_int_uop_table[NVBIT_MATCH] = UOP_NVBIT_MATCH;
+  m_int_uop_table[NVBIT_QSPC] = UOP_NVBIT_QSPC;
+  m_int_uop_table[NVBIT_ATOM] = UOP_NVBIT_ATOM;
+  m_int_uop_table[NVBIT_ATOMS] = UOP_NVBIT_ATOMS;
+  m_int_uop_table[NVBIT_ATOMG] = UOP_NVBIT_ATOMG;
+  m_int_uop_table[NVBIT_RED] = UOP_NVBIT_RED;
+  m_int_uop_table[NVBIT_CCTL] = UOP_NVBIT_CCTL;
+  m_int_uop_table[NVBIT_CCTLL] = UOP_NVBIT_CCTLL;
+  m_int_uop_table[NVBIT_ERRBAR] = UOP_NVBIT_ERRBAR;
+  m_int_uop_table[NVBIT_MEMBAR] = UOP_NVBIT_MEMBAR;
+  m_int_uop_table[NVBIT_CCTLT] = UOP_NVBIT_CCTLT;
+  m_int_uop_table[NVBIT_R2UR] = UOP_NVBIT_R2UR;
+  m_int_uop_table[NVBIT_S2UR] = UOP_NVBIT_S2UR;
+  m_int_uop_table[NVBIT_UBMSK] = UOP_NVBIT_UBMSK;
+  m_int_uop_table[NVBIT_UBREV] = UOP_NVBIT_UBREV;
+  m_int_uop_table[NVBIT_UCLEA] = UOP_NVBIT_UCLEA;
+  m_int_uop_table[NVBIT_UFLO] = UOP_NVBIT_UFLO;
+  m_int_uop_table[NVBIT_UIADD3] = UOP_NVBIT_UIADD3;
+  m_int_uop_table[NVBIT_UIADD3_64] = UOP_NVBIT_UIADD3_64;
+  m_int_uop_table[NVBIT_UIMAD] = UOP_NVBIT_UIMAD;
+  m_int_uop_table[NVBIT_UISETP] = UOP_NVBIT_UISETP;
+  m_int_uop_table[NVBIT_ULDC] = UOP_NVBIT_ULDC;
+  m_int_uop_table[NVBIT_ULEA] = UOP_NVBIT_ULEA;
+  m_int_uop_table[NVBIT_ULOP] = UOP_NVBIT_ULOP;
+  m_int_uop_table[NVBIT_ULOP3] = UOP_NVBIT_ULOP3;
+  m_int_uop_table[NVBIT_ULOP32I] = UOP_NVBIT_ULOP32I;
+  m_int_uop_table[NVBIT_UMOV] = UOP_NVBIT_UMOV;
+  m_int_uop_table[NVBIT_UP2UR] = UOP_NVBIT_UP2UR;
+  m_int_uop_table[NVBIT_UPLOP3] = UOP_NVBIT_UPLOP3;
+  m_int_uop_table[NVBIT_UPOPC] = UOP_NVBIT_UPOPC;
+  m_int_uop_table[NVBIT_UPRMT] = UOP_NVBIT_UPRMT;
+  m_int_uop_table[NVBIT_UPSETP] = UOP_NVBIT_UPSETP;
+  m_int_uop_table[NVBIT_UR2UP] = UOP_NVBIT_UR2UP;
+  m_int_uop_table[NVBIT_USEL] = UOP_NVBIT_USEL;
+  m_int_uop_table[NVBIT_USGXT] = UOP_NVBIT_USGXT;
+  m_int_uop_table[NVBIT_USHF] = UOP_NVBIT_USHF;
+  m_int_uop_table[NVBIT_USHL] = UOP_NVBIT_USHL;
+  m_int_uop_table[NVBIT_USHR] = UOP_NVBIT_USHR;
+  m_int_uop_table[NVBIT_VOTEU] = UOP_NVBIT_VOTEU;
+  m_int_uop_table[NVBIT_TEX] = UOP_NVBIT_TEX;
+  m_int_uop_table[NVBIT_TLD] = UOP_NVBIT_TLD;
+  m_int_uop_table[NVBIT_TLD4] = UOP_NVBIT_TLD4;
+  m_int_uop_table[NVBIT_TMML] = UOP_NVBIT_TMML;
+  m_int_uop_table[NVBIT_TXD] = UOP_NVBIT_TXD;
+  m_int_uop_table[NVBIT_TXQ] = UOP_NVBIT_TXQ;
+  m_int_uop_table[NVBIT_SUATOM] = UOP_NVBIT_SUATOM;
+  m_int_uop_table[NVBIT_SULD] = UOP_NVBIT_SULD;
+  m_int_uop_table[NVBIT_SURED] = UOP_NVBIT_SURED;
+  m_int_uop_table[NVBIT_SUST] = UOP_NVBIT_SUST;
+  m_int_uop_table[NVBIT_BMOV] = UOP_NVBIT_BMOV;
+  m_int_uop_table[NVBIT_BPT] = UOP_NVBIT_BPT;
+  m_int_uop_table[NVBIT_BRA] = UOP_NVBIT_BRA;
+  m_int_uop_table[NVBIT_BREAK] = UOP_NVBIT_BREAK;
+  m_int_uop_table[NVBIT_BRX] = UOP_NVBIT_BRX;
+  m_int_uop_table[NVBIT_BRXU] = UOP_NVBIT_BRXU;
+  m_int_uop_table[NVBIT_BSSY] = UOP_NVBIT_BSSY;
+  m_int_uop_table[NVBIT_BSYNC] = UOP_NVBIT_BSYNC;
+  m_int_uop_table[NVBIT_CALL] = UOP_NVBIT_CALL;
+  m_int_uop_table[NVBIT_EXIT] = UOP_NVBIT_EXIT;
+  m_int_uop_table[NVBIT_JMP] = UOP_NVBIT_JMP;
+  m_int_uop_table[NVBIT_JMX] = UOP_NVBIT_JMX;
+  m_int_uop_table[NVBIT_JMXU] = UOP_NVBIT_JMXU;
+  m_int_uop_table[NVBIT_KILL] = UOP_NVBIT_KILL;
+  m_int_uop_table[NVBIT_NANOSLEEP] = UOP_NVBIT_NANOSLEEP;
+  m_int_uop_table[NVBIT_RET] = UOP_NVBIT_RET;
+  m_int_uop_table[NVBIT_RPCMOV] = UOP_NVBIT_RPCMOV;
+  m_int_uop_table[NVBIT_RTT] = UOP_NVBIT_RTT;
+  m_int_uop_table[NVBIT_WARPSYNC] = UOP_NVBIT_WARPSYNC;
+  m_int_uop_table[NVBIT_YIELD] = UOP_NVBIT_YIELD;
+  m_int_uop_table[NVBIT_B2R] = UOP_NVBIT_B2R;
+  m_int_uop_table[NVBIT_BAR] = UOP_NVBIT_BAR;
+  m_int_uop_table[NVBIT_CS2R] = UOP_NVBIT_CS2R;
+  m_int_uop_table[NVBIT_DEPBAR] = UOP_NVBIT_DEPBAR;
+  m_int_uop_table[NVBIT_GETLMEMBASE] = UOP_NVBIT_GETLMEMBASE;
+  m_int_uop_table[NVBIT_LEPC] = UOP_NVBIT_LEPC;
+  m_int_uop_table[NVBIT_NOP] = UOP_NVBIT_NOP;
+  m_int_uop_table[NVBIT_PMTRIG] = UOP_NVBIT_PMTRIG;
+  m_int_uop_table[NVBIT_R2B] = UOP_NVBIT_R2B;
+  m_int_uop_table[NVBIT_S2R] = UOP_NVBIT_S2R;
+  m_int_uop_table[NVBIT_SETCTAID] = UOP_NVBIT_SETCTAID;
+  m_int_uop_table[NVBIT_SETLMEMBASE] = UOP_NVBIT_SETLMEMBASE;
+  m_int_uop_table[NVBIT_VOT] = UOP_NVBIT_VOT;
 }
 
 const char *nvbit_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
