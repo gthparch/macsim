@@ -569,7 +569,7 @@ typedef enum Uop_Type_enum {
   UOP_NVBIT_S2R,
   UOP_NVBIT_SETCTAID,
   UOP_NVBIT_SETLMEMBASE,
-  UOP_NVBIT_VOT,
+  UOP_NVBIT_VOTE,
   // end of additions for GPU-NVBIT instructions
 
   NUM_UOP_TYPES,
