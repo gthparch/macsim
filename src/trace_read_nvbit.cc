@@ -36,7 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <set>
-#include <fstream>
+// #include <fstream>
 
 #include "assert_macros.h"
 #include "trace_read.h"
@@ -128,10 +128,11 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   }
   // read one instruction each
   else {
-    // bytes_read = gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
-    std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-    trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
-    bytes_read = static_cast<std::size_t>(trace_file.gcount());
+     bytes_read = gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
+
+    // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+    // trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
+    // bytes_read = static_cast<std::size_t>(trace_file.gcount());
   }
 
   if (m_trace_size == bytes_read) {
@@ -171,12 +172,11 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
     thread_trace_info->m_buffer_index = 0;
   }
 
-  // rewind trace file
-  // off_t offset = gzseek(thread_trace_info->m_trace_file,
-  //                       -1 * num_inst * m_trace_size, SEEK_CUR);
-  std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-  trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
-  std::streamoff offset = trace_file.tellg();
+  off_t offset = gzseek(thread_trace_info->m_trace_file,
+                        -1 * num_inst * m_trace_size, SEEK_CUR);
+  // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
+  // trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
+  // std::streamoff offset = trace_file.tellg();
 
   if (offset == -1) {
     return false;
@@ -279,19 +279,19 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id,
 void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_nvbit_s inst_info;
-  // while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
-  //                             m_trace_size)) == m_trace_size) {
-  //   printf("%x ", bytes_read);
-  // }
-  // printf("\n");
-  // gzrewind(trace_info->m_trace_file);
-
-  std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
-  while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
-      // do something
+  while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
+                              m_trace_size)) == m_trace_size) {
+    printf("%x ", bytes_read);
+    // do something
   }
-  trace_file.clear(); // clear EOF flag
-  trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
+  printf("\n");
+  gzrewind(trace_info->m_trace_file);
+  // std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
+  // while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
+  //     // do something
+  //  }
+  // trace_file.clear(); // clear EOF flag
+  // trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1552,14 +1552,12 @@ const char *nvbit_decoder_c::g_tr_cf_names[10] = {
   "CF_ICALL",  // an indirect call
   "CF_ICO",  // an indirect jump to co-routine
   "CF_RET",  // a return
-  "CF_MITE"
-};
+  "CF_MITE"};
 
 const char *nvbit_decoder_c::g_addr_space_names[MAX_GPU_ADDR_SPACE] = {
   "GPU_ADDR_SP_INVALID", "GPU_ADDR_SP_CONST",   "GPU_ADDR_SP_GLOBAL",
   "GPU_ADDR_SP_LOCAL",   "GPU_ADDR_SP_PARAM",   "GPU_ADDR_SP_SHARED",
-  "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC",
-};
+  "GPU_ADDR_SP_TEXTURE", "GPU_ADDR_SP_GENERIC"};
 
 const char *nvbit_decoder_c::g_cache_op_names[MAX_GPU_CACHE_OP] = {
   "GPU_CACHE_OP_INVALID", "GPU_CACHE_OP_CA", "GPU_CACHE_OP_CV",
