@@ -128,6 +128,7 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   }
   // read one instruction each
   else {
+    // bytes_read = gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
     std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
     trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
     bytes_read = static_cast<std::size_t>(trace_file.gcount());
@@ -171,6 +172,8 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
   }
 
   // rewind trace file
+  // off_t offset = gzseek(thread_trace_info->m_trace_file,
+  //                       -1 * num_inst * m_trace_size, SEEK_CUR);
   std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
   trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
   std::streamoff offset = trace_file.tellg();
@@ -276,6 +279,12 @@ void nvbit_decoder_c::dprint_inst(void *trace_info, int core_id,
 void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   int bytes_read;
   trace_info_nvbit_s inst_info;
+  // while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info,
+  //                             m_trace_size)) == m_trace_size) {
+  //   printf("%x ", bytes_read);
+  // }
+  // printf("\n");
+  // gzrewind(trace_info->m_trace_file);
 
   std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
   while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
