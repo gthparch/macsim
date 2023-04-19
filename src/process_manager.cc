@@ -514,23 +514,22 @@ void process_manager_c::setup_process(process_s *process) {
   // get occupancy
   if (trace_type == "ptx") {
     process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
-  }
-  if (trace_type == "newptx") {
+  } else if (trace_type == "newptx") {
     if (!(trace_config_file >> process->m_max_block))
       ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
     trace_type = "ptx";
     if (*m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE_SUPER > 0) {
       process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE_SUPER;
     }
-  }
-
-  if (trace_type == "x86") {
+  } else if (trace_type == "x86") {
     std::string gen_version;
     trace_config_file >> gen_version;
     if (gen_version != t_gen_ver)
       std::cout << "!!WARNING!! Trace reader and trace generator version "
                    "mismatch; trace may not be read correctly."
                 << std::endl;
+  } else if (trace_type == "nvbit") {
+    process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
   }
 
   // get thread count
@@ -778,7 +777,7 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
     if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") {
       trace_info->m_prev_trace_info = new trace_info_nvbit_s;
       trace_info->m_next_trace_info = new trace_info_nvbit_s;
-    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") {
+    } else if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") {
       trace_info->m_prev_trace_info = new trace_info_gpu_s;
       trace_info->m_next_trace_info = new trace_info_gpu_s;
     }
@@ -824,9 +823,19 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
 
 #ifndef USING_QSIM
   // open trace file
-  trace_info->m_trace_file = gzopen(filename.c_str(), "r");
+  trace_info->m_trace_file = gzopen(filename.c_str(), "rb");
   if (trace_info->m_trace_file == NULL)
     ASSERTM(0, "error opening trace file:%s\n", filename.c_str());
+
+  // // printing opcode..
+  // trace_info_nvbit_s inst_info;
+  // int m_trace_size = NVBIT_TRACE_SIZE;
+  // int bytes_read;
+  // while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info, m_trace_size)) == m_trace_size) {
+  //   printf("%x ", inst_info.m_opcode);
+  // }
+  // printf("\n");
+
 #endif
 
   trace_info->m_file_opened = true;
