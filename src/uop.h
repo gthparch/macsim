@@ -432,6 +432,7 @@ typedef enum Uop_Type_enum {
   UOP_NVBIT_DFMA,
   UOP_NVBIT_DMUL,
   UOP_NVBIT_DSETP,
+
   UOP_NVBIT_BMMA,
   UOP_NVBIT_BMSK,
   UOP_NVBIT_BREV,
