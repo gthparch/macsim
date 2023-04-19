@@ -404,7 +404,8 @@ typedef enum Uop_Type_enum {
   UOP_GPU_FRECONVERGE,
   UOP_GPU_FPHI,
   // end of additions for GPU instructions
-  // NVBIT uop
+
+  // added for GPU-NVBIT instructions (turing inst set)
   UOP_NVBIT_FADD,
   UOP_NVBIT_FADD32I,
   UOP_NVBIT_FCHK,
@@ -431,6 +432,7 @@ typedef enum Uop_Type_enum {
   UOP_NVBIT_DFMA,
   UOP_NVBIT_DMUL,
   UOP_NVBIT_DSETP,
+
   UOP_NVBIT_BMMA,
   UOP_NVBIT_BMSK,
   UOP_NVBIT_BREV,
@@ -568,6 +570,8 @@ typedef enum Uop_Type_enum {
   UOP_NVBIT_SETCTAID,
   UOP_NVBIT_SETLMEMBASE,
   UOP_NVBIT_VOTE,
+  // end of additions for GPU-NVBIT instructions
+
   NUM_UOP_TYPES,
 } Uop_Type;
 
