@@ -556,10 +556,13 @@ int dcu_c::access(uop_c* uop) {
       case MEM_LD_LM:
       case MEM_LD_CM:
       case MEM_LD_TM:
+      case MEM_LD_GM:
+      case MEM_LD_SM:
         req_type = MRT_DFETCH;
         break;
       case MEM_ST:
       case MEM_ST_LM:
+      case MEM_ST_SM:
       case MEM_ST_GM:
         req_type = MRT_DSTORE;
         break;

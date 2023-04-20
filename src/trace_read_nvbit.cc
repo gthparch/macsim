@@ -36,7 +36,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <set>
-// #include <fstream>
 
 #include "assert_macros.h"
 #include "trace_read.h"
@@ -129,10 +128,6 @@ bool nvbit_decoder_c::peek_trace(int core_id, void *t_info, int sim_thread_id,
   // read one instruction each
   else {
     bytes_read = gzread(thread_trace_info->m_trace_file, trace_info, m_trace_size);
-
-    // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-    // trace_file.read(reinterpret_cast<char*>(trace_info), m_trace_size);
-    // bytes_read = static_cast<std::size_t>(trace_file.gcount());
   }
 
   if (m_trace_size == bytes_read) {
@@ -174,10 +169,6 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
 
   off_t offset = gzseek(thread_trace_info->m_trace_file,
                         -1 * num_inst * m_trace_size, SEEK_CUR);
-  // std::ifstream trace_file(thread_trace_info->m_trace_file, std::ios::binary);
-  // trace_file.seekg(-1 * num_inst * m_trace_size, std::ios::cur);
-  // std::streamoff offset = trace_file.tellg();
-
   if (offset == -1) {
     return false;
   }
@@ -287,13 +278,6 @@ void nvbit_decoder_c::pre_read_trace(thread_s *trace_info) {
   }
   printf("\n");
   gzrewind(trace_info->m_trace_file);
-
-  // std::ifstream trace_file(trace_info->m_trace_file, std::ios::binary);
-  // while (trace_file.read(reinterpret_cast<char*>(&inst_info), m_trace_size)) {
-  //     // do something
-  //  }
-  // trace_file.clear(); // clear EOF flag
-  // trace_file.seekg(0, std::ios::beg); // rewind to beginning of file
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,16 +312,15 @@ void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 
     if (info->m_table_info->m_mem_type == MEM_ST ||
         info->m_table_info->m_mem_type == MEM_ST_LM ||
-        info->m_table_info->m_mem_type == MEM_ST_SM) {
+        info->m_table_info->m_mem_type == MEM_ST_SM ||
+        info->m_table_info->m_mem_type == MEM_ST_GM) {
       trace_uop->m_va = MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     } else if ((info->m_table_info->m_mem_type == MEM_LD) ||
-               (info->m_table_info->m_mem_type == MEM_LD_LM) ||
-               (info->m_table_info->m_mem_type == MEM_LD_SM) ||
                (info->m_table_info->m_mem_type == MEM_LD_CM) ||
-               (info->m_table_info->m_mem_type == MEM_LD_TM) ||
-               (info->m_table_info->m_mem_type == MEM_LD_PM) ||
-               (info->m_table_info->m_mem_type == MEM_PF)) {
+               (info->m_table_info->m_mem_type == MEM_LD_GM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_LM) ||
+               (info->m_table_info->m_mem_type == MEM_LD_SM)) {
       if (info->m_trace_info.m_second_mem) {
         assert(
           0);  // nbl - mar-19-2013: ptx instructions access only one memory location
@@ -451,11 +434,10 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       write_dest_reg = 1;
 
       if (trace_uop[0]->m_mem_type == MEM_LD ||
-          trace_uop[0]->m_mem_type == MEM_LD_LM ||
-          trace_uop[0]->m_mem_type == MEM_LD_SM ||
           trace_uop[0]->m_mem_type == MEM_LD_CM ||
-          trace_uop[0]->m_mem_type == MEM_LD_TM ||
-          trace_uop[0]->m_mem_type == MEM_LD_PM) {
+          trace_uop[0]->m_mem_type == MEM_LD_GM ||
+          trace_uop[0]->m_mem_type == MEM_LD_LM ||
+          trace_uop[0]->m_mem_type == MEM_LD_SM) {
         inst_has_ld_uop = true;
       }
     }  // HAS_LOAD
@@ -609,6 +591,7 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       if ((trace_uop[ii]->m_mem_type == MEM_ST) ||
           (trace_uop[ii]->m_mem_type == MEM_ST_LM) ||
           (trace_uop[ii]->m_mem_type == MEM_ST_SM) ||
+          (trace_uop[ii]->m_mem_type == MEM_ST_GM) ||
           (trace_uop[ii]->m_cf_type != NOT_CF)) {
         if (tmp_reg_needed && !inst_has_ALU_uop) {
           (trace_uop[ii])->m_srcs[jj].m_type = (Reg_Type)0;
@@ -644,11 +627,10 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       // add tmp register as a destination register
       if (tmp_reg_needed && ((trace_uop[ii]->m_mem_type == MEM_LD) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_LM) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_SM) ||
                              (trace_uop[ii]->m_mem_type == MEM_LD_CM) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_TM) ||
-                             (trace_uop[ii]->m_mem_type == MEM_LD_PM))) {
+                             (trace_uop[ii]->m_mem_type == MEM_LD_GM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_LM) ||
+                             (trace_uop[ii]->m_mem_type == MEM_LD_SM))) {
         (trace_uop[ii])->m_dests[jj].m_type = (Reg_Type)0;
         (trace_uop[ii])->m_dests[jj].m_id = TR_REG_TMP0;
         (trace_uop[ii])->m_dests[jj].m_reg = TR_REG_TMP0;
@@ -1065,7 +1047,7 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
           }
           line_size = core->get_const_cache()->cache_line_size();
           break;
-        // texture memory
+        // texture memory --> todo: should fix it to MEM_LD_LM
         case MEM_LD_TM:
           if (uop->m_vaddr && uop->m_mem_size) {
             line_addr =
@@ -1101,6 +1083,7 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       bool inst_read;
       Addr addr;
       int access_size = uop->m_mem_size;
+
       ASSERTM(access_size,
               "access size cannot be zero %s tid %d core %d uop num %llu block "
               "id %d orig id %d\n",
@@ -1607,4 +1590,5 @@ const char *nvbit_decoder_c::g_mem_type_names[20] = {
   "MEM_EVICT",  // a cache block eviction hint
   "MEM_SWPREF_NTA", "MEM_SWPREF_T0", "MEM_SWPREF_T1", "MEM_SWPREF_T2",
   "MEM_LD_LM",      "MEM_LD_SM",     "MEM_LD_GM",     "MEM_ST_LM",
-  "MEM_ST_SM",      "MEM_ST_GM",     "NUM_MEM_TYPES"};
+  "MEM_ST_SM",      "MEM_ST_GM",      "MEM_LD_CM",    "MEM_LD_TM",
+  "MEM_LD_PM",      "NUM_MEM_TYPES"};
