@@ -181,6 +181,7 @@ typedef struct thread_s {
   int m_orig_block_id; /**< original block id from a trace*/
   int m_orig_thread_id; /**< adjusted block id */
   int m_block_id; /**< block id */
+  uint64_t m_trace_id;
   gzFile m_trace_file; /**< gzip trace file */
   bool m_file_opened; /**< trace file opened? */
   bool m_main_thread; /**< main thread (usually thread id 0) */

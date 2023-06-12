@@ -326,8 +326,7 @@ void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
           0);  // nbl - mar-19-2013: ptx instructions access only one memory location
         // trace_uop->m_va = MIN2((pi->m_ld_vaddr2 + rep_offset)*amp_val, MAX_ADDR);
       } else
-        trace_uop->m_va =
-          MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
+        trace_uop->m_va = MIN2((pi->m_mem_addr + rep_offset) * amp_val, MAX_ADDR);
 
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     }
@@ -527,11 +526,11 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     }
 
     // To-do.. fix GPU_ to NVBIT_
-    ASSERTM((pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED) &&
-              (pi->m_opcode != GPU_MEMBAR_CTA &&
-               pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS),
-            "unsupported uop - %s",
-            nvbit_decoder_c::g_tr_opcode_names[pi->m_opcode]);
+    // ASSERTM(pi->m_opcode != GPU_BAR_ARRIVE && pi->m_opcode != GPU_BAR_RED &&
+    //         pi->m_opcode != GPU_MEMBAR_CTA &&
+    //         pi->m_opcode != GPU_MEMBAR_GL && pi->m_opcode != GPU_MEMBAR_SYS,
+    //         "unsupported uop - %d - %s",
+    //         pi->m_opcode, nvbit_decoder_c::g_tr_opcode_names[pi->m_opcode]);
 
     ///
     /// Non-memory, non-branch instruction
@@ -1016,229 +1015,234 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       }
     }
 
-    if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 1.3f) {
-      if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
-        // cache_line_addr = uop->m_vaddr;
-        // cache_line_size = *KNOB(KNOB_MAX_TRANSACTION_SIZE);
-      }
-      ASSERTM(0, "TBD");
-    } else if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 2.0f) {
-      Addr line_addr = 0;
-      Addr end_line_addr = 0;
-      int line_size;
-      switch (uop->m_mem_type) {
-        // shared memory, parameter memory
-        case MEM_LD_SM:
-        case MEM_ST_SM:
-          if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr =
-              core->get_shared_memory()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_shared_memory()->base_cache_line(
-              uop->m_vaddr + uop->m_mem_size - 1);
-          }
-          line_size = core->get_shared_memory()->cache_line_size();
-          break;
-        // constant memory
-        case MEM_LD_CM:
-          if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr = core->get_const_cache()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_const_cache()->base_cache_line(
-              uop->m_vaddr + uop->m_mem_size - 1);
-          }
-          line_size = core->get_const_cache()->cache_line_size();
-          break;
-        // texture memory --> todo: should fix it to MEM_LD_LM
-        case MEM_LD_TM:
-          if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr =
-              core->get_texture_cache()->base_cache_line(uop->m_vaddr);
-            end_line_addr = core->get_texture_cache()->base_cache_line(
-              uop->m_vaddr + uop->m_mem_size - 1);
-          }
-          line_size = core->get_texture_cache()->cache_line_size();
-          break;
-        // global memory
-        default:
-          if (uop->m_vaddr && uop->m_mem_size) {
-            line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr);
-            end_line_addr = m_simBase->m_memory->base_addr(
-              core_id, uop->m_vaddr + uop->m_mem_size - 1);
-          }
-          line_size = m_simBase->m_memory->line_size(core_id);
-          break;
-      }
+    // if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 1.3f) {
+    //   if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
+    //     // cache_line_addr = uop->m_vaddr;
+    //     // cache_line_size = *KNOB(KNOB_MAX_TRANSACTION_SIZE);
+    //   }
+    //   ASSERTM(0, "TBD");
+    // } else if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 2.0f) {
+    //   Addr line_addr = 0;
+    //   Addr end_line_addr = 0;
+    //   int line_size;
+    //   switch (uop->m_mem_type) {
+    //     // shared memory, parameter memory
+    //     case MEM_LD_SM:
+    //     case MEM_ST_SM:
+    //       if (uop->m_vaddr && uop->m_mem_size) {
+    //         line_addr =
+    //           core->get_shared_memory()->base_cache_line(uop->m_vaddr);
+    //         end_line_addr = core->get_shared_memory()->base_cache_line(
+    //           uop->m_vaddr + uop->m_mem_size - 1);
+    //       }
+    //       line_size = core->get_shared_memory()->cache_line_size();
+    //       break;
+    //     // constant memory
+    //     case MEM_LD_CM:
+    //       if (uop->m_vaddr && uop->m_mem_size) {
+    //         line_addr = core->get_const_cache()->base_cache_line(uop->m_vaddr);
+    //         end_line_addr = core->get_const_cache()->base_cache_line(
+    //           uop->m_vaddr + uop->m_mem_size - 1);
+    //       }
+    //       line_size = core->get_const_cache()->cache_line_size();
+    //       break;
+    //     // texture memory --> todo: should fix it to MEM_LD_LM
+    //     case MEM_LD_TM:
+    //       if (uop->m_vaddr && uop->m_mem_size) {
+    //         line_addr =
+    //           core->get_texture_cache()->base_cache_line(uop->m_vaddr);
+    //         end_line_addr = core->get_texture_cache()->base_cache_line(
+    //           uop->m_vaddr + uop->m_mem_size - 1);
+    //       }
+    //       line_size = core->get_texture_cache()->cache_line_size();
+    //       break;
+    //     // global memory
+    //     default:
+    //       if (uop->m_vaddr && uop->m_mem_size) {
+    //         line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr);
+    //         end_line_addr = m_simBase->m_memory->base_addr(
+    //           core_id, uop->m_vaddr + uop->m_mem_size - 1);
+    //       }
+    //       line_size = m_simBase->m_memory->line_size(core_id);
+    //       break;
+    //   }
 
-      ASSERTM(ungetch_trace(core_id, sim_thread_id, 1), "mention why\n");
+    //   ASSERTM(ungetch_trace(core_id, sim_thread_id, 1), "mention why\n");
 
-      static set<Addr>
-        seen_block_addr;  // to efficiently track seen cache blocks
-      static list<Addr>
-        seen_block_list;  // to maintain the order of seen cache blocks - is it necessary?
-      static map<int, Addr> accessed_addr;
+    //   static set<Addr>
+    //     seen_block_addr;  // to efficiently track seen cache blocks
+    //   static list<Addr>
+    //     seen_block_list;  // to maintain the order of seen cache blocks - is it necessary?
+    //   static map<int, Addr> accessed_addr;
 
-      seen_block_addr.clear();
-      seen_block_list.clear();
+    //   seen_block_addr.clear();
+    //   seen_block_list.clear();
 
-      bool last_inst = false;
-      bool inst_read;
-      Addr addr;
-      int access_size = uop->m_mem_size;
+    //   bool last_inst = false;
+    //   bool inst_read;
+    //   Addr addr;
+    //   int access_size = uop->m_mem_size;
 
-      ASSERTM(access_size,
-              "access size cannot be zero %s tid %d core %d uop num %llu block "
-              "id %d orig id %d\n",
-              nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
-              core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
+    //   ASSERTM(access_size,
+    //           "access size cannot be zero %s tid %d core %d uop num %llu block "
+    //           "id %d orig id %d\n",
+    //           nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
+    //           core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
 
-      // even if a warp has fewer than 32 threads or even if fewer than
-      // 32 threads are active, there will be 32 addresses, with bytes
-      // corresponding to invalid/inactive threads set to zero
-      // we have read 1 out of 32 addresses
-      int read_addr = 1;
-      int addr_per_trace_inst = *KNOB(KNOB_TRACE_USES_64_BIT_ADDR)
-                                  ? (m_trace_size / 8)
-                                  : (m_trace_size / 4);
-      // 32 instructions are guaranteed to be included
-      // how does coalescing of stores happen? say multiple stores map to the same cache block,
-      // but not all bytes of a cache block are written. how will the stores be communicated
-      // to the l2?
-      do {
-        if (line_addr) {
-          if (seen_block_addr.find(line_addr) == seen_block_addr.end()) {
-            seen_block_addr.insert(line_addr);
-            seen_block_list.push_back(line_addr);
-          }
-          if (seen_block_addr.find(end_line_addr) == seen_block_addr.end()) {
-            seen_block_addr.insert(end_line_addr);
-            seen_block_list.push_back(end_line_addr);
-          }
-        }
+    //   // even if a warp has fewer than 32 threads or even if fewer than
+    //   // 32 threads are active, there will be 32 addresses, with bytes
+    //   // corresponding to invalid/inactive threads set to zero
+    //   // we have read 1 out of 32 addresses
+    //   int read_addr = 1;
+    //   int addr_per_trace_inst = *KNOB(KNOB_TRACE_USES_64_BIT_ADDR)
+    //                               ? (m_trace_size / 8)
+    //                               : (m_trace_size / 4);
+    //   // int addr_per_trace_inst = 1;                            
+    //   // 32 instructions are guaranteed to be included
+    //   // how does coalescing of stores happen? say multiple stores map to the same cache block,
+    //   // but not all bytes of a cache block are written. how will the stores be communicated
+    //   // to the l2?
+    //   do {
+    //     if (line_addr) { 
+    //     // if (1) {
+    //       if (seen_block_addr.find(line_addr) == seen_block_addr.end()) {
+    //         seen_block_addr.insert(line_addr);
+    //         seen_block_list.push_back(line_addr);
+    //       }
+    //       if (seen_block_addr.find(end_line_addr) == seen_block_addr.end()) {
+    //         seen_block_addr.insert(end_line_addr);
+    //         seen_block_list.push_back(end_line_addr);
+    //       }
+    //     }
 
-        if (last_inst) {
-          if (!thread_trace_info->m_trace_ended) {
-            read_success =
-              peek_trace(core_id, thread_trace_info->m_prev_trace_info,
-                         sim_thread_id, &inst_read);
-            if (read_success) {
-              if (inst_read) {
-                trace_info_nvbit_s *prev_trace_info =
-                  static_cast<trace_info_nvbit_s *>(
-                    thread_trace_info->m_prev_trace_info);
-                uop->m_npc = prev_trace_info->m_inst_addr;
-              } else {
-                thread_trace_info->m_trace_ended = true;
-                DEBUG_CORE(core_id, "trace ended core_id:%d thread_id:%d\n",
-                           core_id, sim_thread_id);
-              }
-            } else {
-              ASSERTM(0, "why?");
-            }
-          }
-          break;
-        }
+    //     if (last_inst) {
+    //       if (!thread_trace_info->m_trace_ended) {
+    //         read_success =
+    //           peek_trace(core_id, thread_trace_info->m_prev_trace_info,
+    //                      sim_thread_id, &inst_read);
+    //         if (read_success) {
+    //           if (inst_read) {
+    //             trace_info_nvbit_s *prev_trace_info =
+    //               static_cast<trace_info_nvbit_s *>(
+    //                 thread_trace_info->m_prev_trace_info);
+    //             uop->m_npc = prev_trace_info->m_inst_addr;
+    //           } else {
+    //             thread_trace_info->m_trace_ended = true;
+    //             DEBUG_CORE(core_id, "trace ended core_id:%d thread_id:%d\n",
+    //                        core_id, sim_thread_id);
+    //           }
+    //         } else {
+    //           ASSERTM(0, "why?");
+    //         }
+    //       }
+    //       break;
+    //     }
 
-        if (!((read_addr - 1) % addr_per_trace_inst)) {
-          read_success =
-            peek_trace(core_id, &trace_info, sim_thread_id, &inst_read);
-          if (!read_success || (read_success && !inst_read)) {
-            ASSERTM(0, "reached end without reading all addresses");
-          }
-        }
+    //     if (!((read_addr - 1) % addr_per_trace_inst)) {
+    //       read_success =
+    //         peek_trace(core_id, &trace_info, sim_thread_id, &inst_read);
+    //       if (!read_success || (read_success && !inst_read)) {
+    //         cout << "trace id: " << std::dec << thread_trace_info->m_trace_id << endl;
+    //         cout << "mask: " << std::hex << uop->m_active_mask << endl;
+    //         ASSERTM(0, "reached end without reading all addresses");
+    //       }
+    //     }
 
-        if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
-          memcpy(&addr,
-                 ((uint8_t *)&trace_info) +
-                   ((read_addr - 1) % addr_per_trace_inst) * 8,
-                 8);
-        } else {
-          addr = 0;
-          memcpy(&addr,
-                 ((uint8_t *)&trace_info) +
-                   ((read_addr - 1) % addr_per_trace_inst) * 4,
-                 4);
-        }
+    //     if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
+    //       memcpy(&addr,
+    //              ((uint8_t *)&trace_info) +
+    //                ((read_addr - 1) % addr_per_trace_inst) * 8,
+    //              8);
+    //     } else {
+    //       addr = 0;
+    //       memcpy(&addr,
+    //              ((uint8_t *)&trace_info) +
+    //                ((read_addr - 1) % addr_per_trace_inst) * 4,
+    //              4);
+    //     }
 
-        ++read_addr;
-        if (read_addr == *KNOB(KNOB_GPU_WARP_SIZE)) {
-          last_inst = true;
-        }
+    //     ++read_addr;
+    //     if (read_addr == *KNOB(KNOB_GPU_WARP_SIZE)) {
+    //       last_inst = true;
+    //     }
 
-        if (addr && access_size) {
-          int process_id = thread_trace_info->m_process->m_process_id;
-          unsigned long offset = UINT_MAX * process_id * 10;
-          addr += m_simBase->m_memory->base_addr(core_id, offset);
+    //     if (addr && access_size) {
+    //       int process_id = thread_trace_info->m_process->m_process_id;
+    //       unsigned long offset = UINT_MAX * process_id * 10;
+    //       addr += m_simBase->m_memory->base_addr(core_id, offset);
 
-          switch (uop->m_mem_type) {
-            case MEM_LD_SM:
-            case MEM_ST_SM:
-              line_addr = core->get_shared_memory()->base_cache_line(addr);
-              end_line_addr = core->get_shared_memory()->base_cache_line(
-                addr + access_size - 1);
-              break;
-            case MEM_LD_CM:
-              line_addr = core->get_const_cache()->base_cache_line(addr);
-              end_line_addr = core->get_const_cache()->base_cache_line(
-                addr + access_size - 1);
-              break;
-            // texture cache
-            case MEM_LD_TM:
-              line_addr = core->get_texture_cache()->base_cache_line(addr);
-              end_line_addr = core->get_texture_cache()->base_cache_line(
-                addr + access_size - 1);
-              break;
-            default:
-              line_addr = m_simBase->m_memory->base_addr(core_id, addr);
-              end_line_addr =
-                m_simBase->m_memory->base_addr(core_id, addr + access_size - 1);
-              break;
-          }
-        } else {
-          line_addr = 0;
-          end_line_addr = 0;
-        }
-      } while (1);
+    //       switch (uop->m_mem_type) {
+    //         case MEM_LD_SM:
+    //         case MEM_ST_SM:
+    //           line_addr = core->get_shared_memory()->base_cache_line(addr);
+    //           end_line_addr = core->get_shared_memory()->base_cache_line(
+    //             addr + access_size - 1);
+    //           break;
+    //         case MEM_LD_CM:
+    //           line_addr = core->get_const_cache()->base_cache_line(addr);
+    //           end_line_addr = core->get_const_cache()->base_cache_line(
+    //             addr + access_size - 1);
+    //           break;
+    //         // texture cache
+    //         case MEM_LD_TM:
+    //           line_addr = core->get_texture_cache()->base_cache_line(addr);
+    //           end_line_addr = core->get_texture_cache()->base_cache_line(
+    //             addr + access_size - 1);
+    //           break;
+    //         default:
+    //           line_addr = m_simBase->m_memory->base_addr(core_id, addr);
+    //           end_line_addr =
+    //             m_simBase->m_memory->base_addr(core_id, addr + access_size - 1);
+    //           break;
+    //       }
+    //     } else {
+    //       line_addr = 0;
+    //       end_line_addr = 0;
+    //     }
+    //   } while (1);
 
-      ASSERTM(seen_block_addr.size() == seen_block_list.size() &&
-                seen_block_addr.size(),
-              "should be non-zero and equal");
+    //   ASSERTM(seen_block_addr.size() == seen_block_list.size() &&
+    //             seen_block_addr.size(),
+    //           "should be non-zero and equal: %ld, %ld, %d, %llx, %s, %lld, %d, %lld \n", 
+    //           seen_block_addr.size(), seen_block_list.size(), uop->m_mem_type, line_addr, nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], uop->m_vaddr, uop->m_mem_size, trace_uop->m_va);
 
-      uop->m_child_uops = new uop_c *[seen_block_addr.size()];
-      uop->m_num_child_uops = seen_block_addr.size();
-      uop->m_num_child_uops_done = 0;
-      if (uop->m_num_child_uops != 64) {
-        uop->m_pending_child_uops = N_BIT_MASK(uop->m_num_child_uops);
-      } else {
-        uop->m_pending_child_uops = N_BIT_MASK_64;
-      }
-      uop->m_vaddr = 0;
-      uop->m_mem_size = 0;
+    //   uop->m_child_uops = new uop_c *[seen_block_addr.size()];
+    //   uop->m_num_child_uops = seen_block_addr.size();
+    //   uop->m_num_child_uops_done = 0;
+    //   if (uop->m_num_child_uops != 64) {
+    //     uop->m_pending_child_uops = N_BIT_MASK(uop->m_num_child_uops);
+    //   } else {
+    //     uop->m_pending_child_uops = N_BIT_MASK_64;
+    //   }
+    //   uop->m_vaddr = 0;
+    //   uop->m_mem_size = 0;
 
-      uop_c *child_mem_uop = NULL;
-      int count = 0;
+    //   uop_c *child_mem_uop = NULL;
+    //   int count = 0;
 
-      auto itr = seen_block_list.begin();
-      auto end = seen_block_list.end();
-      while (itr != end) {
-        Addr vaddr = *itr;
+    //   auto itr = seen_block_list.begin();
+    //   auto end = seen_block_list.end();
+    //   while (itr != end) {
+    //     Addr vaddr = *itr;
 
-        child_mem_uop =
-          core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
-        child_mem_uop->allocate();
-        ASSERT(child_mem_uop);
+    //     child_mem_uop =
+    //       core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
+    //     child_mem_uop->allocate();
+    //     ASSERT(child_mem_uop);
 
-        memcpy(child_mem_uop, uop, sizeof(uop_c));
+    //     memcpy(child_mem_uop, uop, sizeof(uop_c));
 
-        child_mem_uop->m_parent_uop = uop;
-        child_mem_uop->m_vaddr = vaddr;
-        child_mem_uop->m_mem_size = line_size;
-        child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
-        child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
+    //     child_mem_uop->m_parent_uop = uop;
+    //     child_mem_uop->m_vaddr = vaddr;
+    //     child_mem_uop->m_mem_size = line_size;
+    //     child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
+    //     child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
 
-        uop->m_child_uops[count++] = child_mem_uop;
+    //     uop->m_child_uops[count++] = child_mem_uop;
 
-        ++itr;
-      }
-    }
+    //     ++itr;
+    //   }
+    // }
   }
 
   DEBUG_CORE(

@@ -27,7 +27,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**********************************************************************************************
- * File         : maim.cc
+ * File         : main.cc
  * Author       : HPArch
  * Date         : 3/25/2011
  * SVN          : $Id: main.cc 911 2009-11-20 19:08:10Z kacear $:

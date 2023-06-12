@@ -271,7 +271,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     m_hw_pref = new hwp_common_c(c_id, type, m_simBase);
 
   // const / texture cache
-  if ((m_core_type == "ptx" | m_core_type == "nvbit") &&
+  if ((m_core_type == "ptx" || m_core_type == "nvbit") &&
       *m_simBase->m_knobs->KNOB_USE_CONST_AND_TEX_CACHES) {
     m_const_cache = new readonly_cache_c(
       "const_cache", m_core_id, *KNOB(KNOB_CONST_CACHE_SIZE),

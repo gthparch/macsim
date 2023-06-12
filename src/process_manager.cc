@@ -106,15 +106,6 @@ thread_stat_s::thread_stat_s() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//  process_manager_c() - constructor
-//   m_thread_queue - contains the list of unassigned threads (from all
-//  applications) that are ready to be launched
-//   m_block_queue - contains the list of unassigned blocks (from all
-//  applications) that are ready to be launched
-////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
 //  process_s() - constructor
 ////////////////////////////////////////////////////////////////////////////////
 process_s::process_s() {
@@ -137,7 +128,7 @@ process_s::process_s() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//  process_s() - constructor
+//  process_s() - destructor
 ////////////////////////////////////////////////////////////////////////////////
 process_s::~process_s() {
 }
@@ -186,9 +177,6 @@ thread_s::~thread_s() {
 ////////////////////////////////////////////////////////////////////////////////
 //  block_schedule_info_s() - constructor
 ////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-// block_schedule_info_s constructor
 block_schedule_info_s::block_schedule_info_s() {
   m_start_to_fetch = false;
   m_dispatched_core_id = -1;
@@ -200,10 +188,11 @@ block_schedule_info_s::block_schedule_info_s() {
   m_total_thread_num = 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//  block_schedule_info_s() - destructor
+////////////////////////////////////////////////////////////////////////////////
 block_schedule_info_s::~block_schedule_info_s() {
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //  process_manager_c() - constructor
@@ -241,7 +230,7 @@ process_manager_c::~process_manager_c() {
 //  process_manager_c::create_thread_node()
 //   called for each thread/warp when it becomes ready to be launched (started);
 //  allocates a node for the thread/warp and add its to m_thread_queue (for x86)
-//  or m_block_queue (for ptx)
+//  or m_block_queue (for ptx or nvbit)
 ////////////////////////////////////////////////////////////////////////////////
 void process_manager_c::create_thread_node(process_s *process, int tid,
                                            bool main) {
@@ -264,6 +253,8 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
 
   // block id assignment in case of multiple applications
   int block_id = start_info->m_thread_id >> BLOCK_ID_SHIFT;
+  // inside parenthesis is the unique block id 
+  // multi_key_map_c::find(key1, key2)
   node->m_block_id = m_simBase->m_block_id_mapper->find(
     process->m_process_id,
     block_id +
@@ -529,7 +520,9 @@ void process_manager_c::setup_process(process_s *process) {
                    "mismatch; trace may not be read correctly."
                 << std::endl;
   } else if (trace_type == "nvbit") {
-    process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
+    if (!(trace_config_file >> process->m_max_block))
+      ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
+    // process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
   }
 
   // get thread count
@@ -546,7 +539,7 @@ void process_manager_c::setup_process(process_s *process) {
   }
 
   report("thread_count: " << thread_count);
-  report("max threads per core: " << process->m_max_block);
+  report("max blocks per core: " << process->m_max_block);
 
   // create data structures
   thread_stat_s *new_stat = new thread_stat_s[thread_count];
@@ -812,6 +805,7 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
   // trace_info->m_unique_thread_id = global_unique_thread_id++;
   trace_info->m_unique_thread_id = (start_info->m_thread_id) % BLOCK_ID_MOD;
   trace_info->m_orig_thread_id = global_unique_thread_id++;
+  trace_info->m_trace_id = start_info->m_thread_id;
 
   // set up trace file name
   stringstream sstr;
@@ -824,17 +818,13 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
 #ifndef USING_QSIM
   // open trace file
   trace_info->m_trace_file = gzopen(filename.c_str(), "rb");
-  if (trace_info->m_trace_file == NULL)
-    ASSERTM(0, "error opening trace file:%s\n", filename.c_str());
-
-  // // printing opcode..
-  // trace_info_nvbit_s inst_info;
-  // int m_trace_size = NVBIT_TRACE_SIZE;
-  // int bytes_read;
-  // while ((bytes_read = gzread(trace_info->m_trace_file, &inst_info, m_trace_size)) == m_trace_size) {
-  //   printf("%x ", inst_info.m_opcode);
-  // }
-  // printf("\n");
+  
+  if (trace_info->m_trace_file == NULL) {
+    int errnum = errno;
+    const char* errmsg = strerror(errnum);
+    printf("Error opening file %s: %s\n", filename.c_str(), errmsg);
+    ASSERTM(0, "error opening trace file: %s\n", filename.c_str());
+  }
 
 #endif
 
@@ -1251,7 +1241,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     std::string core_type = core->get_core_type();
-    if (core_type != "ptx" && core_type != "nvbit") continue;
+    if (core_type != "ptx" || core_type != "nvbit") continue;
 
     // get currently fetching id
     int prev_fetching_block_id = core->m_fetching_block_id;
@@ -1368,7 +1358,7 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
     }
   }
 
-  // All threads from previous block have been schedule. Thus, need to find a new block
+  // All threads from previous block have been scheduled. Thus, need to find a new block
   int appl_id = core->get_appl_id();
   int max_block_per_core = m_simBase->m_sim_processes[appl_id]->m_max_block;
 
@@ -1395,8 +1385,7 @@ int process_manager_c::sim_schedule_thread_block(int core_id, bool initial) {
            m_simBase->m_block_id_mapper->find(
              process->m_process_id, process->m_kernel_block_start_count
                                       [process->m_current_vector_index - 1])) %
-            num_core_per_appl !=
-          (core_id - min_core_id)) {
+            num_core_per_appl != (core_id - min_core_id)) {
         continue;
       }
     }
