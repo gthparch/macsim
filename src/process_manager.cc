@@ -1241,7 +1241,7 @@ void process_manager_c::sim_thread_schedule(bool initial) {
     core_c *core = m_simBase->m_core_pointers[core_id];
 
     std::string core_type = core->get_core_type();
-    if (core_type != "ptx" || core_type != "nvbit") continue;
+    if (core_type != "ptx" && core_type != "nvbit") continue;
 
     // get currently fetching id
     int prev_fetching_block_id = core->m_fetching_block_id;
