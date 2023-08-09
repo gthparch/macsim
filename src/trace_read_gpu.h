@@ -49,6 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class gpu_decoder_c : public trace_read_c
 {
+    friend class mbc_c; 
 public:
   /**
    * Constructor

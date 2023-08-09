@@ -414,7 +414,8 @@ private:
   pool_c<uop_c>* m_uop_pool; /**< uop pool */
   map_c* m_map; /**< dependence information */
   bp_data_c* m_bp_data; /**< branch predictor */
-
+  mbc_c* m_mbc; /**< bounds checking structure */ 
+  
   // heartbeat
   unordered_map<int, heartbeat_s*> m_heartbeat; /**< heartbeat per thread*/
   time_t m_heartbeat_last_time_core; /**< last heartbeat time */

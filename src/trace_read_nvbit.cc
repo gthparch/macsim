@@ -296,6 +296,8 @@ void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_nvbit_s *pi = static_cast<trace_info_nvbit_s *>(trace_info);
   trace_uop->m_va = 0;
+  trace_uop->m_bounds_signed = 0; 
+  trace_uop->m_bounds_id = 0; 
 
   trace_uop->m_active_mask = pi->m_active_mask;
   if (info->m_table_info->m_cf_type) {
@@ -330,6 +332,9 @@ void nvbit_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 
       trace_uop->m_mem_size = pi->m_mem_access_size * amp_val;
     }
+      trace_uop->m_bounds_signed = info->m_table_info->m_bounds_signed; 
+      trace_uop->m_bounds_id = info->m_table_info->m_bounds_id; 
+
   }
 
   // next pc
@@ -355,6 +360,7 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   // simulator maintains a cache of decoded instructions (uop) for each process,
   // this avoids decoding of instructions everytime an instruction is executed
   int process_id = core->get_trace_info(sim_thread_id)->m_process->m_process_id;
+  process_s *process = core->get_trace_info(sim_thread_id)->m_process; 
   hash_c<inst_info_s> *htable = m_simBase->m_inst_info_hash[process_id];
 
   // since each instruction can be decoded into multiple uops, the key to the
@@ -394,6 +400,26 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     if (pi->m_is_load) {
       num_uop = 1;
 
+    if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
+  
+        int region_id;
+        // FIXME change src1 id to PC (read from igpu binfo file)
+        if (mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, region_id)) {
+            info->m_table_info->m_bounds_signed = true;
+            info->m_table_info->m_bounds_id = region_id; 
+        } else {
+          info->m_table_info->m_bounds_signed = false; 
+          info->m_table_info->m_bounds_id = 0; 
+        }
+        //info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, &region_id); 
+       // info->m_table_info->m_bounds_signed = mbc_c::bounds_info_check_signed(process->m_bounds_info); 
+      }
+      else {
+          info->m_table_info->m_bounds_signed = false; 
+          info->m_table_info->m_bounds_id = 0; 
+      }
+
+
       // set memory type
       switch (pi->m_opcode) {
         case NVBIT_LD:
@@ -426,6 +452,9 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       trace_uop[0]->m_eom = 0;
       trace_uop[0]->m_alu_uop = false;
       trace_uop[0]->m_inst_size = pi->m_size;
+      trace_uop[0]->m_bounds_signed =    info->m_table_info->m_bounds_signed; 
+      trace_uop[0]->m_bounds_id = info->m_table_info->m_bounds_id; 
+
 
       // m_has_immediate is meaningless for GPU traces
       trace_uop[0]->m_mul_mem_uops = 0;
@@ -502,6 +531,9 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_alu_uop = false;
       cur_trace_uop->m_inst_size = pi->m_size;
       cur_trace_uop->m_mul_mem_uops = 0;
+      cur_trace_uop->m_bounds_signed = 0; 
+      cur_trace_uop->m_bounds_id = 0; 
+
     }
 
     ///

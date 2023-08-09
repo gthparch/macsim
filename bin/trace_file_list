@@ -1,4 +1,5 @@
 1
+/trace2/nvbit_traces/bfs/graph1k/kernel_config.txt
 /fast_data/trace/nvbit/vectoradd/kernel/Trace.txt
 ../../nvbit_macsim_trace/vadd/Trace.txt
 ../sst-unit-test/traces/cachesize_1/trace.txt

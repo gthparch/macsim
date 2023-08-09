@@ -89,6 +89,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "network.h"
 #include "dram.h"
 #include "resource.h"
+#include "mbc.h"
 
 #include "config.h"
 
@@ -239,6 +240,8 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
     m_gpu_allocate = NULL;
   }
 
+  m_mbc = new mbc_c(c_id, m_simBase); // this should be called before calling new exec 
+
   // execution stage
   m_exec = new exec_c(EXEC_INTERFACE_ARGS(), m_simBase);
 
@@ -333,6 +336,7 @@ core_c::~core_c() {
   delete m_schedule;
   delete m_retire;
   delete m_icache;
+  delete m_mbc;
 }
 
 // start core simulation

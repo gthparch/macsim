@@ -102,6 +102,7 @@ src/hmc_process.cc           src/hmc_process.h                         \
 src/trace_gen.h                                                        \
 src/trace_gen_a64.cc         src/trace_gen_a64.h                       \
 src/mmu.cc                   src/mmu.h                                 \
+src/mbc.cc                   src/mbc.h                                 \
 src/tlb.cc                   src/tlb.h                                 \
 src/cs_disas.cc              src/cs_disas.h
 

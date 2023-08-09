@@ -54,7 +54,7 @@ POSSIBILITY OF SUCH DAMAGE.
 class cpu_decoder_c : public trace_read_c
 {
   friend class hmc_function_c;
-
+  friend class mbc_c; 
 public:
   /**
    * Constructor

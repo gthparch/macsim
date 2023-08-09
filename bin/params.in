@@ -1,39 +1,39 @@
 
 # Simulation Configuration
-num_sim_cores 16
-num_sim_small_cores 16
+num_sim_cores 80 
+num_sim_small_cores 80 
 core_type nvbit
-max_threads_per_core 80
+max_threads_per_core 1024 
 num_sim_medium_cores 0
 num_sim_large_cores 0
 
 
 # Clock
 # from device query for gtx580 on damint - gpu clock - 1.66 GHz, mem clock - 2100 MHz
-clock_cpu 4.0
-clock_gpu 4.0
-clock_llc 4.0
-clock_noc 4.0
-clock_mc  4.0
+clock_cpu 2.0
+clock_gpu 2.0
+clock_llc 2.0
+clock_noc 2.0
+clock_mc  2.0
 
 
 # Small Core Configuration
-fetch_wdith 2
+fetch_wdith 4
 width 1
 fetch_latency 5
 alloc_latency 5
 rob_size 1024
 schedule ooo
 isched_rate 4
-msched_rate 2
-fsched_rate 2
+msched_rate 4
+fsched_rate 4
 bp_hist_length 14
-max_block_per_core 4
+max_block_per_core  8  
 fetch_policy rr
 mt_no_fetch_br 1
 fetch_only_load_ready 0
-schedule_ratio 2
-fetch_ratio 2
+schedule_ratio 4
+fetch_ratio 4
 gpu_sched 1
 icache_num_set 8
 
@@ -54,20 +54,24 @@ shared_mem_ports 1
 byte_level_access 0
 
 l1_small_line_size 128
-#48 KB
-l1_small_num_set 64
+#96 KB
+l1_small_num_set 128 
 l1_small_assoc 6
 #16 KB
 #l1_small_num_set 32
 #l1_small_assoc 4
 
-# L3 Cache
-num_llc 6
+l1_small_latency 30
+l2_small_latency 100
+llc_latency 200
+
+# L3 Cache (4.5MB 24 way)
+num_llc 12 
 llc_num_set 128
 llc_line_size 128
-llc_assoc 8
+llc_assoc 24 
 llc_num_bank 4
-llc_latency 10
+llc_latency 200 
 
 
 # DRAM
@@ -80,6 +84,7 @@ dram_num_banks 16
 dram_num_channel 1
 dram_rowbuffer_size 2048
 dram_scheduling_policy FRFCFS
+#dram_scheduling_policy RAMULATOR 
 
 
 
@@ -94,7 +99,7 @@ bug_detector_enable 1
 sim_cycle_count 0
 max_insts 200000000
 heartbeat_interval 1000000
-forward_progress_limit 50000
+forward_progress_limit 100000
 blocks_to_simulate 0
 ptx_exec_ratio 2
 num_warp_scheduler 2
@@ -103,6 +108,14 @@ num_warp_scheduler 2
 noc_topology simple_noc
 noc_dimension 0
 link_width 32
+
+## bounds checking 
+enable_bounds_checking 0 
+enable_bounds_ids_file 0 
+bounds_l0_cache_lat 10 
+bounds_l1_cache_lat 30 
+bounds_l1_cache_miss_lat 300 
+
 
 # DEBUG
 debug_core_id 0

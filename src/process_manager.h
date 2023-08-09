@@ -49,6 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "global_types.h"
 #include "trace_read.h"
 #include "hmc_process.h"
+#include "mbc.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Section type
@@ -278,6 +279,10 @@ typedef struct process_s {
   map<std::pair<uint64_t, uint64_t>, hmc_inst_s> m_hmc_info_ext;
   set<uint64_t>
     m_hmc_fence_info; /**<set of hmc instructions with implicit fence */
+
+  // set<int> m_bounds_info; /*<< set of MBC info */ 
+  unordered_map<int, int> m_bounds_info; /*<< map of Bounds id and info */ 
+
   map<uint64_t, hmc_inst_s> m_lock_info;
 } process_s;
 

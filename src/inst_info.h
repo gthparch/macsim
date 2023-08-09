@@ -91,6 +91,9 @@ typedef struct table_info_s {
   //  char        m_name[256]; //!< Mnemonic of the instruction
   uns8 m_type;  //!< the format type code for the instruction (see table)
   uns32 m_mask; /**< mask */
+  bool m_bounds_signed; //!< instructions are signed or not 
+  int m_bounds_id; //!< bounds buffer id 
+
 } table_info_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

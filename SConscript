@@ -283,6 +283,7 @@ macsim_src = [
   'src/cs_disas.cc',
   'src/resource.cc',
   'src/mmu.cc',
+  'src/mbc.cc',
   'src/tlb.cc'
 ]
 
