@@ -184,8 +184,9 @@ private:
   uns16 m_mem_sched_rate; /**< memory schedule rate */
   uns16 m_fp_sched_rate; /**< fp schedule rate */
   uns8 m_dcache_cycles; /**< L1 cache latency */
-  bool m_ptx_sim; /**< gpu simulation */
+  bool m_acc_sim; /**< gpu simulation */
   bool m_igpu_sim; /**< intel gpu simulation */
+  bool m_ptx_sim; /**< PTX simulation */
   int m_latency[NUM_UOP_TYPES]; /**< latency map */
   Counter m_cur_core_cycle; /**< current core cycle */
   int m_max_port[max_ALLOCQ]; /**< maximum port */

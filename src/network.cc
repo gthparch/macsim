@@ -319,12 +319,12 @@ void router_c::local_packet_injection(void) {
       if (m_input_buffer[0][ii].size() + num_flit <= m_buffer_max_size) {
 #endif
         // flit generation and insert into the buffer
-        STAT_EVENT(TOTAL_PACKET_CPU + req->m_ptx);
+        STAT_EVENT(TOTAL_PACKET_CPU + req->m_acc);
         req->m_noc_cycle = m_cycle;
 
         // stat handling
         ++g_total_packet;
-        if (req->m_ptx) {
+        if (req->m_acc) {
           ++g_total_gpu_packet;
           STAT_EVENT(NOC_AVG_ACTIVE_PACKET_BASE_GPU);
           STAT_EVENT_N(NOC_AVG_ACTIVE_PACKET_GPU, g_total_gpu_packet);
@@ -460,7 +460,7 @@ void router_c::stage_vca(void) {
             "op:%d oc:%d ptx:%d\n",
             m_cycle, m_id, flit->m_req->m_id, flit->m_id,
             flit->m_req->m_msg_src, flit->m_req->m_msg_dst, iport, ivc,
-            m_route_fixed[iport][ivc], ovc, flit->m_req->m_ptx);
+            m_route_fixed[iport][ivc], ovc, flit->m_req->m_acc);
         }
       }
     }
@@ -652,7 +652,7 @@ void router_c::stage_lt(void) {
 
         if (port == LOCAL) {
           --g_total_packet;
-          if (f->m_req->m_ptx) {
+          if (f->m_req->m_acc) {
             --g_total_gpu_packet;
           } else {
             --g_total_cpu_packet;
@@ -667,8 +667,8 @@ void router_c::stage_lt(void) {
           STAT_EVENT(NOC_AVG_LATENCY_BASE);
           STAT_EVENT_N(NOC_AVG_LATENCY, m_cycle - f->m_req->m_noc_cycle);
 
-          STAT_EVENT(NOC_AVG_LATENCY_BASE_CPU + f->m_req->m_ptx);
-          STAT_EVENT_N(NOC_AVG_LATENCY_CPU + f->m_req->m_ptx,
+          STAT_EVENT(NOC_AVG_LATENCY_BASE_CPU + f->m_req->m_acc);
+          STAT_EVENT_N(NOC_AVG_LATENCY_CPU + f->m_req->m_acc,
                        m_cycle - f->m_req->m_noc_cycle);
         }
       }

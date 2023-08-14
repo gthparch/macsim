@@ -538,7 +538,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
       use_port(thread_id, entry);
 
       // GPU : if we use load-block policy, block current thread due to load instruction
-      if (uop_latency == -1 && m_ptx_sim &&
+      if (uop_latency == -1 && m_acc_sim &&
           *m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
         m_frontend->set_load_wait(uop->m_thread_id, uop->m_uop_num);
 
@@ -741,7 +741,7 @@ void exec_c::br_exec(uop_c* uop) {
   }
 
   // GPU : stall on branch policy
-  if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
+  if (m_acc_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
     m_frontend->set_br_ready(uop->m_thread_id);
   }
 }
@@ -793,7 +793,7 @@ void exec_c::run_a_cycle(void) {
     if (responseArrived) {
       DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key,
                  uop->m_vaddr);
-      if (m_ptx_sim || m_igpu_sim) {
+      if (m_acc_sim || m_igpu_sim) {
         if (uop->m_parent_uop) {
           uop_c* puop = uop->m_parent_uop;
           ++puop->m_num_child_uops_done;
@@ -883,7 +883,7 @@ int exec_c::access_data_cache(uop_c* uop) {
   auto i = m_uop_buffer.find(key);
   ASSERTM(m_uop_buffer.end() == i, "uop has already been executed!\n");
 
-  int block_size = m_ptx_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue()
+  int block_size = m_acc_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue()
                              : KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
   // Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
 
@@ -936,7 +936,7 @@ int exec_c::access_data_cache(uop_c* uop) {
 }
 
 int exec_c::access_const_texture_cache(uop_c* uop) {
-  ASSERT(m_ptx_sim);
+  ASSERT(m_acc_sim);
   ASSERT(uop->m_mem_type == MEM_LD_CM || uop->m_mem_type == MEM_LD_TM);
 
   // assign unique key to each memory request; this will be used later in time for strobbing

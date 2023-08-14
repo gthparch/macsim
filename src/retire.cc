@@ -108,7 +108,7 @@ retire_c::retire_c(RETIRE_INTERFACE_PARAMS(), macsim_c* simBase)
 
   RETIRE_CONFIG();
 
-  if (m_knob_ptx_sim || m_knob_igpu_sim) m_knob_width = 1000;
+  if (m_ptx_sim || m_igpu_sim) m_knob_width = 1000;
 }
 
 // retire_c destructor
@@ -130,7 +130,7 @@ void retire_c::run_a_cycle() {
 
   vector<uop_c*>* uop_list = NULL;
   unsigned int uop_list_index = 0;
-  if (m_knob_ptx_sim || m_knob_igpu_sim) {
+  if (m_ptx_sim || m_igpu_sim) {
     // GPU : many retireable uops from multiple threads. Get entire retireable uops
     uop_list =
       m_gpu_rob->get_n_uops_in_ready_order(m_knob_width, m_cur_core_cycle);
@@ -144,7 +144,7 @@ void retire_c::run_a_cycle() {
     // we need to handle retirement for x86 and ptx separately
 
     // retirement logic for GPU
-    if (m_knob_ptx_sim || m_knob_igpu_sim) {
+    if (m_ptx_sim || m_igpu_sim) {
       // GPU : many retireable uops from multiple threads. Get entire retireable uops
       if (uop_list_index == uop_list->size()) {
         uop_list->clear();
@@ -281,7 +281,7 @@ void retire_c::run_a_cycle() {
     STAT_EVENT(UOP_COUNT_TOT);
 
     // GPU : barrier
-    if (m_knob_ptx_sim && cur_uop->m_bar_type == BAR_FETCH) {
+    if (m_ptx_sim && cur_uop->m_bar_type == BAR_FETCH) {
       frontend_c* frontend = core->get_frontend();
       frontend->synch_thread(cur_uop->m_block_id, cur_uop->m_thread_id);
     }
@@ -545,7 +545,7 @@ void retire_c::update_stats(process_s* process) {
       core->get_core_type() == "ptx") {
     if ((process->m_repeat + 1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
-      STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
+      STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
       report("application "
              << process->m_process_id << " terminated "
              << "("
@@ -555,7 +555,7 @@ void retire_c::update_stats(process_s* process) {
   } else {
     if (process->m_repeat == 0) {
       if (core->get_core_type() == "ptx") {
-        STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
+        STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
       } else {
         STAT_EVENT_N(CYC_COUNT_X86, CYCLE);
       }

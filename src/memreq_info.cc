@@ -82,7 +82,7 @@ void mem_req_s::init(void) {
   m_pc = 0;
   m_prefetcher_id = 0;
   m_pref_loadPC = 0;
-  m_ptx = false;
+  m_acc = false;
   m_queue = NULL;
   for (int ii = 0; ii < MEM_LAST; ++ii) m_cache_id[ii] = 0;
   m_uop = NULL;

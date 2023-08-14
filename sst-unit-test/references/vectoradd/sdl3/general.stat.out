@@ -14,7 +14,7 @@ NUM_REPEAT                                                      0               
 
 CYC_COUNT_X86                                                   0                             0
 
-CYC_COUNT_PTX                                                3346                          3346
+CYC_COUNT_ACC                                                3346                          3346
 
 AVG_BLOCK_EXE_CYCLE                                         29130                         29130
 

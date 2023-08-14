@@ -127,7 +127,7 @@ process_s::process_s() {
   m_no_of_threads_created = 0;
   m_no_of_threads_terminated = 0;
   m_core_pool = NULL;
-  m_ptx = false;
+  m_acc = false;
   m_repeat = 0;
   m_current_file_name_base = "";
   m_kernel_config_name = "";
@@ -253,7 +253,7 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
   node->m_process = process;
   node->m_tid = tid;
   node->m_main = main;
-  node->m_ptx = process->m_ptx;
+  node->m_acc = process->m_acc;
 
   // create a new thread start information
   thread_start_info_s *start_info = &(process->m_thread_start_info[tid]);
@@ -284,7 +284,7 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
   process->m_block_list[node->m_block_id] = true;
 
   // add a new node to m_thread_queue (for x86) or m_block_queue (for ptx)
-  if (process->m_ptx == true)
+  if (process->m_acc == true)
     insert_block(node);
   else
     insert_thread(node);
@@ -399,8 +399,8 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
 
   // setup core pool
   if (trace_type == "ptx" || trace_type == "newptx") {
-    process->m_ptx = true;
-    process->m_core_pool = &m_simBase->m_ptx_core_pool;
+    process->m_acc = true;
+    process->m_core_pool = &m_simBase->m_acc_core_pool;
 
     // most basic check to ensure that offsets of members in structure that we
     // use for reading traces (which contains one extra field compared to the
@@ -414,7 +414,7 @@ int process_manager_c::create_process(string appl, int repeat, int pid) {
              (sizeof(trace_info_gpu_small_s) + sizeof(uint32_t)));
     }
   } else {
-    process->m_ptx = false;
+    process->m_acc = false;
     process->m_core_pool = &m_simBase->m_x86_core_pool;
   }
 
@@ -569,7 +569,7 @@ void process_manager_c::setup_process(process_s *process) {
   trace_config_file.close();
 
   // GPU simulation
-  if (true == process->m_ptx) {
+  if (true == process->m_acc) {
     string path = process->m_current_file_name_base;
     path += "_info.txt";
 
@@ -670,7 +670,7 @@ void process_manager_c::setup_process(process_s *process) {
   // Insert the main thread to the pool
   create_thread_node(process, 0, true);
 
-  if (process->m_ptx) {
+  if (process->m_acc) {
     for (int tid = 1; tid < thread_count; ++tid) {
       if (process->m_thread_start_info[tid].m_inst_count == 0) {
         create_thread_node(process, process->m_no_of_threads_created++, false);
@@ -765,7 +765,7 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
   process->m_thread_trace_info[tid] = trace_info;
 
   // TODO - nbl (apr-17-2013): use pools
-  if (process->m_ptx) {
+  if (process->m_acc) {
     trace_info->m_prev_trace_info = new trace_info_gpu_s;
     trace_info->m_next_trace_info = new trace_info_gpu_s;
   } else {
@@ -817,7 +817,7 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
 
   trace_info->m_file_opened = true;
   trace_info->m_trace_ended = false;
-  trace_info->m_ptx = process->m_ptx;
+  trace_info->m_acc = process->m_acc;
   trace_info->m_buffer_index = 0;
   trace_info->m_buffer_index_max = 0;
   trace_info->m_buffer_exhausted = true;
@@ -882,7 +882,7 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
   --m_simBase->m_num_active_threads;
 
   // GPU simulation
-  if (trace_info->m_ptx == true) {
+  if (trace_info->m_acc == true) {
     int t_process_id = trace_info->m_process->m_process_id;
     int t_thread_id = trace_info->m_unique_thread_id;
     m_simBase->m_thread_stats[t_process_id][t_thread_id].m_thread_end_cycle =
@@ -972,7 +972,7 @@ int process_manager_c::terminate_thread(int core_id, thread_s *trace_info,
   }
 
   // TODO - nbl (apr-17-2013): use pools
-  if (trace_info->m_process->m_ptx) {
+  if (trace_info->m_process->m_acc) {
     trace_info_gpu_s *temp =
       static_cast<trace_info_gpu_s *>(trace_info->m_prev_trace_info);
     delete temp;

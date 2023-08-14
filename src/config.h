@@ -50,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
         m_igpu_sim = m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "igpu" \
                        ? true                                                 \
                        : false;                                               \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L1_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS);                        \
       } else if (level == MEM_L2) {                                           \
@@ -65,6 +66,7 @@ POSSIBILITY OF SUCH DAMAGE.
         m_igpu_sim = m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "igpu" \
                        ? true                                                 \
                        : false;                                               \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L2_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS);                        \
       } else if (level == MEM_L3) {                                           \
@@ -79,6 +81,7 @@ POSSIBILITY OF SUCH DAMAGE.
         m_igpu_sim = m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "igpu" \
                        ? true                                                 \
                        : false;                                               \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L3_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS);                        \
       } else if (m_level == MEM_LLC) {                                        \
@@ -93,6 +96,7 @@ POSSIBILITY OF SUCH DAMAGE.
         m_igpu_sim = m_simBase->m_knobs->KNOB_CORE_TYPE->getValue() == "igpu" \
                        ? true                                                 \
                        : false;                                               \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_LLC_READ_PORTS);                         \
         m_num_write_port = *KNOB(KNOB_LLC_WRITE_PORTS);                       \
       }                                                                       \
@@ -112,6 +116,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "igpu"     \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L1_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS);                        \
       } else if (level == MEM_L2) {                                           \
@@ -129,6 +134,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "igpu"     \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L2_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS);                        \
       } else if (level == MEM_L3) {                                           \
@@ -145,6 +151,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "igpu"     \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L3_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS);                        \
       } else if (level == MEM_LLC) {                                          \
@@ -161,6 +168,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE->getValue() == "igpu"     \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_LLC_READ_PORTS);                         \
         m_num_write_port = *KNOB(KNOB_LLC_WRITE_PORTS);                       \
       }                                                                       \
@@ -180,6 +188,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "igpu"      \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L1_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L1_WRITE_PORTS);                        \
       } else if (level == MEM_L2) {                                           \
@@ -197,6 +206,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "igpu"      \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L2_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L2_WRITE_PORTS);                        \
       } else if (level == MEM_L3) {                                           \
@@ -213,6 +223,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "igpu"      \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_L3_READ_PORTS);                          \
         m_num_write_port = *KNOB(KNOB_L3_WRITE_PORTS);                        \
       } else if (level == MEM_LLC) {                                          \
@@ -229,6 +240,7 @@ POSSIBILITY OF SUCH DAMAGE.
           m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE->getValue() == "igpu"      \
             ? true                                                            \
             : false;                                                          \
+        m_acc_sim = (m_igpu_sim || m_ptx_sim);                                \
         m_num_read_port = *KNOB(KNOB_LLC_READ_PORTS);                         \
         m_num_write_port = *KNOB(KNOB_LLC_WRITE_PORTS);                       \
       }                                                                       \
@@ -274,42 +286,44 @@ POSSIBILITY OF SUCH DAMAGE.
       break;                                                     \
   }
 
-#define RETIRE_CONFIG()                                                        \
-  switch (m_unit_type) {                                                       \
-    case UNIT_SMALL:                                                           \
-      m_knob_width = *m_simBase->m_knobs->KNOB_WIDTH;                          \
-      m_knob_ptx_sim =                                                         \
-        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx"      \
-          ? true                                                               \
-          : false;                                                             \
-      m_knob_igpu_sim =                                                        \
-        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu"     \
-          ? true                                                               \
-          : false;                                                             \
-      break;                                                                   \
-    case UNIT_MEDIUM:                                                          \
-      m_knob_width = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH;                   \
-      m_knob_ptx_sim = static_cast<string>(                                    \
-                         *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx"  \
-                         ? true                                                \
-                         : false;                                              \
-      m_knob_igpu_sim =                                                        \
-        static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==     \
-            "igpu"                                                             \
-          ? true                                                               \
-          : false;                                                             \
-      break;                                                                   \
-    case UNIT_LARGE:                                                           \
-      m_knob_width = *m_simBase->m_knobs->KNOB_LARGE_WIDTH;                    \
-      m_knob_ptx_sim = static_cast<string>(                                    \
-                         *m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx"   \
-                         ? true                                                \
-                         : false;                                              \
-      m_knob_igpu_sim = static_cast<string>(                                   \
-                          *m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "igpu" \
-                          ? true                                               \
-                          : false;                                             \
-      break;                                                                   \
+#define RETIRE_CONFIG()                                                    \
+  switch (m_unit_type) {                                                   \
+    case UNIT_SMALL:                                                       \
+      m_knob_width = *m_simBase->m_knobs->KNOB_WIDTH;                      \
+      m_ptx_sim =                                                          \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx"  \
+          ? true                                                           \
+          : false;                                                         \
+      m_igpu_sim =                                                         \
+        static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu" \
+          ? true                                                           \
+          : false;                                                         \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
+      break;                                                               \
+    case UNIT_MEDIUM:                                                      \
+      m_knob_width = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH;               \
+      m_ptx_sim = static_cast<string>(                                     \
+                    *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx"   \
+                    ? true                                                 \
+                    : false;                                               \
+      m_igpu_sim = static_cast<string>(                                    \
+                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu" \
+                     ? true                                                \
+                     : false;                                              \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
+      break;                                                               \
+    case UNIT_LARGE:                                                       \
+      m_knob_width = *m_simBase->m_knobs->KNOB_LARGE_WIDTH;                \
+      m_ptx_sim = static_cast<string>(                                     \
+                    *m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "ptx"    \
+                    ? true                                                 \
+                    : false;                                               \
+      m_igpu_sim = static_cast<string>(                                    \
+                     *m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "igpu"  \
+                     ? true                                                \
+                     : false;                                              \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
+      break;                                                               \
   }
 
 #define EXEC_CONFIG()                                                      \
@@ -332,6 +346,7 @@ POSSIBILITY OF SUCH DAMAGE.
         static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "igpu" \
           ? true                                                           \
           : false;                                                         \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
       break;                                                               \
                                                                            \
     case UNIT_MEDIUM:                                                      \
@@ -344,10 +359,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "ptx"   \
                     ? true                                                 \
                     : false;                                               \
-      m_igpu_sim = static_cast<string>(                                    \
-                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu" \
-                     ? true                                                \
-                     : false;                                              \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
       break;                                                               \
                                                                            \
     case UNIT_LARGE:                                                       \
@@ -364,6 +376,7 @@ POSSIBILITY OF SUCH DAMAGE.
                      *m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) == "igpu"  \
                      ? true                                                \
                      : false;                                              \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                               \
       break;                                                               \
   }                                                                        \
   m_max_port[gen_ALLOCQ] = int_sched_rate;                                 \
@@ -444,14 +457,18 @@ POSSIBILITY OF SUCH DAMAGE.
       m_knob_icache_line_size = *m_simBase->m_knobs->KNOB_ICACHE_LINE_SIZE;    \
       m_fetch_modulo = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1;          \
       if (static_cast<string>(*m_simBase->m_knobs->KNOB_CORE_TYPE) == "ptx") { \
-        m_knob_ptx_sim = true;                                                 \
+        m_ptx_sim = true;                                                      \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
       } else {                                                                 \
-        m_knob_ptx_sim = false;                                                \
+        m_ptx_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
       }                                                                        \
       break;                                                                   \
-                                                                               \
+      m_igpu_sim = static_cast<string>(                                        \
+                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
+                     ? true                                                    \
+                     : false;                                                  \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
     case UNIT_MEDIUM:                                                          \
       m_knob_width = *m_simBase->m_knobs->KNOB_MEDIUM_WIDTH;                   \
       m_knob_fetch_width = *m_simBase->m_knobs->KNOB_FETCH_MEDIUM_WDITH;       \
@@ -460,13 +477,18 @@ POSSIBILITY OF SUCH DAMAGE.
       m_fetch_modulo = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1;          \
       if (static_cast<string>(*m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) ==   \
           "ptx") {                                                             \
-        m_knob_ptx_sim = true;                                                 \
+        m_ptx_sim = true;                                                      \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
       } else {                                                                 \
-        m_knob_ptx_sim = false;                                                \
+        m_ptx_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
       }                                                                        \
       break;                                                                   \
+      m_igpu_sim = static_cast<string>(                                        \
+                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
+                     ? true                                                    \
+                     : false;                                                  \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
                                                                                \
     case UNIT_LARGE:                                                           \
       m_knob_width = *m_simBase->m_knobs->KNOB_LARGE_WIDTH;                    \
@@ -476,13 +498,18 @@ POSSIBILITY OF SUCH DAMAGE.
       m_fetch_modulo = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO - 1;          \
       if (static_cast<string>(*m_simBase->m_knobs->KNOB_LARGE_CORE_TYPE) ==    \
           "ptx") {                                                             \
-        m_knob_ptx_sim = true;                                                 \
+        m_ptx_sim = true;                                                      \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_GPU_FETCH_RATIO;             \
       } else {                                                                 \
-        m_knob_ptx_sim = false;                                                \
+        m_ptx_sim = false;                                                     \
         m_fetch_ratio = *m_simBase->m_knobs->KNOB_CPU_FETCH_RATIO;             \
       }                                                                        \
       break;                                                                   \
+      m_igpu_sim = static_cast<string>(                                        \
+                     *m_simBase->m_knobs->KNOB_MEDIUM_CORE_TYPE) == "igpu"     \
+                     ? true                                                    \
+                     : false;                                                  \
+      m_acc_sim = (m_igpu_sim || m_ptx_sim);                                   \
   }
 
 #define CORE_CONFIG()                                                          \
