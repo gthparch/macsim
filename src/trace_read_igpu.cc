@@ -1522,7 +1522,7 @@ inst_info_s *igpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   first_info->m_trace_info.m_num_uop = num_uop;
 
   DEBUG("%s: read: %d write: %d\n", g_tr_opcode_names[pi->m_opcode],
-        pi->m_num_read_regs, pi->m_num_dest_regs);
+         pi->m_num_read_regs, pi->m_num_dest_regs);
 
   return first_info;
 }
@@ -1566,7 +1566,7 @@ void igpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 }
 
 void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
-  if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE)) return;
+  if (m_dprint_count++ >= 50000 || !*KNOB(KNOB_DEBUG_PRINT_TRACE)) return; 
 
   trace_info_igpu_s *t_info = static_cast<trace_info_igpu_s *>(trace_info);
 
@@ -1608,6 +1608,93 @@ void igpu_decoder_c::dprint_inst(void *trace_info, int core_id, int thread_id) {
 }
 
 const char *igpu_decoder_c::g_tr_opcode_names[GED_OPCODE_LAST] = {
+  "GED_OPCODE_ILLEGAL",
+  "GED_OPCODE_MOV",
+  "GED_OPCODE_SEL",
+  "GED_OPCODE_MOVI",
+  "GED_OPCODE_NOT",
+  "GED_OPCODE_AND",
+  "GED_OPCODE_OR",
+  "GED_OPCODE_XOR",
+  "GED_OPCODE_SHR",
+  "GED_OPCODE_SHL",
+  "GED_OPCODE_SMOV",
+  "GED_OPCODE_ASR",
+  "GED_OPCODE_CMP",
+  "GED_OPCODE_CMPN",
+  "GED_OPCODE_CSEL",
+  "GED_OPCODE_BFREV",
+  "GED_OPCODE_BFE",
+  "GED_OPCODE_BFI1",
+  "GED_OPCODE_BFI2",
+  "GED_OPCODE_JMPI",
+  "GED_OPCODE_BRD",
+  "GED_OPCODE_IF",
+  "GED_OPCODE_BRC",
+  "GED_OPCODE_ELSE",
+  "GED_OPCODE_ENDIF",
+  "GED_OPCODE_WHILE",
+  "GED_OPCODE_BREAK",
+  "GED_OPCODE_CONT",
+  "GED_OPCODE_HALT",
+  "GED_OPCODE_CALLA",
+  "GED_OPCODE_CALL",
+  "GED_OPCODE_RET",
+  "GED_OPCODE_GOTO",
+  "GED_OPCODE_JOIN",
+  "GED_OPCODE_WAIT",
+  "GED_OPCODE_SEND",
+  "GED_OPCODE_SENDC",
+  "GED_OPCODE_SENDS",
+  "GED_OPCODE_SENDSC",
+  "GED_OPCODE_MATH",
+  "GED_OPCODE_ADD",
+  "GED_OPCODE_MUL",
+  "GED_OPCODE_AVG",
+  "GED_OPCODE_FRC",
+  "GED_OPCODE_RNDU",
+  "GED_OPCODE_RNDD",
+  "GED_OPCODE_RNDE",
+  "GED_OPCODE_RNDZ",
+  "GED_OPCODE_MAC",
+  "GED_OPCODE_MACH",
+  "GED_OPCODE_LZD",
+  "GED_OPCODE_FBH",
+  "GED_OPCODE_FBL",
+  "GED_OPCODE_CBIT",
+  "GED_OPCODE_ADDC",
+  "GED_OPCODE_SUBB",
+  "GED_OPCODE_SAD2",
+  "GED_OPCODE_SADA2",
+  "GED_OPCODE_DP4",
+  "GED_OPCODE_DPH",
+  "GED_OPCODE_DP3",
+  "GED_OPCODE_DP2",
+  "GED_OPCODE_LINE",
+  "GED_OPCODE_PLN",
+  "GED_OPCODE_MAD",
+  "GED_OPCODE_LRP",
+  "GED_OPCODE_MADM",
+  "GED_OPCODE_NOP",
+  "GED_OPCODE_ROR",
+  "GED_OPCODE_ROL",
+  "GED_OPCODE_DP4A",
+  "GED_OPCODE_SYNC",  ///< GEN12.1, GEN12.2, GEN12.5
+  "GED_OPCODE_DPAS",  ///< GEN12.2, GEN12.5
+  "GED_OPCODE_ADD3",  ///< GEN12.5
+  "GED_OPCODE_DPASW",  ///< GEN12.2, GEN12.5
+  "GED_OPCODE_BFN",  ///< GEN12.5
+  "GED_OPCODE_MACL",    ///< GEN12.72, GEN13
+  "GED_OPCODE_SHFL",    ///< GEN13
+  "GED_OPCODE_MADV",    ///< GEN13
+  "GED_OPCODE_MADR",    ///< GEN13
+  "GED_OPCODE_F32TO16", ///< GEN7, GEN7.5
+  "GED_OPCODE_F16TO32", ///< GEN7, GEN7.5
+  "GED_OPCODE_DIM",     ///< GEN7.5  
+  "GED_OPCODE_INVALID"
+};
+/*
+const char *igpu_decoder_c::g_tr_opcode_names[GED_OPCODE_LAST] = {
   "GED_OPCODE_ILLEGAL", "GED_OPCODE_MOV",    "GED_OPCODE_SEL",
   "GED_OPCODE_MOVI",    "GED_OPCODE_NOT",    "GED_OPCODE_AND",
   "GED_OPCODE_OR",      "GED_OPCODE_XOR",    "GED_OPCODE_SHR",
@@ -1632,4 +1719,5 @@ const char *igpu_decoder_c::g_tr_opcode_names[GED_OPCODE_LAST] = {
   "GED_OPCODE_DIM",     "GED_OPCODE_CALLA",  "GED_OPCODE_SMOV",
   "GED_OPCODE_GOTO",    "GED_OPCODE_JOIN",   "GED_OPCODE_MADM",
   "GED_OPCODE_SENDS",   "GED_OPCODE_SENDSC", "GED_OPCODE_INVALID"};
+*/
 #endif 

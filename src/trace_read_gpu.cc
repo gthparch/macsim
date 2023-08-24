@@ -403,6 +403,7 @@ inst_info_s *ptx_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       if (*KNOB(KNOB_ENABLE_BOUNDS_IDS_FILE)) {
   
         int region_id;
+        // FIXME change src1 id to PC (read from igpu binfo file)
         if (mbc_c::bounds_info_check_signed((int) pi->m_src[0], process->m_bounds_info, region_id)) {
             info->m_table_info->m_bounds_signed = true;
             info->m_table_info->m_bounds_id = region_id; 

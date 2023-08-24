@@ -167,7 +167,10 @@ bool mbc_c::bounds_info_check_signed(int src1_id, unordered_map<int, int>  &m_bo
     //    return false; 
 
     if(m_bounds_info.empty()) {
-      region_id = src1_id *64 + 2; 
+        //JAEWON  FIXME
+        // INPUT: THREAD_ID
+      //region_id = src1_id *64 + 2; 
+      region_id = src1_id;
       return true; // if there is no bounds info, then all memory instructions are signed 
     }
 }

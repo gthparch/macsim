@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 #########################################################################################
 # Author      : Jaekyu Lee (jq.lee17@gmail.com)
@@ -38,7 +38,7 @@ warn_flags = ' '.join(warn_flags)
 env = Environment()
 custom_vars = set(['AS', 'AR', 'CC', 'CXX', 'HOME', 'LD_LIBRARY_PATH', 'PATH', 'RANLIB'])
 
-for key,val in os.environ.iteritems():
+for key,val in os.environ.items():
   if key in custom_vars:
     env[key] = val
 

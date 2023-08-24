@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 #########################################################################################
 # Author      : Jaekyu Lee (jq.lee17@gmail.com)
@@ -100,7 +100,7 @@ def main():
   if options.qsim:
     cmd += 'qsim=1 '
 
-  # NEW PIN 
+  # NEW PIN
   if options.pin_3_13_trace:
       cmd += 'pin_3_13_trace=1 '
 
@@ -108,9 +108,9 @@ def main():
   if options.ramulator:
     cmd += 'ramulator=1 '
 
-  ## Parallel building 
+  ## Parallel building
   cmd += '-j %s ' % options.thread
-  
+
   if options.clean:
     cmd += '-c'
 

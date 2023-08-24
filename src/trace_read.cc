@@ -371,7 +371,7 @@ void trace_read_c::convert_info_uop(inst_info_s *info, trace_uop_s *trace_uop) {
  * @param info - instruction information in hash table
  */
 void trace_read_c::convert_t_uop_to_info(trace_uop_s *t_uop,
-                                         inst_info_s *info) {
+                                         inst_info_s *info) {                                        
   info->m_table_info->m_op_type = t_uop->m_op_type;
   info->m_table_info->m_mem_type = t_uop->m_mem_type;
   info->m_table_info->m_cf_type = t_uop->m_cf_type;
@@ -704,8 +704,8 @@ trace_reader_wrapper_c::trace_reader_wrapper_c(macsim_c *simBase) {
 }
 
 trace_reader_wrapper_c::trace_reader_wrapper_c() {
-  m_dprint_output->close();
-  delete m_dprint_output;
+  //m_dprint_output->close();
+  //delete m_dprint_output;
 }
 
 trace_reader_wrapper_c::~trace_reader_wrapper_c() {

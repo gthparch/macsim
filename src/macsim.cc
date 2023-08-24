@@ -844,7 +844,7 @@ void macsim_c::init_clock_domain(void) {
   report("MC  clock frequency : " << *KNOB(KNOB_CLOCK_MC) << " GHz");
 }
 
-#define GET_NEXT_CYCLE(domain)              \
+ #define GET_NEXT_CYCLE(domain)              \
   ++m_domain_count[domain];                 \
   m_domain_next[domain] = static_cast<int>( \
     1.0 * m_clock_lcm * m_domain_count[domain] / m_domain_freq[domain]);
@@ -1008,6 +1008,21 @@ int macsim_c::run_a_cycle() {
 
   // increase simulation cycle
   m_simulation_cycle++;
+
+
+  //++ akar34 start
+  //Dumps stats at STAT_CYCLE_INTERVAL gaps. This can be set from the knobs.
+  if(*KNOB(KNOB_STAT_CYCLE_INTERVAL) != 0)
+  {
+	  if(m_simulation_cycle % *KNOB(KNOB_STAT_CYCLE_INTERVAL) ==0)
+	  {
+		  string extension = ".cycle_"+std::to_string(m_simulation_cycle);
+		  m_ProcessorStats->saveStats(extension);
+		  //m_allCoresStats.clear();
+	  }
+  }
+  //++ akar34 end
+
   STAT_EVENT(CYC_COUNT_TOT);
 
   // m_termination_check[0] cpu [1] gpu
