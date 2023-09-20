@@ -14,15 +14,15 @@ def main():
     nvbit_simulation = 1;
 
     # bin = '/fast_data/jaewon/macsim_memsafety_mmu_eval/.opt_build/macsim'
-    bin = '/fast_data/echung67/macsim/bin/macsim'
+    bin = '/fast_data/sjna/macsim/bin/macsim'
     ## ptx gpu simulation
 
     # tools = '/home/hyesoon/macsim_aos/internal/tools/run_batch_local.py'
     # tools= '/fast_data/jaewon/macsim_memsafety_mmu_eval/internal/tools/run_batch_local.py'
-    tools = '/fast_data/echung67/macsim/internal/tools/run_batch_local.py'
+    tools = '/fast_data/sjna/macsim/internal/tools/run_batch_local.py'
     # get_data_tool = '/home/hyesoon/macsim_aos/internal/tools/get_data.py'
     # get_data_tool = '/fast_data/jaewon/macsim_memsafety_mmu_eval/internal/tools/get_data.py'
-    get_data_tool = '/fast_data/echung67/macsim/internal/tools/get_data.py'
+    get_data_tool = '/fast_data/sjna/macsim/internal/tools/get_data.py'
 
     if (ptx_simulation == 1):
         param = '/home/hyesoon/macsim_aos/bin/ptx_test/params.in'
@@ -45,7 +45,7 @@ def main():
         num_sim_cores = 24
         get_data_suite_list = ['aos-igpu-2']
     elif (nvbit_simulation == 1):
-        param = '/fast_data/echung67/macsim/bin/params.in'
+        param = '/fast_data/sjna/macsim/bin/params.in'
         max_insts = 1000000 ## nvbit simulation
         suite = 'rodinia31-nvbit-all'
         num_sim_cores = 16
@@ -132,7 +132,7 @@ def main():
                                     # get_data_cmd = '%s -d %s -widenames -disable-warning -amean -b base -prec 3 -suite %s %s >> summary_%s.txt\n'%  (get_data_tool, new_dir, suite, base_stat_list, desc)
                                         get_data_cmd = '%s -d %s -widenames -disable-warning -suite %s %s >> summary_%s.txt\n'%  (get_data_tool, new_dir, suite, stat_list, desc)
 
-                                        #print(new_cmd)
+                                        print(new_cmd)
                                         os.system(new_cmd)
                                         f.write(get_data_cmd)
 
