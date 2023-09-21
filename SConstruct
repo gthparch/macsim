@@ -96,7 +96,7 @@ flags['sst']           = ARGUMENTS.get('sst', flags['sst'])
 ## Checkout DRAMSim2 copy
 if flags['dram'] == '1':
   if not os.path.exists('src/DRAMSim2'):
-    os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
+    os.system('git clone git@github.com:umd-memsys/DRAMSim2.git src/DRAMSim2')
 
 ## Checkout Ramulator copy
 if flags['ramulator'] == '1':
