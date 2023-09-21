@@ -71,6 +71,7 @@ flags = {}
 Config = configparser.ConfigParser()
 Config.read('macsim.config')
 flags['dram']          = Config.get('Library', 'dram', fallback='0')
+flags['dram3']          = Config.get('Library', 'dram3', fallback='0')
 flags['power']         = Config.get('Library', 'power', fallback='0')
 flags['iris']          = Config.get('Library', 'iris', fallback='0')
 flags['qsim']          = Config.get('Library', 'qsim', fallback='0')
@@ -88,15 +89,25 @@ flags['pin_3_13_trace'] = ARGUMENTS.get('pin_3_13_trace', flags['pin_3_13_trace'
 flags['power']         = ARGUMENTS.get('power', flags['power'])
 flags['iris']          = ARGUMENTS.get('iris', flags['iris'])
 flags['dram']          = ARGUMENTS.get('dram', flags['dram'])
+flags['dram3']          = ARGUMENTS.get('dram3', flags['dram3'])
 flags['val']           = ARGUMENTS.get('val', flags['val'])
 flags['qsim']          = ARGUMENTS.get('qsim', flags['qsim'])
 flags['ramulator']     = ARGUMENTS.get('ramulator', flags['ramulator'])
 flags['sst']           = ARGUMENTS.get('sst', flags['sst'])
 
+print('dram : {} dram3 enabled : {}'.format(flags['dram'],flags['dram3']))
+
 ## Checkout DRAMSim2 copy
 if flags['dram'] == '1':
   if not os.path.exists('src/DRAMSim2'):
-    os.system('git clone git://github.com/dramninjasUMD/DRAMSim2.git src/DRAMSim2')
+    os.system('git clone git@github.com:umd-memsys/DRAMSim2.git src/DRAMSim2')
+
+
+if flags['dram3'] == '1':
+  if not os.path.exists('src/DRAMSim3'):
+    os.system('git clone git@github.com:umd-memsys/DRAMsim3.git src/DRAMSim3')
+
+
 
 ## Checkout Ramulator copy
 if flags['ramulator'] == '1':
@@ -110,6 +121,9 @@ SConscript('scripts/SConscript', exports='flags')
 if flags['sst'] == '1':
   SConscript('SConscript', variant_dir='.sst_build', duplicate=0, exports='flags')
   Clean('.', '.sst_build')
+
+print('build start!')
+
 ## debug build
 elif flags['debug'] == '1' and not flags['sst'] == '1':
   SConscript('SConscript', variant_dir='.dbg_build', duplicate=0, exports='flags')
