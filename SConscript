@@ -180,10 +180,58 @@ DRAMSIM2_srcs = [
 ]
 
 
+  # DRAMSIM3_srcs = glob.glob("/fast_data/sjna/macsim/src/DRAMSim3/src/*.cc")
+########################################
+#DRAMSIM3 integrated by sjna 
+DRAMSIM3_srcs = [
+    'src/DRAMSim3/src/bankstate.cc',
+    'src/DRAMSim3/src/channel_state.cc',
+    'src/DRAMSim3/src/command_queue.cc',
+    'src/DRAMSim3/src/common.cc',
+    'src/DRAMSim3/src/configuration.cc',
+    'src/DRAMSim3/src/controller.cc',
+    # 'src/DRAMSim3/src/cpu.cc',
+    'src/DRAMSim3/src/dram_system.cc',
+    'src/DRAMSim3/src/hmc.cc',
+    # 'src/DRAMSim3/src/main.cc',
+    'src/DRAMSim3/src/memory_system.cc',
+    'src/DRAMSim3/src/refresh.cc',
+    'src/DRAMSim3/src/simple_stats.cc',
+    'src/DRAMSim3/src/timing.cc',
+]
+#############DRAMSIM3  #################
+
+
+
+
 
 
 if flags['dram'] == '1':
   env.Library('dramsim', DRAMSIM2_srcs, CPPDEFINES=['NO_STORAGE', 'DEBUG_BUILD', 'LOG_OUTPUT'])
+
+if flags['dram3']== '1':
+  env.Library('dramsim3',DRAMSIM3_srcs, CPPDEFINES= ['DRAMSIM3'])
+  # print('dram3 LIB PATH!')
+  # libraries.append('dramsim3')
+  # env['CPPDEFINES'].append('DRAMSIM3')
+  # print('Env CPP Defines :{} '.format(env['CPPDEFINES']))
+  env['CPPPATH'] += ['#src/DRAMsim3']
+  env['CPPDEFINES'] += ['DRAMSIM3']
+  
+  # env['CPPFLAGS'] += ' -Wno-missing-field-initializers '
+  # env['CPPFLAGS'] += ' -Wno-unused-variable '
+  # env['CPPFLAGS'] += ' -Wno-reorder '
+  print('Env CPP Defines :{} '.format(env['CPPDEFINES']))
+  env['CPPFLAGS'] += ' -I./src/DRAMSim3/src'
+  env['CPPFLAGS'] += ' -I./src/DRAMSim3/ext/fmt/include'
+  env['CPPFLAGS'] += ' -I./src/DRAMSim3/ext/headers'
+  env['CPPFLAGS'] +=' -DFMT_HEADER_ONLY=1'
+  # env['LIBPATH'] += ["#/src/DRAMsim3/src"]
+  # env['LIBPATH'] += ["#/src/DRAMsim3/ext/fmt/include"]
+  # env['LIBPATH'] += ["#/src/DRAMsim3/ext/headers"]
+  env['LIBPATH']+=[Dir('.')]
+  # env['LIBPATH'] += ['/fast_data/sjna/macsim/src/DRAMSim3/ext/headers', '/fast_data/sjna/macsim/src/DRAMSim3/ext/fmt/include/fmt']
+
 
 
 #########################################################################################
@@ -236,6 +284,8 @@ macsim_src = [
   'src/dram.cc',
   'src/dram_ctrl.cc',
   'src/dram_dramsim.cc',
+  # ADDED by sjna
+  'src/dram_dramsim3.cc',
   'src/exec.cc',
   'src/factory_class.cc',
   'src/fetch_factory.cc',
@@ -302,6 +352,27 @@ if flags['dram'] == '1':
   env['CPPDEFINES'].append('DRAMSIM')
   env['CPPPATH'] += ['#src/DRAMSim2']
   env['LIBPATH'] += [Dir('.')]
+
+
+# DRAMSIM 3 Intergration with macsim
+if flags['dram3']== '1':
+
+  # print('dram3 LIB PATH!')
+  # # libraries.append('dramsim3')
+  # env['CPPDEFINES'].append('DRAMSIM3')
+  # env['CPPPATH'] += ['#src/DRAMsim3']
+
+  # env['CPPFLAGS'] += ' -I/fast_data/sjna/macsim/src/DRAMSim3/ext/fmt/include'
+  # env['CPPFLAGS'] += ' -I/fast_data/sjna/macsim/src/DRAMSim3/ext/headers'
+  # # env['LIBPATH'] += ['/fast_data/sjna/macsim/src/DRAMSim3/ext/headers', '/fast_data/sjna/macsim/src/DRAMSim3/ext/fmt/include/fmt']
+
+  # # env.Library('dramsim3', DRAMSIM3_srcs, CPPDEFINES=['DRAMSIM3'])
+  # # env['LIBPATH'] += [Dir('.')]
+
+  # print('env LIBPah : {}'.format(env['LIBPATH']))
+  libraries.append('dramsim3')
+
+
 
 if flags['iris'] == '1':
   libraries.append('iris')
