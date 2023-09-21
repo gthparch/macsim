@@ -96,6 +96,7 @@ dram_c* frfcfs_controller(macsim_c* simBase);
 dram_c* simple_controller(macsim_c* simBase);
 dram_c* dramsim_controller(macsim_c* simBase);
 dram_c* ramulator_controller(macsim_c* simBase);
+dram_c* dramsim3_controller(macsim_c *simBase);
 #ifdef USING_SST
 dram_c* vaultsim_controller(macsim_c* simBase);
 #endif

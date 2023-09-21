@@ -176,15 +176,29 @@ void macsim_c::register_functions(void) {
   dram_factory_c::get()->register_class("FCFS", fcfs_controller);
   dram_factory_c::get()->register_class("FRFCFS", frfcfs_controller);
   dram_factory_c::get()->register_class("SIMPLE", simple_controller);
+
+  printf("Register DRAM!!\n");
 #ifdef RAMULATOR
   dram_factory_c::get()->register_class("RAMULATOR", ramulator_controller);
+  printf("Ramulator DRAM!\n");
 #endif
 #ifdef DRAMSIM
   dram_factory_c::get()->register_class("DRAMSIM", dramsim_controller);
 #endif
+
 // #ifdef USING_SST // ** DEPRICATED **
 //   dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
 // #endif
+
+#ifdef DRAMSIM3 
+  dram_factory_c::get()->register_class("DRAMSIM3", dramsim3_controller);
+ printf("DRAMSIM3 DRAM!\n");
+
+#endif
+
+#ifdef USING_SST
+  dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
+#endif
 
   fetch_factory_c::get()->register_class("rr", fetch_factory);
   pref_factory_c::get()->register_class(pref_factory);
