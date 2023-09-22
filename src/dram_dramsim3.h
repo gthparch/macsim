@@ -28,7 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /**********************************************************************************************
  * File         : dram_dramsim3.h
- * Author       : HPArch Research Group(Seonjin Na)
+ * Author       : HPArch Research Group (Seonjin Na)
  * Date         : 9/21/2023
  * Description  : DRAMSim3 interface
  *********************************************************************************************/
@@ -48,7 +48,7 @@ class JedecDRAMSystem;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief MC - DRAMSim2 interface
+/// \brief MC - DRAMSim3 interface
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class dram_dramsim3_c : public dram_c
 {
@@ -78,10 +78,6 @@ public:
    */
   void run_a_cycle(bool);
 
-  void read_callback2(uint64_t);
-
-  void write_callback2(uint64_t);
-
 private:
   dram_dramsim3_c();  // do not implement
 
@@ -95,9 +91,9 @@ private:
    */
   void write_callback(unsigned, uint64_t, uint64_t);
 
-  // void read_callback2(uint64_t);
+  void read_callback2(uint64_t);
 
-  // void write_callback2(uint64_t);
+  void write_callback2(uint64_t);
 
   /**
    * Send a packet to NOC
@@ -113,7 +109,7 @@ private:
   list<mem_req_s*>* m_output_buffer; /**< output buffer */
   list<mem_req_s*>* m_tmp_output_buffer; /**< output buffer */
   list<mem_req_s*>* m_pending_request; /**< pending request */
-  dramsim3::Config *m_config;
+  // dramsim3::Config *m_config;
   dramsim3::JedecDRAMSystem *m_dramsim; /**< dramsim3 instance */
 };
 #endif
