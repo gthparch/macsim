@@ -1249,6 +1249,8 @@ void cpu_decoder_c::init_pin_convert(void) {
   // init conversion based on knob value; this is only how they will be mapped and is independent of the UOP latency
   // values - Michael
   switch (lat_map) {
+    case LATENCY_SPR:
+      m_int_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX_COMPUTE_BF16;
     case LATENCY_SKYLAKE:
     case LATENCY_COFFEE_LAKE:
       m_int_uop_table[XED_CATEGORY_INVALID] = UOP_INV;
@@ -2061,6 +2063,7 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "3DNOW",
   "ADOX_ADCX",
   "AES",
+  "AMX_TILE",
   "AVX",
   "AVX2",
   "AVX2GATHER",
@@ -2096,11 +2099,15 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "FMA4",
   "GATHER",
   "GFNI",
+  "HRESET",
   "IFMA",
   "INTERRUPT",
   "IO",
   "IOSTRINGOP",
+  "KEYLOCKER",
+  "KEYLOCKER_WIDE",
   "KMASK",
+  "LEGACY",
   "LOGICAL",
   "LOGICAL_FP",
   "LZCNT",
@@ -2127,6 +2134,7 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "SCATTER",
   "SEGOP",
   "SEMAPHORE",
+  "SERIALIZE",
   "SETCC",
   "SGX",
   "SHA",
@@ -2139,9 +2147,11 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "SYSRET",
   "SYSTEM",
   "TBM",
+  "TSX_LDTRK",
   "UNCOND_BR",
   "VAES",
   "VBMI2",
+  "VEX"
   "VFMA",
   "VIA_PADLOCK",
   "VPCLMULQDQ",

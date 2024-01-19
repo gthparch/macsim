@@ -77,6 +77,7 @@ typedef enum uop_latency_map {  // enum for x86 latency maps - Michael
   LATENCY_SKYLAKE,
   LATENCY_SKYLAKE_X,
   LATENCY_COFFEE_LAKE,
+  LATENCY_SPR,
   NUM_LATENCY_MAPS
 } latency_map;
 

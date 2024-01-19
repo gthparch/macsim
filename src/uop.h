@@ -52,6 +52,7 @@ typedef enum Iaq_Type_enum {
   mem_ALLOCQ,
   fp_ALLOCQ,
   simd_ALLOCQ,
+  tile_ALLOCQ,
   max_ALLOCQ
 } ALLOCQ_Type;
 
@@ -116,12 +117,15 @@ typedef enum Uop_Type_enum {
   // SIMD instructions for Intel GPU
   UOP_SIMD,
 
+  UOP_AMX_COMPUTE_BF16,
+
   // other instructions
   UOP_AES,  //!< AES enctyption
   UOP_PCLMUL,  //!< carryless multiplication
   UOP_X87,  //!< x87 ALU op
   UOP_XSAVE,  //!< XSAVE context switch
   UOP_XSAVEOPT,  //!< optimized XSAVE context switch
+
 
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,
