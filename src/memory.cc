@@ -272,8 +272,8 @@ bool queue_c::full() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // data cache constructor.
-dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id,
-             dcu_c** next, dcu_c** prev, macsim_c* simBase) {
+dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id, 
+            dcu_c** next, dcu_c** prev, macsim_c* simBase, bool perfect_cache = false) {
   m_simBase = simBase;
 
   CREATE_CACHE_CONFIGURATION();
@@ -298,6 +298,8 @@ dcu_c::dcu_c(int id, Unit_Type type, int level, memory_c* mem, int noc_id,
 
   m_cache = NULL;
   m_port = NULL;
+
+  m_perfect_cache = perfect_cache;
 }
 
 // dcu_c destructor.
@@ -316,7 +318,7 @@ dcu_c::~dcu_c() {
 
 // initialize data cache.
 void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up,
-                 bool coupled_down, bool disable, bool has_router) {
+                 bool coupled_down, bool disable, bool has_router, bool perfect_cache = false) {
   m_next_id = next_id;
   m_prev_id = prev_id;
   m_coupled_up = coupled_up;
@@ -324,7 +326,8 @@ void dcu_c::init(int next_id, int prev_id, bool done, bool coupled_up,
   m_done = done;
   m_disable = disable;
   m_has_router = has_router;
-
+  REPORT("TEST INIT: L2 Perfect Cache: %d\n", perfect_cache);
+  m_perfect_cache = perfect_cache;
   if (!m_disable) {
     if (m_level == MEM_LLC) {
       string llc_policy = *KNOB(KNOB_LLC_TYPE);
@@ -450,7 +453,7 @@ int dcu_c::access(uop_c* uop) {
   // DCACHE access
   // -------------------------------------
   bool cache_hit = false;
-  if (*m_simBase->m_knobs->KNOB_PERFECT_DCACHE) {
+  if (*m_simBase->m_knobs->KNOB_PERFECT_DCACHE || m_perfect_cache) {
     cache_hit = true;
   } else if (m_disable == true) {
     cache_hit = false;
@@ -479,7 +482,7 @@ int dcu_c::access(uop_c* uop) {
     } else {
       POWER_EVENT(POWER_LLC_R);
     }
-    STAT_EVENT(L1_HIT_CPU + this->m_acc_sim);
+    STAT_EVENT(L1_HIT_CPU + this->m_ptx_sim);
     DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache hit\n", m_level,
                m_id, uop->m_uop_num);
     // stat
@@ -496,7 +499,7 @@ int dcu_c::access(uop_c* uop) {
     if (*m_simBase->m_knobs->KNOB_ENABLE_CACHE_COHERENCE) {
     }
 
-    if (this->m_acc_sim &&
+    if (this->m_ptx_sim &&
         *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         type == MEM_ST) {
       // evict global data on write hit in L1
@@ -504,7 +507,7 @@ int dcu_c::access(uop_c* uop) {
 
       int req_size;
       Addr req_addr;
-      if (m_acc_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+      if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
         req_size = uop->m_mem_size;
         req_addr = vaddr;
       } else {
@@ -518,7 +521,7 @@ int dcu_c::access(uop_c* uop) {
 
       int result = m_simBase->m_memory->new_mem_req(
         req_type, req_addr, req_size, cache_hit, true, m_latency, uop,
-        done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
+        done_func, uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
 
       if (!result) {
         uop->m_state = OS_DCACHE_MEM_ACCESS_DENIED;
@@ -534,7 +537,7 @@ int dcu_c::access(uop_c* uop) {
   // DCACHE miss
   // -------------------------------------
   else {  // !cache_hit
-    STAT_EVENT(L1_MISS_CPU + this->m_acc_sim);
+    STAT_EVENT(L1_MISS_CPU + this->m_ptx_sim);
     DEBUG_CORE(uop->m_core_id, "L%d[%d] uop_num:%lld cache miss\n", m_level,
                m_id, uop->m_uop_num);
 
@@ -579,7 +582,7 @@ int dcu_c::access(uop_c* uop) {
     // -------------------------------------
     int req_size;
     Addr req_addr;
-    if (m_acc_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
+    if (m_ptx_sim && *m_simBase->m_knobs->KNOB_BYTE_LEVEL_ACCESS) {
       req_size = uop->m_mem_size;
       req_addr = vaddr;
     } else {
@@ -600,7 +603,7 @@ int dcu_c::access(uop_c* uop) {
     // Generate a new memory request (MSHR access)
     // -------------------------------------
     function<bool(mem_req_s*)> done_func = NULL;
-    if (this->m_acc_sim &&
+    if (this->m_ptx_sim &&
         *m_simBase->m_knobs->KNOB_COMPUTE_CAPABILITY == 2.0f &&
         (type == MEM_ST || type == MEM_ST_LM)) {
       done_func = dcache_write_ack_wrapper;
@@ -612,7 +615,7 @@ int dcu_c::access(uop_c* uop) {
     result = m_simBase->m_memory->new_mem_req(
       req_type, req_addr, req_size, cache_hit,
       (type == MEM_ST_GM || type == MEM_ST_LM), m_latency, uop, done_func,
-      uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_acc_sim);
+      uop->m_unique_num, NULL, m_id, uop->m_thread_id, m_ptx_sim);
 
     // -------------------------------------
     // MSHR full
@@ -747,7 +750,7 @@ void dcu_c::process_in_queue() {
         req->m_addr, &line_addr, req->m_type == MRT_WB ? false : true,
         req->m_appl_id);
       cache_hit = (line) ? true : false;
-
+      cache_hit = m_perfect_cache;
       if (m_level != MEM_LLC) {
         POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_R_TAG + (m_level - 1));
       } else {
@@ -758,6 +761,7 @@ void dcu_c::process_in_queue() {
     // -------------------------------------
     // Cache hit
     // -------------------------------------
+    
     if (cache_hit) {
       if (m_level != MEM_LLC) {
         POWER_CORE_EVENT(req->m_core_id, POWER_DCACHE_R + (m_level - 1));
@@ -1147,7 +1151,7 @@ void dcu_c::process_fill_queue() {
 
               // new write-back request
               mem_req_s* wb = m_simBase->m_memory->new_wb_req(
-                victim_line_addr, m_line_size, m_acc_sim, data, m_level);
+                victim_line_addr, m_line_size, m_ptx_sim, data, m_level);
 
               wb->m_rdy_cycle = m_cycle + 1;
 
@@ -1450,7 +1454,7 @@ bool dcu_c::done(mem_req_s* req) {
 
           // new write back request
           mem_req_s* wb = m_simBase->m_memory->new_wb_req(
-            repl_line_addr, m_line_size, m_acc_sim, data, m_level);
+            repl_line_addr, m_line_size, m_ptx_sim, data, m_level);
 
           wb->m_rdy_cycle = m_cycle + 1;
 
@@ -1489,7 +1493,7 @@ bool dcu_c::done(mem_req_s* req) {
                uop->m_inst_num, uop->m_uop_num, req->m_in_global);
     uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
     uop->m_state = OS_SCHEDULED;
-    if (m_acc_sim) {
+    if (m_ptx_sim || m_igpu_sim) {
       if (uop->m_parent_uop) {
         uop_c* puop = uop->m_parent_uop;
         ++puop->m_num_child_uops_done;
@@ -1521,7 +1525,7 @@ bool dcu_c::write_done(mem_req_s* req) {
   uop_c* uop = req->m_uop;
   uop->m_done_cycle = m_simBase->m_core_cycle[uop->m_core_id] + 1;
   uop->m_state = OS_SCHEDULED;
-  if (m_acc_sim || m_igpu_sim) {
+  if (m_ptx_sim || m_igpu_sim) {
     if (uop->m_parent_uop) {
       uop_c* puop = uop->m_parent_uop;
       ++puop->m_num_child_uops_done;
@@ -1575,20 +1579,17 @@ memory_c::memory_c(macsim_c* simBase) {
   m_num_gpu = 0;
   m_num_cpu = 0;
 
-  if ((KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx") ||
-      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
+  if (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx")
     m_num_gpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
 
-  if ((KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx") ||
-      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
+  if (KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx")
     m_num_gpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
-  if ((KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") ||
-      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
+  if (KNOB(KNOB_CORE_TYPE)->getValue() == "ptx")
     m_num_gpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
@@ -2311,9 +2312,12 @@ llc_coupled_network_c::~llc_coupled_network_c() {
 llc_decoupled_network_c::llc_decoupled_network_c(macsim_c* simBase)
   : memory_c(simBase) {
   // NEXT_ID, PREV_ID, DONE, COUPLE_UP, COUPLE_DOWN, DISABLE, HAS_ROUTER
+  cout << "L2 Perfect Cache: " << *m_simBase->m_knobs->KNOB_PERFECT_L2 << endl;
+  REPORT("L2 Perfect Cache: %d\n", KNOB(KNOB_PERFECT_L2)->getValue());
+  //KNOB(KNOB_MEMORY_TYPE)->getValue().c_str());
   for (int ii = 0; ii < m_num_core; ++ii) {
     m_l1_cache[ii]->init(ii, -1, false, false, true, false, false);
-    m_l2_cache[ii]->init(-1, ii, true, true, false, false, true);
+    m_l2_cache[ii]->init(-1, ii, true, true, false, false, true, *m_simBase->m_knobs->KNOB_PERFECT_L2);
   }
 
   for (int ii = 0; ii < m_num_l3; ++ii)

@@ -279,6 +279,16 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
       trace_uop->m_va = MIN2((pi->m_st_vaddr + rep_offset) * amp_val, MAX_ADDR);
       trace_uop->m_mem_size =
         MIN2((pi->m_mem_write_size) * amp_val, REP_MOV_MEM_SIZE_MAX_NEW);
+      // TODO
+      // Add for tilestored
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+          //trace_uop->m_mem_size = 64;
+          DEBUG_CORE(core_id,
+                "AMX_TILESTORE for MEM_ST convert_dyn_uop rep_offset: %llx, mem_size: %d"
+                 "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+                 rep_offset, trace_uop->m_mem_size,
+                 (Addr)(pi->m_instruction_addr), trace_uop->m_va);      
+      }
     } else if ((info->m_table_info->m_mem_type == MEM_LD) ||
                (info->m_table_info->m_mem_type == MEM_PF) ||
                (info->m_table_info->m_mem_type >= MEM_SWPREF_NTA &&
@@ -292,6 +302,49 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 
       trace_uop->m_mem_size =
         MIN2((pi->m_mem_read_size) * amp_val, REP_MOV_MEM_SIZE_MAX_NEW);
+
+      if (pi->m_opcode == XED_CATEGORY_STRINGOP) {
+          DEBUG_CORE(core_id,
+                "STRINGOP rep_offset: %llx, mem_size: %d"
+                 "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+                 rep_offset, trace_uop->m_mem_size,
+                 (Addr)(pi->m_instruction_addr), trace_uop->m_va);      
+      }
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+          DEBUG_CORE(core_id,
+                "AMX_TILELOAD convert_dyn_uop rep_offset: %llx, mem_size: %d"
+                 "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+                 rep_offset, trace_uop->m_mem_size,
+                 (Addr)(pi->m_instruction_addr), trace_uop->m_va);      
+      }
+    }
+  }
+
+  // TDPBF16
+  if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+    bool is_tdpbf16 = (pi->m_is_fp) && (info->m_table_info->m_mem_type != MEM_ST) && (info->m_table_info->m_mem_type != MEM_LD);
+    if(is_tdpbf16){
+          int num_zeros = 0;
+          DEBUG_CORE(core_id,
+                "AMX_TILE_COMPUTE convert_dyn_uop m_src_bitmask[0][0]: %lx, mem_size: %d"
+                 "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+                 pi->m_src_bitmask[0][0], trace_uop->m_mem_size,
+                 (Addr)(pi->m_instruction_addr), trace_uop->m_va);
+          for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 16; j++){
+              uint64_t mask = 3;
+              uint64_t row = pi->m_src_bitmask[i][j];
+              for(int k = 0; k < 32; k++){
+                if(!(row & mask))
+                  num_zeros += 1;
+                
+                mask << 2;
+              }
+            }
+            
+          }
+          STAT_EVENT_N(TDPBF16_OPERANDS_COUNT, 3*16*32);
+          STAT_EVENT_N(TDPBF16_ZEROS_COUNT, num_zeros);
     }
   }
 
@@ -325,7 +378,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   // the instruction addr is shifted left by 3-bits and the number of the uop
   // in the decoded sequence is added to the shifted value to obtain the key
   bool new_entry = false;
-  Addr key_addr = (pi->m_instruction_addr << 3);
+  Addr key_addr = (pi->m_instruction_addr << 5);
 
   // Get instruction information from the hash table if exists.
   // Else create a new entry
@@ -339,7 +392,9 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   bool inst_has_ld_uop = false;
   int ii, jj, kk;
 
-  if (new_entry) {
+  // TODO FIX HERE
+  //if (new_entry) {
+  if(true){
     // Since we found a new instruction, we need to decode this instruction and store all
     // uops to the hash table
     int write_dest_reg = 0;
@@ -468,6 +523,10 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       }  // NUM_LOAD == 2
 
       if (pi->m_opcode == XED_CATEGORY_DATAXFER) {
+        write_dest_reg = 1;
+      }
+      
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE && (pi->m_num_ld)) {
         write_dest_reg = 1;
       }
 
@@ -633,13 +692,14 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       // For the first uop, we have already created hash entry. However, for following uops
       // we need to create hash entries
       if (ii > 0) {
-        key_addr = ((pi->m_instruction_addr << 3) + ii);
+        key_addr = ((pi->m_instruction_addr << 5) + ii);
         info = htable->hash_table_access_create(key_addr, &new_entry);
         info->m_trace_info.m_bom = false;
         info->m_trace_info.m_eom = false;
       }
-      ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n",
-              core_id);
+      // GJ TODO Uncomment after fix
+      //ASSERTM(new_entry, "Add new uops to hash_table for core id::%d\n",
+      //        core_id);
 
       trace_uop[ii]->m_addr = pi->m_instruction_addr;
 
@@ -744,7 +804,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     num_uop = info->m_trace_info.m_num_uop;
     for (ii = 0; ii < num_uop; ++ii) {
       if (ii > 0) {
-        key_addr = ((pi->m_instruction_addr << 3) + ii);
+        key_addr = ((pi->m_instruction_addr << 5) + ii);
         info = htable->hash_table_access_create(key_addr, &new_entry);
       }
       ASSERTM(!new_entry, "Core id %d index %d\n", core_id, ii);
@@ -779,12 +839,20 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   if (pi->m_opcode == XED_CATEGORY_STRINGOP) {
     int rep_counter = 1;
     int rep_dir = 0;
+    
 
     // generate multiple uops with different memory addresses
-    key_addr = ((pi->m_instruction_addr << 3));
+    key_addr = ((pi->m_instruction_addr << 5));
     info = htable->hash_table_access_create(key_addr, &new_entry);
 
     int rep_mem_size = (int)pi->m_mem_read_size;
+
+    DEBUG_CORE(
+    core_id,
+    "trace_read core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d\n",
+    core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+    static_cast<int>(pi->m_opcode),
+    rep_mem_size);
 
     if (rep_mem_size == 0) {
       trace_uop[0]->m_mem_type = NOT_MEM;
@@ -824,10 +892,10 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         ASSERT(num_uop < 8);
         for (ii = 0; ii < num_uop; ++ii) {
           // can't skip when ii = 0; because this routine is repeating ...
-          key_addr = ((pi->m_instruction_addr << 3) + ii);
+          key_addr = ((pi->m_instruction_addr << 5) + ii);
           info = htable->hash_table_access_create(key_addr, &new_entry);
 
-          info->m_trace_info.m_bom = false;
+          //info->m_trace_info.m_bom = false;
           info->m_trace_info.m_eom = false;
 
           ASSERT(!new_entry);
@@ -850,10 +918,165 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       ASSERT(dyn_uop_counter > 0);
     }
-
+    DEBUG_CORE(
+    core_id,
+    "trace_read core_id:%d thread_id:%d pc:0x%llx opcode:%d dyn_uop_counter:%d\n",
+    core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+    static_cast<int>(pi->m_opcode),
+    dyn_uop_counter);
     trace_uop[0]->m_rep_uop_num = dyn_uop_counter;
   }  // XED_CATEGORY_STRINGOP
+  
+  if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+    bool is_amx_mem = (pi->m_opcode == XED_CATEGORY_AMX_TILE) &&
+                      (pi->m_has_st || (pi->m_num_ld > 0));
+    dyn_uop_counter = 1;
+    if(is_amx_mem){
+      int rep_counter = 1;
+      int rep_dir = 0;
+      int tileload_type = -1;
+      if(pi->m_has_st){
+        trace_uop[0]->m_mem_type = MEM_ST;
+        // TODO: Add storeu and storet
+      }
+      else{
+        trace_uop[0]->m_mem_type = MEM_LD;
+        trace_uop[0]->m_mem_size = pi->m_mem_read_size;
+        if(pi->m_num_ld == 64){
+          STAT_EVENT(TILELOADV_COUNT);
+          DEBUG_CORE(
+          core_id,
+          "AMX_TILE_DENSE_LOADV"
+          );
+          tileload_type = 0;
+        }
+        else if(pi->m_num_ld == 32){
+          STAT_EVENT(TILELOADU_COUNT);
+          DEBUG_CORE(
+          core_id,
+          "AMX_TILE_DENSE_LOADU"
+          );
+          tileload_type = 10;
+        }
+        else if(pi->m_num_ld == 16){
+          STAT_EVENT(TILELOADT_COUNT);
+          DEBUG_CORE(
+          core_id,
+          "AMX_TILE_DENSE_LOADT"
+          );
+          tileload_type = 2;
+        }
+        else if (pi->m_num_ld == 1){
+          // TODO: Add metadata count
+          STAT_EVENT(METALOAD_COUNT);
+          DEBUG_CORE(
+          core_id,
+          "AMX_TILE_META_LOAD\n"
+          );
+          tileload_type = 3;
+        }
+        else{
+          DEBUG_CORE(
+          core_id,
+          "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d dyn_uop_counter:%d \n",
+          core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+          static_cast<int>(pi->m_opcode),
+          pi->m_mem_read_size, dyn_uop_counter);
+          assert(false);
+        }
+      }
+      // generate multiple uops with different memory addresses
+      //info = htable->hash_table_access_create(key_addr, &new_entry);
 
+      //int rep_mem_size = (int)pi->m_mem_read_size;
+      
+      //int num_tile_uops = *KNOB(KNOB_NUM_TILE_UOPS);
+      int num_tile_uops = pi->m_num_ld;
+
+      key_addr = ((pi->m_instruction_addr << 5));
+      info = htable->hash_table_access_create(key_addr, &new_entry);
+      assert(!new_entry);
+      info->m_trace_info.m_bom = true;
+      if(tileload_type == -1){
+        info->m_table_info->m_mem_type = MEM_ST;
+      }
+      else{
+        info->m_table_info->m_mem_type = MEM_LD;
+      }
+
+      for (int jj = dyn_uop_counter; jj < num_tile_uops; jj++) {
+        if(tileload_type == -1){
+          trace_uop[jj]->m_mem_type = MEM_ST;
+        }
+        else{
+          trace_uop[jj]->m_mem_type = MEM_LD;
+        }
+
+        if(jj == 0)
+          info->m_trace_info.m_bom = true;
+        int stride = pi->m_ld_vaddr2;
+        int rep_offset = jj * stride;
+
+        trace_uop[jj - 1]->m_npc = pi->m_instruction_addr;
+
+        //ASSERT(num_uop == 1);
+        //for (ii = 0; ii < num_uop; ++ii) {
+        
+        // can't skip when ii = 0; because this routine is repeating ...
+        key_addr = ((pi->m_instruction_addr << 5)) + jj;
+        info = htable->hash_table_access_create(key_addr, &new_entry);
+        
+        if(tileload_type == -1){
+          info->m_table_info->m_mem_type = MEM_ST;
+        }
+        else{
+          info->m_table_info->m_mem_type = MEM_LD;
+        }
+
+        if(!(jj == 0 && ii == 0))
+          info->m_trace_info.m_bom = false;
+        info->m_trace_info.m_eom = false;
+
+        //ASSERT(!new_entry);
+
+        // add dynamic information
+        DEBUG_CORE(
+        core_id,
+        "AMX_TILE rep_offset: %d mem_read_size: %d jj: %d\n",
+        rep_offset, pi->m_mem_read_size, jj
+        );
+
+        if(tileload_type == -1){
+          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_write_size;
+        }
+        else{
+          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
+        }
+
+        convert_dyn_uop(info, pi, trace_uop[dyn_uop_counter], rep_offset,
+                        core_id);
+
+        //trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
+        trace_uop[dyn_uop_counter]->m_info = info;
+        trace_uop[dyn_uop_counter]->m_eom = 0;
+        trace_uop[dyn_uop_counter]->m_addr = pi->m_instruction_addr;
+        
+        
+        //}
+        DEBUG_CORE(
+          core_id,
+          "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d dyn_uop_counter:%d ii:%d\n",
+          core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+          static_cast<int>(pi->m_opcode),
+          pi->m_mem_read_size, dyn_uop_counter, jj);
+        dyn_uop_counter++;
+      }
+
+      ASSERT(dyn_uop_counter > 0);
+      
+    }
+
+  }
   ASSERT(dyn_uop_counter);
 
   // set eom flag and next pc address for the last uop of this instruction
@@ -888,8 +1111,105 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   }
 
   ASSERT(num_uop > 0);
-  first_info->m_trace_info.m_num_uop = num_uop;
+  ASSERT(dyn_uop_counter > 0);
+  first_info->m_trace_info.m_num_uop = dyn_uop_counter;
+  //first_info->m_trace_info.m_num_uop = num_uop;
+  // TODO UPDATE FOR 1:4
+  bool is_amx_mem = pi->m_has_st || (pi->m_num_ld == 1) || 
+    (pi->m_num_ld == 16) || (pi->m_num_ld == 32) || (pi->m_num_ld == 64);
 
+  if((pi->m_opcode == XED_CATEGORY_AMX_TILE) && is_amx_mem){
+    //first_info->m_trace_info.m_num_uop = trace_uop[0]->m_rep_uop_num;
+    if(pi->m_has_st){
+      info->m_table_info->m_mem_type = MEM_ST;
+      if(pi->m_num_st == 16){
+        STAT_EVENT(TILESTORET_COUNT);
+      }
+      else if (pi->m_num_st == 32){
+        STAT_EVENT(TILESTOREU_COUNT);
+      }
+      else{
+        cout << "ERROR FOR TILESTORE" << endl;
+        exit(-1);
+      }
+      DEBUG_CORE(
+            core_id,
+            "AMX_TILE_MEM STORE set core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_write_size:%d dyn_uop_counter:%d m_num_uop:%d\n",
+            core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+            static_cast<int>(pi->m_opcode),
+            pi->m_mem_write_size, dyn_uop_counter, first_info->m_trace_info.m_num_uop);
+    }
+    else{
+      info->m_table_info->m_mem_type = MEM_LD;
+      DEBUG_CORE(
+            core_id,
+            "AMX_TILE_MEM LOAD set core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d dyn_uop_counter:%d m_num_uop:%d\n",
+            core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+            static_cast<int>(pi->m_opcode),
+            pi->m_mem_read_size, dyn_uop_counter, first_info->m_trace_info.m_num_uop);
+    }
+    if(pi->m_num_ld == 16){
+      DEBUG_CORE(
+            core_id,
+            "ASSERT LOAD set core_id:%d thread_id:%d pc:0x%llx opcode:%d m_num_uops:%d dyn_uop_counter:%d m_num_uop:%d\n",
+            core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+            static_cast<int>(pi->m_opcode),
+            first_info->m_trace_info.m_num_uop, dyn_uop_counter, first_info->m_trace_info.m_num_uop);
+      assert(first_info->m_trace_info.m_num_uop == 16);
+    }
+    for(ii = 0; ii < first_info->m_trace_info.m_num_uop; ii++){
+      for (jj = 0; jj < trace_uop[ii]->m_num_src_regs; ++jj) {
+        (trace_uop[ii])->m_srcs[jj].m_type = (Reg_Type)0;
+        (trace_uop[ii])->m_srcs[jj].m_id = pi->m_src[jj];
+        (trace_uop[ii])->m_srcs[jj].m_reg = pi->m_src[jj];
+      }
+      for (jj = 0; jj < trace_uop[ii]->m_num_dest_regs; ++jj) {
+        (trace_uop[ii])->m_dests[jj].m_type = (Reg_Type)0;
+        (trace_uop[ii])->m_dests[jj].m_id = pi->m_dst[jj];
+        (trace_uop[ii])->m_dests[jj].m_reg = pi->m_dst[jj];
+      }
+      
+      if(pi->m_has_st)
+        trace_uop[ii]->m_mem_type = MEM_ST;
+      else
+        trace_uop[ii]->m_mem_type = MEM_LD;
+
+      trace_uop[ii]->m_opcode = pi->m_opcode;
+      if(ii == 0){
+        trace_uop[ii]->m_info->m_trace_info.m_bom = true;
+        trace_uop[ii]->m_eom  = false;
+      }
+      else if(ii == first_info->m_trace_info.m_num_uop - 1){
+        trace_uop[ii]->m_info->m_trace_info.m_bom = false;
+        trace_uop[ii]->m_eom = true;
+      }
+      else{
+        trace_uop[ii]->m_info->m_trace_info.m_bom = false;
+        trace_uop[ii]->m_eom = false;
+      }
+    } 
+  }
+  else if((pi->m_opcode == XED_CATEGORY_AMX_TILE) && (!is_amx_mem)){
+    if(pi->m_is_fp){
+      first_info->m_table_info->m_op_type = UOP_AMX_COMPUTE_BF16;
+      trace_uop[0]->m_mem_type = NOT_MEM;
+      trace_uop[0]->m_op_type = UOP_AMX_COMPUTE_BF16;
+      DEBUG_CORE(
+              core_id,
+              "AMX_TILE_GEMM set core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d dyn_uop_counter:%d m_num_uop:%d\n",
+              core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+              static_cast<int>(pi->m_opcode),
+              pi->m_mem_read_size, dyn_uop_counter, first_info->m_trace_info.m_num_uop);
+    }
+    else{
+      DEBUG_CORE(
+              core_id,
+              "AMX_TILE_DUMMY set core_id:%d thread_id:%d pc:0x%llx opcode:%d mem_read_size:%d dyn_uop_counter:%d m_num_uop:%d\n",
+              core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+              static_cast<int>(pi->m_opcode),
+              pi->m_mem_read_size, dyn_uop_counter, first_info->m_trace_info.m_num_uop);
+    }
+  }
   return first_info;
 }
 
@@ -1112,6 +1432,21 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   /// Set up actual uop data structure
   ///
   uop->m_opcode = trace_uop->m_opcode;
+  // Workaround
+  
+  bool is_amx_compute = (info->m_table_info->m_op_type) == UOP_AMX_COMPUTE_BF16;
+  /*
+  if(is_amx_compute &&){
+    DEBUG_CORE(core_id,
+               "SET AMX_COMPUTE core_id:%d thread_id:%d inst_num:%lld uop_num:%lld "
+               "\n",
+               core_id, sim_thread_id, uop->m_inst_num, uop->m_uop_num
+               );
+    uop->m_uop_type = UOP_AMX_COMPUTE_BF16;
+    uop->m_bogus = 0;
+  }
+  else
+  */
   uop->m_uop_type = info->m_table_info->m_op_type;
   uop->m_cf_type = info->m_table_info->m_cf_type;
   uop->m_mem_type = info->m_table_info->m_mem_type;
@@ -1230,7 +1565,31 @@ bool cpu_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   /// GPU simulation : handling uncoalesced accesses
   /// removed
   ///
+  if(!is_amx_compute && (uop->m_opcode == XED_CATEGORY_AMX_TILE)){
+    DEBUG_CORE(
+    uop->m_core_id,
+    "AMX_MEM new uop: uop_num:%lld vaddr:%llx inst_num:%lld thread_id:%d unique_num:%lld \n",
+    uop->m_uop_num, uop->m_vaddr, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+    uop->m_mem_type = trace_uop->m_mem_type;
 
+  } 
+  if(is_amx_compute){
+    DEBUG_CORE(
+    uop->m_core_id,
+    "AMX_COMPUTE new uop: uop_num:%lld vaddr:%llx inst_num:%lld thread_id:%d unique_num:%lld \n",
+    uop->m_uop_num, uop->m_vaddr, uop->m_inst_num, uop->m_thread_id, uop->m_unique_num);
+    DEBUG_CORE(uop->m_core_id,
+             "uop_num:%llu num_srcs:%d  trace_uop->num_src_regs:%d  "
+             "num_dsts:%d num_sending_uop:%d "
+             "pc:0x%llx dir:%d \n",
+             uop->m_uop_num, uop->m_num_srcs, trace_uop->m_num_src_regs,
+             uop->m_num_dests, thread_trace_info->m_num_sending_uop, uop->m_pc,
+             uop->m_dir);
+    DEBUG("uop_num:%lld src_info[%d]:%d\n", uop->m_uop_num, 0, uop->m_src_info[0]);
+    DEBUG("uop_num:%lld dst_info[%d]:%d\n", uop->m_uop_num, 0, uop->m_dest_info[0]);
+  }
+  
+  // AMX_TILE
   DEBUG_CORE(
     uop->m_core_id,
     "new uop: uop_num:%lld inst_num:%lld thread_id:%d unique_num:%lld \n",
@@ -1312,7 +1671,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_POP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_IADD;  // new
-      m_int_uop_table[XED_CATEGORY_PT] = UOP_IADD;  // new
+      m_int_uop_table[XED_CATEGORY_PTWRITE] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_PUSH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD;  // new
@@ -1418,7 +1777,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_POP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_FADD;  // new
-      m_fp_uop_table[XED_CATEGORY_PT] = UOP_FADD;  // new
+      m_fp_uop_table[XED_CATEGORY_PTWRITE] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_PUSH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD;  // new
@@ -1525,7 +1884,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_POP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_IADD;  // new
-      m_int_uop_table[XED_CATEGORY_PT] = UOP_IADD;  // new
+      m_int_uop_table[XED_CATEGORY_PTWRITE] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_PUSH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD;  // new
@@ -1631,7 +1990,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_POP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_FADD;  // new
-      m_fp_uop_table[XED_CATEGORY_PT] = UOP_FADD;  // new
+      m_fp_uop_table[XED_CATEGORY_PTWRITE] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_PUSH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD;  // new
@@ -1739,7 +2098,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_POP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_IADD;  // new
-      m_int_uop_table[XED_CATEGORY_PT] = UOP_IADD;  // new
+      m_int_uop_table[XED_CATEGORY_PTWRITE] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_PUSH] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_RDPID] = UOP_IADD;  // new
       m_int_uop_table[XED_CATEGORY_RDPRU] = UOP_IADD;  // new
@@ -1845,7 +2204,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_POP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PREFETCHWT1] = UOP_FADD;  // new
-      m_fp_uop_table[XED_CATEGORY_PT] = UOP_FADD;  // new
+      m_fp_uop_table[XED_CATEGORY_PTWRITE] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_PUSH] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_RDPID] = UOP_FADD;  // new
       m_fp_uop_table[XED_CATEGORY_RDPRU] = UOP_FADD;  // new
@@ -1894,171 +2253,339 @@ void cpu_decoder_c::init_pin_convert(void) {
   }
 }
 
-const char *cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
-  "*invalid*", /* 0*/
-  "*none*",      "*UNKNOWN REG 2*",
-  "rdi",         "rsi",
-  "rbp",         "rsp",
-  "rbx",         "rdx",
-  "rcx",         "rax",
-  "r8",          "r9",
-  "r10",         "r11",
-  "r12",         "r13",
-  "r14",         "r15",
-  "cs",          "ss",
-  "ds",          "es",
-  "fs",          "gs",
-  "rflags",      "rip",
-  "al",          "ah",
-  "ax",          "cl",
-  "ch",          "cx",
-  "dl",          "dh",
-  "dx",          "bl",
-  "bh",          "bx",
-  "bp",          "si",
-  "di",          "sp",
-  "flags",       "ip",
-  "edi",         "dil",
-  "esi",         "sil",
-  "ebp",         "bpl",
-  "esp",         "spl",
-  "ebx",         "edx",
-  "ecx",         "eax",
-  "eflags",      "eip",
-  "r8b",         "r8w",
-  "r8d",         "r9b",
-  "r9w",         "r9d",
-  "r10b",        "r10w",
-  "r10d",        "r11b",
-  "r11w",        "r11d",
-  "r12b",        "r12w",
-  "r12d",        "r13b",
-  "r13w",        "r13d",
-  "r14b",        "r14w",
-  "r14d",        "r15b",
-  "r15w",        "r15d",
-  "mm0",         "mm1",
-  "mm2",         "mm3",
-  "mm4",         "mm5",
-  "mm6",         "mm7",
-  "xmm0",        "xmm1",
-  "xmm2",        "xmm3",
-  "xmm4",        "xmm5",
-  "xmm6",        "xmm7",
-  "xmm8",        "xmm9",
-  "xmm10",       "xmm11",
-  "xmm12",       "xmm13",
-  "xmm14",       "xmm15",
-  "xmm16",       "xmm17",
-  "xmm18",       "xmm19",
-  "xmm20",       "xmm21",
-  "xmm22",       "xmm23",
-  "xmm24",       "xmm25",
-  "xmm26",       "xmm27",
-  "xmm28",       "xmm29",
-  "xmm30",       "xmm31",
-  "ymm0",        "ymm1",
-  "ymm2",        "ymm3",
-  "ymm4",        "ymm5",
-  "ymm6",        "ymm7",
-  "ymm8",        "ymm9",
-  "ymm10",       "ymm11",
-  "ymm12",       "ymm13",
-  "ymm14",       "ymm15",
-  "ymm16",       "ymm17",
-  "ymm18",       "ymm19",
-  "ymm20",       "ymm21",
-  "ymm22",       "ymm23",
-  "ymm24",       "ymm25",
-  "ymm26",       "ymm27",
-  "ymm28",       "ymm29",
-  "ymm30",       "ymm31",
-  "zmm0",        "zmm1",
-  "zmm2",        "zmm3",
-  "zmm4",        "zmm5",
-  "zmm6",        "zmm7",
-  "zmm8",        "zmm9",
-  "zmm10",       "zmm11",
-  "zmm12",       "zmm13",
-  "zmm14",       "zmm15",
-  "zmm16",       "zmm17",
-  "zmm18",       "zmm19",
-  "zmm20",       "zmm21",
-  "zmm22",       "zmm23",
-  "zmm24",       "zmm25",
-  "zmm26",       "zmm27",
-  "zmm28",       "zmm29",
-  "zmm30",       "zmm31",
-  "k0",          "k1",
-  "k2",          "k3",
-  "k4",          "k5",
-  "k6",          "k7",
-  "mxcsr",       "mxcsrmask",
-  "orig_rax",    "fpcw",
-  "fpsw",        "fptag",
-  "fpip_off",    "fpip_sel",
-  "fpopcode",    "fpdp_off",
-  "fpdp_sel",    "fptag_full",
-  "st0",         "st1",
-  "st2",         "st3",
-  "st4",         "st5",
-  "st6",         "st7",
-  "dr0",         "dr1",
-  "dr2",         "dr3",
-  "dr4",         "dr5",
-  "dr6",         "dr7",
-  "cr0",         "cr1",
-  "cr2",         "cr3",
-  "cr4",         "tssr",
-  "ldtr",        "tr",
-  "tr3",         "tr4",
-  "tr5",         "tr6",
-  "tr7",         "r_status_flags",
-  "rdf",         "seg_gs_base",
-  "seg_fs_base", "inst_g0",
-  "inst_g1",     "inst_g2",
-  "inst_g3",     "inst_g4",
-  "inst_g5",     "inst_g6",
-  "inst_g7",     "inst_g8",
-  "inst_g9",     "inst_g10",
-  "inst_g11",    "inst_g12",
-  "inst_g13",    "inst_g14",
-  "inst_g15",    "inst_g16",
-  "inst_g17",    "inst_g18",
-  "inst_g19",    "inst_g20",
-  "inst_g21",    "inst_g22",
-  "inst_g23",    "inst_g24",
-  "inst_g25",    "inst_g26",
-  "inst_g27",    "inst_g28",
-  "inst_g29",    "buf_base0",
-  "buf_base1",   "buf_base2",
-  "buf_base3",   "buf_base4",
-  "buf_base5",   "buf_base6",
-  "buf_base7",   "buf_base8",
-  "buf_base9",   "buf_end0",
-  "buf_end1",    "buf_end2",
-  "buf_end3",    "buf_end4",
-  "buf_end5",    "buf_end6",
-  "buf_end7",    "buf_end8",
-  "buf_end9",    "inst_g0d",
-  "inst_g1d",    "inst_g2d",
-  "inst_g3d",    "inst_g4d",
-  "inst_g5d",    "inst_g6d",
-  "inst_g7d",    "inst_g8d",
-  "inst_g9d",    "inst_g10d",
-  "inst_g11d",   "inst_g12d",
-  "inst_g13d",   "inst_g14d",
-  "inst_g15d",   "inst_g16d",
-  "inst_g17d",   "inst_g18d",
-  "inst_g19d",   "inst_g20d",
-  "inst_g21d",   "inst_g22d",
-  "inst_g23d",   "inst_g24d",
-  "inst_g25d",   "inst_g26d",
-  "inst_g27d",   "inst_g28d",
-  "inst_g29d",   "x87",
+const char* cpu_decoder_c::g_tr_reg_names[MAX_TR_REG] = {
+   "*invalid*",
+   "*none*",
+   "*UNKNOWN REG 2*",
+   "rdi",
+   "rsi",
+   "rbp",
+   "rsp",
+   "rbx",
+   "rdx",
+   "rcx",
+   "rax",
+   "r8",
+   "r9",
+   "r10",
+   "r11",
+   "r12",
+   "r13",
+   "r14",
+   "r15",
+   "cs",
+   "ss",
+   "ds",
+   "es",
+   "fs",
+   "gs",
+   "rflags",
+   "rip",
+   "al",
+   "ah",
+   "ax",
+   "cl",
+   "ch",
+   "cx",
+   "dl",
+   "dh",
+   "dx",
+   "bl",
+   "bh",
+   "bx",
+   "bp",
+   "si",
+   "di",
+   "sp",
+   "flags",
+   "ip",
+   "edi",
+   "dil",
+   "esi",
+   "sil",
+   "ebp",
+   "bpl",
+   "esp",
+   "spl",
+   "ebx",
+   "edx",
+   "ecx",
+   "eax",
+   "eflags",
+   "eip",
+   "r8b",
+   "r8w",
+   "r8d",
+   "r9b",
+   "r9w",
+   "r9d",
+   "r10b",
+   "r10w",
+   "r10d",
+   "r11b",
+   "r11w",
+   "r11d",
+   "r12b",
+   "r12w",
+   "r12d",
+   "r13b",
+   "r13w",
+   "r13d",
+   "r14b",
+   "r14w",
+   "r14d",
+   "r15b",
+   "r15w",
+   "r15d",
+   "mm0",
+   "mm1",
+   "mm2",
+   "mm3",
+   "mm4",
+   "mm5",
+   "mm6",
+   "mm7",
+   "xmm0",
+   "xmm1",
+   "xmm2",
+   "xmm3",
+   "xmm4",
+   "xmm5",
+   "xmm6",
+   "xmm7",
+   "xmm8",
+   "xmm9",
+   "xmm10",
+   "xmm11",
+   "xmm12",
+   "xmm13",
+   "xmm14",
+   "xmm15",
+   "xmm16",
+   "xmm17",
+   "xmm18",
+   "xmm19",
+   "xmm20",
+   "xmm21",
+   "xmm22",
+   "xmm23",
+   "xmm24",
+   "xmm25",
+   "xmm26",
+   "xmm27",
+   "xmm28",
+   "xmm29",
+   "xmm30",
+   "xmm31",
+   "ymm0",
+   "ymm1",
+   "ymm2",
+   "ymm3",
+   "ymm4",
+   "ymm5",
+   "ymm6",
+   "ymm7",
+   "ymm8",
+   "ymm9",
+   "ymm10",
+   "ymm11",
+   "ymm12",
+   "ymm13",
+   "ymm14",
+   "ymm15",
+   "ymm16",
+   "ymm17",
+   "ymm18",
+   "ymm19",
+   "ymm20",
+   "ymm21",
+   "ymm22",
+   "ymm23",
+   "ymm24",
+   "ymm25",
+   "ymm26",
+   "ymm27",
+   "ymm28",
+   "ymm29",
+   "ymm30",
+   "ymm31",
+   "zmm0",
+   "zmm1",
+   "zmm2",
+   "zmm3",
+   "zmm4",
+   "zmm5",
+   "zmm6",
+   "zmm7",
+   "zmm8",
+   "zmm9",
+   "zmm10",
+   "zmm11",
+   "zmm12",
+   "zmm13",
+   "zmm14",
+   "zmm15",
+   "zmm16",
+   "zmm17",
+   "zmm18",
+   "zmm19",
+   "zmm20",
+   "zmm21",
+   "zmm22",
+   "zmm23",
+   "zmm24",
+   "zmm25",
+   "zmm26",
+   "zmm27",
+   "zmm28",
+   "zmm29",
+   "zmm30",
+   "zmm31",
+   "k0",
+   "k1",
+   "k2",
+   "k3",
+   "k4",
+   "k5",
+   "k6",
+   "k7",
+   "tmm0",
+   "tmm1",
+   "tmm2",
+   "tmm3",
+   "tmm4",
+   "tmm5",
+   "tmm6",
+   "tmm7",
+   "mxcsr",
+   "mxcsrmask",
+   "orig_rax",
+   "fpcw",
+   "fpsw",
+   "fptag",
+   "fpip_off",
+   "fpip_sel",
+   "fpopcode",
+   "fpdp_off",
+   "fpdp_sel",
+   "fptag_full",
+   "st0",
+   "st1",
+   "st2",
+   "st3",
+   "st4",
+   "st5",
+   "st6",
+   "st7",
+   "dr0",
+   "dr1",
+   "dr2",
+   "dr3",
+   "dr4",
+   "dr5",
+   "dr6",
+   "dr7",
+   "cr0",
+   "cr1",
+   "cr2",
+   "cr3",
+   "cr4",
+   "tssr",
+   "ldtr",
+   "tr",
+   "tr3",
+   "tr4",
+   "tr5",
+   "tr6",
+   "tr7",
+   "r_status_flags",
+   "rdf",
+   "seg_gs_base",
+   "seg_fs_base",
+   "inst_g0",
+   "inst_g1",
+   "inst_g2",
+   "inst_g3",
+   "inst_g4",
+   "inst_g5",
+   "inst_g6",
+   "inst_g7",
+   "inst_g8",
+   "inst_g9",
+   "inst_g10",
+   "inst_g11",
+   "inst_g12",
+   "inst_g13",
+   "inst_g14",
+   "inst_g15",
+   "inst_g16",
+   "inst_g17",
+   "inst_g18",
+   "inst_g19",
+   "inst_g20",
+   "inst_g21",
+   "inst_g22",
+   "inst_g23",
+   "inst_g24",
+   "inst_g25",
+   "inst_g26",
+   "inst_g27",
+   "inst_g28",
+   "inst_g29",
+   "buf_base0",
+   "buf_base1",
+   "buf_base2",
+   "buf_base3",
+   "buf_base4",
+   "buf_base5",
+   "buf_base6",
+   "buf_base7",
+   "buf_base8",
+   "buf_base9",
+   "buf_end0",
+   "buf_end1",
+   "buf_end2",
+   "buf_end3",
+   "buf_end4",
+   "buf_end5",
+   "buf_end6",
+   "buf_end7",
+   "buf_end8",
+   "buf_end9",
+   "inst_g0d",
+   "inst_g1d",
+   "inst_g2d",
+   "inst_g3d",
+   "inst_g4d",
+   "inst_g5d",
+   "inst_g6d",
+   "inst_g7d",
+   "inst_g8d",
+   "inst_g9d",
+   "inst_g10d",
+   "inst_g11d",
+   "inst_g12d",
+   "inst_g13d",
+   "inst_g14d",
+   "inst_g15d",
+   "inst_g16d",
+   "inst_g17d",
+   "inst_g18d",
+   "inst_g19d",
+   "inst_g20d",
+   "inst_g21d",
+   "inst_g22d",
+   "inst_g23d",
+   "inst_g24d",
+   "inst_g25d",
+   "inst_g26d",
+   "inst_g27d",
+   "inst_g28d",
+   "inst_g29d",
+   "x87",
 };
 
-const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
+const char* cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "INVALID",
   "3DNOW",
   "ADOX_ADCX",
@@ -2122,7 +2649,7 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "POP",
   "PREFETCH",
   "PREFETCHWT1",
-  "PT",
+  "PTWRITE",
   "PUSH",
   "RDPID",
   "RDPRU",
@@ -2151,7 +2678,7 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "UNCOND_BR",
   "VAES",
   "VBMI2",
-  "VEX"
+  "VEX",
   "VFMA",
   "VIA_PADLOCK",
   "VPCLMULQDQ",

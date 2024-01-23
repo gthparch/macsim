@@ -303,6 +303,10 @@ bool schedule_c::uop_schedule(int entry, SCHED_FAIL_TYPE* sched_fail_reason) {
       ASSERT(m_num_per_sched[simd_ALLOCQ] > 0);
       --m_num_per_sched[simd_ALLOCQ];
       break;
+    case tile_ALLOCQ:
+      ASSERT(m_num_per_sched[tile_ALLOCQ] > 0);
+      --m_num_per_sched[tile_ALLOCQ];
+      break;
     default:
       printf("unknown allocq\n");
       exit(EXIT_FAILURE);

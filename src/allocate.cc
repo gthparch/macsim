@@ -121,6 +121,7 @@ void allocate_c::run_a_cycle(void) {
     int req_int_reg = 0;  // require integer register
     int req_fp_reg = 0;  // require fp register
     int req_simd_reg = 0;  // require simd register
+    int req_tile_reg = 0;  // require tile register
     int q_type = *m_simBase->m_knobs->KNOB_GEN_ALLOCQ_INDEX;
 
     if (uop->m_mem_type == MEM_LD)  // load queue
@@ -135,6 +136,8 @@ void allocate_c::run_a_cycle(void) {
       req_fp_reg = 1;
     else if (uop->m_uop_type == UOP_SIMD)  // simd register
       req_simd_reg = 1;
+    else if (uop->m_uop_type == UOP_AMX_COMPUTE_BF16)  // tile register
+      req_tile_reg = 1;
 
     // single allocation queue
     if (m_num_queues == 1) {
@@ -146,6 +149,9 @@ void allocate_c::run_a_cycle(void) {
         q_type = *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX;
       else if (req_simd_reg)
         q_type = *m_simBase->m_knobs->KNOB_SIMD_ALLOCQ_INDEX;
+      else if (req_tile_reg){
+        q_type = *m_simBase->m_knobs->KNOB_TILE_ALLOCQ_INDEX;
+      }
       else if (req_sb || req_lb)
         q_type = *m_simBase->m_knobs->KNOB_MEM_ALLOCQ_INDEX;
       else
@@ -155,6 +161,15 @@ void allocate_c::run_a_cycle(void) {
     pqueue_c<int> *alloc_q = m_alloc_q[q_type];
 
     // check rob and other physical resources
+    if(alloc_q->space() < 1){
+      DEBUG_CORE(m_core_id,
+                 "not enough alloc_q space for q_type: %d rob_space:%d num_sb:%d "
+                 "num_lb:%d alloc_q:%d int_reg:%d fp_reg:%d \n",
+                 q_type,
+                 m_rob->space(), m_resource->get_num_sb(),
+                 m_resource->get_num_lb(), alloc_q->space(),
+                 m_resource->get_num_int_regs(), m_resource->get_num_fp_regs());
+    }
     if (m_rob->space() < req_rob || m_resource->get_num_sb() < req_sb ||
         m_resource->get_num_lb() < req_lb || alloc_q->space() < 1 ||
         m_resource->get_num_int_regs() < req_int_reg ||
@@ -208,7 +223,9 @@ void allocate_c::run_a_cycle(void) {
             ? mem_ALLOCQ
             : (q_type == *m_simBase->m_knobs->KNOB_FLOAT_ALLOCQ_INDEX)
                 ? fp_ALLOCQ
-                : simd_ALLOCQ;
+                : (q_type == *m_simBase->m_knobs->KNOB_SIMD_ALLOCQ_INDEX)
+                ? simd_ALLOCQ
+                : tile_ALLOCQ;
     m_rob->push(uop);
 
     POWER_CORE_EVENT(m_core_id, POWER_REORDER_BUF_W);

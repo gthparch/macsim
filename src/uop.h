@@ -126,7 +126,6 @@ typedef enum Uop_Type_enum {
   UOP_XSAVE,  //!< XSAVE context switch
   UOP_XSAVEOPT,  //!< optimized XSAVE context switch
 
-
   // added on may-10-2012 for GPU instructions
   UOP_GPU_ABS,
   UOP_GPU_ABS64,

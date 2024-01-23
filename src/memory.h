@@ -146,7 +146,7 @@ public:
    * data cache constructor
    */
   dcu_c(int id, Unit_Type type, int level, memory_c* mem, int, dcu_c** next,
-        dcu_c** prev, macsim_c* simBase);
+        dcu_c** prev, macsim_c* simBase, bool perfect_cache);
 
   /**
    * data cache destructor
@@ -164,7 +164,7 @@ public:
    * @param has_router decide the next destination (NoC or next cache)
    */
   void init(int next_id, int prev_id, bool done, bool coupled_up,
-            bool coupled_down, bool disable, bool has_router);
+            bool coupled_down, bool disable, bool has_router, bool perfect_cache);
 
   /**
    * Get the cache line address
@@ -303,9 +303,8 @@ private:
   int m_line_size; /**< cache line size */
   int m_banks; /**< number of cache banks */
   int m_latency; /**< cache access latency */
-  bool m_acc_sim; /**< gpu cache */
-  bool m_igpu_sim; /**< intel gpu cache */
   bool m_ptx_sim; /**< gpu cache */
+  bool m_igpu_sim; /**< intel gpu cache */
   queue_c* m_in_queue; /**< input queue */
   queue_c* m_wb_queue; /**< write-back queue */
   queue_c* m_fill_queue; /**< fill queue */
@@ -321,6 +320,8 @@ private:
 
   // clock
   Counter m_cycle; /**< clock cycle */
+
+  bool m_perfect_cache;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

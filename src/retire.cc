@@ -137,7 +137,9 @@ void retire_c::run_a_cycle() {
   }
 
   // retire instructions : all micro-ops within an inst. need to be retired for an inst.
+  //FIX HERE
   for (int count = 0; count < m_knob_width; ++count) {
+  //for (int count = 0; count < 100; ++count) {
     uop_c* cur_uop;
     rob_c* rob;
 
@@ -545,7 +547,7 @@ void retire_c::update_stats(process_s* process) {
       core->get_core_type() == "ptx") {
     if ((process->m_repeat + 1) == *m_simBase->m_knobs->KNOB_REPEAT_TRACE_N) {
       --m_simBase->m_process_count_without_repeat;
-      STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
+      STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
       report("application "
              << process->m_process_id << " terminated "
              << "("
@@ -555,7 +557,7 @@ void retire_c::update_stats(process_s* process) {
   } else {
     if (process->m_repeat == 0) {
       if (core->get_core_type() == "ptx") {
-        STAT_EVENT_N(CYC_COUNT_ACC, CYCLE);
+        STAT_EVENT_N(CYC_COUNT_PTX, CYCLE);
       } else {
         STAT_EVENT_N(CYC_COUNT_X86, CYCLE);
       }

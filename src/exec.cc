@@ -113,6 +113,11 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_x86_coffee_lake[] = {
 #include "../def/uoplatency_x86_coffee_lake.def"
 };
 
+static Uop_LatencyBinding_Init uop_latencybinding_init_x86_spr[] = {
+#define DEFUOP(A, B) {A, #A, B},
+#include "../def/uoplatency_x86_spr.def"
+};
+
 static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 #define DEFUOP(A, B) {A, #A, B},
 #include "../def/uoplatency_ptx580.def"
@@ -186,6 +191,18 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase)
             uop_latencybinding_init_x86_coffee_lake[ii].m_latency;
         }
         break;
+      case LATENCY_SPR:
+        report("UOP latency mapped to SPR");
+        latency_array_size =
+          (sizeof uop_latencybinding_init_x86_spr /
+           sizeof(uop_latencybinding_init_x86_spr[0]));
+
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86_spr[ii].uop_type_s] =
+            uop_latencybinding_init_x86_spr[ii].m_latency;
+        }
+        break;
+
       default:
         report("UOP latency mapped to Sandy Bridge");
         latency_array_size = (sizeof uop_latencybinding_init_x86 /
@@ -211,8 +228,17 @@ exec_c::~exec_c() {
 
 // clear execution ports
 void exec_c::clear_ports() {
-  for (int ii = 0; ii < max_ALLOCQ; ++ii) {
+  // m_port_used[tile_ALLOCQ] should be = 0 only if the previous instruction is done
+  for (int ii = 0; ii < max_ALLOCQ-1; ++ii) {
     m_port_used[ii] = 0;
+  }
+  DEBUG_CORE(m_core_id,
+             "m_cur_core_cycle m_tmul_done_cycle: %lld %lld\n",
+             m_cur_core_cycle, m_tmul_done_cycle
+    );
+  if(m_simBase->m_core_cycle[m_core_id] >= m_tmul_done_cycle){
+    m_tmul_done_cycle = -1;
+    m_port_used[tile_ALLOCQ] = 0;
   }
 }
 
@@ -221,6 +247,21 @@ int exec_c::get_latency(Uop_Type uop_type) {
   // when *m_simBase->m_knobs->KNOB_ONE_CYCLE_EXEC is set, all uops have 1-cyce latency
   if (*m_simBase->m_knobs->KNOB_ONE_CYCLE_EXEC) {
     return 1;
+  }
+
+  if(uop_type == UOP_AMX_COMPUTE_BF16){
+    int latency = 0;
+    latency += *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+    latency = 64;
+    DEBUG_CORE(m_core_id,
+             "UOP_AMX_COMPUTE_BF16 latency: %d\n",
+             latency
+    );
+    return latency;
+    //return *m_simBase->m_knobs->KNOB_AMX_COMPUTE_BF16_LATENCY;
   }
 
   // otherwise return original latency
@@ -245,6 +286,13 @@ void exec_c::use_port(int thread_id, int entry) {
 
   // use specified port
   if (!uop->m_bogus) {
+    if(uop->m_uop_type == UOP_AMX_COMPUTE_BF16){
+      DEBUG_CORE(m_core_id,
+              "UOP_AMX_COMPUTE_PORT SET: %d %d\n",
+              uop->m_allocq_num,
+              m_port_used[uop->m_allocq_num]
+      );
+    }
     ++m_port_used[uop->m_allocq_num];
   }
 }
@@ -284,6 +332,36 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
   // execute memory instructions
   // -------------------------------------
   if (type != NOT_MEM) {
+    
+    // if pipeline is turned on
+    if(*m_simBase->m_knobs->KNOB_AMX_WL_PIPE){
+      // WL-BP
+      if(*m_simBase->m_knobs->KNOB_AMX_WL_BP){
+        DEBUG_CORE(m_core_id,
+                  "UOP_AMX_COMPUTE_BF16 WL-BP enabled\n");
+        // TODO Remove number
+        if((uop->m_opcode == XED_CATEGORY_AMX_TILE) && (uop_type != UOP_AMX_COMPUTE_BF16)){
+          DEBUG_CORE(m_core_id,
+                  "WL-BP 1 \n");
+          if(m_simBase->m_core_cycle[m_core_id] < m_tmul_done_cycle){
+            DEBUG_CORE(m_core_id,
+                  "WL-BP 2: %d \n", uop->m_mem_type);
+            if(uop->m_mem_type == MEM_LD){
+              DEBUG_CORE(m_core_id,
+                  "WL-BP 3 \n"  );
+              if(uop->m_dest_info[0] == m_cur_tmul_weight_reg){
+                DEBUG_CORE(m_core_id,
+                  "%d %d",uop->m_dest_info[0],m_cur_tmul_weight_reg  );
+                  m_tmul_weight_dirty = true;
+                  DEBUG_CORE(m_core_id,
+                  "UOP_AMX_COMPUTE_BF16 Dirty Bit on");
+              }
+            }
+          }
+        }
+      }
+    }
+
     // perfect dcache
     if (KNOB(KNOB_PERFECT_DCACHE)->getValue()) {
       uop_latency = 1;
@@ -464,6 +542,17 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
               uop->m_mem_start_cycle = m_cur_core_cycle;
             }
 
+            if(type == MEM_SWPREF_NTA){
+              DEBUG_CORE(m_core_id,
+                         "m_core_id:%d thread_id:%d uop_num:%llu inst_num:%llu "
+                         "child_uop_num:%llu m_pc:%llx latency: %d \n",
+                         m_core_id, uop->m_thread_id, uop->m_uop_num,
+                         uop->m_inst_num,
+                         uop->m_child_uops[next_set_bit]->m_uop_num,
+                         uop->m_pc,
+                         latency);
+            }
+
             // mark current uop as executed
             uop->m_pending_child_uops =
               CLEAR_BIT(uop->m_pending_child_uops, next_set_bit);
@@ -538,7 +627,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
       use_port(thread_id, entry);
 
       // GPU : if we use load-block policy, block current thread due to load instruction
-      if (uop_latency == -1 && m_acc_sim &&
+      if (uop_latency == -1 && m_ptx_sim &&
           *m_simBase->m_knobs->KNOB_FETCH_ONLY_LOAD_READY) {
         m_frontend->set_load_wait(uop->m_thread_id, uop->m_uop_num);
 
@@ -567,6 +656,136 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
   // non-memory (compute) instructions
   else {
     uop_latency = get_latency(uop_type);
+    assert(!((uop_type == UOP_AMX_COMPUTE_BF16) && (uop->m_mem_type == MEM_LD)));
+    if((uop->m_opcode == XED_CATEGORY_AMX_TILE) && (uop_type == UOP_AMX_COMPUTE_BF16)){
+      DEBUG_CORE(m_core_id,
+                  "XED_CATEGORY_AMX_TILE // UOP_AMX_COMPUTE_BF16 \n");
+      int latency = 0;
+      int port_open_latency = 0;
+      latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+      port_open_latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+      // Port will be visible after WL INIT using PIPE
+      // 0. BASE
+      if(*m_simBase->m_knobs->KNOB_AMX_WL_PIPE == false){
+            latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+            port_open_latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+      }
+      else{
+        // 1. PIPE
+        latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+        port_open_latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+              + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY;
+        
+        // 2. WL-BP
+        if(*m_simBase->m_knobs->KNOB_AMX_WL_BP){
+          latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+          port_open_latency = *m_simBase->m_knobs->KNOB_AMX_WL_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY;
+          if(uop->m_src_info[2] == m_cur_tmul_weight_reg){
+            if(m_tmul_weight_dirty == false){
+                  DEBUG_CORE(m_core_id,
+                  "UOP_AMX_COMPUTE_BF16 WL-BP detected\n");
+                  latency = *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                    + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                    + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+                  port_open_latency = *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY;
+                  //if(m_cur_core_cycle - m_tmul_start_cycle)
+                  STAT_EVENT(WLBP_COUNT);
+              }        
+          }
+          m_cur_tmul_weight_reg = uop->m_src_info[2];
+          m_tmul_weight_dirty = false;
+        }
+        // 3. WL-S
+        else if(*m_simBase->m_knobs->KNOB_AMX_WL_S){
+          latency = *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY
+                    + *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY
+                    + *m_simBase->m_knobs->KNOB_AMX_DR_LATENCY;
+          port_open_latency = *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY;
+        }
+      }
+      //TODO FIX HERE
+      // this never happens
+      if(uop->m_num_srcs == 4){
+        DEBUG_CORE(m_core_id,
+                  "SOMETHING IS WRONG FOR AMX MM\n");
+        exit(-1);
+      }
+      // if dense 
+      else if(uop->m_num_srcs == 3){
+        STAT_EVENT(TDPBF16_COUNT);
+        DEBUG_CORE(m_core_id,
+                  "UOP_AMX_DENSE_COMPUTE detected at %llx\n", uop->m_pc);
+        //SM
+        //latency = 16+32+16+32;
+        //port_open_latency = 32;
+        
+        //DM
+        latency = 16 * 4;
+        port_open_latency = 16;
+      }
+      // if sparse
+      else if(uop->m_num_srcs == 5){
+        STAT_EVENT(SPMMU_COUNT);
+        DEBUG_CORE(m_core_id,
+                  "UOP_AMX_SPARSE_COMPUTE detected\n");
+        //QM
+        //latency = 8+16+8+16;
+        //port_open_latency = 16;
+
+        //OM
+        //latency = 8*4; //8+16+8+16;
+        //port_open_latency = 8;        
+        latency = 16;//8 + 16 + 8 + 16; //8+16+8+16;
+        port_open_latency = 16; // 16;  
+
+        //ideal
+        //latency = 1; //8+16+8+16;
+        //port_open_latency = 1;  
+
+        //small version
+        //latency = 32*4; //8+16+8+16;
+        //port_open_latency = 32;  
+      }
+      else if(uop->m_num_srcs == 7){
+          STAT_EVENT(SPMMV_COUNT);
+      }
+
+      else{
+        cout << uop->m_num_srcs << endl;
+        assert(false);
+      }
+      
+      // TEMPORARY-- FIX HERE
+      latency = *m_simBase->m_knobs->KNOB_AMX_FF_LATENCY;
+      port_open_latency = *m_simBase->m_knobs->KNOB_AMX_FS_LATENCY;
+
+      uop_latency = latency * (*m_simBase->m_knobs->KNOB_AMX_CYCLE_SCALE);
+      m_tmul_done_cycle = m_cur_core_cycle + port_open_latency * (*m_simBase->m_knobs->KNOB_AMX_CYCLE_SCALE);
+    }
+
+   
+
     use_port(thread_id, entry);
 
     switch (uop_type) {
@@ -658,16 +877,46 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
                static_cast<int>(*m_simBase->m_knobs->KNOB_EXEC_RETIRE_LATENCY));
     uop->m_done_cycle = m_cur_core_cycle + max_latency;
   }
-
-  DEBUG_CORE(
+  bool is_uop_mem_ld = uop->m_mem_type == MEM_LD;
+  bool is_uop_amx_compute = uop_type == UOP_AMX_COMPUTE_BF16;
+  if((uop->m_opcode == XED_CATEGORY_AMX_TILE) && is_uop_mem_ld && (!is_uop_amx_compute) ){
+    DEBUG_CORE(
     m_core_id,
-    "done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
+    "UOP_AMX_MEM done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
     " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
-    "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx\n",
+    "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx "
+    "uop_type: %d uop->m_src_info[0]: %d uop->m_src_info[1]: %d uop->m_dest_info[0]: %d"
+    "opcode: %d",
     m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num,
     uop->m_inst_num, uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle,
     uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle,
-    uop->m_pc);
+    uop->m_pc, uop->m_uop_type, uop->m_src_info[0], uop->m_src_info[1], uop->m_dest_info[0], uop->m_opcode);
+  }
+  if(uop_type == UOP_AMX_COMPUTE_BF16){
+    DEBUG_CORE(
+    m_core_id,
+    "UOP_AMX_COMPUTE_BF16 done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
+    " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
+    "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx "
+    "uop_type: %d uop->m_src_info[0]: %d uop->m_src_info[1]: %d uop->m_src_info[2]: %d uop->m_dest_info[0]: %d\n",
+    m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num,
+    uop->m_inst_num, uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle,
+    uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle,
+    uop->m_pc, uop->m_uop_type, uop->m_src_info[0], uop->m_src_info[1], uop->m_src_info[2], uop->m_dest_info[0]);
+    
+    
+  }
+  else
+    DEBUG_CORE(
+      m_core_id,
+      "done_exec m_core_id:%d thread_id:%d core_cycle_count:%llu uop_num:%llu"
+      " inst_num:%llu sched_cycle:%llu exec_cycle:%llu uop->done_cycle:%llu "
+      "inst_count:%llu uop->dcmiss:%d uop_latency:%d done_cycle:%llu pc:0x%llx "
+      "uop_type: %d\n",
+      m_core_id, uop->m_thread_id, m_cur_core_cycle, uop->m_uop_num,
+      uop->m_inst_num, uop->m_sched_cycle, uop->m_exec_cycle, uop->m_done_cycle,
+      uop->m_inst_num, uop->m_uop_info.m_dcmiss, uop_latency, uop->m_done_cycle,
+      uop->m_pc, uop->m_uop_type);
 
   // branch execution
   if (uop->m_cf_type) {
@@ -741,7 +990,7 @@ void exec_c::br_exec(uop_c* uop) {
   }
 
   // GPU : stall on branch policy
-  if (m_acc_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
+  if (m_ptx_sim && *m_simBase->m_knobs->KNOB_MT_NO_FETCH_BR) {
     m_frontend->set_br_ready(uop->m_thread_id);
   }
 }
@@ -793,7 +1042,7 @@ void exec_c::run_a_cycle(void) {
     if (responseArrived) {
       DEBUG_CORE(m_core_id, "key found: 0x%lx, addr = 0x%llx\n", key,
                  uop->m_vaddr);
-      if (m_acc_sim || m_igpu_sim) {
+      if (m_ptx_sim || m_igpu_sim) {
         if (uop->m_parent_uop) {
           uop_c* puop = uop->m_parent_uop;
           ++puop->m_num_child_uops_done;
@@ -883,7 +1132,7 @@ int exec_c::access_data_cache(uop_c* uop) {
   auto i = m_uop_buffer.find(key);
   ASSERTM(m_uop_buffer.end() == i, "uop has already been executed!\n");
 
-  int block_size = m_acc_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue()
+  int block_size = m_ptx_sim ? KNOB(KNOB_L1_SMALL_LINE_SIZE)->getValue()
                              : KNOB(KNOB_L1_LARGE_LINE_SIZE)->getValue();
   // Addr block_addr = uop->m_vaddr & ~((uint64_t)block_size-1);
 
@@ -936,7 +1185,7 @@ int exec_c::access_data_cache(uop_c* uop) {
 }
 
 int exec_c::access_const_texture_cache(uop_c* uop) {
-  ASSERT(m_acc_sim);
+  ASSERT(m_ptx_sim);
   ASSERT(uop->m_mem_type == MEM_LD_CM || uop->m_mem_type == MEM_LD_TM);
 
   // assign unique key to each memory request; this will be used later in time for strobbing

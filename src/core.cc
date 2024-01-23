@@ -195,6 +195,7 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   q_iaq_size[mem_ALLOCQ] = miaq_size;
   q_iaq_size[fp_ALLOCQ] = fq_size;
   q_iaq_size[simd_ALLOCQ] = siaq_size;
+  q_iaq_size[tile_ALLOCQ] = siaq_size; // TODO CHECK HERE
 
   sstr.clear();
   if (m_core_type == "ptx" || m_core_type == "igpu") {
