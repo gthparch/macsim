@@ -188,12 +188,12 @@ void Finish(void);
 void Initialize(void);
 void sanity_check(void);
 
-LOCALVAR CONTROL_MANAGER control;
+GLOBALCVAR CONTROL_MANAGER control;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-LOCALFUN VOID Handler(EVENT_TYPE ev, void *v, CONTEXT *ctxt, void *ip, THREADID tid, bool bast)
+LOCALCFUN VOID Handler(EVENT_TYPE ev, void *v, CONTEXT *ctxt, void *ip, THREADID tid, bool bast)
 {
   switch (ev)
   {
