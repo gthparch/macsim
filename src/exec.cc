@@ -113,6 +113,11 @@ static Uop_LatencyBinding_Init uop_latencybinding_init_x86_coffee_lake[] = {
 #include "../def/uoplatency_x86_coffee_lake.def"
 };
 
+static Uop_LatencyBinding_Init uop_latencybinding_init_x86_sapphire_rapids[] = {
+#define DEFUOP(A, B) {A, #A, B},
+#include "../def/uoplatency_x86_sapphire_rapids.def"
+};
+
 static Uop_LatencyBinding_Init uop_latencybinding_init_ptx[] = {
 #define DEFUOP(A, B) {A, #A, B},
 #include "../def/uoplatency_ptx580.def"
