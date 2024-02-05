@@ -113,11 +113,14 @@ typedef enum Uop_Type_enum {
   // MMX instructions
   UOP_SSE,
 
+  // AMX Instruction
+  UOP_AMX,
+
   // SIMD instructions for Intel GPU
   UOP_SIMD,
 
   // other instructions
-  UOP_AES,  //!< AES enctyption
+  UOP_AES,  //!< AES encryption
   UOP_PCLMUL,  //!< carryless multiplication
   UOP_X87,  //!< x87 ALU op
   UOP_XSAVE,  //!< XSAVE context switch

@@ -1249,14 +1249,46 @@ void cpu_decoder_c::init_pin_convert(void) {
   // init conversion based on knob value; this is only how they will be mapped and is independent of the UOP latency
   // values - Michael
   switch (lat_map) {
+    case LATENCY_SAPPHIRE_RAPIDS:
+      m_int_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX;  // new
+      m_int_uop_table[XED_CATEGORY_APX] = UOP_IADD; //new
+      m_int_uop_table[XED_CATEGORY_AVX_IFMA] = UOP_VADD;  //new
+      m_int_uop_table[XED_CATEGORY_FP16] = UOP_VADD;  //new
+      m_int_uop_table[XED_CATEGORY_HRESET] = UOP_FULL_FENCE;  //new
+      m_int_uop_table[XED_CATEGORY_KEYLOCKER] = UOP_AES; //new
+      m_int_uop_table[XED_CATEGORY_KEYLOCKER_WIDE] = UOP_AES;  //new
+      m_int_uop_table[XED_CATEGORY_LEGACY] = UOP_IADD;  //new
+      m_int_uop_table[XED_CATEGORY_MSRLIST] = UOP_IADD; //new
+      m_int_uop_table[XED_CATEGORY_PBNDKB] = UOP_AES; //new
+      m_int_uop_table[XED_CATEGORY_SERIALIZE] = UOP_IADD; //new
+      m_int_uop_table[XED_CATEGORY_SHA512] = UOP_IADD;  //new
+      m_int_uop_table[XED_CATEGORY_TSX_LDTRK] = UOP_IADD; //new
+      m_int_uop_table[XED_CATEGORY_UINTR] = UOP_IADD; //new
+      m_int_uop_table[XED_CATEGORY_VEX] = UOP_VADD; //new
+      m_int_uop_table[XED_CATEGORY_WRMSRNS] = UOP_IADD; //new
+
+      m_fp_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX; //new
+      m_fp_uop_table[XED_CATEGORY_APX] = UOP_FADD; //new
+      m_fp_uop_table[XED_CATEGORY_AVX_IFMA] = UOP_FADD; //new
+      m_fp_uop_table[XED_CATEGORY_FP16] = UOP_FADD; //new
+      m_fp_uop_table[XED_CATEGORY_HRESET] = UOP_FULL_FENCE; //new
+      m_fp_uop_table[XED_CATEGORY_KEYLOCKER] = UOP_AES;  //new
+      m_fp_uop_table[XED_CATEGORY_KEYLOCKER_WIDE] = UOP_AES; //new    
+      m_fp_uop_table[XED_CATEGORY_LEGACY] = UOP_FADD; //new
+      m_fp_uop_table[XED_CATEGORY_MSRLIST] = UOP_FADD;  //new
+      m_fp_uop_table[XED_CATEGORY_PBNDKB] = UOP_AES; //new
+      m_fp_uop_table[XED_CATEGORY_SERIALIZE] = UOP_IADD;  //new
+      m_fp_uop_table[XED_CATEGORY_SHA512] = UOP_FADD; //new
+      m_fp_uop_table[XED_CATEGORY_TSX_LDTRK] = UOP_FADD;  //new
+      m_fp_uop_table[XED_CATEGORY_UINTR] = UOP_IADD;  //new
+      m_fp_uop_table[XED_CATEGORY_VEX] = UOP_FADD;  //new
+      m_fp_uop_table[XED_CATEGORY_WRMSRNS] = UOP_FADD;  //new
     case LATENCY_SKYLAKE:
     case LATENCY_COFFEE_LAKE:
       m_int_uop_table[XED_CATEGORY_INVALID] = UOP_INV;
       m_int_uop_table[XED_CATEGORY_3DNOW] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_ADOX_ADCX] = UOP_IADD; 
       m_int_uop_table[XED_CATEGORY_AES] = UOP_AES;
-      m_int_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX;  // new
-      m_int_uop_table[XED_CATEGORY_APX] = ; //new
       m_int_uop_table[XED_CATEGORY_AVX] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_AVX2] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_AVX2GATHER] = UOP_VADD;
@@ -1266,7 +1298,6 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_VADD;
-      m_int_uop_table[XED_CATEGORY_AVX_IFMA] = ;  //new
       m_int_uop_table[XED_CATEGORY_BINARY] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_BITBYTE] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_BLEND] = UOP_IADD;
@@ -1292,18 +1323,13 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_FLAGOP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_FMA4] =
         UOP_FMUL;  // fused floating multply and add
-      m_int_uop_table[XED_CATEGORY_FP16] = ;  //new
       m_int_uop_table[XED_CATEGORY_GATHER] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_GFNI] = UOP_IMUL;
-      m_int_uop_table[XED_CATEGORY_HRESET] = ;  //new
       m_int_uop_table[XED_CATEGORY_IFMA] = UOP_IMUL;
       m_int_uop_table[XED_CATEGORY_INTERRUPT] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_IO] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_IOSTRINGOP] = UOP_IMUL;
-      m_int_uop_table[XED_CATEGORY_KEYLOCKER] = ; //new
-      m_int_uop_table[XED_CATEGORY_KEYLOCKER_WIDE] = ;  //new
       m_int_uop_table[XED_CATEGORY_KMASK] = UOP_IADD;
-      m_int_uop_table[XED_CATEGORY_LEGACY] = ;  //new
       m_int_uop_table[XED_CATEGORY_LOGICAL] = UOP_LOGIC;
       m_int_uop_table[XED_CATEGORY_LOGICAL_FP] = UOP_LOGIC;
       m_int_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
@@ -1311,9 +1337,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_MMX] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD;
       m_int_uop_table[XED_CATEGORY_MPX] = UOP_FADD;
-      m_int_uop_table[XED_CATEGORY_MSRLIST] = ; //new
       m_int_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
-      m_int_uop_table[XED_CATEGORY_PBNDKB] = ; //new
       m_int_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_PCLMUL;
       m_int_uop_table[XED_CATEGORY_PCONFIG] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_PKU] = UOP_IADD;
@@ -1332,11 +1356,9 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_SCATTER] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SEGOP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SEMAPHORE] = UOP_IADD;
-      m_int_uop_table[XED_CATEGORY_SERIALIZE] = ; //new
       m_int_uop_table[XED_CATEGORY_SETCC] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SGX] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SHA] = UOP_IADD;
-      m_int_uop_table[XED_CATEGORY_SHA512] = ;  //new
       m_int_uop_table[XED_CATEGORY_SHIFT] = UOP_SHIFT;
       m_int_uop_table[XED_CATEGORY_SMAP] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SSE] = UOP_VADD;
@@ -1346,19 +1368,15 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_SYSRET] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_SYSTEM] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_TBM] = UOP_IADD;
-      m_int_uop_table[XED_CATEGORY_TSX_LDTRK] = ; //new
-      m_int_uop_table[XED_CATEGORY_UINTR] = ; //new
       m_int_uop_table[XED_CATEGORY_UNCOND_BR] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_VAES] = UOP_AES;
       m_int_uop_table[XED_CATEGORY_VBMI2] = UOP_VADD;
-      m_int_uop_table{XED_CATEGORY_VEX} = ; //new
       m_int_uop_table[XED_CATEGORY_VFMA] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_AES;
       m_int_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_PCLMUL;
       m_int_uop_table[XED_CATEGORY_VTX] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_WAITPKG] = UOP_IADD;
       m_int_uop_table[XED_CATEGORY_WIDENOP] = UOP_IADD;
-      m_int_uop_table[XED_CATEGORY_WRMSRNS] = ; //new
       m_int_uop_table[XED_CATEGORY_X87_ALU] = UOP_X87;
       m_int_uop_table[XED_CATEGORY_XOP] = UOP_VADD;
       m_int_uop_table[XED_CATEGORY_XSAVE] = UOP_XSAVE;
@@ -1377,8 +1395,6 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_3DNOW] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_ADOX_ADCX] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_AES] = UOP_AES;
-      m_fp_uop_table[XED_CATEGORY_AMX_TILE] = ; //new
-      m_fp_uop_table[XED_CATEGORY_APX] = ; //new
       m_fp_uop_table[XED_CATEGORY_AVX] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_AVX2] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_AVX2GATHER] = UOP_FADD;
@@ -1388,7 +1404,6 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_AVX512_BITALG] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_AVX512_VBMI] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_AVX512_VP2INTERSECT] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_AVX_IFMA] = ; //new
       m_fp_uop_table[XED_CATEGORY_BINARY] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_BITBYTE] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_BLEND] = UOP_FADD;
@@ -1414,18 +1429,13 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_FLAGOP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_FMA4] =
         UOP_FMUL;  // fused floating multply and add
-      m_fp_uop_table[XED_CATEGORY_FP16] = ; //new
       m_fp_uop_table[XED_CATEGORY_GATHER] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_GFNI] = UOP_FMUL;
-      m_fp_uop_table[XED_CATEGORY_HRESET] = ; //new
       m_fp_uop_table[XED_CATEGORY_IFMA] = UOP_FMUL;
       m_fp_uop_table[XED_CATEGORY_INTERRUPT] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_IO] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_IOSTRINGOP] = UOP_FMUL;
-      m_fp_uop_table[XED_CATEGORY_KEYLOCKER] = ;  //new
-      m_fp_uop_table[XED_CATEGORY_KEYLOCKER_WIDE] = ; //new      
+      m_fp_uop_table[XED_CATEGORY_IOSTRINGOP] = UOP_FMUL;  
       m_fp_uop_table[XED_CATEGORY_KMASK] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_LEGACY] = ; //new
       m_fp_uop_table[XED_CATEGORY_LOGICAL] = UOP_LOGIC;
       m_fp_uop_table[XED_CATEGORY_LOGICAL_FP] = UOP_LOGIC;
       m_fp_uop_table[XED_CATEGORY_LZCNT] = UOP_LOGIC;
@@ -1433,9 +1443,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_MMX] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_MOVDIR] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_MPX] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_MSRLIST] = ;  //new
       m_fp_uop_table[XED_CATEGORY_NOP] = UOP_NOP;
-      m_fp_uop_table[XED_CATEGORY_PBNDKB] = ; //new
       m_fp_uop_table[XED_CATEGORY_PCLMULQDQ] = UOP_PCLMUL;
       m_fp_uop_table[XED_CATEGORY_PCONFIG] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_PKU] = UOP_FADD;
@@ -1454,11 +1462,9 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_SCATTER] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SEGOP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SEMAPHORE] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_SERIALIZE] = ;  //new
       m_fp_uop_table[XED_CATEGORY_SETCC] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SGX] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SHA] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_SHA512] = ; //new
       m_fp_uop_table[XED_CATEGORY_SHIFT] = UOP_SHIFT;
       m_fp_uop_table[XED_CATEGORY_SMAP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SSE] = UOP_FADD;
@@ -1468,19 +1474,15 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_fp_uop_table[XED_CATEGORY_SYSRET] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_SYSTEM] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_TBM] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_TSX_LDTRK] = ;  //new
-      m_fp_uop_table[XED_CATEGORY_UINTR] = ;  //new
       m_fp_uop_table[XED_CATEGORY_UNCOND_BR] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_VAES] = UOP_AES;
       m_fp_uop_table[XED_CATEGORY_VBMI2] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_VEX] = ;  //new
       m_fp_uop_table[XED_CATEGORY_VFMA] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_VIA_PADLOCK] = UOP_AES;
       m_fp_uop_table[XED_CATEGORY_VPCLMULQDQ] = UOP_PCLMUL;
       m_fp_uop_table[XED_CATEGORY_VTX] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_WAITPKG] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_WIDENOP] = UOP_FADD;
-      m_fp_uop_table[XED_CATEGORY_WRMSRNS] = ;  //new
       m_fp_uop_table[XED_CATEGORY_X87_ALU] = UOP_X87;
       m_fp_uop_table[XED_CATEGORY_XOP] = UOP_FADD;
       m_fp_uop_table[XED_CATEGORY_XSAVE] = UOP_XSAVE;
