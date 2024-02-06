@@ -160,6 +160,8 @@ string tr_opcode_names[106] = {
     "3DNOW",
     "ADOX_ADCX",
     "AES",
+    "AMX_TILE", //new
+    "APX",  //new
     "AVX",
     "AVX2",
     "AVX2GATHER",
@@ -169,6 +171,7 @@ string tr_opcode_names[106] = {
     "AVX512_BITALG",
     "AVX512_VBMI",
     "AVX512_VP2INTERSECT",
+    "AVX_IFMA", //new
     "BINARY",
     "BITBYTE",
     "BLEND",
@@ -193,13 +196,18 @@ string tr_opcode_names[106] = {
     "FCMOV",
     "FLAGOP",
     "FMA4",
+    "FP16", //new
     "GATHER",
     "GFNI",
+    "HRESET", //new
     "IFMA",
     "INTERRUPT",
     "IO",
     "IOSTRINGOP",
+    "KEYLOCKER",  //new
+    "KEYLOCKER_WIDE", //new
     "KMASK",
+    "LEGACY", //new
     "LOGICAL",
     "LOGICAL_FP",
     "LZCNT",
@@ -207,14 +215,16 @@ string tr_opcode_names[106] = {
     "MMX",
     "MOVDIR",
     "MPX",
+    "MSRLIST",  //new
     "NOP",
+    "PBNDKB", //new
     "PCLMULQDQ",
     "PCONFIG",
     "PKU",
     "POP",
     "PREFETCH",
     "PREFETCHWT1",
-    "PT",
+    "PTWRITE",  //modified
     "PUSH",
     "RDPID",
     "RDPRU",
@@ -226,9 +236,11 @@ string tr_opcode_names[106] = {
     "SCATTER",
     "SEGOP",
     "SEMAPHORE",
+    "SERIALIZE",  //new
     "SETCC",
     "SGX",
     "SHA",
+    "SHA512", //new
     "SHIFT",
     "SMAP",
     "SSE",
@@ -238,15 +250,19 @@ string tr_opcode_names[106] = {
     "SYSRET",
     "SYSTEM",
     "TBM",
+    "TSX_LDTRK",  //new
+    "UINTR",  //new
     "UNCOND_BR",
     "VAES",
     "VBMI2",
+    "VEX",  //new
     "VFMA",
     "VIA_PADLOCK",
     "VPCLMULQDQ",
     "VTX",
     "WAITPKG",
     "WIDENOP",
+    "WRMSRNS",  //new
     "X87_ALU",
     "XOP",
     "XSAVE",
