@@ -2163,7 +2163,7 @@ const char *cpu_decoder_c::g_tr_opcode_names[MAX_TR_OPCODE_NAME] = {
   "POP",
   "PREFETCH",
   "PREFETCHWT1",
-  "PTWRITE",      //new
+  "PTWRITE",      //modified
   "PUSH",
   "RDPID",
   "RDPRU",
