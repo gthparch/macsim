@@ -188,7 +188,7 @@ void Finish(void);
 void Initialize(void);
 void sanity_check(void);
 
-GLOBALCVAR CONTROL_MANAGER control;
+CONTROL_MANAGER control;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
