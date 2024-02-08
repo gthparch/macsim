@@ -155,7 +155,7 @@ string tr_cf_names[10] = {
     "CF_SYS",
     "CF_ICBR"};
 
-string tr_opcode_names[106] = {
+string tr_opcode_names[122] = {
     "INVALID",
     "3DNOW",
     "ADOX_ADCX",
