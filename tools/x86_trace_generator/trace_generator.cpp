@@ -906,7 +906,7 @@ void instrument(INS ins)
   // ----------------------------------------
   // Load instruction
   // ----------------------------------------
-  if (INS_IsMemoryRead(ins))
+  if (INS_IsMemoryRead(ins) && INS_Category(ins) != XED_CATEGORY_AMX_TILE)
   {
     // 2 memory loads
     if (INS_HasMemoryRead2(ins))
@@ -933,7 +933,7 @@ void instrument(INS ins)
   // ----------------------------------------
   // Store instruction
   // ----------------------------------------
-  if (INS_IsMemoryWrite(ins))
+  if (INS_IsMemoryWrite(ins) && INS_Category(ins) != XED_CATEGORY_AMX_TILE)
   {
     info->has_st = 1;
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)get_st_ea, IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
@@ -962,6 +962,10 @@ void instrument(INS ins)
   {
     //if (info->cf_type) {
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)get_target, IARG_BRANCH_TARGET_ADDR, IARG_BRANCH_TAKEN, IARG_THREAD_ID, IARG_END);
+  }
+
+  if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
+    // AMX Emulation
   }
 
   // ----------------------------------------
