@@ -195,14 +195,18 @@ CONTROL_MANAGER control;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
-  cerr << "Emulate tile load from addr " << addr << " to register " << REG_StringShort(reg) << endl;
+  #ifdef VERBOSE
+  cout << "Emulate tile load from addr " << addr << " to register " << REG_StringShort(reg) << endl;
+  #endif
   PIN_SafeCopy(&(TREGFILE[dst].data), addr, 256*sizeof(FLT32));
+  #ifdef VERBOSE
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      cerr << "\t" << TREGFILE[dst].data[i][j];
+      cout << "\t" << TREGFILE[dst].data[i][j];
     }
-    cerr << endl;
+    cout << endl;
   }
+  #endif
 
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
@@ -217,14 +221,18 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
 }
 
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
-  cerr << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
+  #ifdef
+  cout << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
+  #endif
   PIN_SafeCopy(addr, &(TREGFILE[src].data), 256*sizeof(FLT32));
+  #ifdef VERBOSE
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      cerr << "\t" << TREGFILE[dst].data[i][j];
+      cout << "\t" << TREGFILE[dst].data[i][j];
     }
-    cerr << endl;
+    cout << endl;
   }
+  #endif
 
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
@@ -966,6 +974,64 @@ void instrument(INS ins)
 
   if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
     // AMX Emulation
+    if (INS_Opcode(ins) == XED_ICLASS_TILELOAD) {
+      // emulate AMX Load
+      info->num_ld = 16;
+
+      REG r = INS_OperandReg(ins, 0);
+      REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
+      REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
+      UINT32 dst = r - REG_TMM0;
+      #ifdef VERBOSE
+      cout << "tileloadd " << REG_StringShort(r) << ", [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]" << endl;
+      #endif
+      INS_InsertCall(
+        ins, 
+        IPOINT_BEFORE, AFUNPTR(AMXLoad), 
+        IARG_UINT32, REG(INS_OperandReg(ins, 0)), 
+        IARG_MEMORYOP_EA, 0,
+        IARG_UINT32, dst,
+        IARG_THREAD_ID,
+        IARG_END
+      );
+    } else if (INS_Mnemonic(ins) == "TDPBF16PS") {
+      // emulate AMX GEMM
+      info->is_fp = 1;
+      REG r = INS_OperandReg(ins, 0);
+      REG ra = INS_OperandReg(ins, 1);
+      REG rb = INS_OperandReg(ins, 2);
+
+      if (!REG_is_tmm(r)) cerr << "opd 0 is not a register" << endl;
+      if (!REG_is_tmm(ra)) cerr << "opd 0 is not a register" << endl;
+      if (!REG_is_tmm(rb)) cerr << "opd 0 is not a register" << endl;
+      UINT32 dst = r - REG_TMM0;
+      UINT32 a = ra - REG_TMM0;
+      UINT32 b = rb - REG_TMM0;
+      #ifdef VERBOSE
+      cout << "tdpbf16ps" << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
+      #endif
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNC(AMXGEMM),
+        IARG_UINT32, dst,
+        IARG_UINT32, a,
+        IARG_UINT32, b,
+        IARG_THREAD_ID,
+        IARG_END
+      );
+    } else if (INS_Mnemonic(ins) == "TILEZERO") {
+      // emulate AMX Zero
+    } else if (INS_Mnemonic(ins) == "TILESTORED") {
+      // emulate AMX Store
+      info->has_st = 1;
+    } else if (INS_Mnemonic(ins) == "LDTILECFG") {
+      // emulate AMX tile config
+    } else if (INS_Mnemonic(ins) == "TILERELEASE") {
+      // emulate AMX Tile Release
+    } else {
+      cerr << "Unsupported AMX instruction" << endl;
+      exit(-1);
+    }
   }
 
   // ----------------------------------------
