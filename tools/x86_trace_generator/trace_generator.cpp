@@ -60,7 +60,7 @@ using namespace INSTLIB;
 #define ctr_t UINT64
 #define uns UINT32
 
-#define t_gen_ver 1.3
+#define t_gen_ver 1.5
 
 #define DUMMY_THREAD 100000
 
@@ -189,6 +189,73 @@ void Initialize(void);
 void sanity_check(void);
 
 CONTROL_MANAGER control;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AMX Emulation
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
+  cerr << "Emulate tile load from addr " << addr << " to register " << REG_StringShort(reg) << endl;
+  PIN_SafeCopy(&(TREGFILE[dst].data), addr, 256*sizeof(FLT32));
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cerr << "\t" << TREGFILE[dst].data[i][j];
+    }
+    cerr << endl;
+  }
+
+  // check thread is not a dummy and is being instrumented
+  tid = threadMap[tid];
+  THREAD_ENABLE_CHECK(tid);
+
+  Trace_info *tr_info = trace_info_array[tid];
+  if (tr_info == nullptr){
+    return;
+  }
+  tr_info->vaddr1 = *addr;
+  tr_info->mem_read_size = 64;
+}
+
+VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
+  cerr << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
+  PIN_SafeCopy(addr, &(TREGFILE[src].data), 256*sizeof(FLT32));
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cerr << "\t" << TREGFILE[dst].data[i][j];
+    }
+    cerr << endl;
+  }
+
+  // check thread is not a dummy and is being instrumented
+  tid = threadMap[tid];
+  THREAD_ENABLE_CHECK(tid);
+
+  Trace_info *tr_info = trace_info_array[tid];
+  if (tr_info == nullptr){
+    return;
+  }
+  tr_info->st_vaddr= *addr;
+  tr_info->mem_write_size = 64;
+}
+
+VOID AMXZero(UINT32 dst, THREADID tid) {
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j  < 16; j++) {
+      TREGFILE[dst].data[i][j] = 0.0f;
+    }
+  }
+}
+
+VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+  for (int m = 0; m < 16; m++) {
+    for (int n = 0; n < 16; n++) {
+      for (int k = 0; k < 16; k++) {
+        // dst = a * b'
+        TREGFILE[dst].data[m][n] += TREGFILE[a].data[m][k] * TREGFILE[b].data[n][k];
+      }
+    }
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)

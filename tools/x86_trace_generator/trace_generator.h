@@ -280,6 +280,13 @@ string tr_opcode_names[122] = {
     "CPU_OPCODE_LAST",
 };
 
+// AMX Emulation
+typedef struct {
+    FLT32 data[16][16];
+    UINT32 metadata[32][16];
+} TILE;
+TILE TREGFILE[8];
+
 /////////////////////////////////////////////////////////////////////////////////////////
 /// Function forward declaration
 void write_inst_to_file(ofstream *, Inst_info *);
