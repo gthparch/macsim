@@ -156,6 +156,12 @@ Knob(UINT64, Knob_max, "max", "0", "Max number of instruction to collect");
 Knob(UINT64, Knob_rtn_min, "rmin", "0", "Max number of function calls to collect data");
 Knob(UINT64, Knob_rtn_max, "rmax", "0", "Max number of function calls to collect data");
 
+// AMX Knobs
+/*
+Knob(UINT64, Knob_start_address, "trace_gen_start_address", "0x403320", "Start Address");
+Knob(UINT64, Knob_finish_address, "trace_gen_finish_address", "0x40371d", "Finish Address");
+*/
+
 //Added by Lifeng
 // knob variables and global variable
 //   for identifying benchmark annotations
@@ -221,7 +227,7 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
 }
 
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
-  #ifdef
+  #ifdef VERBOSE
   cout << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
   #endif
   PIN_SafeCopy(addr, &(TREGFILE[src].data), 256*sizeof(FLT32));
@@ -261,6 +267,14 @@ VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
         // dst = a * b'
         TREGFILE[dst].data[m][n] += TREGFILE[a].data[m][k] * TREGFILE[b].data[n][k];
       }
+    }
+  }
+}
+
+VOID AMXDot(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+  for (int m = 0; m < 16; m++) {
+    for (int n = 0; n < 16; n++) {
+      
     }
   }
 }
@@ -974,15 +988,15 @@ void instrument(INS ins)
 
   if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
     // AMX Emulation
-    if (INS_Opcode(ins) == XED_ICLASS_TILELOAD) {
+    if (INS_Mnemonic(ins) == "TILELOADD") {
       // emulate AMX Load
       info->num_ld = 16;
 
       REG r = INS_OperandReg(ins, 0);
-      REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
-      REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
       UINT32 dst = r - REG_TMM0;
       #ifdef VERBOSE
+      REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
+      REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
       cout << "tileloadd " << REG_StringShort(r) << ", [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]" << endl;
       #endif
       INS_InsertCall(
@@ -1012,7 +1026,7 @@ void instrument(INS ins)
       #endif
       INS_InsertCall(
         ins,
-        IPOINT_BEFORE, AFUNC(AMXGEMM),
+        IPOINT_BEFORE, AFUNPTR(AMXGEMM),
         IARG_UINT32, dst,
         IARG_UINT32, a,
         IARG_UINT32, b,
@@ -1040,13 +1054,13 @@ void instrument(INS ins)
       // emulate AMX Store
       info->has_st = 1;
       REG r = INS_OperandReg(ins, 1);
-      REG base_reg = INS_OperandMemoryBaseReg(ins, 0);
-      REG index_reg = INS_OperandMemoryIndexReg(ins, 0);
       if (!REG_is_tmm(r)){
         cout << "opd 1 is not a register" << endl;
       }
       UINT32 src = r - REG_TMM0;
       #ifdef VERBOSE
+      REG base_reg = INS_OperandMemoryBaseReg(ins, 0);
+      REG index_reg = INS_OperandMemoryIndexReg(ins, 0);
       cout << "tilestored [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "], " << REG_StringShort(r) << endl;
       #endif
       INS_InsertCall(
@@ -1071,8 +1085,8 @@ void instrument(INS ins)
       #endif
       INS_Delete(ins);
     } else {
-      cerr << "Unsupported AMX instruction" << endl;
-      exit(-1);
+      cerr << "Unsupported AMX instruction: " << INS_Mnemonic(ins) << endl;
+      //exit(-1);
     }
   }
 
