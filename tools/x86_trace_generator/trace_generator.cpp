@@ -1021,13 +1021,55 @@ void instrument(INS ins)
       );
     } else if (INS_Mnemonic(ins) == "TILEZERO") {
       // emulate AMX Zero
+      REG r = INS_OperandReg(ins, 0);
+      if (!REG_is_tmm(r)) {
+        cout << "opd 0 is not a register" << endl;
+      }
+      #ifdef VERBOSE
+      cout << "tilezero" << REG_StringShort(r) << endl;
+      #endif
+      UINT32 dst = r - REG_TMM0;
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNPTR(AMXZero),
+        IARG_UINT32, dst,
+        IARG_THREAD_ID,
+        IARG_END
+      );
     } else if (INS_Mnemonic(ins) == "TILESTORED") {
       // emulate AMX Store
       info->has_st = 1;
+      REG r = INS_OperandReg(ins, 1);
+      REG base_reg = INS_OperandMemoryBaseReg(ins, 0);
+      REG index_reg = INS_OperandMemoryIndexReg(ins, 0);
+      if (!REG_is_tmm(r)){
+        cout << "opd 1 is not a register" << endl;
+      }
+      UINT32 src = r - REG_TMM0;
+      #ifdef VERBOSE
+      cout << "tilestored [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "], " << REG_StringShort(r) << endl;
+      #endif
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNPTR(AMXStore),
+        IARG_UINT32, REG(INS_OperandReg(ins, 1)),
+        IARG_MEMORYOP_EA, 0,
+        IARG_UINT32, src,
+        IARG_THREAD_ID,
+        IARG_END
+      );
     } else if (INS_Mnemonic(ins) == "LDTILECFG") {
       // emulate AMX tile config
+      // NOTE: unimplemented
+      #ifdef VERBOSE
+      cout << "ldtilecfg" << endl;
+      #endif
     } else if (INS_Mnemonic(ins) == "TILERELEASE") {
       // emulate AMX Tile Release
+      #ifdef VERBOSE
+      cout << "tilerelease" << endl;
+      #endif
+      INS_Delete(ins);
     } else {
       cerr << "Unsupported AMX instruction" << endl;
       exit(-1);
@@ -1045,6 +1087,11 @@ void instrument(INS ins)
   if (print_inst)
   {
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)dprint_inst, IARG_INST_PTR, IARG_PTR, new string(INS_Disassemble(ins)), IARG_THREAD_ID, IARG_END);
+  }
+
+  // any other AMX instruction
+  if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
+    INS_Delete(ins);
   }
 }
 
