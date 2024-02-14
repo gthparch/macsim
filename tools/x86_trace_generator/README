@@ -1,4 +1,4 @@
-Please use Pin 3.13  (version number 56759) for the current trace generator 
+Please use Pin 3.30  (version number 98830) for the current trace generator 
 
 How to generate x86 traces
   1. copy macsim/tools/x86_trace_generator/libzlib.a into <pin-dir>/extras/xed-intel64/lib/
