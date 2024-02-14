@@ -271,14 +271,6 @@ VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   }
 }
 
-VOID AMXDot(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
-  for (int m = 0; m < 16; m++) {
-    for (int n = 0; n < 16; n++) {
-
-    }
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1008,7 +1000,11 @@ void instrument(INS ins)
         IARG_THREAD_ID,
         IARG_END
       );
-    } else if (INS_Mnemonic(ins) == "TDPBF16PS") {
+    } else if (INS_Mnemonic(ins) == "TDPBF16PS" || 
+              INS_Mnemonic(ins) == "TDPBSSD" || 
+              INS_Mnemonic(ins) == "TDPBUSD" || 
+              INS_Mnemonic(ins) == "TDPBSUD" || 
+              INS_Mnemonic(ins) == "TDPBUUD") {
       // emulate AMX GEMM
       info->is_fp = 1;
       REG r = INS_OperandReg(ins, 0);
@@ -1022,7 +1018,33 @@ void instrument(INS ins)
       UINT32 a = ra - REG_TMM0;
       UINT32 b = rb - REG_TMM0;
       #ifdef VERBOSE
-      cout << "tdpbf16ps" << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
+      std::string opcode = INS_Mnemonic(ins);
+      cout << tolower(opcode) << " " << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
+      #endif
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNPTR(AMXGEMM),
+        IARG_UINT32, dst,
+        IARG_UINT32, a,
+        IARG_UINT32, b,
+        IARG_THREAD_ID,
+        IARG_END
+      );
+    } else if (INS_Mnemonic(ins) == "TDPBSSD" || INS_Mnemonic(ins) == "TDPBUSD" || INS_Mnemonic(ins) == "TDPBSUD" || INS_Mnemonic(ins) == "TDPBUUD") {
+      // emulate AMX GEMM
+      info->is_fp = 1;
+      REG r = INS_OperandReg(ins, 0);
+      REG ra = INS_OperandReg(ins, 1);
+      REG rb = INS_OperandReg(ins, 2);
+
+      if (!REG_is_tmm(r)) cerr << "opd 0 is not a tile register" << endl;
+      if (!REG_is_tmm(ra)) cerr << "opd 1 is not a tile register" << endl;
+      if (!REG_is_tmm(rb)) cerr << "opd 2 is not a tile register" << endl;
+      UINT32 dst = r - REG_TMM0;
+      UINT32 a = ra - REG_TMM0;
+      UINT32 b = rb - REG_TMM0;
+      #ifdef VERBOSE
+      cout << "tdpbssd" << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
       #endif
       INS_InsertCall(
         ins,
