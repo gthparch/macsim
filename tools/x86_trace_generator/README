@@ -6,7 +6,7 @@ How to generate x86 traces
   3. Simpoint - Mostly we use SimPoint (PinPoint). Follow instruction
      in $PINHOME/source/tools/PinPoints
 
-  2. Otherwise - Fix trace generator module based on your needs. Then,
+  4. Otherwise - Fix trace generator module based on your needs. Then,
      pin -t trace_generator.so -- $BIN $ARGS
 
      [1] Install Pin  (https://software.intel.com/content/www/us/en/develop/articles/pin-a-dynamic-binary-instrumentation-tool.html) 
@@ -17,7 +17,7 @@ How to generate x86 traces
           into $PIN_ROOT/intel64/lib/ and $PIN_ROOT/extras/xed-intel64/lib
 
      [4] make 
-     
+
      [5] pin -t obj-intel64/trace_generator.so - $BIN $ARGS 
 
 
