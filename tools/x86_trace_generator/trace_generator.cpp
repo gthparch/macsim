@@ -274,7 +274,7 @@ VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
 VOID AMXDot(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   for (int m = 0; m < 16; m++) {
     for (int n = 0; n < 16; n++) {
-      
+
     }
   }
 }
@@ -1015,9 +1015,9 @@ void instrument(INS ins)
       REG ra = INS_OperandReg(ins, 1);
       REG rb = INS_OperandReg(ins, 2);
 
-      if (!REG_is_tmm(r)) cerr << "opd 0 is not a register" << endl;
-      if (!REG_is_tmm(ra)) cerr << "opd 0 is not a register" << endl;
-      if (!REG_is_tmm(rb)) cerr << "opd 0 is not a register" << endl;
+      if (!REG_is_tmm(r)) cerr << "opd 0 is not a tile register" << endl;
+      if (!REG_is_tmm(ra)) cerr << "opd 1 is not a tile register" << endl;
+      if (!REG_is_tmm(rb)) cerr << "opd 2 is not a tile register" << endl;
       UINT32 dst = r - REG_TMM0;
       UINT32 a = ra - REG_TMM0;
       UINT32 b = rb - REG_TMM0;
@@ -1037,7 +1037,7 @@ void instrument(INS ins)
       // emulate AMX Zero
       REG r = INS_OperandReg(ins, 0);
       if (!REG_is_tmm(r)) {
-        cout << "opd 0 is not a register" << endl;
+        cout << "opd 0 is not a tile register" << endl;
       }
       #ifdef VERBOSE
       cout << "tilezero" << REG_StringShort(r) << endl;
@@ -1055,7 +1055,7 @@ void instrument(INS ins)
       info->has_st = 1;
       REG r = INS_OperandReg(ins, 1);
       if (!REG_is_tmm(r)){
-        cout << "opd 1 is not a register" << endl;
+        cout << "opd 1 is not a tile register" << endl;
       }
       UINT32 src = r - REG_TMM0;
       #ifdef VERBOSE
