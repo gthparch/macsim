@@ -64,6 +64,8 @@ using namespace INSTLIB;
 
 #define DUMMY_THREAD 100000
 
+#define VERBOSE
+
 #define THREAD_ENABLE_CHECK(tid)          \
   if ((tid) == DUMMY_THREAD)              \
     return;                               \
@@ -200,15 +202,33 @@ CONTROL_MANAGER control;
 // AMX Emulation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*TODO: Make different load (and store) (or make variable) for INT8 and BF16 types*/
 VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
   #ifdef VERBOSE
   cout << "Emulate tile load from addr " << addr << " to register " << REG_StringShort(reg) << endl;
   #endif
-  PIN_SafeCopy(&(TREGFILE[dst].data), addr, 256*sizeof(FLT32));
   #ifdef VERBOSE
+  cout << "Data in memory:" << endl;
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      cout << "\t" << TREGFILE[dst].data[i][j];
+      cout << "\t" << ((uint8_t*) addr)[i*16 + j]; // doesn't print???
+    }
+    cout << endl;
+  }
+  #endif
+  UINT8 buf[16*16];
+  PIN_SafeCopy(&buf, (UINT8*)(addr), 256*sizeof(UINT8));
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      TREGFILE[dst].data[i * 16 + j] = (FLT32)(buf[i*16 + j]);
+    }
+    cout << endl;
+  }
+  #ifdef VERBOSE
+  cout << "Data in register:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << TREGFILE[dst].data[i * 16 + j];
     }
     cout << endl;
   }
@@ -229,12 +249,26 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
   #ifdef VERBOSE
   cout << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
-  #endif
-  PIN_SafeCopy(addr, &(TREGFILE[src].data), 256*sizeof(FLT32));
-  #ifdef VERBOSE
+  cout << "Data in register:" << endl;
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      cout << "\t" << TREGFILE[dst].data[i][j];
+      cout << "\t" << TREGFILE[src].data[i * 16 + j];
+    }
+    cout << endl;
+  }
+  #endif
+  UINT8 buf[16*16];
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j ++) {
+      buf[i*16 + j] = ((UINT8*)(TREGFILE[src].data))[i * 16 + j];
+    }
+  }
+  PIN_SafeCopy((UINT*)(addr), &buf, 256*sizeof(UINT8));
+  #ifdef VERBOSE
+  cout << "Data in memory:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << ((uint8_t*) addr)[i * 16 + j]; // doesn't print???
     }
     cout << endl;
   }
@@ -253,22 +287,77 @@ VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
 }
 
 VOID AMXZero(UINT32 dst, THREADID tid) {
+  #ifdef VERBOSE
+  cout << "Emulate tilezero in tmm" << dst << endl;
+  #endif
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j  < 16; j++) {
-      TREGFILE[dst].data[i][j] = 0.0f;
+      TREGFILE[dst].data[i * 16 + j] = 0.0f;
     }
   }
 }
 
-VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+VOID AMXBF16MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+  #ifdef VERBOSE
+  cout << "Emulate BF16 matrix multiply with tmm" << dst << " <- tmm" << a << " * tmm" << b << endl;
+  #endif
   for (int m = 0; m < 16; m++) {
     for (int n = 0; n < 16; n++) {
-      for (int k = 0; k < 16; k++) {
+      for (int k = 0; k < 32; k++) {
         // dst = a * b'
-        TREGFILE[dst].data[m][n] += TREGFILE[a].data[m][k] * TREGFILE[b].data[n][k];
+        TREGFILE[dst].data[m * 16 + n] += TREGFILE[a].data[m * 16 + k] * TREGFILE[b].data[k * 32 + n];
       }
     }
   }
+  #ifdef VERBOSE
+  cout << "Data in dst reg:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << TREGFILE[dst].data[i * 16 + j];
+    }
+    cout << endl;
+  }
+  #endif
+}
+
+VOID AMXINT8MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+  #ifdef VERBOSE
+  cout << "Emulate INT8 matrix multiply with tmm" << dst << " <- tmm" << a << " * tmm" << b << endl;
+  #endif
+  UINT8* treg_dst = (UINT8*)(&TREGFILE[dst].data);
+  UINT8* treg_a = (UINT8*)(&TREGFILE[a].data);
+  UINT8* treg_b = (UINT8*)(&TREGFILE[b].data);
+  for (int m = 0; m < 16; m++) {
+    for (int n = 0; n < 16; n++) {
+      for (int k = 0; k < 64; k++) {
+        // dst = a * b'
+        treg_dst[m * 16 + n] += treg_a[m * 16 + k] * treg_b[k * 64 + n];
+      }
+    }
+  }
+  #ifdef VERBOSE
+  cout << "Data in treg a:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << (UINT32)treg_a[i * 16 + j];
+    }
+    cout << endl;
+  }
+  cout << "Data in treg b:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << (UINT32)treg_b[i * 16 + j];
+    }
+    cout << endl;
+  }
+  cout << "Data in dst reg:" << endl;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) {
+      cout << "\t" << treg_dst[i * 16 + j]; // not printing?????????????????????
+    }
+    cout << endl;
+  }
+  #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -986,26 +1075,50 @@ void instrument(INS ins)
 
       REG r = INS_OperandReg(ins, 0);
       UINT32 dst = r - REG_TMM0;
-      #ifdef VERBOSE
       REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
       REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
+      #ifdef VERBOSE
       cout << "tileloadd " << REG_StringShort(r) << ", [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]" << endl;
       #endif
       INS_InsertCall(
         ins, 
         IPOINT_BEFORE, AFUNPTR(AMXLoad), 
         IARG_UINT32, REG(INS_OperandReg(ins, 0)), 
-        IARG_MEMORYOP_EA, 0,
+        IARG_MEMORYOP_PTR, 0,
         IARG_UINT32, dst,
         IARG_THREAD_ID,
         IARG_END
       );
-    } else if (INS_Mnemonic(ins) == "TDPBF16PS" || 
-              INS_Mnemonic(ins) == "TDPBSSD" || 
+    } else if (INS_Mnemonic(ins) == "TDPBF16PS") {
+      // emulate AMX GEMM for BF16
+      info->is_fp = 1;
+      REG r = INS_OperandReg(ins, 0);
+      REG ra = INS_OperandReg(ins, 1);
+      REG rb = INS_OperandReg(ins, 2);
+
+      if (!REG_is_tmm(r)) cerr << "opd 0 is not a tile register" << endl;
+      if (!REG_is_tmm(ra)) cerr << "opd 1 is not a tile register" << endl;
+      if (!REG_is_tmm(rb)) cerr << "opd 2 is not a tile register" << endl;
+      UINT32 dst = r - REG_TMM0;
+      UINT32 a = ra - REG_TMM0;
+      UINT32 b = rb - REG_TMM0;
+      #ifdef VERBOSE
+      cout << "tdpbf16ps" << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
+      #endif
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNPTR(AMXBF16MM),
+        IARG_UINT32, dst,
+        IARG_UINT32, a,
+        IARG_UINT32, b,
+        IARG_THREAD_ID,
+        IARG_END
+      );
+    } else if (INS_Mnemonic(ins) == "TDPBSSD" || 
               INS_Mnemonic(ins) == "TDPBUSD" || 
-              INS_Mnemonic(ins) == "TDPBSUD" || 
+              INS_Mnemonic(ins) == "TDPBSUD" ||   
               INS_Mnemonic(ins) == "TDPBUUD") {
-      // emulate AMX GEMM
+      // emulate AMX GEMM for INT8
       info->is_fp = 1;
       REG r = INS_OperandReg(ins, 0);
       REG ra = INS_OperandReg(ins, 1);
@@ -1019,36 +1132,12 @@ void instrument(INS ins)
       UINT32 b = rb - REG_TMM0;
       #ifdef VERBOSE
       std::string opcode = INS_Mnemonic(ins);
-      cout << tolower(opcode) << " " << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
+      transform(opcode.begin(), opcode.end(), opcode.begin(), ::tolower);
+      cout << opcode << " " << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
       #endif
       INS_InsertCall(
         ins,
-        IPOINT_BEFORE, AFUNPTR(AMXGEMM),
-        IARG_UINT32, dst,
-        IARG_UINT32, a,
-        IARG_UINT32, b,
-        IARG_THREAD_ID,
-        IARG_END
-      );
-    } else if (INS_Mnemonic(ins) == "TDPBSSD" || INS_Mnemonic(ins) == "TDPBUSD" || INS_Mnemonic(ins) == "TDPBSUD" || INS_Mnemonic(ins) == "TDPBUUD") {
-      // emulate AMX GEMM
-      info->is_fp = 1;
-      REG r = INS_OperandReg(ins, 0);
-      REG ra = INS_OperandReg(ins, 1);
-      REG rb = INS_OperandReg(ins, 2);
-
-      if (!REG_is_tmm(r)) cerr << "opd 0 is not a tile register" << endl;
-      if (!REG_is_tmm(ra)) cerr << "opd 1 is not a tile register" << endl;
-      if (!REG_is_tmm(rb)) cerr << "opd 2 is not a tile register" << endl;
-      UINT32 dst = r - REG_TMM0;
-      UINT32 a = ra - REG_TMM0;
-      UINT32 b = rb - REG_TMM0;
-      #ifdef VERBOSE
-      cout << "tdpbssd" << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
-      #endif
-      INS_InsertCall(
-        ins,
-        IPOINT_BEFORE, AFUNPTR(AMXGEMM),
+        IPOINT_BEFORE, AFUNPTR(AMXINT8MM),
         IARG_UINT32, dst,
         IARG_UINT32, a,
         IARG_UINT32, b,
