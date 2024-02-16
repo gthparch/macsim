@@ -282,8 +282,9 @@ string tr_opcode_names[122] = {
 };
 
 // AMX Emulation
-typedef struct {
-    FLT32 data[16*64];
+typedef union {
+    FLT32 fp_data[16][32];
+    UINT8 int_data[16][64];
 } TILE;
 TILE TREGFILE[8];
 

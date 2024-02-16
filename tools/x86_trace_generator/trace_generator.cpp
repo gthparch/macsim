@@ -210,25 +210,25 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
   #ifdef VERBOSE
   cout << "Data in memory:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << ((uint8_t*) addr)[i*16 + j]; // doesn't print???
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)((uint8_t*) addr)[i*16 + j]; 
     }
     cout << endl;
   }
   #endif
-  UINT8 buf[16*16];
-  PIN_SafeCopy(&buf, (UINT8*)(addr), 256*sizeof(UINT8));
+  UINT8 buf[16][64];
+  PIN_SafeCopy(&buf, (UINT8*)(addr), 16*64*sizeof(UINT8));
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      TREGFILE[dst].data[i * 16 + j] = (FLT32)(buf[i*16 + j]);
+    for (int j = 0; j < 64; j++) {
+      TREGFILE[dst].int_data[i][j] = buf[i][j];
     }
     cout << endl;
   }
   #ifdef VERBOSE
   cout << "Data in register:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << TREGFILE[dst].data[i * 16 + j];
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)TREGFILE[dst].int_data[i][j];
     }
     cout << endl;
   }
@@ -251,24 +251,25 @@ VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
   cout << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
   cout << "Data in register:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << TREGFILE[src].data[i * 16 + j];
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)TREGFILE[src].int_data[i][j];
     }
     cout << endl;
   }
   #endif
-  UINT8 buf[16*16];
+  UINT8 buf[16][64];
+  PIN_SafeCopy(&buf, &(TREGFILE[src].int_data), 16*64*sizeof(UINT8));
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j ++) {
-      buf[i*16 + j] = ((UINT8*)(TREGFILE[src].data))[i * 16 + j];
+    for (int j = 0; j < 64; j ++) {
+      ((uint8_t*) addr)[i*16 + j] = buf[i][j];
     }
   }
-  PIN_SafeCopy((UINT*)(addr), &buf, 256*sizeof(UINT8));
+  // PIN_SafeCopy((UINT*)(addr), &buf, 1024*sizeof(UINT8));
   #ifdef VERBOSE
   cout << "Data in memory:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << ((uint8_t*) addr)[i * 16 + j]; // doesn't print???
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)((uint8_t*) addr)[i*16 + j];
     }
     cout << endl;
   }
@@ -291,8 +292,8 @@ VOID AMXZero(UINT32 dst, THREADID tid) {
   cout << "Emulate tilezero in tmm" << dst << endl;
   #endif
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j  < 16; j++) {
-      TREGFILE[dst].data[i * 16 + j] = 0.0f;
+    for (int j = 0; j  < 32; j++) {
+      TREGFILE[dst].fp_data[i][j] = 0.0f;
     }
   }
 }
@@ -305,7 +306,7 @@ VOID AMXBF16MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
     for (int n = 0; n < 16; n++) {
       for (int k = 0; k < 32; k++) {
         // dst = a * b'
-        TREGFILE[dst].data[m * 16 + n] += TREGFILE[a].data[m * 16 + k] * TREGFILE[b].data[k * 32 + n];
+        TREGFILE[dst].fp_data[m][n] += TREGFILE[a].fp_data[m][k] * TREGFILE[b].fp_data[n][k];
       }
     }
   }
@@ -313,7 +314,7 @@ VOID AMXBF16MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   cout << "Data in dst reg:" << endl;
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      cout << "\t" << TREGFILE[dst].data[i * 16 + j];
+      cout << " " << TREGFILE[dst].fp_data[i][j];
     }
     cout << endl;
   }
@@ -324,36 +325,33 @@ VOID AMXINT8MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   #ifdef VERBOSE
   cout << "Emulate INT8 matrix multiply with tmm" << dst << " <- tmm" << a << " * tmm" << b << endl;
   #endif
-  UINT8* treg_dst = (UINT8*)(&TREGFILE[dst].data);
-  UINT8* treg_a = (UINT8*)(&TREGFILE[a].data);
-  UINT8* treg_b = (UINT8*)(&TREGFILE[b].data);
   for (int m = 0; m < 16; m++) {
     for (int n = 0; n < 16; n++) {
       for (int k = 0; k < 64; k++) {
         // dst = a * b'
-        treg_dst[m * 16 + n] += treg_a[m * 16 + k] * treg_b[k * 64 + n];
+        TREGFILE[dst].int_data[m][n] += TREGFILE[a].int_data[m][k] * TREGFILE[b].int_data[n][k];
       }
     }
   }
   #ifdef VERBOSE
   cout << "Data in treg a:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << (UINT32)treg_a[i * 16 + j];
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)TREGFILE[a].int_data[i][j];
     }
     cout << endl;
   }
   cout << "Data in treg b:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << (UINT32)treg_b[i * 16 + j];
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)TREGFILE[b].int_data[i][j];
     }
     cout << endl;
   }
-  cout << "Data in dst reg:" << endl;
+  cout << "Data in dst reg after matmul:" << endl;
   for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
-      cout << "\t" << treg_dst[i * 16 + j]; // not printing?????????????????????
+    for (int j = 0; j < 64; j++) {
+      cout << " " << (UINT32)TREGFILE[dst].int_data[i][j]; 
     }
     cout << endl;
   }
