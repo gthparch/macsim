@@ -199,47 +199,16 @@ void sanity_check(void);
 CONTROL_MANAGER control;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-// AMX Emulation
+// AMX Handling
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*TODO: Make different load (and store) (or make variable) for INT8 and BF16 types*/
 VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
-  // #ifdef VERBOSE
-  // cout << "Emulate tile load from addr " << addr << " to register " << REG_StringShort(reg) << endl;
-  // #endif
-  // #ifdef VERBOSE
-  // cout << "Data in memory:" << endl;
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j++) {
-  //     cout << " " << (UINT32)((uint8_t*) addr)[i*16 + j]; 
-  //   }
-  //   cout << endl;
-  // }
-  // #endif
-  // UINT8 buf[16][64];
-  // PIN_SafeCopy(&buf, (UINT8*)(addr), 16*64*sizeof(UINT8));
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j++) {
-  //     TREGFILE[dst].int_data[i][j] = buf[i][j];
-  //   }
-  //   cout << endl;
-  // }
-  // #ifdef VERBOSE
-  // cout << "Data in register:" << endl;
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j++) {
-  //     cout << " " << (UINT32)TREGFILE[dst].int_data[i][j];
-  //   }
-  //   cout << endl;
-  // }
-  // #endif
-
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info *tr_info = trace_info_array[tid];
-  if (tr_info == nullptr){
+  if (tr_info == nullptr || !PIN_IsAmxActive(tid)){
     return;
   }
   tr_info->vaddr1 = *addr;
@@ -247,40 +216,12 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
 }
 
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
-  // #ifdef VERBOSE
-  // cout << "Emulate tile store from reg " << REG_StringShort(reg) << " to addr " << addr << endl;
-  // cout << "Data in register:" << endl;
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j++) {
-  //     cout << " " << (UINT32)TREGFILE[src].int_data[i][j];
-  //   }
-  //   cout << endl;
-  // }
-  // #endif
-  // UINT8 buf[16][64];
-  // PIN_SafeCopy(&buf, &(TREGFILE[src].int_data), 16*64*sizeof(UINT8));
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j ++) {
-  //     ((uint8_t*) addr)[i*16 + j] = buf[i][j];
-  //   }
-  // }
-  // // PIN_SafeCopy((UINT*)(addr), &buf, 1024*sizeof(UINT8));
-  // #ifdef VERBOSE
-  // cout << "Data in memory:" << endl;
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 64; j++) {
-  //     cout << " " << (UINT32)((uint8_t*) addr)[i*16 + j];
-  //   }
-  //   cout << endl;
-  // }
-  // #endif
-
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
 
   Trace_info *tr_info = trace_info_array[tid];
-  if (tr_info == nullptr){
+  if (tr_info == nullptr || !PIN_IsAmxActive(tid)){
     return;
   }
   tr_info->st_vaddr= *addr;
@@ -288,79 +229,19 @@ VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
 }
 
 VOID AMXZero(UINT32 dst, THREADID tid) {
-  // #ifdef VERBOSE
-  // cout << "Emulate tilezero in tmm" << dst << endl;
-  // #endif
   Trace_info *tr_info = trace_info_array[tid];
-  if (tr_info == nullptr) {
+  if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
   }
   // is there anything I need to do here?
 }
 
 VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
-  // #ifdef VERBOSE
-  // cout << "Emulate BF16 matrix multiply with tmm" << dst << " <- tmm" << a << " * tmm" << b << endl;
-  // #endif
-  // for (int m = 0; m < 16; m++) {
-  //   for (int n = 0; n < 16; n++) {
-  //     for (int k = 0; k < 32; k++) {
-  //       // dst = a * b'
-  //       TREGFILE[dst].fp_data[m][n] += TREGFILE[a].fp_data[m][k] * TREGFILE[b].fp_data[n][k];
-  //     }
-  //   }
-  // }
-  // #ifdef VERBOSE
-  // cout << "Data in dst reg:" << endl;
-  // for (int i = 0; i < 16; i++) {
-  //   for (int j = 0; j < 16; j++) {
-  //     cout << " " << TREGFILE[dst].fp_data[i][j];
-  //   }
-  //   cout << endl;
-  // }
-  // #endif
   Trace_info *tr_info = trace_info_array[tid];
-  if (tr_info == nullptr) {
+  if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
   }
 }
-
-// VOID AMXINT8MM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
-//   #ifdef VERBOSE
-//   cout << "Emulate INT8 matrix multiply with tmm" << dst << " <- tmm" << a << " * tmm" << b << endl;
-//   #endif
-//   for (int m = 0; m < 16; m++) {
-//     for (int n = 0; n < 16; n++) {
-//       for (int k = 0; k < 64; k++) {
-//         // dst = a * b'
-//         TREGFILE[dst].int_data[m][n] += TREGFILE[a].int_data[m][k] * TREGFILE[b].int_data[n][k];
-//       }
-//     }
-//   }
-//   #ifdef VERBOSE
-//   cout << "Data in treg a:" << endl;
-//   for (int i = 0; i < 16; i++) {
-//     for (int j = 0; j < 64; j++) {
-//       cout << " " << (UINT32)TREGFILE[a].int_data[i][j];
-//     }
-//     cout << endl;
-//   }
-//   cout << "Data in treg b:" << endl;
-//   for (int i = 0; i < 16; i++) {
-//     for (int j = 0; j < 64; j++) {
-//       cout << " " << (UINT32)TREGFILE[b].int_data[i][j];
-//     }
-//     cout << endl;
-//   }
-//   cout << "Data in dst reg after matmul:" << endl;
-//   for (int i = 0; i < 16; i++) {
-//     for (int j = 0; j < 64; j++) {
-//       cout << " " << (UINT32)TREGFILE[dst].int_data[i][j]; 
-//     }
-//     cout << endl;
-//   }
-//   #endif
-// }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // control handler for pinpoint (simpoint)
