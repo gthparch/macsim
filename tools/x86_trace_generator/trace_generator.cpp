@@ -64,7 +64,7 @@ using namespace INSTLIB;
 
 #define DUMMY_THREAD 100000
 
-#define VERBOSE
+//#define VERBOSE
 
 #define THREAD_ENABLE_CHECK(tid)          \
   if ((tid) == DUMMY_THREAD)              \
@@ -955,13 +955,13 @@ void instrument(INS ins)
   // ----------------------------------------
   if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
     if (INS_Mnemonic(ins) == "TILELOADD") {
-      info->num_ld = 16;
+      info->num_ld = 16; // TODO: figure out how to uncap this -- it needs to be the size of the config region (at most 1024), but it capped at 16
 
       REG r = INS_OperandReg(ins, 0);
       UINT32 dst = r - REG_TMM0;
+      #ifdef VERBOSE
       REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
       REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
-      #ifdef VERBOSE
       cout << "tileloadd " << REG_StringShort(r) << ", [" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]" << endl;
       #endif
       INS_InsertCall(
@@ -1003,36 +1003,6 @@ void instrument(INS ins)
         IARG_THREAD_ID,
         IARG_END
       );
-    // } else if (INS_Mnemonic(ins) == "TDPBSSD" || 
-    //           INS_Mnemonic(ins) == "TDPBUSD" || 
-    //           INS_Mnemonic(ins) == "TDPBSUD" ||   
-    //           INS_Mnemonic(ins) == "TDPBUUD") {
-    //   // emulate AMX GEMM for INT8
-    //   info->is_fp = 1;
-    //   REG r = INS_OperandReg(ins, 0);
-    //   REG ra = INS_OperandReg(ins, 1);
-    //   REG rb = INS_OperandReg(ins, 2);
-
-    //   if (!REG_is_tmm(r)) cerr << "opd 0 is not a tile register" << endl;
-    //   if (!REG_is_tmm(ra)) cerr << "opd 1 is not a tile register" << endl;
-    //   if (!REG_is_tmm(rb)) cerr << "opd 2 is not a tile register" << endl;
-    //   UINT32 dst = r - REG_TMM0;
-    //   UINT32 a = ra - REG_TMM0;
-    //   UINT32 b = rb - REG_TMM0;
-    //   #ifdef VERBOSE
-    //   std::string opcode = INS_Mnemonic(ins);
-    //   transform(opcode.begin(), opcode.end(), opcode.begin(), ::tolower);
-    //   cout << opcode << " " << REG_StringShort(r) << ", " << REG_StringShort(ra) << ", " << REG_StringShort(rb) << endl;
-    //   #endif
-    //   INS_InsertCall(
-    //     ins,
-    //     IPOINT_BEFORE, AFUNPTR(AMXINT8MM),
-    //     IARG_UINT32, dst,
-    //     IARG_UINT32, a,
-    //     IARG_UINT32, b,
-    //     IARG_THREAD_ID,
-    //     IARG_END
-    //   );
     } else if (INS_Mnemonic(ins) == "TILEZERO") {
       REG r = INS_OperandReg(ins, 0);
       if (!REG_is_tmm(r)) {
@@ -1078,7 +1048,6 @@ void instrument(INS ins)
       #ifdef VERBOSE
       cout << "tilerelease" << endl;
       #endif
-      INS_Delete(ins);
     } else {
       cerr << "Unsupported AMX instruction: " << INS_Mnemonic(ins) << endl;
       exit(-1);
@@ -1096,11 +1065,6 @@ void instrument(INS ins)
   if (print_inst)
   {
     INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)dprint_inst, IARG_INST_PTR, IARG_PTR, new string(INS_Disassemble(ins)), IARG_THREAD_ID, IARG_END);
-  }
-
-  // any other AMX instruction
-  if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
-    INS_Delete(ins);
   }
 }
 
