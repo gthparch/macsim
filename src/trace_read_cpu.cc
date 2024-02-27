@@ -854,6 +854,10 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     trace_uop[0]->m_rep_uop_num = dyn_uop_counter;
   }  // XED_CATEGORY_STRINGOP
 
+  if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+    // handle AMX tile instructions
+  } // XED_CATEGORY_AMX_TILE
+
   ASSERT(dyn_uop_counter);
 
   // set eom flag and next pc address for the last uop of this instruction

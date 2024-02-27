@@ -212,7 +212,7 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
     return;
   }
   tr_info->vaddr1 = *addr;
-  tr_info->mem_read_size = 1024;
+  tr_info->mem_read_size = 64;
 }
 
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
