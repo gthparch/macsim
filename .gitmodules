@@ -1,6 +1,6 @@
 [submodule "internal"]
 	path = internal
-	url = https://github.com/gthparch/macsim_internal
+	url = git@github.com:gthparch/macsim_internal.git
 [submodule "src/rwqueue"]
 	path = src/rwqueue
 	url = https://github.com/cameron314/readerwriterqueue

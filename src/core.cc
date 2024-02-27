@@ -377,7 +377,7 @@ void core_c::run_a_cycle(bool pll_lock) {
 
   // to simulate kernel invocation from host code
   if (*KNOB(KNOB_ENABLE_CONDITIONAL_EXECUTION)) {
-    if (m_core_type == "ptx" && m_simBase->m_gpu_paused) {
+    if ((m_core_type == "ptx" || m_core_type == "nvbit") && m_simBase->m_gpu_paused) {
       m_frontend->stop();
     }
   }
@@ -706,7 +706,7 @@ void core_c::train_hw_pref(int level, int tid, Addr addr, Addr pc, uop_c* uop,
 // hardware prefetcher initialization
 void core_c::pref_init(void) {
   if (*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON && m_knob_enable_pref) {
-    m_hw_pref->pref_init(m_core_type == "ptx" ? true : false);
+    m_hw_pref->pref_init((m_core_type == "ptx") || (m_core_type == "nvbit") ? true : false);
   }
 }
 
