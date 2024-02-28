@@ -279,6 +279,17 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
       trace_uop->m_va = MIN2((pi->m_st_vaddr + rep_offset) * amp_val, MAX_ADDR);
       trace_uop->m_mem_size =
         MIN2((pi->m_mem_write_size) * amp_val, REP_MOV_MEM_SIZE_MAX_NEW);
+
+      // tilestored
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+        DEBUG_CORE(
+          core_id,
+          "AMX_TILESTORE for MEM_ST convert_dyn_uop rep_offset: %llx, memsize: %d"
+          "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+          rep_offset, trace_uop->m_mem_size,
+          (Addr)(pi->m_instruction_addr), trace_uop->m_va
+        );
+      }
     } else if ((info->m_table_info->m_mem_type == MEM_LD) ||
                (info->m_table_info->m_mem_type == MEM_PF) ||
                (info->m_table_info->m_mem_type >= MEM_SWPREF_NTA &&
@@ -292,8 +303,37 @@ void cpu_decoder_c::convert_dyn_uop(inst_info_s *info, void *trace_info,
 
       trace_uop->m_mem_size =
         MIN2((pi->m_mem_read_size) * amp_val, REP_MOV_MEM_SIZE_MAX_NEW);
+      
+      // tileloadd
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+        DEBUG_CORE(
+          core_id,
+          "AMX_TILELOAD convert_dyn_uop rep_offset: %llx, mem_size: %d"
+          "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx \n",
+          rep_offset, trace_uop->m_mem_size,
+          (Addr)(pi->m_instruction_addr), trace_uop->m_va
+        );
+      }
     }
   }
+
+  // tdpbf16/ssd/usd/uud/sud
+  if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+    bool is_matmul = (pi->m_is_fp) && (info->m_table_info->m_mem_type != MEM_ST) && (info->m_table_info->m_mem_size != MEM_LD);
+    if (is_matmul) {
+      // will I have to do anything here? 
+      // doubtful because the whole tile should be usable in one uop
+      DEBUG_CORE(
+        core_id,
+        "AMX_TILE_COMPUTE convert_dyn_uop mem_size: %d"
+        "pi->instruction_addr:0x%llx trace_uop->m_va:0x%llx",
+        trace_uop->m_mem_size, (Addr)(pi->m_instruction_addr), 
+        trace_uop->m_va
+      );
+      // TODO: create STAT_EVENT_N calls for this
+    }
+  }
+  // TODO: handle tileconfig? maybe not
 
   // next pc
   trace_uop->m_npc = trace_uop->m_addr;
@@ -468,6 +508,10 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       }  // NUM_LOAD == 2
 
       if (pi->m_opcode == XED_CATEGORY_DATAXFER) {
+        write_dest_reg = 1;
+      }
+
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
         write_dest_reg = 1;
       }
 
@@ -856,6 +900,33 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
   if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
     // handle AMX tile instructions
+    bool is_amx_mem = (pi->m_has_st) || (pi->m_num_ld > 0);
+    dyn_uop_counter = 1;
+
+    if (is_amx_mem) {
+      int rep_counter = 1;
+      int rep_dir = 0;
+      int tileload_type = -1;
+
+      if (pi->m_has_st) {
+        trace_uop[0]->m_mem_type = MEM_ST;
+      } else {
+        trace_uop[0]->m_mem_type = MEM_LD;
+        trace_uop[0]->m_mem_size = pi->m_mem_read_size;
+        DEBUG_CORE(
+          core_id,
+          "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d"
+          "mem_read_size:%d dyn_uop_counter:%d \n",
+          core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+          static_cast<int>(pi->m_opcode), pi->m_mem_read_size,
+          dyn_uop_counter
+        );
+        ASSERTM(pi->m_num_ld > 0 && "invalid number of loads");
+      }
+    } // is_amx_mem
+
+    // TODO: generate multiple uops for different memory addresses 
+    // (1 uop per row loading num_bytes in the row?)
   } // XED_CATEGORY_AMX_TILE
 
   ASSERT(dyn_uop_counter);

@@ -212,7 +212,7 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
     return;
   }
   tr_info->vaddr1 = *addr;
-  tr_info->mem_read_size = 64;
+  tr_info->mem_read_size = 1024; // TODO: figure out how to get real size from tileconfig
 }
 
 VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
@@ -237,6 +237,14 @@ VOID AMXZero(UINT32 dst, THREADID tid) {
 }
 
 VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
+  Trace_info *tr_info = trace_info_array[tid];
+  if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
+    return;
+  }
+}
+
+VOID AMXConfig(UINT32 dst, THREADID tid) {
+  // TODO: figure out how to get dynamic info from this (rows, row size, etc)
   Trace_info *tr_info = trace_info_array[tid];
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
@@ -955,7 +963,8 @@ void instrument(INS ins)
   // ----------------------------------------
   if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
     if (INS_Mnemonic(ins) == "TILELOADD") {
-      info->num_ld = 16; // TODO: figure out how to uncap this -- it needs to be the size of the config region (at most 1024), but it capped at 16
+      info->num_ld = 64; // TODO: figure out how to uncap this -- it needs to be the size of the config region (at most 1024), but it capped at 64
+      // current solution: break into multiple uops of size 64 (how to set smaller load sizes? tileconfig?)
 
       REG r = INS_OperandReg(ins, 0);
       UINT32 dst = r - REG_TMM0;
@@ -1044,6 +1053,13 @@ void instrument(INS ins)
       #ifdef VERBOSE
       cout << "ldtilecfg" << endl;
       #endif
+      INS_InsertCall(
+        ins,
+        IPOINT_BEFORE, AFUNPTR(AMXConfig),
+        IARG_UINT32, REG_TMM0, // ???
+        IARG_THREAD_ID,
+        IARG_END
+      );
     } else if (INS_Mnemonic(ins) == "TILERELEASE") {
       #ifdef VERBOSE
       cout << "tilerelease" << endl;
