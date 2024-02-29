@@ -636,15 +636,16 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         trace_uop[ii]->m_num_dest_regs += 1;
       }
 
-      // the last uop
-      if (ii == (num_uop - 1) &&
-          trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
-        if (pi->m_opcode == NVBIT_BAR) {
-          // only the last instruction will have bar type - this is in case of
-          // CPU, in case of GPU there is always only one uop?
-          trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
-        }
-      }
+      // NVBit trace tool does not support yet... (euijun Feb 28 2024)
+      // // the last uop
+      // if (ii == (num_uop - 1) &&
+      //     trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
+      //   if (pi->m_opcode == NVBIT_BAR) {
+      //     // only the last instruction will have bar type - this is in case of
+      //     // CPU, in case of GPU there is always only one uop?
+      //     trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
+      //   }
+      // }
 
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
@@ -765,6 +766,7 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
   ///
   /// BOM (beginning of macro) : need to get a next instruction
   ///
+  
   if (thread_trace_info->m_bom) {
     bool inst_read;  // indicate new instruction has been read from a trace file
 
@@ -1006,8 +1008,8 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
         ASSERT((index + 1) < MAX_PUP);
         if (thread_trace_info->m_trace_uop_array[++index]->m_mem_type) {
           ASSERTM(0,
-                  "this condition is not handled in the code (and should never "
-                  "occur?)!");
+          "this condition is not handled in the code (and should never "
+          "occur?)!");
         }
         if (thread_trace_info->m_trace_uop_array[++index]->m_eom) {
           break;

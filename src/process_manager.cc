@@ -522,7 +522,7 @@ void process_manager_c::setup_process(process_s *process) {
   } else if (trace_type == "nvbit") {
     if (!(trace_config_file >> process->m_max_block))
       ASSERTM(0, "error reading from file:%s", trace_info_file_name.c_str());
-    // process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
+    process->m_max_block = *m_simBase->m_knobs->KNOB_MAX_BLOCK_PER_CORE;
   }
 
   // get thread count
@@ -639,7 +639,8 @@ void process_manager_c::setup_process(process_s *process) {
 
   // TODO (jaekyu, 1-30-2009)
   // FIXME
-  if (trace_type == "ptx" && *KNOB(KNOB_BLOCKS_TO_SIMULATE)) {
+  // euijun
+  if ((trace_type == "ptx" || trace_type == "nvbit") && *KNOB(KNOB_BLOCKS_TO_SIMULATE)) {
     if ((*KNOB(KNOB_BLOCKS_TO_SIMULATE) * m_simBase->m_no_threads_per_block) <
         static_cast<unsigned int>(thread_count)) {
       uns temp = thread_count;
