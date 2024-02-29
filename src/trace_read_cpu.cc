@@ -901,27 +901,32 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
     // handle AMX tile instructions
     bool is_amx_mem = (pi->m_has_st) || (pi->m_num_ld > 0);
+    bool is_amx_config = false; // TODO: add way to read this and confirm it
     dyn_uop_counter = 1;
 
     if (is_amx_mem) {
-      int rep_counter = 1;
-      int rep_dir = 0;
-      int tileload_type = -1;
-
-      if (pi->m_has_st) {
-        trace_uop[0]->m_mem_type = MEM_ST;
+      if (is_amx_config) {
+        // load config data regarding tiles
       } else {
-        trace_uop[0]->m_mem_type = MEM_LD;
-        trace_uop[0]->m_mem_size = pi->m_mem_read_size;
-        DEBUG_CORE(
-          core_id,
-          "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d"
-          "mem_read_size:%d dyn_uop_counter:%d \n",
-          core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
-          static_cast<int>(pi->m_opcode), pi->m_mem_read_size,
-          dyn_uop_counter
-        );
-        ASSERTM(pi->m_num_ld > 0 && "invalid number of loads");
+        int rep_counter = 1;
+        int rep_dir = 0;
+        int tileload_type = -1;
+
+        if (pi->m_has_st) {
+          trace_uop[0]->m_mem_type = MEM_ST;
+        } else {
+          trace_uop[0]->m_mem_type = MEM_LD;
+          trace_uop[0]->m_mem_size = pi->m_mem_read_size;
+          DEBUG_CORE(
+            core_id,
+            "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d"
+            "mem_read_size:%d dyn_uop_counter:%d \n",
+            core_id, sim_thread_id, (Addr)(pi->m_instruction_addr),
+            static_cast<int>(pi->m_opcode), pi->m_mem_read_size,
+            dyn_uop_counter
+          );
+          ASSERT(pi->m_num_ld > 0 && "invalid number of loads");
+        }
       }
     } // is_amx_mem
 

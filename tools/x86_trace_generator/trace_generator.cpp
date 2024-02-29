@@ -64,7 +64,7 @@ using namespace INSTLIB;
 
 #define DUMMY_THREAD 100000
 
-//#define VERBOSE
+#define VERBOSE
 
 #define THREAD_ENABLE_CHECK(tid)          \
   if ((tid) == DUMMY_THREAD)              \
@@ -243,12 +243,73 @@ VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   }
 }
 
-VOID AMXConfig(UINT32 dst, THREADID tid) {
+/*
+  layout:
+  Bytes     | field           | description
+  0           palette           selects the supported configuration of the tiles that will be used
+  1           start_row         used for storing the restart values for interrupted operations
+  2-15        reserved, must be 0
+  16-17       tile0.colsb       Tile 0 bytes per row
+  18-19       tile1.colsb       Tile 1 bytes per row
+  20-21       tile2.colsb       Tile 2 bytes per row
+  22-23       tile3.colsb       Tile 3 bytes per row
+  24-25       tile4.colsb       Tile 4 bytes per row
+  26-27       tile5.colsb       Tile 5 bytes per row
+  28-29       tile6.colsb       Tile 6 bytes per row
+  30-31       tile7.colsb       Tile 7 bytes per row
+  32-47       reserved, must be 0
+  48          tile0.rows        Tile 0 rows
+  49          tile1.rows        Tile 1 rows
+  50          tile2.rows        Tile 2 rows
+  51          tile3.rows        Tile 3 rows
+  52          tile4.rows        Tile 4 rows
+  53          tile5.rows        Tile 5 rows
+  54          tile6.rows        Tile 6 rows
+  55          tile7.rows        Tile 7 rows
+  56-63       reserved, must be 0
+*/
+tile_info_t::Tile_info(void) {
+  this->palette = 0;
+  this->start_row = 0;
+  for (int i = 0; i < 14; i++) {
+    this->buf0[i] = 0;
+    this->buf1[i] = 0;
+    if (i < 8) {
+      this->buf2[i] = 0;
+    }
+  }
+  this->tile0_colsb = 0;
+  this->tile1_colsb = 0;
+  this->tile2_colsb = 0;
+  this->tile3_colsb = 0;
+  this->tile4_colsb = 0;
+  this->tile5_colsb = 0;
+  this->tile6_colsb = 0;
+  this->tile7_colsb = 0;
+  this->tile0_rows = 0;
+  this->tile1_rows = 0;
+  this->tile2_rows = 0;
+  this->tile3_rows = 0;
+  this->tile4_rows = 0;
+  this->tile5_rows = 0;
+  this->tile6_rows = 0;
+  this->tile7_rows = 0;
+}
+
+tile_info_t t_info;
+VOID AMXConfig(ADDRINT *addr, THREADID tid) {
   // TODO: figure out how to get dynamic info from this (rows, row size, etc)
   Trace_info *tr_info = trace_info_array[tid];
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
   }
+  PIN_SafeCopy(&t_info, addr, 64);
+
+  // handle data
+  tr_info->inst_info.tile_info = t_info;
+  // load info
+  tr_info->vaddr1 = *addr;
+  tr_info->mem_read_size = 64;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -645,7 +706,7 @@ void instrument(INS ins)
 
   const ADDRINT iaddr = INS_Address(ins);
   Inst_info *info = new Inst_info;
-  memset(info, 0, sizeof(*info));
+  memset((void *)info, 0, sizeof(*info));
 
   src_regs.clear();
   dst_regs.clear();
@@ -1051,12 +1112,16 @@ void instrument(INS ins)
       );
     } else if (INS_Mnemonic(ins) == "LDTILECFG") {
       #ifdef VERBOSE
-      cout << "ldtilecfg" << endl;
+      //REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
+      //REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
+      cout << "ldtilecfg" /*[" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]"*/ << endl;
       #endif
+      // send memory address to copy config data from
+      info->num_ld = 1;
       INS_InsertCall(
         ins,
         IPOINT_BEFORE, AFUNPTR(AMXConfig),
-        IARG_UINT32, REG_TMM0, // ???
+        IARG_MEMORYOP_PTR, 0,
         IARG_THREAD_ID,
         IARG_END
       );
@@ -1064,6 +1129,7 @@ void instrument(INS ins)
       #ifdef VERBOSE
       cout << "tilerelease" << endl;
       #endif
+      memset((void *)&t_info, 0, sizeof(tile_info_t));
     } else {
       cerr << "Unsupported AMX instruction: " << INS_Mnemonic(ins) << endl;
       exit(-1);
@@ -1146,7 +1212,7 @@ void ThreadStart(THREADID tid, CONTEXT *ctxt, INT32 flags, void *v)
     cerr << "could not allocate memory\n";
     return;
   }
-  memset(trace_info, 0, sizeof(Trace_info));
+  memset((void *)trace_info, 0, sizeof(Trace_info));
 
   stringstream sstream;
   sstream << Knob_trace_name.Value() << "_" << threadid << ".raw";

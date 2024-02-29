@@ -65,6 +65,31 @@ struct Thread_info
   uint64_t inst_count; /**< Instruction count */
 };
 
+typedef struct Tile_info {
+  Tile_info(void);
+  UINT8 palette; // selects the supported configuration of the tiles that will be used
+  UINT8 start_row; // used for storing the restart values for interrupted operations
+  UINT8 buf0[14]; // reserved, must be 0
+  UINT16 tile0_colsb; // Tile 0 bytes per row
+  UINT16 tile1_colsb; // Tile 1 bytes per row
+  UINT16 tile2_colsb; // Tile 2 bytes per row
+  UINT16 tile3_colsb; // Tile 3 bytes per row
+  UINT16 tile4_colsb; // Tile 4 bytes per row
+  UINT16 tile5_colsb; // Tile 5 bytes per row
+  UINT16 tile6_colsb; // Tile 6 bytes per row
+  UINT16 tile7_colsb; // Tile 7 bytes per row
+  UINT8 buf1[14]; // reserved, must be 0
+  UINT8 tile0_rows; // Tile 0 rows
+  UINT8 tile1_rows; // Tile 1 rows
+  UINT8 tile2_rows; // Tile 2 rows
+  UINT8 tile3_rows; // Tile 3 rows
+  UINT8 tile4_rows; // Tile 4 rows
+  UINT8 tile5_rows; // Tile 5 rows
+  UINT8 tile6_rows; // Tile 6 rows
+  UINT8 tile7_rows; // Tile 7 rows
+  UINT8 buf2[8]; // reserved, must be 0
+} tile_info_t;
+
 /**
  * Instruction Information
  */
@@ -82,6 +107,7 @@ struct Inst_info
   bool write_flg;           // 1bit
   uint8_t num_ld;           // 2bit
   uint8_t size;             // 5 bit
+  tile_info_t tile_info;     // 64 bytes
   // **** dynamic ****
   uint64_t ld_vaddr1;        // 4 bytes
   uint64_t ld_vaddr2;        // 4 bytes
@@ -91,7 +117,7 @@ struct Inst_info
   uint8_t mem_read_size;     // 8 bit
   uint8_t mem_write_size;    // 8 bit
   bool rep_dir;              // 1 bit
-  bool actually_taken;       // 1 ibt
+  bool actually_taken;       // 1 bit
 };
 
 #define BUF_SIZE (10 * sizeof(struct Inst_info))
