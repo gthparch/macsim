@@ -69,30 +69,6 @@ POSSIBILITY OF SUCH DAMAGE.
 /// read/write required size only.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef struct Tile_info {
-  uint8_t palette; // selects the supported configuration of the tiles that will be used
-  uint8_t start_row; // used for storing the restart values for interrupted operations
-  uint8_t buf0[14]; // reserved, must be 0
-  uint16_t tile0_colsb; // Tile 0 bytes per row
-  uint16_t tile1_colsb; // Tile 1 bytes per row
-  uint16_t tile2_colsb; // Tile 2 bytes per row
-  uint16_t tile3_colsb; // Tile 3 bytes per row
-  uint16_t tile4_colsb; // Tile 4 bytes per row
-  uint16_t tile5_colsb; // Tile 5 bytes per row
-  uint16_t tile6_colsb; // Tile 6 bytes per row
-  uint16_t tile7_colsb; // Tile 7 bytes per row
-  uint8_t buf1[14]; // reserved, must be 0
-  uint8_t tile0_rows; // Tile 0 rows
-  uint8_t tile1_rows; // Tile 1 rows
-  uint8_t tile2_rows; // Tile 2 rows
-  uint8_t tile3_rows; // Tile 3 rows
-  uint8_t tile4_rows; // Tile 4 rows
-  uint8_t tile5_rows; // Tile 5 rows
-  uint8_t tile6_rows; // Tile 6 rows
-  uint8_t tile7_rows; // Tile 7 rows
-  uint8_t buf2[8]; // reserved, must be 0
-} tile_info_t;
-
 typedef struct trace_info_s {
   trace_info_s();
   virtual ~trace_info_s();
@@ -111,7 +87,6 @@ typedef struct trace_info_cpu_s {
   bool m_write_flg; /**< write flag */
   uint8_t m_num_ld; /**< number of load operations */
   uint8_t m_size; /**< instruction size */
-  tile_info_t m_tile_info; /** info regarding tile configuration */
   // dynamic information
   uint64_t m_ld_vaddr1; /**< load address 1 */
   uint64_t m_ld_vaddr2; /**< load address 2 */

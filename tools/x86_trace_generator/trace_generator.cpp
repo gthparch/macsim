@@ -202,7 +202,7 @@ CONTROL_MANAGER control;
 // AMX Handling
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
+VOID AMXLoad(ADDRINT *addr, UINT32 stride, UINT32 mem_read_size, THREADID tid) {
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
@@ -212,10 +212,11 @@ VOID AMXLoad(REG reg, ADDRINT *addr, UINT32 dst, THREADID tid) {
     return;
   }
   tr_info->vaddr1 = *addr;
-  tr_info->mem_read_size = 1024; // TODO: figure out how to get real size from tileconfig
+  tr_info->mem_read_size = mem_read_size;
+  tr_info->vaddr2 = static_cast<ADDRINT>(stride);
 }
 
-VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
+VOID AMXStore(ADDRINT *addr, UINT32 stride, UINT32 mem_st_size, THREADID tid) {
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
@@ -224,8 +225,9 @@ VOID AMXStore(REG reg, ADDRINT *addr, UINT32 src, THREADID tid) {
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)){
     return;
   }
-  tr_info->st_vaddr= *addr;
-  tr_info->mem_write_size = 1024;
+  tr_info->st_vaddr = *addr;
+  tr_info->vaddr2 = static_cast<ADDRINT>(stride);
+  tr_info->mem_write_size = mem_st_size;
 }
 
 VOID AMXZero(UINT32 dst, THREADID tid) {
@@ -241,75 +243,6 @@ VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
   }
-}
-
-/*
-  layout:
-  Bytes     | field           | description
-  0           palette           selects the supported configuration of the tiles that will be used
-  1           start_row         used for storing the restart values for interrupted operations
-  2-15        reserved, must be 0
-  16-17       tile0.colsb       Tile 0 bytes per row
-  18-19       tile1.colsb       Tile 1 bytes per row
-  20-21       tile2.colsb       Tile 2 bytes per row
-  22-23       tile3.colsb       Tile 3 bytes per row
-  24-25       tile4.colsb       Tile 4 bytes per row
-  26-27       tile5.colsb       Tile 5 bytes per row
-  28-29       tile6.colsb       Tile 6 bytes per row
-  30-31       tile7.colsb       Tile 7 bytes per row
-  32-47       reserved, must be 0
-  48          tile0.rows        Tile 0 rows
-  49          tile1.rows        Tile 1 rows
-  50          tile2.rows        Tile 2 rows
-  51          tile3.rows        Tile 3 rows
-  52          tile4.rows        Tile 4 rows
-  53          tile5.rows        Tile 5 rows
-  54          tile6.rows        Tile 6 rows
-  55          tile7.rows        Tile 7 rows
-  56-63       reserved, must be 0
-*/
-tile_info_t::Tile_info(void) {
-  this->palette = 0;
-  this->start_row = 0;
-  for (int i = 0; i < 14; i++) {
-    this->buf0[i] = 0;
-    this->buf1[i] = 0;
-    if (i < 8) {
-      this->buf2[i] = 0;
-    }
-  }
-  this->tile0_colsb = 0;
-  this->tile1_colsb = 0;
-  this->tile2_colsb = 0;
-  this->tile3_colsb = 0;
-  this->tile4_colsb = 0;
-  this->tile5_colsb = 0;
-  this->tile6_colsb = 0;
-  this->tile7_colsb = 0;
-  this->tile0_rows = 0;
-  this->tile1_rows = 0;
-  this->tile2_rows = 0;
-  this->tile3_rows = 0;
-  this->tile4_rows = 0;
-  this->tile5_rows = 0;
-  this->tile6_rows = 0;
-  this->tile7_rows = 0;
-}
-
-tile_info_t t_info;
-VOID AMXConfig(ADDRINT *addr, THREADID tid) {
-  // TODO: figure out how to get dynamic info from this (rows, row size, etc)
-  Trace_info *tr_info = trace_info_array[tid];
-  if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
-    return;
-  }
-  PIN_SafeCopy(&t_info, addr, 64);
-
-  // handle data
-  tr_info->inst_info.tile_info = t_info;
-  // load info
-  tr_info->vaddr1 = *addr;
-  tr_info->mem_read_size = 64;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1024,11 +957,12 @@ void instrument(INS ins)
   // ----------------------------------------
   if (INS_Category(ins) == XED_CATEGORY_AMX_TILE) {
     if (INS_Mnemonic(ins) == "TILELOADD") {
-      info->num_ld = 64; // TODO: figure out how to uncap this -- it needs to be the size of the config region (at most 1024), but it capped at 64
-      // current solution: break into multiple uops of size 64 (how to set smaller load sizes? tileconfig?)
+      info->num_ld = 16; // just assume 16 and break into 1024/16 load uops (one load per row)
 
       REG r = INS_OperandReg(ins, 0);
-      UINT32 dst = r - REG_TMM0;
+      if (!REG_is_tmm(r)){
+        cout << "opd 1 is not a tile register" << endl;
+      }
       #ifdef VERBOSE
       REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
       REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
@@ -1037,9 +971,9 @@ void instrument(INS ins)
       INS_InsertCall(
         ins, 
         IPOINT_BEFORE, AFUNPTR(AMXLoad), 
-        IARG_UINT32, REG(INS_OperandReg(ins, 0)), 
         IARG_MEMORYOP_PTR, 0,
-        IARG_UINT32, dst,
+        IARG_UINT32, 64, // assume max size
+        IARG_UINT32, 64,
         IARG_THREAD_ID,
         IARG_END
       );
@@ -1091,11 +1025,11 @@ void instrument(INS ins)
       );
     } else if (INS_Mnemonic(ins) == "TILESTORED") {
       info->has_st = 1;
+      // info->num_ld = 16;
       REG r = INS_OperandReg(ins, 1);
       if (!REG_is_tmm(r)){
         cout << "opd 1 is not a tile register" << endl;
       }
-      UINT32 src = r - REG_TMM0;
       #ifdef VERBOSE
       REG base_reg = INS_OperandMemoryBaseReg(ins, 0);
       REG index_reg = INS_OperandMemoryIndexReg(ins, 0);
@@ -1104,9 +1038,9 @@ void instrument(INS ins)
       INS_InsertCall(
         ins,
         IPOINT_BEFORE, AFUNPTR(AMXStore),
-        IARG_UINT32, REG(INS_OperandReg(ins, 1)),
         IARG_MEMORYOP_EA, 0,
-        IARG_UINT32, src,
+        IARG_UINT32, 64, // assuming max size
+        IARG_UINT32, 64,
         IARG_THREAD_ID,
         IARG_END
       );
@@ -1117,19 +1051,19 @@ void instrument(INS ins)
       cout << "ldtilecfg" /*[" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]"*/ << endl;
       #endif
       // send memory address to copy config data from
-      info->num_ld = 1;
-      INS_InsertCall(
-        ins,
-        IPOINT_BEFORE, AFUNPTR(AMXConfig),
-        IARG_MEMORYOP_PTR, 0,
-        IARG_THREAD_ID,
-        IARG_END
-      );
+      // info->num_ld = 1;
+      // INS_InsertCall(
+      //   ins,
+      //   IPOINT_BEFORE, AFUNPTR(AMXConfig),
+      //   IARG_MEMORYOP_PTR, 0,
+      //   IARG_THREAD_ID,
+      //   IARG_END
+      // );
     } else if (INS_Mnemonic(ins) == "TILERELEASE") {
       #ifdef VERBOSE
       cout << "tilerelease" << endl;
       #endif
-      memset((void *)&t_info, 0, sizeof(tile_info_t));
+      // memset((void *)&t_info, 0, sizeof(tile_info_t));
     } else {
       cerr << "Unsupported AMX instruction: " << INS_Mnemonic(ins) << endl;
       exit(-1);
