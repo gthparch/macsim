@@ -1490,7 +1490,7 @@ void cpu_decoder_c::init_pin_convert(void) {
   // values - Michael
   switch (lat_map) {
     case LATENCY_SAPPHIRE_RAPIDS:
-      m_int_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX;  // new
+      m_int_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX_COMPUTE;  // new
       m_int_uop_table[XED_CATEGORY_APX] = UOP_IADD; //new
       m_int_uop_table[XED_CATEGORY_AVX_IFMA] = UOP_VADD;  //new
       m_int_uop_table[XED_CATEGORY_FP16] = UOP_VADD;  //new
@@ -1507,7 +1507,7 @@ void cpu_decoder_c::init_pin_convert(void) {
       m_int_uop_table[XED_CATEGORY_VEX] = UOP_VADD; //new
       m_int_uop_table[XED_CATEGORY_WRMSRNS] = UOP_IADD; //new
 
-      m_fp_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX; //new
+      m_fp_uop_table[XED_CATEGORY_AMX_TILE] = UOP_AMX_COMPUTE; //new
       m_fp_uop_table[XED_CATEGORY_APX] = UOP_FADD; //new
       m_fp_uop_table[XED_CATEGORY_AVX_IFMA] = UOP_FADD; //new
       m_fp_uop_table[XED_CATEGORY_FP16] = UOP_FADD; //new

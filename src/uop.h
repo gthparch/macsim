@@ -114,7 +114,7 @@ typedef enum Uop_Type_enum {
   UOP_SSE,
 
   // AMX Instruction
-  UOP_AMX,
+  UOP_AMX_COMPUTE,
 
   // SIMD instructions for Intel GPU
   UOP_SIMD,
