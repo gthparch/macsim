@@ -936,8 +936,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         STAT_EVENT_N(TILELOADD_COUNT, 16);
         ASSERT(pi->m_num_ld > 0 && "invalid number of loads");
       }
-       // generate 1 load uop for each of the 16 rows for a tile 
-       // TODO: test this when servers are working properly
+       // generate 1 uop for each of the 16 rows for a tile 
       int num_tile_uops = 16;//pi->m_num_ld; // 16
 
       key_addr = (pi->m_instruction_addr << 3);
@@ -972,12 +971,6 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         key_addr = (pi->m_instruction_addr << 5) + jj;
         info = htable->hash_table_access_create(key_addr, &new_entry);
 
-        // if (tileload_type) {
-        //   info->m_table_info->m_mem_type = MEM_LD;
-        // } else {
-        //   info->m_table_info->m_mem_type = MEM_ST;
-        // }
-
         if (!(jj == 0 && ii == 0)) {
           info->m_trace_info.m_bom = false;
         }
@@ -988,14 +981,6 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
           "AMX_TILE rep_offset:%d mem_read_size: %d jj: %d\n",
           rep_offset, pi->m_mem_read_size, jj
         );
-
-        // if (tileload_type) {
-        //   // load
-        //   trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
-        // } else {
-        //   // store
-        //   trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_write_size;
-        // }
 
         convert_dyn_uop(info, pi, trace_uop[dyn_uop_counter], rep_offset, core_id);
 
