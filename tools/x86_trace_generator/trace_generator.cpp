@@ -202,7 +202,7 @@ CONTROL_MANAGER control;
 // AMX Handling
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-VOID AMXLoad(ADDRINT *addr, UINT32 stride, UINT32 mem_read_size, THREADID tid) {
+VOID AMXLoad(ADDRINT addr, UINT32 stride, UINT32 mem_read_size, THREADID tid) {
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
@@ -211,12 +211,17 @@ VOID AMXLoad(ADDRINT *addr, UINT32 stride, UINT32 mem_read_size, THREADID tid) {
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)){
     return;
   }
-  tr_info->vaddr1 = *addr;
+  #ifdef VERBOSE
+  cout << "load address: 0x" << std::hex << addr << endl;
+  cout << "load size: " << mem_read_size << endl;
+  cout << "stride: " << stride << endl;
+  #endif
+  tr_info->vaddr1 = addr;
   tr_info->mem_read_size = mem_read_size;
   tr_info->vaddr2 = static_cast<ADDRINT>(stride);
 }
 
-VOID AMXStore(ADDRINT *addr, UINT32 stride, UINT32 mem_st_size, THREADID tid) {
+VOID AMXStore(ADDRINT addr, UINT32 stride, UINT32 mem_st_size, THREADID tid) {
   // check thread is not a dummy and is being instrumented
   tid = threadMap[tid];
   THREAD_ENABLE_CHECK(tid);
@@ -225,7 +230,12 @@ VOID AMXStore(ADDRINT *addr, UINT32 stride, UINT32 mem_st_size, THREADID tid) {
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)){
     return;
   }
-  tr_info->st_vaddr = *addr;
+  #ifdef VERBOSE
+  cout << "store address: 0x" << std::hex << addr << endl;
+  cout << "store size: " << mem_st_size << endl;
+  cout << "stride: " << stride << endl;
+  #endif
+  tr_info->st_vaddr = addr;
   tr_info->vaddr2 = static_cast<ADDRINT>(stride);
   tr_info->mem_write_size = mem_st_size;
 }
@@ -235,7 +245,6 @@ VOID AMXZero(UINT32 dst, THREADID tid) {
   if (tr_info == nullptr || !PIN_IsAmxActive(tid)) {
     return;
   }
-  // is there anything I need to do here?
 }
 
 VOID AMXGEMM(UINT32 dst, UINT32 a, UINT32 b, THREADID tid) {
@@ -972,8 +981,8 @@ void instrument(INS ins)
         ins, 
         IPOINT_BEFORE, AFUNPTR(AMXLoad), 
         IARG_MEMORYOP_PTR, 0,
-        IARG_UINT32, 64, // assume max size
-        IARG_UINT32, 64,
+        IARG_UINT32, 64, // stride
+        IARG_UINT32, 64,  // read size
         IARG_THREAD_ID,
         IARG_END
       );
@@ -1039,31 +1048,19 @@ void instrument(INS ins)
         ins,
         IPOINT_BEFORE, AFUNPTR(AMXStore),
         IARG_MEMORYOP_EA, 0,
-        IARG_UINT32, 64, // assuming max size
-        IARG_UINT32, 64,
+        IARG_UINT32, 64, // stride
+        IARG_UINT32, 64, // write size
         IARG_THREAD_ID,
         IARG_END
       );
     } else if (INS_Mnemonic(ins) == "LDTILECFG") {
       #ifdef VERBOSE
-      //REG base_reg = INS_OperandMemoryBaseReg(ins, 1);
-      //REG index_reg = INS_OperandMemoryIndexReg(ins, 1);
-      cout << "ldtilecfg" /*[" << REG_StringShort(base_reg) << "+" << REG_StringShort(index_reg) << "]"*/ << endl;
+      cout << "ldtilecfg" << endl;
       #endif
-      // send memory address to copy config data from
-      // info->num_ld = 1;
-      // INS_InsertCall(
-      //   ins,
-      //   IPOINT_BEFORE, AFUNPTR(AMXConfig),
-      //   IARG_MEMORYOP_PTR, 0,
-      //   IARG_THREAD_ID,
-      //   IARG_END
-      // );
     } else if (INS_Mnemonic(ins) == "TILERELEASE") {
       #ifdef VERBOSE
       cout << "tilerelease" << endl;
       #endif
-      // memset((void *)&t_info, 0, sizeof(tile_info_t));
     } else {
       cerr << "Unsupported AMX instruction: " << INS_Mnemonic(ins) << endl;
       exit(-1);

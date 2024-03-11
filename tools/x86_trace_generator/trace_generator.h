@@ -82,7 +82,6 @@ struct Inst_info
   bool write_flg;           // 1bit
   uint8_t num_ld;           // 2bit
   uint8_t size;             // 5 bit
-  // tile_info_t tile_info;     // 64 bytes
   // **** dynamic ****
   uint64_t ld_vaddr1;        // 4 bytes
   uint64_t ld_vaddr2;        // 4 bytes

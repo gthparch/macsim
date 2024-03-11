@@ -901,7 +901,6 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
     // handle AMX tile instructions
     bool is_amx_mem = (pi->m_has_st) || (pi->m_num_ld > 0);
-    // bool is_amx_config = (pi->m_num_ld == 1) && (pi->m_tile_info.palette != 0); // questionable...
     dyn_uop_counter = 1;
 
     if (is_amx_mem) {
@@ -911,6 +910,8 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       if (pi->m_has_st) {
         trace_uop[0]->m_mem_type = MEM_ST;
+        trace_uop[0]->m_mem_size = pi->m_mem_write_size;
+        //cout << "store address:0x" << trace_uop[0]->m_addr << endl;
         DEBUG_CORE(
           core_id,
           "AMX_TILE_MEM core_id:%d thread_id:%d pc:0x%llx opcode:%d"
@@ -921,7 +922,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         );
         STAT_EVENT_N(TILESTORED_COUNT, 16);
       } else {
-        int tileload_type = true;
+        tileload_type = true;
         trace_uop[0]->m_mem_type = MEM_LD;
         trace_uop[0]->m_mem_size = pi->m_mem_read_size;
         DEBUG_CORE(
@@ -937,7 +938,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       }
        // generate 1 load uop for each of the 16 rows for a tile 
        // TODO: test this when servers are working properly
-      int num_tile_uops = pi->m_num_ld; // 16
+      int num_tile_uops = 16;//pi->m_num_ld; // 16
 
       key_addr = (pi->m_instruction_addr << 3);
       info = htable->hash_table_access_create(key_addr, &new_entry);
@@ -952,8 +953,12 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       for (jj = dyn_uop_counter; jj < num_tile_uops; jj++) {
         if (tileload_type) {
           trace_uop[jj]->m_mem_type = MEM_LD;
+          info->m_table_info->m_mem_type = MEM_LD;
+          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
         } else {
           trace_uop[jj]->m_mem_type = MEM_ST;
+          info->m_table_info->m_mem_type = MEM_ST;
+          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_write_size;
         }
 
         if (jj == 0) {
@@ -967,11 +972,11 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         key_addr = (pi->m_instruction_addr << 5) + jj;
         info = htable->hash_table_access_create(key_addr, &new_entry);
 
-        if (tileload_type) {
-          info->m_table_info->m_mem_type = MEM_LD;
-        } else {
-          info->m_table_info->m_mem_type = MEM_ST;
-        }
+        // if (tileload_type) {
+        //   info->m_table_info->m_mem_type = MEM_LD;
+        // } else {
+        //   info->m_table_info->m_mem_type = MEM_ST;
+        // }
 
         if (!(jj == 0 && ii == 0)) {
           info->m_trace_info.m_bom = false;
@@ -984,11 +989,13 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
           rep_offset, pi->m_mem_read_size, jj
         );
 
-        if (tileload_type) {
-          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
-        } else {
-          trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_write_size;
-        }
+        // if (tileload_type) {
+        //   // load
+        //   trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_read_size;
+        // } else {
+        //   // store
+        //   trace_uop[dyn_uop_counter]->m_mem_size = pi->m_mem_write_size;
+        // }
 
         convert_dyn_uop(info, pi, trace_uop[dyn_uop_counter], rep_offset, core_id);
 
