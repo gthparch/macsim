@@ -64,7 +64,7 @@ using namespace INSTLIB;
 
 #define DUMMY_THREAD 100000
 
-#define VERBOSE
+//#define VERBOSE
 
 #define THREAD_ENABLE_CHECK(tid)          \
   if ((tid) == DUMMY_THREAD)              \
