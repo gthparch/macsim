@@ -47,6 +47,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug_macros.h"
 #include "bug_detector.h"
 #include "memory.h"
+#include <iostream>
+#include <cstring>
+#include <unistd.h>
+
 
 #include "all_knobs.h"
 #include "statistics.h"
@@ -67,11 +71,16 @@ void dram_dramsim3_c::read_callback2(uint64_t address){
   // find requests with this address
   auto I = m_pending_request->begin();
   auto E = m_pending_request->end();
+
+  printf("Read Call BAck!!\n");
   while (I != E) {
     mem_req_s* req = (*I);
     ++I;
 
     if (req->m_addr == address) {
+  int latency = *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+
+      printf("address : %ld read_callback ! Latnecy: %d\n",address, latency);
       if (*KNOB(KNOB_DRAM_ADDITIONAL_LATENCY)) {
         req->m_rdy_cycle = m_cycle + *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
         m_tmp_output_buffer->push_back(req);
@@ -91,9 +100,14 @@ void dram_dramsim3_c::write_callback2( uint64_t address) {
     mem_req_s* req = (*I);
     ++I;
 
+      // printf("address : %d read_callback ! Latnecy: %d\n",address, *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+
+
     if (req->m_addr == address) {
       // in case of WB, retire requests here
       MEMORY->free_req(req->m_core_id, req);
+      int latency = *KNOB(KNOB_DRAM_ADDITIONAL_LATENCY);
+     printf("address : %ld read_callback ! Latnecy: %d\n",address, latency);
       m_pending_request->remove(req);
     }
   }
@@ -111,13 +125,31 @@ dram_dramsim3_c::dram_dramsim3_c(macsim_c* simBase) : dram_c(simBase) {
   m_tmp_output_buffer = new list<mem_req_s*>;
   m_pending_request = new list<mem_req_s*>;
 
-  dramsim3::Config m_config("configs/HBM1_4Gb_x128.ini", ".");
+  char buffer[PATH_MAX];
+    if (getcwd(buffer, sizeof(buffer)) != nullptr) {
+        std::cout << "Current path: " << buffer << std::endl;
+    } else {
+        perror("getcwd");
+    }
 
+  m_config = new Config("../src/DRAMSim3/configs/DDR4_8Gb_x8_2133_2.ini", ".");
+  printf("m_config epoch_period : %d\n",m_config->epoch_period);
   // m_dramsim = new JedecDRAMSystem(m_config, ".", &dram_dramsim3_c::read_callback2,
   //                                 &dram_dramsim3_c::write_callback2);
 
- m_dramsim = new JedecDRAMSystem(m_config, ".", dummy_call_back,
-                                  dummy_call_back);
+  // function<void(uint64_t)> read_cb = &dram_dramsim3_c::read_callback2;
+
+   read_cb = std::bind(&dram_dramsim3_c::read_callback2, this, std::placeholders::_1);
+  write_cb = std::bind(&dram_dramsim3_c::write_callback2, this, std::placeholders::_1);
+
+
+
+  // function<void(uint64_t)> write_cb =std:: 
+
+ m_dramsim = new JedecDRAMSystem(*m_config, ".", read_cb,
+                                  write_cb);
+
+  m_dramsim->RegisterCallbacks(read_cb,write_cb);
 
 
     // std::function<void(uint64_t)> read_cb = std::bind( &dram_dramsim3_c::read_callback2,this,std::placeholder::_1);
@@ -146,6 +178,7 @@ void dram_dramsim3_c::init(int id) {
 }
 
 void dram_dramsim3_c::run_a_cycle(bool temp) {
+  // printf("DRAMSIM3!!!!\n");
   send();
   m_dramsim->ClockTick();
   receive();
@@ -198,6 +231,10 @@ void dram_dramsim3_c::receive(void) {
                                 static_cast<uint64_t>(req->m_addr))) {
     STAT_EVENT(TOTAL_DRAM);
     m_pending_request->push_back(req);
+
+    int pending_req_size = m_pending_request->size();
+    printf("m_pending_request push  %d\n",pending_req_size);
+
     NETWORK->receive_pop(MEM_MC, m_id);
     if (*KNOB(KNOB_BUG_DETECTOR_ENABLE)) {
       m_simBase->m_bug_detector->deallocate_noc(req);
