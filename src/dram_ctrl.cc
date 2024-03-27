@@ -352,6 +352,8 @@ void dram_ctrl_c::insert_req_in_drb(mem_req_s* mem_req, uint64_t bid,
 
 // tick a cycle
 void dram_ctrl_c::run_a_cycle(bool pll_lock) {
+
+  // printf("dram_ctrl_c runa_cycle!\n");
   if (pll_lock) {
     ++m_cycle;
     return;

@@ -83,8 +83,8 @@ dram_precharge 10
 dram_num_banks 16
 dram_num_channel 1
 dram_rowbuffer_size 2048
-dram_scheduling_policy FRFCFS
-#dram_scheduling_policy RAMULATOR 
+dram_scheduling_policy DRAMSIM3
+#dram_scheduling_policy RAMULATOukk
 
 
 

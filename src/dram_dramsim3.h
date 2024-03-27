@@ -109,8 +109,12 @@ private:
   list<mem_req_s*>* m_output_buffer; /**< output buffer */
   list<mem_req_s*>* m_tmp_output_buffer; /**< output buffer */
   list<mem_req_s*>* m_pending_request; /**< pending request */
-  // dramsim3::Config *m_config;
+  dramsim3::Config *m_config;
   dramsim3::JedecDRAMSystem *m_dramsim; /**< dramsim3 instance */
+
+ std::function<void(uint64_t)> read_cb;
+std::function<void(uint64_t)> write_cb;
+
 };
 #endif
 
