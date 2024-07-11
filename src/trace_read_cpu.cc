@@ -513,6 +513,7 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
 
       if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
         write_dest_reg = 1;
+        num_uop = 16;
       }
 
       if (trace_uop[0]->m_mem_type == MEM_LD) {
@@ -563,6 +564,10 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
       cur_trace_uop->m_inst_size = pi->m_size;
       cur_trace_uop->m_mul_mem_uops =
         pi->m_has_immediate;  // uncoalesced memory accesses
+      
+      if (pi->m_opcode == XED_CATEGORY_AMX_TILE) {
+        num_uop = 16;
+      }
     }
 
     ///
@@ -786,12 +791,14 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     ASSERT(info);
 
     num_uop = info->m_trace_info.m_num_uop;
+    //std::cout << "start key_addr " << (pi->m_instruction_addr << 3) << std::endl;
     for (ii = 0; ii < num_uop; ++ii) {
       if (ii > 0) {
         key_addr = ((pi->m_instruction_addr << 3) + ii);
+        //std::cout << "key_addr " << key_addr << std::endl;
         info = htable->hash_table_access_create(key_addr, &new_entry);
       }
-      ASSERTM(!new_entry, "Core id %d index %d\n", core_id, ii);
+      ASSERTM(!new_entry, "Core id %d index %d", core_id, ii);
 
       // convert raw instruction trace to MacSim trace format
       convert_info_uop(info, trace_uop[ii]);
