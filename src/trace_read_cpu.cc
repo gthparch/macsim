@@ -791,11 +791,9 @@ inst_info_s *cpu_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
     ASSERT(info);
 
     num_uop = info->m_trace_info.m_num_uop;
-    //std::cout << "start key_addr " << (pi->m_instruction_addr << 3) << std::endl;
     for (ii = 0; ii < num_uop; ++ii) {
       if (ii > 0) {
         key_addr = ((pi->m_instruction_addr << 3) + ii);
-        //std::cout << "key_addr " << key_addr << std::endl;
         info = htable->hash_table_access_create(key_addr, &new_entry);
       }
       ASSERTM(!new_entry, "Core id %d index %d", core_id, ii);
