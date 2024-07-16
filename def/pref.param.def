@@ -127,3 +127,218 @@ param< PREF_STRIDE_SINGLE_STRIDE_MODE, pref_stride_single_stride_mode, bool, fal
 param< PREF_STRIDE_ON, pref_stride_on, bool, false >
 param< PREF_STRIDE_ON_MEDIUM_CORE, pref_stride_on_medium_core, bool, false >
 param< PREF_STRIDE_ON_LARGE_CORE, pref_stride_on_large_core, bool, false >
+
+/* added on 2024-03-26
+/* =====================================================================================
+ * Prefetcher
+ ==================================================================================== */
+param< PREF_2DC_ON, pref_2dc_on, bool, false >
+param< PREF_2DC_ON_MEDIUM_CORE, pref_2dc_on_medium_core, bool, false >
+param< PREF_2DC_ON_LARGE_CORE, pref_2dc_on_large_core, bool, false >
+
+param< DEBUG_PREF_2DC, debug_pref_2dc, bool, false >
+DEF_PARAM(pref_2dc_on                 , PREF_2DC_ON              , bool   , bool      , false       ,      ) 
+DEF_PARAM(debug_pref_2dc              , DEBUG_PREF_2DC           , bool   , bool      , false       ,      ) 
+
+param< PREF_2DC_CACHE_SIZE, pref_2dc_cache_size, uns, (1 * 1024) >
+param< PREF_2DC_CACHE_ASSOC, pref_2dc_cache_assoc, uns, 4 >
+param< PREF_2DC_CACHE_LINE_SIZE, pref_2dc_cache_line_size, uns, 1 >
+
+param< PREF_2DC_MAX_DEGREE, pref_2dc_max_degree, uns, 32 >
+
+param< PREF_2DC_DEGREE, pref_2dc_degree, uns, 16 >
+
+param< PREF_2DC_ZONE_SHIFT, pref_2dc_zone_shift, uns, 10 >
+
+param< PREF_2DC_TAG_SIZE, pref_2dc_tag_size, uns, 16 >
+
+param< PREF_2DC_NUM_REGIONS, pref_2dc_num_regions, uns, 64 >
+
+param< PREF_2DC_REGION_HASH, pref_2dc_region_hash, uns, 61 >
+
+/* should be checked with Hyesoon */
+param< PREF_2DC_BANKS, pref_2dc_banks, uns, 32 >
+
+param< DEBUG_PREF_GHB, debug_pref_ghb, bool, false >
+// the size of the global history buffer
+param< PREF_GHB_BUFFER_N, pref_ghb_buffer_n, uns, 256 >
+     // size of ghb index table 
+param< PREF_GHB_INDEX_N, pref_ghb_index_n, uns, 128 >
+     // number of high order bits to use to determine the czone
+     // 12 works best
+param< PREF_GHB_CZONE_BITS, pref_ghb_czone_bits, uns, 12 >
+     // Number of prefetches sent out
+param< PREF_GHB_DEGREE, pref_ghb_degree, uns, 16 >
+
+param< PREF_GHB_MAX_DEGREE, pref_ghb_max_degree, uns, 32 >
+
+/* Heterogeneous Features */
+param< PREF_GHB_ON, pref_ghb_on, bool, false >
+
+param< PREF_GHB_ON_MEDIUM_CORE, pref_ghb_on_medium_core, bool, false >
+
+param< PREF_GHB_ON_LARGE_CORE, pref_ghb_on_large_core, bool, false >
+
+
+param< PREF_PHASE_ON, pref_phase_on, bool, false >
+param< PREF_PHASE_ON_MEDIUM_CORE, pref_phase_on_medium_core, bool, false >
+param< PREF_PHASE_ON_LARGE_CORE, pref_phase_on_large_core, bool, false >
+
+param< PREF_PHASE_STUDY, pref_phase_study, bool, false >
+param< DEBUG_PREF_PHASE, debug_pref_phase, bool, false >
+
+param< PREF_PHASE_PRIME_HASH, pref_phase_prime_hash, uns, 16381 >
+
+param< PREF_PHASE_INFOSIZE, pref_phase_infosize, uns, 16384 >
+
+param< PREF_PHASE_LOG2REGIONSIZE, pref_phase_log2regionsize, uns, 12 >
+param< PREF_PHASE_REGIONENTRIES, pref_phase_regionentries, uns, 64 >
+
+param< PREF_PHASE_TRACKEDREGIONS, pref_phase_trackedregions, uns, 32 >
+
+param< PREF_PHASE_INTERVAL, pref_phase_interval, uns, 100000 >
+
+param< PREF_PHASE_TABLE_SIZE, pref_phase_table_size, uns, 64 >
+param< PREF_PHASE_MAXDIFF_THRESH, pref_phase_maxdiff_thresh, uns, 64 >
+
+param< PREF_PHASE_MIN_MISSES, pref_phase_min_misses, uns, 64 >
+
+param< PREF_PHASE_MISSPER, pref_phase_missper, float, 0.4 >
+
+param< PREF_STRIDEPC_ON, pref_stridepc_on, bool, false >
+param< PREF_STRIDEPC_ON_MEDIUM_CORE, pref_stridepc_on_medium_core, bool, false >
+param< PREF_STRIDEPC_ON_LARGE_CORE, pref_stridepc_on_large_core, bool, false >
+
+param< DEBUG_PREF_STRIDEPC, debug_pref_stridepc, bool, false >
+// the size of the stridepc table
+param< PREF_STRIDEPC_TABLE_N, pref_stridepc_table_n, uns, 256 >
+     // Number of prefetches sent out on a miss/prefetch
+param< PREF_STRIDEPC_DEGREE, pref_stridepc_degree, uns, 4 >
+param< PREF_STRIDEPC_DISTANCE, pref_stridepc_distance, uns, 16 >
+     // Useloadaddr -> Do we stride based on load address
+param< PREF_STRIDEPC_USELOADADDR, pref_stridepc_useloadaddr, bool, false >
+
+param< PREF_STRIDEPC_TRAINNUM, pref_stridepc_trainnum, uns, 2 >
+
+param< PREF_STRIDEPC_STARTDIS, pref_stridepc_startdis, uns, 4 >
+
+
+// the number of stream buffer
+param< STREAM_BUFFER_N, stream_buffer_n, uns, 256 >
+     // how many prefetch is requested every miss 
+param< STREAM_PREFETCH_N, stream_prefetch_n, uns, 2 >
+     // the fist stream prefetch request 
+param< STREAM_START_DIS, stream_start_dis, uns, 5 >
+     // how far the stream prefetcher request the prefetcher
+param< STREAM_LENGTH, stream_length, uns, 16 >
+param< STREAM_TRAIN_LENGTH, stream_train_length, uns, 16 >
+param< STREAM_TRAIN_NUM, stream_train_num, uns, 1 >
+param< STREAM_ACC_THROTTLE, stream_acc_throttle, bool, false >
+param< PREF_ACC_USE_CACHE, pref_acc_use_cache, bool, false >
+param< STREAM_STALL_ON_QUEUE_FULL, stream_stall_on_queue_full, bool, false >
+param< STREAM_L1Q_DEMAND_RESERVE, stream_l1q_demand_reserve, uns, 0 >
+
+param<PREF_TRAIN_WINDOW_SLACK,   pref_train_win_slack,  uns, 4>
+
+     // the number of prefetcher request every cycle 
+param< PREF_SCHEDULE_NUM, pref_schedule_num, uns, 4 >
+     // filter for training the same miss address 
+param< TRAIN_FILTER_SIZE, train_filter_size, uns, 32 >
+     // how many prefetching request can be buffered 
+param< PREF_REQ_Q_SIZE, pref_req_q_size, uns, 64 >
+param< STREAM_CREATE_ON_DC_MISS,stream_create_on_dc_miss , uns, 64 >
+param< STREAM_CREATE_ON_L1_MISS, stream_create_on_l1_miss, bool, true >
+param< STREAM_TRAIN_ON_WRONGPATH, stream_train_on_wrongpath, bool, true >
+param< STREAM_CREATE_ON_WRONGPATH, stream_create_on_wrongpath, bool, true >
+param< STREAM_PREF_INTO_DCACHE, stream_pref_into_dcache, bool, false >
+
+param< STREAM_TRAIN_ON_DC_MISS, stream_train_on_dc_miss, bool, true >
+param< REMOVE_REDUNDANT_STREAM, remove_redundant_stream, bool, false >
+
+
+
+     // DEF_PARAM(l2hit_stream_pref_on              , L2HIT_STREAM_PREF_ON           , bool   , bool      ,false     ,      ) // l0 prefetcher request 
+param< L2HIT_STREAM_SCHEDULE_NUM, l2hit_stream_schedule_num, uns, 4 >
+
+param< PREF_REQ_QUEUE_FILTER_ON, pref_req_queue_filter_on, bool, false >
+param< HW_PREF_HIT_TRAIN_STREAM, hw_pref_hit_train_stream, bool, false >
+
+param< L2HIT_STREAM_BUFFER_N, l2hit_stream_buffer_n, uns, 32 >
+param< L2HIT_STREAM_PREFETCH_N, l2hit_stream_prefetch_n, uns, 2 >
+
+param< L2HIT_STREAM_L2MISS_DROP, l2hit_stream_l2miss_drop, bool, true >
+
+     // the fist stream prefetch request 
+param< L2HIT_STREAM_START_DIS, l2hit_stream_start_dis, uns, 2 >
+     // how far the stream prefetcher request the prefetcher
+param< L2HIT_STREAM_LENGTH, l2hit_stream_length, uns, 8 >
+
+param< L2HIT_PREF_REQ_Q_SIZE, l2hit_pref_req_q_size, uns, 128 >
+param< L2HIT_L2ACCESS_REQ_Q_SIZE, l2hit_l2access_req_q_size, uns, 64 >
+
+
+param< PREF_STREAM_ACCPERSTREAM, pref_stream_accperstream, bool, false >
+
+param< PREF_ACC_ON, pref_acc_on, bool, false >
+// Number of cache lines monitored in a given region
+param< PREF_ACC_REGION_SIZE, pref_acc_region_size, uns, 256 >
+// Number of distinct regions 
+param< PREF_ACC_NUM_REGIONS, pref_acc_num_regions, uns, 128 >
+
+param< PREF_ACC_INCDEC_LENGTH,pref_acc_incdec_length, bool, false >
+param< PREF_TRAIN_THRESH_1, pref_train_thresh_1, float, 0.25 >
+param< PREF_TRAIN_THRESH_2, pref_train_thresh_2, float, 0.50 >
+param< PREF_TRAIN_THRESH_3, pref_train_thresh_3, float, 0.75 >
+
+param< PREF_STREAM_TRAIN_NUM_0, tream_train_num_0, uns, 6 >
+param< PREF_STREAM_TRAIN_NUM_1, tream_train_num_1, uns, 4 >
+param< PREF_STREAM_TRAIN_NUM_2, tream_train_num_2, uns, 2 >
+param< PREF_STREAM_TRAIN_NUM_3, tream_train_num_3, uns, 1 >
+
+param< PREF_ACC_TRAIN_ACCOFFSET_0, pref_acc_train_accoffset_0, float, -0.4 >
+param< PREF_ACC_TRAIN_ACCOFFSET_1, pref_acc_train_accoffset_1, float, -0.2 >
+param< PREF_ACC_TRAIN_ACCOFFSET_2, pref_acc_train_accoffset_2, float, -0.1 >
+param< PREF_ACC_TRAIN_ACCOFFSET_3, pref_acc_train_accoffset_3, float, +0.1 >
+
+param< PREF_ACC_DISTANCE_1, pref_acc_distance_1, uns, 3 >
+param< PREF_ACC_DISTANCE_2, pref_acc_distance_2, uns, 8 >
+param< PREF_ACC_DISTANCE_3, pref_acc_distance_3, uns, 10 >
+param< PREF_ACC_DISTANCE_4, pref_acc_distance_4, uns, 12 >
+param< PREF_ACC_DISTANCE_5, pref_acc_distance_5, uns, 16 >
+param< PREF_ACC_DISTANCE_6, pref_acc_distance_6, uns, 24 >
+param< PREF_ACC_DISTANCE_7, pref_acc_distance_7, uns, 42 >
+param< PREF_ACC_DISTANCE_8, pref_acc_distance_8, uns, 64 >
+param< PREF_ACC_DISTANCE_9, pref_acc_distance_9, uns, 96 >
+param< PREF_ACC_DISTANCE_10, pref_acc_distance_10, uns, 128 >
+
+param< PREF_ACC_REGION_MOVE_ON, pref_acc_region_move_on, bool, true >
+param< PREF_ACC_REGION_MOVE_FRACT, pref_acc_region_move_fract, float, 0.125 >
+
+param< PREF_ACC_CREATE_REG_ON_L2_ACCESS, pref_acc_create_reg_on_l2_access, bool, false >
+
+param< PREF_ACC_USE_REGION, pref_acc_use_region, bool, false >
+
+param< PREF_ACC_UPDATE_DELAY, pref_acc_update_delay, uns, 50 >
+param< PREF_ACC_USE_OVERALLALSO, pref_acc_use_overallalso, bool, false >
+param< PREF_ACC_USE_ONLYGLOBAL, pref_acc_use_onlyglobal, bool, false >
+
+     // MAX DISTANCE FOR ACC BASED THROTTLING
+param< PREF_STREAM_MAX_DISTANCE, pref_stream_max_distance, uns, 64 >
+param< PREF_STREAM_DYN_TRAIN_ON, pref_stream_dyn_train_on, bool, true >
+param< PREF_STREAM_DYN_DIST_ON, pref_stream_dyn_dist_on, bool, true >
+
+
+/* Heterogeneous Feature */
+param<PREF_STREAM_ON, pref_stream_on, bool, false >
+
+param<PREF_STREAM_ON_MEDIUM_CORE, pref_stream_on_medium_core, bool, false >
+
+param<PREF_STREAM_ON_LARGE_CORE, pref_stream_on_large_core, bool, false >
+
+
+param< PREF_THROTTLE_ON, pref_throttle_on, bool, false >
+param< PREF_THROTTLEFB_ON, pref_throttlefb_on, bool, false >
+param< PREF_ACC_THRESH_4, pref_acc_thresh_4, float, 0.40 >
+param< PREF_ACCRATIOTHROTTLE, pref_accratiothrottle, bool, false >
+param< PREF_ACCRATIO_1, pref_accratio_1, float, 0.70 >
+param<DEBUG_STREAM,            debug_stream,             uns,             0> 
