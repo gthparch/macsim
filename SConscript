@@ -28,7 +28,7 @@ warn_flags = [
 #  '-Wunused-function',
 #  '-Wreturn-type',
 #  '-Wpointer-arith',
-  '-Wuninitialized',
+#  '-Wuninitialized',
   '-Wno-write-strings'
 ]
 warn_flags = ' '.join(warn_flags)
@@ -282,7 +282,18 @@ macsim_src = [
   'src/cs_disas.cc',
   'src/resource.cc',
   'src/mmu.cc',
-  'src/tlb.cc'
+  'src/tlb.cc',
+  # add prefetcher code
+  'src/hw_prefetcher/pref_ghb.cc',  
+  'src/hw_prefetcher/pref_ghb.h',
+  'src/hw_prefetcher/pref_2dc.cc',
+  'src/hw_prefetcher/pref_2dc.h',
+  'src/hw_prefetcher/pref_phase.cc',
+  'src/hw_prefetcher/pref_phase.h',
+  'src/hw_prefetcher/pref_stream.cc',
+  'src/hw_prefetcher/pref_stream.h',
+  'src/hw_prefetcher/pref_stridepc.cc',
+  'src/hw_prefetcher/pref_stridepc.h'
 ]
 
 
