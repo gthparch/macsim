@@ -37,13 +37,35 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "pref_factory.h"
 #include "assert.h"
 #include "pref_stride.h"
+#include "all_knobs.h"
+#include "hw_prefetcher/pref_2dc.h"
+#include "hw_prefetcher/pref_ghb.h"
+#include "hw_prefetcher/pref_stream.h"
+#include "hw_prefetcher/pref_stridepc.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 void pref_factory(vector<pref_base_c *> &pref_table, hwp_common_c *hcc,
                   Unit_Type type, macsim_c *simBase) {
-  pref_base_c *pref_stride = new pref_stride_c(hcc, type, simBase);
-  pref_table.push_back(pref_stride);
+  pref_base_c *pref = nullptr;
+  if (*simBase->m_knobs->KNOB_PREF_2DC_ON) {
+    pref = new pref_2dc_c(hcc, type, simBase);
+  }
+
+  if (*simBase->m_knobs->KNOB_PREF_GHB_ON) {
+    pref = new pref_ghb_c(hcc, type, simBase);
+  }
+
+  if (*simBase->m_knobs->KNOB_PREF_STREAM_ON) {
+    pref = new pref_stream_c(hcc, type, simBase);
+  }
+
+  if (*simBase->m_knobs->KNOB_PREF_STRIDEPC_ON) {
+    pref = new pref_stridepc_c(hcc, type, simBase);
+  }
+
+  assert(pref != nullptr);
+  pref_table.push_back(pref);
 }
 
 // Singleton pointer to pref_factory_c

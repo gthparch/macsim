@@ -627,6 +627,23 @@ int dcu_c::access(uop_c* uop) {
     else if (req_type == MRT_DPRF) {
       return m_latency;
     }
+
+    // // TODO: insert hardware prefetch code here? -- need to init somewhere
+    // if (*m_simBase->m_knobs->KNOB_PREF_2DC_ON) {
+    //   //
+    // }
+
+    // if (*m_simBase->m_knobs->KNOB_PREF_STREAM_ON) {
+    //   //
+    // }
+
+    // if (*m_simBase->m_knobs->KNOB_PREF_STRIDE_ON) {
+    //   //
+    // }
+
+    // if (*m_simBase->m_knobs->KNOB_PREF_GHB_ON) {
+    //   //
+    // }
   }  // !cache_hit
 
   return -1;  // cache miss

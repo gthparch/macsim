@@ -730,11 +730,11 @@ void macsim_c::initialize(int argc, char** argv) {
     new manifold::kernel::Clock(1);  // clock has to be global or static
 #endif
 
-  // initialize cores
-  init_cores(m_num_sim_cores);
-
   // init memory
   init_memory();
+
+  // initialize cores
+  init_cores(m_num_sim_cores);
 
   // initialize some of my output streams to the standards */
   init_output_streams();
