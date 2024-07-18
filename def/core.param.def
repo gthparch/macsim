@@ -56,8 +56,8 @@ param<SIMD_ALLOCQ_INDEX,  siaq_index, int, 3>
 
 param<ONE_CYCLE_EXEC,           	one_cycle_exec,         		bool,   0>
 
-param<MAX_INSTS, 					max_insts, 						uns32, 	1000>
-param<SIM_CYCLE_COUNT, 				sim_cycle_count, 				uns32, 	1000000>
+param<MAX_INSTS, 					max_insts, 						uns64, 	1000>
+param<SIM_CYCLE_COUNT, 				sim_cycle_count, 				uns64, 	1000000>
 
 param<FORWARD_PROGRESS_LIMIT, 		forward_progress_limit, 		uns64,  100000>
 
