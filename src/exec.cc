@@ -191,6 +191,17 @@ exec_c::exec_c(EXEC_INTERFACE_PARAMS(), macsim_c* simBase)
             uop_latencybinding_init_x86_coffee_lake[ii].m_latency;
         }
         break;
+      case LATENCY_SAPPHIRE_RAPIDS:
+        report("UOP latency mapped to Sapphire Rapids");
+        latency_array_size =
+          (sizeof uop_latencybinding_init_x86_sapphire_rapids /
+           sizeof(uop_latencybinding_init_x86_sapphire_rapids[0]));
+
+        for (int ii = 0; ii < latency_array_size; ++ii) {
+          m_latency[uop_latencybinding_init_x86_sapphire_rapids[ii].uop_type_s] =
+            uop_latencybinding_init_x86_sapphire_rapids[ii].m_latency;
+        }
+        break;
       default:
         report("UOP latency mapped to Sandy Bridge");
         latency_array_size = (sizeof uop_latencybinding_init_x86 /
