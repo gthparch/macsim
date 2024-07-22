@@ -500,6 +500,7 @@ bool hwp_common_c::pref_addto_l1req_queue(Addr line_index, uns8 prefetcher_id) {
 
 // send a new request to l2 request queue
 bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id) {
+  DEBUG("l2 demand addr: %llx\n", line_index);
   return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false, 0,
                                     0);
 }
@@ -507,6 +508,7 @@ bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id) {
 // send a new request to l2 request queue
 bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
                                           Addr loadPC) {
+  DEBUG("l2 demand addr: %llx\n", line_index);
   return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false,
                                     loadPC, 0);
 }
@@ -514,6 +516,7 @@ bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
 // send a new request to l2 request queue
 bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
                                           Addr loadPC, int tid) {
+  DEBUG("l2 demand addr: %llx\n", line_index);
   return pref_addto_l2req_queue_set(line_index, prefetcher_id, false, false,
                                     loadPC, tid);
 }
@@ -522,6 +525,7 @@ bool hwp_common_c::pref_addto_l2req_queue(Addr line_index, uns8 prefetcher_id,
 bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index,
                                               uns8 prefetcher_id, bool Begin,
                                               bool End, Addr loadPC) {
+  DEBUG("l2 demand addr: %llx\n", line_index);
   return pref_addto_l2req_queue_set(line_index, prefetcher_id, Begin, End,
                                     loadPC, 0);
 }
@@ -535,7 +539,7 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index,
   Addr line_addr;
   if (!line_index)  // addr = 0
     return true;
-
+  DEBUG("l2 demand addr: %llx\n", line_index);
   line_addr = (line_index) << m_shift_bit;
 
   if (*m_simBase->m_knobs->KNOB_PREF_UPDATE_INTERVAL != 0 &&
@@ -674,6 +678,7 @@ bool hwp_common_c::pref_addto_l2req_queue_set(Addr line_index,
     for (ii = 0; ii < *m_simBase->m_knobs->KNOB_PREF_UL1REQ_QUEUE_SIZE; ++ii) {
       if (m_l2req_queue[ii].line_index == line_index) {
         STAT_EVENT(PREF_UL2REQ_QUEUE_MATCHED_REQ);
+        DEBUG("match prefetched address in queue: addr %llx\n", line_index);
         return true;  // Hit another request
       }
     }

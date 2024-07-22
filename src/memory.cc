@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "statistics.h"
 
 #define DEBUG(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ##args)
+#define DEBUG_PREF(args...) _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_PREF, ##args)
 #define DEBUG_CORE(m_core_id, args...)                        \
   if (m_core_id == *m_simBase->m_knobs->KNOB_DEBUG_CORE_ID) { \
     _DEBUG(*m_simBase->m_knobs->KNOB_DEBUG_MEM, ##args);      \

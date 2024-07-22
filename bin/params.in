@@ -58,11 +58,10 @@ l1_large_bypass 0
 memory_type igpu_network
 
 # LLC
-num_l3 1
-l3_num_set 16384 # 128 MB
-l3_assoc 64
-l3_line_size 128
-l3_latency 50
+llc_num_set 16384 # 128 MB
+llc_assoc 64
+llc_line_size 128
+llc_latency 50
 
 # DRAM
 dram_bus_width 4
@@ -86,6 +85,7 @@ pref_stream_on_large_core 1
 stream_length 64
 stream_buffer_n 256
 pref_acc_on 1
+pref_acc_study 1
 
 # ETC
 bug_detector_enable 1
@@ -104,7 +104,7 @@ debug_exec_stage 0
 debug_dcu_stage 0
 debug_retire_stage 0
 debug_map_stage 0
-debug_mem  1
+debug_mem  0
 debug_pref 1
 debug_trace_read 0
 debug_sim_thread_schedule 0
