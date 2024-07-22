@@ -5,7 +5,7 @@ num_sim_medium_cores 0
 num_sim_large_cores 1
 large_core_type x86 
 sim_cycle_count 0
-max_insts 3000000
+max_insts 90000000000
 heartbeat_interval 1000000
 forward_progress_limit 1000000
 core_thread_sched balanced
@@ -41,28 +41,35 @@ max_threads_per_large_core 7
 
 mem_mshr_size 9
 
-# L3-I
+# L1-I
 icache_large_num_set 4096 # 768 KB
 icache_large_assoc 3
 icache_large_line_size 64
 icache_large_cycles 14
 
-# L3-D
-l1_large_num_set 512 # 512 KB
+# L1-D
+l1_large_num_set 1024 # 1 MB
 l1_large_assoc 16
 l1_large_line_size 64
-l1_large_latency 100
+l1_large_latency 3
 l1_large_bypass 0
+
+# L2
+l2_large_num_set 4096 # 16 MB
+l2_large_assoc 32
+l2_large_line_size 128
+l2_large_latency 24
+l2_large_bypass 0
 
 # Memory
 memory_type igpu_network
 
 # LLC
 num_l3 1
-l3_num_set 8192
-l3_assoc 32
-l3_line_size 64
-l3_latency 100
+l3_num_set 16384 # 128 MB
+l3_assoc 64
+l3_line_size 128
+l3_latency 50
 
 # DRAM
 dram_bus_width 4
@@ -74,6 +81,18 @@ dram_num_channel 8
 dram_rowbuffer_size 2048
 dram_scheduling_policy FRFCFS
 dram_additional_latency 95
+
+# prefetch
+enable_pref_large_core 1
+enable_pref_medium_core 1
+enable_pref_small_core 1
+pref_framework_on 1
+pref_stream_on 1
+pref_stream_on_medium_core 1
+pref_stream_on_large_core 1
+stream_length 64
+stream_buffer_n 256
+pref_acc_on 1
 
 # ETC
 bug_detector_enable 1
@@ -92,7 +111,8 @@ debug_exec_stage 0
 debug_dcu_stage 0
 debug_retire_stage 0
 debug_map_stage 0
-debug_mem  0
+debug_mem  1
+debug_pref 1
 debug_trace_read 0
 debug_sim_thread_schedule 0
 debug_cache_lib 0
