@@ -54,6 +54,13 @@ l1_large_line_size 64
 l1_large_latency 3
 l1_large_bypass 0
 
+# L2
+l2_large_num_set 4096 # 16 MB
+l2_large_assoc 32
+l2_large_line_size 128
+l2_large_latency 24
+l2_large_bypass 0
+
 # Memory
 memory_type igpu_network
 
@@ -82,7 +89,7 @@ pref_framework_on 1
 pref_stream_on 1
 pref_stream_on_medium_core 1
 pref_stream_on_large_core 1
-stream_length 64
+stream_length 32768
 stream_buffer_n 256
 pref_acc_on 1
 pref_acc_study 1
