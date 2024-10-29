@@ -806,7 +806,6 @@ thread_s *process_manager_c::create_thread(process_s *process, int tid,
   // trace_info->m_unique_thread_id = global_unique_thread_id++;
   trace_info->m_unique_thread_id = (start_info->m_thread_id) % BLOCK_ID_MOD;
   trace_info->m_orig_thread_id = global_unique_thread_id++;
-  trace_info->m_trace_id = start_info->m_thread_id;
 
   // set up trace file name
   stringstream sstr;

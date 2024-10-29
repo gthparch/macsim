@@ -12,6 +12,8 @@ src/cscope
 tools/mem_trace_generator/*.raw
 tools/mem_trace_generator/mem_trace
 bin/macsim
+bin/*.out
+bin/*.out.0
 .dbg_build/
 *.lo
 *.la
