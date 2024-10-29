@@ -1,2 +1,2 @@
 1
-../sst-unit-test/traces/cachesize_1/trace.txt
+../sst-unit-test/traces/nvbit/vectormultadd/65536/kernel_config.txt

@@ -85,6 +85,7 @@ src/trace_read_cpu.cc        src/trace_read_cpu.h                      \
 src/trace_read_gpu.cc        src/trace_read_gpu.h                      \
 src/trace_read_a64.cc        src/trace_read_a64.h                      \
 src/trace_read_igpu.cc       src/trace_read_igpu.h                     \
+src/trace_read_nvbit.cc       src/trace_read_nvbit.h                     \
 src/uop.cc                   src/uop.h                                 \
 src/utils.cc                 src/utils.h                               \
 src/network.cc               src/network.h                             \

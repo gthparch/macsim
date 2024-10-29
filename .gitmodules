@@ -1,6 +1,9 @@
 [submodule "internal"]
 	path = internal
-	url = https://github.com/gthparch/macsim_internal
+	url = git@github.com:gthparch/macsim_internal.git
 [submodule "src/rwqueue"]
 	path = src/rwqueue
 	url = https://github.com/cameron314/readerwriterqueue
+[submodule "tools/CUDA_trace_generator"]
+	path = tools/CUDA_trace_generator
+	url = git@github.com:ejchung0406/CUDA_trace_generator.git

@@ -57,8 +57,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define MAX_DST_NUM 6
 #define MAX_GPU_SRC_NUM 5
 #define MAX_GPU_DST_NUM 4
+#define MAX_NVBIT_SRC_NUM 4
+#define MAX_NVBIT_DST_NUM 4
 #define CPU_TRACE_SIZE (sizeof(trace_info_cpu_s) - sizeof(uint64_t))
 #define GPU_TRACE_SIZE (sizeof(trace_info_gpu_small_s))
+#define NVBIT_TRACE_SIZE (sizeof(trace_info_nvbit_small_s))
 #define MAX_TR_OPCODE 452  // ARM_INS_ENDING
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +225,75 @@ typedef struct trace_info_gpu_s {
   uint64_t
     m_next_inst_addr;  // next pc address, not present in raw trace format
 } trace_info_gpu_s;
+
+// the same structure as the trace generator
+
+typedef struct trace_info_nvbit_small_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint16_t m_src[MAX_NVBIT_SRC_NUM];
+  uint16_t m_dst[MAX_NVBIT_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space;  // for loads, stores, atomic, prefetch(?)
+    uint8_t m_level;  // for membar
+  };
+  uint8_t m_cache_level;  // for prefetch?
+  uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+} trace_info_nvbit_small_s;
+
+//trace_info_nvbit_small_s + m_next_inst_addr
+typedef struct trace_info_nvbit_s {
+  uint8_t m_opcode;
+  bool m_is_fp;
+  bool m_is_load;
+  uint8_t m_cf_type;
+  uint8_t m_num_read_regs;
+  uint8_t m_num_dest_regs;
+  uint16_t m_src[MAX_NVBIT_SRC_NUM];
+  uint16_t m_dst[MAX_NVBIT_DST_NUM];
+  uint8_t m_size;
+
+  uint32_t m_active_mask;
+  uint32_t m_br_taken_mask;
+  uint64_t m_inst_addr;
+  uint64_t m_br_target_addr;
+  union {
+    uint64_t m_reconv_inst_addr;
+    uint64_t m_mem_addr;
+  };
+  union {
+    uint8_t m_mem_access_size;
+    uint8_t m_barrier_id;
+  };
+  uint16_t m_num_barrier_threads;
+  union {
+    uint8_t m_addr_space;  // for loads, stores, atomic, prefetch(?)
+    uint8_t m_level;  // for membar
+  };
+  uint8_t m_cache_level;  // for prefetch?
+  uint8_t m_cache_operator;  // for loads, stores, atomic, prefetch(?)
+  uint64_t m_next_inst_addr;  // next pc address, not present in raw trace fo
+
+} trace_info_nvbit_s;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief structure to hold decoded uop information
@@ -585,6 +657,173 @@ typedef enum GPU_FENCE_LEVEL_ENUM_ {
   GPU_FENCE_SYS,
   GPU_FENCE_LAST
 } GPU_FENCE_LEVEL_ENUM;
+
+typedef enum NVBIT_OPCODE_ {
+  NVBIT_FADD,
+  NVBIT_FADD32I,
+  NVBIT_FCHK,
+  NVBIT_FFMA32I,
+  NVBIT_FFMA,
+  NVBIT_FMNMX,
+  NVBIT_FMUL,
+  NVBIT_FMUL32I,
+  NVBIT_FSEL,
+  NVBIT_FSET,
+  NVBIT_FSETP,
+  NVBIT_FSWZADD,
+  NVBIT_MUFU,
+  NVBIT_HADD2,
+  NVBIT_HADD2_32I,
+  NVBIT_HFMA2,
+  NVBIT_HFMA2_32I,
+  NVBIT_HMMA,
+  NVBIT_HMUL2,
+  NVBIT_HMUL2_32I,
+  NVBIT_HSET2,
+  NVBIT_HSETP2,
+  NVBIT_DADD,
+  NVBIT_DFMA,
+  NVBIT_DMUL,
+  NVBIT_DSETP,
+  NVBIT_BMMA,
+  NVBIT_BMSK,
+  NVBIT_BREV,
+  NVBIT_FLO,
+  NVBIT_IABS,
+  NVBIT_IADD,
+  NVBIT_IADD3,
+  NVBIT_IADD32I,
+  NVBIT_IDP,
+  NVBIT_IDP4A,
+  NVBIT_IMAD,
+  NVBIT_IMMA,
+  NVBIT_IMNMX,
+  NVBIT_IMUL,
+  NVBIT_IMUL32I,
+  NVBIT_ISCADD,
+  NVBIT_ISCADD32I,
+  NVBIT_ISETP,
+  NVBIT_LEA,
+  NVBIT_LOP,
+  NVBIT_LOP3,
+  NVBIT_LOP32I,
+  NVBIT_POPC,
+  NVBIT_SHF,
+  NVBIT_SHL,
+  NVBIT_SHR,
+  NVBIT_VABSDIFF,
+  NVBIT_VABSDIFF4,
+  NVBIT_F2F,
+  NVBIT_F2I,
+  NVBIT_I2F,
+  NVBIT_I2I,
+  NVBIT_I2IP,
+  NVBIT_FRND,
+  NVBIT_MOV,
+  NVBIT_MOV32I,
+  NVBIT_MOVM,
+  NVBIT_PRMT,
+  NVBIT_SEL,
+  NVBIT_SGXT,
+  NVBIT_SHFL,
+  NVBIT_PLOP3,
+  NVBIT_PSETP,
+  NVBIT_P2R,
+  NVBIT_R2P,
+  NVBIT_LD,
+  NVBIT_LDC,
+  NVBIT_LDG,
+  NVBIT_LDL,
+  NVBIT_LDS,
+  NVBIT_LDSM,
+  NVBIT_ST,
+  NVBIT_STG,
+  NVBIT_STL,
+  NVBIT_STS,
+  NVBIT_MATCH,
+  NVBIT_QSPC,
+  NVBIT_ATOM,
+  NVBIT_ATOMS,
+  NVBIT_ATOMG,
+  NVBIT_RED,
+  NVBIT_CCTL,
+  NVBIT_CCTLL,
+  NVBIT_ERRBAR,
+  NVBIT_MEMBAR,
+  NVBIT_CCTLT,
+  NVBIT_R2UR,
+  NVBIT_S2UR,
+  NVBIT_UBMSK,
+  NVBIT_UBREV,
+  NVBIT_UCLEA,
+  NVBIT_UFLO,
+  NVBIT_UIADD3,
+  NVBIT_UIADD3_64,
+  NVBIT_UIMAD,
+  NVBIT_UISETP,
+  NVBIT_ULDC,
+  NVBIT_ULEA,
+  NVBIT_ULOP,
+  NVBIT_ULOP3,
+  NVBIT_ULOP32I,
+  NVBIT_UMOV,
+  NVBIT_UP2UR,
+  NVBIT_UPLOP3,
+  NVBIT_UPOPC,
+  NVBIT_UPRMT,
+  NVBIT_UPSETP,
+  NVBIT_UR2UP,
+  NVBIT_USEL,
+  NVBIT_USGXT,
+  NVBIT_USHF,
+  NVBIT_USHL,
+  NVBIT_USHR,
+  NVBIT_VOTEU,
+  NVBIT_TEX,
+  NVBIT_TLD,
+  NVBIT_TLD4,
+  NVBIT_TMML,
+  NVBIT_TXD,
+  NVBIT_TXQ,
+  NVBIT_SUATOM,
+  NVBIT_SULD,
+  NVBIT_SURED,
+  NVBIT_SUST,
+  NVBIT_BMOV,
+  NVBIT_BPT,
+  NVBIT_BRA,
+  NVBIT_BREAK,
+  NVBIT_BRX,
+  NVBIT_BRXU,
+  NVBIT_BSSY,
+  NVBIT_BSYNC,
+  NVBIT_CALL,
+  NVBIT_EXIT,
+  NVBIT_JMP,
+  NVBIT_JMX,
+  NVBIT_JMXU,
+  NVBIT_KILL,
+  NVBIT_NANOSLEEP,
+  NVBIT_RET,
+  NVBIT_RPCMOV,
+  NVBIT_RTT,
+  NVBIT_WARPSYNC,
+  NVBIT_YIELD,
+  NVBIT_B2R,
+  NVBIT_BAR,
+  NVBIT_CS2R,
+  NVBIT_DEPBAR,
+  NVBIT_GETLMEMBASE,
+  NVBIT_LEPC,
+  NVBIT_NOP,
+  NVBIT_PMTRIG,
+  NVBIT_R2B,
+  NVBIT_S2R,
+  NVBIT_SETCTAID,
+  NVBIT_SETLMEMBASE,
+  NVBIT_VOTE,
+  NVBIT_OPCODE_LAST
+} NVBIT_OPCODE;
 
 // in trace generator, special registers are assigned values starting from 200
 // matches order in ocelot/ir/interface/PTXOperand.h

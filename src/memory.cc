@@ -556,10 +556,13 @@ int dcu_c::access(uop_c* uop) {
       case MEM_LD_LM:
       case MEM_LD_CM:
       case MEM_LD_TM:
+      case MEM_LD_GM:
+      case MEM_LD_SM:
         req_type = MRT_DFETCH;
         break;
       case MEM_ST:
       case MEM_ST_LM:
+      case MEM_ST_SM:
       case MEM_ST_GM:
         req_type = MRT_DSTORE;
         break;
@@ -1576,18 +1579,21 @@ memory_c::memory_c(macsim_c* simBase) {
   m_num_cpu = 0;
 
   if ((KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "ptx") ||
+      (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "nvbit") ||
       (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_LARGE_CORES);
 
   if ((KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "ptx") ||
+    (KNOB(KNOB_MEDIUM_CORE_TYPE)->getValue() == "nvbit") ||
       (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
   else
     m_num_cpu += *KNOB(KNOB_NUM_SIM_MEDIUM_CORES);
 
   if ((KNOB(KNOB_CORE_TYPE)->getValue() == "ptx") ||
+    (KNOB(KNOB_CORE_TYPE)->getValue() == "nvbit") ||
       (KNOB(KNOB_LARGE_CORE_TYPE)->getValue() == "igpu"))
     m_num_gpu += *KNOB(KNOB_NUM_SIM_SMALL_CORES);
   else

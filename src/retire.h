@@ -221,6 +221,7 @@ private:
   bool m_ptx_sim; /**< ptx simulation */
   bool m_acc_sim; /**< accelerator simulation */
   bool m_igpu_sim; /**< intel gpu simulation */
+  bool m_nvbit_sim; /**< NVBIT simulation */ 
   unordered_map<int, Counter>
     m_insts_retired; /**< number of retired inst. per thread */
   unordered_map<int, Counter>

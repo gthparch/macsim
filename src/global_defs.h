@@ -159,7 +159,7 @@ void delete_store_hash_entry_wrapper(map_c *map, uop_c *uop);
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions
 
-#define MAX_TR_OPCODE_NAME GPU_OPCODE_LAST
+#define MAX_TR_OPCODE_NAME NVBIT_OPCODE_LAST
 #define MAX_GPU_ADDR_SPACE GPU_ADDR_SP_LAST
 #define MAX_GPU_CACHE_OP GPU_CACHE_OP_LAST
 #define MAX_GPU_CACHE_LEVEL GPU_CACHE_LAST
