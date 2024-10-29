@@ -1,7 +1,7 @@
 
 # Simulation Configuration
-num_sim_cores 80 
-num_sim_small_cores 80 
+num_sim_cores 16
+num_sim_small_cores 16
 core_type nvbit
 max_threads_per_core 1024 
 num_sim_medium_cores 0
@@ -81,7 +81,7 @@ dram_column 11
 dram_activate 25
 dram_precharge 10
 dram_num_banks 16
-dram_num_channel 1
+dram_num_channel 8
 dram_rowbuffer_size 2048
 dram_scheduling_policy FRFCFS
 

@@ -1,0 +1,6 @@
+nvbit
+14
+-1
+./Kernel0/trace.txt
+./Kernel1/trace.txt
+./Kernel2/trace.txt

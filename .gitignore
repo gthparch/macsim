@@ -11,7 +11,7 @@ src/statsEnums.h
 src/cscope
 tools/mem_trace_generator/*.raw
 tools/mem_trace_generator/mem_trace
-bin/
+bin/macsim
 .dbg_build/
 *.lo
 *.la

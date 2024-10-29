@@ -254,7 +254,7 @@ void process_manager_c::create_thread_node(process_s *process, int tid,
   // block id assignment in case of multiple applications
   int block_id = start_info->m_thread_id >> BLOCK_ID_SHIFT;
   // inside parenthesis is the unique block id 
-  // multi_key_map_c::find(key1, key2)
+  // using multi-key map with multi_key_map_c::find(key1, key2)
   node->m_block_id = m_simBase->m_block_id_mapper->find(
     process->m_process_id,
     block_id +
