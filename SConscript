@@ -330,13 +330,28 @@ if flags['sst'] == '1':
   print('CPPFLAGS ', env['CPPFLAGS'])
   print('LINKFLAGS', env['LINKFLAGS'])
 
-  sst_elem_cxx = subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
-  sst_elem_cxxflags = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
-  sst_elem_linkflags = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
 
-  sst_elem_cxx = sst_elem_cxx.strip().split(' ')
-  sst_elem_cxxflags = sst_elem_cxxflags.strip().split(' ')
-  sst_elem_linkflags = sst_elem_linkflags.strip().split(' ')
+  # Replace subprocess.run() with subprocess.Popen() and communicate()
+  process = subprocess.Popen(['sst-config', '--CXX'], stdout=subprocess.PIPE)
+  sst_elem_cxx, _ = process.communicate()
+  sst_elem_cxx = sst_elem_cxx.decode('utf-8').strip().split(' ')
+
+  process = subprocess.Popen(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE)
+  sst_elem_cxxflags, _ = process.communicate()
+  sst_elem_cxxflags = sst_elem_cxxflags.decode('utf-8').strip().split(' ')
+
+  process = subprocess.Popen(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE)
+  sst_elem_linkflags, _ = process.communicate()
+  sst_elem_linkflags = sst_elem_linkflags.decode('utf-8').strip().split(' ')
+
+
+  #sst_elem_cxx = subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
+  #sst_elem_cxxflags = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+  #sst_elem_linkflags = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+
+  #sst_elem_cxx = sst_elem_cxx.strip().split(' ')
+  #sst_elem_cxxflags = sst_elem_cxxflags.strip().split(' ')
+  #sst_elem_linkflags = sst_elem_linkflags.strip().split(' ')
 
   print('sst_elem_cxx:', sst_elem_cxx)
   print('sst_elem_cxxflags:', sst_elem_cxxflags)
