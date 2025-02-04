@@ -320,7 +320,6 @@ if flags['ramulator'] == '1':
 if flags['sst'] == '1':
   macsim_component_src = [x for x in macsim_src if 'main.cc' not in x]    # We don't want main.cc
   macsim_component_src += [
-    'src/dram_sst_vaultsim.cc',
     'macsimComponent.cpp'
   ]
   # print(macsim_component_src)

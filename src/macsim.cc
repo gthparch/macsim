@@ -182,9 +182,9 @@ void macsim_c::register_functions(void) {
 #ifdef DRAMSIM
   dram_factory_c::get()->register_class("DRAMSIM", dramsim_controller);
 #endif
-#ifdef USING_SST
-  dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
-#endif
+// #ifdef USING_SST // ** DEPRICATED **
+//   dram_factory_c::get()->register_class("VAULTSIM", vaultsim_controller);
+// #endif
 
   fetch_factory_c::get()->register_class("rr", fetch_factory);
   pref_factory_c::get()->register_class(pref_factory);

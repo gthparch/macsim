@@ -99,9 +99,11 @@ def main():
     # sst-register SST_ELEMENT_TESTS  simpleExternalElement=$(CURDIR)/../tests
     component = 'macsimComponent'
     component_libdir = f'{os.getcwd()}/.sst_build'
-    component_source = f'{os.getcwd()}/sst'
+    component_source = f'{os.getcwd()}'
     # macsim_component_tests = f'{os.getcwd()}/../tests'
     print(f"Registering SST element: {component}")
+    print(f"  SRCDIR: {component_source}")
+    print(f"  LIBDIR: {component_libdir}")
     os.system(f'sst-register {component} {component}_LIBDIR={component_libdir}')
     os.system(f'sst-register SST_ELEMENT_SOURCE {component}={component_source}')
     # os.system(f'sst-register SST_ELEMENT_TESTS {component}={component_tests}')
