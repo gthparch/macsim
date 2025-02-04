@@ -29,6 +29,8 @@ def parse_arg():
   parser.add_option("--power", action="store_true", dest="power", default=False, help="EI Power")
   parser.add_option("--iris", action="store_true", dest="iris", default=False, help="IRIS")
   parser.add_option("--ramulator", action="store_true", dest="ramulator", default=False, help="Ramulator")
+  parser.add_option("--sst", action="store_true", dest="sst", default=False, help="Build Macsim SST Element")
+  parser.add_option("--sst-install", action="store_true", dest="sst_install", default=False, help="Install Macsim SST Element")
 
   return parser
 
@@ -87,6 +89,24 @@ def main():
   # DRAMSim2
   if options.dramsim:
     cmd += 'dram=1 '
+
+  if options.sst:
+    cmd += 'sst=1 '
+
+  if options.sst_install:
+    # sst-register simpleExternalElement simpleExternalElement_LIBDIR=$(CURDIR)
+    # sst-register SST_ELEMENT_SOURCE simpleExternalElement=$(CURDIR)
+    # sst-register SST_ELEMENT_TESTS  simpleExternalElement=$(CURDIR)/../tests
+    component = 'macsimComponent'
+    component_libdir = f'{os.getcwd()}/.sst_build'
+    component_source = f'{os.getcwd()}/sst'
+    # macsim_component_tests = f'{os.getcwd()}/../tests'
+    print(f"Registering SST element: {component}")
+    os.system(f'sst-register {component} {component}_LIBDIR={component_libdir}')
+    os.system(f'sst-register SST_ELEMENT_SOURCE {component}={component_source}')
+    # os.system(f'sst-register SST_ELEMENT_TESTS {component}={component_tests}')
+    sys.exit(0)
+
 
   # EI power
   if options.power:

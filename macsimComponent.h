@@ -12,7 +12,7 @@
 #include <sst/core/component.h>
 #include <sst/core/link.h>
 #include <sst/core/timeConverter.h>
-#include <sst/core/interfaces/simpleMem.h>
+#include <sst/core/interfaces/stdMem.h>
 
 #include "src/macsim.h"
 
@@ -40,11 +40,15 @@ class macsimComponent : public SST::Component
 {
 public:
   /* SST ELI */
-  SST_ELI_REGISTER_COMPONENT(macsimComponent, "macsimComponent",
-                             "macsimComponent",
-                             SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                             "A Heterogeneous Architecture Simulator",
-                             COMPONENT_CATEGORY_PROCESSOR)
+  SST_ELI_REGISTER_COMPONENT(
+    macsimComponent,                            // Class Name
+    "macsimComponent",                          // Name of Library
+    "macsimComponent",                          // Lookup name for the component
+    SST_ELI_ELEMENT_VERSION(1, 0, 0),           // Component version
+    "A Heterogeneous Architecture Simulator",   // Description
+    COMPONENT_CATEGORY_PROCESSOR
+  )
+
   SST_ELI_DOCUMENT_PARAMS(
     {"param_file", "params.in", NULL}, {"trace_file", "trace_file_list", NULL},
     {"output_dir", "output (stats, params.out, etc.) directory", NULL},
@@ -78,9 +82,15 @@ public:
 
 public:
   macsimComponent(SST::ComponentId_t id, SST::Params &params);
-  void init(unsigned int phase);
-  void setup();
-  void finish();
+  
+  // SST lifecycle functions
+  void init(unsigned int phase) override;
+  void setup() override;
+  void complete(unsigned int phase) override;
+  void finish() override;
+
+  // Clock Handler
+  bool clkTicReceived(SST::Cycle_t currentCycle);
 
 private:
   macsimComponent();  // for serialization only
@@ -90,11 +100,11 @@ private:
   void configureLinks(SST::Params &params, TimeConverter *tc);
 
   virtual bool ticReceived(Cycle_t);
-  void handleInstructionCacheEvent(SimpleMem::Request *req);
-  void handleDataCacheEvent(SimpleMem::Request *req);
-  void handleConstCacheEvent(SimpleMem::Request *req);
-  void handleTextureCacheEvent(SimpleMem::Request *req);
-  void handleCubeEvent(SimpleMem::Request *req);
+  void handleInstructionCacheEvent(Interfaces::StandardMem::Request *req);
+  void handleDataCacheEvent(Interfaces::StandardMem::Request *req);
+  void handleConstCacheEvent(Interfaces::StandardMem::Request *req);
+  void handleTextureCacheEvent(Interfaces::StandardMem::Request *req);
+  void handleCubeEvent(Interfaces::StandardMem::Request *req);
 
   string m_param_file;
   string m_trace_file;
@@ -118,11 +128,11 @@ private:
 
   // links
   uint32_t m_num_link;
-  vector<Interfaces::SimpleMem *> m_instruction_cache_links;
-  vector<Interfaces::SimpleMem *> m_data_cache_links;
-  vector<Interfaces::SimpleMem *> m_const_cache_links;
-  vector<Interfaces::SimpleMem *> m_texture_cache_links;
-  Interfaces::SimpleMem *m_cube_link;
+  vector<Interfaces::StandardMem *> m_instruction_cache_links;
+  vector<Interfaces::StandardMem *> m_data_cache_links;
+  vector<Interfaces::StandardMem *> m_const_cache_links;
+  vector<Interfaces::StandardMem *> m_texture_cache_links;
+  Interfaces::StandardMem *m_cube_link;
 
   // debugging
   vector<uint64_t> m_instruction_cache_request_counters;

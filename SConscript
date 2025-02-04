@@ -317,11 +317,66 @@ if flags['qsim'] == '1':
 if flags['ramulator'] == '1':
   libraries.append('ramulator')
 
-env.Program(
-    'macsim',
-    macsim_src, 
-    LIBS=libraries, 
-)
+if flags['sst'] == '1':
+  macsim_component_src = [x for x in macsim_src if 'main.cc' not in x]    # We don't want main.cc
+  macsim_component_src += [
+    'macsimComponent.cpp'
+  ]
+  # print(macsim_component_src)
+
+  import subprocess
+  print('===== Original ====')
+  print('CXX      ', env['CXX'])
+  print('CPPFLAGS ', env['CPPFLAGS'])
+  print('LINKFLAGS', env['LINKFLAGS'])
+
+  sst_elem_cxx = subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
+  sst_elem_cxxflags = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+  sst_elem_linkflags = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+
+  sst_elem_cxx = sst_elem_cxx.strip().split(' ')
+  sst_elem_cxxflags = sst_elem_cxxflags.strip().split(' ')
+  sst_elem_linkflags = sst_elem_linkflags.strip().split(' ')
+
+  print('sst_elem_cxx:', sst_elem_cxx)
+  print('sst_elem_cxxflags:', sst_elem_cxxflags)
+  print('sst_elem_linkflags:', sst_elem_linkflags)
+
+  # CXX
+  sst_compiler = sst_elem_cxx[0]
+  env['CXX'] = sst_compiler
+
+  # CXXFLAGS
+  sst_elem_cxxflags = ' '.join(sst_elem_cxxflags) + ' '
+  if len(sst_elem_cxx) > 1:
+    sst_elem_cxxflags+= ' '.join(sst_elem_cxx[1:])
+  env['CPPFLAGS'] = sst_elem_cxxflags
+  env['CPPFLAGS'] += ' -I/src'     # Macsim src
+  env['CPPFLAGS'] += ' -Isst/src'  # SST folder
+
+  # LINKGLAGS
+  env['LINKFLAGS'] = sst_elem_linkflags # FIXME: Just override for now
+  
+
+  print('===== Modified ====')
+  print('CXX      ', env['CXX'])
+  print('CPPFLAGS ', env['CPPFLAGS'])
+  print('LINKFLAGS', env['LINKFLAGS'])
+
+  # env['CXX'] += subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
+  # env['CXXFLAGS'] = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+  # env['LINKFLAGS'] = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
+  # print(CXX)
+  # print(CXXFLAGS)
+  # print(LINKFLAGS)
+  env.SharedLibrary('macsimComponenet', macsim_component_src, CPPDEFINES=['USING_SST'])
+
+else:
+  env.Program(
+      'macsim',
+      macsim_src, 
+      LIBS=libraries, 
+  )
 
 
 #########################################################################################

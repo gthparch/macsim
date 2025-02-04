@@ -79,6 +79,7 @@ flags['gprof']         = Config.get('Build', 'gprof', fallback='0')
 flags['pin_3_13_trace'] = Config.get('Build', 'pin_3_13_trace', fallback='0')
 flags['val']           = Config.get('Build_Extra', 'val', fallback='0')
 flags['ramulator']     = Config.get('Library', 'ramulator', fallback='0')
+flags['sst']           = Config.get('Build', 'sst', fallback='0')
 
 ## Configuration from commandline
 flags['debug']         = ARGUMENTS.get('debug', flags['debug'])
@@ -90,7 +91,7 @@ flags['dram']          = ARGUMENTS.get('dram', flags['dram'])
 flags['val']           = ARGUMENTS.get('val', flags['val'])
 flags['qsim']          = ARGUMENTS.get('qsim', flags['qsim'])
 flags['ramulator']     = ARGUMENTS.get('ramulator', flags['ramulator'])
-
+flags['sst']           = ARGUMENTS.get('sst', flags['sst'])
 
 ## Checkout DRAMSim2 copy
 if flags['dram'] == '1':
@@ -114,6 +115,10 @@ if flags['debug'] == '1':
 elif flags['gprof'] == '1':
   SConscript('SConscript', variant_dir='.gpf_build', duplicate=0, exports='flags')
   Clean('.', '.gpf_build')
+## sst build
+elif flags['sst'] == '1':
+  SConscript('SConscript', variant_dir='.sst_build', duplicate=0, exports='flags')
+  Clean('.', '.sst_build')
 ## opt build
 else:
   SConscript('SConscript', variant_dir='.opt_build', duplicate=0, exports='flags')
