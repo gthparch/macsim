@@ -116,9 +116,9 @@ def main():
 
   if options.sst_install:
     component = 'macsimComponent'
-    component_lib_dir = '.sst_build'
-    component_src_dir = 'src'
-    component_tests_dir = 'sst-unit-test'
+    component_lib_dir = os.path.abspath('.sst_build')
+    component_src_dir = os.getcwd()
+    component_tests_dir = os.path.abspath('sst-unit-test')
 
     # Check if macsim component exists
     if not os.path.exists(f'{component_lib_dir}/lib{component}.so'):
