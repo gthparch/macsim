@@ -10,6 +10,7 @@ import sys
 import os
 import glob
 
+from build import get_cmd_output
 
 #########################################################################################
 # Build option
@@ -317,81 +318,38 @@ if flags['qsim'] == '1':
 if flags['ramulator'] == '1':
   libraries.append('ramulator')
 
-if flags['sst'] == '1':
+if flags['sst'] == '1':   # Compile Macsim for SST
+  macsim_component_name = 'macsimComponent'
   macsim_component_src = [x for x in macsim_src if 'main.cc' not in x]    # We don't want main.cc
   macsim_component_src += [
     'macsimComponent.cpp'
   ]
-  # print(macsim_component_src)
 
-  import subprocess
-  print('===== Original ====')
-  print('CXX      ', env['CXX'])
-  print('CPPFLAGS ', env['CPPFLAGS'])
-  print('LINKFLAGS', env['LINKFLAGS'])
+  sst_build_cxx =  get_cmd_output(['sst-config', '--CXX']).split(' ')
+  sst_build_cxxflags = get_cmd_output(['sst-config', '--ELEMENT_CXXFLAGS']).split(' ')
+  sst_build_linkflags = get_cmd_output(['sst-config', '--ELEMENT_LDFLAGS']).split(' ')
 
-
-  # Replace subprocess.run() with subprocess.Popen() and communicate()
-  process = subprocess.Popen(['sst-config', '--CXX'], stdout=subprocess.PIPE)
-  sst_elem_cxx, _ = process.communicate()
-  sst_elem_cxx = sst_elem_cxx.decode('utf-8').strip().split(' ')
-
-  process = subprocess.Popen(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE)
-  sst_elem_cxxflags, _ = process.communicate()
-  sst_elem_cxxflags = sst_elem_cxxflags.decode('utf-8').strip().split(' ')
-
-  process = subprocess.Popen(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE)
-  sst_elem_linkflags, _ = process.communicate()
-  sst_elem_linkflags = sst_elem_linkflags.decode('utf-8').strip().split(' ')
-
-
-  #sst_elem_cxx = subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
-  #sst_elem_cxxflags = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
-  #sst_elem_linkflags = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
-
-  #sst_elem_cxx = sst_elem_cxx.strip().split(' ')
-  #sst_elem_cxxflags = sst_elem_cxxflags.strip().split(' ')
-  #sst_elem_linkflags = sst_elem_linkflags.strip().split(' ')
-
-  print('sst_elem_cxx:', sst_elem_cxx)
-  print('sst_elem_cxxflags:', sst_elem_cxxflags)
-  print('sst_elem_linkflags:', sst_elem_linkflags)
-
-  # CXX
-  sst_compiler = sst_elem_cxx[0]
+  # Set CXX compiler
+  sst_compiler = sst_build_cxx[0]
   env['CXX'] = sst_compiler
 
-  # CXXFLAGS
-  sst_elem_cxxflags = ' '.join(sst_elem_cxxflags) + ' '
-  if len(sst_elem_cxx) > 1:
-    sst_elem_cxxflags+= ' '.join(sst_elem_cxx[1:])
-  env['CPPFLAGS'] = sst_elem_cxxflags
-  env['CPPFLAGS'] += ' -I/src'     # Macsim src
-  env['CPPFLAGS'] += ' -Isst/src'  # SST folder
+  # Set CXXFLAGS
+  env['CPPFLAGS'] += ' ' + ' '.join(sst_build_cxxflags)
+  env['CPPFLAGS'] += ' -DUSING_SST'
 
-  # LINKGLAGS
-  env['LINKFLAGS'] = sst_elem_linkflags # FIXME: Just override for now
-  
+  # Set LINKFLAGS
+  env['LINKFLAGS'] = sst_build_linkflags    # Overriding
 
-  print('===== Modified ====')
-  print('CXX      ', env['CXX'])
-  print('CPPFLAGS ', env['CPPFLAGS'])
-  print('LINKFLAGS', env['LINKFLAGS'])
+  # Generate SST component as shared library
+  env.SharedLibrary(macsim_component_name, macsim_component_src)
+  Return()    # Finish gracefully
 
-  # env['CXX'] += subprocess.run(['sst-config', '--CXX'], stdout=subprocess.PIPE, text=True).stdout
-  # env['CXXFLAGS'] = subprocess.run(['sst-config', '--ELEMENT_CXXFLAGS'], stdout=subprocess.PIPE, text=True).stdout
-  # env['LINKFLAGS'] = subprocess.run(['sst-config', '--ELEMENT_LDFLAGS'], stdout=subprocess.PIPE, text=True).stdout
-  # print(CXX)
-  # print(CXXFLAGS)
-  # print(LINKFLAGS)
-  env.SharedLibrary('macsimComponenet', macsim_component_src, CPPDEFINES=['USING_SST'])
-
-else:
-  env.Program(
-      'macsim',
-      macsim_src, 
-      LIBS=libraries, 
-  )
+# Build Macsim executable
+env.Program(
+    'macsim',
+    macsim_src, 
+    LIBS=libraries, 
+)
 
 
 #########################################################################################

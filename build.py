@@ -10,7 +10,7 @@ import os
 import sys
 import itertools
 from optparse import OptionParser
-
+import subprocess
 
 #########################################################################################
 # argument parsing
@@ -59,6 +59,27 @@ def build_test():
         else:
           print('%s %s failed' % (build_option[ii], ' '.join(opt)))
 
+#########################################################################################
+# Util Functions
+#########################################################################################
+def get_cmd_output(cmd:list, abort_on_error:bool=True):
+  """
+  Run a command and return the output.
+  :param cmd: The command to run as a list of tokens.
+  :param abort_on_error: If True, abort on error.
+  :return: The stdout, stderr, and return code of the command.
+  """
+  process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+  stdout, stderr = process.communicate()
+  stdout = stdout.decode('utf-8', errors='replace').strip() if stdout is not None else ''
+  stderr = stderr.decode('utf-8', errors='replace').strip() if stderr is not None else ''
+  if abort_on_error and process.returncode != 0:
+    print(f'Error: Shell command failed (return code: {process.returncode}): ', ' '.join(cmd), file=sys.stderr)
+    print('\tstdout:', stdout, file=sys.stderr)
+    print('\tstderr:', stderr, file=sys.stderr)
+    sys.exit(1)
+  return stdout
+
 
 #########################################################################################
 # main function
@@ -94,21 +115,32 @@ def main():
     cmd += 'sst=1 '
 
   if options.sst_install:
-    # sst-register simpleExternalElement simpleExternalElement_LIBDIR=$(CURDIR)
-    # sst-register SST_ELEMENT_SOURCE simpleExternalElement=$(CURDIR)
-    # sst-register SST_ELEMENT_TESTS  simpleExternalElement=$(CURDIR)/../tests
     component = 'macsimComponent'
-    component_libdir = f'{os.getcwd()}/.sst_build'
-    component_source = f'{os.getcwd()}'
-    # macsim_component_tests = f'{os.getcwd()}/../tests'
-    print(f"Registering SST element: {component}")
-    print(f"  SRCDIR: {component_source}")
-    print(f"  LIBDIR: {component_libdir}")
-    os.system(f'sst-register {component} {component}_LIBDIR={component_libdir}')
-    os.system(f'sst-register SST_ELEMENT_SOURCE {component}={component_source}')
-    # os.system(f'sst-register SST_ELEMENT_TESTS {component}={component_tests}')
-    sys.exit(0)
+    component_lib_dir = '.sst_build'
+    component_src_dir = 'src'
+    component_tests_dir = 'sst-unit-test'
 
+    # Check if macsim component exists
+    if not os.path.exists(f'{component_lib_dir}/lib{component}.so'):
+      print(f"ERROR: {component} not found in {component_lib_dir}, build with sst=1 option first")
+      exit(0)
+
+    print(f"Registering SST element: {component}")
+    print(f"  SRCDIR: {component_src_dir}")
+    print(f"  LIBDIR: {component_lib_dir}")
+    print(f"  TESTDIR: {component_tests_dir}")
+    os.system(f'sst-register {component} {component}_LIBDIR={component_lib_dir}')
+    os.system(f'sst-register SST_ELEMENT_SOURCE {component}={component_src_dir}')
+    os.system(f'sst-register SST_ELEMENT_TESTS {component}={component_tests_dir}')
+
+    # Check if component is registered successfully
+    sst_info_out = get_cmd_output(['sst-info', component])
+    if 'Component 0: macsimComponent' in sst_info_out:
+      print(f"Successfully registered SST element: {component}")
+      exit(0)
+    else:
+      print(f"ERROR: Failed to register SST element: {component}")
+      exit(1)
 
   # EI power
   if options.power:
