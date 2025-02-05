@@ -57,9 +57,11 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   m_command_line = params.find<string>("command_line", found);
 
   m_clock_freq = params.find<string>("frequency", found);
+  if (!found) m_dbg->fatal(CALL_INFO, -1, "Couldn't find frequency parameter\n");
+
   TimeConverter* tc = registerClock(
     m_clock_freq,
-    new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+    new Clock::Handler<macsimComponent>(this, &macsimComponent::clkTicReceived));
 
   if (params.find<bool>("ptx_core", 0)) {
     m_acc_type = PTX_CORE;
