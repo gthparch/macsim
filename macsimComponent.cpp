@@ -90,7 +90,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
       Params interfaceParams;
       interfaceParams.insert("port", "cube_link");
       m_cube_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-        "memHierarchy.memInterface", "cube_link", 0,
+        "memHierarchy.standardInterface", "cube_link", 0,
         ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
         interfaceParams, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
@@ -130,75 +130,87 @@ macsimComponent::macsimComponent() : Component(-1) {
 
 void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
   for (unsigned int l = 0; l < m_num_link; ++l) {
+    // Configure ICache Link
+    std::string icache_portname = "core" + std::to_string(l) + "_icache";
     auto icache_link = loadUserSubComponent<Interfaces::StandardMem>(
-      "core" + std::to_string(l) + "-icache", ComponentInfo::SHARE_NONE, tc,
+      icache_portname, ComponentInfo::SHARE_NONE, tc,
       new Interfaces::StandardMem::Handler<macsimComponent>(
         this, &macsimComponent::handleInstructionCacheEvent));
     if (!icache_link) {
       Params interfaceParams;
-      interfaceParams.insert("port", "core" + std::to_string(l) + "-icache");
+      interfaceParams.insert("port", icache_portname);
       icache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-        "memHierarchy.memInterface", "core" + std::to_string(l) + "-icache", 0,
+        "memHierarchy.standardInterface", icache_portname, 0,
         ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
         interfaceParams, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleInstructionCacheEvent));
     }
+    if(!icache_link) m_dbg->fatal(CALL_INFO, -1, "Configuring icache link failed\n");
     m_instruction_cache_links.push_back(icache_link);
     m_instruction_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
+    break;                                                                      // FIXME: Testing with only ICACHE
+
+    // Configure DCache Link
+    std::string dcache_portname = "core" + std::to_string(l) + "_dcache";
 
     auto dcache_link = loadUserSubComponent<Interfaces::StandardMem>(
-      "core" + std::to_string(l) + "-dcache", ComponentInfo::SHARE_NONE, tc,
+      dcache_portname, ComponentInfo::SHARE_NONE, tc,
       new Interfaces::StandardMem::Handler<macsimComponent>(
         this, &macsimComponent::handleDataCacheEvent));
     if (!dcache_link) {
       Params interfaceParams;
-      interfaceParams.insert("port", "core" + std::to_string(l) + "-dcache");
+      interfaceParams.insert("port", dcache_portname);
       dcache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-        "memHierarchy.memInterface", "core" + std::to_string(l) + "-dcache", 0,
+        "memHierarchy.standardInterface", dcache_portname, 0,
         ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
         interfaceParams, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleDataCacheEvent));
     }
+    if(!dcache_link) m_dbg->fatal(CALL_INFO, -1, "Configuring dcache link failed\n");
     m_data_cache_links.push_back(dcache_link);
     m_data_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_data_cache_responses.push_back(std::set<uint64_t>());
 
     if (m_acc_core) {
+      std::string ccache_portname = "core" + std::to_string(l) + "_ccache";
       auto ccache_link = loadUserSubComponent<Interfaces::StandardMem>(
-        "core" + std::to_string(l) + "_ccache", ComponentInfo::SHARE_NONE, tc,
+        ccache_portname, ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleConstCacheEvent));
       if (!ccache_link) {
         Params interfaceParams;
-        interfaceParams.insert("port", "core" + std::to_string(l) + "_ccache");
+        interfaceParams.insert("port", ccache_portname);
         ccache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-          "memHierarchy.memInterface", "core" + std::to_string(l) + "_ccache",
+          "memHierarchy.standardInterface", ccache_portname,
           0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
           interfaceParams, tc,
           new Interfaces::StandardMem::Handler<macsimComponent>(
             this, &macsimComponent::handleConstCacheEvent));
       }
+      if(!ccache_link) m_dbg->fatal(CALL_INFO, -1, "Configuring ccache link failed\n");
       m_const_cache_links.push_back(ccache_link);
       m_const_cache_requests.push_back(std::map<uint64_t, uint64_t>());
       m_const_cache_responses.push_back(std::set<uint64_t>());
 
+      std::string tcache_portname = "core" + std::to_string(l) + "_tcache";
       auto tcache_link = loadUserSubComponent<Interfaces::StandardMem>(
-        "core" + std::to_string(l) + "-tcache", ComponentInfo::SHARE_NONE, tc,
+        tcache_portname, ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleTextureCacheEvent));
       if (!tcache_link) {
         Params interfaceParams;
-        interfaceParams.insert("port", "core" + std::to_string(l) + "-tcache");
+        interfaceParams.insert("port", tcache_portname);
         tcache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-          "memHierarchy.memInterface", "core" + std::to_string(l) + "-tcache",
+          "memHierarchy.standardInterface", tcache_portname,
           0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
           interfaceParams, tc,
           new Interfaces::StandardMem::Handler<macsimComponent>(
             this, &macsimComponent::handleTextureCacheEvent));
       }
+      if(!tcache_link) m_dbg->fatal(CALL_INFO, -1, "Configuring tcache link failed\n");
       m_texture_cache_links.push_back(tcache_link);
       m_texture_cache_requests.push_back(std::map<uint64_t, uint64_t>());
       m_texture_cache_responses.push_back(std::set<uint64_t>());
@@ -224,7 +236,7 @@ void macsimComponent::init(unsigned int phase) {
   if (!phase) {
     for (unsigned int l = 0; l < m_num_link; ++l) {
       m_instruction_cache_links[l]->init(phase);
-      m_data_cache_links[l]->init(phase);
+      // m_data_cache_links[l]->init(phase);              // FIXME:
     }
 
     if (m_cube_connected) m_cube_link->init(phase);
