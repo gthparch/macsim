@@ -8,10 +8,11 @@ verbose = 2
 ################################################################################
 # Macsim -> L1 ICache -> (MemController) Memory
 ################################################################################
-macsim = sst.Component("macsimComponent", "macsimComponent.macsimComponent")
+macsim = sst.Component("cpu0", "macsimComponent.macsimComponent")
 macsim.addParams({
     "param_file": "params.in",
     "trace_file": "trace_file_list",
+    "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0",
     "output_dir": "output_dir",
     "frequency" : "2GHz",
     "num_cores" : "1",

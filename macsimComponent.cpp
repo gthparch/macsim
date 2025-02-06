@@ -150,7 +150,8 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_instruction_cache_links.push_back(icache_link);
     m_instruction_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
-    
+    break;                                                                      // FIXME: Testing with only ICACHE
+
     // Configure DCache Link
     std::string dcache_portname = "core" + std::to_string(l) + "_dcache";
 
@@ -235,7 +236,7 @@ void macsimComponent::init(unsigned int phase) {
   if (!phase) {
     for (unsigned int l = 0; l < m_num_link; ++l) {
       m_instruction_cache_links[l]->init(phase);
-      m_data_cache_links[l]->init(phase);
+      // m_data_cache_links[l]->init(phase);              // FIXME:
     }
 
     if (m_cube_connected) m_cube_link->init(phase);
