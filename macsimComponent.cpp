@@ -131,14 +131,14 @@ macsimComponent::macsimComponent() : Component(-1) {
 void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
   for (unsigned int l = 0; l < m_num_link; ++l) {
     auto icache_link = loadUserSubComponent<Interfaces::StandardMem>(
-      "core" + std::to_string(l) + "-icache", ComponentInfo::SHARE_NONE, tc,
+      "core" + std::to_string(l) + "_icache", ComponentInfo::SHARE_NONE, tc,
       new Interfaces::StandardMem::Handler<macsimComponent>(
         this, &macsimComponent::handleInstructionCacheEvent));
     if (!icache_link) {
       Params interfaceParams;
-      interfaceParams.insert("port", "core" + std::to_string(l) + "-icache");
+      interfaceParams.insert("port", "core" + std::to_string(l) + "_icache");
       icache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-        "memHierarchy.memInterface", "core" + std::to_string(l) + "-icache", 0,
+        "memHierarchy.memInterface", "core" + std::to_string(l) + "_icache", 0,
         ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
         interfaceParams, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
@@ -149,14 +149,14 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
 
     auto dcache_link = loadUserSubComponent<Interfaces::StandardMem>(
-      "core" + std::to_string(l) + "-dcache", ComponentInfo::SHARE_NONE, tc,
+      "core" + std::to_string(l) + "_dcache", ComponentInfo::SHARE_NONE, tc,
       new Interfaces::StandardMem::Handler<macsimComponent>(
         this, &macsimComponent::handleDataCacheEvent));
     if (!dcache_link) {
       Params interfaceParams;
-      interfaceParams.insert("port", "core" + std::to_string(l) + "-dcache");
+      interfaceParams.insert("port", "core" + std::to_string(l) + "_dcache");
       dcache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-        "memHierarchy.memInterface", "core" + std::to_string(l) + "-dcache", 0,
+        "memHierarchy.memInterface", "core" + std::to_string(l) + "_dcache", 0,
         ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
         interfaceParams, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
@@ -186,14 +186,14 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
       m_const_cache_responses.push_back(std::set<uint64_t>());
 
       auto tcache_link = loadUserSubComponent<Interfaces::StandardMem>(
-        "core" + std::to_string(l) + "-tcache", ComponentInfo::SHARE_NONE, tc,
+        "core" + std::to_string(l) + "_tcache", ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleTextureCacheEvent));
       if (!tcache_link) {
         Params interfaceParams;
-        interfaceParams.insert("port", "core" + std::to_string(l) + "-tcache");
+        interfaceParams.insert("port", "core" + std::to_string(l) + "_tcache");
         tcache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-          "memHierarchy.memInterface", "core" + std::to_string(l) + "-tcache",
+          "memHierarchy.memInterface", "core" + std::to_string(l) + "_tcache",
           0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
           interfaceParams, tc,
           new Interfaces::StandardMem::Handler<macsimComponent>(
