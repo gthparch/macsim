@@ -106,19 +106,18 @@ if flags['ramulator'] == '1':
 ## Create stat/knobs
 SConscript('scripts/SConscript', exports='flags')
 
-
+## sst element build (with/without debug)
+if flags['sst'] == '1':
+  SConscript('SConscript', variant_dir='.sst_build', duplicate=0, exports='flags')
+  Clean('.', '.sst_build')
 ## debug build
-if flags['debug'] == '1':
+elif flags['debug'] == '1' and not flags['sst'] == '1':
   SConscript('SConscript', variant_dir='.dbg_build', duplicate=0, exports='flags')
   Clean('.', '.dbg_build')
 ## gprof build
 elif flags['gprof'] == '1':
   SConscript('SConscript', variant_dir='.gpf_build', duplicate=0, exports='flags')
   Clean('.', '.gpf_build')
-## sst build
-elif flags['sst'] == '1':
-  SConscript('SConscript', variant_dir='.sst_build', duplicate=0, exports='flags')
-  Clean('.', '.sst_build')
 ## opt build
 else:
   SConscript('SConscript', variant_dir='.opt_build', duplicate=0, exports='flags')
