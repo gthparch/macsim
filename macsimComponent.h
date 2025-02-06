@@ -71,12 +71,12 @@ public:
 
   SST_ELI_DOCUMENT_PORTS(
     {"ipc_link", "Port for Inter Processor Communication", {}},
-    {"core%(core_id)d-icache", "Ports connected to instruction cache", {}},
-    {"core%(core_id)d-dcache", "Ports connected to data cache", {}},
-    {"core%(core_id)d-ccache",
+    {"core%(core_id)d_icache", "Ports connected to instruction cache", {}},
+    {"core%(core_id)d_dcache", "Ports connected to data cache", {}},
+    {"core%(core_id)d_ccache",
      "Ports connected to const cache (only for GPU core)",
      {}},
-    {"core%(core_id)d-tcache",
+    {"core%(core_id)d_tcache",
      "Ports connected to texture cache (only for GPU core)",
      {}})
 

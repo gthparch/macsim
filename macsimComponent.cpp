@@ -168,14 +168,14 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
 
     if (m_acc_core) {
       auto ccache_link = loadUserSubComponent<Interfaces::StandardMem>(
-        "core" + std::to_string(l) + "-ccache", ComponentInfo::SHARE_NONE, tc,
+        "core" + std::to_string(l) + "_ccache", ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
           this, &macsimComponent::handleConstCacheEvent));
       if (!ccache_link) {
         Params interfaceParams;
-        interfaceParams.insert("port", "core" + std::to_string(l) + "-ccache");
+        interfaceParams.insert("port", "core" + std::to_string(l) + "_ccache");
         ccache_link = loadAnonymousSubComponent<Interfaces::StandardMem>(
-          "memHierarchy.memInterface", "core" + std::to_string(l) + "-ccache",
+          "memHierarchy.memInterface", "core" + std::to_string(l) + "_ccache",
           0, ComponentInfo::SHARE_PORTS | ComponentInfo::INSERT_STATS,
           interfaceParams, tc,
           new Interfaces::StandardMem::Handler<macsimComponent>(
