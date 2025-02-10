@@ -20,7 +20,8 @@
 #include "macsimEvent.h"
 #include "macsimComponent.h"
 
-#define MSC_DEBUG(fmt, args...) m_dbg->debug(CALL_INFO, INFO, 0, fmt, ##args)
+// #define MSC_DEBUG(fmt, args...) m_dbg->debug(CALL_INFO, INFO, 0, fmt, ##args)
+#define MSC_DEBUG(fmt, args...) printf("MACSIM: " fmt, ##args)                  // FIXME:   Fix debug messages
 
 using namespace SST;
 using namespace SST::MacSim;
@@ -102,6 +103,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
 
   m_mem_size = params.find<uint64_t>("mem_size", 1 * 1024 * 1024 * 1024);
   MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
+  MSC_DEBUG("Mem address range: 0x%" PRIx64 " - 0x%" PRIx64 "\n", 0x0UL, m_mem_size - 1);
 
   registerAsPrimaryComponent();
   primaryComponentDoNotEndSim();
@@ -150,7 +152,6 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_instruction_cache_links.push_back(icache_link);
     m_instruction_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
-    break;                                                                      // FIXME: Testing with only ICACHE
 
     // Configure DCache Link
     std::string dcache_portname = "core" + std::to_string(l) + "_dcache";
@@ -236,7 +237,7 @@ void macsimComponent::init(unsigned int phase) {
   if (!phase) {
     for (unsigned int l = 0; l < m_num_link; ++l) {
       m_instruction_cache_links[l]->init(phase);
-      // m_data_cache_links[l]->init(phase);              // FIXME:
+      m_data_cache_links[l]->init(phase);
     }
 
     if (m_cube_connected) m_cube_link->init(phase);
@@ -438,6 +439,10 @@ void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key,
   StandardMem::Request* req = new StandardMem::Request(
     StandardMem::Request::Read, addr & (m_mem_size - 1), size, 0, HMC_NONE);
 #endif
+  MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+              ", size = %d\n",
+              core_id, addr & 0x3FFFFFFF, addr, size);
+
   m_instruction_cache_links[core_id]->send(req);
   m_instruction_cache_request_counters[core_id]++;
   m_instruction_cache_requests[core_id].insert(make_pair(req->getID(), key));
