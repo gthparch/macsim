@@ -89,9 +89,6 @@ public:
   void complete(unsigned int phase) override;
   void finish() override;
 
-  // Clock Handler
-  bool clkTicReceived(SST::Cycle_t currentCycle);
-
 private:
   macsimComponent();  // for serialization only
   macsimComponent(const macsimComponent &);  // do not implement

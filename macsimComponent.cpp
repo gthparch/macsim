@@ -4,7 +4,7 @@
 #include <string.h>
 #include <algorithm>
 
-#include <sst/core/sst_config.h> // Th  is include is REQUIRED for all implementation files
+// #include <sst/core/sst_config.h> // Th  is include is REQUIRED for all implementation files
 // #include <sst_config.h>           // FIXME: one of these should be removed
 // #include <sst/core/simulation.h>
 // #include <sst/core/params.h>
@@ -62,7 +62,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
 
   TimeConverter* tc = registerClock(
     m_clock_freq,
-    new Clock::Handler<macsimComponent>(this, &macsimComponent::clkTicReceived));
+    new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
 
   if (params.find<bool>("ptx_core", 0)) {
     m_acc_type = PTX_CORE;
@@ -80,6 +80,18 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   }
   m_num_link = params.find<uint32_t>("num_link", 1);
   configureLinks(params, tc);
+
+  // Show link information
+  MSC_DEBUG("Number of links: %d\n", m_num_link);
+  for (unsigned int l = 0; l < m_num_link; ++l) {
+    MSC_DEBUG("-- Core: %d --------\n", l);
+    MSC_DEBUG("  I cache link: %s\n", m_instruction_cache_links[l]->getName().c_str());
+    MSC_DEBUG("  D cache link: %s\n", m_data_cache_links[l]->getName().c_str());
+    if (m_acc_core) {
+      MSC_DEBUG("  C cache link: %s\n", m_const_cache_links[l]->getName().c_str());
+      MSC_DEBUG("  T cache link: %s\n", m_texture_cache_links[l]->getName().c_str());
+    }
+  }
 
   m_cube_connected = params.find<bool>("cube_connected", 0);
   if (m_cube_connected) {
@@ -102,8 +114,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   }
 
   m_mem_size = params.find<uint64_t>("mem_size", 1 * 1024 * 1024 * 1024);
-  MSC_DEBUG("Size of memory address space: 0x%" PRIx64 "\n", m_mem_size);
-  MSC_DEBUG("Mem address range: 0x%" PRIx64 " - 0x%" PRIx64 "\n", 0x0UL, m_mem_size - 1);
+  MSC_DEBUG("Memory address space: %" PRId64 " Bytes (0x%" PRIx64 " - 0x%" PRIx64 ")\n", m_mem_size, 0x0UL, m_mem_size - 1);
 
   registerAsPrimaryComponent();
   primaryComponentDoNotEndSim();
@@ -116,6 +127,7 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   //   Upon completion, MacSim will return an event to another SST component.
   m_operation_mode =
     params.find<int>("operation_mode", (int)OperationMode::MASTER);
+  MSC_DEBUG("Operation mode: %s\n", m_operation_mode == OperationMode::MASTER ? "MASTER" : "SLAVE");
   if (m_operation_mode == OperationMode::MASTER) {
     m_triggered = true;
     m_ipc_link = NULL;
@@ -132,6 +144,7 @@ macsimComponent::macsimComponent() : Component(-1) {
 
 void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
   for (unsigned int l = 0; l < m_num_link; ++l) {
+    ////////////////////////////////////////
     // Configure ICache Link
     std::string icache_portname = "core" + std::to_string(l) + "_icache";
     auto icache_link = loadUserSubComponent<Interfaces::StandardMem>(
@@ -153,6 +166,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_instruction_cache_requests.push_back(std::map<uint64_t, uint64_t>());
     m_instruction_cache_responses.push_back(std::set<uint64_t>());
 
+    ////////////////////////////////////////
     // Configure DCache Link
     std::string dcache_portname = "core" + std::to_string(l) + "_dcache";
 
@@ -176,6 +190,8 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     m_data_cache_responses.push_back(std::set<uint64_t>());
 
     if (m_acc_core) {
+      ////////////////////////////////////////
+      // Configure Const Cache Link
       std::string ccache_portname = "core" + std::to_string(l) + "_ccache";
       auto ccache_link = loadUserSubComponent<Interfaces::StandardMem>(
         ccache_portname, ComponentInfo::SHARE_NONE, tc,
@@ -196,6 +212,8 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
       m_const_cache_requests.push_back(std::map<uint64_t, uint64_t>());
       m_const_cache_responses.push_back(std::set<uint64_t>());
 
+      ////////////////////////////////////////
+      // Configure Texture Cache Link
       std::string tcache_portname = "core" + std::to_string(l) + "_tcache";
       auto tcache_link = loadUserSubComponent<Interfaces::StandardMem>(
         tcache_portname, ComponentInfo::SHARE_NONE, tc,
@@ -238,6 +256,10 @@ void macsimComponent::init(unsigned int phase) {
     for (unsigned int l = 0; l < m_num_link; ++l) {
       m_instruction_cache_links[l]->init(phase);
       m_data_cache_links[l]->init(phase);
+      if (m_acc_core) {
+        m_const_cache_links[l]->init(phase);
+        m_texture_cache_links[l]->init(phase);
+      }
     }
 
     if (m_cube_connected) m_cube_link->init(phase);
@@ -335,6 +357,18 @@ void macsimComponent::setup() {
 
     m_macsim->registerCallback(scr, scrq);
   }
+
+  // Setup memory links
+  for (unsigned int l = 0; l < m_num_link; ++l) {   // Standard CPU does this but others don't, why??
+    m_instruction_cache_links[l]->setup();
+    m_data_cache_links[l]->setup();
+    if(m_acc_core){
+      m_const_cache_links[l]->setup();
+      m_texture_cache_links[l]->setup();
+    }
+  }
+  if (m_cube_connected) m_cube_link->setup();
+
 }
 
 void macsimComponent::complete(unsigned int phase) {
@@ -345,10 +379,6 @@ void macsimComponent::complete(unsigned int phase) {
 void macsimComponent::finish() {
   MSC_DEBUG("------- Finishing simulation -------\n");
   m_macsim->finalize();
-}
-
-bool macsimComponent::clkTicReceived(SST::Cycle_t currentCycle) {
-  return ticReceived(currentCycle);
 }
 
 
@@ -431,17 +461,21 @@ bool macsimComponent::ticReceived(Cycle_t) {
 ////////////////////////////////////////
 void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key,
                                                   uint64_t addr, int size) {
+  // mask address to make sure it lies in address range
+  uint64_t req_addr = addr & (m_mem_size - 1);
+
 #ifndef USE_VAULTSIM_HMC
   // StandardMem::Request* req = new StandardMem::Request(
   //   StandardMem::Request::Read, addr & (m_mem_size - 1), size);
-  StandardMem::Request* req = new StandardMem::Read(addr & (m_mem_size - 1), size);   // FIXME: is this correct?
+  StandardMem::Request* req = new StandardMem::Read(req_addr, size);
 #else
   StandardMem::Request* req = new StandardMem::Request(
-    StandardMem::Request::Read, addr & (m_mem_size - 1), size, 0, HMC_NONE);
+    StandardMem::Request::Read, req_addr, size, 0, HMC_NONE);
 #endif
+
+  // Print out the request
   MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-              ", size = %d\n",
-              core_id, addr & 0x3FFFFFFF, addr, size);
+            "), size = %d\n", core_id, req_addr, addr, size);
 
   m_instruction_cache_links[core_id]->send(req);
   m_instruction_cache_request_counters[core_id]++;
@@ -510,21 +544,43 @@ inline bool isStore(Mem_Type type) {
 #ifndef USE_VAULTSIM_HMC
 void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key,
                                            uint64_t addr, int size, int type) {
+  // FIXME:
+  // mask address to make sure it lies in address range
+  uint64_t req_addr = addr & (m_mem_size - 1);
 
-// FIXME:
-//   bool doWrite = isStore((Mem_Type)type);
-//   StandardMem::Request* req = new StandardMem::Request(
-//     doWrite ? StandardMem::Request::Write : StandardMem::Request::Read,
-//     addr & (m_mem_size - 1), size);
-//   m_data_cache_links[core_id]->sendRequest(req);
-//   m_data_cache_request_counters[core_id]++;
-//   m_data_cache_requests[core_id].insert(make_pair(req->id, key));
-//   if (m_debug_all || m_debug_addr == addr) {
-//     MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-//               "), %s, size = %d\n",
-//               core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read",
-//               size);
-//   }
+  bool doWrite = isStore((Mem_Type)type);
+
+  StandardMem::Request* req;
+  if(doWrite) {
+    std::vector<uint8_t> data;
+    data.push_back((req_addr >> 24) & 0xff);
+    data.push_back((req_addr >> 16) & 0xff);
+    data.push_back((req_addr >>  8) & 0xff);
+    data.push_back((req_addr >>  0) & 0xff);
+    req = new StandardMem::Write(req_addr, size, data);
+  }
+  else {
+    req = new StandardMem::Read(req_addr, size);
+  }
+
+  // StandardMem::Request* req = new StandardMem::Request(
+  //   doWrite ? StandardMem::Request::Write : StandardMem::Request::Read,
+  //   addr & (m_mem_size - 1), size);
+
+  MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+              "), %s, size = %d\n",
+              core_id, req_addr, addr, doWrite ? "write" : "read",
+              size);
+
+  m_data_cache_links[core_id]->send(req);
+  m_data_cache_request_counters[core_id]++;
+  m_data_cache_requests[core_id].insert(make_pair(req->getID(), key));
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+              "), %s, size = %d\n",
+              core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read",
+              size);
+  }
 }
 #else
 void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key,
