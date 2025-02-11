@@ -25,7 +25,16 @@ macsim.addParams({
     "debug_level": DEBUG_LEVEL,
 })
 macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
+macsim_icache_if.addParams({
+    'debug': 10,
+    'verbose': 2
+})
+
 macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if.addParams({
+    'debug': 10,
+    'verbose': 2
+})
 
 # Instruction Memory Controller
 memctrl_i = sst.Component("memory_i", "memHierarchy.MemController")
