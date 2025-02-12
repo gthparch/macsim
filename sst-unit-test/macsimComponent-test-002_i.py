@@ -1,48 +1,19 @@
 import sst
 
 ################################################################################
-# Util functions
-
-KIB = 1024
-MIB = 1024 * KIB
-GIB = 1024 * MIB
-
-def bytes2str(nbytes):
-    if nbytes >= GIB:
-        return "%dGiB" % (nbytes / GIB)
-    elif nbytes >= MIB:
-        return "%dMiB" % (nbytes / MIB)
-    elif nbytes >= KIB:
-        return "%dKiB" % (nbytes / KIB)
-    else:
-        return "%dB" % nbytes
-
-def str2bytes(s):
-    if s.endswith("GiB"):
-        return int(s[:-3]) * GIB
-    elif s.endswith("MiB"):
-        return int(s[:-3]) * MIB
-    elif s.endswith("KiB"):
-        return int(s[:-3]) * KIB
-    else:
-        return int(s)
-
-################################################################################
 # Parameters
-VERBOSE = 2
-DEBUG_CORE = 8
-DEBUG_L1 = 0
-DEBUG_MEM = 0
+DEBUG_L1 = 1
+DEBUG_MEM = 1
+DEBUG_CORE = 1
 DEBUG_LEVEL = 10
+
 MEM_SIZE_S = '512MiB'
 
 MEM_SIZE = str2bytes(MEM_SIZE_S)
 MEM_START = 0
 MEM_END = MEM_START + MEM_SIZE - 1
 
-print("MEM_SIZE: %s" % MEM_SIZE)
-print("MEM_START: %s" % MEM_START)
-print("MEM_END: %s" % MEM_END)
+print("MEM_SIZE: %d (%s): 0x%x - 0x%x" % (MEM_SIZE, MEM_SIZE_S, MEM_START, MEM_END))
    
 
 ################################################################################
@@ -57,31 +28,55 @@ macsim.addParams({
     "frequency" : "2GHz",
     "num_cores" : "1",
     "num_links": "1",
-    "m_mem_size" : MEM_SIZE,
-    "debug_level": DEBUG_CORE
+    "mem_size" : MEM_SIZE,
+    "debug_level": "9",
 })
 
+l1_icache = sst.Component("l1_icache", "memHierarchy.Cache")
+l1_icache.addParams({
+      "access_latency_cycles" : "4",
+      "cache_frequency" : "2 Ghz",
+      "replacement_policy" : "lru",
+      "coherence_protocol" : "MSI",
+      "associativity" : "4",
+      "cache_line_size" : "64",
+      "debug_level" : DEBUG_LEVEL,
+      "L1" : "1",
+      "debug" : DEBUG_L1,
+      "cache_size" : "64 KB"
+})
+
+l1_dcache = sst.Component("l1_dcache", "memHierarchy.Cache")
+l1_dcache.addParams({
+      "access_latency_cycles" : "4",
+      "cache_frequency" : "2 Ghz",
+      "replacement_policy" : "lru",
+      "coherence_protocol" : "MSI",
+      "associativity" : "4",
+      "cache_line_size" : "64",
+      "debug_level" : DEBUG_LEVEL,
+      "L1" : "1",
+      "debug" : DEBUG_L1,
+      "cache_size" : "64 KB"
+})
+
+# Bus between caches and memory controller
 mem_bus = sst.Component("mem_bus", "memHierarchy.Bus")
 mem_bus.addParams({
-     "debug" : "0",
+     "debug" : "8",
      "bus_frequency" : "4 Ghz"
 })
-
-link_coreicache_bus0 = sst.Link("link_coreicache_bus0")
-link_coreicache_bus0.connect( (macsim, "core0_icache", "1000ps"), (mem_bus, "high_network_0", "1000ps") )
-link_coredcache_bus1 = sst.Link("link_coredcache_bus1")
-link_coredcache_bus1.connect( (macsim, "core0_dcache", "1000ps"), (mem_bus, "high_network_1", "1000ps") )
 
 # Memory Controller
 memctrl = sst.Component("memory", "memHierarchy.MemController")
 memctrl.addParams({
     "debug" : DEBUG_MEM,
     "debug_level" : DEBUG_LEVEL,
-    "clock" : "2GHz",
-    "verbose" : VERBOSE,
-    "addr_range_start" : MEM_START,
+    "clock" : "1GHz",
+    # "addr_range_start" : MEM_START,
     "addr_range_end" : MEM_END,
 })
+
 # Memory
 memory = memctrl.setSubComponent("backend", "memHierarchy.simpleMem")
 memory.addParams({
@@ -90,6 +85,30 @@ memory.addParams({
 })
 
 
+########################################
+# Enable statistics
+sst.setStatisticLoadLevel(7)
+sst.setStatisticOutput("sst.statOutputConsole")
+
+########################################
+# Links
+
+# Macsim::icache -> l1_icache
+link_msi_l1icache = sst.Link("link_msi_l1icache")
+link_msi_l1icache.connect((macsim, "core0_icache", "1000ps"), (l1_icache, "highlink", "1000ps"))
+
+# Macsim::dcache -> l1_dcache
+link_msd_l1dcache = sst.Link("link_msd_l1dcache")
+link_msd_l1dcache.connect((macsim, "core0_dcache", "1000ps"), (l1_dcache, "highlink", "1000ps"))
+
+# L1_icache -> Bus
+link_l1icache_bus = sst.Link("link_l1icache_bus")
+link_l1icache_bus.connect((l1_icache, "lowlink", "50ps"), (mem_bus, "highlink0", "50ps"))
+
+# L1_dcache -> Bus
+# link_l1dcache_bus = sst.Link("link_l1dcache_bus")
+# link_l1dcache_bus.connect((l1_dcache, "lowlink", "50ps"), (mem_bus, "highlink1", "50ps"))
+
 # Bus -> memctrl
 link_bus_memctrl = sst.Link("link_bus_memctrl")
-link_bus_memctrl.connect( (mem_bus, "low_network_0", "50ps"), (memctrl, "direct_link", "50ps") )
+link_bus_memctrl.connect((mem_bus, "lowlink0", "50ps"), (memctrl, "highlink", "50ps"))

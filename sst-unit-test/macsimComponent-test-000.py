@@ -1,3 +1,8 @@
+################################################################################
+# Description: 
+#   - macsimComponent instantiation test 
+#   - It will fail since nothing is connected
+################################################################################
 import sst
 
 obj = sst.Component("macsimComponent", "macsimComponent.macsimComponent")

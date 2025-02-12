@@ -88,6 +88,7 @@ public:
   void setup() override;
   void complete(unsigned int phase) override;
   void finish() override;
+  // void emergencyShutdown() override;
 
 private:
   macsimComponent();  // for serialization only
@@ -97,6 +98,18 @@ private:
   void configureLinks(SST::Params &params, TimeConverter *tc);
 
   virtual bool ticReceived(Cycle_t);
+  
+  // TODO: Correct way to implement handlers: see juno example
+  // class ICacheHandlers : public Interfaces::StandardMem::RequestHandler {
+  //   public:
+  //     friend class macsimComponent;  
+  //     macsimComponent* macsim_component;  
+  //     MemHandlers(macsimComponent* macsim_component, SST::Output* out) : Interfaces::StandardMem::RequestHandler(out), macsim_component(macsim_component) {}
+  //     virtual ~MemHandlers() {}
+  //     virtual void handle(Interfaces::StandardMem::ReadResp* resp) override;
+  //     virtual void handle(Interfaces::StandardMem::WriteResp* resp) override;
+  // };
+
   void handleInstructionCacheEvent(Interfaces::StandardMem::Request *req);
   void handleDataCacheEvent(Interfaces::StandardMem::Request *req);
   void handleConstCacheEvent(Interfaces::StandardMem::Request *req);
@@ -174,6 +187,7 @@ private:
   bool strobeTextureCacheRespQ(int, uint64_t);
   bool strobeCubeRespQ(uint64_t);
 
+  TimeConverter* tc;
   Output *m_dbg;
   Cycle_t m_cycle;
 };  // class macsimComponent

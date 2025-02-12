@@ -20,8 +20,7 @@
 #include "macsimEvent.h"
 #include "macsimComponent.h"
 
-// #define MSC_DEBUG(fmt, args...) m_dbg->debug(CALL_INFO, INFO, 0, fmt, ##args)
-#define MSC_DEBUG(fmt, args...) printf("MACSIM: " fmt, ##args)                  // FIXME:   Fix debug messages
+#define MSC_DEBUG(fmt, args...) m_dbg->debug(CALL_INFO, INFO, 0, fmt, ##args)
 
 using namespace SST;
 using namespace SST::MacSim;
@@ -60,10 +59,6 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   m_clock_freq = params.find<string>("frequency", found);
   if (!found) m_dbg->fatal(CALL_INFO, -1, "Couldn't find frequency parameter\n");
 
-  TimeConverter* tc = registerClock(
-    m_clock_freq,
-    new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
-
   if (params.find<bool>("ptx_core", 0)) {
     m_acc_type = PTX_CORE;
     m_acc_core = 1;
@@ -79,6 +74,19 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
     m_acc_type = NO_ACC;
   }
   m_num_link = params.find<uint32_t>("num_link", 1);
+
+  m_mem_size = params.find<uint64_t>("mem_size", 1 * 1024 * 1024 * 1024);
+  MSC_DEBUG("Memory address space: %" PRId64 " Bytes (0x%" PRIx64 " - 0x%" PRIx64 ")\n", m_mem_size, 0x0UL, m_mem_size - 1);
+
+  registerAsPrimaryComponent();
+  primaryComponentDoNotEndSim();
+
+  // Register clock handler
+  tc = registerClock(
+    m_clock_freq,
+    new Clock::Handler<macsimComponent>(this, &macsimComponent::ticReceived));
+
+  // Configure links
   configureLinks(params, tc);
 
   // Show link information
@@ -112,12 +120,6 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   } else {
     m_cube_link = NULL;
   }
-
-  m_mem_size = params.find<uint64_t>("mem_size", 1 * 1024 * 1024 * 1024);
-  MSC_DEBUG("Memory address space: %" PRId64 " Bytes (0x%" PRIx64 " - 0x%" PRIx64 ")\n", m_mem_size, 0x0UL, m_mem_size - 1);
-
-  registerAsPrimaryComponent();
-  primaryComponentDoNotEndSim();
 
   m_macsim = new macsim_c();
   m_sim_running = false;
@@ -250,20 +252,20 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
 }
 
 void macsimComponent::init(unsigned int phase) {
-  MSC_DEBUG("MacsimComponent:  Participating in phase %d of init.\n", phase);
+  MSC_DEBUG("Participating in phase %d of init.\n", phase);
 
-  if (!phase) {
-    for (unsigned int l = 0; l < m_num_link; ++l) {
-      m_instruction_cache_links[l]->init(phase);
-      m_data_cache_links[l]->init(phase);
-      if (m_acc_core) {
-        m_const_cache_links[l]->init(phase);
-        m_texture_cache_links[l]->init(phase);
-      }
+  // if (!phase) {
+  for (unsigned int l = 0; l < m_num_link; ++l) {
+    m_instruction_cache_links[l]->init(phase);
+    m_data_cache_links[l]->init(phase);
+    if (m_acc_core) {
+      m_const_cache_links[l]->init(phase);
+      m_texture_cache_links[l]->init(phase);
     }
-
-    if (m_cube_connected) m_cube_link->init(phase);
   }
+
+  if (m_cube_connected) m_cube_link->init(phase);
+  // }
 }
 
 void macsimComponent::setup() {
@@ -373,7 +375,7 @@ void macsimComponent::setup() {
 
 void macsimComponent::complete(unsigned int phase) {
     // output.verbose(CALL_INFO, 1, 0, "Component is participating in phase %d of complete.\n", phase);
-    MSC_DEBUG("MacsimComponent: Participating in phase %d of complete.\n", phase);
+    MSC_DEBUG("Participating in phase %d of complete.\n", phase);
 }
 
 void macsimComponent::finish() {
@@ -474,18 +476,13 @@ void macsimComponent::sendInstructionCacheRequest(int core_id, uint64_t key,
 #endif
 
   // Print out the request
-  MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-            "), size = %d\n", core_id, req_addr, addr, size);
-
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+              "), size = %d\n", core_id, req_addr, addr, size);
+  }
   m_instruction_cache_links[core_id]->send(req);
   m_instruction_cache_request_counters[core_id]++;
   m_instruction_cache_requests[core_id].insert(make_pair(req->getID(), key));
-
-  if (m_debug_all || m_debug_addr == addr) {
-    MSC_DEBUG("I$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-              ", size = %d\n",
-              core_id, addr & 0x3FFFFFFF, addr, size);
-  }
 }
 
 bool macsimComponent::strobeInstructionCacheRespQ(int core_id, uint64_t key) {
@@ -510,11 +507,11 @@ void macsimComponent::handleInstructionCacheEvent(
         // Get request
         auto m_instruction_req = m_instruction_cache_requests[l].find(req->getID());    // FIXME: 
 
-    // FIXME:
-    //   if (m_debug_all || m_debug_addr == req->Addr) {
-    //     MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 "\n", l,
-    //               req->getAddr());
-    //   }
+        if (m_debug_all/* || m_debug_addr == req->pAddr*/) {    // FIXME: debugging a particular address requires sophisticated handling. see juno example
+          MSC_DEBUG("I$[%d] response arrived: (%s)\n", l, req->getString().c_str());
+          // MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 ", size = %lu (%s)\n",
+          //   l, req->pAddr, req->size, req->getString().c_str());
+        }
       m_instruction_cache_responses[l].insert(i->second);
       m_instruction_cache_response_counters[l]++;
       m_instruction_cache_requests[l].erase(i);
@@ -566,21 +563,16 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key,
   // StandardMem::Request* req = new StandardMem::Request(
   //   doWrite ? StandardMem::Request::Write : StandardMem::Request::Read,
   //   addr & (m_mem_size - 1), size);
-
-  MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-              "), %s, size = %d\n",
-              core_id, req_addr, addr, doWrite ? "write" : "read",
-              size);
-
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+                "), %s, size = %d\n",
+                core_id, req_addr, addr, doWrite ? "write" : "read",
+                size);
+  }
+  
   m_data_cache_links[core_id]->send(req);
   m_data_cache_request_counters[core_id]++;
   m_data_cache_requests[core_id].insert(make_pair(req->getID(), key));
-  if (m_debug_all || m_debug_addr == addr) {
-    MSC_DEBUG("D$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-              "), %s, size = %d\n",
-              core_id, addr & 0x3FFFFFFF, addr, doWrite ? "write" : "read",
-              size);
-  }
 }
 #else
 void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key,
@@ -628,10 +620,12 @@ void macsimComponent::handleDataCacheEvent(
       continue;
     } else {
         // FIXME:
-    //   if (m_debug_all || m_debug_addr == req->getAddr()) {
-    //     MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n",
-    //               l, req->getAddr(), req->size);
-    //   }
+      if (m_debug_all /*|| m_debug_addr == req->pAddr*/) {
+        MSC_DEBUG("D$[%d] response arrived: (%s)\n",
+            l, req->getString().c_str());
+        // MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu (%s)\n",
+        //   l, req->pAddr, req->size, req->getString().c_str());
+      }
       m_data_cache_responses[l].insert(i->second);
       m_data_cache_response_counters[l]++;
       m_data_cache_requests[l].erase(i);
