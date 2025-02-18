@@ -318,7 +318,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
           // constant memory
           if (uop->m_mem_type == MEM_LD_CM) {
 #ifdef USING_SST
-            uop_latency = access_const_texture_cache(uop);
+            uop_latency = access_const_texture_cache(uop);        //FIXME: Is this correct ?
 #else
             uop_latency = core->get_const_cache()->load(uop);
 #endif
@@ -789,7 +789,7 @@ void exec_c::run_a_cycle(void) {
 #ifdef USING_SST
   // Strobing
   core_c* core = m_simBase->m_core_pointers[m_core_id];
-  for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
+  for (auto I = m_uop_buffer.begin(); I != m_uop_buffer.end(); ) {
     uint64_t key = I->first;
     uop_c* uop = I->second;
 
@@ -851,7 +851,9 @@ void exec_c::run_a_cycle(void) {
                  "from memHierarchy!\n",
                  m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
                  uop->m_vaddr);
-      m_uop_buffer.erase(I);
+      I = m_uop_buffer.erase(I);  // erase returns next valid iterator
+    } else {
+      ++I;
     }
   }
 #else  // USING_SST

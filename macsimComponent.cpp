@@ -642,18 +642,17 @@ void macsimComponent::handleDataCacheEvent(
 ////////////////////////////////////////
 void macsimComponent::sendConstCacheRequest(int core_id, uint64_t key,
                                             uint64_t addr, int size) {
-// FIXME:
-//   StandardMem::Request* req = new StandardMem::Request(
-//     StandardMem::Request::Read, addr & (m_mem_size - 1), size);
-//   m_const_cache_links[core_id]->sendRequest(req);
-//   m_const_cache_request_counters[core_id]++;
-//   m_const_cache_requests[core_id].insert(make_pair(req->id, key));
+  uint64_t req_addr = addr & (m_mem_size - 1);
+  StandardMem::Request* req = new StandardMem::Read(req_addr, size);
 
-//   if (m_debug_all || m_debug_addr == addr) {
-//     MSC_DEBUG("C$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-//               ", size = %d\n",
-//               core_id, addr & (m_mem_size - 1), addr, size);
-//   }
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("C$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+              ", size = %d\n",
+              core_id, req_addr, addr, size);
+  }
+  m_const_cache_links[core_id]->send(req);
+  m_const_cache_request_counters[core_id]++;
+  m_const_cache_requests[core_id].insert(make_pair(req->getID(), key));
 }
 
 bool macsimComponent::strobeConstCacheRespQ(int core_id, uint64_t key) {
@@ -669,22 +668,22 @@ bool macsimComponent::strobeConstCacheRespQ(int core_id, uint64_t key) {
 
 // incoming events are scanned and deleted
 void macsimComponent::handleConstCacheEvent(Interfaces::StandardMem::Request* req) {
-// FIXME:
-//   for (unsigned int l = 0; l < m_num_link; ++l) {
-//     auto i = m_const_cache_requests[l].find(req->id);
-//     if (m_const_cache_requests[l].end() == i) {  // No matching request
-//       continue;
-//     } else {
-//       if (m_debug_all || m_debug_addr == req->getAddr()) {
-//         MSC_DEBUG("C$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n",
-//                   l, req->getAddr(), req->size);
-//       }
-//       m_const_cache_responses[l].insert(i->second);
-//       m_const_cache_response_counters[l]++;
-//       m_const_cache_requests[l].erase(i);
-//       break;
-//     }
-//   }
+  for (unsigned int l = 0; l < m_num_link; ++l) {
+    auto i = m_const_cache_requests[l].find(req->getID());
+    if (m_const_cache_requests[l].end() == i) {  // No matching request
+      continue;
+    } else {
+      if (m_debug_all/* || m_debug_addr == req->pAddr*/) {    // FIXME: debugging a particular address requires sophisticated handling. see juno example
+        MSC_DEBUG("C$[%d] response arrived: (%s)\n", l, req->getString().c_str());
+        // MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 ", size = %lu (%s)\n",
+        //   l, req->pAddr, req->size, req->getString().c_str());
+      }
+      m_const_cache_responses[l].insert(i->second);
+      m_const_cache_response_counters[l]++;
+      m_const_cache_requests[l].erase(i);
+      break;
+    }
+  }
 
   delete req;
 }
@@ -696,15 +695,18 @@ void macsimComponent::handleConstCacheEvent(Interfaces::StandardMem::Request* re
 ////////////////////////////////////////
 void macsimComponent::sendTextureCacheRequest(int core_id, uint64_t key,
                                               uint64_t addr, int size) {
-// FIXME:
-//   StandardMem::Request* req = new StandardMem::Request(
-//     StandardMem::Request::Read, addr & (m_mem_size - 1), size);
-//   m_texture_cache_links[core_id]->sendRequest(req);
-//   m_texture_cache_request_counters[core_id]++;
-//   m_texture_cache_requests[core_id].insert(make_pair(req->id, key));
-//   MSC_DEBUG("T$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
-//             ", size = %d\n",
-//             core_id, addr & (m_mem_size - 1), addr, size);
+  // mask address to make sure it lies in address range
+  uint64_t req_addr = addr & (m_mem_size - 1);
+  StandardMem::Request* req = new StandardMem::Read(req_addr, size);
+  
+  MSC_DEBUG("T$[%d] request sent: addr = %#" PRIx64 " (orig addr = %#" PRIx64
+    ", size = %d\n",
+    core_id, req_addr, addr, size);
+  
+  m_texture_cache_links[core_id]->send(req);
+  m_texture_cache_request_counters[core_id]++;
+  m_texture_cache_requests[core_id].insert(make_pair(req->getID(), key));
+
 }
 
 bool macsimComponent::strobeTextureCacheRespQ(int core_id, uint64_t key) {
@@ -722,23 +724,24 @@ bool macsimComponent::strobeTextureCacheRespQ(int core_id, uint64_t key) {
 void macsimComponent::handleTextureCacheEvent(
   Interfaces::StandardMem::Request* req) {
 // FIXME:
-//   for (unsigned int l = 0; l < m_num_link; ++l) {
-//     auto i = m_texture_cache_requests[l].find(req->id);
-//     if (m_texture_cache_requests[l].end() == i) {  // No matching request
-//       continue;
-//     } else {
-//       if (m_debug_all || m_debug_addr == req->getAddr()) {
-//         MSC_DEBUG("T$[%d] response arrived: addr = %#" PRIx64 ", size = %lu\n",
-//                   l, req->getAddr(), req->size);
-//       }
-//       m_texture_cache_responses[l].insert(i->second);
-//       m_texture_cache_response_counters[l]++;
-//       m_texture_cache_requests[l].erase(i);
-//       break;
-//     }
-//   }
+  for (unsigned int l = 0; l < m_num_link; ++l) {
+    auto i = m_texture_cache_requests[l].find(req->getID());
+    if (m_texture_cache_requests[l].end() == i) {  // No matching request
+      continue;
+    } else {
+      if (m_debug_all/* || m_debug_addr == req->pAddr*/) {    // FIXME: debugging a particular address requires sophisticated handling. see juno example
+        MSC_DEBUG("T$[%d] response arrived: (%s)\n", l, req->getString().c_str());
+        // MSC_DEBUG("I$[%d] response arrived: addr = %#" PRIx64 ", size = %lu (%s)\n",
+        //   l, req->pAddr, req->size, req->getString().c_str());
+      }
+      m_texture_cache_responses[l].insert(i->second);
+      m_texture_cache_response_counters[l]++;
+      m_texture_cache_requests[l].erase(i);
+      break;
+    }
+  }
 
-//   delete req;
+  delete req;
 }
 
 ////////////////////////////////////////
@@ -748,19 +751,35 @@ void macsimComponent::handleTextureCacheEvent(
 ////////////////////////////////////////
 void macsimComponent::sendCubeRequest(uint64_t key, uint64_t addr, int size,
                                       int type) {
+  // mask address to make sure it lies in address range
+  uint64_t req_addr = addr & (m_mem_size - 1);
+
+  bool doWrite = isStore((Mem_Type)type);
+  StandardMem::Request* req;
+  if(doWrite) {
+    std::vector<uint8_t> data;
+    data.push_back((req_addr >> 24) & 0xff);
+    data.push_back((req_addr >> 16) & 0xff);
+    data.push_back((req_addr >>  8) & 0xff);
+    data.push_back((req_addr >>  0) & 0xff);
+    req = new StandardMem::Write(req_addr, size, data);
+  }
+  else {
+    req = new StandardMem::Read(req_addr, size);
+  }             
 // FIXME:
 //   bool doWrite = isStore((Mem_Type)type);
 //   StandardMem::Request* req = new StandardMem::Request(
 //     doWrite ? StandardMem::Request::Write : StandardMem::Request::Read,
 //     addr & 0x3FFFFFFF, size);
 //   m_cube_link->sendRequest(req);
-//   if (m_debug_all || m_debug_addr == addr) {
-//     MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64
-//               "), %s %s, size = %d\n",
-//               addr & 0x3FFFFFFF, addr, (type == -1) ? "instruction" : "data",
-//               doWrite ? "write" : "read", size);
-//   }
-//   m_cube_requests.insert(make_pair(req->getID(), key));
+  if (m_debug_all || m_debug_addr == addr) {
+    MSC_DEBUG("Cube request sent: addr = %#" PRIx64 "(orig addr = %#" PRIx64
+              "), %s %s, size = %d\n",
+              addr & 0x3FFFFFFF, addr, (type == -1) ? "instruction" : "data",
+              doWrite ? "write" : "read", size);
+  }
+  m_cube_requests.insert(make_pair(req->getID(), key));
 }
 
 bool macsimComponent::strobeCubeRespQ(uint64_t key) {
@@ -775,19 +794,20 @@ bool macsimComponent::strobeCubeRespQ(uint64_t key) {
 
 // incoming events are scanned and deleted
 void macsimComponent::handleCubeEvent(Interfaces::StandardMem::Request* req) {
-// FIXME:
-//   auto i = m_cube_requests.find(req->getID());
-//   if (m_cube_requests.end() == i) {
-//     // No matching request
-//     m_dbg->fatal(CALL_INFO, -1, "Event (%#" PRIx64 ") not found!\n", req->getID());
-//   } else {
-//     if (m_debug_all || m_debug_addr == req->getAddr()) {
-//       MSC_DEBUG("Cube response arrived: addr = %#" PRIx64 ", size = %lu\n",
-//                 req->getAddr(), req->size);
-//     }
-//     m_cube_responses.insert(i->second);
-//     m_cube_requests.erase(i);
-//   }
+  auto i = m_cube_requests.find(req->getID());
+  if (m_cube_requests.end() == i) {
+    // No matching request
+    m_dbg->fatal(CALL_INFO, -1, "Event (%#" PRIx64 ") not found!\n", req->getID());
+  } else {
+    if (m_debug_all /*|| m_debug_addr == req->pAddr*/) {
+      MSC_DEBUG("Cube request sent response arrived: (%s)\n",
+         req->getString().c_str());
+      // MSC_DEBUG("D$[%d] response arrived: addr = %#" PRIx64 ", size = %lu (%s)\n",
+      //   l, req->pAddr, req->size, req->getString().c_str());
+    }
+    m_cube_responses.insert(i->second);
+    m_cube_requests.erase(i);
+  }
 
-//   delete req;
+  delete req;
 }

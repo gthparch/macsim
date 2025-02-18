@@ -14,7 +14,7 @@ DEBUG_MEM   = 1
 DEBUG_LINKS = 0
 DEBUG_BUS   = 0
 
-DEBUG_LEVEL = 5
+DEBUG_LEVEL = 9
 VERBOSE     = 10
 
 ########################################
@@ -89,3 +89,4 @@ link_bus_memctrl_d.connect((macsim, "core0_dcache", "50ps"), (memctrl_d, "direct
 # Enable statistics
 sst.setStatisticLoadLevel(7)
 sst.setStatisticOutput("sst.statOutputConsole")
+sst.enableAllStatisticsForComponentType("memHierarchy.MemController")

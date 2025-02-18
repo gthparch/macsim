@@ -8,15 +8,16 @@ import sst
 from common import *
 
 # 0: None, 1: Stdout, 2: Stderr, 3: File
-DEBUG_CORE  = 1
-DEBUG_L1    = 0
-DEBUG_MEM   = 1
+DEBUG_CORE          = 1
+DEBUG_CORE_LINKS    = 1
+DEBUG_L1            = 0
+DEBUG_MEM           = 0
 
-DEBUG_LINKS = 0
-DEBUG_BUS   = 0
+DEBUG_LINKS         = 0
+DEBUG_BUS           = 0
 
-DEBUG_LEVEL = 5
-VERBOSE     = 10
+DEBUG_LEVEL         = 5
+VERBOSE             = 10
 
 ########################################
 # System Parameters
@@ -43,13 +44,13 @@ macsim.addParams({
 })
 macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
-    'debug': DEBUG_CORE,
+    'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
 })
 macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
 macsim_dcache_if.addParams({
-    'debug': DEBUG_CORE,
+    'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
 })
@@ -102,3 +103,6 @@ link_bus_memctrl_d.connect((macsim_dcache_if, "port", "50ps"), (memctrl_d, "dire
 # Enable statistics
 sst.setStatisticLoadLevel(7)
 sst.setStatisticOutput("sst.statOutputConsole")
+# sst.setStatisticOutput("sst.statOutputCSV", {"filepath" : "./sst_stats.csv", "separator" : ", " } )
+
+sst.enableAllStatisticsForComponentType("memHierarchy.MemController")
