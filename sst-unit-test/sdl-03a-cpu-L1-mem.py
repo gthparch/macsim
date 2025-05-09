@@ -30,7 +30,7 @@ MEM_END = MEM_START + MEM_SIZE - 1
 macsim = sst.Component("macsimComponent", "macsimComponent.macsimComponent")
 macsim.addParams({
     "param_file": "params.in",
-    "trace_file": "trace_file_list",
+    "trace_file": "trace_file_list_cpu",
     "output_dir": "output_dir",
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 --use_memhierarchy=1 --core_type=x86",
     "frequency" : "2GHz",
@@ -40,13 +40,13 @@ macsim.addParams({
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
 })
-macsim_icache_if = macsim.setSubComponent("macsim_icache_if", "memHierarchy.standardInterface")
+macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
     'debug': DEBUG_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': VERBOSE
 })
-macsim_dcache_if = macsim.setSubComponent("macsim_dcache_if", "memHierarchy.standardInterface")
+macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
 macsim_dcache_if.addParams({
     'debug': DEBUG_LINKS,
     'debug_level': DEBUG_LEVEL,

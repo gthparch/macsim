@@ -2,6 +2,10 @@
 # Description: 
 #   - macsimComponent instantiation test 
 #   - It will fail since nothing is connected
+#   - It should something similar to the folowing:
+#           FATAL: macsimComponent, Error: unable to configure link on port 'core0_icache'
+#           SST Fatal Backtrace Information:
+#           ...
 ################################################################################
 import sst
 

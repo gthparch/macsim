@@ -1,21 +1,24 @@
 ################################################################################
 # Description: 
 #  - Macsim is connected to 2 individual memory controllers for instruction and
-#    data memory
+#    data memory.
+#  - Macsim ports (stdInterface) are loaded as subcomponents explictly.
 ################################################################################
 import sst
 from common import *
 
 # 0: None, 1: Stdout, 2: Stderr, 3: File
-DEBUG_CORE  = 1
-DEBUG_L1    = 0
-DEBUG_MEM   = 1
+DEBUG_CORE          = 1
+DEBUG_CORE_LINKS    = 0
+DEBUG_L1            = 0
+DEBUG_L2            = 0     # L2 Caches
+DEBUG_MEM           = 1
 
-DEBUG_LINKS = 0
-DEBUG_BUS   = 0
+DEBUG_LINKS         = 0
+DEBUG_BUS           = 0
 
-DEBUG_LEVEL = 9
-VERBOSE     = 10
+DEBUG_LEVEL         = 5
+VERBOSE             = 10
 
 ########################################
 # System Parameters
@@ -30,7 +33,7 @@ MEM_END = MEM_START + MEM_SIZE - 1
 macsim = sst.Component("macsimComponent", "macsimComponent.macsimComponent")
 macsim.addParams({
     "param_file": "params.in",
-    "trace_file": "trace_file_list",
+    "trace_file": "trace_file_list_cpu",
     "output_dir": "output_dir",
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 --use_memhierarchy=1 --core_type=x86",
     "frequency" : "2GHz",
@@ -39,6 +42,18 @@ macsim.addParams({
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
+})
+macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
+macsim_icache_if.addParams({
+    'debug': DEBUG_CORE_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
+})
+macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if.addParams({
+    'debug': DEBUG_CORE_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
 })
 
 
@@ -80,13 +95,15 @@ memory_d.addParams({
 ########################################
 # Links
 link_bus_memctrl_i = sst.Link("link_bus_memctrl_i")
-link_bus_memctrl_i.connect((macsim, "core0_icache", "50ps"), (memctrl_i, "direct_link", "50ps"))
+link_bus_memctrl_i.connect((macsim_icache_if, "port", "50ps"), (memctrl_i, "direct_link", "50ps"))
 link_bus_memctrl_d = sst.Link("link_bus_memctrl_d")
-link_bus_memctrl_d.connect((macsim, "core0_dcache", "50ps"), (memctrl_d, "direct_link", "50ps"))
+link_bus_memctrl_d.connect((macsim_dcache_if, "port", "50ps"), (memctrl_d, "direct_link", "50ps"))
 
 
 ########################################
 # Enable statistics
 sst.setStatisticLoadLevel(7)
 sst.setStatisticOutput("sst.statOutputConsole")
+# sst.setStatisticOutput("sst.statOutputCSV", {"filepath" : "./sst_stats.csv", "separator" : ", " } )
+
 sst.enableAllStatisticsForComponentType("memHierarchy.MemController")
