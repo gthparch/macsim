@@ -9,7 +9,7 @@ from common import *
 
 # 0: None, 1: Stdout, 2: Stderr, 3: File
 DEBUG_CORE          = 1
-DEBUG_CORE_LINKS    = 0
+DEBUG_CORE_LINKS    = 1
 DEBUG_L1            = 0
 DEBUG_L2            = 0     # L2 Caches
 DEBUG_MEM           = 0
@@ -38,24 +38,37 @@ macsim.addParams({
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=0 --num_sim_small_cores=1 --use_memhierarchy=1 --core_type=nvbit",
     "frequency" : "2GHz",
     "num_cores" : "1",
-    "num_links": "1",
+    "num_link": "1",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
+    "nvbit_core": True,
 })
-macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
+macsim_icache_if = macsim.setSubComponent("macsim0_core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
     'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
 })
-macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if = macsim.setSubComponent("macsim0_core0_dcache", "memHierarchy.standardInterface")
 macsim_dcache_if.addParams({
     'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
 })
 
+macsim_ccache_if = macsim.setSubComponent("macsim0_core0_ccache", "memHierarchy.standardInterface")
+macsim_ccache_if.addParams({
+    'debug': DEBUG_CORE_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
+})
+macsim_tcache_if = macsim.setSubComponent("macsim0_core0_tcache", "memHierarchy.standardInterface")
+macsim_tcache_if.addParams({
+    'debug': DEBUG_CORE_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
+})
 
 ########################################
 # Instruction Memory Controller
@@ -93,11 +106,50 @@ memory_d.addParams({
 
 
 ########################################
+# Constant Memory Controller
+memctrl_c = sst.Component("memory_c", "memHierarchy.MemController")
+memctrl_c.addParams({
+    "debug" : DEBUG_MEM,
+    "debug_level" : DEBUG_LEVEL,
+    "clock" : "1GHz",
+    "verbose" : VERBOSE,
+    "addr_range_start" : MEM_START,
+    "addr_range_end" : MEM_END,
+})
+memory_c = memctrl_c.setSubComponent("backend", "memHierarchy.simpleMem")
+memory_c.addParams({
+    "access_time" : "1000ns",
+    "mem_size" : MEM_SIZE_S
+})
+
+########################################
+# Texture Memory Controller
+memctrl_t = sst.Component("memory_t", "memHierarchy.MemController")
+memctrl_t.addParams({
+    "debug" : DEBUG_MEM,
+    "debug_level" : DEBUG_LEVEL,
+    "clock" : "1GHz",
+    "verbose" : VERBOSE,
+    "addr_range_start" : MEM_START,
+    "addr_range_end" : MEM_END,
+})
+memory_t = memctrl_t.setSubComponent("backend", "memHierarchy.simpleMem")
+memory_t.addParams({
+    "access_time" : "1000ns",
+    "mem_size" : MEM_SIZE_S
+})
+
+
+########################################
 # Links
 link_bus_memctrl_i = sst.Link("link_bus_memctrl_i")
 link_bus_memctrl_i.connect((macsim_icache_if, "port", "50ps"), (memctrl_i, "direct_link", "50ps"))
 link_bus_memctrl_d = sst.Link("link_bus_memctrl_d")
 link_bus_memctrl_d.connect((macsim_dcache_if, "port", "50ps"), (memctrl_d, "direct_link", "50ps"))
+link_bus_memctrl_c = sst.Link("link_bus_memctrl_c")
+link_bus_memctrl_c.connect((macsim_ccache_if, "port", "50ps"), (memctrl_c, "direct_link", "50ps"))
+link_bus_memctrl_t = sst.Link("link_bus_memctrl_t")
+link_bus_memctrl_t.connect((macsim_tcache_if, "port", "50ps"), (memctrl_t, "direct_link", "50ps"))
 
 
 ########################################

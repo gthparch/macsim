@@ -14,8 +14,8 @@ DEBUG_MEM   = 1
 DEBUG_LINKS = 0
 DEBUG_BUS   = 0
 
-DEBUG_LEVEL = 0
-VERBOSE     = 0
+DEBUG_LEVEL = 3
+VERBOSE     = 6
 
 ########################################
 # System Parameters
@@ -130,6 +130,21 @@ macsim0_core0_tcache.addParams({
     "cache_size" : "2KiB"
 })
 
+gpu_l2cache = sst.Component("l2cache", "memHierarchy.Cache")
+gpu_l2cache.addParams({
+    "access_latency_cycles" : "8",
+    "cache_frequency" : "4Ghz",
+    "replacement_policy" : "lru",
+    "coherence_protocol" : "MSI",
+    "associativity" : "8",
+    "cache_line_size" : "64", 
+    "debug" : DEBUG_L1,
+    "debug_level" : DEBUG_LEVEL,
+    "verbose" : VERBOSE,
+    "L1" : "0",
+    "cache_size" : "64KiB"
+})
+
 
 ########################################
 # Bus between L1 caches and memory controller
@@ -188,8 +203,10 @@ link_tcache_bus = sst.Link("link_tcache_bus")
 link_tcache_bus.connect( (macsim0_core0_tcache, "low_network_0", "50ps"), (mem_bus, "high_network_3", "50ps") )
 
 # Bus -> Memory
+link_bus_L2 = sst.Link("link_bus_L2")
+link_bus_L2.connect( (mem_bus, "low_network_0", "50ps"), (gpu_l2cache, "high_network_0", "50ps") )
 link_bus_mem = sst.Link("link_bus_mem")
-link_bus_mem.connect( (mem_bus, "low_network_0", "50ps"), (memctrl, "direct_link", "50ps") )
+link_bus_mem.connect( (gpu_l2cache, "low_network_0", "50ps"), (memctrl, "direct_link", "50ps") )
 
 
 ########################################

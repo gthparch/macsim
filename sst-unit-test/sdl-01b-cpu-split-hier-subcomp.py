@@ -17,8 +17,8 @@ DEBUG_MEM           = 1
 DEBUG_LINKS         = 0
 DEBUG_BUS           = 0
 
-DEBUG_LEVEL         = 5
-VERBOSE             = 10
+DEBUG_LEVEL         = 0
+VERBOSE             = 0
 
 ########################################
 # System Parameters
@@ -38,18 +38,18 @@ macsim.addParams({
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 --use_memhierarchy=1 --core_type=x86",
     "frequency" : "2GHz",
     "num_cores" : "1",
-    "num_links": "1",
+    "num_link": "1",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
 })
-macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
+macsim_icache_if = macsim.setSubComponent("macsim0_core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
     'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
 })
-macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if = macsim.setSubComponent("macsim0_core0_dcache", "memHierarchy.standardInterface")
 macsim_dcache_if.addParams({
     'debug': DEBUG_CORE_LINKS,
     'debug_level': DEBUG_LEVEL,

@@ -35,18 +35,18 @@ macsim.addParams({
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 --use_memhierarchy=1 --core_type=x86",
     "frequency" : "2GHz",
     "num_cores" : "1",
-    "num_links": "1",
+    "num_link": "1",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
 })
-macsim_icache_if = macsim.setSubComponent("core0_icache", "memHierarchy.standardInterface")
+macsim_icache_if = macsim.setSubComponent("macsim0_core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
     'debug': DEBUG_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': VERBOSE
 })
-macsim_dcache_if = macsim.setSubComponent("core0_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if = macsim.setSubComponent("macsim0_core0_dcache", "memHierarchy.standardInterface")
 macsim_dcache_if.addParams({
     'debug': DEBUG_LINKS,
     'debug_level': DEBUG_LEVEL,
@@ -56,14 +56,14 @@ macsim_dcache_if.addParams({
 
 ########################################
 # L1 Caches
-core0_icache = sst.Component("core0_icache", "memHierarchy.Cache")
-core0_icache.addParams({
+macsim0_core0_icache = sst.Component("macsim0_core0_icache", "memHierarchy.Cache")
+macsim0_core0_icache.addParams({
     "access_latency_cycles" : "3",
     "cache_frequency" : "3.5Ghz",
     "replacement_policy" : "lru",
     "coherence_protocol" : "MSI",
     "associativity" : "4",
-    "cache_line_size" : "64",
+    "cache_line_size" : "128",
     "debug" : DEBUG_L1,
     "debug_level" : DEBUG_LEVEL,
     "verbose" : VERBOSE,
@@ -71,8 +71,8 @@ core0_icache.addParams({
     "cache_size" : "2KiB"
 })
 
-core0_dcache = sst.Component("core0_dcache", "memHierarchy.Cache")
-core0_dcache.addParams({
+macsim0_core0_dcache = sst.Component("macsim0_core0_dcache", "memHierarchy.Cache")
+macsim0_core0_dcache.addParams({
     "access_latency_cycles" : "3",
     "cache_frequency" : "3.5Ghz",
     "replacement_policy" : "lru",
@@ -119,17 +119,17 @@ memory.addParams({
 
 # Macsim::core0_icache -> L1 ICache
 link_macsim_icache = sst.Link("link_macsim_icache")
-link_macsim_icache.connect( (macsim_icache_if, "port", "1000ps"), (core0_icache, "high_network_0", "1000ps") )
+link_macsim_icache.connect( (macsim_icache_if, "port", "1000ps"), (macsim0_core0_icache, "high_network_0", "1000ps") )
 
 # Macsim::core0_dcache -> L1 DCache
 link_macsim_dcache = sst.Link("link_macsim_dcache")
-link_macsim_dcache.connect( (macsim_dcache_if, "port", "1000ps"), (core0_dcache, "high_network_0", "1000ps") )
+link_macsim_dcache.connect( (macsim_dcache_if, "port", "1000ps"), (macsim0_core0_dcache, "high_network_0", "1000ps") )
 
 # L1 I/DCache -> Bus
 link_icache_bus = sst.Link("link_icache_bus")
-link_icache_bus.connect( (core0_icache, "low_network_0", "50ps"), (mem_bus, "high_network_0", "50ps") )
+link_icache_bus.connect( (macsim0_core0_icache, "low_network_0", "50ps"), (mem_bus, "high_network_0", "50ps") )
 link_dcache_bus = sst.Link("link_dcache_bus")
-link_dcache_bus.connect( (core0_dcache, "low_network_0", "50ps"), (mem_bus, "high_network_1", "50ps") )
+link_dcache_bus.connect( (macsim0_core0_dcache, "low_network_0", "50ps"), (mem_bus, "high_network_1", "50ps") )
 
 # Bus -> Memory
 link_bus_mem = sst.Link("link_bus_mem")

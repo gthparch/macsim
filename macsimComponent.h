@@ -71,12 +71,12 @@ public:
 
   SST_ELI_DOCUMENT_PORTS(
     {"ipc_link", "Port for Inter Processor Communication", {}},
-    {"core%(core_id)d_icache", "Ports connected to instruction cache", {}},
-    {"core%(core_id)d_dcache", "Ports connected to data cache", {}},
-    {"core%(core_id)d_ccache",
+    {"macsim%(macsim_id)d_core%(core_id)d_icache", "Ports connected to instruction cache", {}},
+    {"macsim%(macsim_id)d_core%(core_id)d_dcache", "Ports connected to data cache", {}},
+    {"macsim%(macsim_id)d_core%(core_id)d_ccache",
      "Ports connected to const cache (only for GPU core)",
      {}},
-    {"core%(core_id)d_tcache",
+    {"macsim%(macsim_id)d_core%(core_id)d_tcache",
      "Ports connected to texture cache (only for GPU core)",
      {}})
 
@@ -137,6 +137,7 @@ private:
   SST::Link *m_ipc_link;
 
   // links
+  uint32_t m_macsim_component_num; // Specify Macsim component num
   uint32_t m_num_link;
   vector<Interfaces::StandardMem *> m_instruction_cache_links;
   vector<Interfaces::StandardMem *> m_data_cache_links;

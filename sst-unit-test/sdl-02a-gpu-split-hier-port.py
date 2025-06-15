@@ -36,10 +36,11 @@ macsim.addParams({
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=0 --num_sim_small_cores=1 --use_memhierarchy=1 --core_type=nvbit",
     "frequency" : "2GHz",
     "num_cores" : "1",
-    "num_links": "1",
+    "num_link": "1",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
+    "nvbit_core": True,
 })
 
 
@@ -77,13 +78,51 @@ memory_d.addParams({
     "mem_size" : MEM_SIZE_S
 })
 
+########################################
+# Constant Memory Controller
+memctrl_c = sst.Component("memory_c", "memHierarchy.MemController")
+memctrl_c.addParams({
+    "debug" : DEBUG_MEM,
+    "debug_level" : DEBUG_LEVEL,
+    "clock" : "1GHz",
+    "verbose" : VERBOSE,
+    "addr_range_start" : MEM_START,
+    "addr_range_end" : MEM_END,
+})
+memory_c = memctrl_c.setSubComponent("backend", "memHierarchy.simpleMem")
+memory_c.addParams({
+    "access_time" : "1000ns",
+    "mem_size" : MEM_SIZE_S
+})
+
+########################################
+# Texture Memory Controller
+memctrl_t = sst.Component("memory_t", "memHierarchy.MemController")
+memctrl_t.addParams({
+    "debug" : DEBUG_MEM,
+    "debug_level" : DEBUG_LEVEL,
+    "clock" : "1GHz",
+    "verbose" : VERBOSE,
+    "addr_range_start" : MEM_START,
+    "addr_range_end" : MEM_END,
+})
+memory_t = memctrl_t.setSubComponent("backend", "memHierarchy.simpleMem")
+memory_t.addParams({
+    "access_time" : "1000ns",
+    "mem_size" : MEM_SIZE_S
+})
+
 
 ########################################
 # Links
 link_bus_memctrl_i = sst.Link("link_bus_memctrl_i")
-link_bus_memctrl_i.connect((macsim, "core0_icache", "50ps"), (memctrl_i, "direct_link", "50ps"))
+link_bus_memctrl_i.connect((macsim, "macsim0_core0_icache", "50ps"), (memctrl_i, "direct_link", "50ps"))
 link_bus_memctrl_d = sst.Link("link_bus_memctrl_d")
-link_bus_memctrl_d.connect((macsim, "core0_dcache", "50ps"), (memctrl_d, "direct_link", "50ps"))
+link_bus_memctrl_d.connect((macsim, "macsim0_core0_dcache", "50ps"), (memctrl_d, "direct_link", "50ps"))
+link_bus_memctrl_c = sst.Link("link_bus_memctrl_c")
+link_bus_memctrl_c.connect((macsim, "macsim0_core0_ccache", "50ps"), (memctrl_c, "direct_link", "50ps"))
+link_bus_memctrl_t = sst.Link("link_bus_memctrl_t")
+link_bus_memctrl_t.connect((macsim, "macsim0_core0_tcache", "50ps"), (memctrl_t, "direct_link", "50ps"))
 
 
 ########################################

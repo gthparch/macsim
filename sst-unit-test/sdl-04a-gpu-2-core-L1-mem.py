@@ -8,7 +8,7 @@ from common import *
 
 # 0: None, 1: Stdout, 2: Stderr, 3: File
 DEBUG_CORE  = 1
-DEBUG_L1    = 0
+DEBUG_L1    = 1
 DEBUG_MEM   = 1
 
 DEBUG_LINKS = 0
@@ -32,15 +32,16 @@ macsim.addParams({
     "param_file": "params.in",
     "trace_file": "trace_file_list_gpu",
     "output_dir": "output_dir",
-    "command_line": "--num_sim_cores=1 --num_sim_large_cores=0 --num_sim_small_cores=1 --use_memhierarchy=1 --core_type=nvbit",
+    "command_line": "--num_sim_cores=2 --num_sim_large_cores=0 --num_sim_small_cores=2 --use_memhierarchy=1 --core_type=nvbit",
     "frequency" : "2GHz",
-    "num_cores" : "1",
-    "num_link": "1",
+    "num_link": "2",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
     "nvbit_core": True,
 })
+
+# Core 0 interface
 macsim_icache_if = macsim.setSubComponent("macsim0_core0_icache", "memHierarchy.standardInterface")
 macsim_icache_if.addParams({
     'debug': DEBUG_LINKS,
@@ -61,6 +62,32 @@ macsim_ccache_if.addParams({
 })
 macsim_tcache_if = macsim.setSubComponent("macsim0_core0_tcache", "memHierarchy.standardInterface")
 macsim_tcache_if.addParams({
+    'debug': DEBUG_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
+})
+
+# Core 1 Interfaces
+macsim_icache_if_1 = macsim.setSubComponent("macsim0_core1_icache", "memHierarchy.standardInterface")
+macsim_icache_if_1.addParams({
+    'debug': DEBUG_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': VERBOSE
+})
+macsim_dcache_if_1 = macsim.setSubComponent("macsim0_core1_dcache", "memHierarchy.standardInterface")
+macsim_dcache_if_1.addParams({
+    'debug': DEBUG_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': VERBOSE
+})
+macsim_ccache_if_1 = macsim.setSubComponent("macsim0_core1_ccache", "memHierarchy.standardInterface")
+macsim_ccache_if_1.addParams({
+    'debug': DEBUG_LINKS,
+    'debug_level': DEBUG_LEVEL,
+    'verbose': 10
+})
+macsim_tcache_if_1 = macsim.setSubComponent("macsim0_core1_tcache", "memHierarchy.standardInterface")
+macsim_tcache_if_1.addParams({
     'debug': DEBUG_LINKS,
     'debug_level': DEBUG_LEVEL,
     'verbose': 10
@@ -131,6 +158,68 @@ macsim0_core0_tcache.addParams({
 })
 
 
+# Core 1 L1 Caches
+macsim0_core1_icache = sst.Component("macsim0_core1_icache", "memHierarchy.Cache")
+macsim0_core1_icache.addParams({
+    "access_latency_cycles": "3",
+    "cache_frequency": "3.5Ghz",
+    "replacement_policy": "lru",
+    "coherence_protocol": "MSI",
+    "associativity": "4",
+    "cache_line_size": "64",
+    "debug": DEBUG_L1,
+    "debug_level": DEBUG_LEVEL,
+    "verbose": VERBOSE,
+    "L1": "1",
+    "cache_size": "2KiB"
+})
+
+macsim0_core1_dcache = sst.Component("macsim0_core1_dcache", "memHierarchy.Cache")
+macsim0_core1_dcache.addParams({
+    "access_latency_cycles": "3",
+    "cache_frequency": "3.5Ghz",
+    "replacement_policy": "lru",
+    "coherence_protocol": "MSI",
+    "associativity": "4",
+    "cache_line_size": "64",
+    "debug": DEBUG_L1,
+    "debug_level": DEBUG_LEVEL,
+    "verbose": VERBOSE,
+    "L1": "1",
+    "cache_size": "2KiB"
+})
+
+macsim0_core1_ccache = sst.Component("macsim0_core1_ccache", "memHierarchy.Cache")
+macsim0_core1_ccache.addParams({
+    "access_latency_cycles": "3",
+    "cache_frequency": "3.5Ghz",
+    "replacement_policy": "lru",
+    "coherence_protocol": "MSI",
+    "associativity": "4",
+    "cache_line_size": "64",
+    "debug": DEBUG_L1,
+    "debug_level": DEBUG_LEVEL,
+    "verbose": VERBOSE,
+    "L1": "1",
+    "cache_size": "2KiB"
+})
+
+macsim0_core1_tcache = sst.Component("macsim0_core1_tcache", "memHierarchy.Cache")
+macsim0_core1_tcache.addParams({
+    "access_latency_cycles": "3",
+    "cache_frequency": "3.5Ghz",
+    "replacement_policy": "lru",
+    "coherence_protocol": "MSI",
+    "associativity": "4",
+    "cache_line_size": "64",
+    "debug": DEBUG_L1,
+    "debug_level": DEBUG_LEVEL,
+    "verbose": VERBOSE,
+    "L1": "1",
+    "cache_size": "2KiB"
+})
+
+
 ########################################
 # Bus between L1 caches and memory controller
 mem_bus = sst.Component("mem_bus", "memHierarchy.Bus")
@@ -177,6 +266,19 @@ link_macsim_ccache.connect( (macsim_ccache_if, "port", "1000ps"), (macsim0_core0
 link_macsim_tcache = sst.Link("link_macsim_tcache")
 link_macsim_tcache.connect( (macsim_tcache_if, "port", "1000ps"), (macsim0_core0_tcache, "high_network_0", "1000ps") )
 
+# Core 1 Links
+link_macsim_icache_1 = sst.Link("link_macsim_icache_1")
+link_macsim_icache_1.connect((macsim_icache_if_1, "port", "1000ps"), (macsim0_core1_icache, "high_network_0", "1000ps"))
+
+link_macsim_dcache_1 = sst.Link("link_macsim_dcache_1")
+link_macsim_dcache_1.connect((macsim_dcache_if_1, "port", "1000ps"), (macsim0_core1_dcache, "high_network_0", "1000ps"))
+
+link_macsim_ccache_1 = sst.Link("link_macsim_ccache_1")
+link_macsim_ccache_1.connect((macsim_ccache_if_1, "port", "1000ps"), (macsim0_core1_ccache, "high_network_0", "1000ps"))
+
+link_macsim_tcache_1 = sst.Link("link_macsim_tcache_1")
+link_macsim_tcache_1.connect((macsim_tcache_if_1, "port", "1000ps"), (macsim0_core1_tcache, "high_network_0", "1000ps"))
+
 # L1 I/DCache -> Bus
 link_icache_bus = sst.Link("link_icache_bus")
 link_icache_bus.connect( (macsim0_core0_icache, "low_network_0", "50ps"), (mem_bus, "high_network_0", "50ps") )
@@ -186,6 +288,18 @@ link_ccache_bus = sst.Link("link_ccache_bus")
 link_ccache_bus.connect( (macsim0_core0_ccache, "low_network_0", "50ps"), (mem_bus, "high_network_2", "50ps") )
 link_tcache_bus = sst.Link("link_tcache_bus")
 link_tcache_bus.connect( (macsim0_core0_tcache, "low_network_0", "50ps"), (mem_bus, "high_network_3", "50ps") )
+
+link_icache_bus_1 = sst.Link("link_icache_bus_1")
+link_icache_bus_1.connect((macsim0_core1_icache, "low_network_0", "50ps"), (mem_bus, "high_network_4", "50ps"))
+
+link_dcache_bus_1 = sst.Link("link_dcache_bus_1")
+link_dcache_bus_1.connect((macsim0_core1_dcache, "low_network_0", "50ps"), (mem_bus, "high_network_5", "50ps"))
+
+link_ccache_bus_1 = sst.Link("link_ccache_bus_1")
+link_ccache_bus_1.connect((macsim0_core1_ccache, "low_network_0", "50ps"), (mem_bus, "high_network_6", "50ps"))
+
+link_tcache_bus_1 = sst.Link("link_tcache_bus_1")
+link_tcache_bus_1.connect((macsim0_core1_tcache, "low_network_0", "50ps"), (mem_bus, "high_network_7", "50ps"))
 
 # Bus -> Memory
 link_bus_mem = sst.Link("link_bus_mem")

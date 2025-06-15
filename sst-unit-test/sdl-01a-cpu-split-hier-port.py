@@ -38,7 +38,7 @@ macsim.addParams({
     "command_line": "--num_sim_cores=1 --num_sim_large_cores=1 --num_sim_small_cores=0 --use_memhierarchy=1 --core_type=x86",
     "frequency" : "2GHz",
     "num_cores" : "1",
-    "num_links": "1",
+    "num_link": "1",
     "mem_size" : MEM_SIZE,
     "debug": DEBUG_CORE,
     "debug_level": DEBUG_LEVEL,
@@ -83,9 +83,9 @@ memory_d.addParams({
 ########################################
 # Links
 link_bus_memctrl_i = sst.Link("link_bus_memctrl_i")
-link_bus_memctrl_i.connect((macsim, "core0_icache", "50ps"), (memctrl_i, "direct_link", "50ps"))
+link_bus_memctrl_i.connect((macsim, "macsim0_core0_icache", "50ps"), (memctrl_i, "direct_link", "50ps"))
 link_bus_memctrl_d = sst.Link("link_bus_memctrl_d")
-link_bus_memctrl_d.connect((macsim, "core0_dcache", "50ps"), (memctrl_d, "direct_link", "50ps"))
+link_bus_memctrl_d.connect((macsim, "macsim0_core0_dcache", "50ps"), (memctrl_d, "direct_link", "50ps"))
 
 
 ########################################

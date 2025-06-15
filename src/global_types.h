@@ -83,6 +83,7 @@ typedef enum uop_latency_map {  // enum for x86 latency maps - Michael
 typedef enum _ACC_Type_enum {
   NO_ACC = 0, /**< no accelerator */
   PTX_CORE, /**< PTX core */
-  IGPU_CORE /**< IGPU core */
+  IGPU_CORE, /**< IGPU core */
+  NVBIT_CORE/**< NVBIT core */
 } ACC_Type;
 #endif

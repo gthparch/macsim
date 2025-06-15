@@ -65,16 +65,16 @@ macsimComponent::macsimComponent(ComponentId_t id, Params& params)
   } else if (params.find<bool>("igpu_core", 0)) {
     m_acc_type = IGPU_CORE;
     m_acc_core = 1;
-  // } else if (params.find<bool>("nvbit_core", 0)) {    // FIXME: 
-  //   m_acc_type = NVBIT_CORE;
-  //   m_acc_core = 1;
+  } else if (params.find<bool>("nvbit_core", 0)) {    // Fixed: Need to add Constant Cache and Texture Cache
+    m_acc_type = NVBIT_CORE;
+    m_acc_core = 1;
     
   } else {
     m_acc_core = 0;
     m_acc_type = NO_ACC;
   }
   m_num_link = params.find<uint32_t>("num_link", 1);
-
+  m_macsim_component_num = params.find<uint32_t>("component_num", 0);
   m_mem_size = params.find<uint64_t>("mem_size", 1 * 1024 * 1024 * 1024);
   MSC_DEBUG("Memory address space: %" PRId64 " Bytes (0x%" PRIx64 " - 0x%" PRIx64 ")\n", m_mem_size, 0x0UL, m_mem_size - 1);
 
@@ -148,7 +148,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
   for (unsigned int l = 0; l < m_num_link; ++l) {
     ////////////////////////////////////////
     // Configure ICache Link
-    std::string icache_portname = "core" + std::to_string(l) + "_icache";
+    std::string icache_portname = "macsim" + std::to_string(m_macsim_component_num) + "_core" + std::to_string(l) + "_icache";
     auto icache_link = loadUserSubComponent<Interfaces::StandardMem>(
       icache_portname, ComponentInfo::SHARE_NONE, tc,
       new Interfaces::StandardMem::Handler<macsimComponent>(
@@ -170,7 +170,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
 
     ////////////////////////////////////////
     // Configure DCache Link
-    std::string dcache_portname = "core" + std::to_string(l) + "_dcache";
+    std::string dcache_portname =  "macsim" + std::to_string(m_macsim_component_num) + "_core" + std::to_string(l) + "_dcache";
 
     auto dcache_link = loadUserSubComponent<Interfaces::StandardMem>(
       dcache_portname, ComponentInfo::SHARE_NONE, tc,
@@ -194,7 +194,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
     if (m_acc_core) {
       ////////////////////////////////////////
       // Configure Const Cache Link
-      std::string ccache_portname = "core" + std::to_string(l) + "_ccache";
+      std::string ccache_portname =  "macsim" + std::to_string(m_macsim_component_num) + "_core" + std::to_string(l) + "_ccache";
       auto ccache_link = loadUserSubComponent<Interfaces::StandardMem>(
         ccache_portname, ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(
@@ -216,7 +216,7 @@ void macsimComponent::configureLinks(SST::Params& params, TimeConverter* tc) {
 
       ////////////////////////////////////////
       // Configure Texture Cache Link
-      std::string tcache_portname = "core" + std::to_string(l) + "_tcache";
+      std::string tcache_portname =  "macsim" + std::to_string(m_macsim_component_num) + "_core" + std::to_string(l) + "_tcache";
       auto tcache_link = loadUserSubComponent<Interfaces::StandardMem>(
         tcache_portname, ComponentInfo::SHARE_NONE, tc,
         new Interfaces::StandardMem::Handler<macsimComponent>(

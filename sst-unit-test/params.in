@@ -53,7 +53,7 @@ shared_mem_cycles 2
 shared_mem_ports 1
 byte_level_access 0
 
-l1_small_line_size 128
+l1_small_line_size 64
 #96 KB
 l1_small_num_set 128 
 l1_small_assoc 6
