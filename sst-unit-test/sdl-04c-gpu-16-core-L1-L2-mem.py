@@ -8,7 +8,7 @@ from common import *
 
 # 0: None, 1: Stdout, 2: Stderr, 3: File
 DEBUG_CORE  = 1
-DEBUG_L1    = 1
+DEBUG_L1    = 0
 DEBUG_MEM   = 1
 
 DEBUG_LINKS = 0

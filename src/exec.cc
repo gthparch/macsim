@@ -903,8 +903,12 @@ int exec_c::access_data_cache(uop_c* uop) {
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size)
+  if ((offset + uop->m_mem_size) > block_size){
     uop->m_mem_size = block_size - offset;
+  }else if(uop->m_mem_size == 0 && offset == 0){
+    // Manually change the mem_size to be 16 when getting a zero mem_size and offset to avoid runtime error with SST
+    uop->m_mem_size = 16;
+  }
 
   DEBUG_CORE(m_core_id,
              "sending memory request (core_id:%d thread_id:%d uop_num:%llu "
@@ -970,8 +974,12 @@ int exec_c::access_const_texture_cache(uop_c* uop) {
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size)
+  if ((offset + uop->m_mem_size) > block_size){
     uop->m_mem_size = block_size - offset;
+  }else if(uop->m_mem_size == 0 && offset == 0){
+    // Manually change the mem_size to be 16 when getting a zero mem_size and offset to avoid runtime error with SST
+    uop->m_mem_size = 16;
+  }
 
   if (uop->m_mem_type == MEM_LD_CM) {
     DEBUG_CORE(m_core_id,

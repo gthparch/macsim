@@ -63,7 +63,7 @@ macsim0_core0_icache.addParams({
     "replacement_policy" : "lru",
     "coherence_protocol" : "MSI",
     "associativity" : "4",
-    "cache_line_size" : "128",
+    "cache_line_size" : "64",
     "debug" : DEBUG_L1,
     "debug_level" : DEBUG_LEVEL,
     "verbose" : VERBOSE,
