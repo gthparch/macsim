@@ -548,29 +548,13 @@ void macsimComponent::sendDataCacheRequest(int core_id, uint64_t key,
   bool doWrite = isStore((Mem_Type)type);
 
   StandardMem::Request* req;
-  // Update the write request to push the data packets according to the size
+
   if(doWrite) {
     std::vector<uint8_t> data;
-    if(size == 1){
-      data.push_back((req_addr >>  0) & 0xff);
-    }
-    else if(size == 2)
-    {
-      data.push_back((req_addr >>  8) & 0xff);
-      data.push_back((req_addr >>  0) & 0xff);
-    }
-    else if(size == 3)
-    {
-      data.push_back((req_addr >> 16) & 0xff);
-      data.push_back((req_addr >>  8) & 0xff);
-      data.push_back((req_addr >>  0) & 0xff);
-    }
-    else
-    {
-      data.push_back((req_addr >> 24) & 0xff);
-      data.push_back((req_addr >> 16) & 0xff);
-      data.push_back((req_addr >>  8) & 0xff);
-      data.push_back((req_addr >>  0) & 0xff);
+    
+    // Update the write request to push the data packets according to the size
+    for (int i = size; i > 0; i--) {
+      data.push_back((req_addr >> (8 * (i-1))) & 0xff);
     }
 
     req = new StandardMem::Write(req_addr, size, data);

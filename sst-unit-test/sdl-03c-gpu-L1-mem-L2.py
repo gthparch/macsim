@@ -14,8 +14,8 @@ DEBUG_MEM   = 1
 DEBUG_LINKS = 0
 DEBUG_BUS   = 0
 
-DEBUG_LEVEL = 3
-VERBOSE     = 6
+DEBUG_LEVEL = 0
+VERBOSE     = 0
 
 ########################################
 # System Parameters
