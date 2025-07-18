@@ -1,6 +1,8 @@
 #ifndef MACSIM_EVENT_H
 #define MACSIM_EVENT_H
 
+#include <sst/core/event.h>
+
 namespace SST {
 namespace MacSim {
 
@@ -21,7 +23,7 @@ public:
     m_type = type;
   }
 
-  NotSerializable(MacSimEvent)
+  NotSerializable(MacSimEvent);
 
     private : MacSimEventType m_type;
 

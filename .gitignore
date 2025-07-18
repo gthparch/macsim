@@ -1,5 +1,6 @@
 .opt_build/
 .sconf_temp/
+.sst_build/
 .sconsign.dblite
 bin/macsim
 config.log
@@ -23,3 +24,4 @@ Makefile
 Makefile.in
 *.dirstamp
 sst-unit-test/*.out
+.vscode/

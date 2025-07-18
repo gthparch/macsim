@@ -10,6 +10,7 @@ import sys
 import os
 import glob
 
+from build import get_cmd_output
 
 #########################################################################################
 # Build option
@@ -317,6 +318,33 @@ if flags['qsim'] == '1':
 if flags['ramulator'] == '1':
   libraries.append('ramulator')
 
+if flags['sst'] == '1':   # Compile Macsim for SST
+  macsim_component_name = 'macsimComponent'
+  macsim_component_src = [x for x in macsim_src if 'main.cc' not in x]    # We don't want main.cc
+  macsim_component_src += [
+    'macsimComponent.cpp'
+  ]
+
+  sst_build_cxx =  get_cmd_output(['sst-config', '--CXX']).split(' ')
+  sst_build_cxxflags = get_cmd_output(['sst-config', '--ELEMENT_CXXFLAGS']).split(' ')
+  sst_build_linkflags = get_cmd_output(['sst-config', '--ELEMENT_LDFLAGS']).split(' ')
+
+  # Set CXX compiler
+  sst_compiler = sst_build_cxx[0]
+  env['CXX'] = sst_compiler
+
+  # Set CXXFLAGS
+  env['CPPFLAGS'] += ' ' + ' '.join(sst_build_cxxflags)
+  env['CPPFLAGS'] += ' -DUSING_SST'
+
+  # Set LINKFLAGS
+  env['LINKFLAGS'] = sst_build_linkflags    # Overriding
+
+  # Generate SST component as shared library
+  env.SharedLibrary(macsim_component_name, macsim_component_src)
+  Return()    # Finish gracefully
+
+# Build Macsim executable
 env.Program(
     'macsim',
     macsim_src, 

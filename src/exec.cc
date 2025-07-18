@@ -318,7 +318,7 @@ bool exec_c::exec(int thread_id, int entry, uop_c* uop) {
           // constant memory
           if (uop->m_mem_type == MEM_LD_CM) {
 #ifdef USING_SST
-            uop_latency = access_const_texture_cache(uop);
+            uop_latency = access_const_texture_cache(uop);        //FIXME: Is this correct ?
 #else
             uop_latency = core->get_const_cache()->load(uop);
 #endif
@@ -789,7 +789,7 @@ void exec_c::run_a_cycle(void) {
 #ifdef USING_SST
   // Strobing
   core_c* core = m_simBase->m_core_pointers[m_core_id];
-  for (auto I = m_uop_buffer.begin(), E = m_uop_buffer.end(); I != E; I++) {
+  for (auto I = m_uop_buffer.begin(); I != m_uop_buffer.end(); ) {
     uint64_t key = I->first;
     uop_c* uop = I->second;
 
@@ -851,7 +851,9 @@ void exec_c::run_a_cycle(void) {
                  "from memHierarchy!\n",
                  m_core_id, uop->m_thread_id, uop->m_uop_num, uop->m_inst_num,
                  uop->m_vaddr);
-      m_uop_buffer.erase(I);
+      I = m_uop_buffer.erase(I);  // erase returns next valid iterator
+    } else {
+      ++I;
     }
   }
 #else  // USING_SST
@@ -901,8 +903,12 @@ int exec_c::access_data_cache(uop_c* uop) {
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size)
+  if ((offset + uop->m_mem_size) > block_size){
     uop->m_mem_size = block_size - offset;
+  }else if(uop->m_mem_size == 0 && offset == 0){
+    // Manually change the mem_size to be 16 when getting a zero mem_size and offset to avoid runtime error with SST
+    uop->m_mem_size = 16;
+  }
 
   DEBUG_CORE(m_core_id,
              "sending memory request (core_id:%d thread_id:%d uop_num:%llu "
@@ -968,8 +974,12 @@ int exec_c::access_const_texture_cache(uop_c* uop) {
 
   // if the requested block spans a cache line boundary, generate only one request for the first block
   Addr offset = uop->m_vaddr % block_size;
-  if (offset + uop->m_mem_size > block_size)
+  if ((offset + uop->m_mem_size) > block_size){
     uop->m_mem_size = block_size - offset;
+  }else if(uop->m_mem_size == 0 && offset == 0){
+    // Manually change the mem_size to be 16 when getting a zero mem_size and offset to avoid runtime error with SST
+    uop->m_mem_size = 16;
+  }
 
   if (uop->m_mem_type == MEM_LD_CM) {
     DEBUG_CORE(m_core_id,
