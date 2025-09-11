@@ -62,7 +62,7 @@ def build_test():
 #########################################################################################
 # Util Functions
 #########################################################################################
-def get_cmd_output(cmd:list, abort_on_error:bool=True):
+def get_cmd_output(cmd, abort_on_error=True):
   """
   Run a command and return the output.
   :param cmd: The command to run as a list of tokens.
@@ -74,9 +74,12 @@ def get_cmd_output(cmd:list, abort_on_error:bool=True):
   stdout = stdout.decode('utf-8', errors='replace').strip() if stdout is not None else ''
   stderr = stderr.decode('utf-8', errors='replace').strip() if stderr is not None else ''
   if abort_on_error and process.returncode != 0:
-    print(f'Error: Shell command failed (return code: {process.returncode}): ', ' '.join(cmd), file=sys.stderr)
-    print('\tstdout:', stdout, file=sys.stderr)
-    print('\tstderr:', stderr, file=sys.stderr)
+    #print(f'Error: Shell command failed (return code: {process.returncode}): ', ' '.join(cmd), file=sys.stderr)
+    #print('\tstdout:', stdout, file=sys.stderr)
+    #print('\tstderr:', stderr, file=sys.stderr)
+    print >> sys.stderr, 'Error: Shell command failed (return code: {}): {}'.format(process.returncode, ' '.join(cmd))
+    print >> sys.stderr, '\tstdout:', stdout
+    print >> sys.stderr, '\tstderr:', stderr
     sys.exit(1)
   return stdout
 
@@ -121,25 +124,27 @@ def main():
     component_tests_dir = os.path.abspath('sst-unit-test')
 
     # Check if macsim component exists
-    if not os.path.exists(f'{component_lib_dir}/lib{component}.so'):
-      print(f"ERROR: {component} not found in {component_lib_dir}, build with sst=1 option first")
+    if not os.path.exists('{}/lib{}.so'.format(component_lib_dir, component)):
+      print("ERROR: {} not found in {}, build with sst=1 option first".format(component, component_lib_dir))
+    #if not os.path.exists(f'{component_lib_dir}/lib{component}.so'):
+      #print(f"ERROR: {component} not found in {component_lib_dir}, build with sst=1 option first")
       exit(0)
 
-    print(f"Registering SST element: {component}")
-    print(f"  SRCDIR: {component_src_dir}")
-    print(f"  LIBDIR: {component_lib_dir}")
-    print(f"  TESTDIR: {component_tests_dir}")
-    os.system(f'sst-register {component} {component}_LIBDIR={component_lib_dir}')
-    os.system(f'sst-register SST_ELEMENT_SOURCE {component}={component_src_dir}')
-    os.system(f'sst-register SST_ELEMENT_TESTS {component}={component_tests_dir}')
+    print("Registering SST element: {}".format(component))
+    print("  SRCDIR: {}".format(component_src_dir))
+    print("  LIBDIR: {}".format(component_lib_dir))
+    print("  TESTDIR: {}".format(component_tests_dir))
+    os.system('sst-register {} {}_LIBDIR={}'.format(component, component, component_lib_dir))
+    os.system('sst-register SST_ELEMENT_SOURCE {}={}'.format(component, component_src_dir))
+    os.system('sst-register SST_ELEMENT_TESTS {}={}'.format(component, component_tests_dir))
 
     # Check if component is registered successfully
     sst_info_out = get_cmd_output(['sst-info', component])
     if 'Component 0: macsimComponent' in sst_info_out:
-      print(f"Successfully registered SST element: {component}")
+      print("Successfully registered SST element: {}".format(component))
       exit(0)
     else:
-      print(f"ERROR: Failed to register SST element: {component}")
+      print("ERROR: Failed to register SST element: {}".format(component))
       exit(1)
 
   # EI power

@@ -238,9 +238,9 @@ typedef SST::MacSim::CallbackBase<bool, int, uint64_t>
   CallbackStrobeTextureCacheRespQ;
 typedef SST::MacSim::CallbackBase<bool, uint64_t> CallbackStrobeCubeRespQ;
 
+// Update the UNIQUE_KEY to allow a max of 4096 different threads IDs
 #define UNIQUE_KEY(C, T, U, A, I)                                              \
-  ((A << 35) | ((U & 0xFFF) << 23) | ((C & 0x3F) << 17) | ((T & 0x7F) << 10) | \
-   I)
+ ((A << 36) | ((U & 0xFFF) << 24) | ((C & 0x3F) << 18) | ((T & 0xFFF) << 6) | (I & 0x3F))
 #endif  // USING_SST
 
 #endif
