@@ -352,6 +352,12 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_nvbit_s *pi = static_cast<trace_info_nvbit_s *>(trace_info);
 
+  // clamp register counts to avoid out-of-bounds access from malformed traces
+  if (pi->m_num_read_regs > MAX_NVBIT_SRC_NUM)
+    pi->m_num_read_regs = MAX_NVBIT_SRC_NUM;
+  if (pi->m_num_dest_regs > MAX_NVBIT_DST_NUM)
+    pi->m_num_dest_regs = MAX_NVBIT_DST_NUM;
+
   // simulator maintains a cache of decoded instructions (uop) for each process,
   // this avoids decoding of instructions everytime an instruction is executed
   int process_id = core->get_trace_info(sim_thread_id)->m_process->m_process_id;
@@ -636,16 +642,13 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         trace_uop[ii]->m_num_dest_regs += 1;
       }
 
-      // NVBit trace tool does not support yet... (euijun Feb 28 2024)
-      // // the last uop
-      // if (ii == (num_uop - 1) &&
-      //     trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
-      //   if (pi->m_opcode == NVBIT_BAR) {
-      //     // only the last instruction will have bar type - this is in case of
-      //     // CPU, in case of GPU there is always only one uop?
-      //     trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
-      //   }
-      // }
+      // the last uop
+      if (ii == (num_uop - 1) &&
+          trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
+        if (pi->m_opcode == NVBIT_BAR) {
+          trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
+        }
+      }
 
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
@@ -1017,234 +1020,9 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       }
     }
 
-    // if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 1.3f) {
-    //   if (*KNOB(KNOB_BYTE_LEVEL_ACCESS)) {
-    //     // cache_line_addr = uop->m_vaddr;
-    //     // cache_line_size = *KNOB(KNOB_MAX_TRANSACTION_SIZE);
-    //   }
-    //   ASSERTM(0, "TBD");
-    // } else if (*KNOB(KNOB_COMPUTE_CAPABILITY) == 2.0f) {
-    //   Addr line_addr = 0;
-    //   Addr end_line_addr = 0;
-    //   int line_size;
-    //   switch (uop->m_mem_type) {
-    //     // shared memory, parameter memory
-    //     case MEM_LD_SM:
-    //     case MEM_ST_SM:
-    //       if (uop->m_vaddr && uop->m_mem_size) {
-    //         line_addr =
-    //           core->get_shared_memory()->base_cache_line(uop->m_vaddr);
-    //         end_line_addr = core->get_shared_memory()->base_cache_line(
-    //           uop->m_vaddr + uop->m_mem_size - 1);
-    //       }
-    //       line_size = core->get_shared_memory()->cache_line_size();
-    //       break;
-    //     // constant memory
-    //     case MEM_LD_CM:
-    //       if (uop->m_vaddr && uop->m_mem_size) {
-    //         line_addr = core->get_const_cache()->base_cache_line(uop->m_vaddr);
-    //         end_line_addr = core->get_const_cache()->base_cache_line(
-    //           uop->m_vaddr + uop->m_mem_size - 1);
-    //       }
-    //       line_size = core->get_const_cache()->cache_line_size();
-    //       break;
-    //     // texture memory --> todo: should fix it to MEM_LD_LM
-    //     case MEM_LD_TM:
-    //       if (uop->m_vaddr && uop->m_mem_size) {
-    //         line_addr =
-    //           core->get_texture_cache()->base_cache_line(uop->m_vaddr);
-    //         end_line_addr = core->get_texture_cache()->base_cache_line(
-    //           uop->m_vaddr + uop->m_mem_size - 1);
-    //       }
-    //       line_size = core->get_texture_cache()->cache_line_size();
-    //       break;
-    //     // global memory
-    //     default:
-    //       if (uop->m_vaddr && uop->m_mem_size) {
-    //         line_addr = m_simBase->m_memory->base_addr(core_id, uop->m_vaddr);
-    //         end_line_addr = m_simBase->m_memory->base_addr(
-    //           core_id, uop->m_vaddr + uop->m_mem_size - 1);
-    //       }
-    //       line_size = m_simBase->m_memory->line_size(core_id);
-    //       break;
-    //   }
-
-    //   ASSERTM(ungetch_trace(core_id, sim_thread_id, 1), "mention why\n");
-
-    //   static set<Addr>
-    //     seen_block_addr;  // to efficiently track seen cache blocks
-    //   static list<Addr>
-    //     seen_block_list;  // to maintain the order of seen cache blocks - is it necessary?
-    //   static map<int, Addr> accessed_addr;
-
-    //   seen_block_addr.clear();
-    //   seen_block_list.clear();
-
-    //   bool last_inst = false;
-    //   bool inst_read;
-    //   Addr addr;
-    //   int access_size = uop->m_mem_size;
-
-    //   ASSERTM(access_size,
-    //           "access size cannot be zero %s tid %d core %d uop num %llu block "
-    //           "id %d orig id %d\n",
-    //           nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], sim_thread_id,
-    //           core_id, uop->m_uop_num, uop->m_block_id, uop->m_orig_thread_id);
-
-    //   // even if a warp has fewer than 32 threads or even if fewer than
-    //   // 32 threads are active, there will be 32 addresses, with bytes
-    //   // corresponding to invalid/inactive threads set to zero
-    //   // we have read 1 out of 32 addresses
-    //   int read_addr = 1;
-    //   int addr_per_trace_inst = *KNOB(KNOB_TRACE_USES_64_BIT_ADDR)
-    //                               ? (m_trace_size / 8)
-    //                               : (m_trace_size / 4);
-    //   // int addr_per_trace_inst = 1;                            
-    //   // 32 instructions are guaranteed to be included
-    //   // how does coalescing of stores happen? say multiple stores map to the same cache block,
-    //   // but not all bytes of a cache block are written. how will the stores be communicated
-    //   // to the l2?
-    //   do {
-    //     if (line_addr) { 
-    //     // if (1) {
-    //       if (seen_block_addr.find(line_addr) == seen_block_addr.end()) {
-    //         seen_block_addr.insert(line_addr);
-    //         seen_block_list.push_back(line_addr);
-    //       }
-    //       if (seen_block_addr.find(end_line_addr) == seen_block_addr.end()) {
-    //         seen_block_addr.insert(end_line_addr);
-    //         seen_block_list.push_back(end_line_addr);
-    //       }
-    //     }
-
-    //     if (last_inst) {
-    //       if (!thread_trace_info->m_trace_ended) {
-    //         read_success =
-    //           peek_trace(core_id, thread_trace_info->m_prev_trace_info,
-    //                      sim_thread_id, &inst_read);
-    //         if (read_success) {
-    //           if (inst_read) {
-    //             trace_info_nvbit_s *prev_trace_info =
-    //               static_cast<trace_info_nvbit_s *>(
-    //                 thread_trace_info->m_prev_trace_info);
-    //             uop->m_npc = prev_trace_info->m_inst_addr;
-    //           } else {
-    //             thread_trace_info->m_trace_ended = true;
-    //             DEBUG_CORE(core_id, "trace ended core_id:%d thread_id:%d\n",
-    //                        core_id, sim_thread_id);
-    //           }
-    //         } else {
-    //           ASSERTM(0, "why?");
-    //         }
-    //       }
-    //       break;
-    //     }
-
-    //     if (!((read_addr - 1) % addr_per_trace_inst)) {
-    //       read_success =
-    //         peek_trace(core_id, &trace_info, sim_thread_id, &inst_read);
-    //       if (!read_success || (read_success && !inst_read)) {
-    //         cout << "trace id: " << std::dec << thread_trace_info->m_trace_id << endl;
-    //         cout << "mask: " << std::hex << uop->m_active_mask << endl;
-    //         ASSERTM(0, "reached end without reading all addresses");
-    //       }
-    //     }
-
-    //     if (*KNOB(KNOB_TRACE_USES_64_BIT_ADDR)) {
-    //       memcpy(&addr,
-    //              ((uint8_t *)&trace_info) +
-    //                ((read_addr - 1) % addr_per_trace_inst) * 8,
-    //              8);
-    //     } else {
-    //       addr = 0;
-    //       memcpy(&addr,
-    //              ((uint8_t *)&trace_info) +
-    //                ((read_addr - 1) % addr_per_trace_inst) * 4,
-    //              4);
-    //     }
-
-    //     ++read_addr;
-    //     if (read_addr == *KNOB(KNOB_GPU_WARP_SIZE)) {
-    //       last_inst = true;
-    //     }
-
-    //     if (addr && access_size) {
-    //       int process_id = thread_trace_info->m_process->m_process_id;
-    //       unsigned long offset = UINT_MAX * process_id * 10;
-    //       addr += m_simBase->m_memory->base_addr(core_id, offset);
-
-    //       switch (uop->m_mem_type) {
-    //         case MEM_LD_SM:
-    //         case MEM_ST_SM:
-    //           line_addr = core->get_shared_memory()->base_cache_line(addr);
-    //           end_line_addr = core->get_shared_memory()->base_cache_line(
-    //             addr + access_size - 1);
-    //           break;
-    //         case MEM_LD_CM:
-    //           line_addr = core->get_const_cache()->base_cache_line(addr);
-    //           end_line_addr = core->get_const_cache()->base_cache_line(
-    //             addr + access_size - 1);
-    //           break;
-    //         // texture cache
-    //         case MEM_LD_TM:
-    //           line_addr = core->get_texture_cache()->base_cache_line(addr);
-    //           end_line_addr = core->get_texture_cache()->base_cache_line(
-    //             addr + access_size - 1);
-    //           break;
-    //         default:
-    //           line_addr = m_simBase->m_memory->base_addr(core_id, addr);
-    //           end_line_addr =
-    //             m_simBase->m_memory->base_addr(core_id, addr + access_size - 1);
-    //           break;
-    //       }
-    //     } else {
-    //       line_addr = 0;
-    //       end_line_addr = 0;
-    //     }
-    //   } while (1);
-
-    //   ASSERTM(seen_block_addr.size() == seen_block_list.size() &&
-    //             seen_block_addr.size(),
-    //           "should be non-zero and equal: %ld, %ld, %d, %llx, %s, %lld, %d, %lld \n", 
-    //           seen_block_addr.size(), seen_block_list.size(), uop->m_mem_type, line_addr, nvbit_decoder_c::g_tr_opcode_names[uop->m_opcode], uop->m_vaddr, uop->m_mem_size, trace_uop->m_va);
-
-    //   uop->m_child_uops = new uop_c *[seen_block_addr.size()];
-    //   uop->m_num_child_uops = seen_block_addr.size();
-    //   uop->m_num_child_uops_done = 0;
-    //   if (uop->m_num_child_uops != 64) {
-    //     uop->m_pending_child_uops = N_BIT_MASK(uop->m_num_child_uops);
-    //   } else {
-    //     uop->m_pending_child_uops = N_BIT_MASK_64;
-    //   }
-    //   uop->m_vaddr = 0;
-    //   uop->m_mem_size = 0;
-
-    //   uop_c *child_mem_uop = NULL;
-    //   int count = 0;
-
-    //   auto itr = seen_block_list.begin();
-    //   auto end = seen_block_list.end();
-    //   while (itr != end) {
-    //     Addr vaddr = *itr;
-
-    //     child_mem_uop =
-    //       core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
-    //     child_mem_uop->allocate();
-    //     ASSERT(child_mem_uop);
-
-    //     memcpy(child_mem_uop, uop, sizeof(uop_c));
-
-    //     child_mem_uop->m_parent_uop = uop;
-    //     child_mem_uop->m_vaddr = vaddr;
-    //     child_mem_uop->m_mem_size = line_size;
-    //     child_mem_uop->m_uop_num = thread_trace_info->m_temp_uop_count++;
-    //     child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
-
-    //     uop->m_child_uops[count++] = child_mem_uop;
-
-    //     ++itr;
-    //   }
-    // }
+    // Memory coalescing is handled by the tracer (NVBit tool) before writing the trace.
+    // The tracer splits uncoalesced accesses into multiple child trace entries,
+    // so the simulator only needs to read one address per trace entry.
   }
 
   DEBUG_CORE(

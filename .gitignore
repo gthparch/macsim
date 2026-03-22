@@ -31,3 +31,4 @@ macsim_traces/
 macsim
 params.in
 trace_file_list
+test_run/
