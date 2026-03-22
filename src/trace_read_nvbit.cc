@@ -686,13 +686,13 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         trace_uop[ii]->m_num_dest_regs += 1;
       }
 
-      // TODO: barrier support disabled — causes hang with current traces
-      // if (ii == (num_uop - 1) &&
-      //     trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
-      //   if (pi->m_opcode == NVBIT_BAR) {
-      //     trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
-      //   }
-      // }
+      // the last uop
+      if (ii == (num_uop - 1) &&
+          trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
+        if (pi->m_opcode == NVBIT_BAR) {
+          trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
+        }
+      }
 
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
@@ -1067,9 +1067,8 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
     // Parent/child uop linking for coalesced memory traces.
     // The NVBit tracer splits uncoalesced accesses into parent + child entries.
     // Children are identified by m_is_fp=true and m_is_load=true.
-    int num_children = 0;  // TODO: enable child trace support
-    // int num_children = count_child_traces(core_id, sim_thread_id,
-    //                                          trace_info.m_opcode);
+    int num_children = count_child_traces(core_id, sim_thread_id,
+                                             trace_info.m_opcode);
 
     if (num_children > 0) {
       DEBUG_CORE(core_id,

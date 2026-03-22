@@ -142,6 +142,23 @@ grep CYC_COUNT_TOT general.stat.out
 
 > **Note:** The parameter file must be named `params.in`. The macsim binary looks for this exact filename in the current directory.
 
+### 5. Run All Benchmarks
+
+To run all downloaded traces and verify the build:
+
+```bash
+mkdir -p test_run && cp bin/macsim bin/params.in test_run/
+cd test_run
+for trace in ../macsim_traces/*/; do
+  name=$(basename $trace)
+  subdir=$(ls -d $trace/*/kernel_config.txt 2>/dev/null || ls $trace/kernel_config.txt 2>/dev/null)
+  [ -z "$subdir" ] && continue
+  printf "1\n$(realpath $subdir)\n" > trace_file_list
+  result=$(timeout 120 ./macsim 2>&1 | grep "finalize" | head -1)
+  echo "$name: $result"
+done
+```
+
 ## Downloading Traces
 
 ### Publicly Available Traces
