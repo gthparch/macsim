@@ -1,11 +1,12 @@
-# Macsim 
+# MacSim
+
 ## Introduction
 
-* MacSim is a heterogeneous architecture timing model simulator that is
-  developed from Georgia Institute of Technology.
+MacSim is a trace-based cycle-level GPGPU simulator developed by [HPArch](https://sites.gatech.edu/hparch/) at Georgia Institute of Technology.
+
 * It simulates x86, ARM64, NVIDIA PTX and Intel GEN GPU instructions and can be configured as
-  either a trace driven or execution-drive cycle level simulator. It models
-  detailed mico-architectural behaviors, including pipeline stages,
+  either a trace driven or execution-driven cycle level simulator. It models
+  detailed micro-architectural behaviors, including pipeline stages,
   multi-threading, and memory systems.
 * MacSim is capable of simulating a variety of architectures, such as Intel's
   Sandy Bridge, Skylake (both CPUs and GPUs) and NVIDIA's Fermi. It can simulate homogeneous ISA multicore
@@ -14,9 +15,23 @@
   cores) and SMT or MT architectures as well.
 * Currently interconnection network model (based on IRIS) and power model (based
   on McPAT) are connected.
-* MacSim is also one of the components of SST, so multiple MacSim simulatore
+* MacSim is also one of the components of SST, so multiple MacSim simulators
   can run concurrently.
 * The project has been supported by Intel, NSF, Sandia National Lab.
+
+## Table of Contents
+- [Note](#note)
+- [Intel GEN GPU Architecture](#intel-gen-gpu-architecture)
+- [Documentation](#documentation)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Downloading Traces](#downloading-traces)
+- [Generating Your Own Traces](#generating-your-own-traces)
+- [Known Bugs](#known-bugs)
+- [People](#people)
+- [Q & A](#q--a)
+- [Tutorial](#tutorial)
+- [SST+MacSim](#sstmacsim)
 
 ## Note
 
@@ -38,22 +53,11 @@
 
 Please see [MacSim documentation file](https://github.com/gthparch/macsim/blob/master/doc/macsim.pdf) for more detailed descriptions.
 
-
-## Download
-
-* You can download the latest copy from our git repository.
-
-```
-git clone -b intel_gpu https://github.com/gthparch/macsim.git
-
-download traces 
-/macsim/tools/download_trace_files.py
-```
-## Build
+## Installation
 
 ### Prerequisites
 
-- **zlib** (development library) must be installed on your system.
+- **zlib** (development library)
   ```bash
   # Ubuntu/Debian
   sudo apt install zlib1g-dev
@@ -61,49 +65,145 @@ download traces
   sudo dnf install zlib-devel
   ```
 
-Set up a Python virtual environment and install SCons:
+- **Python >= 3.11** and **SCons** (build tool)
+  ```bash
+  uv venv
+  uv pip install scons
+  ```
+
+  Optionally, activate the virtual environment so you can omit `uv run`:
+  ```bash
+  source .venv/bin/activate
+  ```
+
+### Clone and Build
 
 ```bash
-uv venv
-uv pip install scons
+git clone https://github.com/gthparch/macsim.git --recursive
+cd macsim
+./build.py --ramulator -j 32
+
+# Or without activating the virtual environment:
+uv run ./build.py --ramulator -j 32
 ```
 
-Optionally, activate the virtual environment so you can omit `uv run`:
+For more build options, see `./build.py --help`.
+
+## Quick Start
+
+This section walks you through downloading a trace, setting up the simulation, and running it.
+
+### 1. Download a Sample Trace
 
 ```bash
-source .venv/bin/activate
+uv pip install gdown
+gdown -O macsim_traces.tar.gz 1rpAgIMGJnrnXwDSiaM3S7hBysFoVhyO1
+tar -xzf macsim_traces.tar.gz
+rm macsim_traces.tar.gz
 ```
 
-### Building
+This will extract sample traces from the [Rodinia benchmark suite](https://github.com/yuhc/gpu-rodinia) into a `macsim_traces/` directory.
+
+### 2. Set Up a Run Directory
+
+You need three files in the same directory to run a simulation:
+- `macsim` — the binary executable
+- `params.in` — GPU configuration
+- `trace_file_list` — list of paths to GPU traces
+
+Copy them from the build output:
 
 ```bash
-# With virtual environment activated:
-./build.py --ramulator
-
-# Or without activating:
-uv run ./build.py --ramulator
+mkdir run
+cp bin/macsim bin/params.in bin/trace_file_list run/
+cd run
 ```
 
-For more build options, see `./build.py --help` or [INSTALL](INSTALL).
+### 3. Set Up the Trace Path
+
+Edit `trace_file_list`. The first line is the number of traces, and the second line is the path to the trace:
+
+```
+1
+/absolute/path/to/macsim_traces/hotspot/r512h2i2/kernel_config.txt
+```
+
+### 4. Run
+
+```bash
+./macsim
+```
+
+Simulation results will appear in the current directory. For example, check `general.stat.out` for the total cycle count:
+
+```bash
+grep CYC_COUNT_TOT general.stat.out
+```
+
+> **Note:** The parameter file must be named `params.in`. The macsim binary looks for this exact filename in the current directory.
+
+## Downloading Traces
+
+### Publicly Available Traces
+
+| Dataset | Download |
+|---------|----------|
+| Rodinia | [Download](https://www.dropbox.com/scl/fi/qyqk9yuxaut0f9490k5n3/pytorch_nvbit.tar.gz?rlkey=dgq53t37k38izawacgxdkqxsw&st=fbvchdmw&dl=0) |
+| PyTorch | [Download](https://www.dropbox.com/scl/fi/otaiy3gnmkcrexy66hkez/rodinia_nvbit.tar.gz?rlkey=w2pa56a0ik42zydl0incogc99&st=y3ki6xyy&dl=0) |
+| YOLOPv2 | [Download](https://www.dropbox.com/scl/fi/srmp7cp2uw6lup34j4keg/yolopv2.tar.gz?rlkey=s5pg7dhdub7jofit3omy446n3&st=d6dfq6uy&dl=0) |
+| GPT2 | [Download](https://www.dropbox.com/scl/fi/qn72hfwyeo5qq120kyade/gpt2_nvbit.tar.gz?rlkey=pal8q77bwf4iarypfts2osus3&st=cmjslv8o&dl=0) |
+| GEMMA | [Download](https://www.dropbox.com/scl/fi/ewcyrogwv7odc6soi9v6n/gemma_nvbit.tar.gz?rlkey=arifvlad3kj9tcw6ogze7n04m&st=66fbac0t&dl=0) |
+
+## Generating Your Own Traces
+
+> **Warning:** The trace generation tool is experimental — use at your own risk.
+
+To generate traces for your own CUDA workloads, use the [MacSim Tracer](https://github.com/gthparch/Macsim_tracer).
+
+Simply prepend `CUDA_INJECTION64_PATH` to your original command. For example:
+
+```bash
+CUDA_INJECTION64_PATH=/path/to/main.so python3 your_cuda_program.py
+```
+
+Available environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `TRACE_PATH` | Path to save trace files | `./` |
+| `KERNEL_BEGIN` | First kernel to trace | `0` |
+| `KERNEL_END` | Last kernel to trace | `UINT32_MAX` |
+| `INSTR_BEGIN` | First instruction to trace per kernel | `0` |
+| `INSTR_END` | Last instruction to trace per kernel | `UINT32_MAX` |
+| `COMPRESSOR_PATH` | Path to the compressor binary | (built with tracer) |
+| `DEBUG_TRACE` | Generate human-readable debug traces | `0` |
+| `OVERWRITE` | Overwrite existing traces | `0` |
+| `TOOL_VERBOSE` | Enable verbose output | `0` |
+
+See the [MacSim Tracer README](https://github.com/gthparch/Macsim_tracer) for full installation and usage instructions.
+
+## Known Bugs
+
+1. **`src/memory.cc:1043: ASSERT FAILED`** — Happens with FasterTransformer traces + too many cores (40+). **Solution:** Reduce the number of cores.
+
+2. **`src/factory_class.cc:77: ASSERT FAILED`** — Happens when `params.in` file is missing or has a wrong name. **Solution:** Use `params.in` as the config file name.
+
+3. **`src/process_manager.cc:826: ASSERT FAILED ... error opening trace file`** — Too many trace files open simultaneously. **Solution:** Add `ulimit -n 16384` to your `~/.bashrc`.
 
 ## People
 
-* Prof. Hyesoon Kim (Project Leader) at Georgia Tech 
-Hparch research group 
-(http://hparch.gatech.edu/people.hparch) 
+* Prof. Hyesoon Kim (Project Leader) at Georgia Tech
+Hparch research group
+(http://hparch.gatech.edu/people.hparch)
 
+## Q & A
 
-
-## Q & A 
-
-If you have a question, please use github issue ticket. 
-
+If you have a question, please use github issue ticket.
 
 ## Tutorial
 
 * We had a tutorial in HPCA-2012. Please visit [here](http://comparch.gatech.edu/hparch/OcelotMacsim_tutorial.html) for the slides.
 * We had a tutorial in ISCA-2012, Please visit [here](http://comparch.gatech.edu/hparch/isca12_gt.html) for the slides.
-
 
 ## SST+MacSim
 

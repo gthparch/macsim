@@ -27,3 +27,7 @@ sst-unit-test/*.out
 .vscode/
 *.diff
 *.pyc
+macsim_traces/
+macsim
+params.in
+trace_file_list
