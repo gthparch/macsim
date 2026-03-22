@@ -173,11 +173,7 @@ frontend_c::~frontend_c() {
 // fetch stage - fetch instruction from the icache every cycle
 void frontend_c::run_a_cycle(void) {
   // bind core id
-  static bool map_core = false;
-  if (!map_core) {
-    m_core = m_simBase->m_core_pointers[m_core_id];
-    map_core = false;
-  }
+  m_core = m_simBase->m_core_pointers[m_core_id];
 
   m_cur_core_cycle = m_simBase->m_core_cycle[m_core_id];
 

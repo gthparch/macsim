@@ -269,6 +269,8 @@ core_c::core_c(int c_id, macsim_c* simBase, Unit_Type type) {
   // hardware prefetcher
   if (*m_simBase->m_knobs->KNOB_PREF_FRAMEWORK_ON && m_knob_enable_pref)
     m_hw_pref = new hwp_common_c(c_id, type, m_simBase);
+  else
+    m_hw_pref = NULL;
 
   // const / texture cache
   if ((m_core_type == "ptx" || m_core_type == "nvbit") &&
@@ -333,6 +335,10 @@ core_c::~core_c() {
   delete m_schedule;
   delete m_retire;
   delete m_icache;
+  delete m_hw_pref;
+  delete m_const_cache;
+  delete m_texture_cache;
+  delete m_shared_memory;
 }
 
 // start core simulation

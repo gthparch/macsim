@@ -152,6 +152,12 @@ private:
   bool peek_trace(int core_id, void *trace_info, int sim_thread_id,
                   bool *inst_read);
 
+  /**
+   * Count child trace entries following a parent memory instruction.
+   * Child entries are identified by m_is_fp=true and m_is_load=true.
+   */
+  int count_child_traces(int core_id, int sim_thread_id, uint8_t parent_opcode);
+
 private:
 };
 

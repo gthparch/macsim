@@ -176,6 +176,50 @@ bool nvbit_decoder_c::ungetch_trace(int core_id, int sim_thread_id,
 }
 
 /**
+ * Count child trace entries following a parent memory instruction.
+ * A child entry has the same opcode as the parent and m_is_fp=true.
+ * m_prev_trace_info already holds the first potential child (read by BOM phase).
+ * This function peeks from the buffer to count additional children.
+ */
+int nvbit_decoder_c::count_child_traces(int core_id, int sim_thread_id,
+                                        uint8_t parent_opcode) {
+  core_c *core = m_simBase->m_core_pointers[core_id];
+  thread_s *thread_trace_info = core->get_trace_info(sim_thread_id);
+
+  // Check if m_prev_trace_info (already read by BOM) is a child
+  trace_info_nvbit_s *prev = static_cast<trace_info_nvbit_s *>(
+      thread_trace_info->m_prev_trace_info);
+
+  if (prev->m_opcode != parent_opcode || !prev->m_is_fp) {
+    return 0;  // not a child
+  }
+
+  // child_0 confirmed. Peek ahead to count more.
+  int peeked = 0;
+  int matching = 0;
+  trace_info_nvbit_s peek_info;
+  bool inst_read;
+
+  while (matching < 31) {  // max 32 total children (one already found)
+    bool success = peek_trace(core_id, &peek_info, sim_thread_id, &inst_read);
+    if (!success || !inst_read) break;
+    peeked++;
+    if (peek_info.m_opcode == parent_opcode && peek_info.m_is_fp) {
+      matching++;
+    } else {
+      break;
+    }
+  }
+
+  // Ungetch all peeked entries
+  if (peeked > 0) {
+    ungetch_trace(core_id, sim_thread_id, peeked);
+  }
+
+  return 1 + matching;  // 1 (in m_prev) + additional matching children
+}
+
+/**
  * Dump out instruction information to the file. At most 50000 instructions will be printed
  * @param t_info - trace information
  * @param core_id - core id
@@ -352,11 +396,11 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
   core_c *core = m_simBase->m_core_pointers[core_id];
   trace_info_nvbit_s *pi = static_cast<trace_info_nvbit_s *>(trace_info);
 
-  // clamp register counts to avoid out-of-bounds access from malformed traces
-  if (pi->m_num_read_regs > MAX_NVBIT_SRC_NUM)
-    pi->m_num_read_regs = MAX_NVBIT_SRC_NUM;
-  if (pi->m_num_dest_regs > MAX_NVBIT_DST_NUM)
-    pi->m_num_dest_regs = MAX_NVBIT_DST_NUM;
+  // tracer writes 255 for instructions with no registers (e.g., RET)
+  if (pi->m_num_read_regs == 255)
+    pi->m_num_read_regs = 0;
+  if (pi->m_num_dest_regs == 255)
+    pi->m_num_dest_regs = 0;
 
   // simulator maintains a cache of decoded instructions (uop) for each process,
   // this avoids decoding of instructions everytime an instruction is executed
@@ -642,13 +686,13 @@ inst_info_s *nvbit_decoder_c::convert_pinuop_to_t_uop(void *trace_info,
         trace_uop[ii]->m_num_dest_regs += 1;
       }
 
-      // the last uop
-      if (ii == (num_uop - 1) &&
-          trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
-        if (pi->m_opcode == NVBIT_BAR) {
-          trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
-        }
-      }
+      // TODO: barrier support disabled — causes hang with current traces
+      // if (ii == (num_uop - 1) &&
+      //     trace_uop[num_uop - 1]->m_mem_type == NOT_MEM) {
+      //   if (pi->m_opcode == NVBIT_BAR) {
+      //     trace_uop[(num_uop - 1)]->m_bar_type = BAR_FETCH;
+      //   }
+      // }
 
       // update instruction information with MacSim trace
       convert_t_uop_to_info(trace_uop[ii], info);
@@ -1020,9 +1064,83 @@ bool nvbit_decoder_c::get_uops_from_traces(int core_id, uop_c *uop,
       }
     }
 
-    // Memory coalescing is handled by the tracer (NVBit tool) before writing the trace.
-    // The tracer splits uncoalesced accesses into multiple child trace entries,
-    // so the simulator only needs to read one address per trace entry.
+    // Parent/child uop linking for coalesced memory traces.
+    // The NVBit tracer splits uncoalesced accesses into parent + child entries.
+    // Children are identified by m_is_fp=true and m_is_load=true.
+    int num_children = 0;  // TODO: enable child trace support
+    // int num_children = count_child_traces(core_id, sim_thread_id,
+    //                                          trace_info.m_opcode);
+
+    if (num_children > 0) {
+      DEBUG_CORE(core_id,
+                 "parent_uop: uop_num:%lld inst_num:%lld thread_id:%d "
+                 "num_children:%d\n",
+                 uop->m_uop_num, uop->m_inst_num, uop->m_thread_id,
+                 num_children);
+
+      uop->m_child_uops = new uop_c *[num_children];
+      uop->m_num_child_uops = num_children;
+      uop->m_num_child_uops_done = 0;
+      if (uop->m_num_child_uops != 64)
+        uop->m_pending_child_uops = N_BIT_MASK(uop->m_num_child_uops);
+      else
+        uop->m_pending_child_uops = N_BIT_MASK_64;
+
+      uop->m_vaddr = 0;
+      uop->m_mem_size = 0;
+
+      int amp_val = *KNOB(KNOB_MEM_SIZE_AMP);
+      uop_c *child_mem_uop = NULL;
+
+      for (int i = 0; i < num_children; ++i) {
+        // m_prev_trace_info has child_i data
+        // (i=0: set by BOM's memcpy; i>0: set by previous iteration's memcpy)
+        trace_info_nvbit_s *child_ti = static_cast<trace_info_nvbit_s *>(
+            thread_trace_info->m_prev_trace_info);
+
+        child_mem_uop =
+            core->get_frontend()->get_uop_pool()->acquire_entry(m_simBase);
+        child_mem_uop->allocate();
+        ASSERT(child_mem_uop);
+
+        memcpy(child_mem_uop, uop, sizeof(uop_c));
+        child_mem_uop->m_parent_uop = uop;
+
+        if (child_ti->m_mem_addr == 0) {
+          child_mem_uop->m_vaddr = 0;
+        } else {
+          child_mem_uop->m_vaddr =
+              MIN2((Addr)(child_ti->m_mem_addr) * amp_val, MAX_ADDR) +
+              m_simBase->m_memory->base_addr(
+                  core_id,
+                  (unsigned long)UINT_MAX *
+                  (core->get_trace_info(sim_thread_id)->m_process->m_process_id) *
+                  10ul);
+        }
+        child_mem_uop->m_mem_size = child_ti->m_mem_access_size * amp_val;
+
+        child_mem_uop->m_uop_num = (thread_trace_info->m_temp_uop_count++);
+        child_mem_uop->m_unique_num = core->inc_and_get_unique_uop_num();
+
+        uop->m_child_uops[i] = child_mem_uop;
+
+        DEBUG_CORE(uop->m_core_id,
+                   "new %dth-child_uop: uop_num:%lld inst_num:%lld "
+                   "thread_id:%d unique_num:%lld vaddr:0x%llx\n",
+                   i, child_mem_uop->m_uop_num, child_mem_uop->m_inst_num,
+                   child_mem_uop->m_thread_id, child_mem_uop->m_unique_num,
+                   child_mem_uop->m_vaddr);
+
+        // Read next entry and advance m_prev_trace_info
+        bool dummy;
+        read_success = read_trace(core_id, thread_trace_info->m_next_trace_info,
+                                  sim_thread_id, &dummy);
+        if (!read_success || !dummy) break;
+
+        memcpy(thread_trace_info->m_prev_trace_info,
+               thread_trace_info->m_next_trace_info, sizeof(trace_info_nvbit_s));
+      }
+    }
   }
 
   DEBUG_CORE(
