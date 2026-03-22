@@ -6,4 +6,4 @@
 	url = https://github.com/cameron314/readerwriterqueue
 [submodule "tools/CUDA_trace_generator"]
 	path = tools/CUDA_trace_generator
-	url = git@github.com:ejchung0406/CUDA_trace_generator.git
+	url = https://github.com/gthparch/Macsim_tracer.git

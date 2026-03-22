@@ -47,9 +47,7 @@ env['CPPPATH']    = ['#src']
 env['CPPDEFINES'] = ['LONG_COUNTERS', 'NO_MPI']
 env['LIBPATH']    = ['/usr/lib', '/usr/local/lib']
 
-## MAC OS X does not support static linking
-if sys.platform != "darwin" and flags.get('qsim') != '1':
-  env['LINKFLAGS']  = ['--static']
+env['LINKFLAGS']  = []
 # env['CXX']        = ['icpc']
 
 

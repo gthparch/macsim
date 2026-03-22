@@ -2,7 +2,6 @@
 #knobgen.pl for use with componentMACSIM
 
 use File::stat;
-use Time::localtime;
 
 ##### VARIABLES #####
 #all parameter definitions

@@ -25,3 +25,5 @@ Makefile.in
 *.dirstamp
 sst-unit-test/*.out
 .vscode/
+*.diff
+*.pyc

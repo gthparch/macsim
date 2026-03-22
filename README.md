@@ -49,9 +49,42 @@ git clone -b intel_gpu https://github.com/gthparch/macsim.git
 download traces 
 /macsim/tools/download_trace_files.py
 ```
-## build 
-  ./build.py --ramulator 
-  (please see /macsim/INSTALL)
+## Build
+
+### Prerequisites
+
+- **zlib** (development library) must be installed on your system.
+  ```bash
+  # Ubuntu/Debian
+  sudo apt install zlib1g-dev
+  # RHEL/CentOS/Fedora
+  sudo dnf install zlib-devel
+  ```
+
+Set up a Python virtual environment and install SCons:
+
+```bash
+uv venv
+uv pip install scons
+```
+
+Optionally, activate the virtual environment so you can omit `uv run`:
+
+```bash
+source .venv/bin/activate
+```
+
+### Building
+
+```bash
+# With virtual environment activated:
+./build.py --ramulator
+
+# Or without activating:
+uv run ./build.py --ramulator
+```
+
+For more build options, see `./build.py --help` or [INSTALL](INSTALL).
 
 ## People
 

@@ -2,7 +2,6 @@
 # (tri pho 07-11-2011 rewrite for component macsim)
 
 use File::stat;
-use Time::localtime;
 
 #search for *.param.def files
 @files = <../def/*.stat.def>;
