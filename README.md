@@ -44,7 +44,7 @@ MacSim is a trace-based cycle-level GPGPU simulator developed by [HPArch](https:
   B. Lakshminarayana, Hyesoon Kim, William Song, Sudhakar Yalamanchili, Wonyong
   Sung, from Transactions on Design Automation of Electronic Systems (TODAES)
   Vol. 19, No. 3.
-* We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](http://comparch.gatech.edu/hparch/papers/gera_ispass18.pdf)
+* We've characterised the performance of Intel's integrated GPUs using MacSim. Please refer to the following paper for more detailed information. [Performance Characterisation and Simulation of Intel's Integrated GPU Architecture (ISPASS'18)](https://hparch.gatech.edu/papers/gera_ispass18.pdf)
 
 ## Intel GEN GPU Architecture
 * Intel GEN9 GPU Architecture: ![](http://comparch.gatech.edu/hparch/images/intel_gen9_arch.png)
