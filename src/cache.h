@@ -55,22 +55,6 @@ typedef enum Cache_Type_enum {
   CACHE_BTB
 } Cache_Type;
 
-inline bool cache_sets_are_power_of_two(int num_sets) {
-  return (num_sets > 0) && ((num_sets & (num_sets - 1)) == 0);
-}
-
-inline void cache_line_to_set_and_tag(Addr line_number, int num_sets,
-                                      int set_bits, Addr set_mask,
-                                      Addr tag_mask, Addr *tag, int *set) {
-  if (cache_sets_are_power_of_two(num_sets)) {
-    *set = line_number & set_mask;
-    *tag = line_number & tag_mask;
-  } else {
-    *set = line_number % num_sets;
-    *tag = line_number / num_sets;
-  }
-}
-
 /* set data pointers to this initially */
 #define INIT_CACHE_DATA_VALUE ((void *)0x8badbeef)
 

@@ -80,10 +80,7 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
   m_data_size = data_size;
   m_assoc = assoc;
   m_num_sets = num_set;
-  if (m_num_sets <= 0) {
-    ASSERTM(0, "cache:%s num_set:%d\n", m_name.c_str(), m_num_sets);
-    abort();
-  }
+  ASSERTM(m_num_sets > 0, "cache:%s num_set:%d\n", m_name.c_str(), m_num_sets);
   m_line_size = line_size;
   m_cache_type = cache_type_info;
   m_num_tiles = (num_tiles > 0) ? num_tiles : 1;
@@ -186,8 +183,14 @@ void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
   }
 
   Addr line_number = index_addr >> m_shift_bits;
-  cache_line_to_set_and_tag(line_number, m_num_sets, m_set_bits, m_set_mask,
-                            m_tag_mask, tag, set);
+  bool power_of_two_sets = (m_num_sets & (m_num_sets - 1)) == 0;
+  if (power_of_two_sets) {
+    *set = line_number & m_set_mask;
+    *tag = line_number & m_tag_mask;
+  } else {
+    *set = line_number % m_num_sets;
+    *tag = line_number / m_num_sets;
+  }
 }
 
 // access the cache
