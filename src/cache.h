@@ -117,7 +117,7 @@ public:
   /**
    *  \brief Create a new cache using the configuration sent by the caller.
    *  \param name - Name of the cache
-   *  \param num_set - Cache Size
+   *  \param num_set - Number of cache sets (must be > 0, power-of-two not required)
    *  \param assoc - Cache Associativity
    *  \param line_size - Line Size
    *  \param data_size - Data Size
