@@ -55,6 +55,22 @@ typedef enum Cache_Type_enum {
   CACHE_BTB
 } Cache_Type;
 
+inline bool cache_sets_are_power_of_two(int num_sets) {
+  return (num_sets > 0) && ((num_sets & (num_sets - 1)) == 0);
+}
+
+inline void cache_line_to_set_and_tag(Addr line_number, int num_sets,
+                                      int set_bits, Addr set_mask,
+                                      Addr tag_mask, Addr *tag, int *set) {
+  if (cache_sets_are_power_of_two(num_sets)) {
+    *set = line_number & set_mask;
+    *tag = line_number & tag_mask;
+  } else {
+    *set = line_number % num_sets;
+    *tag = line_number / num_sets;
+  }
+}
+
 /* set data pointers to this initially */
 #define INIT_CACHE_DATA_VALUE ((void *)0x8badbeef)
 
@@ -117,7 +133,7 @@ public:
   /**
    *  \brief Create a new cache using the configuration sent by the caller.
    *  \param name - Name of the cache
-   *  \param num_set - Cache Size
+   *  \param num_set - Number of cache sets (must be > 0, power-of-two not required)
    *  \param assoc - Cache Associativity
    *  \param line_size - Line Size
    *  \param data_size - Data Size

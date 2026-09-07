@@ -80,6 +80,10 @@ cache_c::cache_c(string name, int num_set, int assoc, int line_size,
   m_data_size = data_size;
   m_assoc = assoc;
   m_num_sets = num_set;
+  if (m_num_sets <= 0) {
+    ASSERTM(0, "cache:%s num_set:%d\n", m_name.c_str(), m_num_sets);
+    abort();
+  }
   m_line_size = line_size;
   m_cache_type = cache_type_info;
   m_num_tiles = (num_tiles > 0) ? num_tiles : 1;
@@ -154,9 +158,9 @@ cache_c::~cache_c() {
 
 // parse tag address and set index from an address
 void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
+  Addr index_addr = addr;
   if (m_num_tiles == 1) {
-    *tag = addr >> m_shift_bits & m_tag_mask;
-    *set = addr >> m_shift_bits & m_set_mask;
+    index_addr = addr;
   } else {
     Addr mod_addr;
     if (m_tile_bits) {
@@ -172,8 +176,7 @@ void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
         (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) |
         (addr & m_interleave_mask);
     }
-    *tag = mod_addr >> m_shift_bits & m_tag_mask;
-    *set = mod_addr >> m_shift_bits & m_set_mask;
+    index_addr = mod_addr;
     // cout << hex << addr << " mod addr " << mod_addr << " imask " << m_interleave_mask << " addr & imask " << (addr &
     // m_interleave_mask) << " other part short " << ((addr >> m_interleave_bits) / m_num_tiles)  << " other part " <<
     // (((addr >> m_interleave_bits) / m_num_tiles) << m_interleave_bits) << " num tiles " << dec << m_num_tiles << "
@@ -181,6 +184,10 @@ void cache_c::find_tag_and_set(Addr addr, Addr *tag, int *set) {
     // : 0) <<  " tag mask " << hex << m_tag_mask << " tag " << *tag << " set mask " << m_set_mask << " set " << *set <<
     // dec << "\n";
   }
+
+  Addr line_number = index_addr >> m_shift_bits;
+  cache_line_to_set_and_tag(line_number, m_num_sets, m_set_bits, m_set_mask,
+                            m_tag_mask, tag, set);
 }
 
 // access the cache

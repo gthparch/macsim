@@ -349,10 +349,12 @@ env.Program(
     LIBS=libraries, 
 )
 
+if ARGUMENTS.get('cache_set_test', '0') == '1':
+  env.Program('cache_set_indexing_test', ['src/cache_set_indexing_test.cc'])
+
 
 #########################################################################################
 # Clean
 #########################################################################################
 if GetOption('clean'):
   os.system('rm -f ../bin/macsim')
-
